@@ -4,8 +4,14 @@ import CenterView from "./components/CenterView";
 import BottomPanel from "./components/BottomPanel";
 import ErrorBoundary from "./components/ErrorBoundary";
 import ToastContainer from "./components/Toast";
-import { GRILLE_COCKPIT } from "./design/layout";
+import DefsDuBureau from "./design/bureau/DefsDuBureau";
+import {
+  GRILLE_COCKPIT,
+  GRILLE_COCKPIT_SANS_COLONNE,
+  PANNEAUX_SANS_COLONNE,
+} from "./design/layout";
 import { useCockpit } from "./hooks/useCockpit";
+import { OuvrirTicketContext } from "./hooks/useOuvrirTicket";
 
 /**
  * La composition du cockpit — rien d'autre (ticket-252).
@@ -16,11 +22,15 @@ import { useCockpit } from "./hooks/useCockpit";
  */
 export default function App() {
   const cockpit = useCockpit();
+  // Sans contenu pour le panneau actif, la colonne n'est pas rendue (ticket-580).
+  const avecColonne = !PANNEAUX_SANS_COLONNE.includes(cockpit.panel);
+  const colonneCentre = avecColonne ? "3" : "2";
 
   return (
+    <OuvrirTicketContext.Provider value={cockpit.ouvrirTicket}>
     <div
       className="h-screen overflow-hidden bg-zinc-900 text-zinc-100"
-      style={GRILLE_COCKPIT}
+      style={avecColonne ? GRILLE_COCKPIT : GRILLE_COCKPIT_SANS_COLONNE}
     >
       {/* Rail de navigation — col. 1, lignes 1-2 */}
       <div
@@ -31,7 +41,10 @@ export default function App() {
           activePanel={cockpit.panel}
           onChangePanel={cockpit.setPanel}
           runsActifs={cockpit.navRail.runsActifs}
+          appsEnCours={cockpit.navRail.appsEnCours}
           alerte={cockpit.navRail.alerte}
+          notifications={cockpit.navRail.notifications}
+          cloche={cockpit.navRail.cloche}
         />
       </div>
 
@@ -39,21 +52,23 @@ export default function App() {
           Nommée : depuis que le tableau des tickets occupe le centre, les
           mêmes titres apparaissent des deux côtés. Une assertion qui ne dit
           pas de quelle région elle parle en trouve deux. */}
-      <aside
-        aria-label="Panneau latéral"
-        className="border-r border-zinc-700 overflow-hidden"
-        style={{ gridColumn: "2", gridRow: "1 / 3" }}
-      >
-        <ErrorBoundary>
-          <Sidebar panel={cockpit.panel} {...cockpit.sidebar} />
-        </ErrorBoundary>
-      </aside>
+      {avecColonne ? (
+        <aside
+          aria-label="Panneau latéral"
+          className="border-r border-zinc-700 overflow-hidden"
+          style={{ gridColumn: "2", gridRow: "1 / 3" }}
+        >
+          <ErrorBoundary>
+            <Sidebar panel={cockpit.panel} {...cockpit.sidebar} />
+          </ErrorBoundary>
+        </aside>
+      ) : null}
 
-      {/* Centre — col. 3, ligne 1 */}
+      {/* Centre — col. 3 (col. 2 sans colonne latérale), ligne 1 */}
       <main
         aria-label="Vue principale"
         className="overflow-hidden"
-        style={{ gridColumn: "3", gridRow: "1" }}
+        style={{ gridColumn: colonneCentre, gridRow: "1" }}
       >
         <ErrorBoundary>
           <CenterView panel={cockpit.panel} {...cockpit.centre} />
@@ -63,12 +78,15 @@ export default function App() {
       {/* Bandeau des événements — col. 3, ligne 2 */}
       <div
         className="overflow-hidden"
-        style={{ gridColumn: "3", gridRow: "2" }}
+        style={{ gridColumn: colonneCentre, gridRow: "2" }}
       >
         <BottomPanel {...cockpit.bottomPanel} />
       </div>
 
       <ToastContainer toasts={cockpit.toasts} onDismiss={cockpit.fermerToast} />
+      {/* Les symboles partagés des sprites du Bureau : vide hors du Bureau (ticket-727). */}
+      <DefsDuBureau />
     </div>
+    </OuvrirTicketContext.Provider>
   );
 }

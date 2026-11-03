@@ -1,4 +1,5 @@
 {
+  "description": "IDE multi-projets qui orchestre des agents IA (codeur, testeur, sécurité, reviewer, validateur) sur le diff git réel, jusqu'à la PR et au merge. Ce dossier porte ses tickets, sa mémoire et ses ADR.",
   "project_id": "ide-core",
   "category": "Tessera",
   "artifacts": "tracked",
@@ -6,7 +7,7 @@
   "services": [
     {
       "nom": "backend",
-      "commande": "uv run python -m uvicorn tessera.main:app --host 127.0.0.1 --port 8000",
+      "commande": "uv run python -m uvicorn tessera.main:app --host 127.0.0.1 --port 8100",
       "cwd": "../../backend"
     },
     {

@@ -31,6 +31,9 @@ class Project(BaseModel):
     #: le cas utile n'existe pas : il faut que l'IDE tourne pour qu'on voie le
     #: bouton (ticket-152).
     fait_tourner_l_ide: bool = False
+    #: Incohérences relevées au chargement, lisibles par l'utilisateur
+    #: (ticket-481). Un avertissement informe, il ne bloque rien.
+    avertissements: list[str] = Field(default_factory=list)
 
 
 def _verifier_project_id(v: str | None) -> str | None:

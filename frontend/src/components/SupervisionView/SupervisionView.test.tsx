@@ -2,16 +2,17 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useState } from "react";
 import { render, screen, within, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import SupervisionView from "./index";
+import ListeView from "./ListeView";
 import { INITIAL } from "../../hooks/streamState";
 import type { StreamState } from "../../hooks/streamState";
 import type { UseSupervisionResult } from "../../hooks/useSupervision";
 import type { OrchestratorEvent, Project, RunActif } from "../../types/api";
 import { runStore } from "../../hooks/runStore";
+import { boutonsPleins } from "../../test/boutons";
 
 vi.mock("../../lib/api", () => ({
   api: {
-    runs: { events: vi.fn().mockResolvedValue([]) },
+    runs: { events: vi.fn().mockResolvedValue([]), list: vi.fn().mockResolvedValue([]) },
     orchestrator: { limits: vi.fn().mockResolvedValue({ run_max_budget_usd: 0, llm_max_budget_usd: 0 }) },
     tickets: { activity: vi.fn().mockResolvedValue({ ticket_id: "", runs: [], pr_number: null, github_remote: null }) },
   },
@@ -84,7 +85,7 @@ const PROJETS: Project[] = [
 describe("SupervisionView", () => {
   it("dit qu'il n'y a rien en cours plutot que d'afficher un cadre vide", () => {
     render(
-      <SupervisionView supervision={supervision()} projects={PROJETS} />,
+      <ListeView supervision={supervision()} projects={PROJETS} />,
     );
     expect(screen.getByText(/Aucun run en cours/)).toBeInTheDocument();
   });
@@ -93,7 +94,7 @@ describe("SupervisionView", () => {
     // « Aucun run » alors que la socket n'est pas ouverte serait un mensonge :
     // on ne sait pas encore ce qui tourne.
     render(
-      <SupervisionView
+      <ListeView
         supervision={supervision({ connecte: false })}
         projects={PROJETS}
       />,
@@ -105,7 +106,7 @@ describe("SupervisionView", () => {
     // Le parallelisme reel de Tessera (ADR-038) : c'est precisement ce que
     // l'AgentPanel seul ne pouvait pas montrer.
     render(
-      <SupervisionView
+      <ListeView
         supervision={supervision({
           runs: [
             run(),
@@ -134,7 +135,7 @@ describe("SupervisionView", () => {
   it("selectionne un run au clic, ce qui declenche son abonnement", async () => {
     const selectionner = vi.fn();
     render(
-      <SupervisionView
+      <ListeView
         supervision={supervision({
           runs: [run(), run({ run_id: "run-2", project_id: "portfolio" })],
           selectionner,
@@ -154,7 +155,7 @@ describe("SupervisionView", () => {
 
   it("signale qu'un agent attend une reponse", () => {
     render(
-      <SupervisionView
+      <ListeView
         supervision={supervision(
           { runs: [run()] },
           { "run-1": { pendingQuestion: "On casse l'API ?" } },
@@ -167,7 +168,7 @@ describe("SupervisionView", () => {
 
   it("signale un run bloque", () => {
     render(
-      <SupervisionView
+      <ListeView
         supervision={supervision(
           { runs: [run()] },
           { "run-1": { status: "error", errorMessage: "panne" } },
@@ -183,7 +184,7 @@ describe("SupervisionView", () => {
     // ticket, ni tours de revue, ni verdict : afficher les etiquettes d'un
     // pipeline donnerait a lire des cases vides comme une information.
     render(
-      <SupervisionView
+      <ListeView
         supervision={supervision(
           {
             runs: [
@@ -212,7 +213,7 @@ describe("SupervisionView", () => {
     // priver Supervision de son panneau Agents. AgentPanel est toujours rendu
     // dans la partie droite de la grille de SupervisionView.
     render(
-      <SupervisionView
+      <ListeView
         supervision={supervision({ runs: [run()] })}
         projects={PROJETS}
       />,
@@ -234,7 +235,7 @@ describe("SupervisionView", () => {
     // tout seul : le meler aux runs donnerait un chrono qui monte
     // indefiniment a cote de pipelines qui finissent.
     render(
-      <SupervisionView
+      <ListeView
         supervision={supervision({ runs: [run()] })}
         projects={PROJETS}
         services={[
@@ -257,7 +258,7 @@ describe("SupervisionView", () => {
 
   it("montre en rouge un service mort de lui-meme", () => {
     render(
-      <SupervisionView
+      <ListeView
         supervision={supervision()}
         projects={PROJETS}
         services={[
@@ -282,7 +283,7 @@ describe("SupervisionView", () => {
     // « Aucun run en cours » tout court laisserait croire que l'IDE ne fait
     // rien, alors qu'un serveur qu'il a lance ecoute un port.
     render(
-      <SupervisionView
+      <ListeView
         supervision={supervision()}
         projects={PROJETS}
         services={[
@@ -307,7 +308,7 @@ describe("SupervisionView — run en attente en priorité (ticket-266)", () => {
     // Deux runs : le second attend une réponse. Sa carte doit être rendue
     // avant celle du premier.
     render(
-      <SupervisionView
+      <ListeView
         supervision={supervision(
           {
             runs: [
@@ -335,7 +336,7 @@ describe("SupervisionView — run en attente en priorité (ticket-266)", () => {
     // AgentDialogue côté panneau — pas dans la carte — donc sa présence
     // confirme que le bon run est affiché.
     render(
-      <SupervisionView
+      <ListeView
         supervision={supervision(
           {
             runs: [
@@ -357,7 +358,7 @@ describe("SupervisionView — run en attente en priorité (ticket-266)", () => {
     // Un clic de l'utilisateur sur run-1 doit rester prioritaire sur la
     // sélection automatique vers run-2 qui attend.
     render(
-      <SupervisionView
+      <ListeView
         supervision={supervision(
           {
             runs: [
@@ -384,7 +385,7 @@ describe("SupervisionView — run en attente en priorité (ticket-266)", () => {
     // l'input #dialogue-reponse est dans le DOM, le focus est donc synchrone.
     const selectionner = vi.fn();
     render(
-      <SupervisionView
+      <ListeView
         supervision={supervision(
           {
             runs: [
@@ -417,7 +418,7 @@ describe("SupervisionView — état CI par run (ticket-308)", () => {
     // run-2 (ticket-002) attend encore la CI.
     // Seule la carte de run-1 doit afficher "mergée".
     render(
-      <SupervisionView
+      <ListeView
         supervision={supervision(
           {
             runs: [
@@ -457,7 +458,7 @@ describe("SupervisionView — bouton Fermer (ticket-267)", () => {
     // Entre pipeline_done et run_closed, la livraison tourne encore.
     // Le bouton ne doit pas apparaître : cliquer fermerait un run pas encore libéré.
     render(
-      <SupervisionView
+      <ListeView
         supervision={supervision(
           { runs: [run()] },
           {
@@ -481,7 +482,7 @@ describe("SupervisionView — bouton Fermer (ticket-267)", () => {
 
   it("rend Fermer uniquement apres run_closed", () => {
     render(
-      <SupervisionView
+      <ListeView
         supervision={supervision(
           { runs: [run()] },
           {
@@ -507,7 +508,7 @@ describe("SupervisionView — bouton Fermer (ticket-267)", () => {
 
   it("Fermer porte la classe inline-flex (ticket-267)", () => {
     render(
-      <SupervisionView
+      <ListeView
         supervision={supervision(
           { runs: [run()] },
           {
@@ -533,7 +534,7 @@ describe("SupervisionView — bouton Fermer (ticket-267)", () => {
   it("un clic sur Fermer appelle fermerRun avec le bon run_id", async () => {
     const fermerRun = vi.fn();
     render(
-      <SupervisionView
+      <ListeView
         supervision={supervision(
           {
             runs: [run()],
@@ -564,7 +565,7 @@ describe("SupervisionView — bouton Fermer (ticket-267)", () => {
     // Un run clos avec db_run_id doit afficher le bouton « Revoir le run » sur
     // sa RunCard, et le clic doit remplacer le panneau de droite par RunHistorique.
     render(
-      <SupervisionView
+      <ListeView
         supervision={supervision(
           {
             runs: [run({ db_run_id: "db-run-1", ticket_id: "ticket-001" })],
@@ -589,7 +590,7 @@ describe("SupervisionView — bouton Fermer (ticket-267)", () => {
 
   it("ferme RunHistorique et revient au panneau Agents (ticket-327)", async () => {
     render(
-      <SupervisionView
+      <ListeView
         supervision={supervision(
           {
             runs: [run({ db_run_id: "db-run-1", ticket_id: "ticket-001" })],
@@ -626,7 +627,7 @@ describe("SupervisionView — menu Fermer par lot (ticket-344)", () => {
     // run-3 : bloqué (runClosed: true, blocked)
     const fermerRuns = vi.fn();
     render(
-      <SupervisionView
+      <ListeView
         supervision={supervision(
           {
             runs: [
@@ -664,7 +665,7 @@ describe("SupervisionView — menu Fermer par lot (ticket-344)", () => {
   it("Tous les runs clos ne retire jamais un run dont runClosed est false", async () => {
     const fermerRuns = vi.fn();
     render(
-      <SupervisionView
+      <ListeView
         supervision={supervision(
           {
             runs: [
@@ -692,7 +693,7 @@ describe("SupervisionView — menu Fermer par lot (ticket-344)", () => {
 
   it("le menu est absent sans run clos", () => {
     render(
-      <SupervisionView
+      <ListeView
         supervision={supervision(
           {
             runs: [
@@ -710,7 +711,7 @@ describe("SupervisionView — menu Fermer par lot (ticket-344)", () => {
   it("une entree dont le compte vaut zero est desactivee", async () => {
     // Un run terminé : « Les bloqués (0) » doit être désactivé dans le menu.
     render(
-      <SupervisionView
+      <ListeView
         supervision={supervision(
           {
             runs: [
@@ -754,7 +755,7 @@ describe("SupervisionView — menu Fermer par lot (ticket-344)", () => {
         },
       );
 
-      return <SupervisionView supervision={sup} projects={PROJETS} />;
+      return <ListeView supervision={sup} projects={PROJETS} />;
     }
 
     render(<Wrapper />);
@@ -773,5 +774,47 @@ describe("SupervisionView — menu Fermer par lot (ticket-344)", () => {
     // run-2 (en cours) reste : le panneau Agents est toujours affiché.
     expect(screen.getByLabelText("Run ticket-002 sur portfolio")).toBeInTheDocument();
     expect(screen.getByText("Agents")).toBeInTheDocument();
+  });
+});
+
+describe("SupervisionView — composants communs (ticket-442)", () => {
+  const DEUX_EN_ATTENTE = () =>
+    supervision(
+      {
+        runs: [
+          run({ run_id: "run-1", ticket_id: "ticket-001" }),
+          run({ run_id: "run-2", project_id: "portfolio", ticket_id: "ticket-009" }),
+        ],
+        selection: "run-1",
+      },
+      {
+        "run-1": { pendingQuestion: "Première ?", status: "running" },
+        "run-2": { pendingQuestion: "Seconde ?", status: "running" },
+      },
+    );
+
+  it("has a single plein button even when two runs wait for an answer", () => {
+    render(<ListeView supervision={DEUX_EN_ATTENTE()} projects={PROJETS} />);
+
+    expect(screen.getAllByRole("button", { name: /Répondre/i }).length).toBeGreaterThanOrEqual(2);
+    expect(boutonsPleins()).toHaveLength(1);
+  });
+
+  it("draws the status of a run with the shared StatusPill", () => {
+    render(<ListeView supervision={DEUX_EN_ATTENTE()} projects={PROJETS} />);
+
+    const attente = screen.getAllByText("attend une réponse");
+    expect(attente[0]).toHaveAttribute("data-etat", "attention");
+  });
+
+  it("draws a failed run as an echec pill", () => {
+    render(
+      <ListeView
+        supervision={supervision({ runs: [run()] }, { "run-1": { status: "error" } })}
+        projects={PROJETS}
+      />,
+    );
+
+    expect(screen.getByText("bloqué")).toHaveAttribute("data-etat", "echec");
   });
 });

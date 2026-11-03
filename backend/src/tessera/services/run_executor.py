@@ -17,7 +17,8 @@ from pathlib import Path
 from typing import Any, Optional, Protocol
 
 from tessera.config import settings
-from tessera.services.database import create_run, finish_run, save_event
+from tessera.services.database_events import save_event
+from tessera.services.database_runs import create_run, finish_run
 from tessera.models.agent import AgentRole
 from tessera.services.dialogue import DialogueChannel
 from tessera.services.event_hub import EventHub
@@ -93,25 +94,26 @@ def emetteur(
     ticket-128 : un défaut d'écriture ne doit pas priver les observateurs de
     l'événement. L'inverse ferait dépendre l'affichage de SQLite.
     """
-
     async def envoyer(event: OrchestratorEvent) -> None:
         event.run_id = run.run_id
         event.project_id = run.project_id
-        ancien_ticket_id = run.ticket_id
         _suivre(run, event)
         # Tout ticket_status_changed porte ticket_titre dès que le run le connaît.
-        # Le titre n'est relu sur disque qu'au changement de ticket (ticket-324).
+        # Le titre n'est relu sur disque qu'une fois par ticket (ticket-324) :
+        # on compare au ticket du titre en cache, pas à celui d'avant cet
+        # évènement, qu'un autre type d'évènement a pu faire changer (ticket-445).
         if (
             titre_getter is not None
             and event.type is EventType.TICKET_STATUS_CHANGED
             and run.ticket_id
         ):
-            if run.ticket_id != ancien_ticket_id:
-                # Le ticket vient de changer : relire depuis le disque.
+            if run.ticket_id != run.ticket_titre_de:
                 try:
                     run.ticket_titre = await titre_getter(run.ticket_id)
                 except Exception:  # noqa: BLE001
                     run.ticket_titre = None
+                # Même une lecture ratée est notée : pas de relecture à chaque évènement.
+                run.ticket_titre_de = run.ticket_id
             if run.ticket_titre is not None:
                 event.data["ticket_titre"] = run.ticket_titre
         await hub.publish(event)
@@ -158,6 +160,9 @@ def _suivre(run: RunActif, event: OrchestratorEvent) -> None:
     elif event.type is EventType.TICKET_STATUS_CHANGED:
         run.ticket_id = event.ticket_id or run.ticket_id
     elif event.type is EventType.QUEUE_PROGRESS:
+        # Le ticket que la file annonce est le ticket courant : le statut d'une
+        # file le rend, et `ticket_status_changed` n'arrive qu'après (ticket-431).
+        run.ticket_id = event.ticket_id or run.ticket_id
         index = event.data.get("index")
         total = event.data.get("total")
         if isinstance(index, int):
@@ -266,6 +271,10 @@ async def executer(
             run.project_id,
             run.ticket_id or run.mode,
             mode=run.mode,
+            # L'id rendu au lancement porte la ligne enveloppe : c'est lui que
+            # l'appelant a en main, et lui que les endpoints de suivi cherchent
+            # (ticket-431).
+            run_id=run.run_id,
         )
         # Exposé dans l'instantané pour que le frontend puisse relire
         # les événements persistés au rechargement de page (ticket-325).
@@ -286,7 +295,9 @@ async def executer(
             )
         elif run.mode == "queue":
             resultats = await orchestrator.run_queue(
-                run.project_id, ticket_ids or [], envoyer, run.dialogue,
+                run.project_id,
+                ticket_ids if ticket_ids is not None else [],
+                envoyer, run.dialogue,
                 envelope_run_id=run_id_en_base,
                 budget_override_usd=budget_usd,
             )
@@ -311,8 +322,39 @@ async def executer(
         # disparaît pas tout à fait — `pipeline_done` est publié par
         # l'orchestrateur, donc avant ce `finally` — mais elle tombe de
         # plusieurs millisecondes à presque rien.
+        # Une exception dans la file ne passe pas par la fermeture de
+        # `run_queue` : sans ceci, un ajout tardif rendrait 200 pour rien.
+        if run.file is not None:
+            run.file.fermer()
         registry.fermer(run.run_id)
-        await _clore(run, run_id_en_base, resultats, echec, envoyer)
+        await _clore(
+            run, run_id_en_base, resultats, echec, envoyer,
+            interruption=_interruption_de(orchestrator),
+        )
+
+
+def _interruption_de(orchestrator: Any) -> str | None:
+    """The reason a queue stopped early, when the orchestrator kept one."""
+    raison = getattr(orchestrator, "interruption", None)
+    return raison if isinstance(raison, str) and raison else None
+
+
+def _issue(
+    dernier: PipelineResult | None, echec: str | None, interruption: str | None
+) -> tuple[bool, str, str | None]:
+    """`approved`, `final_status` and `arret` of the envelope row.
+
+    Le run parent ne se lit pas sur son dernier ticket seul : une file arrêtée
+    sur « non mergé » finit sur un ticket approuvé, et passait pour réussie
+    (ticket-456). Une interruption l'emporte donc, et garde sa raison.
+    """
+    arret = (dernier.arret if dernier else None) or echec
+    if interruption is None:
+        if dernier is None:
+            return False, "interrupted", arret
+        return dernier.approved, dernier.final_status.value, arret
+    detail = f"{interruption} ; {arret}" if arret else interruption
+    return False, "interrupted", detail
 
 
 async def _clore(
@@ -321,16 +363,21 @@ async def _clore(
     resultats: list[PipelineResult],
     echec: str | None,
     envoyer: EventCallback,
+    interruption: str | None = None,
 ) -> None:
     dernier = resultats[-1] if resultats else None
+    approved, final_status, arret = _issue(dernier, echec, interruption)
     if run_id_en_base is not None:
         try:
             await finish_run(
                 settings.ide_db_path,
                 run_id_en_base,
                 dernier.rounds if dernier else 0,
-                dernier.approved if dernier else False,
-                dernier.final_status.value if dernier else "interrupted",
+                approved,
+                final_status,
+                # Seule l'interruption s'enregistre sur la ligne enveloppe : le
+                # reste se lit déjà sur les lignes des tickets (ticket-456).
+                arret if interruption else None,
             )
         except Exception as exc:  # noqa: BLE001
             _logger.warning("run_non_clos", extra={"erreur": str(exc)})
@@ -354,14 +401,12 @@ async def _clore(
             type=EventType.RUN_CLOSED,
             ticket_id=dernier.ticket_id if dernier else (run.ticket_id or ""),
             data={
-                "approved": dernier.approved if dernier else False,
+                "approved": approved,
                 "rounds": dernier.rounds if dernier else 0,
-                "final_status": (
-                    dernier.final_status.value if dernier else "interrupted"
-                ),
+                "final_status": final_status,
                 "branch": dernier.branch if dernier else None,
                 "commit_sha": dernier.commit_sha if dernier else None,
-                "arret": (dernier.arret if dernier else None) or echec,
+                "arret": arret,
                 "resultats": len(resultats),
                 "db_run_id": run_id_en_base,
             },

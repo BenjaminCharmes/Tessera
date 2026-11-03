@@ -3,6 +3,7 @@ from pathlib import Path
 from anthropic import AsyncAnthropic
 
 from tessera.config import settings
+from tessera.models.agent import EffortLevel
 from tessera.services.providers.agent_sdk import ClaudeAgentSDKProvider
 from tessera.services.providers.anthropic_api import AnthropicApiProvider
 from tessera.services.providers.base import (
@@ -11,6 +12,7 @@ from tessera.services.providers.base import (
     StreamCallback,
     ToolEventCallback,
 )
+from tessera.services.providers.refus_garde import JournalDesRefus
 from tessera.services.shell_detection import resolve_git_bash
 
 __all__ = [
@@ -34,6 +36,11 @@ def get_provider(
     tools: list[str] | None = None,
     racine_ecriture: Path | None = None,
     skills: list[str] | None = None,
+    journal_refus: JournalDesRefus | None = None,
+    duree_max_s: float | None = None,
+    effort: EffortLevel | None = None,
+    base_url: str | None = None,
+    endpoint_key: str = "",
 ) -> LLMProvider:
     """Builds the configured LLM provider. Defaults to the subscription-backed SDK.
 
@@ -61,6 +68,19 @@ def get_provider(
 
     ``skills`` names the skills the role may load (ticket-242); only the SDK
     provider has a `Skill` tool to give.
+
+    ``journal_refus`` collects the writes the guard refuses (ticket-476); only
+    the SDK provider has a guard to feed it.
+
+    ``duree_max_s`` caps the total duration of one call (ticket-518), for the
+    SDK and Ollama providers; ``anthropic_api`` ignores it. ``None``: no cap.
+
+    ``effort`` is the role's reasoning effort (ticket-573); only the SDK
+    provider hands it on. ``None``: nothing is passed.
+
+    ``base_url`` and ``endpoint_key`` are the endpoint of an
+    ``openai_compatible`` role and the key its ``api_key_env`` names
+    (ticket-669). ``api_key`` stays the Anthropic one: the two never mix.
     """
     resolved = name or "agent_sdk"
     if resolved == "agent_sdk":
@@ -73,6 +93,12 @@ def get_provider(
             kwargs["max_budget_usd"] = max_budget_usd
         if skills:
             kwargs["skills"] = list(skills)
+        if journal_refus is not None:
+            kwargs["journal_refus"] = journal_refus
+        if duree_max_s is not None:
+            kwargs["duree_max_s"] = duree_max_s
+        if effort is not None:
+            kwargs["effort"] = effort
         if tools is not None:
             kwargs["allowed_tools"] = list(tools)
         elif not allow_tools:
@@ -95,8 +121,21 @@ def get_provider(
         # la boucle agentique reste au SDK (ticket-189).
         from tessera.services.providers.ollama import OllamaProvider
 
-        return OllamaProvider(settings.ollama_base_url)
+        return OllamaProvider(settings.ollama_base_url, duree_max_s=duree_max_s)
+    if resolved == "openai_compatible":
+        # Sans outils, comme Ollama : il sert les rôles texte→JSON (ticket-669).
+        from tessera.services.providers.openai_compatible import OpenAICompatibleProvider
+
+        if not base_url:
+            raise ValueError(
+                "Le provider 'openai_compatible' exige une base_url, "
+                "déclarée dans agents.json."
+            )
+        return OpenAICompatibleProvider(
+            base_url, endpoint_key, duree_max_s=duree_max_s
+        )
     raise ValueError(
         f"Provider LLM inconnu : {resolved!r}. "
-        "Valeurs acceptées : 'agent_sdk', 'anthropic_api', 'ollama'."
+        "Valeurs acceptées : 'agent_sdk', 'anthropic_api', 'ollama', "
+        "'openai_compatible'."
     )

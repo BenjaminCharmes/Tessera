@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { api } from "../lib/api";
 import { useResource } from "./useResource";
-import { useFenetreVisible } from "./useFenetreVisible";
+import { usePolling } from "./usePolling";
 import type { ServiceActif } from "../types/api";
 
 /**
@@ -77,8 +77,6 @@ export function useServices(
   const { data: lus, error: erreurDeLecture, refresh } = useResource<
     ServiceActif[]
   >(fetcher, AUCUN);
-
-  const fenetreVisible = useFenetreVisible();
 
   // Ce qu'une action vient de produire, tant que la relecture n'a pas eu
   // lieu : sans ça, le bouton ne changerait d'état qu'au rafraîchissement
@@ -168,12 +166,8 @@ export function useServices(
   const services = local.liste ?? lus;
   const enCours = services.some((service) => service.en_cours);
 
-  useEffect(() => {
-    // Rien en cours ou fenêtre cachée : pas de minuteur (ticket-356).
-    if (!projectId || !enCours || !fenetreVisible) return;
-    const minuteur = setInterval(refresh, CADENCE_MS);
-    return () => clearInterval(minuteur);
-  }, [projectId, enCours, refresh, fenetreVisible]);
+  // Rien en cours ou fenêtre cachée : pas de minuteur (ticket-356).
+  usePolling(refresh, { cadenceMs: projectId && enCours ? CADENCE_MS : null });
 
   return {
     services,

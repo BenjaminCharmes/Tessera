@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -8,10 +9,12 @@ import type { Project, ProjectOverview } from "../../types/api";
 vi.mock("../../lib/api", () => ({
   api: {
     projects: { overview: vi.fn(), setCategory: vi.fn() },
+    services: { start: vi.fn(), stop: vi.fn() },
   },
 }));
 
 const overview = vi.mocked(api.projects.overview);
+const startServices = vi.mocked(api.services.start);
 const setCategory = vi.mocked(api.projects.setCategory);
 
 function vue(id: string, nom: string, extra: Partial<ProjectOverview> = {}): ProjectOverview {
@@ -26,6 +29,9 @@ function vue(id: string, nom: string, extra: Partial<ProjectOverview> = {}): Pro
     tickets: { todo: 2, in_progress: 1, in_review: 0, blocked: 3, done: 4 },
     run_actif: false,
     icon: false,
+    services_declares: false,
+    services_en_cours: false,
+    online_declared: false,
     ...extra,
   };
 }
@@ -143,6 +149,39 @@ describe("ProjetsView", () => {
     expect(surSelection).toHaveBeenCalledWith(complet(DEMINEUR));
   });
 
+  it("makes the clicked project active and stays on the projects view (ticket-425)", async () => {
+    overview.mockResolvedValue(TROIS);
+    function Hote() {
+      const [actif, setActif] = useState<Project | null>(null);
+      return (
+        <ProjetsView
+          projets={TROIS.map(complet)}
+          activeProject={actif}
+          onSelectProject={setActif}
+        />
+      );
+    }
+    render(<Hote />);
+    await userEvent.click(await screen.findByRole("article", { name: "Serpent" }));
+
+    expect(screen.getByRole("article", { name: "Serpent" })).toHaveAttribute(
+      "aria-current",
+      "true",
+    );
+    expect(screen.getAllByRole("article")).toHaveLength(3);
+
+    await userEvent.click(screen.getByRole("article", { name: "Démineur" }));
+
+    expect(screen.getByRole("article", { name: "Démineur" })).toHaveAttribute(
+      "aria-current",
+      "true",
+    );
+    expect(screen.getByRole("article", { name: "Serpent" })).not.toHaveAttribute(
+      "aria-current",
+      "true",
+    );
+  });
+
   it("selects the project when Enter is pressed on the focused card", async () => {
     const surSelection = vi.fn();
     afficher(TROIS, surSelection);
@@ -200,6 +239,20 @@ describe("ProjetsView", () => {
 
     expect(setCategory).toHaveBeenCalledWith("serpent", "Outils");
     await waitFor(() => expect(overview).toHaveBeenCalledTimes(2));
+  });
+
+  it("reloads the overview after a successful start from a card", async () => {
+    startServices.mockResolvedValue({ services: [] });
+    const surSelection = vi.fn();
+    afficher([vue("serpent", "Serpent", { services_declares: true })], surSelection);
+    const carte = await screen.findByRole("article", { name: "Serpent" });
+    expect(overview).toHaveBeenCalledTimes(1);
+
+    await userEvent.click(within(carte).getByRole("button", { name: "Lancer l'app" }));
+
+    expect(startServices).toHaveBeenCalledWith("serpent");
+    await waitFor(() => expect(overview).toHaveBeenCalledTimes(2));
+    expect(surSelection).not.toHaveBeenCalled();
   });
 
   it("creates a new category and removes one from the menu without selecting the project", async () => {

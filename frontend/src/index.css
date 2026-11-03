@@ -1,10 +1,14 @@
 @import 'tailwindcss';
+@import './design/bureau/sprites-theme.css';
 
 @theme {
   --text-micro: 0.625rem;
   --text-micro--line-height: 0.875rem;
   --text-mini: 0.6875rem;
   --text-mini--line-height: 1rem;
+  /* « corps » de la charte : 13 px, texte courant et boutons (ticket-439). */
+  --text-corps: 0.8125rem;
+  --text-corps--line-height: 1.25rem;
 
   /* Palette des graphiques — ticket-201. Trois teintes qui ne recoupent
      aucune couleur d'état ni le violet d'identité (ADR-047), validées sur
@@ -13,6 +17,114 @@
   --color-data-1: #0891b2;
   --color-data-2: #6366f1;
   --color-data-3: #db2777;
+}
+
+/* Ce que le moteur des sprites ne dessine pas — ticket-562, ADR-058, ticket-727 :
+   le halo des plafonniers et les voiles de la nuit, translucides, hors de la
+   grille. `static` : ces jetons ne sont lus que par `var()`, et Tailwind n'émet
+   pas sans cela une variable qu'aucune classe ne nomme. Les couleurs des sprites
+   sont dans `sprites-theme.css`, généré par l'atelier. */
+@theme static {
+  --sprite-halo-coeur: rgb(253 224 71);
+  --sprite-voile: rgb(9 9 20 / 0.28);
+  --sprite-voile-sombre: rgb(9 9 20 / 0.55);
+}
+
+/* Sol en lames des pièces et des salles : le parquet est une tuile (`Tuile`,
+   ticket-727) ; la couleur de base ne sert qu'avant sa première peinture. */
+.sol-lames {
+  background-color: var(--sprite-sol-b);
+}
+
+/* Animations du Bureau : `transform` et `opacity` seulement, pour rester sur le
+   compositeur. Le bloc `prefers-reduced-motion` plus bas les coupe toutes. */
+@keyframes tape {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(1px); }
+  100% { transform: translateY(0); }
+}
+@keyframes lueur {
+  0% { opacity: 1; }
+  50% { opacity: 0.55; }
+  100% { opacity: 1; }
+}
+@keyframes flotte {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+  100% { transform: translateY(0); }
+}
+@keyframes vapeur {
+  0% { transform: translateY(0); opacity: 0.8; }
+  100% { transform: translateY(-6px); opacity: 0; }
+}
+@keyframes chute {
+  0% { transform: translateY(-8px); opacity: 1; }
+  100% { transform: translateY(70px); opacity: 0; }
+}
+@keyframes gyro {
+  0% { opacity: 1; }
+  50% { opacity: 0.2; }
+  100% { opacity: 1; }
+}
+/* Image par image (ticket-727) : n calques, chacun visible 1/n du cycle ; durée et
+   décalage posés sur chaque calque. Les scènes d'écran défilent sans déborder. */
+@keyframes trame-6 {
+  0% { opacity: 1; }
+  16.667% { opacity: 0; }
+  100% { opacity: 0; }
+}
+@keyframes trame-4 {
+  0% { opacity: 1; }
+  25% { opacity: 0; }
+  100% { opacity: 0; }
+}
+@keyframes trame-8 {
+  0% { opacity: 1; }
+  12.5% { opacity: 0; }
+  100% { opacity: 0; }
+}
+/* Une diode de baie par serveur, tant que le service tourne (ticket-727). */
+@keyframes clignote {
+  0% { opacity: 1; }
+  50% { opacity: 0.15; }
+  100% { opacity: 1; }
+}
+/* Deux étoiles de la fenêtre de nuit (ticket-727) : le décor du ciel, jamais un état. */
+@keyframes scintille {
+  0% { opacity: 1; }
+  50% { opacity: 0.3; }
+  100% { opacity: 1; }
+}
+/* Le défilement de l'écran d'un agent de produit (ticket-710), un pixel par palier. */
+@keyframes defile {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-4px); }
+}
+.anim-defile { animation: defile 1.2s steps(4) infinite; }
+.anim-tape { animation: tape 0.5s steps(2) infinite; }
+.anim-scintille { animation: scintille 2.6s steps(1) infinite; }
+.anim-trame { animation-iteration-count: infinite; animation-timing-function: step-end; }
+.anim-trame-4 { animation-name: trame-4; }
+.anim-trame-6 { animation-name: trame-6; }
+.anim-trame-8 { animation-name: trame-8; }
+.anim-clignote { animation: clignote 1.1s steps(1) infinite; }
+/* L'hélice de la VMC : sa durée vient du régime (BoucheVMC), quatre paliers par tour. */
+.anim-helice { animation: helice 1.2s steps(4) infinite; transform-box: fill-box; transform-origin: 50% 50%; }
+@keyframes helice { to { transform: rotate(90deg); } }
+.anim-chute { animation: chute 1.6s linear infinite; }
+.anim-gyro { animation: gyro 0.8s steps(2) infinite; }
+.anim-lueur { animation: lueur 1.6s ease-in-out infinite; }
+.anim-flotte { animation: flotte 1.8s ease-in-out infinite; }
+.anim-vapeur { animation: vapeur 1.6s steps(4) infinite; }
+/* La marche d'un agent : translation en paliers, comme un sprite qui avance
+   case par case. Elle s'efface avec `prefers-reduced-motion` : l'agent change
+   de place sans marcher. */
+.marche { transition: transform 1.8s steps(12), opacity 0.9s; }
+@media (prefers-reduced-motion: reduce) {
+  .anim-tape, .anim-lueur, .anim-flotte, .anim-vapeur, .anim-chute, .anim-gyro,
+  .anim-defile, .anim-helice, .anim-scintille,
+  .anim-trame, .anim-clignote { animation: none; }
+  .marche { transition: none; }
 }
 
 /*
@@ -76,3 +188,34 @@
 .markdown-rendu th, .markdown-rendu td { border: 1px solid #27272a; padding: .35rem .6rem; text-align: left; }
 .markdown-rendu th { background: #18181b; color: #d4d4d8; font-weight: 600; }
 .markdown-rendu input[type="checkbox"] { margin-right: .4rem; }
+
+/* Coup de pinceau — ticket-735 : une base plus douce, sans changer d'identité.
+   Texte lissé, barres de défilement discrètes, transitions courtes sur ce qui se
+   clique, et une entrée en fondu des vues. Tout s'efface sous
+   `prefers-reduced-motion`. */
+@layer base {
+  html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  * { scrollbar-width: thin; scrollbar-color: #3f3f46 transparent; }
+  button, a, [role="tab"], input, select, textarea {
+    transition: color 150ms ease, background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease, opacity 150ms ease;
+  }
+}
+@keyframes entree-de-vue { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+.entree-de-vue { animation: entree-de-vue 180ms ease-out both; }
+@media (prefers-reduced-motion: reduce) {
+  .entree-de-vue { animation: none; }
+  button, a, [role="tab"], input, select, textarea { transition: none; }
+}
+
+/* L'apparition des graphiques — ticket-735 : les barres poussent depuis la ligne
+   de base, les courbes se dévoilent de gauche à droite, l'anneau s'ouvre. Une fois,
+   à l'arrivée des données ; rien sous `prefers-reduced-motion`. */
+@keyframes pousse { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+@keyframes devoile { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+@keyframes ouvre { from { opacity: 0; transform: scale(0.8) rotate(-90deg); } to { opacity: 1; transform: none; } }
+.anim-pousse { transform-origin: bottom; animation: pousse 900ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.anim-devoile { animation: devoile 1300ms cubic-bezier(0.3, 0.7, 0.2, 1) both; }
+.anim-ouvre { animation: ouvre 1200ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+@media (prefers-reduced-motion: reduce) {
+  .anim-pousse, .anim-devoile, .anim-ouvre { animation: none; }
+}

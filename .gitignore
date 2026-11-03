@@ -86,3 +86,7 @@ tessera-detaches/
 # Marqueur de la doc par lot (ADR-035) : réécrit par chaque run, il salissait
 # l arbre et bloquait le rebase de la livraison (ticket-213).
 projects/ide-core/memory/documentation.json
+
+# File des signalements en attente (ticket-430) : elle vit hors du dépôt, ce
+# chemin n'est qu'un filet si un ancien fichier réapparaît ici.
+backend/signalements_en_attente.json

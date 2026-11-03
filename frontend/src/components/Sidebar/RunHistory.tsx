@@ -3,32 +3,19 @@ import RegionTitle from "../../design/RegionTitle";
 import { IconBlocked, IconCheck, IconDot } from "../../design/icons";
 import { useState } from "react";
 import type { PipelineRun } from "../../types/api";
+import { formatDate } from "../../lib/format";
+import { estInterrompu, formatDuree, runsDeTicket } from "../HistoriqueView/runs";
+import { statutDuRun } from "../../lib/libelles";
 
 interface RunHistoryProps {
   runs: PipelineRun[];
   loading: boolean;
   error: string | null;
   onSelectTicket?: (ticketId: string) => void;
-}
-
-function formatDuration(startedAt: string, finishedAt: string | null): string {
-  if (!finishedAt) return "En cours…";
-  const ms = new Date(finishedAt).getTime() - new Date(startedAt).getTime();
-  if (ms < 0) return "—";
-  const totalSeconds = Math.floor(ms / 1000);
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-  return `${minutes}m ${seconds.toString().padStart(2, "0")}s`;
-}
-
-function formatTime(iso: string): string {
-  const d = new Date(iso);
-  return d.toLocaleString("fr-FR", {
-    day: "2-digit",
-    month: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  /** Le run regardé au centre (ticket-427). */
+  selectedRunId?: string | null;
+  /** Un clic sur un run le montre au centre (ticket-427). */
+  onSelectRun?: (runId: string) => void;
 }
 
 function StatusIcon({
@@ -47,28 +34,39 @@ function StatusIcon({
 interface RunRowProps {
   run: PipelineRun;
   onSelectTicket?: (ticketId: string) => void;
+  selected: boolean;
+  onSelectRun?: (runId: string) => void;
 }
 
-function RunRow({ run, onSelectTicket }: RunRowProps) {
+function RunRow({ run, onSelectTicket, selected, onSelectRun }: RunRowProps) {
   const [expanded, setExpanded] = useState(false);
 
   return (
     <div className="border-b border-zinc-800">
       <button
-        onClick={() => setExpanded((v) => !v)}
-        className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-zinc-800 transition-colors"
+        onClick={() => {
+          onSelectRun?.(run.id);
+          setExpanded((v) => !v);
+        }}
+        aria-pressed={selected}
+        className={`w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-zinc-800 transition-colors ${
+          selected ? "bg-zinc-800" : ""
+        }`}
       >
         <StatusIcon approved={run.approved} finalStatus={run.final_status} />
         <span className="flex-1 min-w-0 text-mini font-mono text-zinc-300 truncate">
           {run.ticket_id}
         </span>
+        {estInterrompu(run) && (
+          <span className="shrink-0 text-micro text-zinc-400">Interrompu</span>
+        )}
         <span className="shrink-0 text-micro text-zinc-500">
           {run.rounds != null
             ? `${run.rounds} tour${run.rounds > 1 ? "s" : ""}`
             : "—"}
         </span>
         <span className="shrink-0 text-micro text-zinc-500 ml-1">
-          {formatDuration(run.started_at, run.finished_at)}
+          {formatDuree(run)}
         </span>
       </button>
 
@@ -76,17 +74,17 @@ function RunRow({ run, onSelectTicket }: RunRowProps) {
         <div className="px-3 pb-3 space-y-1 bg-zinc-850">
           <div className="text-micro text-zinc-500">
             <span className="text-zinc-400">Début :</span>{" "}
-            {formatTime(run.started_at)}
+            {formatDate(run.started_at)}
           </div>
           {run.finished_at && (
             <div className="text-micro text-zinc-500">
               <span className="text-zinc-400">Fin :</span>{" "}
-              {formatTime(run.finished_at)}
+              {formatDate(run.finished_at)}
             </div>
           )}
           <div className="text-micro text-zinc-500">
             <span className="text-zinc-400">Statut final :</span>{" "}
-            {run.final_status ?? "En cours"}
+            {run.final_status ? statutDuRun(run.final_status) : "En cours"}
           </div>
           {run.approved !== null && (
             <div className="text-micro text-zinc-500">
@@ -120,11 +118,15 @@ function RunRow({ run, onSelectTicket }: RunRowProps) {
 }
 
 export default function RunHistory({
-  runs,
+  runs: tousLesRuns,
   loading,
   error,
   onSelectTicket,
+  selectedRunId = null,
+  onSelectRun,
 }: RunHistoryProps) {
+  // Une ligne par run de ticket : le run d'une file n'a pas la sienne.
+  const runs = runsDeTicket(tousLesRuns);
   if (loading) {
     return (
       <div className="p-4 text-zinc-500 text-xs">Chargement des runs…</div>
@@ -153,7 +155,13 @@ export default function RunHistory({
       </div>
       <div className="flex-1 overflow-y-auto">
         {runs.map((run) => (
-          <RunRow key={run.id} run={run} onSelectTicket={onSelectTicket} />
+          <RunRow
+            key={run.id}
+            run={run}
+            onSelectTicket={onSelectTicket}
+            selected={run.id === selectedRunId}
+            onSelectRun={onSelectRun}
+          />
         ))}
       </div>
     </div>

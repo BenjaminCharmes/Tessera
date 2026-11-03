@@ -13,7 +13,8 @@ from fastapi.testclient import TestClient
 from tessera.config import settings
 from tessera.main import app
 from tessera.services.chat_service import ChatBudgetExceeded, ChatReply
-from tessera.services.database import init_db, list_chat_messages
+from tessera.services.database import init_db
+from tessera.services.database_chat import list_chat_messages
 
 
 @pytest.fixture(autouse=True)
@@ -291,7 +292,7 @@ def test_le_lancement_transmet_la_discussion_au_codeur(
     # de la conversation est perdu.
     import asyncio
 
-    from tessera.services.database import save_chat_message
+    from tessera.services.database_chat import save_chat_message
 
     asyncio.run(
         save_chat_message(
@@ -321,7 +322,7 @@ def test_le_lancement_transmet_la_discussion_au_codeur(
     async def _build(project_id: str) -> _FakeOrchestrator:
         return _FakeOrchestrator()
 
-    monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
+    monkeypatch.setattr("tessera.routers.chat.build_orchestrator", _build)
 
     resp = _client().post(
         "/api/v1/projects/mon-projet/chat/run",
@@ -343,7 +344,7 @@ def test_un_lancement_concurrent_est_refuse_avec_409(
     async def _build(project_id: str) -> object:
         raise AssertionError("ne doit pas être atteint")
 
-    monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
+    monkeypatch.setattr("tessera.routers.chat.build_orchestrator", _build)
     # Depuis ticket-127 le verrou n'a plus de dictionnaire à lui : c'est le
     # registre qui dit ce qui tourne, et c'est donc lui qu'on occupe.
     monkeypatch.setitem(

@@ -1,5 +1,7 @@
 # Configuration
 
+Le backend Tessera écoute sur le port **8100**.
+
 Toutes les variables sont dans `.env` (copie de `.env.example`) :
 
 | Variable | Requis | Default | Description |
@@ -8,31 +10,45 @@ Toutes les variables sont dans `.env` (copie de `.env.example`) :
 | `ANTHROPIC_API_KEY` | si `anthropic_api` | — | Clef API Anthropic — inutile en mode `agent_sdk` |
 | `LLM_MAX_TURNS` | | `30` | Plafond d'allers-retours outil pour un agent (défaut global) |
 | `LLM_MAX_TURNS_REVIEWER` | | `10` | Plafond d'actions du reviewer dans la boucle de révision |
+| `LLM_MAX_TURNS_SECURITE` | | `30` | Plafond d'allers-retours outil pour l'audit de sécurité (lecture du projet hors diff) |
 | `LLM_MAX_TURNS_PLAN` | | `25` | Plafond d'actions du tour de cadrage (planification de tickets) |
 | `LLM_MAX_TURNS_REVIEWER` | | `10` | Plafond d'allers-retours outil pour le reviewer (lecture et critique du diff) |
 | `LLM_MAX_TURNS_PLAN` | | `25` | Plafond d'allers-retours outil pour le tour de plan (lecture seule) |
 | `LLM_MAX_BUDGET_USD` | | `2.0` | Plafond de dépense d'un seul appel agent. Un dépassement n'est plus une erreur : le run se termine non approuvé et commite son travail (ADR-037) |
+| `LLM_DUREE_MAX_ROLE_TEXTE_S` | | `900` | Durée totale maximale d'un appel de rôle texte (validateur, sécurité, documentation), attente de créneau Ollama comprise (en secondes, `0` = aucune borne, ticket-518). Dépassée, l'appel est indisponible : le repli joue, et la ligne `<rôle>: repli vers …` s'écrit dans `pipeline-log.md` |
 | `AGENT_SILENCE_MAX_S` | | `1200` | Délai maximum sans message du flux d'un agent avant interruption du processus (en secondes, ticket-381) |
 | `RUN_MAX_BUDGET_USD` | | `5.0` | Plafond de dépense d'un run autonome (`0` = aucun). En mode file, le plafond est multiplié par le nombre de tickets, sauf si la requête fixe `budget_usd` |
 | `CHAT_MAX_CONVERSATION_USD` | | `2.0` | Plafond cumulé d'une conversation du chat |
 | `KEEP_AWAKE_DURING_RUNS` | | `true` | Maintient le système éveillé tant qu'un run est ouvert (Windows uniquement — no-op ailleurs). L'écran peut s'éteindre ; seule la mise en veille du système est empêchée. Désactiver si un outil externe gère déjà la veille (ticket-394) |
 | `IDE_WORKSPACE_DIR` | | `~/tessera-workspace` | Dossier des projets |
+| `IDE_STATE_DIR` | | `%LOCALAPPDATA%\Tessera` (Windows); `~/.local/state/tessera` (macOS/Linux) | Dossier hors du dépôt pour l'état persistant de l'IDE (signalements en attente). Créé au besoin |
+| `IDE_WORKTREES_DIR` | | `~/.tessera/worktrees` | Racine des worktrees de run, `<projet>/<ticket>` dessous (ADR-056). Hors de tout dépôt ; la garder courte, Windows limitant la longueur des chemins. Ne sert qu'aux projets qui déclarent `worktree` dans `agents.json` |
 | `IDE_PROMPTS_DIR` | | `agents/prompts/` | Dossier des system prompts |
 | `IDE_LOG_LEVEL` | | `INFO` | Niveau de log |
 | `GITHUB_TOKEN` | | `""` | Token GitHub (sync issues, clone, PRs) |
 | `GITHUB_REPO` | | `""` | Repo cible `owner/repo` |
 | `GITHUB_BASE_BRANCH` | | `develop` | Base par défaut des PR ouvertes par l'IDE |
 | `DIALOGUE_TIMEOUT_S` | | `300.0` | Délai après lequel un agent qui a posé une question reprend seul, en énonçant son hypothèse (ADR-025) |
+| `REVIEWER_CONFIDENCE_THRESHOLD` | | `80` | Seuil de confiance (0-100) des remarques bloquantes du reviewer : un refus dont toutes les remarques portent un score inférieur est lu comme une approbation avec remarques. Une remarque sans score garde le refus ; 0 désactive le filtre (ticket-574) |
 | `ATTENTE_FUSIONNABILITE_MAX_S` | | `300` | Délai maximum d'attente pour le calcul du statut fusionnable d'une PR avant abandon de la tentative de merge (en secondes, ticket-384) |
 | `ATTENTE_MERGE_MAX_S` | | `600` | Pour les projets avec `merge_without_ci: true`, délai maximum d'attente du merge du ticket précédent avant de lancer le ticket suivant d'une file (en secondes, ticket-382) |
 | `CI_GRACE_S` | | `300` | Délai de grâce avant de conclure que les checks CI ne s'enregistreront pas (`none` → achèvement). Si des workflows sont déclarés dans le dépôt, le statut reste `pending` jusqu'à `attente_ci_max_s` (ticket-405) |
 | `IDE_DB_PATH` | | `tessera.db` | Base SQLite des runs, coûts et événements |
+| `IDE_STATE_DIR` | | `%LOCALAPPDATA%\Tessera` (Windows) ou `~/.local/state/tessera` (autres) | Répertoire pour les fichiers d'état en dehors du dépôt : signalements en attente, etc. Créé au démarrage s'il n'existe pas. |
 | `FORBIDDEN_TERMS` | | `""` | Termes interdits au push et en CI, virgules comme séparateurs. Correspondance insensible à la casse, accents normalisés (ADR-048, ADR-050). |
+| `VERCEL_TOKEN` | | `""` | Jeton Vercel pour déployer. Portée minimale : `read` sur les projects, `write` sur les deployments. À définir avec une date d'expiration. |
+| `VERCEL_TEAM_ID` | | `""` | Identifiant du team Vercel (trouvé dans les settings du team). Utilisé par le client Vercel pour créer ou chercher des projets. |
+| `NEON_API_KEY` | | `""` | Clef API Neon pour les migrations de base. Portée minimale : `read_only` sur les branches. À définir avec une date d'expiration. |
+| `NEON_ORG_ID` | | `""` | Identifiant de l'organisation Neon qui porte les projets. Vide : lu sur le compte s'il n'a qu'une organisation ; avec plusieurs, l'étape « base » demande de le renseigner. |
+| `RESEND_API_KEY` | | `""` | Clef API Resend pour les e-mails transactionnels. Portée minimale : `sending_access`. À définir avec une date d'expiration. |
+| `STRIPE_API_KEY` | | `""` | Clef API Stripe (secrète). Portée minimale : permissions de paiement. À définir avec une date d'expiration. |
+| `CLOUDFLARE_API_TOKEN` | | `""` | Jeton Cloudflare pour la gestion des domaines et du cache. Portée minimale : droits sur la zone. À définir avec une date d'expiration. |
 | `OLLAMA_BASE_URL` | | `http://127.0.0.1:11434` | URL du serveur Ollama pour les modèles locaux (rôles de jugement uniquement) |
 | `OLLAMA_MAX_CONCURRENT` | | `1` | Nombre maximum de requêtes parallèles au serveur Ollama. Au-delà, les requêtes attendent leur créneau |
 | `OLLAMA_SLOT_WAIT_S` | | `30` | Délai maximum d'attente pour un créneau chez le serveur Ollama avant basculement sur le repli (en secondes) |
 | `OLLAMA_COOLDOWN_S` | | `600` | Durée du repos du serveur Ollama après un dépassement de délai, avant nouvelle tentative (en secondes) |
 | `STATIC_TOKEN` | | `""` | Si renseignée, **toutes** les requêtes — HTTP et WebSocket — exigent le token (voir ci-dessous). Vide, l'API est ouverte : `make dev` et `make run` ne la servent que sur `127.0.0.1` |
+| `ALLOWED_HOSTS` | | `""` | Noms de `Host` admis en plus du loopback, séparés par des virgules (voir ci-dessous). Vide : `127.0.0.1`, `localhost` et `[::1]` seuls |
 | `KEEP_AWAKE_DURING_RUNS` | | `true` | Maintient le système éveillé tant qu'un run est ouvert (Windows uniquement — no-op ailleurs). L'écran peut s'éteindre ; seule la mise en veille du système est empêchée. Désactiver si un outil externe gère déjà la veille (ticket-394) |
 
 ## Budget et limites
@@ -66,6 +82,26 @@ Sans elle, une UI face à un backend protégé ne reçoit que des `401`.
 uvicorn et dans tout proxy sur le chemin. Le Bearer HTTP n'y apparaît pas.
 `VITE_STATIC_TOKEN` est inliné dans le bundle : c'est un secret partagé
 entre le poste et son backend, pas un mécanisme de comptes.
+
+## `ALLOWED_HOSTS`
+
+Un middleware refuse, avant le contrôle du token et même quand `STATIC_TOKEN`
+est vide, deux choses qu'une page web visitée par l'utilisateur pourrait tenter
+sur l'API locale :
+
+- **un `Host` étranger** (rebond DNS) : le nom, port retiré, doit être
+  `127.0.0.1`, `localhost`, `[::1]` ou l'un des noms de `ALLOWED_HOSTS`
+  (`ALLOWED_HOSTS=tessera.lan,poste.local`). Sinon : `403` en HTTP, fermeture
+  de la WebSocket ;
+- **un `Origin` étranger** : s'il est présent, il doit être une origine
+  loopback (`http://localhost:<port>`, `http://127.0.0.1:<port>`, tout port —
+  le Vite de dev et ceux des worktrees) ou une origine de l'app Tauri
+  (`tauri://localhost`, `http://tauri.localhost`, `https://tauri.localhost`).
+  Sinon : `403` en HTTP, fermeture de la WebSocket en code `4403`.
+
+Sans `Origin` (curl, outils, tests), la requête passe. `/health` reste ouvert.
+Le contrôle ne protège pas contre un processus local : le loopback reste de
+confiance. Servir l'API sous un autre nom exige de le déclarer ici.
 
 ## Ollama
 
@@ -104,6 +140,7 @@ port.
 
 ```bash
 make setup         # Initialisation complète (première fois)
+make install-hooks # installe le hook pre-push de contrôle des termes interdits
 make dev           # Lance FastAPI sur http://localhost:8100
 make dev-frontend  # Lance Vite sur http://localhost:5173
 make tauri-dev     # Lance l'app desktop Tauri (nécessite make dev)
@@ -112,6 +149,8 @@ make test          # Tests Python (pytest)
 make test-fast     # Tests Python rapides
 make test-coverage # Rapport de couverture backend + frontend
 make lint          # Type-check mypy
+make openapi       # Régénère docs/openapi.json si des routes ou modèles de réponse changent
+make check-tickets # Valide les tickets d'un projet (usage: make check-tickets PROJET=<id>)
 make clean         # Supprime les caches
 ```
 

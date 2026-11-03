@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>En cours — salles</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#18181b}
+a{color:#c4b5fd}a:hover{color:#ddd6fe}
+.rack{position:relative;cursor:default}
+.rack .tip{display:none;position:absolute;left:50%;bottom:calc(100% + 10px);transform:translateX(-50%);z-index:5}
+.rack:hover .tip{display:block}
+.rack:hover .chassis{outline:2px solid #8b5cf6;outline-offset:2px}
+.term:hover{outline:2px solid #8b5cf6;outline-offset:2px;cursor:pointer}
+.btn{font:500 12px Inter,system-ui,sans-serif;color:#e4e4e7;background:#27272a;border:1px solid #3f3f46;border-radius:6px;padding:6px 10px;min-height:30px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{background:#3f3f46;color:#fafafa}
+.btn.primary{background:#6d28d9;border-color:#7c3aed}
+.btn.primary:hover{background:#7c3aed}
+.blink{animation:bl 1.4s steps(2) infinite}
+@keyframes bl{50%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){.blink{animation:none}}
+</style>
+</helmet>
+<div style="font-family: Inter, system-ui, sans-serif; color: #e4e4e7; background: #18181b; min-height: 1180px; padding: 20px 24px 32px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px">
+
+  <!-- En-tête -->
+  <header style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px; justify-content: space-between">
+    <div style="display: flex; align-items: center; gap: 10px">
+      <span style="width: 3px; height: 16px; background: #8b5cf6; display: block"></span>
+      <h1 style="margin: 0; font-size: 13px; letter-spacing: .08em; font-weight: 600">EN COURS</h1>
+      <span style="font-size: 12px; color: #a1a1aa">2 projets · 5 services</span>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 18px; font-size: 12px; color: #a1a1aa">
+      <span>Mémoire totale <strong style="color: #e4e4e7; font-weight: 600">612,4 Mo</strong></span>
+      <span>Erreurs (15 min) <strong style="color: #f87171; font-weight: 600">3</strong></span>
+      <span>Agents de produit <strong style="color: #e4e4e7; font-weight: 600">2</strong></span>
+      <div style="display: flex; border: 1px solid #3f3f46; border-radius: 6px; overflow: hidden">
+        <button class="btn" style="border: 0; border-radius: 0; background: #3f3f46">Salles</button>
+        <button class="btn" style="border: 0; border-radius: 0; background: transparent; color: #a1a1aa">Liste</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Salles : une par projet -->
+  <section aria-label="Projets lancés" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(560px, 1fr)); gap: 20px">
+    <sc-for list="{{rooms}}" as="room" hint-placeholder-count="2">
+      <article style="background: #202024; border: 1px solid {{room.border}}; border-radius: 10px; overflow: hidden; display: flex; flex-direction: column">
+
+        <!-- Plaque de la porte -->
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 12px 14px; border-bottom: 1px solid #2f2f35">
+          <span style="width: 10px; height: 10px; border-radius: 2px; background: {{room.dot}}; display: block"></span>
+          <h2 style="margin: 0; font-size: 14px; font-weight: 600">{{room.name}}</h2>
+          <span style="font-size: 12px; color: #a1a1aa">{{room.summary}}</span>
+          <sc-if value="{{room.run}}" hint-placeholder-val="{{true}}">
+            <span style="font-size: 11px; color: #bfdbfe; background: #1e3a8a; border: 1px solid #1d4ed8; border-radius: 999px; padding: 3px 9px">{{room.run}}</span>
+          </sc-if>
+          <div style="margin-left: auto; display: flex; gap: 6px; flex-wrap: wrap">
+            <a class="btn" href="#">Ouvrir ↗</a>
+            <button class="btn">Redémarrer</button>
+            <button class="btn">Arrêter</button>
+          </div>
+        </div>
+
+        <!-- La salle -->
+        <div style="position: relative; height: 300px; background: linear-gradient(#2a2a31 0 72%, #1c1c21 72% 100%); overflow: visible">
+          <!-- chemin de câbles -->
+          <div style="position: absolute; left: 0; right: 0; top: 14px; height: 6px; background: repeating-linear-gradient(90deg,#3f3f46 0 10px,#33333a 10px 14px)"></div>
+          <!-- dalles -->
+          <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 28%; background-image: linear-gradient(#26262c 1px, transparent 1px), linear-gradient(90deg, #26262c 1px, transparent 1px); background-size: 28px 28px"></div>
+
+          <div style="position: absolute; inset: 34px 18px 22px; display: flex; align-items: flex-end; gap: 22px">
+
+            <!-- Écrans muraux : un par service, les vraies dernières lignes -->
+            <div style="display: flex; flex-direction: column; gap: 10px; align-self: flex-start; flex: 1 1 260px; min-width: 0">
+              <sc-for list="{{room.services}}" as="svc" hint-placeholder-count="2">
+                <div class="term" title="Déplier le journal" style="background: #09090b; border: 3px solid #3f3f46; border-radius: 4px; padding: 6px 8px; font-family: 'JetBrains Mono', monospace; font-size: 10.5px; line-height: 1.45; color: #d4d4d8; box-shadow: 0 2px 0 #111">
+                  <div style="display: flex; justify-content: space-between; color: #a1a1aa; margin-bottom: 3px">
+                    <span>{{svc.nom}} — stdout</span><span style="color: {{svc.ledText}}">{{svc.etatCourt}}</span>
+                  </div>
+                  <sc-for list="{{svc.logs}}" as="l" hint-placeholder-count="4">
+                    <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: {{l.c}}">{{l.t}}</div>
+                  </sc-for>
+                </div>
+              </sc-for>
+            </div>
+
+            <!-- Baies : une par service -->
+            <div style="display: flex; gap: 14px; align-items: flex-end">
+              <sc-for list="{{room.services}}" as="svc" hint-placeholder-count="2">
+                <div class="rack" tabindex="0" aria-label="{{svc.nom}} : {{svc.etat}}">
+                  <div class="tip" role="tooltip" style="width: 230px; background: #09090b; border: 1px solid #52525b; border-radius: 8px; padding: 10px 12px; font-size: 12px; line-height: 1.6; color: #d4d4d8; box-shadow: 0 8px 24px rgba(0,0,0,.5)">
+                    <div style="font-weight: 600; color: #fafafa; margin-bottom: 4px">{{svc.nom}} · {{svc.etat}}</div>
+                    <div style="display: grid; grid-template-columns: 80px 1fr; column-gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 11px">
+                      <span style="color: #a1a1aa">commande</span><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{svc.cmd}}</span>
+                      <span style="color: #a1a1aa">pid</span><span>{{svc.pid}}</span>
+                      <span style="color: #a1a1aa">ports</span><span>{{svc.ports}}</span>
+                      <span style="color: #a1a1aa">mémoire</span><span>{{svc.mem}}</span>
+                      <span style="color: #a1a1aa">démarré</span><span>{{svc.depuis}}</span>
+                      <span style="color: #a1a1aa">santé</span><span style="color: {{svc.ledText}}">{{svc.sante}}</span>
+                    </div>
+                  </div>
+                  <div class="chassis" style="width: 64px; height: {{svc.h}}; background: #3a3a42; border: 2px solid #52525b; border-radius: 2px; padding: 6px 6px 0; box-sizing: border-box; display: flex; flex-direction: column; gap: 4px">
+                    <div style="display: flex; justify-content: space-between; align-items: center">
+                      <span class="{{svc.blink}}" style="width: 7px; height: 7px; background: {{svc.led}}; display: block"></span>
+                      <span style="font: 500 9px 'JetBrains Mono', monospace; color: #d4d4d8">{{svc.port}}</span>
+                    </div>
+                    <sc-for list="{{svc.units}}" as="u" hint-placeholder-count="6">
+                      <div style="height: 7px; background: {{u}}; border-radius: 1px"></div>
+                    </sc-for>
+                  </div>
+                  <div style="text-align: center; font-size: 10px; color: #a1a1aa; margin-top: 4px">{{svc.nom}}</div>
+                </div>
+              </sc-for>
+              <sc-if value="{{room.alarm}}" hint-placeholder-val="{{false}}">
+                <div style="align-self: flex-start; margin-top: -14px; width: 14px; height: 10px; background: #ef4444; border-radius: 7px 7px 0 0" class="blink" aria-label="Alarme : un service est tombé"></div>
+              </sc-if>
+            </div>
+
+            <!-- Poste du run : seulement si une file tourne sur ce projet -->
+            <sc-if value="{{room.run}}" hint-placeholder-val="{{true}}">
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; width: 120px">
+                <div style="background: #09090b; border: 2px solid #1d4ed8; border-radius: 3px; padding: 4px 6px; font: 10px 'JetBrains Mono', monospace; color: #bfdbfe; width: 108px; box-sizing: border-box">
+                  <div>{{room.runTicket}}</div><div style="color: #93c5fd">{{room.runEtape}}</div>
+                </div>
+                <div style="display: flex; align-items: flex-end; gap: 6px">
+                  <div style="width: 16px; height: 30px; background: #8b5cf6; border-radius: 6px 6px 2px 2px; box-shadow: inset 0 -8px 0 #6d28d9"></div>
+                  <div style="width: 76px; height: 22px; background: #52525b; border-top: 4px solid #71717a"></div>
+                </div>
+                <span style="font-size: 10px; color: #a1a1aa">pipeline Tessera</span>
+              </div>
+            </sc-if>
+
+            <!-- Agents du produit (ADR-064), seulement depuis services[].activite -->
+            <sc-for list="{{room.agents}}" as="ag" hint-placeholder-count="0">
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; width: 92px">
+                <div style="background: #fafafa; color: #18181b; font-size: 10px; border-radius: 6px; padding: 3px 6px; max-width: 92px; text-align: center">{{ag.bulle}}</div>
+                <div style="width: 14px; height: 26px; background: {{ag.c}}; border-radius: 6px 6px 2px 2px"></div>
+                <span style="font-size: 10px; color: #a1a1aa">{{ag.nom}}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- Pied : mémoire et uptime par service -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px 18px; padding: 10px 14px 12px; border-top: 1px solid #2f2f35; font-size: 11px; color: #a1a1aa">
+          <sc-for list="{{room.services}}" as="svc" hint-placeholder-count="2">
+            <div style="display: flex; flex-direction: column; gap: 4px">
+              <div style="display: flex; justify-content: space-between"><span>{{svc.nom}} · {{svc.ports}}</span><span style="color: #d4d4d8">{{svc.mem}}</span></div>
+              <div style="height: 4px; background: #2f2f35; border-radius: 2px"><div style="height: 4px; width: {{svc.memPct}}; background: #a1a1aa; border-radius: 2px"></div></div>
+              <span>{{svc.depuis}} · {{svc.erreurs}}</span>
+            </div>
+          </sc-for>
+        </div>
+      </article>
+    </sc-for>
+  </section>
+
+  <!-- Projets arrêtés : des salles éteintes, compactes -->
+  <section aria-label="Projets arrêtés" style="display: flex; flex-direction: column; gap: 10px">
+    <h2 style="margin: 0; font-size: 12px; font-weight: 500; color: #a1a1aa">Arrêtés (12)</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px">
+      <sc-for list="{{stopped}}" as="p" hint-placeholder-count="12">
+        <div style="background: #1c1c20; border: 1px solid #2f2f35; border-radius: 8px; padding: 10px 12px; display: flex; align-items: center; gap: 12px">
+          <div aria-hidden="true" style="display: flex; gap: 3px; align-items: flex-end">
+            <span style="width: 12px; height: 22px; background: #2f2f35; display: block"></span>
+            <span style="width: 12px; height: 28px; background: #2f2f35; display: block"></span>
+          </div>
+          <div style="flex: 1; min-width: 0">
+            <div style="font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{p.n}}</div>
+            <div style="font-size: 11px; color: #a1a1aa">{{p.d}}</div>
+          </div>
+          <button class="btn">Lancer</button>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1180}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const g = '#22c55e', r = '#ef4444', z = '#a1a1aa';
+    const units = (n, hot) => Array.from({ length: n }, (_, i) => (i % 3 === 0 ? '#4b4b55' : '#2f2f37')).map((c, i) => (hot && i === 1 ? '#7f1d1d' : c));
+    const L = (t, c) => ({ t, c: c || '#d4d4d8' });
+    return {
+      rooms: [
+        {
+          name: 'Curio — culture générale, cinq minutes par jour',
+          summary: '2 services · tous en cours',
+          border: '#2f2f35', dot: g, alarm: false,
+          run: 'File 3/6 · ticket-059', runTicket: 'ticket-059', runEtape: 'relecture · 4 min',
+          agents: [],
+          services: [
+            { nom: 'backend', etat: 'en cours', etatCourt: '● en cours', port: ':8026', ports: ':8026', pid: 18424, cmd: 'uv run uvicorn app.main:app --port 8026', mem: '90,5 Mo', memPct: '30%', depuis: 'depuis 09:03 (28 min)', erreurs: '0 erreur', sante: '/health 200 · 12 ms', led: g, ledText: '#4ade80', blink: '', h: '150px', units: units(12),
+              logs: [L('INFO  GET /api/quiz/today 200 · 18 ms'), L('INFO  POST /api/answers 201 · 9 ms'), L('INFO  GET /api/frise/next 200 · 41 ms'), L('INFO  GET /api/health 200 · 2 ms', z)] },
+            { nom: 'frontend', etat: 'en cours', etatCourt: '● en cours', port: ':5196', ports: ':5196', pid: 20112, cmd: 'npm run dev -- --port 5196', mem: '178,0 Mo', memPct: '58%', depuis: 'depuis 09:03 (28 min)', erreurs: '0 erreur', sante: 'page 200', led: g, ledText: '#4ade80', blink: '', h: '130px', units: units(10),
+              logs: [L('VITE v6.3.5  ready in 812 ms', z), L('➜ Local: http://localhost:5196/'), L('9:24:11 [vite] hmr update /src/screens/Frise.tsx'), L('9:26:40 [vite] page reload src/api/quiz.ts')] }
+          ]
+        },
+        {
+          name: 'Kadoomi — listes d’envies partagées',
+          summary: '3 services · 1 tombé',
+          border: '#7f1d1d', dot: r, alarm: true,
+          run: '', runTicket: '', runEtape: '',
+          agents: [
+            { nom: 'rappels', bulle: '12 e-mails en file', c: '#60a5fa' },
+            { nom: 'import', bulle: 'liste 48/120', c: '#60a5fa' }
+          ],
+          services: [
+            { nom: 'api', etat: 'en cours', etatCourt: '● en cours', port: ':3010', ports: ':3010', pid: 9930, cmd: 'npm run start:api', mem: '142,2 Mo', memPct: '46%', depuis: 'depuis 08:51 (40 min)', erreurs: '1 avertissement', sante: '/api/health 200', led: g, ledText: '#4ade80', blink: '', h: '150px', units: units(12),
+              logs: [L('GET /api/lists/42 200 31ms'), L('WARN slow query lists_by_owner 812ms', '#fbbf24'), L('POST /api/items 201 22ms'), L('GET /api/health 200 3ms', z)] },
+            { nom: 'worker', etat: 'tombé · code 1', etatCourt: '■ code 1', port: '—', ports: '—', pid: '—', cmd: 'npm run worker', mem: '—', memPct: '0%', depuis: 'mort à 09:27', erreurs: '2 erreurs', sante: 'injoignable', led: r, ledText: '#f87171', blink: 'blink', h: '120px', units: units(9, true),
+              logs: [L('job reminders#812 started'), L('Error: connect ECONNREFUSED 127.0.0.1:5432', '#f87171'), L('    at TCPConnectWrap.afterConnect', '#f87171'), L('process exited with code 1', '#f87171')] },
+            { nom: 'web', etat: 'en cours', etatCourt: '● en cours', port: ':3000', ports: ':3000', pid: 9944, cmd: 'npm run dev:web', mem: '201,7 Mo', memPct: '66%', depuis: 'depuis 08:51 (40 min)', erreurs: '0 erreur', sante: 'page 200', led: g, ledText: '#4ade80', blink: '', h: '136px', units: units(11),
+              logs: [L('▲ Next.js 15 · Local: http://localhost:3000', z), L('✓ Compiled /l/[slug] in 640ms'), L('GET /l/noel-2026 200 in 88ms'), L('GET / 200 in 41ms')] }
+          ]
+        }
+      ],
+      stopped: [
+        { n: 'Affût — conseiller d’achats', d: 'lancé hier à 18:12' },
+        { n: 'Cockpit carrière', d: 'lancé le 28/10' },
+        { n: 'Jeu — Démineur', d: 'lancé le 05/10' },
+        { n: 'Devinoo — pronostics entre proches', d: 'lancé hier à 22:40' },
+        { n: 'FluentDB', d: 'jamais lancé' },
+        { n: 'Freelance — cockpit indépendant', d: 'lancé le 21/10' },
+        { n: 'Habit Tracker', d: 'lancé le 12/10' },
+        { n: 'Homelab Monitor', d: 'lancé le 09/10' },
+        { n: 'Serpent', d: 'lancé le 06/10' },
+        { n: 'Vigie', d: 'lancé le 27/10' },
+        { n: 'Portfolio', d: 'lancé le 04/10' },
+        { n: 'Repo Radar', d: 'jamais lancé' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

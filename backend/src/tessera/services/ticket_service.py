@@ -1,6 +1,5 @@
 import asyncio
 import re
-import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterator
@@ -14,6 +13,12 @@ from tessera.models.ticket import (
     TicketStatus,
     TicketType,
     TicketUnreadable,
+)
+from tessera.services.ticket_archive import (
+    archive_done_tickets,
+    highest_number,
+    is_archived,
+    iter_archive_files,
 )
 from tessera.utils.logger import get_logger
 
@@ -124,7 +129,9 @@ def _status_from_folder(path: Path, meta: dict[str, Any]) -> TicketStatus:
     folder_status = by_dir.get(path.parent.name)
     if folder_status is not None:
         return folder_status
-    # Dossier non reconnu (archive, arborescence inattendue) : on retombe sur
+    if is_archived(path):
+        return TicketStatus.done
+    # Dossier non reconnu (arborescence inattendue) : on retombe sur
     # ce que le fichier déclare plutôt que d'échouer.
     return TicketStatus(meta["status"])
 
@@ -217,6 +224,10 @@ class TicketService:
         return self._parse(dest)
 
     async def create_ticket(self, ticket: Ticket) -> Ticket:
+        return self.create_ticket_sync(ticket)
+
+    def create_ticket_sync(self, ticket: Ticket) -> Ticket:
+        """Write ``ticket`` under ``todo/``; usable where no event loop is awaited."""
         ticket_id = ticket.id if ticket.id else self._next_id()
         created = ticket.created or datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
@@ -272,42 +283,17 @@ class TicketService:
             created.append(await self.create_ticket(ticket))
         return created
 
-    async def archive_old_tickets(self, days: int = 30) -> list[Ticket]:
-        done_dir = self._tickets_root() / "done"
-        if not done_dir.is_dir():
-            return []
+    async def archive_done_tickets(self) -> list[str]:
+        """File done tickets 100+ numbers below the highest into the archive.
 
-        cutoff = time.time() - days * 86400
-        archived: list[Ticket] = []
-
-        for ticket_file in sorted(done_dir.glob("ticket-*.md")):
-            if ticket_file.stat().st_mtime > cutoff:
-                continue
-            mtime = datetime.fromtimestamp(
-                ticket_file.stat().st_mtime, tz=timezone.utc
-            )
-            dest_dir = (
-                self._tickets_root()
-                / "archive"
-                / "done"
-                / mtime.strftime("%Y-%m")
-            )
-            dest_dir.mkdir(parents=True, exist_ok=True)
-            dest = dest_dir / ticket_file.name
-            ticket_file.rename(dest)
-            try:
-                archived.append(self._parse(dest))
-            except Exception:
-                pass
-
-        return archived
+        Returns the ids archived. The archive stays readable by id
+        (`get_ticket`, `depends_on`, numbering) but not in the listings.
+        """
+        return await asyncio.to_thread(archive_done_tickets, self._tickets_root())
 
     async def list_archived_tickets(self) -> list[Ticket]:
-        archive_root = self._tickets_root() / "archive"
-        if not archive_root.is_dir():
-            return []
         tickets: list[Ticket] = []
-        for path in sorted(archive_root.rglob("ticket-*.md")):
+        for path in iter_archive_files(self._tickets_root()):
             try:
                 tickets.append(self._parse(path))
             except Exception:
@@ -361,7 +347,9 @@ class TicketService:
         # `stem.startswith(ticket_id)` faisait trouver `ticket-100` à partir de
         # `ticket-1` (ticket-122). Le nom est l'identifiant seul, ou
         # l'identifiant suivi d'un tiret et d'un slug.
-        for path in self._iter_active_files():
+        # L'archive se lit par identifiant, jamais dans les listes : un ticket
+        # rangé reste atteignable pour `get_ticket` et pour `depends_on`.
+        for path in (*self._iter_active_files(), *iter_archive_files(self._tickets_root())):
             if path.stem == ticket_id or path.stem.startswith(ticket_id + "-"):
                 return path
         return None
@@ -379,14 +367,8 @@ class TicketService:
         ]
 
     def _next_n(self) -> int:
-        max_n = 0
-        root = self._tickets_root()
-        if root.is_dir():
-            for path in root.rglob("ticket-*.md"):
-                parts = path.stem.split("-")
-                if len(parts) >= 2 and parts[1].isdigit():
-                    max_n = max(max_n, int(parts[1]))
-        return max_n + 1
+        # Archive comprise : un numéro rangé ne se réattribue pas.
+        return highest_number(self._tickets_root()) + 1
 
     def _next_id(self) -> str:
         return f"ticket-{self._next_n():03d}"
@@ -400,29 +382,80 @@ class TicketService:
         return _ticket_cache[key]
 
     def _parse(self, path: Path) -> Ticket:
-        post = frontmatter.load(str(path))
-        # Frontmatter metadata is arbitrary YAML: every field is coerced to
-        # the model's own type here, at the parsing boundary, so an invalid
-        # ticket file fails loudly instead of producing a half-typed Ticket.
-        meta: dict[str, Any] = dict(post.metadata)
-        raw_pr_number = meta.get("pr_number")
-        return Ticket(
-            id=str(meta["id"]),
-            title=str(meta["title"]),
-            type=TicketType(meta["type"]),
-            status=_status_from_folder(path, meta),
-            priority=TicketPriority(meta["priority"]),
-            agent=str(meta["agent"]),
-            depends_on=_normalize_depends_on(meta.get("depends_on")),
-            created=str(meta.get("created", "")),
-            github_issue_url=str(meta["github_issue_url"])
-            if meta.get("github_issue_url")
-            else None,
-            pr_number=int(raw_pr_number) if isinstance(raw_pr_number, int) else None,
-            # Seul un vrai booléen YAML l'active : « oui » ne demande rien.
-            plan=meta.get("plan") is True,
-            light=meta.get("light") is True,
-            body=str(post.content),
-            project_id=self._project_id,
-            file_path=str(path),
+        return _ticket_from_post(frontmatter.load(str(path)), path, self._project_id)
+
+
+def _ticket_from_post(post: frontmatter.Post, path: Path, project_id: str) -> Ticket:
+    """Build a `Ticket` from a parsed file; the single parsing rule for tickets.
+
+    Frontmatter metadata is arbitrary YAML: every field is coerced to the
+    model's own type here, at the parsing boundary, so an invalid ticket file
+    fails loudly instead of producing a half-typed Ticket.
+    """
+    meta: dict[str, Any] = dict(post.metadata)
+    raw_pr_number = meta.get("pr_number")
+    return Ticket(
+        id=str(meta["id"]),
+        title=str(meta["title"]),
+        type=TicketType(meta["type"]),
+        status=_status_from_folder(path, meta),
+        priority=TicketPriority(meta["priority"]),
+        agent=str(meta["agent"]),
+        depends_on=_normalize_depends_on(meta.get("depends_on")),
+        created=str(meta.get("created", "")),
+        github_issue_url=str(meta["github_issue_url"])
+        if meta.get("github_issue_url")
+        else None,
+        pr_number=int(raw_pr_number) if isinstance(raw_pr_number, int) else None,
+        # Seul un vrai booléen YAML l'active : « oui » ne demande rien.
+        plan=meta.get("plan") is True,
+        light=meta.get("light") is True,
+        body=str(post.content),
+        project_id=project_id,
+        file_path=str(path),
+    )
+
+
+#: Un nom de fichier de ticket : l'identifiant, puis éventuellement un slug.
+#: Aucun séparateur de chemin ni point : le nom vient d'une requête.
+_TICKET_FILE_RE = re.compile(r"^(ticket-\d+)(?:-[\w-]+)?\.md$")
+
+
+def ticket_depuis_contenu(chemin: str, contenu: str, project_id: str) -> Ticket:
+    """Build a `Ticket` from file content read elsewhere than the work tree.
+
+    Contrairement à `validate_ticket`, le dossier du chemin (`todo/`, `done/`…)
+    décide du statut : un ticket livré sur la base n'est pas jugé « à faire ».
+    Raises `ValueError` when the content is not a readable ticket (ticket-504).
+    """
+    try:
+        return _ticket_from_post(frontmatter.loads(contenu), Path(chemin), project_id)
+    except Exception as exc:  # noqa: BLE001 — YAML, enum ou modèle : un seul refus
+        raise ValueError(f"{chemin} : ticket illisible : {exc}") from exc
+
+
+def validate_ticket(name: str, content: str) -> Ticket:
+    """Parse a ticket file the way loading does, or raise `ValueError`.
+
+    The same rule as `TicketService._parse`, so a ticket refused here would
+    also be unreadable once on disk (ticket-479). The file is judged as if it
+    sat in `todo/`; the id in the frontmatter must match the one in the name.
+    """
+    matched = _TICKET_FILE_RE.match(name)
+    if matched is None:
+        raise ValueError(
+            f"Nom de fichier refusé : {name!r} (attendu : ticket-<n>[-slug].md)"
         )
+    try:
+        ticket = _ticket_from_post(
+            frontmatter.loads(content), Path("todo") / name, ""
+        )
+    except KeyError as exc:
+        raise ValueError(f"{name} : champ de frontmatter manquant : {exc.args[0]}") from exc
+    except Exception as exc:  # noqa: BLE001 — YAML, enum ou modèle : un seul refus
+        raise ValueError(f"{name} : frontmatter invalide : {exc}") from exc
+    if ticket.id != matched.group(1):
+        raise ValueError(
+            f"{name} : l'id du frontmatter ({ticket.id}) ne correspond pas au nom du fichier"
+        )
+    return ticket

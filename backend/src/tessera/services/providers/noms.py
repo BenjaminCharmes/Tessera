@@ -5,7 +5,9 @@ les SDK derrière lui.
 """
 
 #: Les valeurs acceptées pour `provider` dans `agents.json` (ticket-188).
-PROVIDERS_CONNUS: tuple[str, ...] = ("agent_sdk", "anthropic_api", "ollama")
+PROVIDERS_CONNUS: tuple[str, ...] = (
+    "agent_sdk", "anthropic_api", "ollama", "openai_compatible",
+)
 
 #: Ceux dont le modèle doit être dans la grille tarifaire : le coût d'un
 #: appel s'y calcule depuis les tokens (ticket-080). Un provider hors de
@@ -15,6 +17,14 @@ PROVIDERS_ANTHROPIC: frozenset[str] = frozenset({"agent_sdk", "anthropic_api"})
 
 class ProviderInconnu(ValueError):
     """`agents.json` nomme un provider que l'application ne sait pas construire."""
+
+
+class DeclarationRefusee(ProviderInconnu):
+    """Une entrée d'`agents.json` déclare mal son provider : clé en clair,
+    nom de variable qui ressemble à une clé, `base_url` absente. Fille de
+    `ProviderInconnu` : les routes qui répondent 422 à celle-ci répondent
+    pareil à celle-là. Le message nomme le champ, jamais sa valeur.
+    """
 
 
 class ProviderIndisponible(RuntimeError):

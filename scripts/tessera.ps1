@@ -17,8 +17,12 @@
 [CmdletBinding()]
 param(
     [Parameter(Position = 0)]
-    [ValidateSet('help', 'setup', 'doctor', 'run', 'dev', 'dev-frontend', 'stop', 'test', 'lint', 'verify')]
-    [string]$Task = 'help'
+    [ValidateSet('help', 'setup', 'doctor', 'run', 'dev', 'dev-frontend', 'stop', 'test', 'lint', 'verify', 'check-tickets')]
+    [string]$Task = 'help',
+
+    # Identifiant du projet, pour `check-tickets`.
+    [Parameter(Position = 1)]
+    [string]$Projet = ''
 )
 
 $ErrorActionPreference = 'Stop'
@@ -34,6 +38,7 @@ function Show-Help {
     Write-Host '  .\scripts\tessera.ps1 stop         Arrete tout, worker orphelin compris'
     Write-Host '  .\scripts\tessera.ps1 test         Suite de tests backend'
     Write-Host '  .\scripts\tessera.ps1 lint         Type-check mypy'
+    Write-Host '  .\scripts\tessera.ps1 check-tickets <id>  Verifie les tickets d un projet avant de les committer'
     Write-Host ''
 }
 
@@ -55,20 +60,42 @@ function Invoke-Setup {
     try { & npm install } finally { Pop-Location }
 }
 
+function Get-ProcessusTessera {
+    # Le worker `uvicorn --reload` orphelin est le piege principal : tuer le
+    # parent laisse l'enfant vivant, qui garde le port 8100. Mais le filtre
+    # ne doit viser que Tessera (ticket-423) : la selection est faite par
+    # scripts/arreter_tessera.py (testee), ce script ne fait que lister et tuer.
+    $processus = @(Get-CimInstance Win32_Process |
+            Where-Object { $_.Name -in 'python.exe', 'node.exe' } |
+            ForEach-Object { @{ pid = [int]$_.ProcessId; nom = $_.Name; commande = [string]$_.CommandLine } })
+    $ecoutes = @{}
+    foreach ($port in 8100, 5173) {
+        $ecoutes["$port"] = @(Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue |
+                ForEach-Object { [int]$_.OwningProcess })
+    }
+    $entree = ConvertTo-Json -Compress -Depth 4 -InputObject @{ processus = $processus; ecoutes = $ecoutes }
+    $ancien = $OutputEncoding
+    $OutputEncoding = [Text.UTF8Encoding]::new($false)
+    Push-Location (Join-Path $Root 'backend')
+    try { $sortie = $entree | & uv run python (Join-Path $PSScriptRoot 'arreter_tessera.py') $Root }
+    finally { Pop-Location; $OutputEncoding = $ancien }
+    if ($LASTEXITCODE -ne 0) { throw "arreter_tessera.py a echoue (code $LASTEXITCODE)" }
+    $json = [string]::Join('', $sortie)
+    if ([string]::IsNullOrWhiteSpace($json)) { return @() }
+    # Windows PowerShell 5.1 ne deroule pas un tableau JSON : `[]` revient comme
+    # un objet unique (un tableau vide), d'ou une iteration a vide. Le passage
+    # par le pipeline le deroule dans les deux versions ; le filtre ecarte tout
+    # element sans PID.
+    return @(ConvertFrom-Json $json | ForEach-Object { $_ } | Where-Object { $null -ne $_ -and $null -ne $_.pid })
+}
+
 function Stop-Tessera {
-    # Le worker `uvicorn --reload` orphelin est le piège principal : tuer le
-    # parent laisse l'enfant vivant, qui garde le port 8100 et sert le code de
-    # son dernier rechargement. On cible donc la ligne de commande, pas un PID.
     $stopped = 0
-    foreach ($spec in @(
-            @{ Name = 'python.exe'; Match = '*uvicorn*' },
-            @{ Name = 'node.exe'; Match = '*vite*' })) {
-        Get-CimInstance Win32_Process -Filter "Name='$($spec.Name)'" |
-            Where-Object { $_.CommandLine -like $spec.Match } |
-            ForEach-Object {
-                Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue
-                $stopped++
-            }
+    foreach ($p in Get-ProcessusTessera) {
+        if ($p.pid -eq $PID) { continue }
+        Stop-Process -Id $p.pid -Force -ErrorAction SilentlyContinue
+        Write-Host "-> arrete PID $($p.pid) ($($p.nom)) : $($p.debut)"
+        $stopped++
     }
     Write-Host "-> $stopped processus arrete(s)"
 
@@ -92,9 +119,29 @@ function Start-Backend {
     #     mais bloquerait le terminal appelant : ce lanceur est prevu pour un
     #     PowerShell interactif. En session non interactive, lancer les deux
     #     commandes directement (voir README).
-    Start-Process -FilePath 'uv' `
-        -ArgumentList 'run', 'python', '-m', 'uvicorn', 'tessera.main:app', '--host', '127.0.0.1', '--port', '8100' `
-        -WorkingDirectory (Join-Path $Root 'backend')
+    #  3. `Start-Process` rattache le backend a la console qui le lance : il
+    #     meurt avec elle (ticket-667). `Win32_Process.Create` (WMI) le demarre
+    #     hors de cette console, puis on attend /health avant de rendre la main.
+    $uv = (Get-Command uv -ErrorAction Stop).Source
+    $commande = "`"$uv`" run python -m uvicorn tessera.main:app --host 127.0.0.1 --port 8100"
+    $resultat = Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{
+        CommandLine      = $commande
+        CurrentDirectory = (Join-Path $Root 'backend')
+    }
+    if ($resultat.ReturnValue -ne 0) { throw "Win32_Process.Create a echoue (code $($resultat.ReturnValue))" }
+    Wait-Health -Url 'http://127.0.0.1:8100/health' -BackendPid $resultat.ProcessId
+}
+
+function Wait-Health([string]$Url, [int]$BackendPid, [int]$TimeoutSec = 90) {
+    # `$Pid` serait le PID automatique de PowerShell, en lecture seule.
+    $limite = (Get-Date).AddSeconds($TimeoutSec)
+    while ((Get-Date) -lt $limite) {
+        try {
+            $reponse = Invoke-WebRequest -Uri $Url -UseBasicParsing -TimeoutSec 2
+            if ($reponse.StatusCode -eq 200) { Write-Host "-> backend pret (PID $BackendPid)"; return }
+        } catch { Start-Sleep -Milliseconds 500 }
+    }
+    throw "Le backend ne repond pas sur $Url apres $TimeoutSec s (PID $BackendPid)."
 }
 
 function Start-Frontend {
@@ -111,6 +158,9 @@ switch ($Task) {
     'dev-frontend' { Start-Frontend; Write-Host '-> http://localhost:5173' }
     'run' {
         Invoke-Doctor
+        # Un controle en echec (checkout hors develop, port pris...) arrete le
+        # lancement : demarrer quand meme, c'est servir le mauvais code.
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
         Start-Backend
         Start-Frontend
         Write-Host ''
@@ -152,6 +202,17 @@ switch ($Task) {
         Write-Host 'Vert.' -ForegroundColor Green
         Write-Host 'Hors de portee ici : cargo check (Rust absent de ce poste).'
         Write-Host 'Il ne tourne en CI que si frontend/src-tauri/ a change.'
+    }
+    'check-tickets' {
+        # Sort en erreur au moindre probleme : utilisable avant un commit (ticket-433).
+        if ([string]::IsNullOrWhiteSpace($Projet)) {
+            Write-Host 'usage : .\scripts\tessera.ps1 check-tickets <id>' -ForegroundColor Red
+            exit 2
+        }
+        Push-Location (Join-Path $Root 'backend')
+        try { & uv run python -m tessera.services.ticket_check $Projet }
+        finally { Pop-Location }
+        exit $LASTEXITCODE
     }
     'lint' {
         Push-Location (Join-Path $Root 'backend')

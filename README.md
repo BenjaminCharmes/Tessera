@@ -28,12 +28,40 @@ Trois choix le distinguent d'un assistant de code classique :
   suivant.
 - **Vous décidez jusqu'où il va.** Chaque projet déclare son niveau : s'arrêter
   au commit, ouvrir la PR, ou merger — et seulement si la CI est verte.
+- **Les fichiers sensibles restent protégés.** Les agents ne peuvent pas
+  modifier les règles de votre IDE (`CLAUDE.md`, `agents.json`, `.github/workflows/`,
+  `.git/`) ni sa configuration locale (`.claude/`). Ils ne peuvent pas non plus
+  modifier les contraintes communes (`memory/contraintes.md`) directement : les
+  nouvelles règles y sont proposées d'abord, en attente d'acceptation. Le script
+  de vérification (celui de `test_command`) est aussi protégé : un codeur ne peut
+  pas affaiblir la vérification qui juge son code. Un diff qui touche la
+  configuration des tests est signalé au reviewer pour vérification. Si un ticket
+  exige une telle modification, le run s'arrête avant le premier tour avec un
+  message clair.
 
-Après un run approuvé, la livraison enchaîne seule jusqu'où le projet
-l'autorise : rebase, PR, attente de CI, merge. Certains conflits simples — dans
-le journal (`memory/pipeline-log.md`) et la liste de documentation
-(`memory/documentation.json`) — sont résolus automatiquement en union. Les autres
-sont tentés par un agent, et leur résolution est toujours relue.
+Après un run approuvé, seul le commit que le reviewer et le validateur ont lu
+est mergé : Tessera rejette d'office tout changement introduit ultérieurement
+à la branche sans relecture supplémentaire. La livraison enchaîne ensuite seule
+jusqu'où le projet l'autorise : rebase, PR, attente de CI, merge. Certains
+conflits simples — dans le journal (`memory/pipeline-log.md`) et la liste de
+documentation (`memory/documentation.json`) — sont résolus automatiquement en
+union. Les autres sont tentés par le `resolveur-conflit` — s'il est déclaré
+dans `agents.json` du projet —, et leur résolution est toujours relue. Si le
+résolveur n'est pas available, la ligne d'arrêt explique pourquoi.
+
+Si une PR devient non fusionnable pendant l'attente de CI (état `dirty`, ou
+conflits détectés), le CIWatcher arrête la surveillance avec un message dans le
+pipeline. Le ticket passe en échec, et les dépendants qui l'attendent le reçoivent
+en échec.
+
+Les interruptions de run — arrêt du backend, redémarrage du système — ne perdent jamais 
+de travail : tout changement non livré est automatiquement sauvé et committé.
+
+Après un redémarrage du backend, l'IDE reprend la surveillance de toute PR ouverte
+sur une branche `ticket-NNN-*` vers la `base_branch` du projet — y compris les PR
+créées manuellement. En autonomie `merge`, elles seront mergées si la CI est verte.
+Utilisez une branche temporaire (`wip/*`, `tmp/*`) plutôt qu'une branche `ticket-NNN-*`
+si vous testez une PR en attente de lancement par le pipeline.
 
 ## Démarrer
 
@@ -73,12 +101,13 @@ ils ont besoin des outils fichier que seul le SDK fournit.
 **Sérialisation des requêtes** : quand plusieurs runs appellent le même serveur
 Ollama, l'IDE les sérialise (une à la fois par serveur) pour éviter la compétition
 pour le modèle et la mémoire. Un réglage `OLLAMA_MAX_CONCURRENT` contrôle ce
-comportement. Si le serveur est saturé ou trop lent, l'IDE bascule rapidement sur
-le repli pour ne pas bloquer le run — voir la [configuration](docs/configuration.md#ollama).
+comportement.
 
-
-
-Si le serveur Ollama est lent ou indisponible, l'agent bascule rapidement sur le repli — voir `OLLAMA_SLOT_WAIT_S` dans la [configuration](docs/configuration.md).
+Les rôles texte (validateur, audit, documentation) ont une durée totale maximale
+par appel (`LLM_DUREE_MAX_ROLE_TEXTE_S`, défaut 900 s). Si le serveur Ollama est
+lent, saturé, ou si l'appel dépasse cette durée, l'IDE bascule automatiquement sur
+Claude pour ne pas bloquer le run — le passage au repli est tracé dans `pipeline-log.md`.
+Voir la [configuration](docs/configuration.md#ollama) pour régler ces délais.
 
 ## Documentation
 
@@ -92,7 +121,7 @@ Si le serveur Ollama est lent ou indisponible, l'agent bascule rapidement sur le
 | [Historique](docs/historique.md) | ce qui a été livré, étape par étape |
 
 Les décisions d'architecture en vigueur sont dans
-[`projects/ide-core/memory/decisions.md`](projects/ide-core/memory/decisions.md) :
+[`projects/ide-core/memory/contraintes.md`](projects/ide-core/memory/contraintes.md) :
 ce sont des contraintes, pas des archives.
 
 ## Self-hosting

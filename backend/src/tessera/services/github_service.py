@@ -6,6 +6,7 @@ from typing import Any, Literal
 import httpx
 
 from tessera.config import settings
+from tessera.services.github_retry import reessayer_5xx
 from pydantic import BaseModel
 
 
@@ -19,6 +20,19 @@ class PRNonFusionnableError(Exception):
 
 _BASE = "https://api.github.com"
 
+# Lecture des PR fermées : trois pages de cent, les plus récemment mises à jour.
+_TAILLE_PAGE = 100
+_PAGES_PR_FERMEES = 3
+
+
+def _est_mergee_de(item: dict[str, Any], prefix: str, base: str | None) -> bool:
+    """True when the listed PR was merged from a branch starting with `prefix`."""
+    if not item.get("merged_at"):
+        return False
+    if not str(item.get("head", {}).get("ref", "")).startswith(prefix):
+        return False
+    return base is None or item.get("base", {}).get("ref") == base
+
 
 class GitHubIssue(BaseModel):
     number: int
@@ -28,12 +42,22 @@ class GitHubIssue(BaseModel):
     labels: list[str]
 
 
+#: `unreadable` : le jeton ne peut pas lire la CI (HTTP 403/404), ce qui n'est
+#: pas « pas de CI » — ticket-449.
+CiStatus = Literal["pending", "passing", "failing", "none", "unreadable"]
+
+
 @dataclass
 class PRStatus:
     state: Literal["open", "closed", "merged"]
-    ci_status: Literal["pending", "passing", "failing", "none"]
+    ci_status: CiStatus
     pr_url: str
     pr_number: int
+    # Code HTTP du refus quand `ci_status` vaut `unreadable`, sinon None.
+    ci_http_status: int | None = None
+    # `mergeable_state` de GitHub (`dirty` : conflit avec la base). Absent
+    # quand GitHub ne l'a pas encore calculé — ticket-452.
+    mergeable_state: str | None = None
 
 
 @dataclass
@@ -43,6 +67,24 @@ class PRListEntry:
     state: Literal["open", "closed", "merged"]
     pr_url: str
     head_sha: str
+
+
+@dataclass(frozen=True)
+class PrOuverte:
+    """An open pull request: its number, head branch and base branch — ticket-516."""
+
+    number: int
+    branche: str
+    base: str
+
+
+def _pr_ouverte_de(item: dict[str, Any]) -> PrOuverte:
+    """Build a `PrOuverte` from one entry of the PR listing."""
+    return PrOuverte(
+        number=int(item["number"]),
+        branche=str(item.get("head", {}).get("ref", "")),
+        base=str(item.get("base", {}).get("ref", "")),
+    )
 
 
 @dataclass
@@ -55,13 +97,29 @@ class RepositoryInfo:
 
 
 class GitHubService:
-    def __init__(self, token: str, repo: str) -> None:
+    def __init__(
+        self,
+        token: str,
+        repo: str,
+        dormir: Callable[[float], Awaitable[None]] = asyncio.sleep,
+    ) -> None:
         self._repo = repo
         self._headers = {
             "Authorization": f"Bearer {token}",
             "Accept": "application/vnd.github+json",
             "X-GitHub-Api-Version": "2022-11-28",
         }
+        # Attente entre deux essais d'un 5xx (ticket-461) ; injectable en test.
+        self._dormir = dormir
+
+    async def _requete(
+        self, client: httpx.AsyncClient, methode: str, url: str, **kwargs: Any
+    ) -> httpx.Response:
+        """Send one request, retrying a 502, 503 or 504 (ticket-461)."""
+        return await reessayer_5xx(
+            lambda: client.request(methode, url, headers=self._headers, **kwargs),
+            self._dormir,
+        )
 
     async def list_agent_ready_issues(self) -> list[GitHubIssue]:
         url = f"{_BASE}/repos/{self._repo}/issues"
@@ -145,11 +203,77 @@ class GitHubService:
         data = resp.json()
         return int(data["number"]), str(data["html_url"])
 
+    async def find_open_pull_request(self, branch: str) -> int | None:
+        """Number of the open PR whose head branch is `branch`, or None — ticket-455.
+
+        GitHub filters `head` as `<owner>:<branch>`; the owner is the one of the
+        repository, since a run's branch is always pushed to it.
+        """
+        owner = self._repo.split("/", 1)[0]
+        url = f"{_BASE}/repos/{self._repo}/pulls"
+        params: dict[str, str | int] = {
+            "head": f"{owner}:{branch}", "state": "open", "per_page": 1,
+        }
+        async with httpx.AsyncClient() as client:
+            resp = await client.get(url, headers=self._headers, params=params)
+            resp.raise_for_status()
+        items: list[dict[str, Any]] = resp.json()
+        return int(items[0]["number"]) if items else None
+
+    async def find_merged_pull_request(
+        self, prefix: str, base: str | None = None
+    ) -> int | None:
+        """Number of a merged PR whose head branch starts with `prefix`, or None.
+
+        The prefix carries its dash (`ticket-48-`), so `ticket-48-` never
+        matches `ticket-482-…`. Only the most recently updated closed PRs are
+        read (three pages): a ticket delivered by hand was delivered recently.
+        With `base`, a PR merged into another branch does not count — ticket-482.
+        """
+        url = f"{_BASE}/repos/{self._repo}/pulls"
+        async with httpx.AsyncClient() as client:
+            for page in range(1, _PAGES_PR_FERMEES + 1):
+                params: dict[str, str | int] = {
+                    "state": "closed", "sort": "updated", "direction": "desc",
+                    "per_page": _TAILLE_PAGE, "page": page,
+                }
+                resp = await self._requete(client, "GET", url, params=params)
+                resp.raise_for_status()
+                items: list[dict[str, Any]] = resp.json()
+                for item in items:
+                    if _est_mergee_de(item, prefix, base):
+                        return int(item["number"])
+                if len(items) < _TAILLE_PAGE:
+                    break
+        return None
+
+    async def find_open_pull_requests(self, base: str) -> list[PrOuverte]:
+        """Every open PR whose base branch is `base` — ticket-516.
+
+        Reads up to three pages of a hundred; a PR into another base is dropped
+        even if GitHub returned it.
+        """
+        url = f"{_BASE}/repos/{self._repo}/pulls"
+        trouvees: list[PrOuverte] = []
+        async with httpx.AsyncClient() as client:
+            for page in range(1, _PAGES_PR_FERMEES + 1):
+                params: dict[str, str | int] = {
+                    "state": "open", "base": base,
+                    "per_page": _TAILLE_PAGE, "page": page,
+                }
+                resp = await self._requete(client, "GET", url, params=params)
+                resp.raise_for_status()
+                items: list[dict[str, Any]] = resp.json()
+                trouvees.extend(_pr_ouverte_de(item) for item in items)
+                if len(items) < _TAILLE_PAGE:
+                    break
+        return [pr for pr in trouvees if pr.base == base]
+
     async def get_pull_request_status(self, pr_number: int) -> PRStatus:
         """Retourne le statut d'une PR avec son état CI agrégé."""
         url = f"{_BASE}/repos/{self._repo}/pulls/{pr_number}"
         async with httpx.AsyncClient() as client:
-            resp = await client.get(url, headers=self._headers)
+            resp = await self._requete(client, "GET", url)
             resp.raise_for_status()
         pr_data = resp.json()
 
@@ -161,13 +285,16 @@ class GitHubService:
             state = "open"
 
         head_sha: str = pr_data["head"]["sha"]
-        ci_status = await self._get_ci_status(head_sha)
+        ci_status, http_status = await self._lire_ci(head_sha)
+        mergeable_state = pr_data.get("mergeable_state")
 
         return PRStatus(
             state=state,
             ci_status=ci_status,
             pr_url=str(pr_data["html_url"]),
             pr_number=pr_number,
+            ci_http_status=http_status,
+            mergeable_state=str(mergeable_state) if mergeable_state else None,
         )
 
     async def get_pull_request_state(
@@ -176,12 +303,20 @@ class GitHubService:
         """Read only the state of a PR, without querying its CI — ticket-405."""
         url = f"{_BASE}/repos/{self._repo}/pulls/{pr_number}"
         async with httpx.AsyncClient() as client:
-            resp = await client.get(url, headers=self._headers)
+            resp = await self._requete(client, "GET", url)
             resp.raise_for_status()
         pr_data = resp.json()
         if pr_data.get("merged"):
             return "merged"
         return "closed" if pr_data["state"] == "closed" else "open"
+
+    async def get_pull_request_head_sha(self, pr_number: int) -> str:
+        """The SHA of the head commit of a PR — ticket-492."""
+        url = f"{_BASE}/repos/{self._repo}/pulls/{pr_number}"
+        async with httpx.AsyncClient() as client:
+            resp = await self._requete(client, "GET", url)
+            resp.raise_for_status()
+        return str(resp.json()["head"]["sha"])
 
     async def has_workflows(self) -> bool:
         """Whether the repository declares at least one GitHub Actions workflow.
@@ -206,8 +341,12 @@ class GitHubService:
         pr_number: int,
         method: str = "squash",
         commit_title: str | None = None,
+        sha: str | None = None,
     ) -> None:
         """Merge la PR avec la méthode déclarée par le projet — ticket-265.
+
+        Avec `sha`, GitHub refuse (409) si la tête de la PR n'est plus ce
+        commit : le contrôle et le merge ne font qu'un geste (ticket-492).
 
         `method` vaut `squash` par défaut, ce qui correspond à la convention
         ticket → develop de ce dépôt (CLAUDE.md, section Git). La PR de
@@ -226,14 +365,14 @@ class GitHubService:
         payload: dict[str, str] = {"merge_method": method}
         if commit_title is not None:
             payload["commit_title"] = commit_title
+        if sha is not None:
+            payload["sha"] = sha
         async with httpx.AsyncClient() as client:
-            resp = await client.put(url, headers=self._headers, json=payload)
+            resp = await self._requete(client, "PUT", url, json=payload)
             resp.raise_for_status()
 
-    async def get_ci_status(
-        self, sha: str
-    ) -> Literal["pending", "passing", "failing", "none"]:
-        """Public CI check-runs query — used by the bulk PR status service."""
+    async def get_ci_status(self, sha: str) -> CiStatus:
+        """Public CI query — used by the bulk PR status service."""
         return await self._get_ci_status(sha)
 
     async def list_pull_requests(self, needed: set[int]) -> dict[int, PRListEntry]:
@@ -280,23 +419,61 @@ class GitHubService:
             page += 1
         return found
 
-    async def _get_ci_status(
-        self, sha: str
-    ) -> Literal["pending", "passing", "failing", "none"]:
-        url = f"{_BASE}/repos/{self._repo}/commits/{sha}/check-runs"
+    async def _get_ci_status(self, sha: str) -> CiStatus:
+        return (await self._lire_ci(sha))[0]
+
+    async def _lire_ci(self, sha: str) -> tuple[CiStatus, int | None]:
+        """Read the CI of a commit: its state, and the HTTP code when unreadable.
+
+        Reads the workflow runs first: a fine-grained token can (ticket-450).
+        Only a 403 or 404 there falls back on `check-runs`; when both are
+        refused the CI is `unreadable`, not `none` (ticket-449). Any other
+        non-200 answer keeps the former `none`.
+        """
         async with httpx.AsyncClient() as client:
-            resp = await client.get(url, headers=self._headers)
-            if resp.status_code != 200:
-                return "none"
+            runs_url = f"{_BASE}/repos/{self._repo}/actions/runs"
+            resp = await self._requete(
+                client, "GET", runs_url, params={"head_sha": sha}
+            )
+            if resp.status_code not in (403, 404):
+                return self._etat_des_workflow_runs(resp)
+            checks_url = f"{_BASE}/repos/{self._repo}/commits/{sha}/check-runs"
+            resp = await self._requete(client, "GET", checks_url)
+        return self._etat_des_check_runs(resp)
+
+    @staticmethod
+    def _etat_des_workflow_runs(resp: httpx.Response) -> tuple[CiStatus, int | None]:
+        """Turn an `actions/runs` answer into a CI state."""
+        if resp.status_code != 200:
+            return "none", None
+        runs: list[dict[str, Any]] = resp.json().get("workflow_runs", [])
+        if not runs:
+            return "none", None
+        if any(r.get("status") != "completed" for r in runs):
+            return "pending", None
+        conclusions = [r.get("conclusion") for r in runs]
+        if "action_required" in conclusions:
+            return "pending", None
+        if any(c in ("failure", "timed_out", "cancelled") for c in conclusions):
+            return "failing", None
+        return "passing", None
+
+    @staticmethod
+    def _etat_des_check_runs(resp: httpx.Response) -> tuple[CiStatus, int | None]:
+        """Turn a `check-runs` answer into a CI state."""
+        if resp.status_code in (403, 404):
+            return "unreadable", resp.status_code
+        if resp.status_code != 200:
+            return "none", None
         runs: list[dict[str, Any]] = resp.json().get("check_runs", [])
         if not runs:
-            return "none"
+            return "none", None
         conclusions = [r.get("conclusion") for r in runs]
         if any(c in (None, "action_required") for c in conclusions):
-            return "pending"
+            return "pending", None
         if any(c in ("failure", "timed_out", "cancelled") for c in conclusions):
-            return "failing"
-        return "passing"
+            return "failing", None
+        return "passing", None
 
     async def _lire_mergeabilite(self, pr_number: int) -> bool | None:
         """Read the 'mergeable' field of a pull request.
@@ -306,7 +483,7 @@ class GitHubService:
         """
         url = f"{_BASE}/repos/{self._repo}/pulls/{pr_number}"
         async with httpx.AsyncClient() as client:
-            resp = await client.get(url, headers=self._headers)
+            resp = await self._requete(client, "GET", url)
             resp.raise_for_status()
         raw = resp.json().get("mergeable")
         if raw is None:
@@ -322,8 +499,11 @@ class GitHubService:
         intervalle_s: float = 5.0,
         intervalle_max_s: float = 30.0,
         dormir: Callable[[float], Awaitable[None]] = asyncio.sleep,
+        sha: str | None = None,
     ) -> None:
         """Merge the PR after verifying GitHub has computed mergeability.
+
+        `sha`, when given, is the head the merge is bound to (ticket-492).
 
         Polls the PR until `mergeable` is non-null (up to
         `attente_fusionnabilite_max_s` seconds). The polling interval grows
@@ -371,14 +551,14 @@ class GitHubService:
         # state can lag behind the field it just returned.
         try:
             await self.merge_pull_request(
-                pr_number, method=method, commit_title=commit_title
+                pr_number, method=method, commit_title=commit_title, sha=sha
             )
         except httpx.HTTPStatusError as exc:
             if exc.response.status_code != 405:
                 raise
             await dormir(intervalle_s)
             await self.merge_pull_request(
-                pr_number, method=method, commit_title=commit_title
+                pr_number, method=method, commit_title=commit_title, sha=sha
             )
 
     async def get_repository_info(self) -> RepositoryInfo:

@@ -19,6 +19,13 @@ const LIBELLES_ETAT: Partial<Record<EtatDesNotifications, string>> = {
   indisponibles: "non prises en charge ici",
 };
 
+/** Ce que le cockpit sait des notifications : l'état, et le moyen de le changer. */
+export interface ReglageDesNotifications {
+  active: boolean;
+  etat: EtatDesNotifications;
+  onChange: (v: boolean) => void;
+}
+
 interface ReglageNotificationsProps {
   active: boolean;
   etat: EtatDesNotifications;

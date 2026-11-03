@@ -13,24 +13,24 @@ La politique se lit donc **une fois**, par l'orchestrateur, et voyage jusqu'aux
 services qui en dépendent. Ce qu'un agent écrit dans `agents.json` ne vaut
 qu'au run suivant — et le hook de périmètre le lui refuse de toute façon.
 """
-import json
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal
 
 from tessera.services.artifacts import ArtifactMode, read_artifact_mode
 from tessera.services.autonomie import NiveauAutonomie, lire_niveau
+from tessera.services.manifeste import lire_booleen, lire_chaine
+from tessera.models.worktree_config import ConfigWorktree
 from tessera.services.project_loader import load_pipeline_config
+from tessera.services.racine_depot import est_ancestor, racine_ecriture_projet
+from tessera.services.worktree_dossiers import DossiersWorktree
+from tessera.services.worktree_politique import lire_worktree
 
 #: Méthodes de merge acceptées par GitHub.
 MergeMethod = Literal["squash", "merge", "rebase"]
 
 #: Valeurs reconnues — toute autre valeur retombe sur le défaut fermé.
 _MERGE_METHODS_VALIDES: frozenset[str] = frozenset({"squash", "merge", "rebase"})
-
-#: La seule valeur qui ouvre le dépôt parent (ADR-028). Une valeur inconnue
-#: ne désarme rien.
-_GIT_ROOT_ANCESTOR = "ancestor"
 
 
 @dataclass(frozen=True)
@@ -58,6 +58,10 @@ class PolitiqueRun:
     #: Absente ou inconnue dans agents.json : `squash`. Le défaut protège :
     #: squash est la convention de ce dépôt (CLAUDE.md, section Git).
     merge_method: MergeMethod = "squash"
+    #: Le worktree que le projet déclare (ADR-056, ticket-521). `None` : clef
+    #: absente, illisible, mal typée, ou projet en `artifacts: local` — le run
+    #: reste dans le checkout. Rien ne le consomme encore.
+    worktree: ConfigWorktree | None = None
 
     @classmethod
     def lire(cls, project_path: Path) -> "PolitiqueRun":
@@ -66,15 +70,19 @@ class PolitiqueRun:
         Réutilise les lecteurs existants plutôt que d'en écrire un cinquième :
         chacun porte son défaut fermé et son traitement du fichier illisible.
         """
+        git_root = lire_chaine(project_path, "git_root")
+        artifacts = read_artifact_mode(project_path)
+        racine_depot = cls(git_root=git_root).racine_ecriture(project_path)
         return cls(
             autonomy=lire_niveau(project_path),
-            git_root=_lire_git_root(project_path),
-            artifacts=read_artifact_mode(project_path),
+            git_root=git_root,
+            artifacts=artifacts,
             test_command=load_pipeline_config(project_path).test_command,
-            base_branch=_lire_chaine(project_path, "base_branch"),
-            merge_without_ci=_lire_booleen(project_path, "merge_without_ci"),
-            confidentialite=_lire_chaine(project_path, "confidentiality"),
+            base_branch=lire_chaine(project_path, "base_branch"),
+            merge_without_ci=lire_booleen(project_path, "merge_without_ci"),
+            confidentialite=lire_chaine(project_path, "confidentiality"),
             merge_method=_lire_merge_method(project_path),
+            worktree=lire_worktree(project_path, racine_depot, artifacts),
         )
 
     @property
@@ -90,42 +98,27 @@ class PolitiqueRun:
     @property
     def dans_le_depot_parent(self) -> bool:
         """True si le projet travaille dans le dépôt qui le contient (ADR-028)."""
-        return self.git_root == _GIT_ROOT_ANCESTOR
+        return est_ancestor(self.git_root)
 
-    def racine_ecriture(self, project_path: Path) -> Path:
+    def racine_ecriture(
+        self, project_path: Path, worktree: DossiersWorktree | None = None
+    ) -> Path:
         """Le dossier sous lequel les agents de ce run ont le droit d'écrire.
 
         Le dossier du projet, ou le dépôt qui le contient s'il l'a déclaré —
         le dépôt, pas le simple parent : `projects/` ne serait ni la bonne
         racine ni une racine qui veut dire quelque chose (ADR-031).
+
+        Avec un worktree (ADR-056), la racine est la sienne et jamais celle du
+        checkout : la racine du worktree pour un projet `ancestor`, le dossier
+        du projet dans le worktree sinon. Résolue comme les autres : un lien
+        posé dans le worktree sort de la racine, donc reste en lecture seule.
         """
-        racine = project_path.resolve()
-        if not self.dans_le_depot_parent:
-            return racine
-        for candidat in racine.parents:
-            if (candidat / ".git").exists():
-                return candidat
-        return racine.parent
-
-
-def _lire_git_root(project_path: Path) -> str | None:
-    return _lire_chaine(project_path, "git_root")
-
-
-def _lire_booleen(project_path: Path, clef: str) -> bool:
-    """Un booléen du manifeste. Tout ce qui n'est pas `True` ne désarme rien.
-
-    Une chaîne « oui », un entier, une clef absente : le défaut fermé d'ADR-023
-    vaut ici aussi — une valeur qu'on ne comprend pas ne lève pas une garde.
-    """
-    agents_json = project_path / "agents.json"
-    if not agents_json.is_file():
-        return False
-    try:
-        data = json.loads(agents_json.read_text(encoding="utf-8"))
-    except (json.JSONDecodeError, OSError):
-        return False
-    return data.get(clef) is True
+        if worktree is not None:
+            if self.dans_le_depot_parent:
+                return worktree.racine.resolve()
+            return worktree.projet.resolve()
+        return racine_ecriture_projet(project_path, self.dans_le_depot_parent)
 
 
 def _lire_merge_method(project_path: Path) -> MergeMethod:
@@ -135,25 +128,7 @@ def _lire_merge_method(project_path: Path) -> MergeMethod:
     protège, l'exception s'énonce (ADR-023). `squash` est la convention de
     ticket → develop sur ce dépôt (CLAUDE.md, section Git).
     """
-    valeur = _lire_chaine(project_path, "merge_method")
+    valeur = lire_chaine(project_path, "merge_method")
     if valeur in _MERGE_METHODS_VALIDES:
         return valeur  # type: ignore[return-value]
     return "squash"
-
-
-def _lire_chaine(project_path: Path, clef: str) -> str | None:
-    """Une chaîne du manifeste, `None` si absente, illisible ou mal typée.
-
-    Un seul lecteur pour les clefs de cette forme : `git_root` en avait le
-    sien, et `base_branch` aurait été le deuxième à répéter les mêmes quatre
-    gardes.
-    """
-    agents_json = project_path / "agents.json"
-    if not agents_json.is_file():
-        return None
-    try:
-        data = json.loads(agents_json.read_text(encoding="utf-8"))
-    except (json.JSONDecodeError, OSError):
-        return None
-    valeur = data.get(clef)
-    return valeur if isinstance(valeur, str) else None

@@ -7,11 +7,16 @@ from pathlib import Path
 from tessera.config import _REPO_ROOT
 from tessera.models.project import ProjectCreate, ProjectFromTemplateResult
 from tessera.services.git_link import init_repository
+from tessera.services.manifeste import lire_liste
 from tessera.services.project_loader import ProjectLoader
 from tessera.services.modeles_par_defaut import MODELE_JUGEMENT, MODELE_PRODUCTION
+from tessera.services.template_claude_md import write_claude_md
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
+
+# Branche de base : écrite dans agents.json et donnée à `git init -b`.
+_BASE_BRANCH = "main"
 
 # Répertoire du gabarit, ancré sur la racine du dépôt.
 _TEMPLATE_DIR = _REPO_ROOT / "templates" / "fastapi-react"
@@ -29,12 +34,13 @@ _TEST_COMMAND = (
     " && uv --directory backend run python -m pytest -q"
 )
 
-# Rôles des projets créés depuis le gabarit : production sur Sonnet, jugement
-# et documentation sur Haiku via l'abonnement (configuration de vigie).
+# Rôles des projets créés depuis le gabarit : production et documentation sur
+# Sonnet (ADR-057), jugement sur Haiku via l'abonnement (configuration de vigie).
 _MODELE_PRODUCTION = MODELE_PRODUCTION
 _MODELE_JUGEMENT = MODELE_JUGEMENT
 _ROLES_PRODUCTION = ["codeur", "architect", "reviewer"]
-_ROLES_JUGEMENT = ["securite", "validateur", "doc-technique", "doc-fonctionnelle"]
+_ROLES_JUGEMENT = ["securite", "validateur"]
+_ROLES_DOCUMENTATION = ["doc-technique", "doc-fonctionnelle"]
 _ROLES_AVEC_SKILL_DESIGN = {"codeur", "architect"}
 
 
@@ -52,16 +58,12 @@ def _collect_used_ports(workspace: Path) -> set[int]:
             continue
 
         # Ports déclarés dans les services de agents.json
-        agents_json = project_dir / "agents.json"
-        if agents_json.exists():
-            try:
-                data = json.loads(agents_json.read_text(encoding="utf-8"))
-                for service in data.get("services", []):
-                    commande = service.get("commande", "")
-                    for m in re.finditer(r"--port[= ](\d+)", commande):
-                        used.add(int(m.group(1)))
-            except Exception:
-                pass
+        for service in lire_liste(project_dir, "services") or []:
+            commande = service.get("commande", "") if isinstance(service, dict) else ""
+            if not isinstance(commande, str):
+                continue
+            for m in re.finditer(r"--port[= ](\d+)", commande):
+                used.add(int(m.group(1)))
 
         # Port déclaré dans frontend/vite.config.ts
         vite_config = project_dir / "frontend" / "vite.config.ts"
@@ -124,23 +126,26 @@ def _build_agents_json(project_id: str, backend_port: int, frontend_port: int) -
         }
         for role in _ROLES_PRODUCTION
     ]
+    modeles_texte = [
+        (role, _MODELE_JUGEMENT) for role in _ROLES_JUGEMENT
+    ] + [(role, _MODELE_PRODUCTION) for role in _ROLES_DOCUMENTATION]
     agents += [
         {
             "role": role,
-            "model": _MODELE_JUGEMENT,
+            "model": modele,
             "max_tokens": 4096,
             "prompt_file": f"agents/prompts/{role}.md",
             "active": True,
             "provider": "agent_sdk",
         }
-        for role in _ROLES_JUGEMENT
+        for role, modele in modeles_texte
     ]
     data: dict[str, object] = {
         "project_id": project_id,
         "artifacts": "tracked",
         "autonomy": "merge",
         "merge_without_ci": True,
-        "base_branch": "main",
+        "base_branch": _BASE_BRANCH,
         "agents": agents,
         "services": [
             {
@@ -214,10 +219,15 @@ async def create_project_from_template(
         encoding="utf-8",
     )
 
-    # Initialisation du dépôt git (lit artifacts: tracked depuis agents.json).
+    # Le CLAUDE.md générique de create_project ignore agents et stack : on le
+    # réécrit d'après le manifeste qui vient d'être posé.
+    write_claude_md(project_path, name, backend_port, frontend_port)
+
+    # Initialisation du dépôt git (lit artifacts: tracked depuis agents.json),
+    # sur la branche de base déclarée dans le manifeste.
     git_ready = False
     try:
-        await init_repository(project_path)
+        await init_repository(project_path, initial_branch=_BASE_BRANCH)
         git_ready = True
     except Exception as exc:
         _logger.warning(

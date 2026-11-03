@@ -1,0 +1,172 @@
+"""Capture a running project's screens — ticket-432.
+
+Le backend vérifie que l'app répond, puis délègue la prise de vue à un
+exécuteur : par défaut `scripts/captures.mjs`, qui utilise le Playwright du
+frontend de Tessera. Les images vont dans le dossier d'état de l'IDE, hors du
+dépôt du projet (ADR-021) : une capture n'a pas à finir dans un commit.
+"""
+import asyncio
+import json
+import re
+from collections.abc import Awaitable, Callable
+from pathlib import Path
+from urllib.parse import urlsplit
+
+from tessera.config import settings
+from tessera.services.captures_config import ConfigCaptures
+from tessera.services.lancement import essais_de_commande
+from tessera.utils.logger import get_logger
+
+_logger = get_logger(__name__)
+
+_SCRIPT = Path(__file__).resolve().parents[4] / "scripts" / "captures.mjs"
+_DELAI_SONDE_S = 2.0
+_DELAI_EXECUTEUR_S = 300.0
+
+#: Forme d'un nom de capture : `<nom>-<largeur>-<thème>.png`. La largeur est un
+#: entier quelconque : ce que le projet déclare est borné par sa configuration.
+MOTIF_FICHIER = re.compile(r"^[a-z0-9-]+-[0-9]{1,4}-(clair|sombre)\.png$")
+
+Executeur = Callable[[ConfigCaptures, Path, str | None], Awaitable[None]]
+
+
+class CapturesEchouees(Exception):
+    """The capture run failed or did not produce every expected image."""
+
+
+#: Un identifiant de ticket sert de nom de dossier : rien d'autre n'y passe.
+MOTIF_TICKET = re.compile(r"^ticket-[0-9]+$")
+
+
+def dossier_des_captures(project_id: str, ticket: str | None = None) -> Path:
+    """Return where captures live, outside the repository.
+
+    Without `ticket`, the folder of the on-demand captures of the project ;
+    with one, the sub-folder of the captures a run took (ticket-618).
+    """
+    dossier = settings.ide_state_dir / "captures" / project_id
+    if ticket is None:
+        return dossier
+    if not MOTIF_TICKET.fullmatch(ticket):
+        raise ValueError(f"Identifiant de ticket invalide : {ticket!r}")
+    return dossier / ticket
+
+
+def lister_les_captures(project_id: str, ticket: str) -> list[str]:
+    """Return the image names a run took, sorted ; empty when it took none.
+
+    Seuls les fichiers dont le nom a la forme d'une capture sont rendus : ce que
+    l'endpoint annonce est exactement ce que `servir_une_capture` accepte.
+    """
+    dossier = dossier_des_captures(project_id, ticket)
+    if not dossier.is_dir():
+        return []
+    return sorted(
+        f.name for f in dossier.iterdir() if f.is_file() and MOTIF_FICHIER.fullmatch(f.name)
+    )
+
+
+def noms_attendus(config: ConfigCaptures) -> list[str]:
+    """Return the `<nom>-<largeur>-<thème>.png` names, one per width and theme."""
+    return [
+        f"{ecran.nom}-{largeur}-{theme}.png"
+        for ecran in config.ecrans
+        for largeur in config.largeurs
+        for theme in config.themes
+    ]
+
+
+async def app_repond(url: str) -> bool:
+    """Return True when something accepts a TCP connection at this URL."""
+    parties = urlsplit(url)
+    if not parties.hostname:
+        return False
+    port = parties.port or (443 if parties.scheme == "https" else 80)
+    try:
+        _, writer = await asyncio.wait_for(
+            asyncio.open_connection(parties.hostname, port), _DELAI_SONDE_S
+        )
+    except (OSError, asyncio.TimeoutError):
+        return False
+    writer.close()
+    return True
+
+
+def _charge(config: ConfigCaptures, jeton: str | None) -> bytes:
+    """Build the JSON sent on stdin ; the token travels only here."""
+    charge: dict[str, object] = {
+        "url": config.url,
+        "largeurs": list(config.largeurs),
+        "themes": list(config.themes),
+        "ecrans": [
+            {"nom": e.nom, "chemin": e.chemin, "clic": e.clic} for e in config.ecrans
+        ],
+    }
+    if config.session is not None and jeton:
+        charge["session"] = {"chemin": config.session.chemin, "jeton": jeton}
+    return json.dumps(charge).encode("utf-8")
+
+
+async def _lancer_le_script(
+    commande: list[str], config: ConfigCaptures, sortie: Path, jeton: str | None
+) -> tuple[int, str]:
+    # Le jeton n'est jamais dans les arguments : `ps` les montre à tout le monde.
+    processus = await asyncio.create_subprocess_exec(
+        *commande,
+        str(sortie),
+        stdin=asyncio.subprocess.PIPE,
+        stdout=asyncio.subprocess.DEVNULL,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    _, erreurs = await processus.communicate(_charge(config, jeton))
+    texte = erreurs.decode("utf-8", "replace").strip()
+    if jeton:
+        texte = texte.replace(jeton, "***")
+    return processus.returncode or 0, texte
+
+
+async def executeur_playwright(
+    config: ConfigCaptures, sortie: Path, jeton: str | None = None
+) -> None:
+    """Run `scripts/captures.mjs` without a shell, config given on stdin."""
+    for commande in essais_de_commande(["node", str(_SCRIPT)]):
+        try:
+            code, erreurs = await _lancer_le_script(commande, config, sortie, jeton)
+        except FileNotFoundError:
+            continue
+        if code != 0:
+            raise CapturesEchouees(erreurs or f"Le script s'est terminé en {code}.")
+        return
+    raise CapturesEchouees("Node est introuvable : il faut `node` dans le PATH.")
+
+
+async def capturer(
+    project_id: str,
+    config: ConfigCaptures,
+    executeur: Executeur | None = None,
+    jeton: str | None = None,
+    ticket: str | None = None,
+) -> list[str]:
+    """Capture every declared screen and return the image names, in order.
+
+    `jeton` is handed to the executor only ; it is never logged or returned.
+    `ticket` sends the images to the run's own sub-folder.
+    """
+    sortie = dossier_des_captures(project_id, ticket)
+    sortie.mkdir(parents=True, exist_ok=True)
+    attendus = noms_attendus(config)
+    # Une image d'un tour précédent ferait passer un échec pour une réussite.
+    for nom in attendus:
+        (sortie / nom).unlink(missing_ok=True)
+    try:
+        lancer = executeur or executeur_playwright
+        await asyncio.wait_for(lancer(config, sortie, jeton), _DELAI_EXECUTEUR_S)
+    except asyncio.TimeoutError as exc:
+        raise CapturesEchouees(
+            f"Les captures n'ont pas fini en {int(_DELAI_EXECUTEUR_S)} s."
+        ) from exc
+    manquantes = [nom for nom in attendus if not (sortie / nom).is_file()]
+    if manquantes:
+        raise CapturesEchouees(f"Captures manquantes : {', '.join(manquantes)}.")
+    _logger.info("captures_prises", extra={"projet": project_id, "nombre": len(attendus)})
+    return attendus

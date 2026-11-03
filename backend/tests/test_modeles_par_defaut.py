@@ -3,7 +3,7 @@ import json
 import re
 from pathlib import Path
 
-from tessera.services import security_auditor, validator
+from tessera.services import documentation, security_auditor, validator
 from tessera.services.modeles_par_defaut import (
     MODELE_JUGEMENT,
     MODELE_PRODUCTION,
@@ -27,13 +27,14 @@ def test_no_stale_model_id_in_services() -> None:
 
 
 def test_default_manifest_uses_current_models() -> None:
-    data = json.loads(
-        _default_agents_json("p", ["codeur", "reviewer", "validateur"], "tracked")
-    )
+    roles = ["codeur", "reviewer", "validateur", "doc-technique", "doc-fonctionnelle"]
+    data = json.loads(_default_agents_json("p", roles, "tracked"))
     modeles = {a["role"]: a["model"] for a in data["agents"]}
     assert modeles["codeur"] == MODELE_PRODUCTION
     assert modeles["reviewer"] == MODELE_PRODUCTION
     assert modeles["validateur"] == MODELE_JUGEMENT
+    assert modeles["doc-technique"] == MODELE_PRODUCTION
+    assert modeles["doc-fonctionnelle"] == MODELE_PRODUCTION
 
 
 def test_judgment_services_default_to_judgment_model() -> None:
@@ -41,3 +42,14 @@ def test_judgment_services_default_to_judgment_model() -> None:
     assert validator._MODEL == MODELE_JUGEMENT
     assert modele_par_defaut("securite") == MODELE_JUGEMENT
     assert modele_par_defaut("architect") == MODELE_PRODUCTION
+
+
+def test_documentation_roles_default_to_production_model() -> None:
+    assert modele_par_defaut("doc-technique") == MODELE_PRODUCTION
+    assert modele_par_defaut("doc-fonctionnelle") == MODELE_PRODUCTION
+    assert modele_par_defaut("validateur") == MODELE_JUGEMENT
+    assert modele_par_defaut("inconnu") == MODELE_JUGEMENT
+
+
+def test_documentation_service_fallback_follows_production_model() -> None:
+    assert documentation._MODELE == MODELE_PRODUCTION

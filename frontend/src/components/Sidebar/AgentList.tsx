@@ -7,6 +7,7 @@ import { api } from "../../lib/api";
 import { useAgents } from "../../hooks/useAgents";
 import type { AgentInfo } from "../../types/api";
 import AgentCreatorModal from "./AgentCreatorModal";
+import Modale from "../../design/ui/Modale";
 
 interface AgentRowProps {
   agent: AgentInfo;
@@ -36,7 +37,7 @@ function AgentRow({
         type="button"
         onClick={() => onSelect?.(agent.role)}
         title={agent.prompt_preview || undefined}
-        className={`min-w-0 flex-1 truncate text-left font-mono text-mini transition-colors ${
+        className={`min-w-0 flex-1 truncate text-left text-mini transition-colors ${
           selectionne ? "text-zinc-100" : "text-zinc-200 hover:text-zinc-100"
         }`}
       >
@@ -164,11 +165,10 @@ export default function AgentList({
       )}
 
       {aConfirmer && (
-        <div
-          role="dialog"
-          aria-modal="true"
+        <Modale
+          onFermer={() => setAConfirmer(null)}
+          fermerSurLeFond={false}
           aria-label="Confirmer la suppression"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
         >
           <div className="w-full max-w-sm rounded-lg border border-zinc-700 bg-zinc-900 p-5 shadow-xl">
             <h2 className="mb-2 text-sm font-medium text-zinc-100">
@@ -196,7 +196,7 @@ export default function AgentList({
               </button>
             </div>
           </div>
-        </div>
+        </Modale>
       )}
     </div>
   );

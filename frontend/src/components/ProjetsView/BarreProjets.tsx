@@ -11,10 +11,15 @@ interface BarreProjetsProps {
   /** Nombre de projets, toutes catégories confondues. */
   total: number;
   onChange: (f: FiltresProjets) => void;
+  onImporter: () => void;
+  onCreer: () => void;
 }
 
 const CHAMP =
   "rounded-sm border border-zinc-700 bg-zinc-950 px-2 py-1 text-xs text-zinc-300 outline-hidden focus:border-zinc-500";
+
+const BOUTON =
+  "rounded-sm bg-zinc-700 px-3 py-1 text-xs text-zinc-200 transition-colors hover:bg-zinc-600";
 
 function Pastille({
   libelle,
@@ -50,6 +55,8 @@ export default function BarreProjets({
   pastilles,
   total,
   onChange,
+  onImporter,
+  onCreer,
 }: BarreProjetsProps) {
   return (
     <div className="flex flex-col gap-2 border-b border-zinc-800 px-4 py-3">
@@ -76,6 +83,12 @@ export default function BarreProjets({
             </option>
           ))}
         </select>
+        <button type="button" onClick={onImporter} className={BOUTON}>
+          Importer un projet
+        </button>
+        <button type="button" onClick={onCreer} className={BOUTON}>
+          Créer un projet
+        </button>
       </div>
       <div className="flex flex-wrap gap-1.5">
         <Pastille

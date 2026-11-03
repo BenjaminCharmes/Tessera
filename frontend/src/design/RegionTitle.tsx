@@ -29,8 +29,8 @@ export default function RegionTitle({
         }`}
       />
       <span
-        className={`font-semibold uppercase tracking-wider ${
-          taille === "md" ? "text-xs text-zinc-300" : "text-mini text-zinc-400"
+        className={`font-semibold tracking-tight ${
+          taille === "md" ? "text-sm text-zinc-100" : "text-xs text-zinc-300"
         }`}
       >
         {children}

@@ -113,7 +113,7 @@ def _brancher(monkeypatch: pytest.MonkeyPatch) -> None:
     async def _build(project_id: str) -> _OrchestrateurQuiAttend:
         return _OrchestrateurQuiAttend()
 
-    monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
+    monkeypatch.setattr("tessera.routers.orchestrator.build_orchestrator", _build)
 
 
 def _demarrer(client: TestClient, project_id: str, ticket_id: str) -> str:

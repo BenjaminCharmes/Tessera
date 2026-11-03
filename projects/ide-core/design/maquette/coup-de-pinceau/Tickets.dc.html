@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Tickets d'un projet</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#09090b}
+a{color:#a78bfa}a:hover{color:#c4b5fd}
+</style>
+</helmet>
+<div style="min-height: 900px; display: flex; flex-wrap: wrap; background: #09090b; color: #f4f4f5; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 14px">
+  <nav aria-label="Navigation" style="flex: 0 0 96px; background: #18181b; border-right: 1px solid #27272a; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px 0">
+    <div style="width: 32px; height: 32px; border-radius: 8px; background: #6d28d9" aria-hidden="true"></div>
+    <span style="font-size: 10px; color: #a1a1aa; letter-spacing: .08em; margin-top: 4px">PROJET</span>
+    <button type="button" aria-label="Changer de projet : Tessera" style="width: 80px; padding: 8px 4px; border-radius: 8px; background: #27272a; border: 1px solid #3f3f46; color: #fafafa; font: inherit; font-size: 12px; font-weight: 600; cursor: pointer">Tessera ▾</button>
+    <a href="#" style="width: 80px; padding: 8px 0; text-align: center; color: #fafafa; text-decoration: none; font-size: 12px; border-radius: 6px; background: #2e1065; box-shadow: inset 0 0 0 1px #6d28d9">Tickets</a>
+    <a href="#" style="width: 80px; padding: 8px 0; text-align: center; color: #d4d4d8; text-decoration: none; font-size: 12px; border-radius: 6px">Fichiers</a>
+    <a href="#" style="width: 80px; padding: 8px 0; text-align: center; color: #d4d4d8; text-decoration: none; font-size: 12px; border-radius: 6px">Historique</a>
+  </nav>
+  <main style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column">
+    <header style="height: 44px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid #27272a; background: #18181b">
+      <span style="width: 3px; height: 14px; background: #8b5cf6" aria-hidden="true"></span>
+      <h1 style="margin: 0; font-size: 13px; letter-spacing: .06em; font-weight: 600">TICKETS · TESSERA</h1>
+      <span style="margin-left: auto; display: flex; gap: 8px">
+        <button type="button" style="min-height: 32px; padding: 0 12px; border-radius: 6px; background: #27272a; border: 1px solid #3f3f46; color: #f4f4f5; font: inherit; font-size: 13px; cursor: pointer">Planifier</button>
+        <button type="button" style="min-height: 32px; padding: 0 12px; border-radius: 6px; background: #6d28d9; border: 0; color: #fafafa; font: inherit; font-size: 13px; cursor: pointer">Nouveau ticket</button>
+      </span>
+    </header>
+    <section style="flex: 1; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; padding: 16px 20px; align-items: start">
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <h2 style="margin: 0; font-size: 12px; color: #a1a1aa; font-weight: 600">À faire · 7</h2>
+        <article style="padding: 12px; border-radius: 8px; background: #18181b; border: 1px solid #27272a; display: flex; flex-direction: column; gap: 6px"><span style="font-size: 11px; color: #a1a1aa">ticket-691 · refactor</span><span>Le chargeur de projets découpé par rôle</span></article>
+        <article style="padding: 12px; border-radius: 8px; background: #18181b; border: 1px solid #27272a; display: flex; flex-direction: column; gap: 6px"><span style="font-size: 11px; color: #a1a1aa">ticket-731 · feat</span><span>L'audit sécurité sait ce que le ticket laisse au suivant</span></article>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <h2 style="margin: 0; font-size: 12px; color: #a1a1aa; font-weight: 600">En cours · 1</h2>
+        <article style="padding: 12px; border-radius: 8px; background: #18181b; border: 1px solid #1e40af; display: flex; flex-direction: column; gap: 6px"><span style="font-size: 11px; color: #a1a1aa">ticket-690 · refactor</span><span>Le module de base découpé par domaine</span><span style="font-size: 12px; color: #60a5fa">● Codeur au travail · 4 min</span></article>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <h2 style="margin: 0; font-size: 12px; color: #a1a1aa; font-weight: 600">En revue · 1</h2>
+        <article style="padding: 12px; border-radius: 8px; background: #18181b; border: 1px solid #27272a; display: flex; flex-direction: column; gap: 6px"><span style="font-size: 11px; color: #a1a1aa">ticket-674 · design</span><span>Une PR devenue conflictuelle se met à jour sans push forcé</span><span style="font-size: 12px; color: #a1a1aa">PR #823 · CI en cours</span></article>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <h2 style="margin: 0; font-size: 12px; color: #a1a1aa; font-weight: 600">Bloqués · 0</h2>
+        <p style="margin: 0; padding: 12px; border-radius: 8px; border: 1px dashed #3f3f46; color: #a1a1aa; font-size: 12px">Rien de bloqué.</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <h2 style="margin: 0; font-size: 12px; color: #a1a1aa; font-weight: 600">Faits · 690</h2>
+        <article style="padding: 12px; border-radius: 8px; background: #18181b; border: 1px solid #27272a; display: flex; flex-direction: column; gap: 6px"><span style="font-size: 11px; color: #a1a1aa">ticket-698 · refactor</span><span>Trois composants passent sous 300 lignes</span><span style="font-size: 12px; color: #4ade80">✓ mergé · PR #822</span></article>
+      </div>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

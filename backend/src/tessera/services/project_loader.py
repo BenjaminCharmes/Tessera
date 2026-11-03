@@ -1,25 +1,37 @@
 import asyncio
-import json
-import re
 from pathlib import Path
 
 from tessera.models.agent import AgentConfig, AgentPipelineConfig
 from tessera.models.project import Project, ProjectCreate
 from tessera.services.artifacts import default_mode_for
-from tessera.services.modeles_par_defaut import modele_par_defaut
-from tessera.services.providers.noms import (
-    PROVIDERS_ANTHROPIC,
-    PROVIDERS_CONNUS,
-    ProviderInconnu,
+from tessera.services.extraction_claude_md import (
+    lire_readme,
+    parse_active_agents,
+    parse_description,
+    parse_name,
+    parse_stack,
 )
+from tessera.services.forge import parse_remote
+from tessera.services.gabarits_projet import default_agents_json, default_claude_md
+from tessera.services.manifeste import lire_chaine, lire_liste, lire_valeur
 
-# ------------------------------------------------------------------
-# Project-id validation — ticket-370
-# ------------------------------------------------------------------
+# Ré-exports : ces noms vivaient ici avant le ticket-691 et des appelants (les
+# tests, notamment) les importent encore depuis ce module.
+from tessera.services.manifeste_ecriture import (
+    AgentAbsentDuProjet as AgentAbsentDuProjet,
+    ModeleInconnu as ModeleInconnu,
+    set_agent_model as set_agent_model,
+    set_agent_provider as set_agent_provider,
+    set_pipeline_settings as set_pipeline_settings,
+)
+from tessera.services.providers.declaration import verifier_configs, verifier_entrees
+from tessera.services.providers.noms import PROVIDERS_CONNUS
+from tessera.utils.logger import get_logger
 
-# La validation des identifiants vit dans `tessera.utils.project_id`
-# (ticket-370) : les modèles en ont besoin aussi, et ce module les importe.
+_logger = get_logger(__name__)
 
+# Ancien nom du générateur, importé par les tests.
+_default_agents_json = default_agents_json
 
 
 # ------------------------------------------------------------------
@@ -69,22 +81,45 @@ def load_project(project_path: Path) -> Project:
     github_forge, github_slug = _load_github_remote(project_path)
     project = Project(
         id=project_path.name,
-        name=_parse_name(raw, fallback=project_path.name),
+        name=parse_name(raw, fallback=project_path.name),
         path=project_path,
         # Une description déclarée l'emporte : quand ni le CLAUDE.md ni le
         # README ne présentent le projet (ticket-399, cartes de projets).
         description=_chaine_declaree(project_path, "description")
-        or _parse_description(raw, _lire_readme(project_path)),
-        active_agents=_parse_active_agents(raw),
-        stack=_parse_stack(raw),
+        or parse_description(raw, lire_readme(project_path)),
+        active_agents=parse_active_agents(raw),
+        stack=parse_stack(raw),
         raw_claude_md=raw,
         github_remote=github_slug,
         github_forge=github_forge,
         category=_load_category(project_path),
         fait_tourner_l_ide=fait_tourner_l_ide(project_path),
+        avertissements=_avertissements_du_manifeste(project_path),
     )
     _project_cache[key] = project
     return project
+
+
+def _avertissements_du_manifeste(project_path: Path) -> list[str]:
+    """Signale un `project_id` d'`agents.json` qui ne suit pas le dossier.
+
+    Le nom du dossier reste l'identifiant : le manifeste ne le change pas, il
+    est seulement signalé (ticket-481). `agents.json` étant interdit aux
+    agents, la correction revient à l'humain.
+    """
+    declare = _chaine_declaree(project_path, "project_id")
+    if declare is None or declare == project_path.name:
+        return []
+    message = (
+        f"agents.json déclare project_id « {declare} » mais le dossier "
+        f"s'appelle « {project_path.name} » : l'identifiant retenu est "
+        f"« {project_path.name} »."
+    )
+    _logger.warning(
+        "project_id_mismatch",
+        extra={"folder": project_path.name, "declared": declare},
+    )
+    return [message]
 
 
 def list_projects(workspace: Path) -> list[Project]:
@@ -109,15 +144,8 @@ def _load_category(project_path: Path) -> str | None:
 
 def _chaine_declaree(project_path: Path, cle: str) -> str | None:
     """Une chaîne non vide déclarée à la racine d'`agents.json`, sinon `None`."""
-    agents_json = project_path / "agents.json"
-    if not agents_json.exists():
-        return None
-    try:
-        data = json.loads(agents_json.read_text(encoding="utf-8"))
-    except Exception:
-        return None
-    valeur = data.get(cle) if isinstance(data, dict) else None
-    if not isinstance(valeur, str) or not valeur.strip():
+    valeur = lire_chaine(project_path, cle)
+    if valeur is None or not valeur.strip():
         return None
     return valeur.strip()
 
@@ -128,46 +156,26 @@ def _load_github_remote(project_path: Path) -> tuple[str | None, str | None]:
     The raw value is never rewritten (ADR-036 pattern).
     Returns (None, None) when the field is absent, blank, or the file is unreadable.
     """
-    from tessera.services.github_workflow import parse_remote
-
-    agents_json = project_path / "agents.json"
-    if not agents_json.exists():
-        return None, None
-    try:
-        data = json.loads(agents_json.read_text(encoding="utf-8"))
-        value = data.get("github_remote")
-        return parse_remote(str(value) if value else None)
-    except Exception:
-        return None, None
+    value = lire_valeur(project_path, "github_remote")
+    return parse_remote(str(value) if value else None)
 
 
 def load_agents_config(project_path: Path) -> list[AgentConfig]:
     """Lit agents.json et retourne la liste des AgentConfig actifs."""
-    agents_json = project_path / "agents.json"
-    if not agents_json.exists():
+    brutes = lire_valeur(project_path, "agents")
+    if not isinstance(brutes, (list, tuple)):
         return []
+    entrees = list(brutes)
+    # Un provider mal orthographié, une clé en clair : pas un manifeste
+    # illisible. Le refus sort du `try`, sinon le rôle retomberait sur le
+    # défaut sans rien dire (tickets 188 et 669).
+    verifier_entrees(entrees)
     try:
-        data = json.loads(agents_json.read_text(encoding="utf-8"))
-        configs = [AgentConfig(**a) for a in data.get("agents", [])]
+        configs = [AgentConfig(**a) for a in entrees]
     except Exception:
         return []
-    # Un provider mal orthographié n'est pas un manifeste illisible : le
-    # taire enverrait le rôle sur le défaut sans rien dire (ticket-188).
-    for config in configs:
-        _verifier_provider(config.role, config.provider)
-        if config.fallback is not None:
-            _verifier_provider(config.role, config.fallback.provider, repli=True)
+    verifier_configs(configs, PROVIDERS_CONNUS)
     return configs
-
-
-def _verifier_provider(role: str, provider: str, repli: bool = False) -> None:
-    if provider in PROVIDERS_CONNUS:
-        return
-    quoi = "repli" if repli else "provider"
-    raise ProviderInconnu(
-        f"Rôle '{role}' : {quoi} inconnu {provider!r}. "
-        f"Valeurs acceptées : {', '.join(PROVIDERS_CONNUS)}."
-    )
 
 
 def fait_tourner_l_ide(
@@ -205,16 +213,7 @@ def load_services_config(project_path: Path) -> list[dict[str, str]]:
     n'est donc pas un manque à combler par une heuristique, c'est la réponse
     « ce projet ne se lance pas depuis l'IDE ».
     """
-    agents_json = project_path / "agents.json"
-    if not agents_json.exists():
-        return []
-    try:
-        data = json.loads(agents_json.read_text(encoding="utf-8"))
-    except Exception:
-        return []
-    services = data.get("services") or []
-    if not isinstance(services, list):
-        return []
+    services = lire_liste(project_path, "services") or []
     return [
         {
             "nom": str(s.get("nom", "")),
@@ -228,12 +227,11 @@ def load_services_config(project_path: Path) -> list[dict[str, str]]:
 
 def load_pipeline_config(project_path: Path) -> AgentPipelineConfig:
     """Lit la section pipeline de agents.json."""
-    agents_json = project_path / "agents.json"
-    if not agents_json.exists():
+    section = lire_valeur(project_path, "pipeline")
+    if section is None:
         return AgentPipelineConfig()
     try:
-        data = json.loads(agents_json.read_text(encoding="utf-8"))
-        return AgentPipelineConfig(**data.get("pipeline", {}))
+        return AgentPipelineConfig.model_validate(section)
     except Exception:
         return AgentPipelineConfig()
 
@@ -282,7 +280,7 @@ class ProjectLoader:
         ]:
             (project_path / subdir).mkdir(parents=True, exist_ok=True)
 
-        content = body.claude_md_content or _default_claude_md(
+        content = body.claude_md_content or default_claude_md(
             body.project_id, body.name, body.active_agents
         )
         (project_path / "CLAUDE.md").write_text(content, encoding="utf-8")
@@ -291,332 +289,9 @@ class ProjectLoader:
         # la modale de création n'en envoie aucun, si bien qu'un projet né de
         # l'UI n'en avait pas du tout, et retombait en silence sur un pipeline
         # codeur → reviewer (ticket-105).
-        agents_json = _default_agents_json(
+        agents_json = default_agents_json(
             body.project_id, body.active_agents, default_mode_for("create")
         )
         (project_path / "agents.json").write_text(agents_json, encoding="utf-8")
 
         return load_project(project_path)
-
-
-# ------------------------------------------------------------------
-# Parsers et templates internes
-# ------------------------------------------------------------------
-
-
-#: `CLAUDE.md` accolé au titre, avant ou après un tiret. Les prompts qui
-#: génèrent ces fichiers écrivent « # CLAUDE.md — NomDuProjet », ce qui est un
-#: bon en-tête de fichier et un mauvais nom de projet.
-_DECORATION = re.compile(
-    r"^\s*CLAUDE\.md\s*$"                       # le titre n'est que le fichier
-    r"|^\s*CLAUDE\.md\s*[—:–-]\s*(?:projet\s+)?"  # « CLAUDE.md — projet X »
-    r"|\s*[—:–-]\s*CLAUDE\.md\s*$",              # « X — CLAUDE.md »
-    re.IGNORECASE,
-)
-
-
-def _parse_name(content: str, fallback: str) -> str:
-    """Le nom lisible du projet, tiré du premier titre du CLAUDE.md (ADR-007).
-
-    Le titre sert deux choses à la fois : il annonce le fichier et il nomme le
-    projet. Les deux ne veulent pas la même chose — la barre latérale affichait
-    « Lyra — CLAUDE.md » et « CLAUDE.md — projet ide-core ». Le nom du
-    fichier est retiré ici, parce que c'est ici qu'on lit un **nom de projet**
-    (ticket-093).
-    """
-    for line in content.splitlines():
-        m = re.match(r"^#\s+(.+)", line)
-        if not m:
-            continue
-        titre = _DECORATION.sub("", m.group(1).strip()).strip()
-        return titre or fallback
-    return fallback
-
-
-#: Débuts de paragraphe qui ne sont pas de la prose : citation (une note aux
-#: agents, « > Fichier local uniquement… »), séparateur, HTML, tableau, code,
-#: liste.
-_PAS_DE_LA_PROSE = (">", "---", "***", "<", "|", "```", "- ", "* ", "!")
-
-#: Un paragraphe qui s'adresse aux agents (« Profil agent : … ») ne décrit pas
-#: le projet.
-_CONSIGNE_AUX_AGENTS = re.compile(r"^(\*\*)?profil (agent|attendu)\b", re.IGNORECASE)
-
-_MARKDOWN_EN_LIGNE: tuple[tuple[re.Pattern[str], str], ...] = (
-    (re.compile(r"!\[[^\]]*\]\([^)]*\)"), ""),  # image
-    (re.compile(r"\[([^\]]+)\]\([^)]*\)"), r"\1"),  # lien → son texte
-    (re.compile(r"(\*\*|__)(.+?)\1"), r"\2"),  # gras
-    (re.compile(r"(?<![\w*])\*(?!\s)(.+?)(?<!\s)\*(?![\w*])"), r"\1"),  # italique
-    (re.compile(r"(?<![\w_])_(?!\s)(.+?)(?<!\s)_(?![\w_])"), r"\1"),
-    (re.compile(r"`([^`]+)`"), r"\1"),  # code
-)
-
-
-def _texte_brut(markdown: str) -> str:
-    """Inline Markdown → plain text, whitespace collapsed (ticket-399 cards)."""
-    texte = markdown
-    for motif, remplacement in _MARKDOWN_EN_LIGNE:
-        texte = motif.sub(remplacement, texte)
-    return re.sub(r"\s+", " ", texte).strip()
-
-
-def _introduction(content: str) -> str:
-    """The first prose paragraph between the title and the first section.
-
-    Les notes aux agents (citations), les séparateurs, le HTML d'un README de
-    profil et les listes ne décrivent pas le projet : ils sont sautés.
-    """
-    paragraphes: list[list[str]] = [[]]
-    titre_vu = False
-    for ligne in content.splitlines():
-        brute = ligne.strip()
-        if brute.startswith("#"):
-            if titre_vu or brute.startswith("##"):
-                break
-            titre_vu = True
-            continue
-        if not brute:
-            paragraphes.append([])
-        else:
-            paragraphes[-1].append(brute)
-    for lignes in paragraphes:
-        if (
-            lignes
-            and not lignes[0].startswith(_PAS_DE_LA_PROSE)
-            and not _CONSIGNE_AUX_AGENTS.match(lignes[0])
-        ):
-            return _texte_brut(" ".join(lignes))
-    return ""
-
-
-def _parse_description(content: str, readme: str = "") -> str:
-    """The project's description, in plain text.
-
-    D'abord l'introduction du `CLAUDE.md` ; à défaut (un `CLAUDE.md` qui ne
-    s'adresse qu'aux agents), celle du `README.md`.
-    """
-    return _introduction(content) or _introduction(readme)
-
-
-def _lire_readme(project_path: Path) -> str:
-    try:
-        return (project_path / "README.md").read_text(encoding="utf-8")
-    except (OSError, UnicodeDecodeError):
-        return ""
-
-
-def _parse_active_agents(content: str) -> list[str]:
-    in_section = False
-    agents: list[str] = []
-    for line in content.splitlines():
-        if re.match(r"^##\s+Agents actifs", line):
-            in_section = True
-            continue
-        if in_section and line.startswith("##"):
-            break
-        if in_section:
-            m = re.match(r"^-\s+`(\w+)`", line)
-            if m:
-                agents.append(m.group(1))
-    return agents
-
-
-def _parse_stack(content: str) -> str | None:
-    in_section = False
-    lines: list[str] = []
-    for line in content.splitlines():
-        if re.match(r"^##\s+Stack", line):
-            in_section = True
-            continue
-        if in_section and line.startswith("##"):
-            break
-        if in_section and line.strip():
-            lines.append(line.strip())
-    return "\n".join(lines) if lines else None
-
-
-def _default_claude_md(project_id: str, name: str, active_agents: list[str]) -> str:
-    agents_block = (
-        "\n".join(f"- `{a}` — à configurer" for a in active_agents)
-        if active_agents
-        else "_Aucun agent configuré._"
-    )
-    return f"""# {name}
-
-Projet créé via Tessera.
-
----
-
-## Agents actifs sur ce projet
-
-{agents_block}
-
-## Stack
-
-À définir.
-"""
-
-
-#: Les rôles posés quand la création n'en demande aucun. La modale n'envoie que
-#: l'identifiant, le nom et la description : sans ce défaut, le projet naissait
-#: sans manifeste du tout.
-_ROLES_PAR_DEFAUT = ["codeur", "reviewer"]
-
-
-def _default_agents_json(
-    project_id: str, active_agents: list[str], artifacts: str
-) -> str:
-    """Le manifeste d'un projet neuf, écrit en entier plutôt que deviné.
-
-    Sans manifeste, `load_pipeline_config` rend un `AgentPipelineConfig()` où
-    la sécurité et le validateur sont éteints — alors que les deux services
-    sont déjà câblés. Ils l'étaient par absence de déclaration, pas par choix,
-    et rien ne le disait.
-
-    `max_instances` n'est plus écrit : rien ne le lit, le backend ne contient
-    aucun `asyncio.gather` et le pipeline est strictement séquentiel. C'est le
-    défaut que ticket-091 a nettoyé sur `auto_merge_on_approve` — un réglage
-    qu'on lit et qu'on croit.
-    """
-    roles = active_agents or _ROLES_PAR_DEFAUT
-    # Rôles qui reçoivent le skill de design d'interface (ticket-294).
-    _ROLES_AVEC_SKILL_DESIGN = {"codeur", "architect"}
-    agents = [
-        {
-            "role": role,
-            "model": modele_par_defaut(role),
-            "max_tokens": 8192 if role == "codeur" else 4096,
-            "prompt_file": f"agents/prompts/{role}.md",
-            "active": True,
-            **({"skills": ["tessera:design-ui"]} if role in _ROLES_AVEC_SKILL_DESIGN else {}),
-        }
-        for role in roles
-    ]
-    data = {
-        "project_id": project_id,
-        # Explicite plutôt que dépendant du défaut de lecture d'ADR-023, qui
-        # échoue fermé : un manifeste muet et un manifeste qui a choisi `local`
-        # se lisent pareil, et seul le second l'a décidé.
-        "artifacts": artifacts,
-        # ADR-029 : le défaut protège. On n'écrit jamais `merge` dans un
-        # fichier généré — merger, c'est décider qu'un travail est bon.
-        "autonomy": "commit",
-        "agents": agents,
-        "pipeline": {
-            "max_review_rounds": 3,
-            # Un flag à vrai sans commande valide est pire qu'un flag à faux :
-            # le lanceur avale l'erreur et rend `True`, si bien que l'absence
-            # de tests se lirait comme des tests verts. Un projet neuf n'a pas
-            # de stack, donc aucune commande ne se devine ici.
-            "testeur_enabled": False,
-            "test_command": None,
-            "securite_enabled": True,
-            "validateur_enabled": True,
-        },
-    }
-    return json.dumps(data, indent=2, ensure_ascii=False) + "\n"
-
-
-class ModeleInconnu(ValueError):
-    """Le modèle demandé n'est pas dans la grille tarifaire."""
-
-
-class AgentAbsentDuProjet(LookupError):
-    """Ce projet ne déclare pas cet agent."""
-
-
-def set_agent_model(project_path: Path, role: str, model: str) -> None:
-    """Change le modèle d'un agent dans le `agents.json` **de ce projet**.
-
-    Le modèle est une propriété du projet, pas de l'agent : le même `codeur`
-    mérite un modèle lourd sur un backend métier et un modèle léger sur un
-    script personnel. C'est pour cela que ce réglage vit ici et non dans le
-    registre d'agents, qui est global (ticket-080).
-
-    Le fichier est réécrit en préservant tout ce qu'il contient d'autre : il
-    porte aussi le mode des artefacts, la racine git et la configuration du
-    pipeline.
-    """
-    from tessera.services.cost_calculator import modeles_connus
-
-    data, agent = _entree_du_role(project_path, role)
-    # La grille tarifaire ne borne que les providers Anthropic : ailleurs le
-    # coût est rapporté par le provider ou nul, et la liste n'aurait rien à
-    # dire (ticket-188).
-    if agent.get("provider", "agent_sdk") in PROVIDERS_ANTHROPIC and model not in modeles_connus():
-        raise ModeleInconnu(
-            f"Modèle inconnu : {model}. L'application ne saurait pas en "
-            "calculer le coût."
-        )
-    agent["model"] = model
-    _ecrire_manifeste(project_path, data)
-
-
-def set_agent_provider(
-    project_path: Path,
-    role: str,
-    provider: str,
-    fallback: dict[str, str] | None,
-) -> None:
-    """Change le provider d'un rôle et son repli, dans le manifeste du projet
-    (ticket-188). `fallback=None` retire le repli."""
-    _verifier_provider(role, provider)
-    if fallback is not None:
-        _verifier_provider(role, fallback["provider"], repli=True)
-    data, agent = _entree_du_role(project_path, role)
-    agent["provider"] = provider
-    if fallback is None:
-        agent.pop("fallback", None)
-    else:
-        agent["fallback"] = {"provider": fallback["provider"], "model": fallback["model"]}
-    _ecrire_manifeste(project_path, data)
-
-
-def set_pipeline_settings(
-    project_path: Path,
-    *,
-    pipeline: dict[str, object],
-    racine: dict[str, object],
-    retirer: tuple[str, ...] = (),
-) -> None:
-    """Réécrit les seuls réglages reçus dans le manifeste du projet (ticket-196).
-
-    `pipeline` va sous la clef `pipeline`, `racine` au premier niveau
-    (`autonomy`, `merge_without_ci`, `category`) ; `retirer` nomme les clefs
-    de la racine à supprimer (ticket-398). Tout le reste du fichier est
-    préservé : services, artefacts, racine git, agents.
-    """
-    agents_json = project_path / "agents.json"
-    if not agents_json.is_file():
-        raise AgentAbsentDuProjet(f"{project_path.name} n'a pas de manifeste")
-    data = json.loads(agents_json.read_text(encoding="utf-8"))
-    section = data.get("pipeline")
-    if not isinstance(section, dict):
-        section = {}
-    section.update(pipeline)
-    data["pipeline"] = section
-    data.update(racine)
-    for clef in retirer:
-        data.pop(clef, None)
-    _ecrire_manifeste(project_path, data)
-
-
-def _entree_du_role(project_path: Path, role: str) -> tuple[dict[str, object], dict[str, object]]:
-    agents_json = project_path / "agents.json"
-    if not agents_json.is_file():
-        raise AgentAbsentDuProjet(f"{project_path.name} ne déclare aucun agent")
-
-    data = json.loads(agents_json.read_text(encoding="utf-8"))
-    for agent in data.get("agents", []):
-        if agent.get("role") == role:
-            return data, agent
-    raise AgentAbsentDuProjet(f"L'agent '{role}' n'est pas déclaré ici")
-
-
-def _ecrire_manifeste(project_path: Path, data: dict[str, object]) -> None:
-    """Réécrit `agents.json` en préservant tout ce qu'il contient d'autre :
-    le mode des artefacts, la racine git, la configuration du pipeline."""
-    (project_path / "agents.json").write_text(
-        json.dumps(data, indent=2, ensure_ascii=False) + "\n",
-        encoding="utf-8",
-    )

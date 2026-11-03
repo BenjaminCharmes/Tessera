@@ -2,6 +2,7 @@ import { IconCheck } from "../../design/icons";
 import { useState } from "react";
 import type { Project } from "../../types/api";
 import { api } from "../../lib/api";
+import Modale from "../../design/ui/Modale";
 
 interface CreateProjectModalProps {
   onClose: () => void;
@@ -74,36 +75,15 @@ export default function CreateProjectModal({
     }
   }
 
-  function handleOverlayClick(e: React.MouseEvent) {
-    if (e.target === e.currentTarget) {
-      if (createdProject) {
-        onCreated(createdProject);
-      } else {
-        onClose();
-      }
-    }
-  }
-
-  function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === "Escape") {
-      if (createdProject) {
-        onCreated(createdProject);
-      } else {
-        onClose();
-      }
-    }
+  // Une fois le projet créé, fermer revient à continuer : il faut le signaler.
+  function fermer() {
+    if (createdProject) onCreated(createdProject);
+    else onClose();
   }
 
   if (createdProject) {
     return (
-      <div
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
-        onClick={handleOverlayClick}
-        onKeyDown={handleKeyDown}
-        role="dialog"
-        aria-modal="true"
-        aria-label="Projet créé"
-      >
+      <Modale onFermer={fermer} aria-label="Projet créé">
         <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-6 w-full max-w-md shadow-xl">
           <p className="inline-flex items-center gap-1 text-green-400 text-sm font-medium mb-1">
             <IconCheck size={14} /> Projet &ldquo;{createdProject.name}&rdquo;
@@ -183,19 +163,12 @@ export default function CreateProjectModal({
             </button>
           </div>
         </div>
-      </div>
+      </Modale>
     );
   }
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
-      onClick={handleOverlayClick}
-      onKeyDown={handleKeyDown}
-      role="dialog"
-      aria-modal="true"
-      aria-label="Créer un projet"
-    >
+    <Modale onFermer={fermer} aria-label="Créer un projet">
       <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-6 w-full max-w-md shadow-xl">
         <h2 className="text-zinc-100 text-base font-semibold mb-4">
           Nouveau projet
@@ -304,6 +277,6 @@ export default function CreateProjectModal({
           </div>
         </form>
       </div>
-    </div>
+    </Modale>
   );
 }

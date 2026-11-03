@@ -2373,3 +2373,4889 @@ Le diff refactorise  (32359ms)
 - 2026-10-13 07:36:43 UTC — [ticket-408] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le composant SignalementModal es (153641ms)
 - 2026-10-13 07:36:43 UTC — [ticket-408] APPROVED après 1 tour(s)
 - 2026-10-13 07:38:58 UTC — [ticket-408] documentation: 3 fichier(s) (132155ms)
+- 2026-10-13 07:39:12 UTC — [ide-core] ticket-408 PR #389 confiée au CIWatcher
+- 2026-10-13 08:44:13 UTC — [ticket-409] branche ticket-409-a-project-created-from-the-template-starts-on-its
+- 2026-10-13 08:44:13 UTC — [ticket-409] tour 1 — codeur démarré
+- 2026-10-13 08:45:35 UTC — [ticket-409] tour 1 — codeur terminé (81953ms)
+- 2026-10-13 08:49:58 UTC — [ticket-409] testeur: OK (exit 0)
+- 2026-10-13 08:51:09 UTC — [ticket-409] securite: PASS — No CRITICAL or HIGH vulnerabilities introduced by this diff. The diff adds optio (71422ms)
+- 2026-10-13 08:51:09 UTC — [ticket-409] tour 1 — reviewer démarré
+- 2026-10-13 08:51:45 UTC — [ticket-409] tour 1 — reviewer terminé (35344ms)
+- 2026-10-13 08:54:34 UTC — [ticket-409] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (204188ms)
+- 2026-10-13 08:54:34 UTC — [ticket-409] APPROVED après 1 tour(s)
+- 2026-10-13 08:55:41 UTC — [ticket-409] documentation: 0 fichier(s) (62358ms)
+- 2026-10-13 08:55:55 UTC — [ide-core] ticket-409 PR #394 confiée au CIWatcher
+- 2026-10-13 09:08:06 UTC — [ticket-413] branche ticket-413-a-run-on-a-project-that-delivers-on-its-own-is-re
+- 2026-10-13 09:08:06 UTC — [ticket-413] tour 1 — codeur démarré
+- 2026-10-13 09:09:21 UTC — [ticket-413] tour 1 — codeur terminé (74969ms)
+- 2026-10-13 09:15:59 UTC — [ticket-413] testeur: OK (exit 0)
+- 2026-10-13 09:16:49 UTC — [ticket-413] securite: PASS — Audit de sécurité complet : aucune vulnérabilité détectée dans le diff. Le code  (49936ms)
+- 2026-10-13 09:16:49 UTC — [ticket-413] tour 1 — reviewer démarré
+- 2026-10-13 09:17:10 UTC — [ticket-413] tour 1 — reviewer terminé (20093ms)
+- 2026-10-13 09:17:11 UTC — [ticket-413] validateur: APPROVED — Tous les critères sont satisfaits. Le diff montre une implémentation complète :  (21813ms)
+- 2026-10-13 09:17:11 UTC — [ticket-413] APPROVED après 1 tour(s)
+- 2026-10-13 09:18:48 UTC — [ticket-413] documentation: 1 fichier(s) (94655ms)
+- 2026-10-13 09:19:06 UTC — [ide-core] ticket-413 PR #396 confiée au CIWatcher
+- 2026-10-13 09:19:09 UTC — [ticket-410] branche ticket-410-the-projects-overview-tells-for-each-project-whet
+- 2026-10-13 09:19:09 UTC — [ticket-410] tour 1 — codeur démarré
+- 2026-10-13 09:20:38 UTC — [ticket-410] tour 1 — codeur terminé (88344ms)
+- 2026-10-13 09:26:00 UTC — [ticket-410] testeur: OK (exit 0)
+- 2026-10-13 09:26:31 UTC — [ticket-410] securite: PASS — Le diff ajoute deux champs booléens (`services_declares` et `services_en_cours`) (30405ms)
+- 2026-10-13 09:26:31 UTC — [ticket-410] tour 1 — reviewer démarré
+- 2026-10-13 09:26:48 UTC — [ticket-410] tour 1 — reviewer terminé (17000ms)
+- 2026-10-13 09:27:37 UTC — [ticket-410] validateur: APPROVED — Tous les critères sont satisfaits. Les trois tests vérifient la logique métier c (66530ms)
+- 2026-10-13 09:27:37 UTC — [ticket-410] APPROVED après 1 tour(s)
+- 2026-10-13 09:29:31 UTC — [ticket-410] documentation: 2 fichier(s) (110827ms)
+- 2026-10-13 09:34:38 UTC — [ide-core] ticket-410 : base réalignée sur develop
+- 2026-10-13 09:34:38 UTC — [ide-core] ticket-410 PR #397 confiée au CIWatcher
+- 2026-10-13 09:34:40 UTC — [ticket-411] branche ticket-411-each-project-card-in-the-projects-view-can-start
+- 2026-10-13 09:34:41 UTC — [ticket-411] tour 1 — codeur démarré
+- 2026-10-13 09:36:07 UTC — [ticket-411] tour 1 — codeur terminé (86656ms)
+- 2026-10-13 09:42:19 UTC — [ticket-411] testeur: OK (exit 0)
+- 2026-10-13 09:42:41 UTC — [ticket-411] securite: PASS — Aucune vulnérabilité détectée dans ce diff. Le nouveau composant BoutonServices  (22468ms)
+- 2026-10-13 09:42:42 UTC — [ticket-411] tour 1 — reviewer démarré
+- 2026-10-13 09:43:02 UTC — [ticket-411] tour 1 — reviewer terminé (20452ms)
+- 2026-10-13 09:45:00 UTC — [ticket-411] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests couvrent les comporte (138609ms)
+- 2026-10-13 09:45:00 UTC — [ticket-411] APPROVED après 1 tour(s)
+- 2026-10-13 09:46:20 UTC — [ticket-411] documentation: 3 fichier(s) (76953ms)
+- 2026-10-13 09:46:35 UTC — [ide-core] ticket-411 PR #399 confiée au CIWatcher
+- 2026-10-13 09:46:37 UTC — [ticket-412] branche ticket-412-each-project-card-in-the-projects-view-can-launch
+- 2026-10-13 09:46:38 UTC — [ticket-412] tour 1 — codeur démarré
+- 2026-10-13 09:48:20 UTC — [ticket-412] tour 1 — codeur terminé (102203ms)
+- 2026-10-13 11:54:31 UTC — [ticket-412] testeur: délai dépassé, suite relancée
+- 2026-10-13 12:00:08 UTC — [ticket-412] testeur: OK (exit 0)
+- 2026-10-13 12:00:40 UTC — [ticket-412] securite: PASS — Aucune vulnérabilité critique ou haute détectée. Le code utilise TypeScript stri (32250ms)
+- 2026-10-13 12:00:40 UTC — [ticket-412] tour 1 — reviewer démarré
+- 2026-10-13 12:00:59 UTC — [ticket-412] tour 1 — reviewer terminé (18844ms)
+- 2026-10-13 12:01:27 UTC — [ticket-412] validateur: APPROVED — Tous les critères d'acceptation sont couverts par des tests explicites et bien f (46764ms)
+- 2026-10-13 12:01:27 UTC — [ticket-412] APPROVED après 1 tour(s)
+- 2026-10-13 12:03:11 UTC — [ticket-412] documentation: 1 fichier(s) (99969ms)
+- 2026-10-13 12:04:02 UTC — [ticket-412] livraison: arrêt — Conflit avec develop sur : frontend/src/components/ProjetsView/ProjetCarte.tsx, frontend/src/compone
+- 2026-10-13 12:32:33 UTC — [ticket-414] branche ticket-414-agents-working-on-a-hosted-project-no-longer-inhe
+- 2026-10-13 12:32:34 UTC — [ticket-414] tour 1 — codeur démarré
+- 2026-10-13 12:33:47 UTC — [ticket-414] tour 1 — codeur terminé (73640ms)
+- 2026-10-13 12:40:00 UTC — [ticket-414] testeur: OK (exit 0)
+- 2026-10-13 12:40:26 UTC — [ticket-414] securite: PASS — Aucune vulnérabilité critique ou majeure introduite. Le diff ajoute deux fonctio (26139ms)
+- 2026-10-13 12:40:27 UTC — [ticket-414] tour 1 — reviewer démarré
+- 2026-10-13 12:40:55 UTC — [ticket-414] tour 1 — reviewer terminé (28610ms)
+- 2026-10-13 12:43:51 UTC — [ticket-414] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (204453ms)
+- 2026-10-13 12:43:51 UTC — [ticket-414] APPROVED après 1 tour(s)
+- 2026-10-13 12:45:05 UTC — [ticket-414] documentation: 1 fichier(s) (70827ms)
+- 2026-10-13 12:45:20 UTC — [ide-core] ticket-414 PR #403 confiée au CIWatcher
+- 2026-10-13 12:45:22 UTC — [ticket-415] branche ticket-415-a-delivery-that-fails-after-opening-its-pr-names
+- 2026-10-13 12:46:08 UTC — [ticket-415] plan rendu (45030ms)
+- 2026-10-13 12:46:08 UTC — [ticket-415] tour 1 — codeur démarré
+- 2026-10-13 12:48:32 UTC — [ticket-415] tour 1 — codeur terminé (144188ms)
+- 2026-10-13 12:49:15 UTC — [ticket-414] livraison: PR #403 mergée malgré une erreur réseau (ReadTimeout)
+- 2026-10-13 12:53:55 UTC — [ticket-415] testeur: OK (exit 0)
+- 2026-10-13 12:54:33 UTC — [ticket-415] securite: PASS — Aucune vulnérabilité de sécurité détectée. Ce diff effectue une refactorisation  (37655ms)
+- 2026-10-13 12:54:33 UTC — [ticket-415] tour 1 — reviewer démarré
+- 2026-10-13 12:54:55 UTC — [ticket-415] tour 1 — reviewer terminé (22094ms)
+- 2026-10-13 12:55:30 UTC — [ticket-415] validateur: APPROVED — Tous les critères sont implémentés et testés. Un utilitaire `decrire_exception() (56812ms)
+- 2026-10-13 12:55:30 UTC — [ticket-415] APPROVED après 1 tour(s)
+- 2026-10-13 12:56:56 UTC — [ticket-415] documentation: 1 fichier(s) (82171ms)
+- 2026-10-13 12:57:28 UTC — [ide-core] ticket-415 PR #404 confiée au CIWatcher
+- 2026-10-13 12:57:36 UTC — [ticket-418] branche ticket-418-append-only-pipeline-files-no-longer-stop-a-deliv
+- 2026-10-13 12:57:37 UTC — [ticket-418] tour 1 — codeur démarré
+- 2026-10-13 13:02:10 UTC — [ticket-418] tour 1 — codeur terminé (273047ms)
+- 2026-10-13 13:06:38 UTC — [ticket-418] testeur: OK (exit 0)
+- 2026-10-13 13:07:51 UTC — [ticket-418] securite: PASS — Audit complet des nouveaux fichiers et modifications apportés. Aucune vulnérabil (72390ms)
+- 2026-10-13 13:07:51 UTC — [ticket-418] tour 1 — reviewer démarré
+- 2026-10-13 13:08:16 UTC — [ticket-418] tour 1 — reviewer terminé (25046ms)
+- 2026-10-13 13:08:24 UTC — [ticket-418] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (32969ms)
+- 2026-10-13 13:08:24 UTC — [ticket-418] APPROVED après 1 tour(s)
+- 2026-10-13 13:10:48 UTC — [ticket-418] documentation: 2 fichier(s) (141484ms)
+- 2026-10-13 13:11:03 UTC — [ide-core] ticket-418 PR #405 confiée au CIWatcher
+- 2026-10-13 13:11:06 UTC — [ticket-416] branche ticket-416-one-endpoint-lists-every-project-app-running-loca
+- 2026-10-13 13:12:11 UTC — [ticket-416] plan rendu (64811ms)
+- 2026-10-13 13:12:11 UTC — [ticket-416] tour 1 — codeur démarré
+- 2026-10-13 13:17:05 UTC — [ticket-416] tour 1 — codeur terminé (294282ms)
+- 2026-10-13 13:22:45 UTC — [ticket-416] testeur: OK (exit 0)
+- 2026-10-13 13:23:16 UTC — [ticket-416] securite: PASS — Aucune vulnérabilité de sécurité détectée dans ce diff.
+
+Analyse :
+- **Contrôle  (30655ms)
+- 2026-10-13 13:23:16 UTC — [ticket-416] tour 1 — reviewer démarré
+- 2026-10-13 13:23:43 UTC — [ticket-416] validateur: APPROVED — Tous les critères sont satisfaits. Le code introduit une interface testable (`So (26733ms)
+- 2026-10-13 13:23:52 UTC — [ticket-416] tour 1 — reviewer terminé (35969ms)
+- 2026-10-13 13:23:52 UTC — [ticket-416] APPROVED après 1 tour(s)
+- 2026-10-13 13:27:54 UTC — [ticket-416] documentation: 3 fichier(s) (238514ms)
+- 2026-10-13 13:32:21 UTC — [ide-core] ticket-416 : base réalignée sur develop
+- 2026-10-13 13:32:21 UTC — [ide-core] ticket-416 PR #406 confiée au CIWatcher
+- 2026-10-13 13:32:23 UTC — [ticket-417] branche ticket-417-a-running-view-lists-the-project-apps-alive-on-th
+- 2026-10-13 13:32:24 UTC — [ticket-417] tour 1 — codeur démarré
+- 2026-10-13 13:36:26 UTC — [ticket-417] tour 1 — codeur terminé (242687ms)
+- 2026-10-13 13:41:17 UTC — [ticket-417] testeur: OK (exit 0)
+- 2026-10-13 13:41:54 UTC — [ticket-417] securite: PASS — Audit complet du diff frontend — aucune vulnérabilité détectée. Le code ajoute u (36234ms)
+- 2026-10-13 13:41:54 UTC — [ticket-417] tour 1 — reviewer démarré
+- 2026-10-13 13:42:25 UTC — [ticket-417] tour 1 — reviewer terminé (31390ms)
+- 2026-10-13 13:46:13 UTC — [ticket-417] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (259202ms)
+- 2026-10-13 13:46:13 UTC — [ticket-417] APPROVED après 1 tour(s)
+- 2026-10-13 13:49:52 UTC — [ticket-417] documentation: 3 fichier(s) (215828ms)
+- 2026-10-13 13:50:06 UTC — [ide-core] ticket-417 PR #408 confiée au CIWatcher
+- 2026-10-13 13:57:02 UTC — [ticket-420] branche ticket-420-fin-de-file-la-base-locale-reste-en-retard-d-un-c
+- 2026-10-13 13:57:02 UTC — [ticket-420] tour 1 — codeur démarré
+- 2026-10-13 13:59:48 UTC — [ticket-420] tour 1 — codeur terminé (165311ms)
+- 2026-10-13 14:05:35 UTC — [ticket-420] testeur: OK (exit 0)
+- 2026-10-13 14:06:26 UTC — [ticket-420] securite: PASS — Audit de sécurité du ticket réalignement_base (ticket-422) — aucune vulnérabilit (50688ms)
+- 2026-10-13 14:06:26 UTC — [ticket-420] tour 1 — reviewer démarré
+- 2026-10-13 14:07:10 UTC — [ticket-420] tour 1 — reviewer terminé (43640ms)
+- 2026-10-13 14:09:41 UTC — [ticket-420] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente le réalignem (195297ms)
+- 2026-10-13 14:09:41 UTC — [ticket-420] CHANGES_REQUESTED tour 1: Reviewer : CHANGES_REQUESTED
+
+## Problèmes bloquants
+
+1. **Le réalignement ne se déclenche jamais su
+- 2026-10-13 14:09:41 UTC — [ticket-420] tour 2 — codeur démarré
+- 2026-10-13 14:11:11 UTC — [ticket-420] tour 2 — codeur terminé (89703ms)
+- 2026-10-13 14:17:27 UTC — [ticket-420] testeur: OK (exit 0)
+- 2026-10-13 14:18:06 UTC — [ticket-420] securite: PASS — Aucune vulnérabilité bloquante détectée. L'analyse couvre :
+
+✓ **Injection de co (39030ms)
+- 2026-10-13 14:18:06 UTC — [ticket-420] tour 2 — reviewer démarré
+- 2026-10-13 14:18:29 UTC — [ticket-420] tour 2 — reviewer terminé (23375ms)
+- 2026-10-13 14:22:24 UTC — [ticket-420] validateur: APPROVED — Tous les critères d'acceptation sont satisfait. Les tests couvrent correctement  (258250ms)
+- 2026-10-13 14:22:24 UTC — [ticket-420] APPROVED après 2 tour(s)
+- 2026-10-13 14:23:42 UTC — [ticket-420] documentation: 1 fichier(s) (75343ms)
+- 2026-10-13 14:23:58 UTC — [ide-core] ticket-420 PR #411 confiée au CIWatcher
+- 2026-10-13 14:24:01 UTC — [ticket-421] branche ticket-421-a-report-sent-while-an-ide-core-run-is-active-wai
+- 2026-10-13 14:24:02 UTC — [ticket-421] tour 1 — codeur démarré
+- 2026-10-13 14:26:13 UTC — [ticket-421] tour 1 — codeur terminé (131077ms)
+- 2026-10-13 14:31:34 UTC — [ticket-421] testeur: OK (exit 0)
+- 2026-10-13 14:33:07 UTC — [ticket-421] securite: PASS — Audit complet du diff — aucune vulnérabilité CRITICAL ou HIGH détectée.
+
+Analyse (93125ms)
+- 2026-10-13 14:33:07 UTC — [ticket-421] tour 1 — reviewer démarré
+- 2026-10-13 14:33:44 UTC — [ticket-421] tour 1 — reviewer terminé (36561ms)
+- 2026-10-13 14:36:40 UTC — [ticket-421] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (213171ms)
+- 2026-10-13 14:36:40 UTC — [ticket-421] APPROVED après 1 tour(s)
+- 2026-10-13 14:39:15 UTC — [ticket-421] documentation: 4 fichier(s) (151875ms)
+- 2026-10-13 14:39:32 UTC — [ide-core] ticket-421 PR #414 confiée au CIWatcher
+- 2026-10-13 14:39:35 UTC — [ticket-419] branche ticket-419-a-validated-mockup-in-design-maquette-becomes-the
+- 2026-10-13 14:39:35 UTC — [ticket-419] tour 1 — codeur démarré
+- 2026-10-13 14:40:46 UTC — [ticket-419] tour 1 — codeur terminé (70921ms)
+- 2026-10-13 14:46:02 UTC — [ticket-419] testeur: OK (exit 0)
+- 2026-10-13 14:46:19 UTC — [ticket-419] securite: PASS — Audit complet : aucune vulnérabilité détectée. Ce diff ajoute (1) une section de (16280ms)
+- 2026-10-13 14:46:19 UTC — [ticket-419] tour 1 — reviewer démarré
+- 2026-10-13 14:46:34 UTC — [ticket-419] tour 1 — reviewer terminé (14905ms)
+- 2026-10-13 14:48:10 UTC — [ticket-419] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le fichier SKILL.md contient bi (111500ms)
+- 2026-10-13 14:48:10 UTC — [ticket-419] APPROVED après 1 tour(s)
+- 2026-10-13 14:52:35 UTC — [ticket-419] documentation: 2 fichier(s) (261829ms) — après tour de correction
+- 2026-10-13 14:52:50 UTC — [ide-core] ticket-419 PR #415 confiée au CIWatcher
+- 2026-10-13 14:58:10 UTC — [ticket-423] branche ticket-423-stopping-tessera-only-stops-tessera-s-own-server
+- 2026-10-13 14:58:10 UTC — [ticket-423] tour 1 — codeur démarré
+- 2026-10-13 14:59:37 UTC — [ticket-423] tour 1 — codeur terminé (87420ms)
+- 2026-10-13 15:04:45 UTC — [ticket-423] testeur: OK (exit 0)
+- 2026-10-13 15:05:35 UTC — [ticket-423] securite: PASS — Audit complet du diff : ajout d'un script de sélection de processus Tessera (`sc (49859ms)
+- 2026-10-13 15:05:35 UTC — [ticket-423] tour 1 — reviewer démarré
+- 2026-10-13 15:06:19 UTC — [ticket-423] tour 1 — reviewer terminé (43328ms)
+- 2026-10-13 15:08:07 UTC — [ticket-423] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests couvrent les cas dema (151984ms)
+- 2026-10-13 15:08:07 UTC — [ticket-423] CHANGES_REQUESTED tour 1: Reviewer : CHANGES_REQUESTED
+
+## Problèmes bloquants
+
+1. **`scripts/tessera.ps1`, l. 78 et 83 : sous
+- 2026-10-13 15:08:07 UTC — [ticket-423] tour 2 — codeur démarré
+- 2026-10-13 15:08:26 UTC — [ticket-423] tour 2 — codeur terminé (18703ms)
+- 2026-10-13 15:13:29 UTC — [ticket-423] testeur: OK (exit 0)
+- 2026-10-13 15:14:05 UTC — [ticket-423] securite: PASS — Audit de sécurité complet : aucune vulnérabilité CRITICAL ou HIGH détectée dans  (36155ms)
+- 2026-10-13 15:14:05 UTC — [ticket-423] tour 2 — reviewer démarré
+- 2026-10-13 15:14:29 UTC — [ticket-423] tour 2 — reviewer terminé (23063ms)
+- 2026-10-13 15:16:49 UTC — [ticket-423] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests couvrent les cas dema (163296ms)
+- 2026-10-13 15:16:49 UTC — [ticket-423] APPROVED après 2 tour(s)
+- 2026-10-13 15:17:40 UTC — [ticket-423] documentation: 0 fichier(s) (48172ms)
+- 2026-10-13 15:17:56 UTC — [ide-core] ticket-423 PR #416 confiée au CIWatcher
+- 2026-10-13 15:17:59 UTC — [ticket-422] branche ticket-422-the-backend-test-suite-never-writes-into-the-real
+- 2026-10-13 15:18:00 UTC — [ticket-422] tour 1 — codeur démarré
+- 2026-10-14 06:44:04 UTC — [ticket-422] branche ticket-422-the-backend-test-suite-never-writes-into-the-real
+- 2026-10-14 06:44:04 UTC — [ticket-422] tour 1 — codeur démarré
+- 2026-10-14 06:45:47 UTC — [ticket-422] tour 1 — codeur terminé (102515ms)
+- 2026-10-14 06:50:30 UTC — [ticket-422] testeur: OK (exit 0)
+- 2026-10-14 06:50:57 UTC — [ticket-422] securite: PASS — Audit complet du diff sans vulnérabilité détectée.
+
+Le diff ajoute deux fixtures (26906ms)
+- 2026-10-14 06:50:57 UTC — [ticket-422] tour 1 — reviewer démarré
+- 2026-10-14 06:51:22 UTC — [ticket-422] tour 1 — reviewer terminé (24609ms)
+- 2026-10-14 06:54:08 UTC — [ticket-422] validateur: APPROVED — Tous les critères sont satisfaits. Le code assure que les tests n'écrivent plus  (189827ms)
+- 2026-10-14 06:54:08 UTC — [ticket-422] APPROVED après 1 tour(s)
+- 2026-10-14 06:55:11 UTC — [ticket-422] documentation: 1 fichier(s) (59390ms)
+- 2026-10-14 06:55:25 UTC — [ide-core] ticket-422 PR #417 confiée au CIWatcher
+- 2026-10-14 06:55:28 UTC — [ticket-424] branche ticket-424-the-running-view-stops-a-whole-project-at-once-sh
+- 2026-10-14 06:55:29 UTC — [ticket-424] tour 1 — codeur démarré
+- 2026-10-14 06:59:26 UTC — [ticket-424] tour 1 — codeur terminé (236874ms)
+- 2026-10-14 07:04:06 UTC — [ticket-424] testeur: OK (exit 0)
+- 2026-10-14 07:04:45 UTC — [ticket-424] securite: PASS — Audit complet du diff : aucune vulnérabilité de sécurité détectée.
+
+Le ticket in (38094ms)
+- 2026-10-14 07:04:45 UTC — [ticket-424] tour 1 — reviewer démarré
+- 2026-10-14 07:05:13 UTC — [ticket-424] tour 1 — reviewer terminé (28187ms)
+- 2026-10-14 07:09:13 UTC — [ticket-424] validateur: APPROVED — Tous les critères d'acceptation ont été vérifiés via les tests unitaires fournis (268640ms)
+- 2026-10-14 07:09:13 UTC — [ticket-424] APPROVED après 1 tour(s)
+- 2026-10-14 07:12:05 UTC — [ticket-424] documentation: 1 fichier(s) (167547ms)
+- 2026-10-14 07:12:19 UTC — [ide-core] ticket-424 PR #418 confiée au CIWatcher
+- 2026-10-14 08:14:51 UTC — [ticket-425] branche ticket-425-switching-project-keeps-the-current-tab-and-view
+- 2026-10-14 08:14:52 UTC — [ticket-425] tour 1 — codeur démarré
+- 2026-10-14 08:16:39 UTC — [ticket-425] tour 1 — codeur terminé (107609ms)
+- 2026-10-14 08:24:47 UTC — [ticket-425] testeur: OK (exit 0)
+- 2026-10-14 08:25:03 UTC — [ticket-425] securite: PASS — Diff composé uniquement de tests unitaires et d'une refactorisation logique méti (15358ms)
+- 2026-10-14 08:25:03 UTC — [ticket-425] tour 1 — reviewer démarré
+- 2026-10-14 08:25:24 UTC — [ticket-425] tour 1 — reviewer terminé (21561ms)
+- 2026-10-14 08:27:33 UTC — [ticket-425] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les tests ont été ajoutés ou mod (150733ms)
+- 2026-10-14 08:27:33 UTC — [ticket-425] APPROVED après 1 tour(s)
+- 2026-10-14 08:29:01 UTC — [ticket-425] documentation: 1 fichier(s) (83936ms)
+- 2026-10-14 08:29:16 UTC — [ide-core] ticket-425 PR #422 confiée au CIWatcher
+- 2026-10-14 08:36:03 UTC — [ticket-425] livraison: arrêt — PR #422 non mergée : CI failing : la PR #422 reste ouverte.
+- 2026-10-14 08:47:36 UTC — [ticket-426] branche ticket-426-the-navigation-rail-is-grouped-into-pilotage-proj
+- 2026-10-14 08:47:37 UTC — [ticket-426] tour 1 — codeur démarré
+- 2026-10-14 08:49:16 UTC — [ticket-426] tour 1 — codeur terminé (99109ms)
+- 2026-10-14 08:54:26 UTC — [ticket-426] testeur: OK (exit 0)
+- 2026-10-14 08:54:47 UTC — [ticket-426] securite: PASS — Audit de sécurité : aucune vulnérabilité détectée.
+
+Ce diff porte exclusivement  (21530ms)
+- 2026-10-14 08:54:47 UTC — [ticket-426] tour 1 — reviewer démarré
+- 2026-10-14 08:55:07 UTC — [ticket-426] tour 1 — reviewer terminé (19875ms)
+- 2026-10-14 08:56:36 UTC — [ticket-426] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les tests ont été ajoutés pour v (108375ms)
+- 2026-10-14 08:56:36 UTC — [ticket-426] APPROVED après 1 tour(s)
+- 2026-10-14 08:58:45 UTC — [ticket-426] documentation: 0 fichier(s) (126125ms)
+- 2026-10-14 08:59:03 UTC — [ide-core] ticket-426 PR #423 confiée au CIWatcher
+- 2026-10-14 08:59:06 UTC — [ticket-427] branche ticket-427-the-history-tab-shows-the-selected-run-in-the-cen
+- 2026-10-14 08:59:06 UTC — [ticket-427] tour 1 — codeur démarré
+- 2026-10-14 09:02:52 UTC — [ticket-427] tour 1 — codeur terminé (226188ms)
+- 2026-10-14 09:09:07 UTC — [ticket-427] testeur: OK (exit 0)
+- 2026-10-14 09:09:51 UTC — [ticket-427] securite: PASS — Analyse complète du diff : 10 fichiers modifiés/créés pour l'ajout d'un onglet H (44000ms)
+- 2026-10-14 09:09:51 UTC — [ticket-427] tour 1 — reviewer démarré
+- 2026-10-14 09:10:14 UTC — [ticket-427] tour 1 — reviewer terminé (23421ms)
+- 2026-10-14 09:15:18 UTC — [ticket-427] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests dans `HistoriqueView. (327281ms)
+- 2026-10-14 09:15:18 UTC — [ticket-427] APPROVED après 1 tour(s)
+- 2026-10-14 09:18:11 UTC — [ticket-427] documentation: 2 fichier(s) (161156ms)
+- 2026-10-14 09:18:26 UTC — [ide-core] ticket-427 PR #424 confiée au CIWatcher
+- 2026-10-14 09:18:29 UTC — [ticket-428] branche ticket-428-the-files-tab-shows-the-open-file-a-search-and-re
+- 2026-10-14 09:18:29 UTC — [ticket-428] tour 1 — codeur démarré
+- 2026-10-14 09:22:48 UTC — [ticket-428] tour 1 — codeur terminé (259313ms)
+- 2026-10-14 09:28:01 UTC — [ticket-428] testeur: OK (exit 0)
+- 2026-10-14 09:28:32 UTC — [ticket-428] securite: PASS — Aucune vulnérabilité critique ou haute introduite par ce ticket. Le code ajoute  (30875ms)
+- 2026-10-14 09:28:32 UTC — [ticket-428] tour 1 — reviewer démarré
+- 2026-10-14 09:28:52 UTC — [ticket-428] tour 1 — reviewer terminé (19610ms)
+- 2026-10-14 09:33:58 UTC — [ticket-428] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le ticket-428 apporte sa propre (325875ms)
+- 2026-10-14 09:33:58 UTC — [ticket-428] APPROVED après 1 tour(s)
+- 2026-10-14 09:36:50 UTC — [ticket-428] documentation: 1 fichier(s) (169593ms)
+- 2026-10-14 09:37:26 UTC — [ticket-428] livraison: arrêt — Conflit avec develop sur : frontend/src/components/CenterView.test.tsx, frontend/src/components/Cent
+- 2026-10-14 09:37:33 UTC — [ticket-429] branche ticket-429-the-agents-tab-shows-a-role-sheet-with-its-30-day
+- 2026-10-14 09:37:33 UTC — [ticket-429] tour 1 — codeur démarré
+- 2026-10-14 09:43:53 UTC — [ticket-429] tour 1 — codeur terminé (379360ms)
+- 2026-10-14 09:53:32 UTC — [ticket-429] testeur: OK (exit 0)
+- 2026-10-14 09:54:05 UTC — [ticket-429] securite: PASS — Refactoring de composants frontend — extraction de logique et création de nouvea (32672ms)
+- 2026-10-14 09:54:05 UTC — [ticket-429] tour 1 — reviewer démarré
+- 2026-10-14 09:54:30 UTC — [ticket-429] tour 1 — reviewer terminé (25264ms)
+- 2026-10-14 09:55:38 UTC — [ticket-429] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le refactoring de `AgentDetail` (93109ms)
+- 2026-10-14 09:55:38 UTC — [ticket-429] APPROVED après 1 tour(s)
+- 2026-10-14 09:58:13 UTC — [ticket-429] documentation: 1 fichier(s) (129218ms)
+- 2026-10-14 10:27:14 UTC — [ticket-435] branche ticket-435-the-running-view-only-attributes-an-app-to-a-proj
+- 2026-10-14 10:27:14 UTC — [ticket-435] tour 1 — codeur démarré
+- 2026-10-14 10:31:26 UTC — [ticket-435] tour 1 — codeur terminé (251264ms)
+- 2026-10-14 10:36:54 UTC — [ticket-435] testeur: OK (exit 0)
+- 2026-10-14 10:38:04 UTC — [ticket-435] securite: PASS — Le diff introduit une **amélioration de sécurité** (ticket-435) qui renforce le  (70360ms)
+- 2026-10-14 10:38:04 UTC — [ticket-435] tour 1 — reviewer démarré
+- 2026-10-14 10:38:31 UTC — [ticket-435] tour 1 — reviewer terminé (26453ms)
+- 2026-10-14 10:44:41 UTC — [ticket-435] validateur: APPROVED — Les cinq critères sont satisfaits par les tests du nouveau fichier `test_inventa (397047ms)
+- 2026-10-14 10:44:41 UTC — [ticket-435] APPROVED après 1 tour(s)
+- 2026-10-14 10:48:11 UTC — [ticket-435] documentation: 2 fichier(s) (206734ms) — après tour de correction
+- 2026-10-14 10:48:33 UTC — [ide-core] ticket-435 PR #430 confiée au CIWatcher
+- 2026-10-14 10:48:37 UTC — [ticket-430] branche ticket-430-pending-reports-are-kept-outside-the-repository-s
+- 2026-10-14 10:48:37 UTC — [ticket-430] tour 1 — codeur démarré
+- 2026-10-14 10:50:37 UTC — [ticket-430] tour 1 — codeur terminé (119234ms)
+- 2026-10-14 10:52:55 UTC — [ticket-430] testeur: 1 failed, 691 passed, 20 warnings in 135.50s (0:02:15)
+- 2026-10-14 10:52:55 UTC — [ticket-430] tests rouges au tour 1
+- 2026-10-14 10:52:55 UTC — [ticket-430] tour 2 — codeur démarré
+- 2026-10-14 10:53:22 UTC — [ticket-430] tour 2 — codeur terminé (26296ms)
+- 2026-10-14 10:58:14 UTC — [ticket-430] testeur: OK (exit 0)
+- 2026-10-14 10:58:44 UTC — [ticket-430] securite: PASS — Aucune vulnérabilité de sécurité détectée. Ce diff déplace correctement un fichi (30093ms)
+- 2026-10-14 10:58:44 UTC — [ticket-430] tour 2 — reviewer démarré
+- 2026-10-14 10:59:03 UTC — [ticket-430] tour 2 — reviewer terminé (18765ms)
+- 2026-10-14 11:00:55 UTC — [ticket-430] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le chemin du fichier d'attente e (130734ms)
+- 2026-10-14 11:00:55 UTC — [ticket-430] APPROVED après 2 tour(s)
+- 2026-10-14 11:05:18 UTC — [ticket-430] documentation: 3 fichier(s) (260297ms) — après tour de correction
+- 2026-10-14 11:05:33 UTC — [ide-core] ticket-430 PR #431 confiée au CIWatcher
+- 2026-10-14 11:05:36 UTC — [ticket-434] branche ticket-434-the-validator-is-given-the-files-a-criterion-cite
+- 2026-10-14 11:06:18 UTC — [ticket-434] plan rendu (41609ms)
+- 2026-10-14 11:06:18 UTC — [ticket-434] tour 1 — codeur démarré
+- 2026-10-14 11:09:10 UTC — [ticket-434] tour 1 — codeur terminé (171093ms)
+- 2026-10-14 11:15:58 UTC — [ticket-434] testeur: OK (exit 0)
+- 2026-10-14 11:16:33 UTC — [ticket-434] securite: PASS — Audit de sécurité : aucune vulnérabilité détectée. Le diff effectue un refactori (35702ms)
+- 2026-10-14 11:16:33 UTC — [ticket-434] tour 1 — reviewer démarré
+- 2026-10-14 11:17:00 UTC — [ticket-434] validateur: APPROVED — Le diff implémente complètement le ticket-434 : extraction des références de fic (26312ms)
+- 2026-10-14 11:17:01 UTC — [ticket-434] tour 1 — reviewer terminé (27952ms)
+- 2026-10-14 11:17:01 UTC — [ticket-434] APPROVED après 1 tour(s)
+- 2026-10-14 11:20:16 UTC — [ticket-434] documentation: 1 fichier(s) (192265ms)
+- 2026-10-14 11:20:31 UTC — [ide-core] ticket-434 PR #432 confiée au CIWatcher
+- 2026-10-14 11:20:34 UTC — [ticket-436] branche ticket-436-an-unreadable-security-audit-answer-is-asked-agai
+- 2026-10-14 11:20:35 UTC — [ticket-436] tour 1 — codeur démarré
+- 2026-10-14 11:21:45 UTC — [ticket-436] tour 1 — codeur terminé (70125ms)
+- 2026-10-14 11:27:51 UTC — [ticket-436] testeur: OK (exit 0)
+- 2026-10-14 11:28:17 UTC — [ticket-436] securite: PASS — Aucune vulnérabilité de sécurité détectée. Le diff améliore la robustesse de l'a (26735ms)
+- 2026-10-14 11:28:17 UTC — [ticket-436] tour 1 — reviewer démarré
+- 2026-10-14 11:28:34 UTC — [ticket-436] tour 1 — reviewer terminé (16921ms)
+- 2026-10-14 11:30:07 UTC — [ticket-436] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (109235ms)
+- 2026-10-14 11:30:07 UTC — [ticket-436] APPROVED après 1 tour(s)
+- 2026-10-14 11:32:08 UTC — [ticket-436] documentation: 1 fichier(s) (118046ms)
+- 2026-10-14 11:32:23 UTC — [ide-core] ticket-436 PR #433 confiée au CIWatcher
+- 2026-10-14 11:32:26 UTC — [ticket-431] branche ticket-431-the-run-id-returned-when-launching-a-queue-can-be
+- 2026-10-14 11:33:14 UTC — [ticket-431] plan rendu (47985ms)
+- 2026-10-14 11:33:14 UTC — [ticket-431] tour 1 — codeur démarré
+- 2026-10-14 11:36:28 UTC — [ticket-431] tour 1 — codeur terminé (194046ms)
+- 2026-10-14 11:42:23 UTC — [ticket-431] testeur: OK (exit 0)
+- 2026-10-14 11:43:30 UTC — [ticket-431] securite: PASS — Audit de sécurité du diff ticket-431 (suivi de runs par ID de lancement). Aucune (66719ms)
+- 2026-10-14 11:43:30 UTC — [ticket-431] tour 1 — reviewer démarré
+- 2026-10-14 11:44:04 UTC — [ticket-431] tour 1 — reviewer terminé (33750ms)
+- 2026-10-14 11:46:59 UTC — [ticket-431] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (208859ms)
+- 2026-10-14 11:46:59 UTC — [ticket-431] APPROVED après 1 tour(s)
+- 2026-10-14 11:50:39 UTC — [ticket-431] documentation: 1 fichier(s) (215750ms)
+- 2026-10-14 11:50:56 UTC — [ide-core] ticket-431 PR #434 confiée au CIWatcher
+- 2026-10-14 11:51:00 UTC — [ticket-433] branche ticket-433-one-command-checks-every-ticket-file-of-a-project
+- 2026-10-14 11:51:01 UTC — [ticket-433] tour 1 — codeur démarré
+- 2026-10-14 11:54:14 UTC — [ticket-433] tour 1 — codeur terminé (193235ms)
+- 2026-10-14 12:00:08 UTC — [ticket-433] testeur: OK (exit 0)
+- 2026-10-14 12:01:45 UTC — [ticket-433] securite: PASS — No critical or high-severity vulnerabilities introduced by this ticket. The code (96844ms)
+- 2026-10-14 12:01:45 UTC — [ticket-433] tour 1 — reviewer démarré
+- 2026-10-14 12:02:13 UTC — [ticket-433] validateur: APPROVED — Les cinq critères sont satisfaits : le nouveau module `ticket_check.py` implémen (27905ms)
+- 2026-10-14 12:02:22 UTC — [ticket-433] tour 1 — reviewer terminé (36734ms)
+- 2026-10-14 12:02:22 UTC — [ticket-433] APPROVED après 1 tour(s)
+- 2026-10-14 12:06:34 UTC — [ticket-433] documentation: 3 fichier(s) (233203ms)
+- 2026-10-14 12:06:50 UTC — [ide-core] ticket-433 PR #435 confiée au CIWatcher
+- 2026-10-14 12:06:53 UTC — [ticket-432] branche ticket-432-tessera-captures-a-project-s-screens-at-phone-and
+- 2026-10-14 12:07:56 UTC — [ticket-432] plan rendu (62750ms)
+- 2026-10-14 12:07:56 UTC — [ticket-432] tour 1 — codeur démarré
+- 2026-10-14 12:12:20 UTC — [ticket-432] tour 1 — codeur terminé (263765ms)
+- 2026-10-14 12:17:35 UTC — [ticket-432] testeur: OK (exit 0)
+- 2026-10-14 12:18:28 UTC — [ticket-432] securite: PASS — Audit de sécurité complet des captures de projet (ticket-432). Aucune vulnérabil (53467ms)
+- 2026-10-14 12:18:28 UTC — [ticket-432] tour 1 — reviewer démarré
+- 2026-10-14 12:18:56 UTC — [ticket-432] tour 1 — reviewer terminé (27750ms)
+- 2026-10-14 12:18:58 UTC — [ticket-432] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le diff contient un système com (29500ms)
+- 2026-10-14 12:18:58 UTC — [ticket-432] APPROVED après 1 tour(s)
+- 2026-10-14 12:22:25 UTC — [ticket-432] documentation: 0 fichier(s) (204562ms)
+- 2026-10-14 12:22:46 UTC — [ide-core] ticket-432 PR #436 confiée au CIWatcher
+- 2026-10-14 13:48:48 UTC — [ticket-438] branche ticket-438-the-running-view-also-finds-a-project-s-declared
+- 2026-10-14 13:49:48 UTC — [ticket-438] plan rendu (59469ms)
+- 2026-10-14 13:49:48 UTC — [ticket-438] tour 1 — codeur démarré
+- 2026-10-14 13:54:24 UTC — [ticket-438] tour 1 — codeur terminé (276125ms)
+- 2026-10-14 14:02:57 UTC — [ticket-438] testeur: OK (exit 0)
+- 2026-10-14 14:04:38 UTC — [ticket-438] securite: PASS — Le diff introduit une nouvelle fonctionnalité de détection des services déclarés (101484ms)
+- 2026-10-14 14:04:38 UTC — [ticket-438] tour 1 — reviewer démarré
+- 2026-10-14 14:05:07 UTC — [ticket-438] tour 1 — reviewer terminé (29203ms)
+- 2026-10-14 14:06:06 UTC — [ticket-438] validateur: fichiers cités joints : aucun ; absents : python -m app.worker, .venv
+- 2026-10-14 14:06:06 UTC — [ticket-438] validateur: APPROVED — Tous les critères sont satisfaits. Le codeur a implémenté la détection des servi (87594ms)
+- 2026-10-14 14:06:06 UTC — [ticket-438] APPROVED après 1 tour(s)
+- 2026-10-14 14:10:37 UTC — [ticket-438] documentation: 1 fichier(s) (256686ms)
+- 2026-10-14 14:11:00 UTC — [ide-core] ticket-438 PR #440 confiée au CIWatcher
+- 2026-10-14 14:11:04 UTC — [ticket-437] branche ticket-437-screen-captures-can-open-a-session-on-a-project-t
+- 2026-10-14 14:11:05 UTC — [ticket-437] tour 1 — codeur démarré
+- 2026-10-14 14:16:38 UTC — [ticket-437] tour 1 — codeur terminé (333266ms)
+- 2026-10-14 14:25:56 UTC — [ticket-437] testeur: OK (exit 0)
+- 2026-10-14 14:28:00 UTC — [ticket-437] securite: PASS — Audit de sécurité du diff captures avec session (ticket-437). Le nouveau code in (123889ms)
+- 2026-10-14 14:28:00 UTC — [ticket-437] tour 1 — reviewer démarré
+- 2026-10-14 14:28:30 UTC — [ticket-437] tour 1 — reviewer terminé (29735ms)
+- 2026-10-14 14:28:36 UTC — [ticket-437] validateur: fichiers cités joints : agents.json ; absents : docs/guide-utilisateur.md
+- 2026-10-14 14:28:36 UTC — [ticket-437] validateur: APPROVED — Tous les critères sont satisfaits. Le code produit implémente une sécurisation c (35515ms)
+- 2026-10-14 14:28:36 UTC — [ticket-437] APPROVED après 1 tour(s)
+- 2026-10-14 14:31:43 UTC — [ticket-437] documentation: 0 fichier(s) (183327ms)
+- 2026-10-14 14:32:02 UTC — [ide-core] ticket-437 PR #441 confiée au CIWatcher
+- 2026-10-14 14:32:20 UTC — [ticket-439] branche ticket-439-shared-ui-components-from-the-charter-status-pill
+- 2026-10-14 14:32:20 UTC — [ticket-439] tour 1 — codeur démarré
+- 2026-10-14 14:34:54 UTC — [ticket-439] tour 1 — codeur terminé (154000ms)
+- 2026-10-14 14:42:41 UTC — [ticket-439] testeur: OK (exit 0)
+- 2026-10-14 14:43:01 UTC — [ticket-439] securite: PASS — Refactoring TypeScript/React sans introduction de vulnérabilités. Le diff extrai (19484ms)
+- 2026-10-14 14:43:01 UTC — [ticket-439] tour 1 — reviewer démarré
+- 2026-10-14 14:43:22 UTC — [ticket-439] tour 1 — reviewer terminé (21359ms)
+- 2026-10-14 14:46:44 UTC — [ticket-439] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les composants partagés StatusP (223514ms)
+- 2026-10-14 14:46:44 UTC — [ticket-439] APPROVED après 1 tour(s)
+- 2026-10-14 14:48:43 UTC — [ticket-439] documentation: 1 fichier(s) (114140ms)
+- 2026-10-14 14:54:06 UTC — [ide-core] ticket-439 : base réalignée sur develop
+- 2026-10-14 14:54:06 UTC — [ide-core] ticket-439 PR #442 confiée au CIWatcher
+- 2026-10-14 14:54:12 UTC — [ticket-440] branche ticket-440-the-pipeline-log-at-the-bottom-is-collapsible-fol
+- 2026-10-14 14:54:13 UTC — [ticket-440] tour 1 — codeur démarré
+- 2026-10-14 14:55:57 UTC — [ticket-440] tour 1 — codeur terminé (103921ms)
+- 2026-10-14 15:03:22 UTC — [ticket-440] testeur: Tests  1 failed | 1185 passed (1186)
+- 2026-10-14 15:03:22 UTC — [ticket-440] tests rouges au tour 1
+- 2026-10-14 15:03:22 UTC — [ticket-440] tour 2 — codeur démarré
+- 2026-10-14 15:04:20 UTC — [ticket-440] tour 2 — codeur terminé (58641ms)
+- 2026-10-14 15:50:37 UTC — [ticket-440] testeur: délai dépassé, suite relancée
+- 2026-10-14 16:03:11 UTC — [ticket-440] testeur: OK (exit 0)
+- 2026-10-14 16:03:42 UTC — [ticket-440] securite: PASS — Aucune vulnérabilité de sécurité détectée. Le diff ajoute une fonctionnalité UI  (31156ms)
+- 2026-10-14 16:03:42 UTC — [ticket-440] tour 2 — reviewer démarré
+- 2026-10-14 16:04:05 UTC — [ticket-440] tour 2 — reviewer terminé (22516ms)
+- 2026-10-14 16:04:09 UTC — [ticket-440] validateur: fichiers cités joints : aucun ; absents : layout.ts
+- 2026-10-14 16:04:09 UTC — [ticket-440] validateur: APPROVED — Tous les critères sont satisfaits. Le diff montre une implémentation complète du (27140ms)
+- 2026-10-14 16:04:09 UTC — [ticket-440] APPROVED après 2 tour(s)
+- 2026-10-14 16:05:58 UTC — [ticket-440] documentation: 1 fichier(s) (104984ms)
+- 2026-10-14 16:06:19 UTC — [ide-core] ticket-440 PR #444 confiée au CIWatcher
+- 2026-10-14 16:06:23 UTC — [ticket-441] branche ticket-441-settings-move-behind-a-button-at-the-bottom-of-th
+- 2026-10-14 16:06:24 UTC — [ticket-441] tour 1 — codeur démarré
+- 2026-10-14 16:11:00 UTC — [ticket-441] tour 1 — codeur terminé (276296ms)
+- 2026-10-14 16:18:15 UTC — [ticket-441] testeur: OK (exit 0)
+- 2026-10-14 16:18:36 UTC — [ticket-441] securite: PASS — Aucune vulnérabilité détectée. Ce diff est une refactorisation UI (ticket-441) : (21703ms)
+- 2026-10-14 16:18:36 UTC — [ticket-441] tour 1 — reviewer démarré
+- 2026-10-14 16:19:07 UTC — [ticket-441] tour 1 — reviewer terminé (30765ms)
+- 2026-10-14 16:19:27 UTC — [ticket-441] validateur: APPROVED — Tous les critères d'acceptation reçoivent une couverture de test spécifique. Le  (50641ms)
+- 2026-10-14 16:19:27 UTC — [ticket-441] APPROVED après 1 tour(s)
+- 2026-10-14 16:21:46 UTC — [ticket-441] documentation: 1 fichier(s) (133797ms)
+- 2026-10-14 16:49:19 UTC — [ticket-443] branche ticket-443-the-history-list-shows-one-row-per-ticket-run-not
+- 2026-10-14 16:49:20 UTC — [ticket-443] tour 1 — codeur démarré
+- 2026-10-14 16:51:48 UTC — [ticket-443] tour 1 — codeur terminé (148093ms)
+- 2026-10-14 16:58:52 UTC — [ticket-443] testeur: OK (exit 0)
+- 2026-10-14 16:59:19 UTC — [ticket-443] securite: PASS — Audit complet : ce diff ajoute un nouvel état de run « interrompu » pour les run (26968ms)
+- 2026-10-14 16:59:19 UTC — [ticket-443] tour 1 — reviewer démarré
+- 2026-10-14 16:59:54 UTC — [ticket-443] tour 1 — reviewer terminé (34828ms)
+- 2026-10-14 17:01:58 UTC — [ticket-443] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les tests vérifient le comportem (159500ms)
+- 2026-10-14 17:01:58 UTC — [ticket-443] APPROVED après 1 tour(s)
+- 2026-10-14 17:03:19 UTC — [ticket-443] documentation: 1 fichier(s) (75625ms)
+- 2026-10-14 17:03:51 UTC — [ide-core] ticket-443 PR #447 confiée au CIWatcher
+- 2026-10-14 17:03:55 UTC — [ticket-442] branche ticket-442-kanban-history-supervision-and-running-use-the-sh
+- 2026-10-14 17:03:55 UTC — [ticket-442] tour 1 — codeur démarré
+- 2026-10-14 17:08:22 UTC — [ticket-442] tour 1 — codeur terminé (267063ms)
+- 2026-10-14 17:15:01 UTC — [ticket-442] testeur: OK (exit 0)
+- 2026-10-14 17:15:28 UTC — [ticket-442] securite: PASS — Audit de sécurité — aucune vulnérabilité détectée.
+
+Ce diff refactorise l'UI pou (27266ms)
+- 2026-10-14 17:15:28 UTC — [ticket-442] tour 1 — reviewer démarré
+- 2026-10-14 17:15:54 UTC — [ticket-442] tour 1 — reviewer terminé (25750ms)
+- 2026-10-14 17:16:02 UTC — [ticket-442] validateur: APPROVED — Le diff migrе complètement les quatre vues vers les composants partagés : `Statu (33421ms)
+- 2026-10-14 17:16:02 UTC — [ticket-442] APPROVED après 1 tour(s)
+- 2026-10-14 17:17:31 UTC — [ticket-442] documentation: 0 fichier(s) (86656ms)
+- 2026-10-14 17:18:18 UTC — [ticket-442] livraison: arrêt — Conflit avec develop sur : frontend/src/components/HistoriqueView/DetailDuRun.tsx, frontend/src/comp
+- 2026-10-14 17:18:30 UTC — [ticket-444] branche ticket-444-a-queue-s-status-tells-the-approved-tickets-from
+- 2026-10-14 17:18:31 UTC — [ticket-444] tour 1 — codeur démarré
+- 2026-10-14 17:20:29 UTC — [ticket-444] tour 1 — codeur terminé (118187ms)
+- 2026-10-14 17:29:40 UTC — [ticket-444] testeur: OK (exit 0)
+- 2026-10-14 17:30:12 UTC — [ticket-444] securite: PASS — Aucune vulnérabilité critique ou haute détectée dans ce diff. Les changements co (31843ms)
+- 2026-10-14 17:30:12 UTC — [ticket-444] tour 1 — reviewer démarré
+- 2026-10-14 17:30:43 UTC — [ticket-444] tour 1 — reviewer terminé (31219ms)
+- 2026-10-14 17:33:01 UTC — [ticket-444] validateur: fichiers cités joints : aucun ; absents : docs/api.md
+- 2026-10-14 17:33:01 UTC — [ticket-444] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente la séparatio (169608ms)
+- 2026-10-14 17:33:01 UTC — [ticket-444] APPROVED après 1 tour(s)
+- 2026-10-14 17:36:04 UTC — [ticket-444] documentation: 1 fichier(s) (179766ms)
+- 2026-10-14 17:36:24 UTC — [ide-core] ticket-444 PR #449 confiée au CIWatcher
+- 2026-10-14 17:43:53 UTC — [ticket-445] branche ticket-445-a-ticket-status-event-in-a-queue-always-carries-t
+- 2026-10-14 17:43:55 UTC — [ticket-445] tour 1 — codeur démarré
+- 2026-10-14 17:45:56 UTC — [ticket-445] tour 1 — codeur terminé (120656ms)
+- 2026-10-14 17:51:44 UTC — [ticket-445] testeur: OK (exit 0)
+- 2026-10-14 17:51:59 UTC — [ticket-445] securite: PASS — Audit de sécurité du diff pour le ticket-445 (ticket_titre_de) : aucune vulnérab (14641ms)
+- 2026-10-14 17:51:59 UTC — [ticket-445] tour 1 — reviewer démarré
+- 2026-10-14 17:52:14 UTC — [ticket-445] tour 1 — reviewer terminé (15796ms)
+- 2026-10-14 17:53:19 UTC — [ticket-445] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (80781ms)
+- 2026-10-14 17:53:19 UTC — [ticket-445] APPROVED après 1 tour(s)
+- 2026-10-14 17:54:07 UTC — [ticket-445] documentation: 0 fichier(s) (43514ms)
+- 2026-10-14 17:54:23 UTC — [ide-core] ticket-445 PR #451 confiée au CIWatcher
+- 2026-10-15 07:53:37 UTC — [ticket-446] branche ticket-446-a-run-s-commit-never-untracks-a-file-the-reposito
+- 2026-10-15 07:53:37 UTC — [ticket-446] tour 1 — codeur démarré
+- 2026-10-15 07:55:08 UTC — [ticket-446] tour 1 — codeur terminé (90936ms)
+- 2026-10-15 08:01:09 UTC — [ticket-446] testeur: OK (exit 0)
+- 2026-10-15 08:01:34 UTC — [ticket-446] securite: PASS — Audit de sécurité du diff ticket-446 : aucune vulnérabilité détectée.
+
+Le change (25422ms)
+- 2026-10-15 08:01:34 UTC — [ticket-446] tour 1 — reviewer démarré
+- 2026-10-15 08:01:54 UTC — [ticket-446] tour 1 — reviewer terminé (19766ms)
+- 2026-10-15 08:04:31 UTC — [ticket-446] validateur: fichiers cités joints : CLAUDE.md ; absents : git_workspace.py, git ls-files CLAUDE.md, test_run_interrompu_arbre_propre.py
+- 2026-10-15 08:04:31 UTC — [ticket-446] validateur: CHANGES_REQUESTED — Les critères 1 à 3 sont satisfaits : le code modifie correctement `_purger_stage (176234ms)
+- 2026-10-15 08:04:31 UTC — [ticket-446] CHANGES_REQUESTED tour 1: Validateur : Les critères 1 à 3 sont satisfaits : le code modifie correctement `_purger_stage_ignoré
+- 2026-10-15 08:04:31 UTC — [ticket-446] tour 2 — codeur démarré
+- 2026-10-15 08:04:45 UTC — [ticket-446] tour 2 — codeur terminé (14703ms)
+- 2026-10-15 08:09:22 UTC — [ticket-446] testeur: OK (exit 0)
+- 2026-10-15 08:09:41 UTC — [ticket-446] securite: PASS — Audit de sécurité complet : aucune vulnérabilité détectée.
+
+Le diff modifie `_pu (19375ms)
+- 2026-10-15 08:09:41 UTC — [ticket-446] tour 2 — reviewer démarré
+- 2026-10-15 08:10:00 UTC — [ticket-446] tour 2 — reviewer terminé (19077ms)
+- 2026-10-15 08:12:19 UTC — [ticket-446] validateur: fichiers cités joints : CLAUDE.md ; absents : git_workspace.py, git ls-files CLAUDE.md, test_run_interrompu_arbre_propre.py
+- 2026-10-15 08:12:19 UTC — [ticket-446] validateur: CHANGES_REQUESTED — Les critères 1 à 3 sont satisfaits : le code modifie correctement `_purger_stage (157359ms)
+- 2026-10-15 08:12:19 UTC — [ticket-446] CHANGES_REQUESTED tour 2: Validateur : Les critères 1 à 3 sont satisfaits : le code modifie correctement `_purger_stage_ignoré
+- 2026-10-15 08:12:19 UTC — [ticket-446] tour 3 — codeur démarré
+- 2026-10-15 08:12:45 UTC — [ticket-446] tour 3 — codeur terminé (26421ms)
+- 2026-10-15 08:17:37 UTC — [ticket-446] testeur: OK (exit 0)
+- 2026-10-15 08:18:03 UTC — [ticket-446] securite: PASS — Audit de sécurité du diff ticket-446 (protection des fichiers suivis lors de la  (25484ms)
+- 2026-10-15 08:18:03 UTC — [ticket-446] tour 3 — reviewer démarré
+- 2026-10-15 08:18:33 UTC — [ticket-446] tour 3 — reviewer terminé (29594ms)
+- 2026-10-15 08:20:48 UTC — [ticket-446] validateur: fichiers cités joints : CLAUDE.md ; absents : git_workspace.py, git ls-files CLAUDE.md, test_run_interrompu_arbre_propre.py
+- 2026-10-15 08:20:48 UTC — [ticket-446] validateur: CHANGES_REQUESTED — Les critères 1 à 3 sont satisfaits : le code modifie correctement `_purger_stage (165546ms)
+- 2026-10-15 08:20:48 UTC — [ticket-446] CHANGES_REQUESTED tour 3: Validateur : Les critères 1 à 3 sont satisfaits : le code modifie correctement `_purger_stage_ignoré
+- 2026-10-15 08:20:49 UTC — [ticket-446] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-15 08:20:51 UTC — [ide-core] file interrompue : ticket-446 non approuvé
+- 2026-10-15 08:36:32 UTC — [ticket-448] branche ticket-448-the-validator-finds-a-cited-file-anywhere-in-the
+- 2026-10-15 08:36:32 UTC — [ticket-448] tour 1 — codeur démarré
+- 2026-10-15 08:38:24 UTC — [ticket-448] tour 1 — codeur terminé (112109ms)
+- 2026-10-15 08:43:06 UTC — [ticket-448] testeur: OK (exit 0)
+- 2026-10-15 08:43:39 UTC — [ticket-448] securite: PASS — Audit complet : pas de vulnérabilité détectée. Le diff renforce au contraire la  (33280ms)
+- 2026-10-15 08:43:39 UTC — [ticket-448] tour 1 — reviewer démarré
+- 2026-10-15 08:43:58 UTC — [ticket-448] tour 1 — reviewer terminé (18264ms)
+- 2026-10-15 08:45:17 UTC — [ticket-448] validateur: fichiers cités joints : aucun ; absents : backend/x.py, x.py, ../../.env, git ls-files CLAUDE.md
+- 2026-10-15 08:45:17 UTC — [ticket-448] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests couvrent correctement (97530ms)
+- 2026-10-15 08:45:17 UTC — [ticket-448] APPROVED après 1 tour(s)
+- 2026-10-15 08:47:36 UTC — [ticket-448] documentation: 1 fichier(s) (136172ms) — après tour de correction
+- 2026-10-15 08:47:49 UTC — [ide-core] ticket-448 PR #456 confiée au CIWatcher
+- 2026-10-15 08:47:52 UTC — [ticket-447] branche ticket-447-a-mise-en-ligne-skill-gives-agents-the-launch-che
+- 2026-10-15 08:47:52 UTC — [ticket-447] tour 1 — codeur démarré
+- 2026-10-15 08:49:05 UTC — [ticket-447] tour 1 — codeur terminé (72969ms)
+- 2026-10-15 08:54:27 UTC — [ticket-447] testeur: 1 failed, 2072 passed, 20 warnings in 318.57s (0:05:18)
+- 2026-10-15 08:54:27 UTC — [ticket-447] tests rouges au tour 1
+- 2026-10-15 08:54:27 UTC — [ticket-447] tour 2 — codeur démarré
+- 2026-10-15 08:55:34 UTC — [ticket-447] tour 2 — codeur terminé (66609ms)
+- 2026-10-15 09:02:37 UTC — [ticket-447] testeur: OK (exit 0)
+- 2026-10-15 09:02:55 UTC — [ticket-447] securite: PASS — Aucune vulnérabilité détectée. Le diff ajoute un skill de documentation (SKILL.m (17905ms)
+- 2026-10-15 09:02:55 UTC — [ticket-447] tour 2 — reviewer démarré
+- 2026-10-15 09:03:32 UTC — [ticket-447] tour 2 — reviewer terminé (36280ms)
+- 2026-10-15 09:07:21 UTC — [ticket-447] validateur: fichiers cités joints : agents/plugin/skills/mise-en-ligne/SKILL.md
+- 2026-10-15 09:07:21 UTC — [ticket-447] validateur: APPROVED — Tous les critères sont satisfaits. Le fichier SKILL.md est correctement créé ave (265328ms)
+- 2026-10-15 09:07:21 UTC — [ticket-447] APPROVED après 2 tour(s)
+- 2026-10-15 09:10:01 UTC — [ticket-447] documentation: 1 fichier(s) (156608ms)
+- 2026-10-15 09:10:21 UTC — [ide-core] ticket-447 PR #458 confiée au CIWatcher
+- 2026-10-15 09:11:22 UTC — [ticket-449] branche ticket-449-a-ci-the-token-cannot-read-stops-the-delivery-at
+- 2026-10-15 09:11:23 UTC — [ticket-449] tour 1 — codeur démarré
+- 2026-10-15 09:13:47 UTC — [ticket-449] tour 1 — codeur terminé (143436ms)
+- 2026-10-15 09:19:23 UTC — [ticket-449] testeur: OK (exit 0)
+- 2026-10-15 09:19:52 UTC — [ticket-449] securite: PASS — Audit complet : aucune vulnérabilité détectée dans ce diff. Le changement introd (28702ms)
+- 2026-10-15 09:19:52 UTC — [ticket-449] tour 1 — reviewer démarré
+- 2026-10-15 09:20:17 UTC — [ticket-449] tour 1 — reviewer terminé (24936ms)
+- 2026-10-15 09:22:43 UTC — [ticket-449] validateur: fichiers cités joints : aucun ; absents : github_service.py
+- 2026-10-15 09:22:43 UTC — [ticket-449] validateur: APPROVED — Tous les critères d'acceptation ont été vérifiés avec succès. Le code implémente (170781ms)
+- 2026-10-15 09:22:43 UTC — [ticket-449] APPROVED après 1 tour(s)
+- 2026-10-15 09:25:11 UTC — [ticket-449] documentation: 1 fichier(s) (145406ms)
+- 2026-10-15 09:25:27 UTC — [ide-core] ticket-449 PR #460 confiée au CIWatcher
+- 2026-10-15 09:30:53 UTC — [ticket-450] branche ticket-450-the-ci-verdict-is-read-from-workflow-runs-which-a
+- 2026-10-15 09:30:54 UTC — [ticket-450] tour 1 — codeur démarré
+- 2026-10-15 09:32:36 UTC — [ticket-450] tour 1 — codeur terminé (102406ms)
+- 2026-10-15 09:37:19 UTC — [ticket-450] testeur: OK (exit 0)
+- 2026-10-15 09:37:55 UTC — [ticket-450] securite: PASS — Aucune vulnérabilité détectée. Le diff améliore la gestion de l'authentification (35890ms)
+- 2026-10-15 09:37:55 UTC — [ticket-450] tour 1 — reviewer démarré
+- 2026-10-15 09:38:20 UTC — [ticket-450] tour 1 — reviewer terminé (24890ms)
+- 2026-10-15 09:40:14 UTC — [ticket-450] validateur: fichiers cités joints : aucun ; absents : backend/src/tessera/services/livraison.py
+- 2026-10-15 09:40:14 UTC — [ticket-450] validateur: CHANGES_REQUESTED — Les tests pour les critères 1 à 4 sont tous présents et couvrent correctement le (138891ms)
+- 2026-10-15 09:40:14 UTC — [ticket-450] CHANGES_REQUESTED tour 1: Validateur : Les tests pour les critères 1 à 4 sont tous présents et couvrent correctement les cas d
+- 2026-10-15 09:40:14 UTC — [ticket-450] tour 2 — codeur démarré
+- 2026-10-15 09:40:30 UTC — [ticket-450] tour 2 — codeur terminé (15702ms)
+- 2026-10-15 09:45:50 UTC — [ticket-450] testeur: OK (exit 0)
+- 2026-10-15 09:46:36 UTC — [ticket-450] securite: PASS — Ce diff refactorise le service d'interrogation de la CI GitHub pour supporter le (45375ms)
+- 2026-10-15 09:46:36 UTC — [ticket-450] tour 2 — reviewer démarré
+- 2026-10-15 09:46:57 UTC — [ticket-450] tour 2 — reviewer terminé (20735ms)
+- 2026-10-15 09:49:00 UTC — [ticket-450] validateur: fichiers cités joints : aucun ; absents : backend/src/tessera/services/livraison.py
+- 2026-10-15 09:49:00 UTC — [ticket-450] validateur: CHANGES_REQUESTED — Les tests couvrent efficacement les critères 1 à 4 avec des scénarios bien défin (144515ms)
+- 2026-10-15 09:49:00 UTC — [ticket-450] CHANGES_REQUESTED tour 2: Validateur : Les tests couvrent efficacement les critères 1 à 4 avec des scénarios bien définis et v
+- 2026-10-15 09:49:00 UTC — [ticket-450] tour 3 — codeur démarré
+- 2026-10-15 09:49:19 UTC — [ticket-450] tour 3 — codeur terminé (18452ms)
+- 2026-10-15 09:54:33 UTC — [ticket-450] testeur: OK (exit 0)
+- 2026-10-15 09:55:08 UTC — [ticket-450] securite: PASS — Audit complet du diff — aucune vulnérabilité de sécurité détectée.
+
+**Modificati (34968ms)
+- 2026-10-15 09:55:08 UTC — [ticket-450] tour 3 — reviewer démarré
+- 2026-10-15 09:55:29 UTC — [ticket-450] tour 3 — reviewer terminé (21265ms)
+- 2026-10-15 09:57:43 UTC — [ticket-450] validateur: fichiers cités joints : aucun ; absents : backend/src/tessera/services/livraison.py
+- 2026-10-15 09:57:43 UTC — [ticket-450] validateur: CHANGES_REQUESTED — Les quatre premiers critères sont satisfaits par les tests et le code fourni. Le (155359ms)
+- 2026-10-15 09:57:43 UTC — [ticket-450] CHANGES_REQUESTED tour 3: Validateur : Les quatre premiers critères sont satisfaits par les tests et le code fourni. Le dernie
+- 2026-10-15 09:57:43 UTC — [ticket-450] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-15 09:57:46 UTC — [ide-core] file interrompue : ticket-450 non approuvé
+- 2026-10-15 11:08:52 UTC — [ticket-451] branche ticket-451-a-queue-waits-for-the-real-merge-of-a-dependency
+- 2026-10-15 11:10:02 UTC — [ticket-451] plan rendu (69686ms)
+- 2026-10-15 11:10:02 UTC — [ticket-451] tour 1 — codeur démarré
+- 2026-10-15 11:13:51 UTC — [ticket-451] tour 1 — codeur terminé (228625ms)
+- 2026-10-15 11:19:42 UTC — [ticket-451] testeur: OK (exit 0)
+- 2026-10-15 11:21:39 UTC — [ticket-451] securite: PASS — Un potentiel path traversal détecté dans la nouvelle fonction `_lecteur_etat_pr` (116733ms)
+- 2026-10-15 11:21:39 UTC — [ticket-451] tour 1 — reviewer démarré
+- 2026-10-15 11:22:15 UTC — [ticket-451] tour 1 — reviewer terminé (36436ms)
+- 2026-10-15 11:26:05 UTC — [ticket-451] validateur: APPROVED — Tous les critères d'acceptation sont respectés : les tests couvrent les cas de f (266280ms)
+- 2026-10-15 11:26:05 UTC — [ticket-451] APPROVED après 1 tour(s)
+- 2026-10-15 11:27:56 UTC — [ticket-451] documentation: 0 fichier(s) (107327ms)
+- 2026-10-15 11:28:11 UTC — [ide-core] ticket-451 PR #464 confiée au CIWatcher
+- 2026-10-15 11:28:14 UTC — [ticket-452] branche ticket-452-the-ci-watcher-stops-with-a-message-when-a-watche
+- 2026-10-15 11:29:10 UTC — [ticket-452] plan rendu (55327ms)
+- 2026-10-15 11:29:10 UTC — [ticket-452] tour 1 — codeur démarré
+- 2026-10-15 11:31:43 UTC — [ticket-452] tour 1 — codeur terminé (153625ms)
+- 2026-10-15 11:37:18 UTC — [ticket-452] testeur: OK (exit 0)
+- 2026-10-15 11:37:38 UTC — [ticket-452] securite: PASS — Aucune vulnérabilité détectée. Le diff introduit une gestion des PRs en conflit  (20109ms)
+- 2026-10-15 11:37:38 UTC — [ticket-452] tour 1 — reviewer démarré
+- 2026-10-15 11:38:11 UTC — [ticket-452] tour 1 — reviewer terminé (33046ms)
+- 2026-10-15 11:43:58 UTC — [ticket-452] validateur: fichiers cités joints : pipeline-log.md (tronqué)
+- 2026-10-15 11:43:58 UTC — [ticket-452] validateur: CHANGES_REQUESTED — Les trois premiers critères sont satisfaits : le test `test_pr_dirty_arrete_la_s (380000ms)
+- 2026-10-15 11:43:58 UTC — [ticket-452] CHANGES_REQUESTED tour 1: Reviewer : CHANGES_REQUESTED
+
+## Problèmes bloquants
+1. **Le critère 4 n'est pas rempli. Rien ne dit
+- 2026-10-15 11:43:58 UTC — [ticket-452] tour 2 — codeur démarré
+- 2026-10-15 11:45:50 UTC — [ticket-452] tour 2 — codeur terminé (112188ms)
+- 2026-10-15 11:52:37 UTC — [ticket-452] testeur: OK (exit 0)
+- 2026-10-15 11:53:01 UTC — [ticket-452] securite: PASS — Aucune vulnérabilité détectée. Le diff ajoute une détection des PR en conflit av (24311ms)
+- 2026-10-15 11:53:01 UTC — [ticket-452] tour 2 — reviewer démarré
+- 2026-10-15 11:53:26 UTC — [ticket-452] tour 2 — reviewer terminé (24469ms)
+- 2026-10-15 11:58:38 UTC — [ticket-452] validateur: fichiers cités joints : pipeline-log.md (tronqué)
+- 2026-10-15 11:58:38 UTC — [ticket-452] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code intègre la lecture de ` (336594ms)
+- 2026-10-15 11:58:38 UTC — [ticket-452] APPROVED après 2 tour(s)
+- 2026-10-15 12:02:20 UTC — [ticket-452] documentation: 3 fichier(s) (213235ms)
+- 2026-10-15 12:03:17 UTC — [ide-core] ticket-452 PR #466 confiée au CIWatcher
+- 2026-10-15 12:03:28 UTC — [ticket-453] branche ticket-453-a-rebase-conflict-at-delivery-is-handed-to-the-co
+- 2026-10-15 12:04:25 UTC — [ticket-453] plan rendu (55030ms)
+- 2026-10-15 12:04:25 UTC — [ticket-453] tour 1 — codeur démarré
+- 2026-10-15 12:08:38 UTC — [ticket-453] tour 1 — codeur terminé (253797ms)
+- 2026-10-15 12:17:48 UTC — [ticket-453] testeur: OK (exit 0)
+- 2026-10-15 12:19:01 UTC — [ticket-453] securite: PASS — Deux problèmes LOW detectés : (1) le stderr de git est exposé sans sanitization, (73485ms)
+- 2026-10-15 12:19:01 UTC — [ticket-453] tour 1 — reviewer démarré
+- 2026-10-15 12:19:23 UTC — [ticket-453] tour 1 — reviewer terminé (21905ms)
+- 2026-10-15 12:22:56 UTC — [ticket-453] validateur: fichiers cités joints : agents.json
+- 2026-10-15 12:22:56 UTC — [ticket-453] validateur: APPROVED — Les deux critères sont satisfaits. Le code inclut un nouveau test qui reproduit  (234219ms)
+- 2026-10-15 12:22:56 UTC — [ticket-453] APPROVED après 1 tour(s)
+- 2026-10-15 12:26:20 UTC — [ticket-453] documentation: 3 fichier(s) (199312ms)
+- 2026-10-15 12:26:43 UTC — [ide-core] ticket-453 PR #467 confiée au CIWatcher
+- 2026-10-15 12:27:54 UTC — [ticket-454] branche ticket-454-a-run-warns-when-the-project-has-a-build-script-t
+- 2026-10-15 12:27:54 UTC — [ticket-454] tour 1 — codeur démarré
+- 2026-10-15 12:29:41 UTC — [ticket-454] tour 1 — codeur terminé (106235ms)
+- 2026-10-15 12:41:14 UTC — [ticket-454] testeur: ❯ Timeout.<anonymous> node_modules/vitest/dist/chunks/index.DpLw24bj.js:11035:58
+- 2026-10-15 12:41:14 UTC — [ticket-454] tests rouges au tour 1
+- 2026-10-15 12:41:14 UTC — [ticket-454] tour 2 — codeur démarré
+- 2026-10-15 12:41:55 UTC — [ticket-454] tour 2 — codeur terminé (40844ms)
+- 2026-10-15 12:51:13 UTC — [ticket-454] testeur: OK (exit 0)
+- 2026-10-15 12:51:42 UTC — [ticket-454] securite: PASS — Aucune vulnérabilité détectée. Ce diff ajoute un utilitaire défensif (`build_war (29453ms)
+- 2026-10-15 12:51:42 UTC — [ticket-454] tour 2 — reviewer démarré
+- 2026-10-15 12:52:04 UTC — [ticket-454] tour 2 — reviewer terminé (21187ms)
+- 2026-10-15 12:54:59 UTC — [ticket-454] validateur: fichiers cités joints : package.json, agents/plugin/skills/mise-en-ligne/SKILL.md ; absents : scripts.build
+- 2026-10-15 12:54:59 UTC — [ticket-454] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests couvrent les cas atte (196422ms)
+- 2026-10-15 12:54:59 UTC — [ticket-454] APPROVED après 2 tour(s)
+- 2026-10-15 12:57:51 UTC — [ticket-454] documentation: 0 fichier(s) (167609ms)
+- 2026-10-15 12:58:13 UTC — [ide-core] ticket-454 PR #470 confiée au CIWatcher
+- 2026-10-15 12:58:17 UTC — [ticket-455] branche ticket-455-a-pr-opened-despite-a-lost-response-is-found-agai
+- 2026-10-15 12:58:18 UTC — [ticket-455] tour 1 — codeur démarré
+- 2026-10-15 13:00:41 UTC — [ticket-455] tour 1 — codeur terminé (142593ms)
+- 2026-10-15 13:10:01 UTC — [ticket-455] testeur: OK (exit 0)
+- 2026-10-15 13:10:32 UTC — [ticket-455] securite: PASS — Aucune vulnérabilité détectée. Le diff ajoute une fonctionnalité de récupération (31250ms)
+- 2026-10-15 13:10:32 UTC — [ticket-455] tour 1 — reviewer démarré
+- 2026-10-15 13:10:51 UTC — [ticket-455] tour 1 — reviewer terminé (19390ms)
+- 2026-10-15 13:13:02 UTC — [ticket-455] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le code implémente une logique (149921ms)
+- 2026-10-15 13:13:02 UTC — [ticket-455] APPROVED après 1 tour(s)
+- 2026-10-15 13:15:06 UTC — [ticket-455] documentation: 2 fichier(s) (119311ms)
+- 2026-10-15 13:42:53 UTC — [ide-core] ticket-459 PR #473 confiée au CIWatcher
+- 2026-10-15 13:42:56 UTC — [ticket-458] branche ticket-458-the-ci-watcher-writes-a-pipeline-log-line-when-it
+- 2026-10-15 13:42:56 UTC — [ticket-458] tour 1 — codeur démarré
+- 2026-10-15 13:44:16 UTC — [ticket-458] tour 1 — codeur terminé (79484ms)
+- 2026-10-15 13:49:52 UTC — [ticket-458] testeur: OK (exit 0)
+- 2026-10-15 13:51:21 UTC — [ticket-458] securite: BLOCK — A path traversal vulnerability is introduced by the new `pipeline_log_path` para (89015ms)
+- 2026-10-15 13:51:24 UTC — [ide-core] file interrompue : ticket-458 non approuvé
+- 2026-10-15 13:15:31 UTC — [ide-core] ticket-455 PR #471 confiée au CIWatcher
+- 2026-10-15 13:16:04 UTC — [ticket-455] livraison: arrêt — PR #471 non mergée : erreur inattendue : HTTPStatusError: Server error '503 Service Unavailable' for url 'https://api.github.com/repos/BenjaminCharmes/Tessera/pulls/471'
+For more information check: https://developer.mozil
+- 2026-10-15 13:32:38 UTC — [ticket-459] branche ticket-459-ticket-status-folders-stay-in-git-when-they-are-e
+- 2026-10-15 13:32:38 UTC — [ticket-459] tour 1 — codeur démarré
+- 2026-10-15 13:34:06 UTC — [ticket-459] tour 1 — codeur terminé (87938ms)
+- 2026-10-15 13:40:00 UTC — [ticket-459] testeur: OK (exit 0)
+- 2026-10-15 13:40:12 UTC — [ticket-459] securite: PASS — Aucune vulnérabilité détectée.
+
+Le diff ajoute deux tests unitaires et cinq fich (12640ms)
+- 2026-10-15 13:40:12 UTC — [ticket-459] tour 1 — reviewer démarré
+- 2026-10-15 13:40:44 UTC — [ticket-459] tour 1 — reviewer terminé (31375ms)
+- 2026-10-15 13:41:51 UTC — [ticket-459] validateur: APPROVED — Tous les critères sont satisfaits. Le code insère un .gitkeep dans chaque dossie (98110ms)
+- 2026-10-15 13:41:51 UTC — [ticket-459] APPROVED après 1 tour(s)
+- 2026-10-15 13:42:37 UTC — [ticket-459] documentation: 0 fichier(s) (43234ms)
+- 2026-10-15 14:00:47 UTC — [ticket-456] branche ticket-456-an-interrupted-queue-s-parent-run-reports-the-int
+- 2026-10-15 14:00:47 UTC — [ticket-456] tour 1 — codeur démarré
+- 2026-10-15 14:05:00 UTC — [ticket-456] tour 1 — codeur terminé (252750ms)
+- 2026-10-15 14:11:06 UTC — [ticket-456] testeur: OK (exit 0)
+- 2026-10-15 14:11:31 UTC — [ticket-456] securite: PASS — Pas de vulnérabilités détectées. Le diff ajoute un tracking de raison d'interrup (25094ms)
+- 2026-10-15 14:11:31 UTC — [ticket-456] tour 1 — reviewer démarré
+- 2026-10-15 14:11:50 UTC — [ticket-456] tour 1 — reviewer terminé (19281ms)
+- 2026-10-15 14:14:19 UTC — [ticket-456] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests couvrent explicitemen (168218ms)
+- 2026-10-15 14:14:19 UTC — [ticket-456] APPROVED après 1 tour(s)
+- 2026-10-15 14:19:47 UTC — [ticket-456] documentation: 1 fichier(s) (322905ms) — après tour de correction
+- 2026-10-15 14:20:03 UTC — [ide-core] ticket-456 PR #475 confiée au CIWatcher
+- 2026-10-15 14:20:06 UTC — [ticket-457] branche ticket-457-starting-a-run-puts-the-tree-back-on-the-base-bra
+- 2026-10-15 14:21:33 UTC — [ticket-457] plan rendu (87078ms)
+- 2026-10-15 14:21:33 UTC — [ticket-457] tour 1 — codeur démarré
+- 2026-10-15 14:27:20 UTC — [ticket-457] tour 1 — codeur terminé (346250ms)
+- 2026-10-15 14:34:21 UTC — [ticket-457] testeur: OK (exit 0)
+- 2026-10-15 14:35:21 UTC — [ticket-457] securite: PASS — Diff d'amélioration d'orchestration git (ticket-457). Aucune vulnérabilité intro (59687ms)
+- 2026-10-15 14:35:21 UTC — [ticket-457] tour 1 — reviewer démarré
+- 2026-10-15 14:36:02 UTC — [ticket-457] tour 1 — reviewer terminé (41014ms)
+- 2026-10-15 14:41:20 UTC — [ticket-457] validateur: fichiers cités joints : memory/pipeline-log.md (tronqué)
+- 2026-10-15 14:41:20 UTC — [ticket-457] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code ajoute un nouveau modul (359405ms)
+- 2026-10-15 14:41:20 UTC — [ticket-457] APPROVED après 1 tour(s)
+- 2026-10-15 14:42:46 UTC — [ticket-457] documentation: 1 fichier(s) (81421ms)
+- 2026-10-15 14:43:07 UTC — [ide-core] ticket-457 PR #476 confiée au CIWatcher
+- 2026-10-15 14:43:10 UTC — [ticket-460] branche ticket-460-every-ticket-id-shown-in-the-app-opens-that-ticke
+- 2026-10-15 14:44:29 UTC — [ticket-460] plan rendu (79093ms)
+- 2026-10-15 14:44:29 UTC — [ticket-460] tour 1 — codeur démarré
+- 2026-10-15 14:49:23 UTC — [ticket-460] tour 1 — codeur terminé (293530ms)
+- 2026-10-15 14:55:04 UTC — [ticket-460] testeur: OK (exit 0)
+- 2026-10-15 14:55:35 UTC — [ticket-460] securite: PASS — Aucune vulnérabilité de sécurité détectée. Le diff introduit une fonctionnalité  (31062ms)
+- 2026-10-15 14:55:35 UTC — [ticket-460] tour 1 — reviewer démarré
+- 2026-10-15 14:56:10 UTC — [ticket-460] tour 1 — reviewer terminé (34890ms)
+- 2026-10-15 15:01:33 UTC — [ticket-460] validateur: fichiers cités joints : RunCard.tsx, TousLesRuns.tsx, RunView/index.tsx
+- 2026-10-15 15:01:33 UTC — [ticket-460] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le diff ajoute un composant `Li (357655ms)
+- 2026-10-15 15:01:33 UTC — [ticket-460] APPROVED après 1 tour(s)
+- 2026-10-15 15:03:05 UTC — [ticket-460] documentation: 1 fichier(s) (87375ms)
+- 2026-10-15 15:03:26 UTC — [ide-core] ticket-460 PR #477 confiée au CIWatcher
+- 2026-10-15 15:03:29 UTC — [ticket-461] branche ticket-461-the-ci-watcher-retries-a-github-5xx-instead-of-gi
+- 2026-10-15 15:03:30 UTC — [ticket-461] tour 1 — codeur démarré
+- 2026-10-15 15:05:20 UTC — [ticket-461] tour 1 — codeur terminé (110344ms)
+- 2026-10-15 15:11:21 UTC — [ticket-461] testeur: OK (exit 0)
+- 2026-10-15 15:11:55 UTC — [ticket-461] securite: PASS — Audit de sécurité complet sur le diff de ticket-461 (retry GitHub 5xx). Aucune v (33313ms)
+- 2026-10-15 15:11:55 UTC — [ticket-461] tour 1 — reviewer démarré
+- 2026-10-15 15:12:21 UTC — [ticket-461] tour 1 — reviewer terminé (26328ms)
+- 2026-10-15 15:13:47 UTC — [ticket-461] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests couvrent les cas de 5 (112360ms)
+- 2026-10-15 15:13:47 UTC — [ticket-461] APPROVED après 1 tour(s)
+- 2026-10-15 15:14:41 UTC — [ticket-461] documentation: 1 fichier(s) (48782ms)
+- 2026-10-15 15:14:58 UTC — [ide-core] ticket-461 PR #478 confiée au CIWatcher
+- 2026-10-15 15:35:13 UTC — [ticket-462] branche ticket-462-the-validator-is-told-a-cited-binary-file-exists
+- 2026-10-15 15:35:14 UTC — [ticket-462] tour 1 — codeur démarré
+- 2026-10-15 15:36:35 UTC — [ticket-462] tour 1 — codeur terminé (80796ms)
+- 2026-10-15 15:41:39 UTC — [ticket-462] testeur: OK (exit 0)
+- 2026-10-15 15:42:13 UTC — [ticket-462] securite: PASS — Audit terminé. Le diff ajoute une détection de fichiers binaires et améliore la  (33640ms)
+- 2026-10-15 15:42:13 UTC — [ticket-462] tour 1 — reviewer démarré
+- 2026-10-15 15:42:29 UTC — [ticket-462] tour 1 — reviewer terminé (16828ms)
+- 2026-10-15 15:42:47 UTC — [ticket-462] validateur: fichiers cités joints : aucun ; absents : .png
+- 2026-10-15 15:42:47 UTC — [ticket-462] validateur: APPROVED — Tous les critères sont couverts par des tests qui passent (exit 0). Le code déte (34264ms)
+- 2026-10-15 15:42:47 UTC — [ticket-462] APPROVED après 1 tour(s)
+- 2026-10-15 15:44:08 UTC — [ticket-462] documentation: 0 fichier(s) (78234ms)
+- 2026-10-15 15:44:23 UTC — [ide-core] ticket-462 PR #480 confiée au CIWatcher
+- 2026-10-15 15:48:47 UTC — [ide-core] ticket-462 PR #480 mergée (CI verte)
+- 2026-10-16 07:58:39 UTC — [ticket-463] branche ticket-463-design-how-tessera-provisions-a-project-online-ve
+- 2026-10-16 07:58:39 UTC — [ticket-463] tour 1 — codeur démarré
+- 2026-10-16 08:04:16 UTC — [ticket-463] tour 1 — architect terminé (336608ms)
+- 2026-10-16 08:11:09 UTC — [ticket-463] testeur: 1 failed, 2307 passed, 20 warnings in 406.39s (0:06:46)
+- 2026-10-16 08:11:09 UTC — [ticket-463] tests rouges au tour 1
+- 2026-10-16 08:11:09 UTC — [ticket-463] tour 2 — codeur démarré
+- 2026-10-16 08:11:34 UTC — [ticket-463] tour 2 — architect terminé (24952ms)
+- 2026-10-16 08:17:43 UTC — [ticket-463] testeur: OK (exit 0)
+- 2026-10-16 08:18:06 UTC — [ticket-463] securite: PASS — Ce diff contient uniquement de la documentation Markdown (architecture.md, contr (23202ms)
+- 2026-10-16 08:18:06 UTC — [ticket-463] tour 2 — reviewer démarré
+- 2026-10-16 08:18:33 UTC — [ticket-463] tour 2 — reviewer terminé (26922ms)
+- 2026-10-16 08:23:42 UTC — [ticket-463] validateur: fichiers cités joints : projects/ide-core/memory/decisions.md (tronqué) ; non joints (budget épuisé) : docs/architecture.md
+- 2026-10-16 08:23:42 UTC — [ticket-463] validateur: APPROVED — Tous les critères sont satisfaits. L'ADR-053 fixe complètement la stratégie de g (335875ms)
+- 2026-10-16 08:23:42 UTC — [ticket-463] APPROVED après 2 tour(s)
+- 2026-10-16 08:26:10 UTC — [ticket-463] documentation: 0 fichier(s) (144327ms)
+- 2026-10-16 08:26:27 UTC — [ide-core] ticket-463 PR #482 confiée au CIWatcher
+- 2026-10-16 08:31:22 UTC — [ide-core] ticket-463 PR #482 mergée (CI verte)
+- 2026-10-16 08:32:02 UTC — [ticket-464] branche ticket-464-online-service-tokens-are-read-by-the-backend-onl
+- 2026-10-16 08:32:02 UTC — [ticket-464] tour 1 — codeur démarré
+- 2026-10-16 08:38:40 UTC — [ticket-464] tour 1 — codeur terminé (397734ms)
+- 2026-10-16 08:45:40 UTC — [ticket-464] testeur: 1 failed, 1137 passed, 20 warnings in 415.94s (0:06:55)
+- 2026-10-16 08:45:40 UTC — [ticket-464] tests rouges au tour 1
+- 2026-10-16 08:45:40 UTC — [ticket-464] tour 2 — codeur démarré
+- 2026-10-16 08:46:17 UTC — [ticket-464] tour 2 — codeur terminé (37594ms)
+- 2026-10-16 08:55:42 UTC — [ticket-464] testeur: Tests  1236 passed (1236)
+- 2026-10-16 08:55:42 UTC — [ticket-464] tests rouges au tour 2
+- 2026-10-16 08:55:42 UTC — [ticket-464] tour 3 — codeur démarré
+- 2026-10-16 08:57:34 UTC — [ticket-464] tour 3 — codeur terminé (112015ms)
+- 2026-10-16 09:04:32 UTC — [ticket-464] testeur: OK (exit 0)
+- 2026-10-16 09:05:08 UTC — [ticket-464] securite: PASS — Aucune vulnérabilité détectée dans ce diff. Le ticket implémente une protection  (36484ms)
+- 2026-10-16 09:05:09 UTC — [ticket-464] tour 3 — reviewer démarré
+- 2026-10-16 09:05:54 UTC — [ticket-464] tour 3 — reviewer terminé (45032ms)
+- 2026-10-16 09:06:28 UTC — [ticket-464] validateur: fichiers cités joints : .env ; absents : Livraison.arret
+- 2026-10-16 09:06:28 UTC — [ticket-464] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits : le code implémente les cinq je (80015ms)
+- 2026-10-16 09:06:28 UTC — [ticket-464] APPROVED après 3 tour(s)
+- 2026-10-16 09:11:55 UTC — [ticket-464] documentation: 2 fichier(s) (318405ms) — après tour de correction
+- 2026-10-16 09:16:28 UTC — [ide-core] ticket-464 PR #485 mergée (CI verte)
+- 2026-10-16 09:16:30 UTC — [ide-core] ticket-464 : base réalignée sur develop
+- 2026-10-16 09:16:30 UTC — [ide-core] ticket-464 PR #485 confiée au CIWatcher
+- 2026-10-16 09:16:32 UTC — [ticket-465] branche ticket-465-a-provisioning-plan-runs-ordered-steps-re-reads-t
+- 2026-10-16 09:16:32 UTC — [ticket-465] tour 1 — codeur démarré
+- 2026-10-16 09:20:23 UTC — [ticket-465] tour 1 — codeur terminé (230438ms)
+- 2026-10-16 09:30:46 UTC — [ticket-465] testeur: OK (exit 0)
+- 2026-10-16 09:31:21 UTC — [ticket-465] securite: PASS — Audit de sécurité du module de provisioning (ticket-465) : aucune vulnérabilité  (34390ms)
+- 2026-10-16 09:31:21 UTC — [ticket-465] tour 1 — reviewer démarré
+- 2026-10-16 09:31:49 UTC — [ticket-465] tour 1 — reviewer terminé (28391ms)
+- 2026-10-16 09:32:03 UTC — [ticket-465] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code introduit un moteur de  (41703ms)
+- 2026-10-16 09:32:03 UTC — [ticket-465] APPROVED après 1 tour(s)
+- 2026-10-16 09:34:31 UTC — [ticket-465] documentation: 1 fichier(s) (142718ms)
+- 2026-10-16 09:40:57 UTC — [ide-core] ticket-465 PR #487 mergée (CI verte)
+- 2026-10-16 09:40:59 UTC — [ide-core] ticket-465 : base réalignée sur develop
+- 2026-10-16 09:40:59 UTC — [ide-core] ticket-465 PR #487 confiée au CIWatcher
+- 2026-10-16 09:41:01 UTC — [ticket-466] branche ticket-466-the-vercel-step-finds-or-creates-the-project-link
+- 2026-10-16 09:41:01 UTC — [ticket-466] tour 1 — codeur démarré
+- 2026-10-16 09:46:30 UTC — [ticket-466] tour 1 — codeur terminé (328922ms)
+- 2026-10-16 09:54:39 UTC — [ticket-466] testeur: OK (exit 0)
+- 2026-10-16 09:55:50 UTC — [ticket-466] securite: PASS — Audit complet de l'intégration Vercel (ticket-466) : sécurité robuste, pas de vu (71218ms)
+- 2026-10-16 09:55:50 UTC — [ticket-466] tour 1 — reviewer démarré
+- 2026-10-16 09:56:15 UTC — [ticket-466] validateur: APPROVED — Tous les critères sont satisfaits. Les tests couvrent l'intégralité du comportem (24405ms)
+- 2026-10-16 09:56:25 UTC — [ticket-466] tour 1 — reviewer terminé (34563ms)
+- 2026-10-16 09:56:25 UTC — [ticket-466] APPROVED après 1 tour(s)
+- 2026-10-16 09:59:42 UTC — [ticket-466] documentation: 3 fichier(s) (188327ms)
+- 2026-10-16 10:20:20 UTC — [ide-core] ticket-467 PR #490 confiée au CIWatcher
+- 2026-10-16 10:20:22 UTC — [ticket-468] branche ticket-468-the-resend-steps-find-or-create-the-sending-domai
+- 2026-10-16 10:20:23 UTC — [ticket-468] tour 1 — codeur démarré
+- 2026-10-16 10:23:36 UTC — [ticket-468] tour 1 — codeur terminé (193108ms)
+- 2026-10-16 10:24:59 UTC — [ide-core] ticket-467 PR #490 mergée (CI verte)
+- 2026-10-16 10:28:46 UTC — [ticket-468] testeur: OK (exit 0)
+- 2026-10-16 10:29:34 UTC — [ticket-468] securite: PASS — Code de provisioning Resend (domaines, clés API, vérification DNS) sans vulnérab (47531ms)
+- 2026-10-16 10:29:34 UTC — [ticket-468] tour 1 — reviewer démarré
+- 2026-10-16 10:30:00 UTC — [ticket-468] tour 1 — reviewer terminé (26156ms)
+- 2026-10-16 10:33:01 UTC — [ticket-468] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (207281ms)
+- 2026-10-16 10:33:01 UTC — [ticket-468] APPROVED après 1 tour(s)
+- 2026-10-16 10:35:44 UTC — [ticket-468] documentation: 1 fichier(s) (159094ms) — après tour de correction
+- 2026-10-16 10:36:15 UTC — [ticket-468] livraison: résolveur tenté : docs/architecture.md (23515ms)
+- 2026-10-16 10:36:15 UTC — [ticket-468] livraison: arrêt — Conflit avec develop sur : docs/architecture.md — résolveur tenté sur docs/architecture.md, sans suc
+- 2026-10-16 10:04:21 UTC — [ide-core] ticket-466 PR #489 mergée (CI verte)
+- 2026-10-16 10:04:22 UTC — [ide-core] ticket-466 : base réalignée sur develop
+- 2026-10-16 10:04:22 UTC — [ide-core] ticket-466 PR #489 confiée au CIWatcher
+- 2026-10-16 10:04:25 UTC — [ticket-467] branche ticket-467-the-database-step-finds-or-creates-the-neon-proje
+- 2026-10-16 10:04:25 UTC — [ticket-467] tour 1 — codeur démarré
+- 2026-10-16 10:07:10 UTC — [ticket-467] tour 1 — codeur terminé (164702ms)
+- 2026-10-16 10:14:59 UTC — [ticket-467] testeur: OK (exit 0)
+- 2026-10-16 10:15:37 UTC — [ticket-467] securite: PASS — Audit de sécurité complet sur les fichiers ajoutés (neon.py, neon_steps.py, test (37952ms)
+- 2026-10-16 10:15:37 UTC — [ticket-467] tour 1 — reviewer démarré
+- 2026-10-16 10:16:08 UTC — [ticket-467] tour 1 — reviewer terminé (31030ms)
+- 2026-10-16 10:16:08 UTC — [ticket-467] validateur: APPROVED — Tous les critères d'acceptation sont couverts par des tests qui passent. Le code (31139ms)
+- 2026-10-16 10:16:08 UTC — [ticket-467] APPROVED après 1 tour(s)
+- 2026-10-16 10:20:04 UTC — [ticket-467] documentation: 2 fichier(s) (232031ms)
+- 2026-10-16 10:36:19 UTC — [ticket-469] branche ticket-469-the-dns-step-publishes-the-records-other-steps-as
+- 2026-10-16 10:36:19 UTC — [ticket-469] tour 1 — codeur démarré
+- 2026-10-16 10:39:05 UTC — [ticket-469] tour 1 — codeur terminé (165577ms)
+- 2026-10-16 10:44:17 UTC — [ticket-469] testeur: OK (exit 0)
+- 2026-10-16 10:45:28 UTC — [ticket-469] securite: PASS — Les deux nouveaux fichiers `cloudflare.py` et `cloudflare_steps.py` implémentent (71375ms)
+- 2026-10-16 10:45:28 UTC — [ticket-469] tour 1 — reviewer démarré
+- 2026-10-16 10:45:55 UTC — [ticket-469] tour 1 — reviewer terminé (26219ms)
+- 2026-10-16 10:48:37 UTC — [ticket-469] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les tests couvrent les cas de fi (188922ms)
+- 2026-10-16 10:48:37 UTC — [ticket-469] APPROVED après 1 tour(s)
+- 2026-10-16 10:51:50 UTC — [ticket-469] documentation: 2 fichier(s) (187639ms)
+- 2026-10-16 10:52:06 UTC — [ide-core] ticket-469 PR #491 confiée au CIWatcher
+- 2026-10-16 10:52:08 UTC — [ticket-470] branche ticket-470-the-stripe-step-works-in-test-mode-unless-the-pro
+- 2026-10-16 10:52:09 UTC — [ticket-470] tour 1 — codeur démarré
+- 2026-10-16 10:56:45 UTC — [ticket-470] tour 1 — codeur terminé (276656ms)
+- 2026-10-16 10:56:46 UTC — [ide-core] ticket-469 PR #491 mergée (CI verte)
+- 2026-10-16 11:02:09 UTC — [ticket-470] testeur: OK (exit 0)
+- 2026-10-16 11:02:51 UTC — [ticket-470] securite: PASS — Aucune vulnérabilité critique ni haute gravité détectée. Le code introduit (Stri (42578ms)
+- 2026-10-16 11:02:51 UTC — [ticket-470] tour 1 — reviewer démarré
+- 2026-10-16 11:03:18 UTC — [ticket-470] tour 1 — reviewer terminé (26671ms)
+- 2026-10-16 11:08:20 UTC — [ticket-470] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code fournit un client Strip (328890ms)
+- 2026-10-16 11:08:20 UTC — [ticket-470] APPROVED après 1 tour(s)
+- 2026-10-16 11:10:06 UTC — [ticket-470] documentation: 0 fichier(s) (99390ms)
+- 2026-10-16 11:10:21 UTC — [ide-core] ticket-470 PR #493 confiée au CIWatcher
+- 2026-10-16 11:10:23 UTC — [ticket-471] branche ticket-471-a-project-is-put-online-by-an-explicit-request-an
+- 2026-10-16 11:10:24 UTC — [ticket-471] tour 1 — codeur démarré
+- 2026-10-16 11:13:58 UTC — [ticket-471] tour 1 — codeur terminé (214452ms)
+- 2026-10-16 11:15:00 UTC — [ide-core] ticket-470 PR #493 mergée (CI verte)
+- 2026-10-16 11:19:58 UTC — [ticket-471] testeur: OK (exit 0)
+- 2026-10-16 11:20:56 UTC — [ticket-471] securite: PASS — Audit complet : aucune vulnérabilité OWASP Top 10 ou CVE détectée.
+
+Points posit (58359ms)
+- 2026-10-16 11:20:56 UTC — [ticket-471] tour 1 — reviewer démarré
+- 2026-10-16 11:21:32 UTC — [ticket-471] tour 1 — reviewer terminé (35578ms)
+- 2026-10-16 11:25:16 UTC — [ticket-471] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (259265ms)
+- 2026-10-16 11:25:16 UTC — [ticket-471] APPROVED après 1 tour(s)
+- 2026-10-16 11:27:23 UTC — [ticket-471] documentation: 2 fichier(s) (120358ms)
+- 2026-10-16 12:29:01 UTC — [ide-core] ticket-476 PR #497 confiée au CIWatcher
+- 2026-10-16 12:29:03 UTC — [ticket-474] branche ticket-474-the-coder-receives-the-reviewer-s-whole-objection
+- 2026-10-16 12:29:04 UTC — [ticket-474] tour 1 — codeur démarré
+- 2026-10-16 12:31:16 UTC — [ticket-474] tour 1 — codeur terminé (132000ms)
+- 2026-10-16 12:33:22 UTC — [ticket-476] livraison: arrêt — PR #497 non mergée : CI failing : la PR #497 reste ouverte.
+- 2026-10-16 12:40:03 UTC — [ticket-474] testeur: OK (exit 0)
+- 2026-10-16 12:40:40 UTC — [ticket-474] securite: PASS — Refactoring de traitement de texte sans vulnérabilité détectée. Les trois nouvel (37062ms)
+- 2026-10-16 12:40:40 UTC — [ticket-474] tour 1 — reviewer démarré
+- 2026-10-16 12:41:06 UTC — [ticket-474] tour 1 — reviewer terminé (26171ms)
+- 2026-10-16 12:43:11 UTC — [ticket-474] validateur: APPROVED — Tous les critères sont satisfaits. Le code implémente correctement le comporteme (150969ms)
+- 2026-10-16 12:43:11 UTC — [ticket-474] APPROVED après 1 tour(s)
+- 2026-10-16 12:44:20 UTC — [ticket-474] documentation: 1 fichier(s) (63063ms)
+- 2026-10-16 12:45:58 UTC — [ticket-474] livraison: résolveur tenté : docs/architecture.md (78922ms)
+- 2026-10-16 12:45:58 UTC — [ticket-474] livraison: arrêt — Conflit avec develop sur : docs/architecture.md — résolveur tenté sur docs/architecture.md, sans suc
+- 2026-10-16 11:27:41 UTC — [ide-core] ticket-471 PR #494 confiée au CIWatcher
+- 2026-10-16 11:32:10 UTC — [ide-core] ticket-471 PR #494 mergée (CI verte)
+- 2026-10-16 11:47:41 UTC — [ticket-476] branche ticket-476-a-criterion-that-needs-a-protected-file-stops-the
+- 2026-10-16 11:49:41 UTC — [ticket-476] plan rendu (119250ms)
+- 2026-10-16 11:49:41 UTC — [ticket-476] tour 1 — codeur démarré
+- 2026-10-16 11:56:23 UTC — [ticket-476] tour 1 — codeur terminé (401843ms)
+- 2026-10-16 11:56:24 UTC — [ticket-476] testeur: en attente d'un créneau de test
+- 2026-10-16 12:05:22 UTC — [ticket-476] testeur: OK (exit 0)
+- 2026-10-16 12:06:02 UTC — [ticket-476] securite: PASS — Audit complet du diff ticket-476 : ajout d'un système pour détecter et signaler  (39905ms)
+- 2026-10-16 12:06:02 UTC — [ticket-476] tour 1 — reviewer démarré
+- 2026-10-16 12:06:31 UTC — [ticket-476] validateur: fichiers cités joints : CLAUDE.md
+- 2026-10-16 12:06:31 UTC — [ticket-476] validateur: APPROVED — Tous les critères sont satisfaits. La détection des critères impossibles est com (28921ms)
+- 2026-10-16 12:06:59 UTC — [ticket-476] tour 1 — reviewer terminé (56592ms)
+- 2026-10-16 12:06:59 UTC — [ticket-476] CHANGES_REQUESTED tour 1: Reviewer : CHANGES_REQUESTED
+
+## Problèmes bloquants
+
+1. **La détection bloque des critères qui ne f
+- 2026-10-16 12:06:59 UTC — [ticket-476] tour 2 — codeur démarré
+- 2026-10-16 12:10:28 UTC — [ticket-476] tour 2 — codeur terminé (209469ms)
+- 2026-10-16 12:17:35 UTC — [ticket-476] testeur: OK (exit 0)
+- 2026-10-16 12:18:36 UTC — [ticket-476] securite: PASS — Le diff introduit une feature pour bloquer les runs avant le codeur si un critèr (60859ms)
+- 2026-10-16 12:18:36 UTC — [ticket-476] tour 2 — reviewer démarré
+- 2026-10-16 12:19:09 UTC — [ticket-476] tour 2 — reviewer terminé (33234ms)
+- 2026-10-16 12:24:26 UTC — [ticket-476] validateur: fichiers cités joints : CLAUDE.md
+- 2026-10-16 12:24:26 UTC — [ticket-476] validateur: APPROVED — Tous les critères sont satisfaits. Le code détecte correctement les critères imp (350578ms)
+- 2026-10-16 12:24:26 UTC — [ticket-476] APPROVED après 2 tour(s)
+- 2026-10-16 12:28:33 UTC — [ticket-476] documentation: 3 fichier(s) (241922ms)
+- 2026-10-16 12:46:16 UTC — [ticket-473] branche ticket-473-a-failed-test-step-reports-its-first-error-line-n
+- 2026-10-16 12:46:17 UTC — [ticket-473] tour 1 — codeur démarré
+- 2026-10-16 12:49:30 UTC — [ticket-473] tour 1 — codeur terminé (192655ms)
+- 2026-10-16 12:53:22 UTC — [ticket-473] testeur: 8 errors in 135.14s (0:02:15)
+- 2026-10-16 12:53:22 UTC — [ticket-473] tests rouges au tour 1
+- 2026-10-16 12:53:22 UTC — [ticket-473] tour 2 — codeur démarré
+- 2026-10-16 12:53:54 UTC — [ticket-473] tour 2 — codeur terminé (32327ms)
+- 2026-10-16 12:56:00 UTC — [ticket-473] testeur: 8 errors in 6.79s
+- 2026-10-16 12:56:00 UTC — [ticket-473] tests rouges au tour 2
+- 2026-10-16 12:56:00 UTC — [ticket-473] tour 3 — codeur démarré
+- 2026-10-16 12:56:19 UTC — [ticket-473] tour 3 — codeur terminé (19235ms)
+- 2026-10-16 12:58:26 UTC — [ticket-473] testeur: 8 errors in 36.67s
+- 2026-10-16 12:58:26 UTC — [ticket-473] tests rouges au tour 3
+- 2026-10-16 12:58:26 UTC — [ticket-473] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-16 12:58:33 UTC — [ide-core] file interrompue : ticket-473 non approuvé
+- 2026-10-16 13:18:32 UTC — [ticket-487] branche ticket-487-a-configuration-error-names-the-faulty-variable-b
+- 2026-10-16 13:18:33 UTC — [ticket-487] tour 1 — codeur démarré
+- 2026-10-16 13:20:24 UTC — [ticket-487] tour 1 — codeur terminé (111703ms)
+- 2026-10-16 13:21:55 UTC — [ticket-487] testeur: 8 errors in 2.57s
+- 2026-10-16 13:21:55 UTC — [ticket-487] tests rouges au tour 1
+- 2026-10-16 13:21:55 UTC — [ticket-487] tour 2 — codeur démarré
+- 2026-10-16 13:23:12 UTC — [ticket-487] tour 2 — codeur terminé (77234ms)
+- 2026-10-16 13:29:24 UTC — [ticket-487] testeur: OK (exit 0)
+- 2026-10-16 13:30:55 UTC — [ticket-487] securite: BLOCK — Une vulnérabilité HIGH de type Path Traversal est introduite par ce ticket : la  (91420ms)
+- 2026-10-16 13:30:59 UTC — [ide-core] file interrompue : ticket-487 non approuvé
+- 2026-10-16 14:16:07 UTC — [ticket-488] branche ticket-488-putting-a-project-online-runs-its-resend-and-stri
+- 2026-10-16 14:16:07 UTC — [ticket-488] tour 1 — codeur démarré
+- 2026-10-16 14:17:45 UTC — [ticket-488] tour 1 — codeur terminé (97967ms)
+- 2026-10-16 14:23:58 UTC — [ticket-488] testeur: OK (exit 0)
+- 2026-10-16 14:26:07 UTC — [ticket-488] securite: PASS — Diff analyzed for security vulnerabilities. No CRITICAL or HIGH severity issues  (129172ms)
+- 2026-10-16 14:26:07 UTC — [ticket-488] tour 1 — reviewer démarré
+- 2026-10-16 14:26:33 UTC — [ticket-488] tour 1 — reviewer terminé (26358ms)
+- 2026-10-16 14:28:31 UTC — [ticket-488] validateur: fichiers cités joints : launcher.py
+- 2026-10-16 14:28:31 UTC — [ticket-488] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les tests ont été ajoutés pour v (143671ms)
+- 2026-10-16 14:28:31 UTC — [ticket-488] APPROVED après 1 tour(s)
+- 2026-10-16 14:31:37 UTC — [ticket-488] documentation: 0 fichier(s) (181030ms) — après tour de correction
+- 2026-10-16 14:31:57 UTC — [ide-core] ticket-488 PR #506 confiée au CIWatcher
+- 2026-10-16 14:32:00 UTC — [ticket-485] branche ticket-485-the-security-audit-can-read-the-project-s-code-be
+- 2026-10-16 14:33:03 UTC — [ticket-485] plan rendu (61952ms)
+- 2026-10-16 14:33:03 UTC — [ticket-485] tour 1 — codeur démarré
+- 2026-10-16 14:35:16 UTC — [ticket-485] tour 1 — codeur terminé (133015ms)
+- 2026-10-16 14:36:41 UTC — [ticket-488] livraison: PR #506 mergée malgré une erreur réseau (ReadTimeout)
+- 2026-10-16 14:41:47 UTC — [ticket-485] testeur: OK (exit 0)
+- 2026-10-16 14:42:55 UTC — [ticket-485] securite: PASS — Aucune vulnérabilité détectée. Le diff introduit correctement une capacité de le (68046ms)
+- 2026-10-16 14:42:55 UTC — [ticket-485] tour 1 — reviewer démarré
+- 2026-10-16 14:43:19 UTC — [ticket-485] tour 1 — reviewer terminé (24217ms)
+- 2026-10-16 14:45:06 UTC — [ticket-485] validateur: fichiers cités joints : agents/prompts/securite.md
+- 2026-10-16 14:45:06 UTC — [ticket-485] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code modifié permet à l'audi (130812ms)
+- 2026-10-16 14:45:06 UTC — [ticket-485] APPROVED après 1 tour(s)
+- 2026-10-16 14:47:14 UTC — [ticket-485] documentation: 1 fichier(s) (123186ms)
+- 2026-10-16 14:47:37 UTC — [ide-core] ticket-485 PR #507 confiée au CIWatcher
+- 2026-10-16 14:47:40 UTC — [ticket-483] branche ticket-483-a-project-declares-which-variables-provisioning-g
+- 2026-10-16 14:47:41 UTC — [ticket-483] tour 1 — codeur démarré
+- 2026-10-16 14:49:29 UTC — [ticket-483] tour 1 — codeur terminé (107844ms)
+- 2026-10-16 14:51:47 UTC — [ide-core] ticket-485 PR #507 mergée (CI verte)
+- 2026-10-16 14:55:10 UTC — [ticket-483] testeur: OK (exit 0)
+- 2026-10-16 14:56:27 UTC — [ticket-483] securite: PASS — Deux problèmes de validation insuffisante détectés (MEDIUM et LOW), aucun critiq (76750ms)
+- 2026-10-16 14:56:27 UTC — [ticket-483] tour 1 — reviewer démarré
+- 2026-10-16 14:56:50 UTC — [ticket-483] tour 1 — reviewer terminé (22734ms)
+- 2026-10-16 14:58:34 UTC — [ticket-483] validateur: fichiers cités joints : aucun ; absents : https://kadoomi.com, kadoomi.com
+- 2026-10-16 14:58:34 UTC — [ticket-483] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests couvrent les fonction (125687ms)
+- 2026-10-16 14:58:34 UTC — [ticket-483] APPROVED après 1 tour(s)
+- 2026-10-16 15:02:16 UTC — [ticket-483] documentation: 0 fichier(s) (216828ms)
+- 2026-10-16 18:35:01 UTC — [ticket-475] branche ticket-475-a-dotted-identifier-in-a-criterion-is-not-taken-f
+- 2026-10-16 18:35:01 UTC — [ticket-475] tour 1 — codeur démarré
+- 2026-10-16 18:36:33 UTC — [ticket-475] tour 1 — codeur terminé (92218ms)
+- 2026-10-16 18:41:34 UTC — [ticket-475] testeur: ❯ src/components/Sidebar/ProjectNav.test.tsx:48:32
+- 2026-10-16 18:41:34 UTC — [ticket-475] tests rouges au tour 1
+- 2026-10-16 18:41:34 UTC — [ticket-475] tour 2 — codeur démarré
+- 2026-10-16 18:42:16 UTC — [ticket-475] tour 2 — codeur terminé (41500ms)
+- 2026-10-16 18:47:21 UTC — [ticket-475] testeur: OK (exit 0)
+- 2026-10-16 18:49:56 UTC — [ticket-475] securite: PASS — No security vulnerabilities introduced. The refactoring improves security by red (154984ms)
+- 2026-10-16 18:49:56 UTC — [ticket-475] tour 2 — reviewer démarré
+- 2026-10-16 18:50:21 UTC — [ticket-475] tour 2 — reviewer terminé (24515ms)
+- 2026-10-16 18:52:31 UTC — [ticket-475] validateur: fichiers cités joints : brand.ts, src/lib/brand.ts, prisma/schema.prisma ; absents : BRAND.name
+- 2026-10-16 18:52:31 UTC — [ticket-475] validateur: APPROVED — Les trois critères d'acceptation sont respectés. Les tests ont été ajoutés pour  (155172ms)
+- 2026-10-16 18:52:31 UTC — [ticket-475] APPROVED après 2 tour(s)
+- 2026-10-16 18:54:49 UTC — [ticket-475] documentation: 1 fichier(s) (133108ms)
+- 2026-10-17 07:02:51 UTC — [ticket-495] branche ticket-495-the-security-audit-renders-a-verdict-before-it-ru
+- 2026-10-17 07:02:51 UTC — [ticket-495] tour 1 — codeur démarré
+- 2026-10-17 07:06:31 UTC — [ticket-495] tour 1 — codeur terminé (219780ms)
+- 2026-10-17 07:14:35 UTC — [ticket-495] testeur: 1 failed, 1339 passed, 20 warnings in 477.67s (0:07:57)
+- 2026-10-17 07:14:35 UTC — [ticket-495] tests rouges au tour 1
+- 2026-10-17 07:14:35 UTC — [ticket-495] tour 2 — codeur démarré
+- 2026-10-17 07:15:20 UTC — [ticket-495] tour 2 — codeur terminé (45141ms)
+- 2026-10-17 07:21:25 UTC — [ticket-495] testeur: OK (exit 0)
+- 2026-10-17 07:23:24 UTC — [ticket-495] securite: PASS — Aucune vulnérabilité critique ou haute détectée. Le code ajoute correctement un  (118625ms)
+- 2026-10-17 07:23:24 UTC — [ticket-495] tour 2 — reviewer démarré
+- 2026-10-17 07:23:54 UTC — [ticket-495] tour 2 — reviewer terminé (30702ms)
+- 2026-10-17 07:26:07 UTC — [ticket-495] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente un budget pr (162422ms)
+- 2026-10-17 07:26:07 UTC — [ticket-495] APPROVED après 2 tour(s)
+- 2026-10-17 07:27:33 UTC — [ticket-495] documentation: 2 fichier(s) (82186ms)
+- 2026-10-17 07:27:49 UTC — [ide-core] ticket-495 PR #513 confiée au CIWatcher
+- 2026-10-17 07:27:52 UTC — [ticket-491] branche ticket-491-the-stripe-step-with-a-key-of-the-wrong-type-asks
+- 2026-10-17 07:27:52 UTC — [ticket-491] tour 1 — codeur démarré
+- 2026-10-17 07:29:26 UTC — [ticket-491] tour 1 — codeur terminé (94139ms)
+- 2026-10-17 07:32:32 UTC — [ide-core] ticket-495 PR #513 mergée (CI verte)
+- 2026-10-17 07:35:37 UTC — [ticket-491] testeur: OK (exit 0)
+- 2026-10-17 07:37:33 UTC — [ticket-491] securite: PASS — Refactorisation logique et sécurisée du contrôle de flux pour les étapes de prov (116266ms)
+- 2026-10-17 07:37:33 UTC — [ticket-491] tour 1 — reviewer démarré
+- 2026-10-17 07:38:04 UTC — [ticket-491] tour 1 — reviewer terminé (30922ms)
+- 2026-10-17 07:39:07 UTC — [ticket-491] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le code modifie le comportemen (93625ms)
+- 2026-10-17 07:39:07 UTC — [ticket-491] APPROVED après 1 tour(s)
+- 2026-10-17 07:39:13 UTC — [ticket-491] documentation: échec — Claude Code returned an error result: You've hit your session limit · resets 1:2
+- 2026-10-17 07:39:26 UTC — [ide-core] ticket-491 PR #514 confiée au CIWatcher
+- 2026-10-17 07:39:29 UTC — [ticket-489] branche ticket-489-putting-a-project-online-triggers-its-first-produ
+- 2026-10-17 07:39:29 UTC — [ticket-489] tour 1 — codeur démarré
+- 2026-10-17 07:39:32 UTC — [ticket-489] INTERROMPU par limite de session (reprise : 1:20pm (Europe/Paris))
+- 2026-10-17 07:39:36 UTC — [ide-core] file interrompue : limite de session (reprise : 1:20pm (Europe/Paris))
+- 2026-10-17 07:44:04 UTC — [ide-core] ticket-491 PR #514 mergée (CI verte)
+- 2026-10-17 11:38:45 UTC — [ticket-489] branche ticket-489-putting-a-project-online-triggers-its-first-produ
+- 2026-10-17 11:38:46 UTC — [ticket-489] tour 1 — codeur démarré
+- 2026-10-17 11:43:39 UTC — [ticket-489] tour 1 — codeur terminé (293531ms)
+- 2026-10-17 11:49:31 UTC — [ticket-489] testeur: OK (exit 0)
+- 2026-10-17 11:54:36 UTC — [ticket-489] securite: PASS — Aucune vulnérabilité détectée. Le code suit les bonnes pratiques de sécurité pou (305125ms)
+- 2026-10-17 11:54:36 UTC — [ticket-489] tour 1 — reviewer démarré
+- 2026-10-17 11:55:15 UTC — [ticket-489] tour 1 — reviewer terminé (39171ms)
+- 2026-10-17 11:58:27 UTC — [ticket-489] validateur: APPROVED — Tous les critères d'acceptation ont été implémentés et vérifiés par les tests. L (231015ms)
+- 2026-10-17 11:58:27 UTC — [ticket-489] APPROVED après 1 tour(s)
+- 2026-10-17 12:00:21 UTC — [ticket-489] documentation: 0 fichier(s) (110140ms)
+- 2026-10-17 12:00:37 UTC — [ide-core] ticket-489 PR #515 confiée au CIWatcher
+- 2026-10-17 12:00:40 UTC — [ticket-496] branche ticket-496-a-test-step-whose-tool-cannot-be-found-is-reporte
+- 2026-10-17 12:00:40 UTC — [ticket-496] tour 1 — codeur démarré
+- 2026-10-17 12:03:10 UTC — [ticket-496] tour 1 — codeur terminé (149655ms)
+- 2026-10-17 12:05:20 UTC — [ide-core] ticket-489 PR #515 mergée (CI verte)
+- 2026-10-17 12:10:12 UTC — [ticket-496] testeur: OK (exit 0)
+- 2026-10-17 12:11:16 UTC — [ticket-496] securite: PASS — Aucune vulnérabilité détectée. Le module outil_introuvable reconnaît les outils  (63984ms)
+- 2026-10-17 12:11:16 UTC — [ticket-496] tour 1 — reviewer démarré
+- 2026-10-17 12:11:50 UTC — [ticket-496] tour 1 — reviewer terminé (33375ms)
+- 2026-10-17 12:13:48 UTC — [ticket-496] validateur: APPROVED — Tous les critères d'acceptation ont été implémentés et testés. Le code reconnaît (151859ms)
+- 2026-10-17 12:13:48 UTC — [ticket-496] APPROVED après 1 tour(s)
+- 2026-10-17 12:15:49 UTC — [ticket-496] documentation: 2 fichier(s) (114265ms)
+- 2026-10-17 12:24:16 UTC — [ide-core] ticket-496 PR #517 mergée (CI verte)
+- 2026-10-17 18:16:11 UTC — [ticket-499] branche ticket-499-neon-calls-carry-the-organization-id-so-provision
+- 2026-10-17 18:16:12 UTC — [ticket-499] tour 1 — codeur démarré
+- 2026-10-17 18:18:24 UTC — [ticket-499] tour 1 — codeur terminé (132593ms)
+- 2026-10-17 18:23:05 UTC — [ticket-499] testeur: 1 failed, 1225 passed, 28 warnings in 278.31s (0:04:38)
+- 2026-10-17 18:23:05 UTC — [ticket-499] tests rouges au tour 1
+- 2026-10-17 18:23:05 UTC — [ticket-499] tour 2 — codeur démarré
+- 2026-10-17 18:23:59 UTC — [ticket-499] tour 2 — codeur terminé (54235ms)
+- 2026-10-17 18:30:57 UTC — [ticket-499] testeur: OK (exit 0)
+- 2026-10-17 18:33:27 UTC — [ticket-499] securite: PASS — **No vulnerabilities detected.** This diff introduces security improvements for  (150156ms)
+- 2026-10-17 18:33:27 UTC — [ticket-499] tour 2 — reviewer démarré
+- 2026-10-17 18:34:00 UTC — [ticket-499] tour 2 — reviewer terminé (32969ms)
+- 2026-10-17 18:34:01 UTC — [ticket-499] validateur: APPROVED — Tous les critères sont satisfaits. Le nouveau fichier `test_provisioning_neon_or (33750ms)
+- 2026-10-17 18:34:01 UTC — [ticket-499] APPROVED après 2 tour(s)
+- 2026-10-17 18:35:15 UTC — [ticket-499] documentation: 0 fichier(s) (69656ms)
+- 2026-10-17 12:16:09 UTC — [ide-core] ticket-496 PR #517 confiée au CIWatcher
+- 2026-10-17 12:16:12 UTC — [ticket-477] branche ticket-477-a-run-is-refused-before-its-first-ticket-when-del
+- 2026-10-17 12:16:15 UTC — [ticket-477] plan : échec, le run continue sans (Claude Code returned an error result: You've hit your session limit · resets 6:20pm (Europe/Paris) (exit code: 1))
+- 2026-10-17 12:16:15 UTC — [ticket-477] tour 1 — codeur démarré
+- 2026-10-17 12:16:19 UTC — [ticket-477] INTERROMPU par limite de session (reprise : 6:20pm (Europe/Paris))
+- 2026-10-17 12:16:23 UTC — [ide-core] file interrompue : limite de session (reprise : 6:20pm (Europe/Paris))
+- 2026-10-17 18:35:30 UTC — [ide-core] ticket-499 PR #518 confiée au CIWatcher
+- 2026-10-17 18:35:33 UTC — [ticket-477] branche ticket-477-a-run-is-refused-before-its-first-ticket-when-del
+- 2026-10-17 18:36:38 UTC — [ticket-477] plan rendu (64125ms)
+- 2026-10-17 18:36:38 UTC — [ticket-477] tour 1 — codeur démarré
+- 2026-10-17 18:38:23 UTC — [ticket-477] tour 1 — codeur terminé (105485ms)
+- 2026-10-17 18:40:09 UTC — [ide-core] ticket-499 PR #518 mergée (CI verte)
+- 2026-10-17 18:45:31 UTC — [ticket-477] testeur: OK (exit 0)
+- 2026-10-17 18:47:38 UTC — [ticket-477] securite: PASS — Aucune vulnérabilité CRITICAL ou HIGH détectée. Le champ `force` permet intentio (127328ms)
+- 2026-10-17 18:47:38 UTC — [ticket-477] tour 1 — reviewer démarré
+- 2026-10-17 18:48:02 UTC — [ticket-477] tour 1 — reviewer terminé (24061ms)
+- 2026-10-17 18:48:03 UTC — [ticket-477] validateur: APPROVED — Tous les critères sont couverts par des tests spécifiques et documentés dans `te (24750ms)
+- 2026-10-17 18:48:03 UTC — [ticket-477] APPROVED après 1 tour(s)
+- 2026-10-17 18:50:14 UTC — [ticket-477] documentation: 2 fichier(s) (127140ms)
+- 2026-10-18 07:34:57 UTC — [ticket-500] branche ticket-500-when-neon-refuses-to-create-a-project-in-a-vercel
+- 2026-10-18 07:34:58 UTC — [ticket-500] tour 1 — codeur démarré
+- 2026-10-18 07:36:25 UTC — [ticket-500] tour 1 — codeur terminé (86907ms)
+- 2026-10-18 07:40:31 UTC — [ticket-500] testeur: 1 failed, 1185 passed, 28 warnings in 244.07s (0:04:04)
+- 2026-10-18 07:40:31 UTC — [ticket-500] tests rouges au tour 1
+- 2026-10-18 07:40:31 UTC — [ticket-500] tour 2 — codeur démarré
+- 2026-10-18 07:40:59 UTC — [ticket-500] tour 2 — codeur terminé (27812ms)
+- 2026-10-18 07:46:02 UTC — [ticket-500] testeur: OK (exit 0)
+- 2026-10-18 07:47:42 UTC — [ticket-500] securite: PASS — Aucune vulnérabilité de sécurité détectée. Le code respecte l'ADR-053 (secrets n (99202ms)
+- 2026-10-18 07:47:42 UTC — [ticket-500] tour 2 — reviewer démarré
+- 2026-10-18 07:47:59 UTC — [ticket-500] tour 2 — reviewer terminé (17218ms)
+- 2026-10-18 07:49:28 UTC — [ticket-500] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (105969ms)
+- 2026-10-18 07:49:28 UTC — [ticket-500] APPROVED après 2 tour(s)
+- 2026-10-18 07:51:40 UTC — [ticket-500] documentation: 1 fichier(s) (128531ms)
+- 2026-10-17 18:50:31 UTC — [ide-core] ticket-477 PR #519 confiée au CIWatcher
+- 2026-10-17 18:50:33 UTC — [ticket-498] branche ticket-498-an-agent-call-cut-by-an-exhausted-subscription-qu
+- 2026-10-17 18:51:19 UTC — [ticket-498] plan rendu (45625ms)
+- 2026-10-17 18:51:19 UTC — [ticket-498] tour 1 — codeur démarré
+- 2026-10-17 18:53:34 UTC — [ticket-498] tour 1 — codeur terminé (134641ms)
+- 2026-10-17 18:54:21 UTC — [ide-core] ticket-477 PR #519 mergée (CI verte)
+- 2026-10-17 18:59:56 UTC — [ticket-498] testeur: OK (exit 0)
+- 2026-10-17 19:00:00 UTC — [ticket-498] securite: BLOCK — Audit sécurité indisponible : Claude Code returned an error result: You've hit y (3561ms)
+- 2026-10-17 19:00:04 UTC — [ide-core] file interrompue : ticket-498 non approuvé
+- 2026-10-18 07:51:56 UTC — [ide-core] ticket-500 PR #522 confiée au CIWatcher
+- 2026-10-18 07:52:00 UTC — [ticket-498] branche ticket-498-an-agent-call-cut-by-an-exhausted-subscription-qu
+- 2026-10-18 07:52:36 UTC — [ticket-498] plan rendu (36092ms)
+- 2026-10-18 07:52:36 UTC — [ticket-498] tour 1 — codeur démarré
+- 2026-10-18 07:53:35 UTC — [ticket-498] tour 1 — codeur terminé (59000ms)
+- 2026-10-18 07:56:50 UTC — [ide-core] ticket-500 PR #522 mergée (CI verte)
+- 2026-10-18 07:58:44 UTC — [ticket-498] testeur: OK (exit 0)
+- 2026-10-18 08:00:09 UTC — [ticket-498] securite: PASS — Le code ajoute une gestion robuste pour détecter et gérer l'épuisement du quota  (84984ms)
+- 2026-10-18 08:00:09 UTC — [ticket-498] tour 1 — reviewer démarré
+- 2026-10-18 08:00:41 UTC — [ticket-498] tour 1 — reviewer terminé (31764ms)
+- 2026-10-18 08:02:13 UTC — [ticket-498] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente une reconnai (123797ms)
+- 2026-10-18 08:02:13 UTC — [ticket-498] APPROVED après 1 tour(s)
+- 2026-10-18 08:05:08 UTC — [ticket-498] documentation: 1 fichier(s) (171202ms)
+- 2026-10-16 18:55:04 UTC — [ide-core] ticket-475 PR #510 confiée au CIWatcher
+- 2026-10-16 18:55:06 UTC — [ticket-486] branche ticket-486-the-ci-watcher-blocked-ticket-test-waits-for-its
+- 2026-10-16 18:55:06 UTC — [ticket-486] tour 1 — codeur démarré
+- 2026-10-16 18:55:08 UTC — [ticket-486] INTERROMPU au tour 1 — ResultError: Claude Code returned an error result: You've hit your weekly limit · resets 3pm (Europe/Paris) (exit code: 1)
+- 2026-10-16 18:55:12 UTC — [ide-core] file interrompue : ticket-486 non approuvé
+- 2026-10-18 08:26:03 UTC — [ticket-486] branche ticket-486-the-ci-watcher-blocked-ticket-test-waits-for-its
+- 2026-10-18 08:26:03 UTC — [ticket-486] tour 1 — codeur démarré
+- 2026-10-18 08:28:56 UTC — [ticket-486] tour 1 — codeur terminé (173016ms)
+- 2026-10-18 08:34:05 UTC — [ticket-486] testeur: OK (exit 0)
+- 2026-10-18 08:34:33 UTC — [ticket-486] securite: PASS — Aucune vulnérabilité de sécurité détectée. Le diff améliore la fiabilité des tes (28297ms)
+- 2026-10-18 08:34:33 UTC — [ticket-486] tour 1 — reviewer démarré
+- 2026-10-18 08:35:03 UTC — [ticket-486] tour 1 — reviewer terminé (29875ms)
+- 2026-10-18 08:37:20 UTC — [ticket-486] validateur: fichiers cités joints : backend/tests/test_ci_watcher.py (tronqué)
+- 2026-10-18 08:37:20 UTC — [ticket-486] validateur: CHANGES_REQUESTED — Les deux premiers critères sont respectés : les tests n'utilisent plus `asyncio. (166515ms)
+- 2026-10-18 08:37:20 UTC — [ticket-486] CHANGES_REQUESTED tour 1: Validateur : Les deux premiers critères sont respectés : les tests n'utilisent plus `asyncio.sleep` fixe et ils attendent explicitement la fin des opérations via une fonction `_attendre_fin` avec un t
+- 2026-10-18 08:37:20 UTC — [ticket-486] tour 2 — codeur démarré
+- 2026-10-18 08:39:05 UTC — [ticket-486] tour 2 — codeur terminé (104921ms)
+- 2026-10-18 08:44:16 UTC — [ticket-486] testeur: OK (exit 0)
+- 2026-10-18 08:44:39 UTC — [ticket-486] securite: PASS — Refactoring de tests pour remplacer les délais arbitraires par des attentes déte (23032ms)
+- 2026-10-18 08:44:39 UTC — [ticket-486] tour 2 — reviewer démarré
+- 2026-10-18 08:45:28 UTC — [ticket-486] tour 2 — reviewer terminé (48702ms)
+- 2026-10-18 08:47:58 UTC — [ticket-486] validateur: fichiers cités joints : backend/tests/test_ci_watcher.py (tronqué)
+- 2026-10-18 08:47:58 UTC — [ticket-486] validateur: CHANGES_REQUESTED — Les deux premiers critères sont satisfaits : le code n'utilise plus `asyncio.sle (198797ms)
+- 2026-10-18 08:47:58 UTC — [ticket-486] CHANGES_REQUESTED tour 2: Validateur : Les deux premiers critères sont satisfaits : le code n'utilise plus `asyncio.sleep` fixes et tous les tests attendent explicitement la fin des opérations via une fonction `_attendre_fin` 
+- 2026-10-18 08:47:58 UTC — [ticket-486] tour 3 — codeur démarré
+- 2026-10-18 08:48:17 UTC — [ticket-486] tour 3 — codeur terminé (19125ms)
+- 2026-10-18 08:54:06 UTC — [ticket-486] testeur: OK (exit 0)
+- 2026-10-18 08:54:36 UTC — [ticket-486] securite: PASS — Diff refonctorisant les tests de CIWatcher : remplacement de `asyncio.sleep()` p (30156ms)
+- 2026-10-18 08:54:36 UTC — [ticket-486] tour 3 — reviewer démarré
+- 2026-10-18 08:55:18 UTC — [ticket-486] tour 3 — reviewer terminé (42250ms)
+- 2026-10-18 08:57:24 UTC — [ticket-486] validateur: fichiers cités joints : backend/tests/test_ci_watcher.py (tronqué)
+- 2026-10-18 08:57:24 UTC — [ticket-486] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code a été mis à jour pour su (167766ms)
+- 2026-10-18 08:57:24 UTC — [ticket-486] APPROVED après 3 tour(s)
+- 2026-10-18 08:57:52 UTC — [ticket-486] documentation: 0 fichier(s) (23281ms)
+- 2026-10-18 08:05:25 UTC — [ide-core] ticket-498 PR #523 confiée au CIWatcher
+- 2026-10-18 08:05:27 UTC — [ticket-497] branche ticket-497-a-resumed-ticket-whose-branch-already-carries-wor
+- 2026-10-18 08:06:37 UTC — [ticket-497] plan rendu (69406ms)
+- 2026-10-18 08:06:37 UTC — [ticket-497] tour 1 — codeur démarré
+- 2026-10-18 08:10:03 UTC — [ide-core] ticket-498 PR #523 mergée (CI verte)
+- 2026-10-18 08:10:39 UTC — [ticket-497] tour 1 — codeur terminé (241921ms)
+- 2026-10-18 08:16:13 UTC — [ticket-497] testeur: OK (exit 0)
+- 2026-10-18 08:18:30 UTC — [ticket-497] securite: PASS — Audit complet du ticket-497 : refactorisation de la logique de reprise de branch (136577ms)
+- 2026-10-18 08:18:30 UTC — [ticket-497] tour 1 — reviewer démarré
+- 2026-10-18 08:19:03 UTC — [ticket-497] tour 1 — reviewer terminé (33717ms)
+- 2026-10-18 08:23:00 UTC — [ticket-497] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (269827ms)
+- 2026-10-18 08:23:00 UTC — [ticket-497] APPROVED après 1 tour(s)
+- 2026-10-18 08:25:22 UTC — [ticket-497] documentation: 2 fichier(s) (138327ms)
+- 2026-10-18 08:25:58 UTC — [ticket-497] livraison: résolveur tenté : backend/src/tessera/services/orchestrator.py (29609ms)
+- 2026-10-18 08:25:58 UTC — [ticket-497] livraison: arrêt — Conflit avec develop sur : backend/src/tessera/services/orchestrator.py — résolveur tenté sur backen
+- 2026-10-18 09:02:14 UTC — [ide-core] ticket-486 PR #525 mergée (CI verte)
+- 2026-10-18 13:20:36 UTC — [ticket-502] branche ticket-502-putting-a-project-online-also-serves-www-redirect
+- 2026-10-18 13:20:37 UTC — [ticket-502] tour 1 — codeur démarré
+- 2026-10-18 13:22:31 UTC — [ticket-502] tour 1 — codeur terminé (114375ms)
+- 2026-10-18 13:27:20 UTC — [ticket-502] testeur: OK (exit 0)
+- 2026-10-18 13:29:18 UTC — [ticket-502] securite: PASS — Aucune vulnérabilité de sécurité détectée. Les domaines sont validés par regex s (118312ms)
+- 2026-10-18 13:29:18 UTC — [ticket-502] tour 1 — reviewer démarré
+- 2026-10-18 13:29:42 UTC — [ticket-502] tour 1 — reviewer terminé (24296ms)
+- 2026-10-18 13:31:02 UTC — [ticket-502] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code ajoute automatiquement  (104327ms)
+- 2026-10-18 13:31:02 UTC — [ticket-502] APPROVED après 1 tour(s)
+- 2026-10-18 13:33:03 UTC — [ticket-502] documentation: 2 fichier(s) (116578ms)
+- 2026-10-18 08:58:08 UTC — [ide-core] ticket-486 PR #525 confiée au CIWatcher
+- 2026-10-18 08:58:10 UTC — [ticket-482] branche ticket-482-a-blocked-ticket-whose-branch-was-merged-by-hand
+- 2026-10-18 08:59:26 UTC — [ticket-482] plan rendu (75500ms)
+- 2026-10-18 08:59:26 UTC — [ticket-482] tour 1 — codeur démarré
+- 2026-10-18 08:59:32 UTC — [ticket-482] INTERROMPU par limite de session (reprise : 1:50pm (Europe/Paris))
+- 2026-10-18 08:59:36 UTC — [ide-core] file interrompue : limite de session (reprise : 1:50pm (Europe/Paris))
+- 2026-10-18 13:33:18 UTC — [ide-core] ticket-502 PR #527 confiée au CIWatcher
+- 2026-10-18 13:33:22 UTC — [ticket-482] branche ticket-482-a-blocked-ticket-whose-branch-was-merged-by-hand
+- 2026-10-18 13:34:15 UTC — [ticket-482] plan rendu (53360ms)
+- 2026-10-18 13:37:43 UTC — [ide-core] ticket-502 PR #527 mergée (CI verte)
+- 2026-10-18 13:40:35 UTC — [ticket-482] testeur: OK (exit 0)
+- 2026-10-18 13:40:35 UTC — [ticket-482] branche reprise (2 commit(s)) — tests green, codeur sauté
+- 2026-10-18 13:40:56 UTC — [ticket-482] securite: PASS — Aucun diff git fourni pour l'audit. Veuillez fournir le code à analyser. (19453ms)
+- 2026-10-18 13:40:56 UTC — [ticket-482] tour 1 — reviewer démarré
+- 2026-10-18 13:42:32 UTC — [ticket-482] tour 1 — reviewer terminé (95593ms)
+- 2026-10-18 13:42:44 UTC — [ticket-482] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Les tests vérifient que les ti (107594ms)
+- 2026-10-18 13:42:44 UTC — [ticket-482] CHANGES_REQUESTED tour 1: Reviewer : le diff fourni est vide.CHANGES_REQUESTED
+- 2026-10-18 13:42:44 UTC — [ticket-482] tour 2 — codeur démarré
+- 2026-10-18 13:50:42 UTC — [ticket-482] tour 2 — codeur terminé (478672ms)
+- 2026-10-18 13:56:02 UTC — [ticket-482] testeur: OK (exit 0)
+- 2026-10-18 13:58:46 UTC — [ticket-482] securite: PASS — Aucune vulnérabilité de sécurité détectée. La fonctionnalité ticket-482 qui dépl (164500ms)
+- 2026-10-18 13:58:46 UTC — [ticket-482] tour 2 — reviewer démarré
+- 2026-10-18 13:59:15 UTC — [ticket-482] tour 2 — reviewer terminé (28327ms)
+- 2026-10-18 14:00:47 UTC — [ticket-482] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Les tests vérifient que les ti (120485ms)
+- 2026-10-18 14:00:47 UTC — [ticket-482] APPROVED après 2 tour(s)
+- 2026-10-18 14:03:13 UTC — [ticket-482] documentation: 2 fichier(s) (141532ms)
+- 2026-10-18 14:03:31 UTC — [ide-core] ticket-482 PR #528 confiée au CIWatcher
+- 2026-10-18 14:03:33 UTC — [ticket-480] branche ticket-480-after-a-run-the-base-branch-pulls-cleanly-and-lef
+- 2026-10-18 14:04:33 UTC — [ticket-480] plan rendu (59063ms)
+- 2026-10-18 14:04:33 UTC — [ticket-480] tour 1 — codeur démarré
+- 2026-10-18 14:08:09 UTC — [ide-core] ticket-482 PR #528 mergée (CI verte)
+- 2026-10-18 14:11:31 UTC — [ticket-480] tour 1 — codeur terminé (417828ms)
+- 2026-10-18 14:16:57 UTC — [ticket-480] testeur: OK (exit 0)
+- 2026-10-18 14:19:31 UTC — [ticket-480] securite: PASS — Aucune vulnérabilité CRITICAL ou HIGH détectée. Le code gère les chemins et les  (153421ms)
+- 2026-10-18 14:19:31 UTC — [ticket-480] tour 1 — reviewer démarré
+- 2026-10-18 14:20:15 UTC — [ticket-480] tour 1 — reviewer terminé (44093ms)
+- 2026-10-18 14:21:46 UTC — [ticket-480] validateur: APPROVED — Les deux critères d'acceptation sont satisfaits. Le code implémente correctement (134813ms)
+- 2026-10-18 14:21:46 UTC — [ticket-480] CHANGES_REQUESTED tour 1: Reviewer : ## Problèmes bloquants
+- 2026-10-18 14:21:46 UTC — [ticket-480] tour 2 — codeur démarré
+- 2026-10-18 14:24:13 UTC — [ticket-480] tour 2 — codeur terminé (147109ms)
+- 2026-10-18 14:29:42 UTC — [ticket-480] testeur: OK (exit 0)
+- 2026-10-18 14:32:46 UTC — [ticket-480] securite: PASS — Aucune vulnérabilité critique ou haute introduite par ce ticket. Le code gère le (183578ms)
+- 2026-10-18 14:32:46 UTC — [ticket-480] tour 2 — reviewer démarré
+- 2026-10-18 14:33:10 UTC — [ticket-480] tour 2 — reviewer terminé (23968ms)
+- 2026-10-18 14:35:06 UTC — [ticket-480] validateur: APPROVED — Les deux critères d'acceptation sont satisfaits. Les tests couvrent correctement (140733ms)
+- 2026-10-18 14:35:06 UTC — [ticket-480] APPROVED après 2 tour(s)
+- 2026-10-18 14:37:42 UTC — [ticket-480] documentation: 1 fichier(s) (150483ms) — après tour de correction
+- 2026-10-18 14:38:00 UTC — [ide-core] ticket-480 PR #529 confiée au CIWatcher
+- 2026-10-18 14:38:03 UTC — [ticket-478] branche ticket-478-tickets-can-be-appended-to-a-queue-that-is-alread
+- 2026-10-18 14:38:54 UTC — [ticket-478] plan rendu (50969ms)
+- 2026-10-18 14:38:54 UTC — [ticket-478] tour 1 — codeur démarré
+- 2026-10-18 14:42:19 UTC — [ticket-478] tour 1 — codeur terminé (204187ms)
+- 2026-10-18 14:42:39 UTC — [ide-core] ticket-480 PR #529 mergée (CI verte)
+- 2026-10-18 14:47:57 UTC — [ticket-478] testeur: OK (exit 0)
+- 2026-10-18 14:49:43 UTC — [ticket-478] securite: PASS — Aucune vulnérabilité OWASP Top 10 détectée. Le nouvel endpoint `POST /orchestrat (106687ms)
+- 2026-10-18 14:49:44 UTC — [ticket-478] tour 1 — reviewer démarré
+- 2026-10-18 14:50:23 UTC — [ticket-478] tour 1 — reviewer terminé (39141ms)
+- 2026-10-18 14:52:36 UTC — [ticket-478] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests couvrent efficacement (172906ms)
+- 2026-10-18 14:52:36 UTC — [ticket-478] APPROVED après 1 tour(s)
+- 2026-10-18 14:57:11 UTC — [ticket-478] documentation: 1 fichier(s) (269906ms)
+- 2026-10-18 14:57:30 UTC — [ide-core] ticket-478 PR #530 confiée au CIWatcher
+- 2026-10-18 14:57:33 UTC — [ticket-479] branche ticket-479-new-tickets-can-be-proposed-to-a-project-while-a
+- 2026-10-18 14:58:55 UTC — [ticket-479] plan rendu (82141ms)
+- 2026-10-18 14:58:55 UTC — [ticket-479] tour 1 — codeur démarré
+- 2026-10-18 15:02:25 UTC — [ide-core] ticket-478 PR #530 mergée (CI verte)
+- 2026-10-18 15:06:05 UTC — [ticket-479] tour 1 — codeur terminé (430000ms)
+- 2026-10-18 15:11:22 UTC — [ticket-479] testeur: OK (exit 0)
+- 2026-10-18 15:14:14 UTC — [ticket-479] securite: PASS — Aucune vulnérabilité de sécurité introduite. Le code implémente une proposition  (171438ms)
+- 2026-10-18 15:14:14 UTC — [ticket-479] tour 1 — reviewer démarré
+- 2026-10-18 15:14:29 UTC — [ticket-479] INTERROMPU par limite de session (reprise : 7:20pm (Europe/Paris))
+- 2026-10-18 15:14:33 UTC — [ide-core] file interrompue : limite de session (reprise : 7:20pm (Europe/Paris))
+- 2026-10-18 15:17:39 UTC — [ticket-479] validateur: APPROVED — Tous les critères d'acceptation ont été vérifiés via les tests fournis. Les fonc (204687ms)
+- 2026-10-18 18:38:49 UTC — [ticket-479] branche ticket-479-new-tickets-can-be-proposed-to-a-project-while-a
+- 2026-10-18 18:39:49 UTC — [ticket-479] plan rendu (60265ms)
+- 2026-10-18 18:46:19 UTC — [ticket-479] testeur: ❯ src/components/Sidebar/ProjectNav.test.tsx:48:32
+- 2026-10-18 18:46:19 UTC — [ticket-479] branche reprise (3 commit(s)) — tests red, codeur en premier
+- 2026-10-18 18:46:19 UTC — [ticket-479] tour 1 — codeur démarré
+- 2026-10-18 18:49:00 UTC — [ticket-479] tour 1 — codeur terminé (160578ms)
+- 2026-10-18 18:56:22 UTC — [ticket-479] testeur: 1 failed, 1959 passed, 28 warnings in 439.46s (0:07:19)
+- 2026-10-18 18:56:22 UTC — [ticket-479] tests rouges au tour 1
+- 2026-10-18 18:56:22 UTC — [ticket-479] tour 2 — codeur démarré
+- 2026-10-18 18:56:57 UTC — [ticket-479] tour 2 — codeur terminé (34047ms)
+- 2026-10-18 19:05:00 UTC — [ticket-479] testeur: OK (exit 0)
+- 2026-10-18 19:06:42 UTC — [ticket-479] securite: PASS — Aucune vulnérabilité critique ou haute sécurité introduite par ce ticket. La rou (101639ms)
+- 2026-10-18 19:06:42 UTC — [ticket-479] tour 2 — reviewer démarré
+- 2026-10-18 19:07:21 UTC — [ticket-479] tour 2 — reviewer terminé (38905ms)
+- 2026-10-18 19:12:14 UTC — [ticket-479] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits par des tests explicites et de c (332031ms)
+- 2026-10-18 19:12:14 UTC — [ticket-479] APPROVED après 2 tour(s)
+- 2026-10-18 19:15:42 UTC — [ticket-479] documentation: 3 fichier(s) (203562ms)
+- 2026-10-18 19:15:59 UTC — [ide-core] ticket-479 PR #533 confiée au CIWatcher
+- 2026-10-18 19:16:03 UTC — [ticket-490] branche ticket-490-the-verification-script-a-run-is-judged-by-is-wri
+- 2026-10-18 19:16:03 UTC — [ticket-490] tour 1 — codeur démarré
+- 2026-10-18 19:20:53 UTC — [ide-core] ticket-479 PR #533 mergée (CI verte)
+- 2026-10-18 19:21:03 UTC — [ticket-490] tour 1 — codeur terminé (299703ms)
+- 2026-10-18 19:27:46 UTC — [ticket-490] testeur: OK (exit 0)
+- 2026-10-18 19:29:50 UTC — [ticket-490] securite: PASS — Aucune vulnérabilité détectée. Le diff ajoute une protection robuste du script d (124734ms)
+- 2026-10-18 19:29:51 UTC — [ticket-490] tour 1 — reviewer démarré
+- 2026-10-18 19:30:20 UTC — [ticket-490] tour 1 — reviewer terminé (29765ms)
+- 2026-10-18 19:35:20 UTC — [ticket-490] validateur: fichiers cités joints : scripts/verifier.py, conftest.py, vitest.config.ts, memory/contraintes.md (tronqué)
+- 2026-10-18 19:35:20 UTC — [ticket-490] validateur: APPROVED — Le diff implémente intégralement le ticket : le script de vérification se refuse (329578ms)
+- 2026-10-18 19:35:20 UTC — [ticket-490] APPROVED après 1 tour(s)
+- 2026-10-18 19:39:15 UTC — [ticket-490] documentation: 3 fichier(s) (230453ms) — après tour de correction
+- 2026-10-19 07:00:04 UTC — [ticket-503] branche ticket-503-putting-a-project-online-ends-with-a-declared-hea
+- 2026-10-19 07:00:05 UTC — [ticket-503] tour 1 — codeur démarré
+- 2026-10-19 07:03:09 UTC — [ticket-503] tour 1 — codeur terminé (183780ms)
+- 2026-10-19 07:10:10 UTC — [ticket-503] testeur: 1 failed, 2789 passed, 28 warnings in 417.10s (0:06:57)
+- 2026-10-19 07:10:10 UTC — [ticket-503] tests rouges au tour 1
+- 2026-10-19 07:10:10 UTC — [ticket-503] tour 2 — codeur démarré
+- 2026-10-19 07:11:32 UTC — [ticket-503] tour 2 — codeur terminé (81968ms)
+- 2026-10-19 07:18:26 UTC — [ticket-503] testeur: 1 failed, 2752 passed, 28 warnings in 407.71s (0:06:47)
+- 2026-10-19 07:18:26 UTC — [ticket-503] tests rouges au tour 2
+- 2026-10-19 07:18:26 UTC — [ticket-503] tour 3 — codeur démarré
+- 2026-10-19 07:21:08 UTC — [ticket-503] tour 3 — codeur terminé (161547ms)
+- 2026-10-19 07:27:59 UTC — [ticket-503] testeur: OK (exit 0)
+- 2026-10-19 07:29:54 UTC — [ticket-503] securite: PASS — Aucune vulnérabilité détectée. Le code introduit une étape de vérification de sa (115000ms)
+- 2026-10-19 07:29:54 UTC — [ticket-503] tour 3 — reviewer démarré
+- 2026-10-19 07:30:15 UTC — [ticket-503] validateur: fichiers cités joints : docs/architecture.md (tronqué)
+- 2026-10-19 07:30:15 UTC — [ticket-503] validateur: APPROVED — Tous les critères sont satisfaits. Le nouveau module `HealthCheckStep` implément (21672ms)
+- 2026-10-19 07:30:19 UTC — [ticket-503] tour 3 — reviewer terminé (25204ms)
+- 2026-10-19 07:30:19 UTC — [ticket-503] APPROVED après 3 tour(s)
+- 2026-10-19 07:32:47 UTC — [ticket-503] documentation: 0 fichier(s) (139875ms)
+- 2026-10-19 07:33:08 UTC — [ide-core] ticket-503 PR #536 confiée au CIWatcher
+- 2026-10-19 07:33:13 UTC — [ticket-505] branche ticket-505-an-exhausted-quota-during-the-security-audit-stop
+- 2026-10-19 07:33:13 UTC — [ticket-505] tour 1 — codeur démarré
+- 2026-10-19 07:37:36 UTC — [ticket-505] tour 1 — codeur terminé (262655ms)
+- 2026-10-19 07:37:51 UTC — [ide-core] ticket-503 PR #536 mergée (CI verte)
+- 2026-10-19 07:45:23 UTC — [ticket-505] testeur: OK (exit 0)
+- 2026-10-19 07:48:18 UTC — [ticket-505] securite: PASS — Le diff améliore correctement la détection des quotas d'API épuisés sans introdu (174500ms)
+- 2026-10-19 07:48:18 UTC — [ticket-505] tour 1 — reviewer démarré
+- 2026-10-19 07:48:51 UTC — [ticket-505] tour 1 — reviewer terminé (32750ms)
+- 2026-10-19 07:50:57 UTC — [ticket-505] validateur: APPROVED — Les tests ont été implémentés et couvrent correctement les quatre critères d'acc (159125ms)
+- 2026-10-19 07:50:57 UTC — [ticket-505] APPROVED après 1 tour(s)
+- 2026-10-19 07:53:36 UTC — [ticket-505] documentation: 2 fichier(s) (153188ms)
+- 2026-10-19 07:53:55 UTC — [ide-core] ticket-505 PR #537 confiée au CIWatcher
+- 2026-10-19 07:53:58 UTC — [ticket-504] branche ticket-504-a-ticket-merged-into-the-base-branch-while-a-queu
+- 2026-10-19 07:55:26 UTC — [ticket-504] plan rendu (88014ms)
+- 2026-10-19 07:55:26 UTC — [ticket-504] tour 1 — codeur démarré
+- 2026-10-19 07:58:50 UTC — [ide-core] ticket-505 PR #537 mergée (CI verte)
+- 2026-10-19 07:59:05 UTC — [ticket-504] tour 1 — codeur terminé (218750ms)
+- 2026-10-19 08:06:07 UTC — [ticket-504] testeur: OK (exit 0)
+- 2026-10-19 08:08:48 UTC — [ticket-504] securite: PASS — Ticket-504 introduces a read-only fallback reader for tickets merged on the remo (160922ms)
+- 2026-10-19 08:08:48 UTC — [ticket-504] tour 1 — reviewer démarré
+- 2026-10-19 08:09:33 UTC — [ticket-504] tour 1 — reviewer terminé (45219ms)
+- 2026-10-19 08:11:29 UTC — [ticket-504] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (161015ms)
+- 2026-10-19 08:11:29 UTC — [ticket-504] APPROVED après 1 tour(s)
+- 2026-10-19 08:14:34 UTC — [ticket-504] documentation: 3 fichier(s) (180858ms)
+- 2026-10-18 19:39:33 UTC — [ide-core] ticket-490 PR #534 confiée au CIWatcher
+- 2026-10-18 19:39:37 UTC — [ticket-492] branche ticket-492-an-approval-is-bound-to-the-commit-it-reviewed-an
+- 2026-10-18 19:39:37 UTC — [ticket-492] tour 1 — codeur démarré
+- 2026-10-18 19:44:28 UTC — [ide-core] ticket-490 PR #534 mergée (CI verte)
+- 2026-10-18 19:52:17 UTC — [ticket-492] tour 1 — codeur terminé (760077ms)
+- 2026-10-18 19:58:07 UTC — [ticket-492] testeur: ❯ src/components/Sidebar/ProjectNav.test.tsx:48:32
+- 2026-10-18 19:58:07 UTC — [ticket-492] tests rouges au tour 1
+- 2026-10-18 19:58:07 UTC — [ticket-492] tour 2 — codeur démarré
+- 2026-10-18 19:59:27 UTC — [ticket-492] tour 2 — codeur terminé (79608ms)
+- 2026-10-18 20:05:13 UTC — [ticket-492] testeur: OK (exit 0)
+- 2026-10-18 20:07:33 UTC — [ticket-492] securite: PASS — Aucune vulnérabilité critique ou haute détectée. Le code implémente correctement (139452ms)
+- 2026-10-18 20:07:33 UTC — [ticket-492] tour 2 — reviewer démarré
+- 2026-10-18 20:08:38 UTC — [ticket-492] tour 2 — reviewer terminé (65671ms)
+- 2026-10-18 20:13:11 UTC — [ticket-492] validateur: fichiers cités joints : memory/contraintes.md
+- 2026-10-18 20:13:11 UTC — [ticket-492] validateur: APPROVED — Tous les critères sont satisfaits. Le code implémente un système complet : enreg (337858ms)
+- 2026-10-18 20:13:11 UTC — [ticket-492] CHANGES_REQUESTED tour 2: Reviewer : ## Problèmes bloquants
+- 2026-10-18 20:13:11 UTC — [ticket-492] tour 3 — codeur démarré
+- 2026-10-18 20:18:28 UTC — [ticket-492] tour 3 — codeur terminé (317250ms)
+- 2026-10-18 20:24:20 UTC — [ticket-492] testeur: OK (exit 0)
+- 2026-10-18 20:25:43 UTC — [ticket-492] securite: BLOCK — Audit sécurité indisponible : Claude Code returned an error result: You've hit y (83514ms)
+- 2026-10-18 20:25:48 UTC — [ide-core] file interrompue : ticket-492 non approuvé
+- 2026-10-19 08:14:52 UTC — [ide-core] ticket-504 PR #539 confiée au CIWatcher
+- 2026-10-19 08:14:57 UTC — [ticket-492] branche ticket-492-an-approval-is-bound-to-the-commit-it-reviewed-an
+- 2026-10-19 08:19:56 UTC — [ide-core] ticket-504 PR #539 mergée (CI verte)
+- 2026-10-19 08:23:51 UTC — [ticket-492] testeur: OK (exit 0)
+- 2026-10-19 08:23:51 UTC — [ticket-492] branche reprise (3 commit(s)) — tests green, codeur sauté
+- 2026-10-19 08:27:19 UTC — [ticket-492] branche ticket-492-an-approval-is-bound-to-the-commit-it-reviewed-an
+- 2026-10-19 08:35:39 UTC — [ticket-492] testeur: OK (exit 0)
+- 2026-10-19 08:35:39 UTC — [ticket-492] branche reprise (4 commit(s)) — tests green, codeur sauté
+- 2026-10-19 08:38:06 UTC — [ticket-492] securite: PASS — Aucune vulnérabilité CRITICAL ou HIGH détectée. Le changement implémente un cont (146109ms)
+- 2026-10-19 08:38:06 UTC — [ticket-492] tour 1 — reviewer démarré
+- 2026-10-19 08:38:46 UTC — [ticket-492] tour 1 — reviewer terminé (39828ms)
+- 2026-10-19 08:43:28 UTC — [ticket-492] validateur: fichiers cités joints : memory/contraintes.md
+- 2026-10-19 08:43:28 UTC — [ticket-492] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le diff contient quatre fichier (321921ms)
+- 2026-10-19 08:43:28 UTC — [ticket-492] APPROVED après 1 tour(s)
+- 2026-10-19 08:46:15 UTC — [ticket-492] documentation: 3 fichier(s) (161750ms)
+- 2026-10-19 08:46:34 UTC — [ide-core] ticket-492 PR #540 confiée au CIWatcher
+- 2026-10-19 08:46:37 UTC — [ticket-493] branche ticket-493-a-constraint-written-by-an-agent-stays-proposed-a
+- 2026-10-19 08:46:38 UTC — [ticket-493] tour 1 — codeur démarré
+- 2026-10-19 08:51:29 UTC — [ide-core] ticket-492 PR #540 mergée (CI verte)
+- 2026-10-19 08:52:34 UTC — [ticket-493] tour 1 — codeur terminé (356327ms)
+- 2026-10-19 08:59:07 UTC — [ticket-493] testeur: OK (exit 0)
+- 2026-10-19 09:00:51 UTC — [ticket-493] securite: PASS — Audit complet sans vulnérabilité détectée. Le mécanisme de validation des règles (103750ms)
+- 2026-10-19 09:00:51 UTC — [ticket-493] tour 1 — reviewer démarré
+- 2026-10-19 09:01:51 UTC — [ticket-493] tour 1 — reviewer terminé (60015ms)
+- 2026-10-19 09:06:37 UTC — [ticket-493] validateur: fichiers cités joints : memory/contraintes.md, test_consignes_coherentes.py (tronqué)
+- 2026-10-19 09:06:37 UTC — [ticket-493] validateur: APPROVED — Tous les critères sont satisfaits. Le code ajoute une section `## Proposées` ign (345436ms)
+- 2026-10-19 09:06:37 UTC — [ticket-493] APPROVED après 1 tour(s)
+- 2026-10-19 09:09:25 UTC — [ticket-493] documentation: 2 fichier(s) (162125ms)
+- 2026-10-19 09:09:42 UTC — [ide-core] ticket-493 PR #541 confiée au CIWatcher
+- 2026-10-19 09:09:44 UTC — [ticket-484] branche ticket-484-additive-conflicts-in-a-prisma-schema-are-resolve
+- 2026-10-19 09:10:39 UTC — [ticket-484] plan rendu (54453ms)
+- 2026-10-19 09:10:39 UTC — [ticket-484] tour 1 — codeur démarré
+- 2026-10-19 09:13:49 UTC — [ide-core] ticket-493 PR #541 mergée (CI verte)
+- 2026-10-19 09:19:19 UTC — [ticket-484] tour 1 — codeur terminé (519984ms)
+- 2026-10-19 09:26:32 UTC — [ticket-484] testeur: OK (exit 0)
+- 2026-10-19 09:29:19 UTC — [ticket-484] securite: PASS — Audit de sécurité complet du ticket-484 (Prisma collision resolution) : aucune v (166922ms)
+- 2026-10-19 09:29:19 UTC — [ticket-484] tour 1 — reviewer démarré
+- 2026-10-19 09:29:58 UTC — [ticket-484] tour 1 — reviewer terminé (38875ms)
+- 2026-10-19 09:34:11 UTC — [ticket-484] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (291922ms)
+- 2026-10-19 09:34:11 UTC — [ticket-484] APPROVED après 1 tour(s)
+- 2026-10-19 09:37:53 UTC — [ticket-484] documentation: 0 fichier(s) (217593ms) — après tour de correction — refusé : doc-technique : README.md : texte introuvable — « Certains conflits simples — dans le journal (`memory/pipelin ». L'agent a proposé une modification sur un text — refusé : doc-fonctionnelle : README.md : texte introuvable — « Après un run approuvé, seul le commit que le reviewer et le  ». L'agent a proposé une modification sur un 
+- 2026-10-19 09:38:06 UTC — [ide-core] ticket-484 PR #542 confiée au CIWatcher
+- 2026-10-19 09:38:09 UTC — [ticket-481] branche ticket-481-a-project-whose-agents-json-project-id-differs-fr
+- 2026-10-19 09:38:09 UTC — [ticket-481] tour 1 — codeur démarré
+- 2026-10-19 09:41:28 UTC — [ticket-481] tour 1 — codeur terminé (198421ms)
+- 2026-10-19 09:43:24 UTC — [ide-core] ticket-484 PR #542 mergée (CI verte)
+- 2026-10-19 09:54:47 UTC — [ticket-481] testeur: OK (exit 0)
+- 2026-10-19 09:57:17 UTC — [ticket-481] securite: PASS — Le diff ajoute une détection des mismatches entre `project_id` déclaré et le nom (149389ms)
+- 2026-10-19 09:57:17 UTC — [ticket-481] tour 1 — reviewer démarré
+- 2026-10-19 09:57:34 UTC — [ticket-481] tour 1 — reviewer terminé (17077ms)
+- 2026-10-19 09:57:35 UTC — [ticket-481] validateur: APPROVED — Les trois critères sont pleinement satisfaits : le test `test_warns_when_project (17578ms)
+- 2026-10-19 09:57:35 UTC — [ticket-481] APPROVED après 1 tour(s)
+- 2026-10-19 09:59:38 UTC — [ticket-481] documentation: 2 fichier(s) (119297ms)
+- 2026-10-19 10:58:02 UTC — [ticket-507] branche ticket-507-a-test-command-that-times-out-is-killed-with-its
+- 2026-10-19 10:58:02 UTC — [ticket-507] tour 1 — codeur démarré
+- 2026-10-19 11:00:59 UTC — [ticket-507] tour 1 — codeur terminé (176577ms)
+- 2026-10-19 11:07:34 UTC — [ticket-507] testeur: OK (exit 0)
+- 2026-10-19 11:10:08 UTC — [ticket-507] securite: PASS — No CRITICAL or HIGH severity vulnerabilities detected. The code properly validat (154484ms)
+- 2026-10-19 11:10:08 UTC — [ticket-507] tour 1 — reviewer démarré
+- 2026-10-19 11:10:49 UTC — [ticket-507] tour 1 — reviewer terminé (40905ms)
+- 2026-10-19 11:18:45 UTC — [ticket-507] validateur: fichiers cités joints : test_runner.py (tronqué)
+- 2026-10-19 11:18:45 UTC — [ticket-507] validateur: APPROVED — Tous les critères sont satisfaits. Le ticket implémente correctement la gestion  (517063ms)
+- 2026-10-19 11:18:45 UTC — [ticket-507] APPROVED après 1 tour(s)
+- 2026-10-19 11:22:09 UTC — [ticket-507] documentation: 2 fichier(s) (199984ms)
+- 2026-10-19 11:22:27 UTC — [ide-core] ticket-507 PR #548 confiée au CIWatcher
+- 2026-10-19 11:22:30 UTC — [ticket-508] branche ticket-508-appending-a-ticket-merged-on-the-base-works-when
+- 2026-10-19 11:22:30 UTC — [ticket-508] tour 1 — codeur démarré
+- 2026-10-19 11:24:22 UTC — [ticket-508] tour 1 — codeur terminé (112110ms)
+- 2026-10-19 11:27:26 UTC — [ide-core] ticket-507 PR #548 mergée (CI verte)
+- 2026-10-19 11:31:25 UTC — [ticket-508] testeur: OK (exit 0)
+- 2026-10-19 11:33:41 UTC — [ticket-508] securite: PASS — Aucune vulnérabilité détectée. Le changement introduit un fallback cohérent sur  (136030ms)
+- 2026-10-19 11:33:41 UTC — [ticket-508] tour 1 — reviewer démarré
+- 2026-10-19 11:33:59 UTC — [ticket-508] tour 1 — reviewer terminé (18545ms)
+- 2026-10-19 11:36:22 UTC — [ticket-508] validateur: fichiers cités joints : git_workspace.py (tronqué) ; non joints (budget épuisé) : backend/tests/test_ajout_ticket_sur_la_base.py, test_ajout_ticket_sur_la_base.py
+- 2026-10-19 11:36:22 UTC — [ticket-508] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code modifie le comportement  (161110ms)
+- 2026-10-19 11:36:22 UTC — [ticket-508] APPROVED après 1 tour(s)
+- 2026-10-19 11:38:20 UTC — [ticket-508] documentation: 0 fichier(s) (113421ms)
+- 2026-10-19 11:38:37 UTC — [ide-core] ticket-508 PR #549 confiée au CIWatcher
+- 2026-10-19 11:38:41 UTC — [ticket-472] branche ticket-472-a-project-that-declares-online-resources-gets-a-p
+- 2026-10-19 11:38:42 UTC — [ticket-472] tour 1 — codeur démarré
+- 2026-10-19 11:43:33 UTC — [ide-core] ticket-508 PR #549 mergée (CI verte)
+- 2026-10-19 11:47:19 UTC — [ticket-472] tour 1 — codeur terminé (517000ms)
+- 2026-10-19 11:56:10 UTC — [ticket-472] testeur: OK (exit 0)
+- 2026-10-19 11:58:17 UTC — [ticket-472] branche ticket-472-a-project-that-declares-online-resources-gets-a-p
+- 2026-10-19 12:08:21 UTC — [ticket-472] testeur: OK (exit 0)
+- 2026-10-19 12:08:21 UTC — [ticket-472] branche reprise (1 commit(s)) — tests green, codeur sauté
+- 2026-10-19 12:11:22 UTC — [ticket-472] securite: PASS — Aucune vulnérabilité détectée. Le diff ajoute l'interface de mise en ligne (tick (177265ms)
+- 2026-10-19 12:11:22 UTC — [ticket-472] tour 1 — reviewer démarré
+- 2026-10-19 12:12:05 UTC — [ticket-472] tour 1 — reviewer terminé (43265ms)
+- 2026-10-19 12:12:37 UTC — [ticket-472] validateur: fichiers cités joints : projects/ide-core/design/maquette/MettreEnLigne-Carte.dc.html, agents.json
+- 2026-10-19 12:12:37 UTC — [ticket-472] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. L'implémentation complète du bo (74703ms)
+- 2026-10-19 12:12:37 UTC — [ticket-472] APPROVED après 1 tour(s)
+- 2026-10-19 12:15:38 UTC — [ticket-472] documentation: 1 fichier(s) (146452ms)
+- 2026-10-19 12:16:06 UTC — [ide-core] ticket-472 PR #553 confiée au CIWatcher
+- 2026-10-19 12:16:13 UTC — [ticket-511] branche ticket-511-putting-a-project-online-sets-the-e-mail-sender-a
+- 2026-10-19 12:16:14 UTC — [ticket-511] tour 1 — codeur démarré
+- 2026-10-19 12:17:45 UTC — [ticket-511] tour 1 — codeur terminé (91468ms)
+- 2026-10-19 12:20:38 UTC — [ide-core] ticket-472 PR #553 mergée (CI verte)
+- 2026-10-19 12:24:22 UTC — [ticket-511] testeur: 1 failed, 1159 passed, 40 warnings in 394.58s (0:06:34)
+- 2026-10-19 12:24:22 UTC — [ticket-511] tests rouges au tour 1
+- 2026-10-19 12:24:22 UTC — [ticket-511] tour 2 — codeur démarré
+- 2026-10-19 12:25:32 UTC — [ticket-511] tour 2 — codeur terminé (69375ms)
+- 2026-10-19 12:35:10 UTC — [ticket-511] testeur: OK (exit 0)
+- 2026-10-19 12:37:08 UTC — [ticket-511] securite: PASS — Une vulnérabilité MEDIUM détectée : absence de validation de `project_name` lors (118422ms)
+- 2026-10-19 12:37:08 UTC — [ticket-511] tour 2 — reviewer démarré
+- 2026-10-19 12:37:28 UTC — [ticket-511] tour 2 — reviewer terminé (20015ms)
+- 2026-10-19 12:39:27 UTC — [ticket-511] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les tests couvrent les cas atten (139014ms)
+- 2026-10-19 12:39:27 UTC — [ticket-511] APPROVED après 2 tour(s)
+- 2026-10-19 12:41:06 UTC — [ticket-511] documentation: 0 fichier(s) (93110ms)
+- 2026-10-19 12:41:24 UTC — [ide-core] ticket-511 PR #554 confiée au CIWatcher
+- 2026-10-19 12:41:27 UTC — [ticket-510] branche ticket-510-pull-requests-left-to-the-ci-watcher-are-watched
+- 2026-10-19 12:41:27 UTC — [ticket-510] tour 1 — codeur démarré
+- 2026-10-19 12:44:46 UTC — [ticket-510] tour 1 — codeur terminé (198500ms)
+- 2026-10-19 12:46:06 UTC — [ide-core] ticket-511 PR #554 mergée (CI verte)
+- 2026-10-19 12:54:08 UTC — [ticket-510] testeur: OK (exit 0)
+- 2026-10-19 12:56:09 UTC — [ticket-510] securite: PASS — Aucune vulnérabilité détectée. Le code ajoute une reprise de surveillance des PR (121171ms)
+- 2026-10-19 12:56:09 UTC — [ticket-510] tour 1 — reviewer démarré
+- 2026-10-19 12:57:09 UTC — [ticket-510] tour 1 — reviewer terminé (59889ms)
+- 2026-10-19 13:01:39 UTC — [ticket-510] validateur: fichiers cités joints : pipeline-log.md (tronqué) ; non joints (budget épuisé) : memory/pipeline-log.md
+- 2026-10-19 13:01:39 UTC — [ticket-510] validateur: APPROVED — Tous les critères sont satisfaits. Le code implémente correctement la reprise de (329687ms)
+- 2026-10-19 13:01:39 UTC — [ticket-510] APPROVED après 1 tour(s)
+- 2026-10-19 13:05:46 UTC — [ticket-510] documentation: 2 fichier(s) (242844ms) — après tour de correction
+- 2026-10-19 13:06:05 UTC — [ide-core] ticket-510 PR #556 confiée au CIWatcher
+- 2026-10-19 13:06:08 UTC — [ticket-509] branche ticket-509-a-folder-cited-in-an-acceptance-criterion-gives-t
+- 2026-10-19 13:06:09 UTC — [ticket-509] tour 1 — codeur démarré
+- 2026-10-19 13:09:32 UTC — [ticket-509] tour 1 — codeur terminé (203484ms)
+- 2026-10-19 13:11:04 UTC — [ide-core] ticket-510 PR #556 mergée (CI verte)
+- 2026-10-19 13:17:35 UTC — [ticket-509] testeur: OK (exit 0)
+- 2026-10-19 13:20:00 UTC — [ticket-509] securite: PASS — No critical or high-severity vulnerabilities detected. Path traversal protection (144921ms)
+- 2026-10-19 13:20:00 UTC — [ticket-509] tour 1 — reviewer démarré
+- 2026-10-19 13:20:32 UTC — [ticket-509] tour 1 — reviewer terminé (32125ms)
+- 2026-10-19 13:24:26 UTC — [ticket-509] validateur: fichiers cités joints : validator_cited_files.py
+- 2026-10-19 13:24:26 UTC — [ticket-509] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (265500ms)
+- 2026-10-19 13:24:26 UTC — [ticket-509] APPROVED après 1 tour(s)
+- 2026-10-19 13:27:12 UTC — [ticket-509] documentation: 2 fichier(s) (154203ms)
+- 2026-10-19 13:42:16 UTC — [ticket-512] branche ticket-512-test-commands-run-with-a-closed-stdin-so-no-tool
+- 2026-10-19 13:42:16 UTC — [ticket-512] tour 1 — codeur démarré
+- 2026-10-19 13:43:22 UTC — [ticket-512] tour 1 — codeur terminé (65344ms)
+- 2026-10-19 13:54:19 UTC — [ticket-512] testeur: OK (exit 0)
+- 2026-10-19 13:55:06 UTC — [ticket-512] securite: PASS — Aucune vulnérabilité détectée. Le diff ajoute une amélioration de sécurité : fer (46515ms)
+- 2026-10-19 13:55:06 UTC — [ticket-512] tour 1 — reviewer démarré
+- 2026-10-19 13:55:25 UTC — [ticket-512] tour 1 — reviewer terminé (19000ms)
+- 2026-10-19 13:57:41 UTC — [ticket-512] validateur: fichiers cités joints : test_runner.py (tronqué)
+- 2026-10-19 13:57:41 UTC — [ticket-512] validateur: APPROVED — Tous les critères sont respectés. Le code modifie correctement le lancement des  (155640ms)
+- 2026-10-19 13:57:41 UTC — [ticket-512] APPROVED après 1 tour(s)
+- 2026-10-19 13:59:19 UTC — [ticket-512] documentation: 1 fichier(s) (91390ms)
+- 2026-10-19 13:59:43 UTC — [ide-core] ticket-512 PR #560 confiée au CIWatcher
+- 2026-10-19 13:59:51 UTC — [ticket-515] branche ticket-515-tool-calls-rejected-by-the-cli-in-a-resumed-coder
+- 2026-10-19 14:01:08 UTC — [ticket-515] plan rendu (76375ms)
+- 2026-10-19 14:01:08 UTC — [ticket-515] tour 1 — codeur démarré
+- 2026-10-19 14:03:48 UTC — [ticket-515] tour 1 — codeur terminé (159219ms)
+- 2026-10-19 14:05:02 UTC — [ide-core] ticket-512 PR #560 mergée (CI verte)
+- 2026-10-19 14:11:03 UTC — [ticket-515] branche ticket-515-tool-calls-rejected-by-the-cli-in-a-resumed-coder
+- 2026-10-19 14:11:39 UTC — [ticket-515] plan rendu (35359ms)
+- 2026-10-19 14:20:00 UTC — [ticket-515] testeur: 1 failed, 2050 passed, 40 warnings in 499.38s (0:08:19)
+- 2026-10-19 14:20:00 UTC — [ticket-515] branche reprise (1 commit(s)) — tests red, codeur en premier
+- 2026-10-19 14:20:00 UTC — [ticket-515] tour 1 — codeur démarré
+- 2026-10-19 14:20:43 UTC — [ticket-515] tour 1 — codeur terminé (42796ms)
+- 2026-10-19 14:34:07 UTC — [ticket-515] testeur: OK (exit 0)
+- 2026-10-19 14:35:23 UTC — [ticket-515] securite: PASS — La fonctionnalité de tracking des refus du CLI utilise une source de données fia (75671ms)
+- 2026-10-19 14:35:23 UTC — [ticket-515] tour 1 — reviewer démarré
+- 2026-10-19 14:35:43 UTC — [ticket-515] tour 1 — reviewer terminé (19688ms)
+- 2026-10-19 14:36:34 UTC — [ticket-515] validateur: APPROVED — Tous les critères sont satisfaits. Le plan établit clairement que la cause profo (71406ms)
+- 2026-10-19 14:36:34 UTC — [ticket-515] APPROVED après 1 tour(s)
+- 2026-10-19 14:39:17 UTC — [ticket-515] documentation: 2 fichier(s) (157172ms)
+- 2026-10-19 14:39:34 UTC — [ide-core] ticket-515 PR #561 confiée au CIWatcher
+- 2026-10-19 14:39:37 UTC — [ticket-516] branche ticket-516-the-ci-watch-resumed-after-a-restart-finds-the-pi
+- 2026-10-19 14:39:38 UTC — [ticket-516] tour 1 — codeur démarré
+- 2026-10-19 14:43:15 UTC — [ticket-516] tour 1 — codeur terminé (217045ms)
+- 2026-10-19 14:44:02 UTC — [ide-core] ticket-515 PR #561 mergée (CI verte)
+- 2026-10-19 14:51:51 UTC — [ticket-516] testeur: OK (exit 0)
+- 2026-10-19 14:53:12 UTC — [ticket-516] securite: PASS — Aucune vulnérabilité détectée. Le code ajouté suit les bonnes pratiques de sécur (80905ms)
+- 2026-10-19 14:53:12 UTC — [ticket-516] tour 1 — reviewer démarré
+- 2026-10-19 14:53:44 UTC — [ticket-516] tour 1 — reviewer terminé (32672ms)
+- 2026-10-19 14:59:45 UTC — [ticket-516] validateur: fichiers cités joints : reprise_surveillance.py, test_reprise_surveillance.py
+- 2026-10-19 14:59:45 UTC — [ticket-516] validateur: APPROVED — Ticket-516 est entièrement implémenté et fonctionnel. Le codeur a ajouté une sou (393000ms)
+- 2026-10-19 14:59:45 UTC — [ticket-516] APPROVED après 1 tour(s)
+- 2026-10-19 15:02:46 UTC — [ticket-516] documentation: 3 fichier(s) (160985ms)
+- 2026-10-19 15:03:07 UTC — [ide-core] ticket-516 PR #562 confiée au CIWatcher
+- 2026-10-19 15:03:11 UTC — [ticket-514] branche ticket-514-a-test-timeout-reports-how-long-each-step-took-so
+- 2026-10-19 15:03:11 UTC — [ticket-514] tour 1 — codeur démarré
+- 2026-10-19 15:06:57 UTC — [ticket-514] tour 1 — codeur terminé (225844ms)
+- 2026-10-19 15:07:51 UTC — [ide-core] ticket-516 PR #562 mergée (CI verte)
+- 2026-10-19 16:32:11 UTC — [ticket-514] testeur: délai dépassé, suite relancée
+- 2026-10-19 16:41:37 UTC — [ticket-514] testeur: OK (exit 0)
+- 2026-10-19 16:43:35 UTC — [ticket-514] securite: PASS — Aucune vulnérabilité détectée. Le diff ajoute une fonctionnalité de rapportage d (117671ms)
+- 2026-10-19 16:43:35 UTC — [ticket-514] tour 1 — reviewer démarré
+- 2026-10-19 16:44:09 UTC — [ticket-514] tour 1 — reviewer terminé (33687ms)
+- 2026-10-19 16:44:33 UTC — [ticket-514] validateur: fichiers cités joints : test_runner.py (tronqué)
+- 2026-10-19 16:44:33 UTC — [ticket-514] validateur: APPROVED — Ticket-514 complètement satisfait. Le codeur a implémenté la mesure de durée pou (58156ms)
+- 2026-10-19 16:44:33 UTC — [ticket-514] CHANGES_REQUESTED tour 1: Reviewer : ## Problèmes bloquants
+- 2026-10-19 16:44:33 UTC — [ticket-514] tour 2 — codeur démarré
+- 2026-10-19 16:46:02 UTC — [ticket-514] tour 2 — codeur terminé (88235ms)
+- 2026-10-19 16:54:16 UTC — [ticket-514] testeur: OK (exit 0)
+- 2026-10-19 16:56:15 UTC — [ticket-514] securite: PASS — Aucune vulnérabilité de sécurité détectée. Le diff introduit une fonctionnalité  (118625ms)
+- 2026-10-19 16:56:15 UTC — [ticket-514] tour 2 — reviewer démarré
+- 2026-10-19 16:56:38 UTC — [ticket-514] tour 2 — reviewer terminé (22796ms)
+- 2026-10-19 16:56:39 UTC — [ticket-514] validateur: fichiers cités joints : test_runner.py (tronqué)
+- 2026-10-19 16:56:39 UTC — [ticket-514] validateur: APPROVED — Ticket-514 complètement satisfait. Le codeur a implémenté la mesure de durée pou (23828ms)
+- 2026-10-19 16:56:39 UTC — [ticket-514] APPROVED après 2 tour(s)
+- 2026-10-19 16:58:16 UTC — [ticket-514] documentation: 1 fichier(s) (92593ms)
+- 2026-10-19 16:58:35 UTC — [ide-core] ticket-514 PR #565 confiée au CIWatcher
+- 2026-10-19 16:58:39 UTC — [ticket-513] branche ticket-513-a-ticket-not-yet-started-can-be-removed-from-a-ru
+- 2026-10-19 16:58:39 UTC — [ticket-513] tour 1 — codeur démarré
+- 2026-10-19 17:00:56 UTC — [ticket-513] tour 1 — codeur terminé (137313ms)
+- 2026-10-19 17:03:37 UTC — [ide-core] ticket-514 PR #565 mergée (CI verte)
+- 2026-10-19 17:08:14 UTC — [ticket-513] testeur: OK (exit 0)
+- 2026-10-19 17:11:24 UTC — [ticket-513] securite: PASS — Aucune vulnérabilité CRITICAL ou HIGH détectée. Le code introduit un nouvel endp (190266ms)
+- 2026-10-19 17:11:24 UTC — [ticket-513] tour 1 — reviewer démarré
+- 2026-10-19 17:12:02 UTC — [ticket-513] tour 1 — reviewer terminé (37811ms)
+- 2026-10-19 17:12:31 UTC — [ticket-513] validateur: fichiers cités joints : file_vivante.py, docs/api.md (tronqué)
+- 2026-10-19 17:12:31 UTC — [ticket-513] validateur: APPROVED — Tous les critères sont satisfaits. L'implémentation de `FileVivante.retirer()` e (66328ms)
+- 2026-10-19 17:12:31 UTC — [ticket-513] APPROVED après 1 tour(s)
+- 2026-10-19 17:15:23 UTC — [ticket-513] documentation: 1 fichier(s) (161218ms)
+- 2026-10-19 13:27:30 UTC — [ide-core] ticket-509 PR #558 confiée au CIWatcher
+- 2026-10-19 13:27:33 UTC — [ticket-494] branche ticket-494-design-how-each-run-works-in-its-own-worktree-so
+- 2026-10-19 13:27:33 UTC — [ticket-494] tour 1 — codeur démarré
+- 2026-10-19 13:32:46 UTC — [ide-core] ticket-509 PR #558 mergée (CI verte)
+- 2026-10-19 13:34:25 UTC — [ticket-494] tour 1 — architect terminé (411515ms)
+- 2026-10-19 17:15:56 UTC — [ide-core] ticket-513 PR #566 confiée au CIWatcher
+- 2026-10-19 17:16:00 UTC — [ticket-494] branche ticket-494-design-how-each-run-works-in-its-own-worktree-so
+- 2026-10-19 17:21:15 UTC — [ide-core] ticket-513 PR #566 mergée (CI verte)
+- 2026-10-19 17:26:10 UTC — [ticket-494] testeur: OK (exit 0)
+- 2026-10-19 17:26:10 UTC — [ticket-494] branche reprise (1 commit(s)) — tests green, codeur sauté
+- 2026-10-19 17:27:08 UTC — [ticket-494] securite: PASS — Ce diff ne contient que de la documentation et des spécifications d'architecture (56985ms)
+- 2026-10-19 17:27:08 UTC — [ticket-494] tour 1 — reviewer démarré
+- 2026-10-19 17:27:46 UTC — [ticket-494] tour 1 — reviewer terminé (38140ms)
+- 2026-10-19 17:28:48 UTC — [ticket-494] validateur: CHANGES_REQUESTED — L'ADR-056 et sa conception fixent complètement les interfaces, contraintes et ca (100250ms)
+- 2026-10-19 17:28:48 UTC — [ticket-494] CHANGES_REQUESTED tour 1: Reviewer : ## Problèmes bloquants
+- 2026-10-19 17:28:48 UTC — [ticket-494] tour 2 — codeur démarré
+- 2026-10-19 17:31:16 UTC — [ticket-494] tour 2 — architect terminé (147625ms)
+- 2026-10-19 17:37:50 UTC — [ticket-494] testeur: 1 failed, 1499 passed, 56 warnings in 390.52s (0:06:30)
+- 2026-10-19 17:37:50 UTC — [ticket-494] tests rouges au tour 2
+- 2026-10-19 17:37:50 UTC — [ticket-494] tour 3 — codeur démarré
+- 2026-10-19 17:38:21 UTC — [ticket-494] tour 3 — architect terminé (31625ms)
+- 2026-10-19 17:46:05 UTC — [ticket-494] testeur: OK (exit 0)
+- 2026-10-19 17:46:36 UTC — [ticket-494] securite: PASS — Aucune vulnérabilité détectée. Le diff ajoute une spécification d'architecture e (30750ms)
+- 2026-10-19 17:46:36 UTC — [ticket-494] tour 3 — reviewer démarré
+- 2026-10-19 17:47:33 UTC — [ticket-494] tour 3 — reviewer terminé (57358ms)
+- 2026-10-19 17:52:16 UTC — [ticket-494] validateur: APPROVED — Le ticket-494 satisfait ses trois critères d'acceptation : l'ADR-056 et sa spéci (340436ms)
+- 2026-10-19 17:52:16 UTC — [ticket-494] APPROVED après 3 tour(s)
+- 2026-10-19 17:52:21 UTC — [ticket-494] fichiers non suivis laissés par le run : tickets/todo/ticket-521-a-project-declares-its-worktree-in-agents-json-and-the-policy-freezes-it.md, tickets/todo/ticket-522-a-run-worktree-is-created-from-the-remote-base-and-removed-only-when-it-holds-nothing-unsaved.md, tickets/todo/ticket-523-a-worktree-is-populated-and-its-links-are-removed-before-anything-else.md, tickets/todo/ticket-524-test-commands-run-in-a-worktree-with-the-declared-interpreter-and-environment.md, tickets/todo/ticket-525-the-write-hook-and-the-ancestor-claude-md-follow-the-worktree.md (à ignorer dans .gitignore ?)
+- 2026-10-19 17:53:56 UTC — [ticket-494] documentation: 1 fichier(s) (94672ms)
+- 2026-10-19 17:54:17 UTC — [ide-core] ticket-494 PR #567 confiée au CIWatcher
+- 2026-10-19 17:54:21 UTC — [ticket-506] branche ticket-506-the-resend-verification-step-reports-a-verificati
+- 2026-10-19 17:54:21 UTC — [ticket-506] tour 1 — codeur démarré
+- 2026-10-19 17:55:45 UTC — [ticket-506] tour 1 — codeur terminé (83656ms)
+- 2026-10-19 17:59:00 UTC — [ide-core] ticket-494 PR #567 mergée (CI verte)
+- 2026-10-19 18:03:13 UTC — [ticket-506] testeur: OK (exit 0)
+- 2026-10-19 18:06:03 UTC — [ticket-506] securite: PASS — Aucune vulnérabilité CRITICAL ou HIGH détectée. Le code améliore le rapportage d (169843ms)
+- 2026-10-19 18:06:04 UTC — [ticket-506] tour 1 — reviewer démarré
+- 2026-10-19 18:06:22 UTC — [ticket-506] tour 1 — reviewer terminé (18061ms)
+- 2026-10-19 18:08:43 UTC — [ticket-506] validateur: fichiers cités joints : resend_steps.py, backend/tests/test_provisioning_resend.py (tronqué)
+- 2026-10-19 18:08:43 UTC — [ticket-506] validateur: APPROVED — Tous les critères d'acceptation ont été implémentés et vérifiés. Le code modifie (160015ms)
+- 2026-10-19 18:08:43 UTC — [ticket-506] APPROVED après 1 tour(s)
+- 2026-10-19 18:10:06 UTC — [ticket-506] documentation: 2 fichier(s) (77828ms)
+- 2026-10-19 18:10:23 UTC — [ide-core] ticket-506 PR #570 confiée au CIWatcher
+- 2026-10-19 18:10:26 UTC — [ticket-517] branche ticket-517-the-pushed-commit-is-read-from-the-remote-even-wh
+- 2026-10-19 18:10:26 UTC — [ticket-517] tour 1 — codeur démarré
+- 2026-10-19 18:13:38 UTC — [ticket-517] tour 1 — codeur terminé (191375ms)
+- 2026-10-19 18:15:07 UTC — [ide-core] ticket-506 PR #570 mergée (CI verte)
+- 2026-10-19 18:21:18 UTC — [ticket-517] testeur: OK (exit 0)
+- 2026-10-19 18:23:22 UTC — [ticket-517] securite: PASS — Le diff ajoute une capacité de fallback pour lire le SHA du distant via `git ls- (124061ms)
+- 2026-10-19 18:23:22 UTC — [ticket-517] tour 1 — reviewer démarré
+- 2026-10-19 18:23:42 UTC — [ticket-517] validateur: fichiers cités joints : git_workspace.py (tronqué) ; non joints (budget épuisé) : git_clone.py
+- 2026-10-19 18:23:42 UTC — [ticket-517] validateur: APPROVED — Tous les critères sont satisfaits. Le diff montre l'ajout de `--no-single-branch (20188ms)
+- 2026-10-19 18:23:54 UTC — [ticket-517] tour 1 — reviewer terminé (31390ms)
+- 2026-10-19 18:23:54 UTC — [ticket-517] APPROVED après 1 tour(s)
+- 2026-10-19 18:26:23 UTC — [ticket-517] documentation: 1 fichier(s) (145016ms) — après tour de correction
+- 2026-10-19 18:26:43 UTC — [ticket-517] livraison: arrêt — PR #571 non mergée : la tête de la PR #571 n'est plus le commit poussé : 9c3e03e au lieu de eab7443. La PR reste ouverte.
+- 2026-10-19 18:26:42 UTC — [ide-core] ticket-517 PR #571 confiée au CIWatcher
+- 2026-10-19 18:26:46 UTC — [ticket-518] branche ticket-518-a-validator-security-or-documentation-call-has-a
+- 2026-10-19 18:28:44 UTC — [ticket-518] plan rendu (117766ms)
+- 2026-10-19 18:28:44 UTC — [ticket-518] tour 1 — codeur démarré
+- 2026-10-19 18:50:14 UTC — [ticket-518] tour 1 — codeur terminé (1290014ms)
+- 2026-10-19 18:55:26 UTC — [ticket-518] testeur: 1 failed, 1331 passed, 56 warnings in 310.07s (0:05:10)
+- 2026-10-19 18:55:26 UTC — [ticket-518] tests rouges au tour 1
+- 2026-10-19 18:55:26 UTC — [ticket-518] tour 2 — codeur démarré
+- 2026-10-19 18:55:35 UTC — [ticket-518] tour 2 — codeur terminé (8578ms)
+- 2026-10-19 19:02:20 UTC — [ticket-518] testeur: 1 failed, 1331 passed, 56 warnings in 401.32s (0:06:41)
+- 2026-10-19 19:02:20 UTC — [ticket-518] tests rouges au tour 2
+- 2026-10-19 19:02:20 UTC — [ticket-518] tour 3 — codeur démarré
+- 2026-10-19 19:02:50 UTC — [ticket-518] tour 3 — codeur terminé (30313ms)
+- 2026-10-19 19:09:22 UTC — [ticket-518] testeur: OK (exit 0)
+- 2026-10-19 19:11:07 UTC — [ticket-518] securite: PASS — Le ticket 518 ajoute une borne de durée totale pour les rôles texte et journalis (105030ms)
+- 2026-10-19 19:11:07 UTC — [ticket-518] tour 3 — reviewer démarré
+- 2026-10-19 19:11:42 UTC — [ticket-518] tour 3 — reviewer terminé (34843ms)
+- 2026-10-19 19:17:22 UTC — [ticket-518] validateur: fichiers cités joints : pipeline-log.md (tronqué) ; non joints (budget épuisé) : providers/
+- 2026-10-19 19:17:22 UTC — [ticket-518] validateur: CHANGES_REQUESTED — L'implémentation couvre cinq des six critères : durée maximale bornée pour Ollam (375250ms)
+- 2026-10-19 19:17:22 UTC — [ticket-518] CHANGES_REQUESTED tour 3: Validateur : L'implémentation couvre cinq des six critères : durée maximale bornée pour Ollama et agent_sdk, prise en compte de l'attente de créneaux, trace du repli en journal, et tests existants pas
+- 2026-10-19 19:17:22 UTC — [ticket-518] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-19 19:17:27 UTC — [ide-core] file interrompue : ticket-518 non approuvé
+- 2026-10-19 19:22:31 UTC — [ticket-518] branche ticket-518-a-validator-security-or-documentation-call-has-a
+- 2026-10-19 19:24:17 UTC — [ticket-518] plan rendu (105156ms)
+- 2026-10-19 19:30:44 UTC — [ticket-518] testeur: OK (exit 0)
+- 2026-10-19 19:30:44 UTC — [ticket-518] branche reprise (3 commit(s)) — tests green, codeur sauté
+- 2026-10-19 19:33:19 UTC — [ticket-518] securite: PASS — Audit complet du diff ticket-518 : aucune vulnérabilité OWASP détectée. Le code  (153031ms)
+- 2026-10-19 19:33:19 UTC — [ticket-518] tour 1 — reviewer démarré
+- 2026-10-19 19:33:55 UTC — [ticket-518] tour 1 — reviewer terminé (35546ms)
+- 2026-10-19 19:39:01 UTC — [ticket-518] validateur: fichiers cités joints : pipeline-log.md (tronqué) ; non joints (budget épuisé) : providers/
+- 2026-10-19 19:39:01 UTC — [ticket-518] validateur: CHANGES_REQUESTED — Les 5 premiers critères (implémentation de la durée maximale, tests des provider (341719ms)
+- 2026-10-19 19:39:01 UTC — [ticket-518] CHANGES_REQUESTED tour 1: Validateur : Les 5 premiers critères (implémentation de la durée maximale, tests des providers Ollama et SDK, journal de repli) sont bien couverts par le diff, validé par exit 0. Seul le diagnostic de
+- 2026-10-19 19:39:01 UTC — [ticket-518] tour 2 — codeur démarré
+- 2026-10-19 19:42:50 UTC — [ticket-518] tour 2 — codeur terminé (228781ms)
+- 2026-10-19 19:50:49 UTC — [ticket-518] testeur: OK (exit 0)
+- 2026-10-19 19:53:10 UTC — [ticket-518] securite: PASS — Aucune vulnérabilité détectée. Le diff implémente une limite de durée totale pou (141516ms)
+- 2026-10-19 19:53:10 UTC — [ticket-518] tour 2 — reviewer démarré
+- 2026-10-19 19:53:32 UTC — [ticket-518] tour 2 — reviewer terminé (22172ms)
+- 2026-10-19 19:58:52 UTC — [ticket-518] validateur: fichiers cités joints : pipeline-log.md (tronqué) ; non joints (budget épuisé) : providers/
+- 2026-10-19 19:58:52 UTC — [ticket-518] validateur: APPROVED — Le diff implémente une borne de durée totale par appel pour les rôles texte (val (341328ms)
+- 2026-10-19 19:58:52 UTC — [ticket-518] APPROVED après 2 tour(s)
+- 2026-10-19 20:01:54 UTC — [ticket-518] documentation: 2 fichier(s) (177266ms)
+- 2026-10-19 20:02:14 UTC — [ide-core] ticket-518 PR #575 confiée au CIWatcher
+- 2026-10-19 20:02:18 UTC — [ticket-526] branche ticket-526-a-run-whose-diff-leaves-two-ticket-files-with-the
+- 2026-10-19 20:02:18 UTC — [ticket-526] tour 1 — codeur démarré
+- 2026-10-19 20:06:33 UTC — [ticket-526] tour 1 — codeur terminé (254500ms)
+- 2026-10-19 20:08:07 UTC — [ide-core] ticket-518 PR #575 mergée (CI verte)
+- 2026-10-19 20:10:13 UTC — [ticket-526] branche ticket-526-a-run-whose-diff-leaves-two-ticket-files-with-the
+- 2026-10-19 20:17:27 UTC — [ticket-526] testeur: OK (exit 0)
+- 2026-10-19 20:17:27 UTC — [ticket-526] branche reprise (1 commit(s)) — tests green, codeur sauté
+- 2026-10-19 20:20:04 UTC — [ticket-526] securite: PASS — Audit sécurité complet du diff ticket-526. Code de vérification de fiches bien c (155484ms)
+- 2026-10-19 20:20:04 UTC — [ticket-526] tour 1 — reviewer démarré
+- 2026-10-19 20:20:28 UTC — [ticket-526] tour 1 — reviewer terminé (23593ms)
+- 2026-10-19 20:20:34 UTC — [ticket-526] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : créneau occupé depuis plus de 30 s
+- 2026-10-19 20:21:05 UTC — [ticket-526] validateur: fichiers cités joints : agents/prompts/architect.md
+- 2026-10-19 20:21:05 UTC — [ticket-526] validateur: APPROVED — Tous les critères sont satisfaits. Les tests couvrent les deux cas (doublon renv (61328ms)
+- 2026-10-19 20:21:05 UTC — [ticket-526] APPROVED après 1 tour(s)
+- 2026-10-19 20:23:43 UTC — [ticket-526] documentation: 1 fichier(s) (143781ms)
+- 2026-10-19 20:24:01 UTC — [ide-core] ticket-526 PR #576 confiée au CIWatcher
+- 2026-10-19 20:24:05 UTC — [ticket-527] branche ticket-527-a-pull-request-head-that-still-shows-the-previous
+- 2026-10-19 20:24:05 UTC — [ticket-527] tour 1 — codeur démarré
+- 2026-10-19 20:26:09 UTC — [ticket-527] tour 1 — codeur terminé (124235ms)
+- 2026-10-19 20:29:18 UTC — [ide-core] ticket-526 PR #576 mergée (CI verte)
+- 2026-10-19 20:32:45 UTC — [ticket-527] testeur: OK (exit 0)
+- 2026-10-19 20:35:18 UTC — [ticket-527] securite: PASS — Aucune vulnérabilité détectée. Le diff implémente une vérification git sécurisée (152625ms)
+- 2026-10-19 20:35:18 UTC — [ticket-527] tour 1 — reviewer démarré
+- 2026-10-19 20:35:47 UTC — [ticket-527] tour 1 — reviewer terminé (29375ms)
+- 2026-10-19 20:39:54 UTC — [ticket-527] validateur: fichiers cités joints : ci_watcher.py (tronqué)
+- 2026-10-19 20:39:54 UTC — [ticket-527] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (275985ms)
+- 2026-10-19 20:39:54 UTC — [ticket-527] APPROVED après 1 tour(s)
+- 2026-10-19 20:42:37 UTC — [ticket-527] documentation: 2 fichier(s) (157688ms)
+- 2026-10-19 20:42:57 UTC — [ide-core] ticket-527 PR #577 confiée au CIWatcher
+- 2026-10-19 20:43:00 UTC — [ticket-521] branche ticket-521-a-project-declares-its-worktree-in-agents-json-an
+- 2026-10-19 20:43:01 UTC — [ticket-521] tour 1 — codeur démarré
+- 2026-10-19 20:46:13 UTC — [ticket-521] tour 1 — codeur terminé (192610ms)
+- 2026-10-19 20:48:13 UTC — [ide-core] ticket-527 PR #577 mergée (CI verte)
+- 2026-10-19 20:54:54 UTC — [ticket-521] testeur: OK (exit 0)
+- 2026-10-19 20:56:56 UTC — [ticket-521] securite: PASS — Aucune vulnérabilité détectée. Le diff implémente correctement la validation des (121860ms)
+- 2026-10-19 20:56:56 UTC — [ticket-521] tour 1 — reviewer démarré
+- 2026-10-19 20:56:56 UTC — [ticket-521] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-10-19 20:57:21 UTC — [ticket-521] validateur: APPROVED — Le ticket-521 est complètement validé. La lecture et la validation de la clé `wo (25358ms)
+- 2026-10-19 20:57:22 UTC — [ticket-521] tour 1 — reviewer terminé (26484ms)
+- 2026-10-19 20:57:22 UTC — [ticket-521] APPROVED après 1 tour(s)
+- 2026-10-19 20:59:21 UTC — [ticket-521] documentation: 1 fichier(s) (113500ms) — après tour de correction
+- 2026-10-19 21:05:12 UTC — [ide-core] ticket-521 PR #578 mergée (CI verte)
+- 2026-10-19 21:05:21 UTC — [ide-core] ticket-521 : base réalignée sur develop
+- 2026-10-19 21:05:21 UTC — [ide-core] ticket-521 PR #578 confiée au CIWatcher
+- 2026-10-19 21:05:30 UTC — [ticket-522] branche ticket-522-a-run-worktree-is-created-from-the-remote-base-an
+- 2026-10-19 21:05:30 UTC — [ticket-522] tour 1 — codeur démarré
+- 2026-10-19 21:13:49 UTC — [ticket-522] tour 1 — codeur terminé (499421ms)
+- 2026-10-19 21:20:52 UTC — [ticket-522] testeur: OK (exit 0)
+- 2026-10-19 21:25:13 UTC — [ticket-522] securite: PASS — Aucune vulnérabilité CRITICAL ou HIGH détectée. Le module run_worktree.py implém (261781ms)
+- 2026-10-19 21:25:13 UTC — [ticket-522] tour 1 — reviewer démarré
+- 2026-10-19 21:25:40 UTC — [ticket-522] tour 1 — reviewer terminé (26718ms)
+- 2026-10-19 21:27:23 UTC — [ticket-522] validateur: CHANGES_REQUESTED — Les deux premiers critères sont respectés : les tests existent et passent, et `r (129828ms)
+- 2026-10-19 21:27:23 UTC — [ticket-522] CHANGES_REQUESTED tour 1: Validateur : Les deux premiers critères sont respectés : les tests existent et passent, et `run_git` n'est pas dupliqué. Le troisième critère ne peut être vérifié à partir du diff fourni, car il néces
+- 2026-10-19 21:27:23 UTC — [ticket-522] tour 2 — codeur démarré
+- 2026-10-19 21:28:15 UTC — [ticket-522] tour 2 — codeur terminé (51609ms)
+- 2026-10-19 21:35:16 UTC — [ticket-522] testeur: OK (exit 0)
+- 2026-10-19 21:36:42 UTC — [ticket-522] securite: PASS — Aucune vulnérabilité détectée. Le diff ajoute une configuration git légitime (`c (85750ms)
+- 2026-10-19 21:36:42 UTC — [ticket-522] tour 2 — reviewer démarré
+- 2026-10-19 21:37:09 UTC — [ticket-522] tour 2 — reviewer terminé (27641ms)
+- 2026-10-19 21:38:50 UTC — [ticket-522] validateur: CHANGES_REQUESTED — Les deux premiers critères sont respectés : les tests existent et passent, et `r (128515ms)
+- 2026-10-19 21:38:50 UTC — [ticket-522] CHANGES_REQUESTED tour 2: Validateur : Les deux premiers critères sont respectés : les tests existent et passent, et `run_git` n'est pas dupliqué. Le troisième critère ne peut être vérifié à partir du diff fourni, car il néces
+- 2026-10-19 21:38:50 UTC — [ticket-522] tour 3 — codeur démarré
+- 2026-10-19 21:39:13 UTC — [ticket-522] tour 3 — codeur terminé (23046ms)
+- 2026-10-19 21:46:57 UTC — [ticket-522] testeur: OK (exit 0)
+- 2026-10-19 21:49:16 UTC — [ticket-522] securite: PASS — No CRITICAL or HIGH vulnerabilities detected that would block this ticket. The p (138765ms)
+- 2026-10-19 21:49:16 UTC — [ticket-522] tour 3 — reviewer démarré
+- 2026-10-19 21:49:37 UTC — [ticket-522] tour 3 — reviewer terminé (20796ms)
+- 2026-10-19 21:51:22 UTC — [ticket-522] validateur: CHANGES_REQUESTED — Les deux premiers critères sont respectés : les tests existent et passent, et `r (126656ms)
+- 2026-10-19 21:51:22 UTC — [ticket-522] CHANGES_REQUESTED tour 3: Validateur : Les deux premiers critères sont respectés : les tests existent et passent, et `run_git` n'est pas dupliqué. Le troisième critère ne peut être vérifié à partir du diff fourni car il nécess
+- 2026-10-19 21:51:23 UTC — [ticket-522] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-19 21:51:27 UTC — [ide-core] file interrompue : ticket-522 non approuvé
+- 2026-10-19 21:56:43 UTC — [ticket-522] branche ticket-522-a-run-worktree-is-created-from-the-remote-base-an
+- 2026-10-19 22:03:15 UTC — [ticket-522] testeur: OK (exit 0)
+- 2026-10-19 22:03:15 UTC — [ticket-522] branche reprise (3 commit(s)) — tests green, codeur sauté
+- 2026-10-19 22:06:15 UTC — [ticket-522] securite: BLOCK — **Path Traversal CRITIQUE** : Le module n'est pas appelé en production (intégrat (178328ms)
+- 2026-10-19 22:06:19 UTC — [ide-core] file interrompue : ticket-522 non approuvé
+- 2026-10-19 22:11:19 UTC — [ticket-522] branche ticket-522-a-run-worktree-is-created-from-the-remote-base-an
+- 2026-10-19 22:17:57 UTC — [ticket-522] testeur: OK (exit 0)
+- 2026-10-19 22:17:57 UTC — [ticket-522] branche reprise (6 commit(s)) — tests green, codeur sauté
+- 2026-10-19 22:20:44 UTC — [ticket-522] securite: BLOCK — Une vulnérabilité HIGH de path traversal a été introduite dans `run_worktree.py` (165859ms)
+- 2026-10-19 22:20:48 UTC — [ide-core] file interrompue : ticket-522 non approuvé
+- 2026-10-19 22:25:57 UTC — [ticket-522] branche ticket-522-a-run-worktree-is-created-from-the-remote-base-an
+- 2026-10-19 22:32:54 UTC — [ticket-522] testeur: OK (exit 0)
+- 2026-10-19 22:32:54 UTC — [ticket-522] branche reprise (10 commit(s)) — tests green, codeur sauté
+- 2026-10-19 22:34:00 UTC — [ticket-522] securite: PASS — Audit complet du diff : zéro vulnérabilité introduite. Le module `run_worktree.p (64469ms)
+- 2026-10-19 22:34:00 UTC — [ticket-522] tour 1 — reviewer démarré
+- 2026-10-19 22:34:26 UTC — [ticket-522] tour 1 — reviewer terminé (25719ms)
+- 2026-10-19 22:39:00 UTC — [ticket-522] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-19 22:39:28 UTC — [ticket-522] validateur: fichiers cités joints : utils/project_id.py, backend/src/tessera/services/pipeline_stages.py (tronqué) ; absents : ../x ; non joints (budget épuisé) : backend/src/tessera/services/orchestrator.py
+- 2026-10-19 22:39:28 UTC — [ticket-522] validateur: APPROVED — Tous les critères sont satisfaits. Le module `run_worktree.py` est implémenté av (328110ms)
+- 2026-10-19 22:39:28 UTC — [ticket-522] APPROVED après 1 tour(s)
+- 2026-10-19 22:41:43 UTC — [ticket-522] documentation: 0 fichier(s) (131061ms)
+- 2026-10-19 22:41:53 UTC — [ticket-522] livraison: arrêt — Livraison interrompue : GitCommandError: git command failed (code 1): git -c core.hooksPath=C:\Users
+- 2026-10-19 22:41:54 UTC — [ide-core] file interrompue : ticket-522 n'a pas été livré
+- 2026-10-19 22:47:39 UTC — [ticket-523] branche ticket-523-a-worktree-is-populated-from-its-declared-entries
+- 2026-10-19 22:47:39 UTC — [ticket-523] tour 1 — codeur démarré
+- 2026-10-19 22:52:36 UTC — [ticket-523] tour 1 — codeur terminé (296171ms)
+- 2026-10-19 22:58:43 UTC — [ticket-523] testeur: OK (exit 0)
+- 2026-10-19 23:01:50 UTC — [ticket-523] securite: PASS — Audit complet sans vulnérabilité critique ou haute introduite. Le diff implément (187125ms)
+- 2026-10-19 23:01:50 UTC — [ticket-523] tour 1 — reviewer démarré
+- 2026-10-19 23:02:23 UTC — [ticket-523] tour 1 — reviewer terminé (33155ms)
+- 2026-10-19 23:04:56 UTC — [ticket-523] validateur: fichiers cités joints : .env
+- 2026-10-19 23:04:56 UTC — [ticket-523] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les tests ont été créés et passe (186250ms)
+- 2026-10-19 23:04:56 UTC — [ticket-523] APPROVED après 1 tour(s)
+- 2026-10-19 23:06:10 UTC — [ticket-523] documentation: 1 fichier(s) (69921ms)
+- 2026-10-19 23:11:35 UTC — [ticket-523] livraison: arrêt — PR #583 non mergée : CI failing : la PR #583 reste ouverte.
+- 2026-10-19 23:11:35 UTC — [ide-core] file interrompue : ticket-523 non mergé
+- 2026-10-19 23:20:51 UTC — [ticket-524] branche ticket-524-test-commands-run-in-a-worktree-with-the-declared
+- 2026-10-19 23:20:52 UTC — [ticket-524] tour 1 — codeur démarré
+- 2026-10-19 23:24:46 UTC — [ticket-524] tour 1 — codeur terminé (234281ms)
+- 2026-10-19 23:31:02 UTC — [ticket-524] testeur: OK (exit 0)
+- 2026-10-19 23:34:09 UTC — [ticket-524] securite: PASS — Aucune vulnérabilité introduite. Le code worktree est préparatoire : paramètres  (187781ms)
+- 2026-10-19 23:34:09 UTC — [ticket-524] tour 1 — reviewer démarré
+- 2026-10-19 23:34:36 UTC — [ticket-524] tour 1 — reviewer terminé (26468ms)
+- 2026-10-19 23:36:33 UTC — [ticket-524] validateur: CHANGES_REQUESTED — Les tests requis pour les fonctionnalités implémentées passent correctement. Le  (143578ms)
+- 2026-10-19 23:36:33 UTC — [ticket-524] CHANGES_REQUESTED tour 1: Validateur : Les tests requis pour les fonctionnalités implémentées passent correctement. Le code intègre les nouvelles fonctionnalités de gestion des commandes et environnements dans un worktree, mai
+- 2026-10-19 23:36:33 UTC — [ticket-524] tour 2 — codeur démarré
+- 2026-10-19 23:36:49 UTC — [ticket-524] tour 2 — codeur terminé (16343ms)
+- 2026-10-19 23:43:19 UTC — [ticket-524] testeur: OK (exit 0)
+- 2026-10-19 23:45:28 UTC — [ticket-524] securite: PASS — Aucune vulnérabilité détectée. Le ticket-524 introduit une infrastructure sécuri (128186ms)
+- 2026-10-19 23:45:28 UTC — [ticket-524] tour 2 — reviewer démarré
+- 2026-10-19 23:45:54 UTC — [ticket-524] tour 2 — reviewer terminé (26109ms)
+- 2026-10-19 23:48:15 UTC — [ticket-524] validateur: APPROVED — Les trois critères d'acceptation sont respectés. Les tests requis ont été implém (167500ms)
+- 2026-10-19 23:48:15 UTC — [ticket-524] APPROVED après 2 tour(s)
+- 2026-10-19 23:50:03 UTC — [ticket-524] documentation: 1 fichier(s) (103328ms)
+- 2026-10-19 23:55:17 UTC — [ide-core] ticket-524 PR #585 mergée (CI verte)
+- 2026-10-19 23:55:19 UTC — [ide-core] ticket-524 : base réalignée sur develop
+- 2026-10-19 23:55:19 UTC — [ide-core] ticket-524 PR #585 confiée au CIWatcher
+- 2026-10-19 23:55:22 UTC — [ticket-525] branche ticket-525-the-write-hook-and-the-ancestor-claude-md-exclusi
+- 2026-10-19 23:55:22 UTC — [ticket-525] tour 1 — codeur démarré
+- 2026-10-20 00:00:31 UTC — [ticket-525] tour 1 — codeur terminé (308953ms)
+- 2026-10-20 00:06:56 UTC — [ticket-525] testeur: 1 failed, 2931 passed, 56 warnings in 382.53s (0:06:22)
+- 2026-10-20 00:06:56 UTC — [ticket-525] tests rouges au tour 1
+- 2026-10-20 00:06:56 UTC — [ticket-525] tour 2 — codeur démarré
+- 2026-10-20 00:10:54 UTC — [ticket-525] tour 2 — codeur terminé (237561ms)
+- 2026-10-20 00:18:01 UTC — [ticket-525] testeur: OK (exit 0)
+- 2026-10-20 00:20:29 UTC — [ticket-525] securite: PASS — Les changements supportant ADR-056 (worktrees de run) sont sécurisés. Trois couc (148343ms)
+- 2026-10-20 00:20:29 UTC — [ticket-525] tour 2 — reviewer démarré
+- 2026-10-20 00:20:55 UTC — [ticket-525] tour 2 — reviewer terminé (25969ms)
+- 2026-10-20 00:22:56 UTC — [ticket-525] validateur: CHANGES_REQUESTED — Les tests nécessaires pour les fonctionnalités liées aux worktrees sont présents (146577ms)
+- 2026-10-20 00:22:56 UTC — [ticket-525] CHANGES_REQUESTED tour 2: Validateur : Les tests nécessaires pour les fonctionnalités liées aux worktrees sont présents et passent. Les modifications apportées au code permettent de gérer correctement les worktrees, notamment 
+- 2026-10-20 00:22:56 UTC — [ticket-525] tour 3 — codeur démarré
+- 2026-10-20 00:23:07 UTC — [ticket-525] tour 3 — codeur terminé (11766ms)
+- 2026-10-20 00:31:25 UTC — [ticket-525] testeur: OK (exit 0)
+- 2026-10-20 00:34:02 UTC — [ticket-525] securite: PASS — Aucune vulnérabilité de sécurité détectée. Le diff implémente ADR-056 (worktrees (156875ms)
+- 2026-10-20 00:34:02 UTC — [ticket-525] tour 3 — reviewer démarré
+- 2026-10-20 00:34:32 UTC — [ticket-525] tour 3 — reviewer terminé (30656ms)
+- 2026-10-20 00:36:34 UTC — [ticket-525] validateur: CHANGES_REQUESTED — Les tests requis pour les fonctionnalités liées aux worktrees sont présents et p (152093ms)
+- 2026-10-20 00:36:34 UTC — [ticket-525] CHANGES_REQUESTED tour 3: Validateur : Les tests requis pour les fonctionnalités liées aux worktrees sont présents et passent. Les modifications apportées au code permettent de gérer correctement les worktrees, notamment en aj
+- 2026-10-20 00:36:34 UTC — [ticket-525] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-20 00:36:38 UTC — [ide-core] file interrompue : ticket-525 non approuvé
+- 2026-10-20 00:43:22 UTC — [ticket-525] branche ticket-525-the-write-hook-and-the-ancestor-claude-md-exclusi
+- 2026-10-20 00:51:26 UTC — [ticket-525] testeur: OK (exit 0)
+- 2026-10-20 00:51:26 UTC — [ticket-525] branche reprise (3 commit(s)) — tests green, codeur sauté
+- 2026-10-20 00:54:41 UTC — [ticket-525] securite: PASS — Aucune vulnérabilité CRITICAL ou HIGH détectée. Le ticket-525 ajoute le support  (194516ms)
+- 2026-10-20 00:54:41 UTC — [ticket-525] tour 1 — reviewer démarré
+- 2026-10-20 00:55:25 UTC — [ticket-525] tour 1 — reviewer terminé (43796ms)
+- 2026-10-20 00:56:50 UTC — [ticket-525] validateur: CHANGES_REQUESTED — Les tests requis sont présents et passent, et les fonctionnalités pour gérer les (128610ms)
+- 2026-10-20 00:56:50 UTC — [ticket-525] CHANGES_REQUESTED tour 1: Validateur : Les tests requis sont présents et passent, et les fonctionnalités pour gérer les worktrees ont été implémentées correctement. Cependant, le ticket-519 n'a pas encore été implémenté, donc 
+- 2026-10-20 00:56:50 UTC — [ticket-525] tour 2 — codeur démarré
+- 2026-10-20 01:00:53 UTC — [ticket-525] tour 2 — codeur terminé (242813ms)
+- 2026-10-20 01:00:54 UTC — [ticket-525] ARRÊTÉ par l'utilisateur au tour 2
+- 2026-10-20 01:00:58 UTC — [ide-core] file interrompue : ticket-525 non approuvé
+- 2026-10-20 01:01:49 UTC — [ticket-525] branche ticket-525-the-write-hook-and-the-ancestor-claude-md-exclusi
+- 2026-10-20 01:09:25 UTC — [ticket-525] testeur: OK (exit 0)
+- 2026-10-20 01:09:25 UTC — [ticket-525] branche reprise (6 commit(s)) — tests green, codeur sauté
+- 2026-10-20 01:12:31 UTC — [ticket-525] securite: PASS — Audit complet du diff ADR-056 (ticket-525). Aucune vulnérabilité détectée. Les m (184656ms)
+- 2026-10-20 01:12:31 UTC — [ticket-525] tour 1 — reviewer démarré
+- 2026-10-20 01:13:04 UTC — [ticket-525] tour 1 — reviewer terminé (32952ms)
+- 2026-10-20 01:16:15 UTC — [ticket-525] validateur: fichiers cités joints : backend/src/tessera/services/pipeline_stages.py (tronqué) ; non joints (budget épuisé) : backend/src/tessera/services/orchestrator.py
+- 2026-10-20 01:16:15 UTC — [ticket-525] validateur: APPROVED — Tous les critères d'acceptation sont respectés : les quatre blocs de tests exist (223922ms)
+- 2026-10-20 01:16:15 UTC — [ticket-525] APPROVED après 1 tour(s)
+- 2026-10-20 01:17:15 UTC — [ticket-525] documentation: 1 fichier(s) (55266ms)
+- 2026-10-20 01:22:30 UTC — [ide-core] ticket-525 PR #588 mergée (CI verte)
+- 2026-10-20 01:22:32 UTC — [ide-core] ticket-525 : base réalignée sur develop
+- 2026-10-20 01:22:32 UTC — [ide-core] ticket-525 PR #588 confiée au CIWatcher
+- 2026-10-20 01:22:34 UTC — [ticket-519] branche ticket-519-a-run-executes-in-its-worktree-and-the-checkout-i
+- 2026-10-20 01:22:35 UTC — [ticket-519] tour 1 — codeur démarré
+- 2026-10-20 01:34:37 UTC — [ticket-519] tour 1 — codeur terminé (721906ms)
+- 2026-10-20 01:41:06 UTC — [ticket-519] testeur: 1 failed, 3215 passed, 56 warnings in 386.55s (0:06:26)
+- 2026-10-20 01:41:06 UTC — [ticket-519] tests rouges au tour 1
+- 2026-10-20 01:41:06 UTC — [ticket-519] tour 2 — codeur démarré
+- 2026-10-20 01:42:19 UTC — [ticket-519] tour 2 — codeur terminé (72593ms)
+- 2026-10-20 01:49:43 UTC — [ticket-519] testeur: OK (exit 0)
+- 2026-10-20 01:52:22 UTC — [ticket-519] securite: PASS — No introduced vulnerabilities detected. The worktree implementation (ADR-056) in (159139ms)
+- 2026-10-20 01:52:22 UTC — [ticket-519] tour 2 — reviewer démarré
+- 2026-10-20 01:52:52 UTC — [ticket-519] tour 2 — reviewer terminé (29625ms)
+- 2026-10-20 01:56:37 UTC — [ticket-519] validateur: fichiers cités joints : backend/src/tessera/services/run_lock.py
+- 2026-10-20 01:56:37 UTC — [ticket-519] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (254468ms)
+- 2026-10-20 01:56:37 UTC — [ticket-519] CHANGES_REQUESTED tour 2: Reviewer : ## Problèmes bloquants
+- 2026-10-20 01:56:37 UTC — [ticket-519] tour 3 — codeur démarré
+- 2026-10-20 02:00:19 UTC — [ticket-519] tour 3 — codeur terminé (222687ms)
+- 2026-10-20 02:08:14 UTC — [ticket-519] testeur: OK (exit 0)
+- 2026-10-20 02:10:39 UTC — [ticket-519] securite: PASS — Audit complet du support des worktrees (ADR-056, ticket-519). Le code ajoute un  (145000ms)
+- 2026-10-20 02:10:39 UTC — [ticket-519] tour 3 — reviewer démarré
+- 2026-10-20 02:11:07 UTC — [ticket-519] tour 3 — reviewer terminé (27717ms)
+- 2026-10-20 02:15:39 UTC — [ticket-519] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-20 02:16:45 UTC — [ticket-519] validateur: fichiers cités joints : backend/src/tessera/services/run_lock.py
+- 2026-10-20 02:16:45 UTC — [ticket-519] validateur: APPROVED — Tous les critères sont satisfaits. Les sept tests sont présents dans le diff (`t (366328ms)
+- 2026-10-20 02:16:45 UTC — [ticket-519] APPROVED après 3 tour(s)
+- 2026-10-20 02:19:38 UTC — [ticket-519] documentation: 1 fichier(s) (168438ms)
+- 2026-10-20 02:19:56 UTC — [ide-core] ticket-519 PR #589 confiée au CIWatcher
+- 2026-10-20 02:19:59 UTC — [ticket-520] branche ticket-520-worktrees-left-by-a-backend-stop-are-saved-then-r
+- 2026-10-20 02:19:59 UTC — [ticket-520] tour 1 — codeur démarré
+- 2026-10-20 02:24:19 UTC — [ticket-520] tour 1 — codeur terminé (259953ms)
+- 2026-10-20 02:24:31 UTC — [ticket-519] livraison: arrêt — PR #589 non mergée : CI failing : la PR #589 reste ouverte.
+- 2026-10-20 02:31:23 UTC — [ticket-520] testeur: 1 failed, 3236 passed, 56 warnings in 420.92s (0:07:00)
+- 2026-10-20 02:31:23 UTC — [ticket-520] tests rouges au tour 1
+- 2026-10-20 02:31:23 UTC — [ticket-520] tour 2 — codeur démarré
+- 2026-10-20 02:32:41 UTC — [ticket-520] tour 2 — codeur terminé (78735ms)
+- 2026-10-20 02:40:17 UTC — [ticket-520] testeur: OK (exit 0)
+- 2026-10-20 02:42:47 UTC — [ticket-520] securite: PASS — No security vulnerabilities detected. The code properly handles path traversal p (150593ms)
+- 2026-10-20 02:42:47 UTC — [ticket-520] configuration des tests modifiée : backend/tests/conftest.py
+- 2026-10-20 02:42:47 UTC — [ticket-520] tour 2 — reviewer démarré
+- 2026-10-20 02:43:23 UTC — [ticket-520] tour 2 — reviewer terminé (35921ms)
+- 2026-10-20 02:44:27 UTC — [ticket-520] validateur: APPROVED — Les deux critères d'acceptation sont respectés. Le code inclut les sept tests de (99125ms)
+- 2026-10-20 02:44:27 UTC — [ticket-520] APPROVED après 2 tour(s)
+- 2026-10-20 02:47:48 UTC — [ticket-520] documentation: 2 fichier(s) (197281ms)
+- 2026-10-20 02:48:10 UTC — [ticket-520] livraison: résolveur tenté : backend/tests/test_run_worktree.py (14687ms)
+- 2026-10-20 02:48:10 UTC — [ticket-520] livraison: arrêt — Conflit avec develop sur : backend/tests/test_run_worktree.py — résolveur tenté sur backend/tests/te
+- 2026-10-20 02:48:14 UTC — [ticket-528] branche ticket-528-a-resumed-branch-whose-last-run-was-refused-by-th
+- 2026-10-20 02:48:14 UTC — [ticket-528] tour 1 — codeur démarré
+- 2026-10-20 02:52:20 UTC — [ticket-528] tour 1 — codeur terminé (245577ms)
+- 2026-10-20 02:59:41 UTC — [ticket-528] testeur: OK (exit 0)
+- 2026-10-20 03:02:04 UTC — [ticket-528] securite: PASS — Aucune vulnérabilité CRITICAL ou HIGH détectée. Le code est correct et sûr:
+
+- L (142532ms)
+- 2026-10-20 03:02:04 UTC — [ticket-528] tour 1 — reviewer démarré
+- 2026-10-20 03:02:38 UTC — [ticket-528] tour 1 — reviewer terminé (33968ms)
+- 2026-10-20 03:04:07 UTC — [ticket-528] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (123156ms)
+- 2026-10-20 03:04:07 UTC — [ticket-528] APPROVED après 1 tour(s)
+- 2026-10-20 03:06:29 UTC — [ticket-528] documentation: 3 fichier(s) (137202ms)
+- 2026-10-20 03:06:46 UTC — [ide-core] ticket-528 PR #590 confiée au CIWatcher
+- 2026-10-20 03:12:14 UTC — [ide-core] ticket-528 PR #590 mergée (CI verte)
+- 2026-10-22 08:52:48 UTC — [ticket-530] branche ticket-530-en-mode-worktree-la-documentation-par-lot-crit-da
+- 2026-10-22 08:52:50 UTC — [ticket-530] tour 1 — codeur démarré
+- 2026-10-22 08:56:34 UTC — [ticket-530] tour 1 — codeur terminé (224186ms)
+- 2026-10-22 09:09:07 UTC — [ticket-530] testeur: OK (exit 0)
+- 2026-10-22 09:12:33 UTC — [ticket-530] securite: PASS — Le diff ajoute le paramètre `wt: RunWorktree | None` à `_documenteur()` pour écr (206625ms)
+- 2026-10-22 09:12:33 UTC — [ticket-530] tour 1 — reviewer démarré
+- 2026-10-22 09:12:51 UTC — [ticket-530] tour 1 — reviewer terminé (17546ms)
+- 2026-10-22 09:16:25 UTC — [ticket-530] validateur: fichiers cités joints : routers/orchestrator.py (tronqué)
+- 2026-10-22 09:16:25 UTC — [ticket-530] validateur: APPROVED — Tous les critères sont respectés. Le code modifie correctement la fonction `_doc (231328ms)
+- 2026-10-22 09:16:25 UTC — [ticket-530] APPROVED après 1 tour(s)
+- 2026-10-22 09:17:30 UTC — [ticket-530] documentation: 0 fichier(s) (58953ms)
+- 2026-10-22 09:17:54 UTC — [ide-core] ticket-530 PR #596 confiée au CIWatcher
+- 2026-10-22 09:17:58 UTC — [ticket-531] branche ticket-531-la-suppression-du-worktree-choue-sur-un-chemin-de
+- 2026-10-22 09:17:59 UTC — [ticket-531] tour 1 — codeur démarré
+- 2026-10-22 09:23:26 UTC — [ide-core] ticket-530 PR #596 mergée (CI verte)
+- 2026-10-22 09:27:16 UTC — [ticket-531] tour 1 — codeur terminé (557030ms)
+- 2026-10-22 09:39:46 UTC — [ticket-531] testeur: OK (exit 0)
+- 2026-10-22 09:42:12 UTC — [ticket-531] securite: PASS — Le diff améliore la robustesse de la suppression des worktrees avec un fallback  (145797ms)
+- 2026-10-22 09:42:12 UTC — [ticket-531] tour 1 — reviewer démarré
+- 2026-10-22 09:42:36 UTC — [ticket-531] tour 1 — reviewer terminé (23890ms)
+- 2026-10-22 09:47:10 UTC — [ticket-531] validateur: fichiers cités joints : services/run_worktree_populate.py
+- 2026-10-22 09:47:10 UTC — [ticket-531] validateur: APPROVED — Tous les critères d'acceptation ont été satisfaits. Le code implémente correctem (297561ms)
+- 2026-10-22 09:47:10 UTC — [ticket-531] APPROVED après 1 tour(s)
+- 2026-10-22 09:48:55 UTC — [ticket-531] documentation: 1 fichier(s) (100531ms)
+- 2026-10-22 09:49:16 UTC — [ide-core] ticket-531 PR #597 confiée au CIWatcher
+- 2026-10-22 09:49:19 UTC — [ticket-532] branche ticket-532-a-queue-on-a-worktree-project-is-refused-instead
+- 2026-10-22 09:49:20 UTC — [ticket-532] tour 1 — codeur démarré
+- 2026-10-22 09:52:41 UTC — [ticket-532] tour 1 — codeur terminé (201438ms)
+- 2026-10-22 09:54:23 UTC — [ide-core] ticket-531 PR #597 mergée (CI verte)
+- 2026-10-22 10:04:46 UTC — [ticket-532] testeur: OK (exit 0)
+- 2026-10-22 10:07:16 UTC — [ticket-532] securite: PASS — Aucune vulnérabilité détectée. Le diff corrige un bug d'exécution en checkout po (150328ms)
+- 2026-10-22 10:07:16 UTC — [ticket-532] tour 1 — reviewer démarré
+- 2026-10-22 10:07:35 UTC — [ticket-532] tour 1 — reviewer terminé (18531ms)
+- 2026-10-22 10:09:32 UTC — [ticket-532] validateur: fichiers cités joints : routers/orchestrator.py (tronqué)
+- 2026-10-22 10:09:32 UTC — [ticket-532] validateur: APPROVED — Tous les critères sont satisfaits. Le code modifié dans `routers/orchestrator.py (136265ms)
+- 2026-10-22 10:09:32 UTC — [ticket-532] APPROVED après 1 tour(s)
+- 2026-10-22 10:11:08 UTC — [ticket-532] documentation: 3 fichier(s) (90188ms)
+- 2026-10-22 10:11:26 UTC — [ide-core] ticket-532 PR #598 confiée au CIWatcher
+- 2026-10-22 10:16:56 UTC — [ide-core] ticket-532 PR #598 mergée (CI verte)
+- 2026-10-22 11:29:09 UTC — [ticket-534] branche ticket-534-a-documentation-role-declared-inactive-is-not-cal
+- 2026-10-22 11:29:10 UTC — [ticket-534] tour 1 — codeur démarré
+- 2026-10-22 11:33:16 UTC — [ticket-534] tour 1 — codeur terminé (245047ms)
+- 2026-10-22 11:43:11 UTC — [ticket-534] testeur: OK (exit 0)
+- 2026-10-22 11:44:50 UTC — [ticket-534] securite: PASS — Audit complet du diff passé en revue : aucune vulnérabilité détectée.
+
+Le change (99454ms)
+- 2026-10-22 11:44:50 UTC — [ticket-534] tour 1 — reviewer démarré
+- 2026-10-22 11:45:09 UTC — [ticket-534] tour 1 — reviewer terminé (18484ms)
+- 2026-10-22 11:48:03 UTC — [ticket-534] validateur: fichiers cités joints : agents.json, memory/documentation.json
+- 2026-10-22 11:48:03 UTC — [ticket-534] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests couvrent les différen (192265ms)
+- 2026-10-22 11:48:03 UTC — [ticket-534] APPROVED après 1 tour(s)
+- 2026-10-22 11:51:07 UTC — [ticket-534] documentation: 1 fichier(s) (179280ms) — après tour de correction
+- 2026-10-22 11:51:25 UTC — [ide-core] ticket-534 PR #600 confiée au CIWatcher
+- 2026-10-22 11:51:28 UTC — [ticket-536] branche ticket-536-a-worktree-runs-its-declared-setup-command-before
+- 2026-10-22 11:51:29 UTC — [ticket-536] tour 1 — codeur démarré
+- 2026-10-22 11:57:13 UTC — [ide-core] ticket-534 PR #600 mergée (CI verte)
+- 2026-10-22 11:57:15 UTC — [ticket-536] tour 1 — codeur terminé (346655ms)
+- 2026-10-22 12:08:49 UTC — [ticket-536] testeur: 1 failed, 3462 passed, 57 warnings in 676.99s (0:11:16)
+- 2026-10-22 12:08:49 UTC — [ticket-536] tests rouges au tour 1
+- 2026-10-22 12:08:49 UTC — [ticket-536] tour 2 — codeur démarré
+- 2026-10-22 12:13:38 UTC — [ticket-536] tour 2 — codeur terminé (289390ms)
+- 2026-10-22 12:26:08 UTC — [ticket-536] testeur: 1 failed, 1083 passed, 56 warnings in 740.22s (0:12:20)
+- 2026-10-22 12:26:08 UTC — [ticket-536] tests rouges au tour 2
+- 2026-10-22 12:26:08 UTC — [ticket-536] tour 3 — codeur démarré
+- 2026-10-22 12:28:13 UTC — [ticket-536] tour 3 — codeur terminé (124984ms)
+- 2026-10-22 12:41:15 UTC — [ticket-536] testeur: OK (exit 0)
+- 2026-10-22 12:43:43 UTC — [ticket-536] securite: PASS — Aucune vulnérabilité détectée. Le code setup du worktree utilise correctement sh (147280ms)
+- 2026-10-22 12:43:44 UTC — [ticket-536] tour 3 — reviewer démarré
+- 2026-10-22 12:44:14 UTC — [ticket-536] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : créneau occupé depuis plus de 30 s
+- 2026-10-22 12:44:18 UTC — [ticket-536] tour 3 — reviewer terminé (33593ms)
+- 2026-10-22 12:44:46 UTC — [ticket-536] validateur: fichiers cités joints : models/worktree_config.py ; absents : worktree.env
+- 2026-10-22 12:44:46 UTC — [ticket-536] validateur: APPROVED — Tous les critères sont satisfaits. Le champ `setup` est ajouté à `ConfigWorktree (63047ms)
+- 2026-10-22 12:44:46 UTC — [ticket-536] APPROVED après 3 tour(s)
+- 2026-10-22 12:47:31 UTC — [ticket-536] documentation: 1 fichier(s) (153609ms)
+- 2026-10-22 12:47:52 UTC — [ide-core] ticket-536 PR #601 confiée au CIWatcher
+- 2026-10-22 12:53:33 UTC — [ide-core] ticket-536 PR #601 mergée (CI verte)
+- 2026-10-22 15:37:26 UTC — [ticket-538] branche ticket-538-the-worktree-setup-step-is-visible-in-the-events
+- 2026-10-22 15:37:28 UTC — [ticket-538] tour 1 — codeur démarré
+- 2026-10-22 15:43:36 UTC — [ticket-538] tour 1 — codeur terminé (368046ms)
+- 2026-10-22 15:58:25 UTC — [ticket-538] testeur: OK (exit 0)
+- 2026-10-22 16:00:05 UTC — [ticket-538] securite: PASS — Aucune vulnérabilité détectée. Restructuration du type Preparation pour inclure  (99985ms)
+- 2026-10-22 16:00:05 UTC — [ticket-538] tour 1 — reviewer démarré
+- 2026-10-22 16:00:30 UTC — [ticket-538] tour 1 — reviewer terminé (24360ms)
+- 2026-10-22 16:02:41 UTC — [ticket-538] validateur: fichiers cités joints : services/preparation_worktree.py
+- 2026-10-22 16:02:41 UTC — [ticket-538] validateur: APPROVED — Tous les critères d'acceptation ont été implémentés et testés. Le type d'événeme (155920ms)
+- 2026-10-22 16:02:41 UTC — [ticket-538] APPROVED après 1 tour(s)
+- 2026-10-22 16:05:30 UTC — [ticket-538] documentation: 1 fichier(s) (163609ms)
+- 2026-10-23 06:57:46 UTC — [ticket-535] branche ticket-535-batch-documentation-is-written-from-the-delivered
+- 2026-10-23 06:59:12 UTC — [ticket-535] plan rendu (84889ms)
+- 2026-10-23 06:59:12 UTC — [ticket-535] tour 1 — codeur démarré
+- 2026-10-23 07:02:45 UTC — [ticket-535] tour 1 — architect terminé (213093ms)
+- 2026-10-23 07:13:08 UTC — [ticket-535] testeur: OK (exit 0)
+- 2026-10-23 07:13:39 UTC — [ticket-535] securite: PASS — Aucune vulnérabilité détectée. Ce diff contient uniquement de la documentation d (30422ms)
+- 2026-10-23 07:13:39 UTC — [ticket-535] tour 1 — reviewer démarré
+- 2026-10-23 07:14:04 UTC — [ticket-535] tour 1 — reviewer terminé (25187ms)
+- 2026-10-23 07:18:39 UTC — [ticket-535] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-23 07:19:11 UTC — [ticket-535] validateur: fichiers cités joints : memory/decisions.md (tronqué)
+- 2026-10-23 07:19:11 UTC — [ticket-535] validateur: APPROVED — La conception est complète et bien structurée. ADR-057 décrit précisément ce que (332155ms)
+- 2026-10-23 07:19:11 UTC — [ticket-535] APPROVED après 1 tour(s)
+- 2026-10-23 07:19:16 UTC — [ticket-535] fichiers non suivis laissés par le run : tickets/todo/ticket-540-documentation-code-material-filtered-bounded-diff-per-ticket-and-touched-files.md, tickets/todo/ticket-541-the-documentation-batch-reads-the-delivered-code-oldest-tickets-first.md, tickets/todo/ticket-542-a-documentation-edit-must-quote-the-code-that-supports-it.md, tickets/todo/ticket-543-documentation-roles-default-to-sonnet.md (à ignorer dans .gitignore ?)
+- 2026-10-23 07:21:10 UTC — [ticket-535] documentation: 1 fichier(s) (114218ms)
+- 2026-10-23 07:26:59 UTC — [ide-core] ticket-535 PR #606 mergée (CI verte)
+- 2026-10-23 08:07:35 UTC — [ticket-540] branche ticket-540-documentation-code-material-a-filtered-bounded-di
+- 2026-10-23 08:07:37 UTC — [ticket-540] tour 1 — codeur démarré
+- 2026-10-23 08:22:07 UTC — [ticket-540] tour 1 — codeur terminé (869594ms)
+- 2026-10-23 08:37:52 UTC — [ticket-540] testeur: OK (exit 0)
+- 2026-10-23 08:40:16 UTC — [ticket-540] securite: PASS — Aucune vulnérabilité de sécurité détectée. Le code introduit deux nouveaux modul (143686ms)
+- 2026-10-23 08:40:16 UTC — [ticket-540] tour 1 — reviewer démarré
+- 2026-10-23 08:40:46 UTC — [ticket-540] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : créneau occupé depuis plus de 30 s
+- 2026-10-23 08:40:58 UTC — [ticket-540] tour 1 — reviewer terminé (41296ms)
+- 2026-10-23 08:42:13 UTC — [ticket-540] validateur: fichiers cités joints : services/documentation_code.py, tickets/ (dossier, 0 fichiers), memory/ (dossier, 8 fichiers), agents.json, README.md, docs/ (dossier, 6 fichiers), projects/ (dossier, 0 fichiers), backend/ (dossier, 8 fichiers)
+- 2026-10-23 08:42:13 UTC — [ticket-540] validateur: APPROVED — Le codeur a livré une implémentation complète et bien testée du ticket-540 : deu (116640ms)
+- 2026-10-23 08:42:13 UTC — [ticket-540] APPROVED après 1 tour(s)
+- 2026-10-23 08:43:17 UTC — [ticket-540] documentation: 1 fichier(s) (50421ms)
+- 2026-10-23 08:49:39 UTC — [ide-core] ticket-540 PR #608 mergée (CI verte)
+- 2026-10-23 08:49:45 UTC — [ide-core] ticket-540 : base réalignée sur develop
+- 2026-10-23 08:49:45 UTC — [ide-core] ticket-540 PR #608 confiée au CIWatcher
+- 2026-10-23 08:50:01 UTC — [ticket-543] branche ticket-543-documentation-roles-default-to-sonnet
+- 2026-10-23 08:50:06 UTC — [ticket-543] tour 1 — codeur démarré
+- 2026-10-23 08:53:18 UTC — [ticket-543] tour 1 — codeur terminé (192000ms)
+- 2026-10-23 09:08:21 UTC — [ticket-543] testeur: OK (exit 0)
+- 2026-10-23 09:09:13 UTC — [ticket-543] securite: PASS — Aucune vulnérabilité détectée. Le diff modifie simplement la configuration des m (52422ms)
+- 2026-10-23 09:09:13 UTC — [ticket-543] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-10-23 09:09:13 UTC — [ticket-543] tour 1 — reviewer démarré
+- 2026-10-23 09:09:28 UTC — [ticket-543] tour 1 — reviewer terminé (15047ms)
+- 2026-10-23 09:09:47 UTC — [ticket-543] validateur: fichiers cités joints : services/documentation.py (tronqué) ; non joints (budget épuisé) : modeles_par_defaut.py, agents.json
+- 2026-10-23 09:09:47 UTC — [ticket-543] validateur: APPROVED — Tous les critères sont satisfaits. Le code ajoute correctement `ROLES_REDACTION` (33436ms)
+- 2026-10-23 09:09:47 UTC — [ticket-543] APPROVED après 1 tour(s)
+- 2026-10-23 09:12:18 UTC — [ticket-543] documentation: 0 fichier(s) (126625ms)
+- 2026-10-23 09:12:34 UTC — [ide-core] ticket-543 PR #611 confiée au CIWatcher
+- 2026-10-23 09:12:37 UTC — [ticket-541] branche ticket-541-the-documentation-batch-reads-the-delivered-code
+- 2026-10-23 09:12:37 UTC — [ticket-541] base non réalignée — git command failed (code 128): git -c core.hooksPath=C:\Users\BENJAM~1.CHA\AppData\Local\Temp\tessera-sans-hooks -c core.quotePath=false -c core.longpaths=true checkout develop
+fatal: 'develop' is already used by worktree at 'C:/tmp/wt-tix'
+
+- 2026-10-23 09:12:38 UTC — [ticket-541] tour 1 — codeur démarré
+- 2026-10-23 09:18:09 UTC — [ide-core] ticket-543 PR #611 mergée (CI verte)
+- 2026-10-23 09:19:45 UTC — [ticket-541] tour 1 — codeur terminé (427610ms)
+- 2026-10-23 09:38:11 UTC — [ticket-541] testeur: OK (exit 0)
+- 2026-10-23 09:40:06 UTC — [ticket-541] securite: PASS — Aucune vulnérabilité détectée. Le diff introduit la fourniture de diffs réels et (114172ms)
+- 2026-10-23 09:40:06 UTC — [ticket-541] tour 1 — reviewer démarré
+- 2026-10-23 09:40:50 UTC — [ticket-541] tour 1 — reviewer terminé (44452ms)
+- 2026-10-23 09:45:08 UTC — [ticket-541] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-23 09:46:21 UTC — [ticket-541] validateur: fichiers cités joints : agents/prompts/doc-technique.md, agents/prompts/doc-fonctionnelle.md, test_documentation.py (tronqué) ; non joints (budget épuisé) : test_consignes_coherentes.py
+- 2026-10-23 09:46:21 UTC — [ticket-541] validateur: APPROVED — Le ticket 541 intègre avec succès la matière de code (diffs et fichiers touchés) (375047ms)
+- 2026-10-23 09:46:21 UTC — [ticket-541] APPROVED après 1 tour(s)
+- 2026-10-23 09:48:37 UTC — [ticket-541] documentation: 0 fichier(s) (118452ms)
+- 2026-10-23 09:53:31 UTC — [ide-core] ticket-541 PR #614 mergée (CI verte)
+- 2026-10-23 09:53:32 UTC — [ide-core] ticket-541 : base réalignée sur develop
+- 2026-10-23 09:53:32 UTC — [ide-core] ticket-541 PR #614 confiée au CIWatcher
+- 2026-10-23 09:53:35 UTC — [ticket-542] branche ticket-542-a-documentation-edit-must-quote-the-code-that-sup
+- 2026-10-23 09:53:35 UTC — [ticket-542] base non réalignée — git command failed (code 128): git -c core.hooksPath=C:\Users\BENJAM~1.CHA\AppData\Local\Temp\tessera-sans-hooks -c core.quotePath=false -c core.longpaths=true checkout develop
+fatal: 'develop' is already used by worktree at 'C:/tmp/wt-tix'
+
+- 2026-10-23 09:53:36 UTC — [ticket-542] tour 1 — codeur démarré
+- 2026-10-23 10:03:34 UTC — [ticket-542] tour 1 — codeur terminé (598765ms)
+- 2026-10-23 10:11:44 UTC — [ticket-542] testeur: OK (exit 0)
+- 2026-10-23 10:13:34 UTC — [ticket-542] securite: PASS — Le diff implémente le contrôle des preuves de documentation (ADR-057, ticket-542 (110375ms)
+- 2026-10-23 10:13:34 UTC — [ticket-542] tour 1 — reviewer démarré
+- 2026-10-23 10:14:30 UTC — [ticket-542] tour 1 — reviewer terminé (55906ms)
+- 2026-10-23 10:18:34 UTC — [ticket-542] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-23 10:19:41 UTC — [ticket-542] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le diff introduit un contrôle m (366484ms)
+- 2026-10-23 10:19:41 UTC — [ticket-542] APPROVED après 1 tour(s)
+- 2026-10-23 10:21:26 UTC — [ticket-542] documentation: 0 fichier(s) (100593ms)
+- 2026-10-23 10:21:44 UTC — [ide-core] ticket-542 PR #615 confiée au CIWatcher
+- 2026-10-23 10:21:46 UTC — [ticket-544] branche ticket-544-a-backend-file-can-no-longer-grow-past-its-ceilin
+- 2026-10-23 10:21:46 UTC — [ticket-544] base non réalignée — git command failed (code 128): git -c core.hooksPath=C:\Users\BENJAM~1.CHA\AppData\Local\Temp\tessera-sans-hooks -c core.quotePath=false -c core.longpaths=true checkout develop
+fatal: 'develop' is already used by worktree at 'C:/tmp/wt-tix'
+
+- 2026-10-23 10:21:47 UTC — [ticket-544] tour 1 — codeur démarré
+- 2026-10-23 10:23:41 UTC — [ticket-544] tour 1 — codeur terminé (113844ms)
+- 2026-10-23 10:27:33 UTC — [ide-core] ticket-542 PR #615 mergée (CI verte)
+- 2026-10-23 10:32:08 UTC — [ticket-544] testeur: OK (exit 0)
+- 2026-10-23 10:33:31 UTC — [ticket-544] securite: PASS — Path traversal en LOW dans un test helper interne, jamais exploitée car les chem (82750ms)
+- 2026-10-23 10:33:31 UTC — [ticket-544] tour 1 — reviewer démarré
+- 2026-10-23 10:33:44 UTC — [ticket-544] tour 1 — reviewer terminé (13077ms)
+- 2026-10-23 10:36:06 UTC — [ticket-544] validateur: fichiers cités joints : backend/tests/test_longueur_des_fichiers.py, backend/src/tessera (dossier, 6 fichiers)
+- 2026-10-23 10:36:06 UTC — [ticket-544] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le test vérifie bien que les fic (155468ms)
+- 2026-10-23 10:36:06 UTC — [ticket-544] APPROVED après 1 tour(s)
+- 2026-10-23 10:38:31 UTC — [ticket-544] documentation: 0 fichier(s) (139233ms) — après tour de correction
+- 2026-10-23 10:38:47 UTC — [ticket-544] livraison: rebase sur develop (828ms)
+- 2026-10-23 10:38:47 UTC — [ticket-544] livraison: PR #616 ouverte (4547ms)
+- 2026-10-23 10:42:51 UTC — [ticket-544] livraison: arrêt — PR #616 non mergée : CI failing : la PR #616 reste ouverte.
+- 2026-10-23 10:42:51 UTC — [ide-core] file interrompue : ticket-544 non mergé
+- 2026-10-23 11:55:44 UTC — [ticket-549] branche ticket-549-an-agent-s-health-is-visible-active-waiting-suspe
+- 2026-10-23 11:56:53 UTC — [ticket-549] plan rendu (67453ms)
+- 2026-10-23 11:56:53 UTC — [ticket-549] tour 1 — codeur démarré
+- 2026-10-23 11:59:04 UTC — [ticket-549] tour 1 — codeur terminé (131078ms)
+- 2026-10-23 12:14:05 UTC — [ticket-549] testeur: OK (exit 0)
+- 2026-10-23 12:15:56 UTC — [ticket-549] securite: PASS — Aucune vulnérabilité détectée. Le code suit les bonnes pratiques React en matièr (111360ms)
+- 2026-10-23 12:15:56 UTC — [ticket-549] tour 1 — reviewer démarré
+- 2026-10-23 12:16:22 UTC — [ticket-549] tour 1 — reviewer terminé (25593ms)
+- 2026-10-23 12:16:26 UTC — [ticket-549] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : créneau occupé depuis plus de 30 s
+- 2026-10-23 12:16:51 UTC — [ticket-549] validateur: fichiers cités joints : backend/ (dossier, 8 fichiers)
+- 2026-10-23 12:16:51 UTC — [ticket-549] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le ticket introduit une pastill (54485ms)
+- 2026-10-23 12:16:51 UTC — [ticket-549] APPROVED après 1 tour(s)
+- 2026-10-23 12:21:01 UTC — [ticket-549] documentation: 0 fichier(s) (238952ms)
+- 2026-10-23 12:27:05 UTC — [ide-core] ticket-549 PR #617 mergée (CI verte)
+- 2026-10-23 12:27:07 UTC — [ide-core] ticket-549 : base réalignée sur develop
+- 2026-10-23 12:27:07 UTC — [ide-core] ticket-549 PR #617 confiée au CIWatcher
+- 2026-10-23 12:27:10 UTC — [ticket-550] branche ticket-550-design-of-the-office-view-that-replaces-supervisi
+- 2026-10-23 12:28:51 UTC — [ticket-550] plan rendu (99796ms)
+- 2026-10-23 12:28:51 UTC — [ticket-550] tour 1 — codeur démarré
+- 2026-10-23 12:36:40 UTC — [ticket-550] tour 1 — architect terminé (469610ms)
+- 2026-10-23 12:47:06 UTC — [ticket-550] testeur: OK (exit 0)
+- 2026-10-23 12:48:10 UTC — [ticket-550] securite: PASS — Aucune vulnérabilité détectée. Ce diff contient uniquement de la documentation d (64000ms)
+- 2026-10-23 12:48:10 UTC — [ticket-550] tour 1 — reviewer démarré
+- 2026-10-23 12:48:54 UTC — [ticket-550] tour 1 — reviewer terminé (43717ms)
+- 2026-10-23 12:53:10 UTC — [ticket-550] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-23 12:53:44 UTC — [ticket-550] validateur: fichiers cités joints : memory/decisions.md (tronqué) ; non joints (budget épuisé) : design/maquette/Bureau.dc.html, design/maquette/Bureau-Compact.dc.html
+- 2026-10-23 12:53:44 UTC — [ticket-550] validateur: APPROVED — Conception complète et conforme. L'ADR-058 articule bien le remplacement de Supe (333890ms)
+- 2026-10-23 12:53:44 UTC — [ticket-550] CHANGES_REQUESTED tour 1: Reviewer : ## Problèmes bloquants
+- 2026-10-23 12:53:44 UTC — [ticket-550] tour 2 — codeur démarré
+- 2026-10-23 12:54:30 UTC — [ticket-550] tour 2 — architect terminé (46562ms)
+- 2026-10-23 13:05:39 UTC — [ticket-550] testeur: OK (exit 0)
+- 2026-10-23 13:06:25 UTC — [ticket-550] securite: PASS — Diff composé uniquement de documentation (spécification, contraintes, décision a (45469ms)
+- 2026-10-23 13:06:25 UTC — [ticket-550] tour 2 — reviewer démarré
+- 2026-10-23 13:06:45 UTC — [ticket-550] tour 2 — reviewer terminé (19906ms)
+- 2026-10-23 13:11:25 UTC — [ticket-550] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-23 13:12:13 UTC — [ticket-550] validateur: fichiers cités joints : memory/decisions.md (tronqué) ; non joints (budget épuisé) : design/maquette/Bureau.dc.html, design/maquette/Bureau-Compact.dc.html
+- 2026-10-23 13:12:13 UTC — [ticket-550] validateur: APPROVED — La conception complète du Bureau est livrée et conforme. L'ADR-058 clarifie le r (348405ms)
+- 2026-10-23 13:12:13 UTC — [ticket-550] APPROVED après 2 tour(s)
+- 2026-10-23 13:12:18 UTC — [ticket-550] fichiers non suivis laissés par le run : tickets/todo/ticket-558-a-quota-reading-is-kept-per-window-and-readable-outside-a-run.md, tickets/todo/ticket-559-an-outside-wait-and-a-conflict-resolution-are-announced-as-events.md, tickets/todo/ticket-560-the-remaining-tickets-of-a-live-queue-count-appended-ones.md, tickets/todo/ticket-561-the-office-view-selectors-are-pure-functions.md, tickets/todo/ticket-562-the-office-sprites-and-a-project-room.md, tickets/todo/ticket-563-the-office-folders-mailbox-and-server-rack.md, tickets/todo/ticket-564-the-office-break-room-meeting-room-and-a-health-that-can-wait.md, tickets/todo/ticket-565-the-office-day-board.md, tickets/todo/ticket-566-the-office-to-you-column-and-the-sound-alert.md, tickets/todo/ticket-567-the-office-becomes-the-default-supervision-view.md (à ignorer dans .gitignore ?)
+- 2026-10-23 13:13:49 UTC — [ticket-550] documentation: 0 fichier(s) (91530ms)
+- 2026-10-23 13:14:08 UTC — [ide-core] ticket-550 PR #618 confiée au CIWatcher
+- 2026-10-23 13:14:10 UTC — [ticket-545] branche ticket-545-a-frontend-file-can-no-longer-grow-past-its-ceili
+- 2026-10-23 13:14:11 UTC — [ticket-545] tour 1 — codeur démarré
+- 2026-10-23 13:15:34 UTC — [ticket-545] tour 1 — codeur terminé (83015ms)
+- 2026-10-23 13:25:44 UTC — [ticket-545] testeur: OK (exit 0)
+- 2026-10-23 13:26:36 UTC — [ticket-545] securite: PASS — Nouveau fichier de test sans vulnérabilité identifiée. Le cliquet sur la longueu (52453ms)
+- 2026-10-23 13:26:38 UTC — [ticket-545] tour 1 — reviewer démarré
+- 2026-10-23 13:26:57 UTC — [ticket-545] tour 1 — reviewer terminé (19264ms)
+- 2026-10-23 13:29:30 UTC — [ticket-545] validateur: fichiers cités joints : frontend/src/longueur-des-fichiers.test.ts, frontend/src (dossier, 8 fichiers), frontend/eslint.config.js ; absents : .ts, .tsx
+- 2026-10-23 13:29:30 UTC — [ticket-545] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le fichier `frontend/src/longueu (173953ms)
+- 2026-10-23 13:29:30 UTC — [ticket-545] APPROVED après 1 tour(s)
+- 2026-10-23 13:30:11 UTC — [ide-core] ticket-550 PR #618 mergée (CI verte)
+- 2026-10-23 13:33:54 UTC — [ticket-545] documentation: 0 fichier(s) (258765ms) — après tour de correction
+- 2026-10-23 13:34:15 UTC — [ide-core] ticket-545 PR #620 confiée au CIWatcher
+- 2026-10-23 13:34:19 UTC — [ticket-547] branche ticket-547-a-push-is-refused-when-the-added-lines-carry-a-re
+- 2026-10-23 13:34:20 UTC — [ticket-547] tour 1 — codeur démarré
+- 2026-10-23 13:39:08 UTC — [ticket-547] tour 1 — codeur terminé (288219ms)
+- 2026-10-23 13:39:47 UTC — [ide-core] ticket-545 PR #620 mergée (CI verte)
+- 2026-10-23 13:40:18 UTC — [ide-core] ticket-546 retiré de la file
+- 2026-10-23 13:40:18 UTC — [ide-core] ticket-548 retiré de la file
+- 2026-10-23 13:40:18 UTC — [ide-core] ticket-552 retiré de la file
+- 2026-10-23 13:40:18 UTC — [ide-core] ticket-553 retiré de la file
+- 2026-10-23 13:40:18 UTC — [ide-core] ticket-556 retiré de la file
+- 2026-10-23 13:40:18 UTC — [ide-core] ticket-554 retiré de la file
+- 2026-10-23 13:40:18 UTC — [ide-core] ticket-558 retiré de la file
+- 2026-10-23 13:40:18 UTC — [ide-core] ticket-559 retiré de la file
+- 2026-10-23 13:40:18 UTC — [ide-core] ticket-560 retiré de la file
+- 2026-10-23 13:40:18 UTC — [ide-core] ticket-561 retiré de la file
+- 2026-10-23 13:40:18 UTC — [ide-core] ticket-562 retiré de la file
+- 2026-10-23 13:40:19 UTC — [ide-core] ticket-563 retiré de la file
+- 2026-10-23 13:40:19 UTC — [ide-core] ticket-564 retiré de la file
+- 2026-10-23 13:40:19 UTC — [ide-core] ticket-565 retiré de la file
+- 2026-10-23 13:40:19 UTC — [ide-core] ticket-566 retiré de la file
+- 2026-10-23 13:40:19 UTC — [ide-core] ticket-567 retiré de la file
+- 2026-10-23 13:40:19 UTC — [ide-core] ticket-555 retiré de la file
+- 2026-10-23 13:46:23 UTC — [ticket-547] testeur: 1 failed, 1700 passed, 56 warnings in 431.94s (0:07:11)
+- 2026-10-23 13:46:23 UTC — [ticket-547] tests rouges au tour 1
+- 2026-10-23 13:46:24 UTC — [ticket-547] tour 2 — codeur démarré
+- 2026-10-23 13:47:48 UTC — [ticket-547] tour 2 — codeur terminé (84202ms)
+- 2026-10-23 13:56:14 UTC — [ticket-547] testeur: OK (exit 0)
+- 2026-10-23 14:00:31 UTC — [ticket-547] securite: PASS — Aucune vulnérabilité introduite. Le contrôle de secrets s'appuie sur des pattern (256250ms)
+- 2026-10-23 14:00:31 UTC — [ticket-547] tour 2 — reviewer démarré
+- 2026-10-23 14:00:49 UTC — [ticket-547] tour 2 — reviewer terminé (18640ms)
+- 2026-10-23 14:03:51 UTC — [ticket-547] validateur: fichiers cités joints : backend/src/tessera/services/secrets_diff.py
+- 2026-10-23 14:03:51 UTC — [ticket-547] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (200187ms)
+- 2026-10-23 14:03:51 UTC — [ticket-547] APPROVED après 2 tour(s)
+- 2026-10-23 14:11:48 UTC — [ticket-547] documentation: 2 fichier(s) (471125ms) — après tour de correction
+- 2026-10-23 14:12:09 UTC — [ide-core] ticket-547 PR #622 confiée au CIWatcher
+- 2026-10-23 14:12:11 UTC — [ticket-568] branche ticket-568-the-tests-run-again-before-the-push-when-the-reba
+- 2026-10-23 14:13:28 UTC — [ticket-568] plan rendu (76061ms)
+- 2026-10-23 14:13:28 UTC — [ticket-568] tour 1 — codeur démarré
+- 2026-10-23 14:17:42 UTC — [ide-core] ticket-547 PR #622 mergée (CI verte)
+- 2026-10-23 14:19:43 UTC — [ticket-568] tour 1 — codeur terminé (374843ms)
+- 2026-10-23 14:29:21 UTC — [ticket-568] testeur: OK (exit 0)
+- 2026-10-23 14:31:11 UTC — [ticket-568] securite: PASS — Aucune vulnérabilité CRITICAL ou HIGH détectée. Le diff ajoute une fonctionnalit (109967ms)
+- 2026-10-23 14:31:11 UTC — [ticket-568] tour 1 — reviewer démarré
+- 2026-10-23 14:31:37 UTC — [ticket-568] tour 1 — reviewer terminé (26625ms)
+- 2026-10-23 14:36:11 UTC — [ticket-568] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-23 14:36:54 UTC — [ticket-568] validateur: fichiers cités joints : memory/pipeline-log.md (tronqué)
+- 2026-10-23 14:36:54 UTC — [ticket-568] validateur: APPROVED — Les quatre critères sont satisfaits. Le code implémente le retest après rebase v (343594ms)
+- 2026-10-23 14:36:54 UTC — [ticket-568] APPROVED après 1 tour(s)
+- 2026-10-23 14:42:45 UTC — [ticket-568] documentation: 0 fichier(s) (345702ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « preuve » — l'extrait « Dans la phase 1 de livraison, après le rebase et avant le pu » (ticket-568) n'est ni dans 
+- 2026-10-23 17:17:14 UTC — [ticket-546] branche ticket-546-git-workspace-py-is-split-into-a-package-one-modu
+- 2026-10-23 17:18:21 UTC — [ticket-546] plan rendu (66125ms)
+- 2026-10-23 17:18:21 UTC — [ticket-546] tour 1 — codeur démarré
+- 2026-10-23 17:26:48 UTC — [ticket-546] tour 1 — codeur terminé (507030ms)
+- 2026-10-23 17:35:17 UTC — [ticket-546] testeur: OK (exit 0)
+- 2026-10-23 17:37:42 UTC — [ticket-546] securite: PASS — Refactorisation structurelle sans régression de sécurité. Le diff supprime un fi (144891ms)
+- 2026-10-23 17:37:42 UTC — [ticket-546] tour 1 — reviewer démarré
+- 2026-10-23 17:38:20 UTC — [ticket-546] tour 1 — reviewer terminé (37375ms)
+- 2026-10-23 17:42:43 UTC — [ticket-546] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-23 17:43:34 UTC — [ticket-546] validateur: fichiers cités joints : backend/src/tessera/services/git_workspace/ (dossier, 17 fichiers), __init__.py, backend/tests/ (dossier, 289 fichiers, tronqué), backend/tests/test_longueur_des_fichiers.py ; absents : backend/src/tessera/services/git_workspace.py, git_workspace.py
+- 2026-10-23 17:43:34 UTC — [ticket-546] validateur: APPROVED — Refactorisation réussie : le monolithe `git_workspace.py` (2294 lignes) est deve (352171ms)
+- 2026-10-23 17:43:34 UTC — [ticket-546] APPROVED après 1 tour(s)
+- 2026-10-23 17:50:38 UTC — [ticket-546] documentation: 0 fichier(s) (418812ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « jeton vérifiable » — guillemets « tests relancés après rebase : rouges » n'est ni dans le texte remplacé, ni dans
+- 2026-10-23 17:52:28 UTC — [ide-core] ticket-548 retiré de la file
+- 2026-10-23 17:52:28 UTC — [ide-core] ticket-552 retiré de la file
+- 2026-10-23 17:52:28 UTC — [ide-core] ticket-553 retiré de la file
+- 2026-10-23 17:52:28 UTC — [ide-core] ticket-556 retiré de la file
+- 2026-10-23 17:52:28 UTC — [ide-core] ticket-554 retiré de la file
+- 2026-10-23 17:52:28 UTC — [ide-core] ticket-558 retiré de la file
+- 2026-10-23 17:52:28 UTC — [ide-core] ticket-559 retiré de la file
+- 2026-10-23 17:52:28 UTC — [ide-core] ticket-560 retiré de la file
+- 2026-10-23 17:52:28 UTC — [ide-core] ticket-561 retiré de la file
+- 2026-10-23 17:52:28 UTC — [ide-core] ticket-562 retiré de la file
+- 2026-10-23 17:52:28 UTC — [ide-core] ticket-563 retiré de la file
+- 2026-10-23 17:52:28 UTC — [ide-core] ticket-564 retiré de la file
+- 2026-10-23 17:52:28 UTC — [ide-core] ticket-565 retiré de la file
+- 2026-10-23 17:52:28 UTC — [ide-core] ticket-566 retiré de la file
+- 2026-10-23 17:52:28 UTC — [ide-core] ticket-567 retiré de la file
+- 2026-10-23 17:52:28 UTC — [ide-core] ticket-555 retiré de la file
+- 2026-10-23 17:52:28 UTC — [ide-core] ticket-570 retiré de la file
+- 2026-10-23 17:52:28 UTC — [ide-core] ticket-569 retiré de la file
+- 2026-10-23 18:02:48 UTC — [ide-core] ticket-546 PR #625 mergée (CI verte)
+- 2026-10-23 18:02:50 UTC — [ide-core] ticket-546 : base réalignée sur develop
+- 2026-10-23 18:02:50 UTC — [ide-core] ticket-546 PR #625 confiée au CIWatcher
+- 2026-10-23 18:02:52 UTC — [ticket-571] branche ticket-571-the-test-command-is-cut-at-its-deadline-even-when
+- 2026-10-23 18:03:37 UTC — [ide-core] ticket-548 retiré de la file
+- 2026-10-23 18:03:37 UTC — [ide-core] ticket-552 retiré de la file
+- 2026-10-23 18:03:37 UTC — [ide-core] ticket-553 retiré de la file
+- 2026-10-23 18:03:37 UTC — [ide-core] ticket-556 retiré de la file
+- 2026-10-23 18:03:37 UTC — [ide-core] ticket-554 retiré de la file
+- 2026-10-23 18:03:37 UTC — [ide-core] ticket-558 retiré de la file
+- 2026-10-23 18:03:37 UTC — [ide-core] ticket-559 retiré de la file
+- 2026-10-23 18:03:37 UTC — [ide-core] ticket-560 retiré de la file
+- 2026-10-23 18:03:37 UTC — [ide-core] ticket-561 retiré de la file
+- 2026-10-23 18:03:37 UTC — [ide-core] ticket-562 retiré de la file
+- 2026-10-23 18:03:37 UTC — [ide-core] ticket-563 retiré de la file
+- 2026-10-23 18:03:37 UTC — [ide-core] ticket-564 retiré de la file
+- 2026-10-23 18:03:37 UTC — [ide-core] ticket-565 retiré de la file
+- 2026-10-23 18:03:37 UTC — [ide-core] ticket-566 retiré de la file
+- 2026-10-23 18:03:37 UTC — [ide-core] ticket-567 retiré de la file
+- 2026-10-23 18:03:37 UTC — [ide-core] ticket-555 retiré de la file
+- 2026-10-23 18:03:37 UTC — [ide-core] ticket-570 retiré de la file
+- 2026-10-23 18:03:37 UTC — [ide-core] ticket-569 retiré de la file
+- 2026-10-23 18:03:47 UTC — [ticket-571] plan rendu (54281ms)
+- 2026-10-23 18:03:47 UTC — [ticket-571] tour 1 — codeur démarré
+- 2026-10-23 18:09:03 UTC — [ticket-571] tour 1 — codeur terminé (315343ms)
+- 2026-10-23 18:15:21 UTC — [ticket-571] testeur: 1 failed, 1641 passed, 64 warnings in 375.64s (0:06:15)
+- 2026-10-23 18:15:21 UTC — [ticket-571] tests rouges au tour 1
+- 2026-10-23 18:15:21 UTC — [ticket-571] tour 2 — codeur démarré
+- 2026-10-23 18:17:23 UTC — [ticket-571] tour 2 — codeur terminé (122110ms)
+- 2026-10-23 18:25:00 UTC — [ticket-571] testeur: OK (exit 0)
+- 2026-10-23 18:27:13 UTC — [ticket-571] securite: PASS — Ticket-571: Timeout handling refactor is secure. Thread-safe implementation with (133483ms)
+- 2026-10-23 18:27:14 UTC — [ticket-571] tour 2 — reviewer démarré
+- 2026-10-23 18:28:05 UTC — [ticket-571] tour 2 — reviewer terminé (51781ms)
+- 2026-10-23 18:32:14 UTC — [ticket-571] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-23 18:32:53 UTC — [ticket-571] validateur: fichiers cités joints : memory/pipeline-log.md (tronqué)
+- 2026-10-23 18:32:53 UTC — [ticket-571] validateur: CHANGES_REQUESTED — Les trois premiers critères sont bien satisfaits : le minuteur indépendant de la (339296ms)
+- 2026-10-23 18:32:53 UTC — [ticket-571] CHANGES_REQUESTED tour 2: Validateur : Les trois premiers critères sont bien satisfaits : le minuteur indépendant de la boucle tue la commande à l'échéance (test de blocage), s'annule quand elle finit à temps (test du cancel),
+- 2026-10-23 18:32:53 UTC — [ticket-571] tour 3 — codeur démarré
+- 2026-10-23 18:33:13 UTC — [ticket-571] tour 3 — codeur terminé (19750ms)
+- 2026-10-23 18:41:47 UTC — [ticket-571] testeur: OK (exit 0)
+- 2026-10-23 18:43:46 UTC — [ticket-571] securite: PASS — Aucune vulnérabilité détectée. Le diff introduit un minuteur thread-safe pour tu (118000ms)
+- 2026-10-23 18:43:46 UTC — [ticket-571] tour 3 — reviewer démarré
+- 2026-10-23 18:44:21 UTC — [ticket-571] tour 3 — reviewer terminé (35890ms)
+- 2026-10-23 18:48:46 UTC — [ticket-571] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-23 18:50:27 UTC — [ticket-571] validateur: fichiers cités joints : memory/pipeline-log.md (tronqué)
+- 2026-10-23 18:50:27 UTC — [ticket-571] validateur: CHANGES_REQUESTED — Les trois premiers critères sont excellemment satisfaits : le minuteur indépenda (401328ms)
+- 2026-10-23 18:50:27 UTC — [ticket-571] CHANGES_REQUESTED tour 3: Validateur : Les trois premiers critères sont excellemment satisfaits : le minuteur indépendant de la boucle tue la commande à l'échéance même quand la boucle est bloquée (test de synchrone), s'annule
+- 2026-10-23 18:50:27 UTC — [ticket-571] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-23 18:50:31 UTC — [ide-core] file interrompue : ticket-571 non approuvé
+- 2026-10-23 18:57:16 UTC — [ticket-571] branche ticket-571-the-test-command-is-cut-at-its-deadline-even-when
+- 2026-10-23 18:58:06 UTC — [ticket-571] plan rendu (48875ms)
+- 2026-10-23 18:58:06 UTC — [ticket-571] branche reprise (3 commit(s)) — refus précédent : revue, codeur en premier
+- 2026-10-23 18:58:06 UTC — [ticket-571] tour 1 — codeur démarré
+- 2026-10-23 19:01:14 UTC — [ticket-571] tour 1 — codeur terminé (187311ms)
+- 2026-10-23 19:10:07 UTC — [ticket-571] testeur: OK (exit 0)
+- 2026-10-23 19:11:51 UTC — [ticket-571] securite: PASS — Aucune vulnérabilité CRITICAL ou HIGH introduite. Le code ajoute un minuteur ind (103812ms)
+- 2026-10-23 19:11:51 UTC — [ticket-571] tour 1 — reviewer démarré
+- 2026-10-23 19:12:28 UTC — [ticket-571] tour 1 — reviewer terminé (36828ms)
+- 2026-10-23 19:16:51 UTC — [ticket-571] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-23 19:17:37 UTC — [ticket-571] validateur: fichiers cités joints : memory/pipeline-log.md (tronqué)
+- 2026-10-23 19:17:37 UTC — [ticket-571] validateur: CHANGES_REQUESTED — Le code implémente un minuteur indépendant de la boucle d'événements qui tue les (345936ms)
+- 2026-10-23 19:17:37 UTC — [ticket-571] CHANGES_REQUESTED tour 1: Validateur : Le code implémente un minuteur indépendant de la boucle d'événements qui tue les processus à leur échéance, couvert par trois tests solides (boucle bloquée, annulation normale, ligne de l
+- 2026-10-23 19:17:37 UTC — [ticket-571] tour 2 — codeur démarré
+- 2026-10-23 19:18:02 UTC — [ticket-571] tour 2 — codeur terminé (25156ms)
+- 2026-10-23 19:27:40 UTC — [ticket-571] testeur: OK (exit 0)
+- 2026-10-23 19:29:17 UTC — [ticket-571] securite: PASS — Refactoring de test_runner.py avec ajout d'un minuteur indépendant de la boucle  (96531ms)
+- 2026-10-23 19:29:17 UTC — [ticket-571] tour 2 — reviewer démarré
+- 2026-10-23 19:29:51 UTC — [ticket-571] tour 2 — reviewer terminé (34750ms)
+- 2026-10-23 19:34:17 UTC — [ticket-571] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-23 19:35:24 UTC — [ticket-571] validateur: fichiers cités joints : memory/pipeline-log.md (tronqué)
+- 2026-10-23 19:35:24 UTC — [ticket-571] validateur: CHANGES_REQUESTED — Le code implémente un minuteur indépendant de la boucle d'événements (ticket-571 (367313ms)
+- 2026-10-23 19:35:24 UTC — [ticket-571] CHANGES_REQUESTED tour 2: Validateur : Le code implémente un minuteur indépendant de la boucle d'événements (ticket-571) couvert par trois tests solides : blocage de la boucle et terminaison du processus, annulation du minuteu
+- 2026-10-23 19:35:24 UTC — [ticket-571] tour 3 — codeur démarré
+- 2026-10-23 19:35:40 UTC — [ticket-571] tour 3 — codeur terminé (15750ms)
+- 2026-10-23 19:45:17 UTC — [ticket-571] testeur: OK (exit 0)
+- 2026-10-23 19:46:57 UTC — [ticket-571] securite: PASS — Audit de ticket-571 : refactorisation du lanceur de tests avec minuteur indépend (100578ms)
+- 2026-10-23 19:46:57 UTC — [ticket-571] tour 3 — reviewer démarré
+- 2026-10-23 19:47:27 UTC — [ticket-571] tour 3 — reviewer terminé (29655ms)
+- 2026-10-23 19:51:57 UTC — [ticket-571] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-23 19:53:41 UTC — [ticket-571] validateur: fichiers cités joints : memory/pipeline-log.md (tronqué)
+- 2026-10-23 19:53:41 UTC — [ticket-571] validateur: CHANGES_REQUESTED — Le minuteur indépendant de la boucle d'événements fonctionne correctement : troi (403562ms)
+- 2026-10-23 19:53:41 UTC — [ticket-571] CHANGES_REQUESTED tour 3: Validateur : Le minuteur indépendant de la boucle d'événements fonctionne correctement : trois tests solides couvrent le blocage avec terminaison du processus, l'annulation normale, et l'affichage de 
+- 2026-10-23 19:53:41 UTC — [ticket-571] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-23 19:53:45 UTC — [ide-core] file interrompue : ticket-571 non approuvé
+- 2026-10-23 19:56:32 UTC — [ticket-548] branche ticket-548-trivial-rebase-conflicts-are-settled-by-rules-bef
+- 2026-10-23 19:58:27 UTC — [ticket-548] plan rendu (113125ms)
+- 2026-10-23 19:58:27 UTC — [ticket-548] tour 1 — codeur démarré
+- 2026-10-23 20:10:53 UTC — [ticket-548] tour 1 — codeur terminé (746641ms)
+- 2026-10-23 20:17:24 UTC — [ticket-548] testeur: 1 failed, 1643 passed, 56 warnings in 387.15s (0:06:27)
+- 2026-10-23 20:17:24 UTC — [ticket-548] tests rouges au tour 1
+- 2026-10-23 20:17:24 UTC — [ticket-548] tour 2 — codeur démarré
+- 2026-10-23 20:18:32 UTC — [ticket-548] tour 2 — codeur terminé (68483ms)
+- 2026-10-23 20:27:28 UTC — [ticket-548] testeur: OK (exit 0)
+- 2026-10-23 20:31:50 UTC — [ticket-548] securite: PASS — Aucune vulnérabilité CRITICAL ou HIGH introduite par ce ticket. Le code est bien (261936ms)
+- 2026-10-23 20:31:50 UTC — [ticket-548] tour 2 — reviewer démarré
+- 2026-10-23 20:32:17 UTC — [ticket-548] tour 2 — reviewer terminé (27468ms)
+- 2026-10-23 20:36:09 UTC — [ticket-548] validateur: fichiers cités joints : memory/pipeline-log.md (tronqué)
+- 2026-10-23 20:36:09 UTC — [ticket-548] validateur: CHANGES_REQUESTED — Réponse du validateur non parseable. (259562ms)
+- 2026-10-23 20:36:09 UTC — [ticket-548] CHANGES_REQUESTED tour 2: Validateur : Réponse du validateur non parseable.
+- 2026-10-23 20:36:09 UTC — [ticket-548] tour 3 — codeur démarré
+- 2026-10-23 20:36:28 UTC — [ticket-548] tour 3 — codeur terminé (18921ms)
+- 2026-10-23 20:46:52 UTC — [ticket-548] testeur: OK (exit 0)
+- 2026-10-23 20:49:27 UTC — [ticket-548] securite: PASS — Audit complet : zéro vulnérabilité critique ou haute détectée. Le code suit les  (155046ms)
+- 2026-10-23 20:49:27 UTC — [ticket-548] tour 3 — reviewer démarré
+- 2026-10-23 20:49:57 UTC — [ticket-548] tour 3 — reviewer terminé (30000ms)
+- 2026-10-23 20:54:27 UTC — [ticket-548] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-23 20:55:01 UTC — [ticket-548] validateur: fichiers cités joints : memory/pipeline-log.md (tronqué)
+- 2026-10-23 20:55:01 UTC — [ticket-548] validateur: APPROVED — Tous les critères sont satisfaits. Le module `regles_conflit.py` implémente quat (333609ms)
+- 2026-10-23 20:55:01 UTC — [ticket-548] APPROVED après 3 tour(s)
+- 2026-10-23 21:00:06 UTC — [ticket-548] documentation: 0 fichier(s) (300264ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « preuve » — l'extrait « class GitWorkspaceService(GitTicketOnBase, GitSync, GitBranc » (backend/src/tessera/servic
+- 2026-10-23 21:57:28 UTC — [ticket-553] branche ticket-553-an-agent-suspected-of-being-stalled-is-notified
+- 2026-10-23 21:57:29 UTC — [ticket-553] tour 1 — codeur démarré
+- 2026-10-23 21:59:07 UTC — [ticket-553] tour 1 — codeur terminé (97625ms)
+- 2026-10-23 22:10:29 UTC — [ticket-553] testeur: OK (exit 0)
+- 2026-10-23 22:11:45 UTC — [ticket-553] securite: PASS — Aucune vulnérabilité détectée. Le diff ajoute une détection de freeze d'agent (t (75609ms)
+- 2026-10-23 22:11:45 UTC — [ticket-553] tour 1 — reviewer démarré
+- 2026-10-23 22:12:02 UTC — [ticket-553] tour 1 — reviewer terminé (16812ms)
+- 2026-10-23 22:13:17 UTC — [ticket-553] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les tests couvrent correctement  (91593ms)
+- 2026-10-23 22:13:17 UTC — [ticket-553] APPROVED après 1 tour(s)
+- 2026-10-23 22:20:22 UTC — [ticket-553] documentation: 0 fichier(s) (419812ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « preuve » — l'extrait « async def _resoudre_par_regles(
+        self, conflits: tupl » (backend/src/tessera/servic
+- 2026-10-23 22:21:00 UTC — [ticket-553] livraison: résolveur tenté : frontend/src/lib/notifications.test.ts, frontend/src/lib/notifications.ts (34422ms)
+- 2026-10-23 22:21:00 UTC — [ticket-553] livraison: arrêt — Conflit avec develop sur : frontend/src/lib/notifications.test.ts, frontend/src/lib/notifications.ts
+- 2026-10-23 21:10:12 UTC — [ide-core] ticket-548 PR #628 confiée au CIWatcher
+- 2026-10-23 21:10:15 UTC — [ticket-552] branche ticket-552-a-merged-pr-a-red-ci-or-a-refused-merge-is-notifi
+- 2026-10-23 21:11:18 UTC — [ticket-552] plan rendu (61578ms)
+- 2026-10-23 21:11:18 UTC — [ticket-552] tour 1 — codeur démarré
+- 2026-10-23 21:12:04 UTC — [ticket-552] tour 1 — codeur terminé (46296ms)
+- 2026-10-23 21:14:06 UTC — [ide-core] ticket-548 PR #628 mergée (CI verte)
+- 2026-10-23 21:22:26 UTC — [ticket-552] testeur: OK (exit 0)
+- 2026-10-23 21:24:14 UTC — [ticket-552] securite: PASS — Pas de vulnérabilité détectée. Le code ajouté crée une fonction `notifLivraison` (107687ms)
+- 2026-10-23 21:24:14 UTC — [ticket-552] tour 1 — reviewer démarré
+- 2026-10-23 21:24:41 UTC — [ticket-552] tour 1 — reviewer terminé (27796ms)
+- 2026-10-23 21:27:29 UTC — [ticket-552] validateur: fichiers cités joints : streamState.ts (tronqué) ; non joints (budget épuisé) : lib/notifications.ts
+- 2026-10-23 21:27:29 UTC — [ticket-552] validateur: CHANGES_REQUESTED — Le critère 2 et 4 sont respectés. Le code ajoute la gestion des notifications po (194921ms)
+- 2026-10-23 21:27:29 UTC — [ticket-552] CHANGES_REQUESTED tour 1: Reviewer : ## Problèmes bloquants
+- 2026-10-23 21:27:29 UTC — [ticket-552] tour 2 — codeur démarré
+- 2026-10-23 21:28:09 UTC — [ticket-552] tour 2 — codeur terminé (40764ms)
+- 2026-10-23 21:38:38 UTC — [ticket-552] testeur: ❯ src/components/Sidebar/ProjectNav.test.tsx:48:32
+- 2026-10-23 21:38:38 UTC — [ticket-552] tests rouges au tour 2
+- 2026-10-23 21:38:38 UTC — [ticket-552] tour 3 — codeur démarré
+- 2026-10-23 21:39:22 UTC — [ticket-552] tour 3 — codeur terminé (43453ms)
+- 2026-10-23 21:50:05 UTC — [ticket-552] testeur: OK (exit 0)
+- 2026-10-23 21:52:19 UTC — [ticket-552] securite: PASS — Aucune vulnérabilité détectée. Le code ajoute des notifications sur l'issue de l (134125ms)
+- 2026-10-23 21:52:19 UTC — [ticket-552] tour 3 — reviewer démarré
+- 2026-10-23 21:52:37 UTC — [ticket-552] tour 3 — reviewer terminé (17436ms)
+- 2026-10-23 21:55:53 UTC — [ticket-552] validateur: fichiers cités joints : streamState.ts (tronqué) ; non joints (budget épuisé) : lib/notifications.ts
+- 2026-10-23 21:55:53 UTC — [ticket-552] validateur: CHANGES_REQUESTED — Les critères 2 et 4 sont respectés avec des tests correspondants. Le critère 1 n (213421ms)
+- 2026-10-23 21:55:53 UTC — [ticket-552] CHANGES_REQUESTED tour 3: Validateur : Les critères 2 et 4 sont respectés avec des tests correspondants. Le critère 1 n'est pas satisfait car `streamState.ts` n'est pas modifié pour gérer `ci_merge_blocked` et `ci_watcher_bloc
+- 2026-10-23 21:55:53 UTC — [ticket-552] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-23 21:55:57 UTC — [ide-core] file interrompue : ticket-552 non approuvé
+- 2026-10-23 22:21:05 UTC — [ticket-556] branche ticket-556-clicking-a-desktop-notification-brings-tessera-fo
+- 2026-10-23 22:21:28 UTC — [ticket-556] plan rendu (21656ms)
+- 2026-10-23 22:21:28 UTC — [ticket-556] tour 1 — codeur démarré
+- 2026-10-23 22:21:57 UTC — [ticket-556] tour 1 — codeur terminé (28906ms)
+- 2026-10-23 22:32:43 UTC — [ticket-556] testeur: OK (exit 0)
+- 2026-10-23 22:33:51 UTC — [ticket-556] securite: PASS — Le diff modifie uniquement la documentation (commentaires JSDoc) sans changement (68171ms)
+- 2026-10-23 22:33:51 UTC — [ticket-556] tour 1 — reviewer démarré
+- 2026-10-23 22:34:11 UTC — [ticket-556] tour 1 — reviewer terminé (19563ms)
+- 2026-10-23 22:35:37 UTC — [ticket-556] validateur: fichiers cités joints : src-tauri/capabilities/default.json
+- 2026-10-23 22:35:37 UTC — [ticket-556] validateur: CHANGES_REQUESTED — Le critère 1 est satisfait : le code indique clairement qu'aucune API 2.x du plu (105843ms)
+- 2026-10-23 22:35:37 UTC — [ticket-556] CHANGES_REQUESTED tour 1: Validateur : Le critère 1 est satisfait : le code indique clairement qu'aucune API 2.x du plugin de notification ne permet de gérer les clics. Le critère 3 est également respecté : aucune permission i
+- 2026-10-23 22:35:37 UTC — [ticket-556] tour 2 — codeur démarré
+- 2026-10-23 22:35:54 UTC — [ticket-556] tour 2 — codeur terminé (17203ms)
+- 2026-10-23 22:46:46 UTC — [ticket-556] testeur: OK (exit 0)
+- 2026-10-23 22:47:15 UTC — [ticket-556] securite: PASS — Modification documentaire uniquement. Aucun code fonctionnel n'est ajouté ni mod (28281ms)
+- 2026-10-23 22:47:15 UTC — [ticket-556] tour 2 — reviewer démarré
+- 2026-10-23 22:47:30 UTC — [ticket-556] tour 2 — reviewer terminé (15688ms)
+- 2026-10-23 22:48:53 UTC — [ticket-556] validateur: fichiers cités joints : src-tauri/capabilities/default.json
+- 2026-10-23 22:48:53 UTC — [ticket-556] validateur: CHANGES_REQUESTED — Le critère 1 est satisfait car le code indique clairement qu'aucune API 2.x du p (98296ms)
+- 2026-10-23 22:48:53 UTC — [ticket-556] CHANGES_REQUESTED tour 2: Validateur : Le critère 1 est satisfait car le code indique clairement qu'aucune API 2.x du plugin de notification ne permet de gérer les clics. Le critère 3 est également respecté, avec un fichier de
+- 2026-10-23 22:48:53 UTC — [ticket-556] tour 3 — codeur démarré
+- 2026-10-23 22:49:37 UTC — [ticket-556] tour 3 — codeur terminé (44046ms)
+- 2026-10-23 23:00:39 UTC — [ticket-556] testeur: OK (exit 0)
+- 2026-10-23 23:01:50 UTC — [ticket-556] securite: PASS — Le diff ajoute un test de régression qui valide qu'une notification desktop Taur (71061ms)
+- 2026-10-23 23:01:50 UTC — [ticket-556] tour 3 — reviewer démarré
+- 2026-10-23 23:02:05 UTC — [ticket-556] tour 3 — reviewer terminé (14844ms)
+- 2026-10-23 23:03:33 UTC — [ticket-556] validateur: fichiers cités joints : src-tauri/capabilities/default.json
+- 2026-10-23 23:03:33 UTC — [ticket-556] validateur: CHANGES_REQUESTED — Le ticket est correctement traité : il indique clairement qu'aucune API 2.x du p (103468ms)
+- 2026-10-23 23:03:33 UTC — [ticket-556] CHANGES_REQUESTED tour 3: Validateur : Le ticket est correctement traité : il indique clairement qu'aucune API 2.x du plugin de notification ne permet de gérer les clics desktop. Le test vérifie cette absence d'action, et le f
+- 2026-10-23 23:03:33 UTC — [ticket-556] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-23 23:03:38 UTC — [ide-core] file interrompue : ticket-556 non approuvé
+- 2026-10-23 23:06:19 UTC — [ticket-558] branche ticket-558-a-quota-reading-is-kept-per-window-and-can-be-rea
+- 2026-10-23 23:06:19 UTC — [ticket-558] tour 1 — codeur démarré
+- 2026-10-23 23:09:59 UTC — [ticket-558] tour 1 — codeur terminé (219813ms)
+- 2026-10-23 23:20:10 UTC — [ticket-558] testeur: OK (exit 0)
+- 2026-10-23 23:21:19 UTC — [ticket-558] securite: PASS — Aucune vulnérabilité détectée.
+
+Le diff ajoute :
+1. Deux modèles Pydantic (`Quot (69656ms)
+- 2026-10-23 23:21:19 UTC — [ticket-558] tour 1 — reviewer démarré
+- 2026-10-23 23:21:38 UTC — [ticket-558] tour 1 — reviewer terminé (18469ms)
+- 2026-10-23 23:23:49 UTC — [ticket-558] validateur: fichiers cités joints : frontend/ (dossier, 16 fichiers)
+- 2026-10-23 23:23:49 UTC — [ticket-558] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (149062ms)
+- 2026-10-23 23:23:49 UTC — [ticket-558] APPROVED après 1 tour(s)
+- 2026-10-23 23:31:22 UTC — [ticket-558] documentation: 0 fichier(s) (449171ms) — après tour de correction — refusé : doc-technique : README.md : règle « preuve » — l'extrait « class GitConflictsRegles(GitConflicts):
+    """Rules applied » (backend/src/tessera/services/git_work
+- 2026-10-23 23:44:51 UTC — [ide-core] ticket-558 PR #632 mergée (CI verte)
+- 2026-10-23 23:44:53 UTC — [ide-core] ticket-558 : base réalignée sur develop
+- 2026-10-23 23:44:53 UTC — [ide-core] ticket-558 PR #632 confiée au CIWatcher
+- 2026-10-23 23:44:56 UTC — [ticket-559] branche ticket-559-a-wait-for-an-outside-event-and-a-conflict-resolu
+- 2026-10-23 23:44:56 UTC — [ticket-559] tour 1 — codeur démarré
+- 2026-10-23 23:49:32 UTC — [ticket-559] tour 1 — codeur terminé (275891ms)
+- 2026-10-23 23:55:54 UTC — [ticket-559] testeur: 1 failed, 1345 passed, 64 warnings in 379.55s (0:06:19)
+- 2026-10-23 23:55:54 UTC — [ticket-559] tests rouges au tour 1
+- 2026-10-23 23:55:54 UTC — [ticket-559] tour 2 — codeur démarré
+- 2026-10-23 23:56:25 UTC — [ticket-559] tour 2 — codeur terminé (31093ms)
+- 2026-10-24 00:02:47 UTC — [ticket-559] testeur: 1 failed, 1653 passed, 64 warnings in 379.16s (0:06:19)
+- 2026-10-24 00:02:47 UTC — [ticket-559] tests rouges au tour 2
+- 2026-10-24 00:02:47 UTC — [ticket-559] tour 3 — codeur démarré
+- 2026-10-24 00:05:25 UTC — [ticket-559] tour 3 — codeur terminé (158078ms)
+- 2026-10-24 00:13:54 UTC — [ticket-559] testeur: OK (exit 0)
+- 2026-10-24 00:15:26 UTC — [ticket-559] securite: PASS — Aucune vulnérabilité CRITICAL ou HIGH détectée. Le code ajoute deux événements ( (92296ms)
+- 2026-10-24 00:15:26 UTC — [ticket-559] tour 3 — reviewer démarré
+- 2026-10-24 00:15:57 UTC — [ticket-559] tour 3 — reviewer terminé (30375ms)
+- 2026-10-24 00:19:16 UTC — [ticket-559] validateur: fichiers cités joints : frontend/ (dossier, 16 fichiers)
+- 2026-10-24 00:19:16 UTC — [ticket-559] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (229405ms)
+- 2026-10-24 00:19:16 UTC — [ticket-559] APPROVED après 3 tour(s)
+- 2026-10-24 00:27:27 UTC — [ticket-559] documentation: 1 fichier(s) (485921ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « preuve » — l'extrait « class GitConflictsRegles(GitConflicts):
+    """Rules applied » (backend/src/tessera/servic
+- 2026-10-24 00:34:33 UTC — [ide-core] ticket-559 PR #633 mergée (CI verte)
+- 2026-10-24 00:34:36 UTC — [ide-core] ticket-559 : base réalignée sur develop
+- 2026-10-24 00:34:36 UTC — [ide-core] ticket-559 PR #633 confiée au CIWatcher
+- 2026-10-24 00:34:39 UTC — [ticket-560] branche ticket-560-the-remaining-tickets-of-a-live-queue-count-the-o
+- 2026-10-24 00:34:39 UTC — [ticket-560] tour 1 — codeur démarré
+- 2026-10-24 00:41:45 UTC — [ticket-560] tour 1 — codeur terminé (425828ms)
+- 2026-10-24 00:50:04 UTC — [ticket-560] testeur: OK (exit 0)
+- 2026-10-24 00:51:32 UTC — [ticket-560] securite: PASS — Aucune vulnérabilité de sécurité détectée. Le diff introduit un refactoring de l (87811ms)
+- 2026-10-24 00:51:32 UTC — [ticket-560] tour 1 — reviewer démarré
+- 2026-10-24 00:51:54 UTC — [ticket-560] tour 1 — reviewer terminé (22453ms)
+- 2026-10-24 00:53:27 UTC — [ticket-560] validateur: fichiers cités joints : frontend/ (dossier, 16 fichiers) ; absents : .../remove
+- 2026-10-24 00:53:27 UTC — [ticket-560] validateur: APPROVED — Tous les critères sont satisfaits. Le code implémente correctement la logique de (115125ms)
+- 2026-10-24 00:53:27 UTC — [ticket-560] APPROVED après 1 tour(s)
+- 2026-10-24 00:59:28 UTC — [ticket-560] documentation: 0 fichier(s) (355718ms) — après tour de correction
+- 2026-10-24 01:03:22 UTC — [ide-core] ticket-560 PR #634 mergée (CI verte)
+- 2026-10-24 01:03:24 UTC — [ide-core] ticket-560 : base réalignée sur develop
+- 2026-10-24 01:03:24 UTC — [ide-core] ticket-560 PR #634 confiée au CIWatcher
+- 2026-10-24 01:03:27 UTC — [ticket-561] branche ticket-561-the-office-view-selectors-are-pure-functions
+- 2026-10-24 01:03:28 UTC — [ticket-561] tour 1 — codeur démarré
+- 2026-10-24 01:05:48 UTC — [ticket-561] tour 1 — codeur terminé (139860ms)
+- 2026-10-24 01:15:11 UTC — [ticket-561] testeur: OK (exit 0)
+- 2026-10-24 01:16:07 UTC — [ticket-561] securite: PASS — Aucune vulnérabilité détectée. Les 4 nouveaux modules sont des utilitaires purs  (55733ms)
+- 2026-10-24 01:16:07 UTC — [ticket-561] tour 1 — reviewer démarré
+- 2026-10-24 01:16:34 UTC — [ticket-561] tour 1 — reviewer terminé (26765ms)
+- 2026-10-24 07:40:49 UTC — [ticket-561] branche ticket-561-the-office-view-selectors-are-pure-functions
+- 2026-10-24 07:53:40 UTC — [ticket-561] testeur: OK (exit 0)
+- 2026-10-24 07:53:40 UTC — [ticket-561] branche reprise (1 commit(s)) — tests green, codeur sauté
+- 2026-10-24 07:54:53 UTC — [ticket-561] securite: PASS — Audit complet : 4 fichiers TypeScript ajoutés (boiteAuxLettres, contourDeLaPiece (71172ms)
+- 2026-10-24 07:54:53 UTC — [ticket-561] tour 1 — reviewer démarré
+- 2026-10-24 07:55:34 UTC — [ticket-561] tour 1 — reviewer terminé (41343ms)
+- 2026-10-24 07:59:53 UTC — [ticket-561] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-24 08:00:21 UTC — [ticket-561] validateur: fichiers cités joints : backend/ (dossier, 6 fichiers), hooks/streamState.ts (tronqué)
+- 2026-10-24 08:00:21 UTC — [ticket-561] validateur: APPROVED — Les quatre sélecteurs purs (`postesDuRun`, `boiteAuxLettres`, `contourDeLaPiece` (328578ms)
+- 2026-10-24 08:00:21 UTC — [ticket-561] APPROVED après 1 tour(s)
+- 2026-10-24 08:02:12 UTC — [ticket-561] documentation: 0 fichier(s) (101562ms)
+- 2026-10-24 08:07:59 UTC — [ide-core] ticket-561 PR #635 mergée (CI verte)
+- 2026-10-24 08:08:01 UTC — [ide-core] ticket-561 : base réalignée sur develop
+- 2026-10-24 08:08:01 UTC — [ide-core] ticket-561 PR #635 confiée au CIWatcher
+- 2026-10-24 08:08:05 UTC — [ticket-562] branche ticket-562-the-office-sprites-and-a-project-room
+- 2026-10-24 08:09:47 UTC — [ticket-562] plan rendu (100655ms)
+- 2026-10-24 08:09:47 UTC — [ticket-562] tour 1 — codeur démarré
+- 2026-10-24 08:17:45 UTC — [ticket-562] tour 1 — codeur terminé (477859ms)
+- 2026-10-24 08:17:53 UTC — [ticket-562] testeur: en attente d'un créneau de test
+- 2026-10-24 08:26:16 UTC — [ide-core] ticket-563 retiré de la file
+- 2026-10-24 08:26:16 UTC — [ide-core] ticket-564 retiré de la file
+- 2026-10-24 08:26:16 UTC — [ide-core] ticket-565 retiré de la file
+- 2026-10-24 08:26:16 UTC — [ide-core] ticket-555 retiré de la file
+- 2026-10-24 08:26:16 UTC — [ide-core] ticket-554 retiré de la file
+- 2026-10-24 08:26:16 UTC — [ide-core] ticket-566 retiré de la file
+- 2026-10-24 08:26:16 UTC — [ide-core] ticket-567 retiré de la file
+- 2026-10-24 08:26:16 UTC — [ide-core] ticket-570 retiré de la file
+- 2026-10-24 08:26:16 UTC — [ide-core] ticket-569 retiré de la file
+- 2026-10-24 08:37:59 UTC — [ticket-562] testeur: OK (exit 0)
+- 2026-10-24 08:39:39 UTC — [ticket-562] securite: PASS — Composants Bureau ajoutés avec code sûr : texte rendu en JSX auto-échappé, chemi (100514ms)
+- 2026-10-24 08:39:39 UTC — [ticket-562] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-10-24 08:39:39 UTC — [ticket-562] tour 1 — reviewer démarré
+- 2026-10-24 08:40:08 UTC — [ticket-562] tour 1 — reviewer terminé (28139ms)
+- 2026-10-24 08:40:32 UTC — [ticket-562] validateur: fichiers cités joints : backend/ (dossier, 8 fichiers) ; absents : design/bureau/
+- 2026-10-24 08:40:32 UTC — [ticket-562] validateur: APPROVED — Tous les critères sont satisfaits. Le diff introduit les sprites du Bureau (Bull (53015ms)
+- 2026-10-24 08:40:32 UTC — [ticket-562] APPROVED après 1 tour(s)
+- 2026-10-24 08:45:24 UTC — [ticket-562] documentation: 1 fichier(s) (285860ms) — après tour de correction
+- 2026-10-24 09:10:29 UTC — [ide-core] ticket-562 PR #637 mergée (CI verte)
+- 2026-10-24 09:10:31 UTC — [ide-core] ticket-562 : base réalignée sur develop
+- 2026-10-24 09:10:31 UTC — [ide-core] ticket-562 PR #637 confiée au CIWatcher
+- 2026-10-24 09:10:34 UTC — [ticket-572] branche ticket-572-initialising-the-base-ref-never-moves-the-checked
+- 2026-10-24 09:10:35 UTC — [ticket-572] tour 1 — codeur démarré
+- 2026-10-24 09:16:29 UTC — [ticket-572] tour 1 — codeur terminé (354219ms)
+- 2026-10-24 09:28:02 UTC — [ticket-572] testeur: OK (exit 0)
+- 2026-10-24 09:30:10 UTC — [ticket-572] securite: PASS — Refactorisation de gestion d'avancement de branche git. Code sûr contre l'inject (127656ms)
+- 2026-10-24 09:30:10 UTC — [ticket-572] tour 1 — reviewer démarré
+- 2026-10-24 09:30:12 UTC — [ticket-572] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-10-24 09:30:34 UTC — [ticket-572] tour 1 — reviewer terminé (23780ms)
+- 2026-10-24 09:30:37 UTC — [ticket-572] validateur: fichiers cités joints : backend/src/tessera/services/git_workspace/base.py, backend/tests/test_ticket_ajoute_sur_la_base.py ; absents : tickets/todo/ticket-a.md, tickets/todo/ticket-b.md
+- 2026-10-24 09:30:37 UTC — [ticket-572] validateur: APPROVED — Tous les critères sont satisfaits. Le code refactorise correctement `_avancer_ba (26921ms)
+- 2026-10-24 09:30:37 UTC — [ticket-572] APPROVED après 1 tour(s)
+- 2026-10-24 09:30:43 UTC — [ticket-572] documentation: 0 fichier(s) (421ms)
+- 2026-10-24 09:30:43 UTC — [ticket-572] documentation: pas de diff retrouvable, non documenté
+- 2026-10-24 09:31:01 UTC — [ide-core] ticket-572 PR #638 confiée au CIWatcher
+- 2026-10-24 09:31:05 UTC — [ticket-563] branche ticket-563-the-office-folders-mailbox-and-server-rack
+- 2026-10-24 09:32:34 UTC — [ticket-563] plan rendu (88125ms)
+- 2026-10-24 09:32:34 UTC — [ticket-563] tour 1 — codeur démarré
+- 2026-10-24 09:35:09 UTC — [ide-core] ticket-572 PR #638 mergée (CI verte)
+- 2026-10-24 09:39:59 UTC — [ticket-563] tour 1 — codeur terminé (444719ms)
+- 2026-10-24 09:58:23 UTC — [ticket-563] testeur: Tests  1 failed | 1417 passed (1418)
+- 2026-10-24 09:58:23 UTC — [ticket-563] tests rouges au tour 1
+- 2026-10-24 09:58:23 UTC — [ticket-563] tour 2 — codeur démarré
+- 2026-10-24 09:58:29 UTC — [ticket-563] INTERROMPU par limite de session (reprise : 2:30pm (Europe/Paris))
+- 2026-10-24 09:58:33 UTC — [ide-core] file interrompue : limite de session (reprise : 2:30pm (Europe/Paris))
+- 2026-10-26 07:58:44 UTC — [ticket-563] branche ticket-563-the-office-folders-mailbox-and-server-rack
+- 2026-10-26 07:59:44 UTC — [ticket-563] plan rendu (59843ms)
+- 2026-10-26 08:11:05 UTC — [ticket-563] testeur: Tests  1 failed | 1417 passed (1418)
+- 2026-10-26 08:11:05 UTC — [ticket-563] branche reprise (3 commit(s)) — tests red, codeur en premier
+- 2026-10-26 08:11:05 UTC — [ticket-563] tour 1 — codeur démarré
+- 2026-10-26 08:12:44 UTC — [ticket-563] tour 1 — codeur terminé (98827ms)
+- 2026-10-26 08:28:27 UTC — [ticket-563] testeur: OK (exit 0)
+- 2026-10-26 08:30:33 UTC — [ticket-563] securite: PASS — Aucune vulnérabilité CRITICAL ou HIGH détectée.
+
+**Points de sécurité vérifiés** (125125ms)
+- 2026-10-26 08:30:33 UTC — [ticket-563] tour 1 — reviewer démarré
+- 2026-10-26 08:30:55 UTC — [ticket-563] tour 1 — reviewer terminé (22157ms)
+- 2026-10-26 08:35:33 UTC — [ticket-563] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-26 08:36:24 UTC — [ticket-563] validateur: fichiers cités joints : backend/ (dossier, 8 fichiers)
+- 2026-10-26 08:36:24 UTC — [ticket-563] validateur: APPROVED — Tous les critères sont satisfaits. Le diff ajoute trois composants React (pile d (350938ms)
+- 2026-10-26 08:36:24 UTC — [ticket-563] APPROVED après 1 tour(s)
+- 2026-10-26 08:39:28 UTC — [ticket-563] documentation: 0 fichier(s) (177641ms)
+- 2026-10-26 09:45:07 UTC — [ticket-565] branche ticket-565-the-office-day-board
+- 2026-10-26 09:45:09 UTC — [ticket-565] tour 1 — codeur démarré
+- 2026-10-26 09:50:01 UTC — [ticket-565] tour 1 — codeur terminé (291967ms)
+- 2026-10-26 09:53:15 UTC — [ticket-565] testeur: OK (exit 0)
+- 2026-10-26 09:55:26 UTC — [ide-core] ticket-579 retiré de la file
+- 2026-10-26 09:55:26 UTC — [ide-core] ticket-578 retiré de la file
+- 2026-10-26 09:55:26 UTC — [ide-core] ticket-577 retiré de la file
+- 2026-10-26 09:55:26 UTC — [ide-core] ticket-569 retiré de la file
+- 2026-10-26 09:55:26 UTC — [ide-core] ticket-555 retiré de la file
+- 2026-10-26 09:55:26 UTC — [ide-core] ticket-575 retiré de la file
+- 2026-10-26 09:55:26 UTC — [ide-core] ticket-573 retiré de la file
+- 2026-10-26 09:55:26 UTC — [ide-core] ticket-574 retiré de la file
+- 2026-10-26 09:55:26 UTC — [ide-core] ticket-576 retiré de la file
+- 2026-10-26 09:55:26 UTC — [ide-core] ticket-570 retiré de la file
+- 2026-10-26 09:55:30 UTC — [ticket-565] securite: PASS — Aucune vulnérabilité détectée. Le code ajouté respecte les bonnes pratiques : au (134780ms)
+- 2026-10-26 09:55:30 UTC — [ticket-565] tour 1 — reviewer démarré
+- 2026-10-26 09:56:07 UTC — [ticket-565] tour 1 — reviewer terminé (37015ms)
+- 2026-10-26 09:59:53 UTC — [ticket-565] validateur: fichiers cités joints : backend/ (dossier, 8 fichiers) ; absents : design/charts/
+- 2026-10-26 09:59:53 UTC — [ticket-565] validateur: CHANGES_REQUESTED — Tous les critères fonctionnels ont été implémentés et vérifiés via des tests uni (263842ms)
+- 2026-10-26 09:59:53 UTC — [ticket-565] CHANGES_REQUESTED tour 1: Validateur : Tous les critères fonctionnels ont été implémentés et vérifiés via des tests unitaires. Le code respecte les contraintes de design, notamment sur les couleurs utilisées et l'affichage des
+- 2026-10-26 09:59:53 UTC — [ticket-565] tour 2 — codeur démarré
+- 2026-10-26 10:01:08 UTC — [ticket-565] tour 2 — codeur terminé (75015ms)
+- 2026-10-26 10:02:52 UTC — [ticket-565] testeur: OK (exit 0)
+- 2026-10-26 10:04:43 UTC — [ticket-565] securite: PASS — Difficulté lecteur : frontend - tous les appels API passent par `authorized()`.  (111140ms)
+- 2026-10-26 10:04:43 UTC — [ticket-565] tour 2 — reviewer démarré
+- 2026-10-26 10:05:11 UTC — [ticket-565] tour 2 — reviewer terminé (27734ms)
+- 2026-10-26 10:09:43 UTC — [ticket-565] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-26 10:10:23 UTC — [ticket-565] validateur: fichiers cités joints : backend/ (dossier, 6 fichiers) ; absents : design/charts/
+- 2026-10-26 10:10:23 UTC — [ticket-565] validateur: APPROVED — Tous les critères fonctionnels sont implémentés et vérifiés par des tests unitai (340140ms)
+- 2026-10-26 10:10:23 UTC — [ticket-565] APPROVED après 2 tour(s)
+- 2026-10-26 10:14:48 UTC — [ticket-565] documentation: 0 fichier(s) (259797ms) — après tour de correction
+- 2026-10-26 10:30:36 UTC — [ide-core] ticket-565 PR #645 mergée (CI verte)
+- 2026-10-26 10:30:41 UTC — [ide-core] ticket-565 : base réalignée sur develop
+- 2026-10-26 10:30:41 UTC — [ide-core] ticket-565 PR #645 confiée au CIWatcher
+- 2026-10-26 10:30:51 UTC — [ticket-554] branche ticket-554-a-bell-keeps-the-day-s-notifications-and-lets-eac
+- 2026-10-26 10:32:07 UTC — [ticket-554] plan rendu (74953ms)
+- 2026-10-26 10:32:07 UTC — [ticket-554] tour 1 — codeur démarré
+- 2026-10-26 10:36:52 UTC — [ticket-554] tour 1 — codeur terminé (285031ms)
+- 2026-10-26 10:38:48 UTC — [ticket-554] testeur: OK (exit 0)
+- 2026-10-26 10:40:30 UTC — [ticket-554] securite: PASS — Aucune vulnérabilité de sécurité détectée. Le code valide strictement les donnée (102655ms)
+- 2026-10-26 10:40:31 UTC — [ticket-554] tour 1 — reviewer démarré
+- 2026-10-26 10:41:08 UTC — [ticket-554] tour 1 — reviewer terminé (36656ms)
+- 2026-10-26 10:45:32 UTC — [ticket-554] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-26 10:46:01 UTC — [ticket-554] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le codeur a implémenté la cloch (329141ms)
+- 2026-10-26 10:46:01 UTC — [ticket-554] APPROVED après 1 tour(s)
+- 2026-10-26 10:49:25 UTC — [ticket-554] documentation: 1 fichier(s) (194750ms)
+- 2026-10-26 10:53:18 UTC — [ide-core] ticket-554 PR #646 mergée (CI verte)
+- 2026-10-26 10:53:20 UTC — [ide-core] ticket-554 : base réalignée sur develop
+- 2026-10-26 10:53:20 UTC — [ide-core] ticket-554 PR #646 confiée au CIWatcher
+- 2026-10-26 10:53:23 UTC — [ticket-566] branche ticket-566-the-office-to-you-column-and-the-sound-alert
+- 2026-10-26 10:53:25 UTC — [ticket-566] tour 1 — codeur démarré
+- 2026-10-26 10:57:29 UTC — [ticket-566] tour 1 — codeur terminé (244311ms)
+- 2026-10-26 10:59:32 UTC — [ticket-566] testeur: OK (exit 0)
+- 2026-10-26 11:01:33 UTC — [ticket-566] securite: PASS — Audit complet sans vulnérabilités détectées. Le diff ajoute une colonne 'À toi'  (121250ms)
+- 2026-10-26 11:01:33 UTC — [ticket-566] tour 1 — reviewer démarré
+- 2026-10-26 11:01:53 UTC — [ticket-566] tour 1 — reviewer terminé (19469ms)
+- 2026-10-26 11:06:33 UTC — [ticket-566] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-26 11:07:31 UTC — [ticket-566] validateur: fichiers cités joints : backend/ (dossier, 8 fichiers)
+- 2026-10-26 11:07:31 UTC — [ticket-566] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le diff ajoute la colonne « À t (357686ms)
+- 2026-10-26 11:07:31 UTC — [ticket-566] APPROVED après 1 tour(s)
+- 2026-10-26 11:09:50 UTC — [ticket-566] documentation: 0 fichier(s) (133702ms)
+- 2026-10-26 11:14:18 UTC — [ide-core] ticket-566 PR #647 mergée (CI verte)
+- 2026-10-26 11:14:20 UTC — [ide-core] ticket-566 : base réalignée sur develop
+- 2026-10-26 11:14:20 UTC — [ide-core] ticket-566 PR #647 confiée au CIWatcher
+- 2026-10-26 11:14:25 UTC — [ticket-564] branche ticket-564-the-office-break-room-meeting-room-and-a-health-t
+- 2026-10-26 11:15:47 UTC — [ticket-564] plan rendu (80827ms)
+- 2026-10-26 11:15:47 UTC — [ticket-564] tour 1 — codeur démarré
+- 2026-10-26 11:24:03 UTC — [ticket-564] tour 1 — codeur terminé (496609ms)
+- 2026-10-26 11:33:41 UTC — [ticket-564] testeur: OK (exit 0)
+- 2026-10-26 11:36:21 UTC — [ticket-564] securite: PASS — Le diff ajoute deux nouveaux événements WebSocket avec validation stricte côté f (160311ms)
+- 2026-10-26 11:36:21 UTC — [ticket-564] tour 1 — reviewer démarré
+- 2026-10-26 11:37:06 UTC — [ticket-564] tour 1 — reviewer terminé (44875ms)
+- 2026-10-26 11:41:21 UTC — [ticket-564] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-26 11:42:54 UTC — [ticket-564] validateur: fichiers cités joints : backend/ (dossier, 8 fichiers)
+- 2026-10-26 11:42:54 UTC — [ticket-564] validateur: CHANGES_REQUESTED — 6 critères satisfaits sur 8. Le work frontend est correct et complet : types `ex (392969ms)
+- 2026-10-26 11:42:54 UTC — [ticket-564] CHANGES_REQUESTED tour 1: Reviewer : ## Problèmes bloquants
+- 2026-10-26 11:42:54 UTC — [ticket-564] tour 2 — codeur démarré
+- 2026-10-26 11:44:01 UTC — [ticket-564] tour 2 — codeur terminé (66188ms)
+- 2026-10-26 11:53:51 UTC — [ticket-564] testeur: OK (exit 0)
+- 2026-10-26 11:56:02 UTC — [ticket-564] securite: PASS — Aucune vulnérabilité de sécurité détectée. Le code ajoute deux nouveaux types d' (131390ms)
+- 2026-10-26 11:56:02 UTC — [ticket-564] tour 2 — reviewer démarré
+- 2026-10-26 11:56:28 UTC — [ticket-564] tour 2 — reviewer terminé (26264ms)
+- 2026-10-26 12:01:02 UTC — [ticket-564] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-26 12:02:34 UTC — [ticket-564] validateur: fichiers cités joints : backend/ (dossier, 6 fichiers)
+- 2026-10-26 12:02:34 UTC — [ticket-564] validateur: CHANGES_REQUESTED — 6 critères sur 8 sont satisfaits. Le travail frontend est correct et complet : l (392311ms)
+- 2026-10-26 12:02:34 UTC — [ticket-564] CHANGES_REQUESTED tour 2: Reviewer : ## Problèmes bloquants
+- 2026-10-26 12:02:34 UTC — [ticket-564] tour 3 — codeur démarré
+- 2026-10-26 12:03:27 UTC — [ticket-564] tour 3 — codeur terminé (52656ms)
+- 2026-10-26 12:12:04 UTC — [ticket-564] testeur: OK (exit 0)
+- 2026-10-26 12:14:34 UTC — [ticket-564] securite: PASS — Audit complet du diff : aucune vulnérabilité de sécurité détectée. Le code ajout (150375ms)
+- 2026-10-26 12:14:34 UTC — [ticket-564] tour 3 — reviewer démarré
+- 2026-10-26 12:14:50 UTC — [ticket-564] tour 3 — reviewer terminé (16343ms)
+- 2026-10-26 12:19:34 UTC — [ticket-564] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-26 12:20:15 UTC — [ticket-564] validateur: fichiers cités joints : backend/ (dossier, 8 fichiers)
+- 2026-10-26 12:20:15 UTC — [ticket-564] validateur: CHANGES_REQUESTED — Le travail frontend est correct et complet : types ajoutés, store mis à jour, sa (341421ms)
+- 2026-10-26 12:20:15 UTC — [ticket-564] CHANGES_REQUESTED tour 3: Validateur : Le travail frontend est correct et complet : types ajoutés, store mis à jour, santé refactorisée, salles implémentées avec couverture de tests solide. Cependant, le diff modifie un fichie
+- 2026-10-26 12:20:15 UTC — [ticket-564] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-26 12:20:20 UTC — [ide-core] file interrompue : ticket-564 non approuvé
+- 2026-10-26 13:00:52 UTC — [ticket-567] branche ticket-567-the-office-becomes-the-default-supervision-view
+- 2026-10-26 13:02:53 UTC — [ticket-567] plan rendu (119421ms)
+- 2026-10-26 13:02:53 UTC — [ticket-567] tour 1 — codeur démarré
+- 2026-10-26 13:13:06 UTC — [ticket-567] tour 1 — codeur terminé (612562ms)
+- 2026-10-26 13:15:10 UTC — [ticket-567] testeur: OK (exit 0)
+- 2026-10-26 13:16:15 UTC — [ticket-567] securite: PASS — Aucune vulnérabilité introduite. Ce diff refactorise la supervision avec deux vu (65905ms)
+- 2026-10-26 13:16:16 UTC — [ticket-567] tour 1 — reviewer démarré
+- 2026-10-26 13:16:47 UTC — [ticket-567] tour 1 — reviewer terminé (30593ms)
+- 2026-10-26 13:21:16 UTC — [ticket-567] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-26 13:22:28 UTC — [ticket-567] validateur: fichiers cités joints : SupervisionView.test.tsx (tronqué) ; non joints (budget épuisé) : SupervisionView/index.tsx, backend/
+- 2026-10-26 13:22:28 UTC — [ticket-567] validateur: APPROVED — Ticket-567 livré complet : le Bureau devient la vue par défaut avec sélecteur Bu (372015ms)
+- 2026-10-26 13:22:28 UTC — [ticket-567] APPROVED après 1 tour(s)
+- 2026-10-26 13:28:17 UTC — [ticket-567] documentation: 1 fichier(s) (345344ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « preuve » — l'extrait « /**
+ * Ce qui n'est ni du travail ni un blocage : un quota é » (frontend/src/components/Bu
+- 2026-10-26 13:28:36 UTC — [ide-core] ticket-567 PR #650 confiée au CIWatcher
+- 2026-10-26 13:28:39 UTC — [ticket-579] branche ticket-579-a-run-whose-worktree-setup-fails-commits-its-book
+- 2026-10-26 13:29:37 UTC — [ticket-579] plan rendu (57530ms)
+- 2026-10-26 13:29:37 UTC — [ticket-579] tour 1 — codeur démarré
+- 2026-10-26 13:34:39 UTC — [ide-core] ticket-567 PR #650 mergée (CI verte)
+- 2026-10-26 13:37:25 UTC — [ticket-579] tour 1 — codeur terminé (467983ms)
+- 2026-10-26 13:42:05 UTC — [ide-core] ticket-578 retiré de la file
+- 2026-10-26 13:42:05 UTC — [ide-core] ticket-577 retiré de la file
+- 2026-10-26 13:42:05 UTC — [ide-core] ticket-569 retiré de la file
+- 2026-10-26 13:42:05 UTC — [ide-core] ticket-555 retiré de la file
+- 2026-10-26 13:42:05 UTC — [ide-core] ticket-575 retiré de la file
+- 2026-10-26 13:42:05 UTC — [ide-core] ticket-573 retiré de la file
+- 2026-10-26 13:42:05 UTC — [ide-core] ticket-574 retiré de la file
+- 2026-10-26 13:42:05 UTC — [ide-core] ticket-576 retiré de la file
+- 2026-10-26 13:42:05 UTC — [ide-core] ticket-570 retiré de la file
+- 2026-10-26 13:46:52 UTC — [ticket-579] testeur: OK (exit 0)
+- 2026-10-26 13:50:41 UTC — [ticket-579] securite: PASS — Aucune vulnérabilité critique introduite par ce diff. Le code ajoute un commit d (228467ms)
+- 2026-10-26 13:50:41 UTC — [ticket-579] tour 1 — reviewer démarré
+- 2026-10-26 13:51:13 UTC — [ticket-579] tour 1 — reviewer terminé (31609ms)
+- 2026-10-26 13:55:41 UTC — [ticket-579] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-26 13:57:12 UTC — [ticket-579] validateur: fichiers cités joints : memory/pipeline-log.md (tronqué)
+- 2026-10-26 13:57:12 UTC — [ticket-579] validateur: APPROVED — Tous les critères d'acceptation sont couverts par des tests d'intégration robust (390671ms)
+- 2026-10-26 13:57:12 UTC — [ticket-579] APPROVED après 1 tour(s)
+- 2026-10-26 13:59:32 UTC — [ticket-579] documentation: 0 fichier(s) (136266ms)
+- 2026-10-26 14:07:55 UTC — [ide-core] ticket-579 PR #652 confiée au CIWatcher
+- 2026-10-26 14:07:58 UTC — [ticket-580] branche ticket-580-the-side-column-is-hidden-where-it-has-nothing-to
+- 2026-10-26 14:07:59 UTC — [ticket-580] tour 1 — codeur démarré
+- 2026-10-26 14:09:03 UTC — [ide-core] ticket-578 retiré de la file
+- 2026-10-26 14:09:03 UTC — [ide-core] ticket-577 retiré de la file
+- 2026-10-26 14:09:03 UTC — [ide-core] ticket-569 retiré de la file
+- 2026-10-26 14:09:03 UTC — [ide-core] ticket-555 retiré de la file
+- 2026-10-26 14:09:03 UTC — [ide-core] ticket-575 retiré de la file
+- 2026-10-26 14:09:03 UTC — [ide-core] ticket-573 retiré de la file
+- 2026-10-26 14:09:03 UTC — [ide-core] ticket-574 retiré de la file
+- 2026-10-26 14:09:03 UTC — [ide-core] ticket-576 retiré de la file
+- 2026-10-26 14:09:03 UTC — [ide-core] ticket-570 retiré de la file
+- 2026-10-26 14:09:38 UTC — [ticket-580] tour 1 — codeur terminé (98219ms)
+- 2026-10-26 14:11:57 UTC — [ticket-580] testeur: OK (exit 0)
+- 2026-10-26 14:13:10 UTC — [ide-core] ticket-579 PR #652 mergée (CI verte)
+- 2026-10-26 14:14:02 UTC — [ticket-580] securite: PASS — Aucune vulnérabilité détectée. Le diff introduit un rendu conditionnel de la col (125061ms)
+- 2026-10-26 14:14:02 UTC — [ticket-580] tour 1 — reviewer démarré
+- 2026-10-26 14:14:24 UTC — [ticket-580] tour 1 — reviewer terminé (22233ms)
+- 2026-10-26 14:15:18 UTC — [ide-core] ticket-585 retiré de la file
+- 2026-10-26 14:15:18 UTC — [ide-core] ticket-584 retiré de la file
+- 2026-10-26 14:15:18 UTC — [ide-core] ticket-578 retiré de la file
+- 2026-10-26 14:15:18 UTC — [ide-core] ticket-577 retiré de la file
+- 2026-10-26 14:15:18 UTC — [ide-core] ticket-569 retiré de la file
+- 2026-10-26 14:15:18 UTC — [ide-core] ticket-555 retiré de la file
+- 2026-10-26 14:15:18 UTC — [ide-core] ticket-575 retiré de la file
+- 2026-10-26 14:15:18 UTC — [ide-core] ticket-573 retiré de la file
+- 2026-10-26 14:15:18 UTC — [ide-core] ticket-574 retiré de la file
+- 2026-10-26 14:15:18 UTC — [ide-core] ticket-576 retiré de la file
+- 2026-10-26 14:15:18 UTC — [ide-core] ticket-570 retiré de la file
+- 2026-10-26 14:16:28 UTC — [ticket-580] validateur: fichiers cités joints : Cloche.tsx, backend/ (dossier, 6 fichiers)
+- 2026-10-26 14:16:28 UTC — [ticket-580] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code modifie correctement l'a (145889ms)
+- 2026-10-26 14:16:28 UTC — [ticket-580] APPROVED après 1 tour(s)
+- 2026-10-26 14:17:58 UTC — [ticket-580] documentation: 0 fichier(s) (84735ms)
+- 2026-10-26 14:26:11 UTC — [ide-core] ticket-580 PR #654 mergée (CI verte)
+- 2026-10-26 14:26:13 UTC — [ide-core] ticket-580 : base réalignée sur develop
+- 2026-10-26 14:26:13 UTC — [ide-core] ticket-580 PR #654 confiée au CIWatcher
+- 2026-10-26 14:26:16 UTC — [ticket-581] branche ticket-581-office-view-polish-after-first-use-no-duplicate-s
+- 2026-10-26 14:27:20 UTC — [ticket-581] plan rendu (63375ms)
+- 2026-10-26 14:27:20 UTC — [ticket-581] tour 1 — codeur démarré
+- 2026-10-26 14:29:30 UTC — [ticket-581] tour 1 — codeur terminé (129514ms)
+- 2026-10-26 14:31:18 UTC — [ticket-581] testeur: OK (exit 0)
+- 2026-10-26 14:32:34 UTC — [ticket-581] securite: PASS — Refonte UI pure sans changements de logique de sécurité. Tous les textes affiché (75890ms)
+- 2026-10-26 14:32:34 UTC — [ticket-581] tour 1 — reviewer démarré
+- 2026-10-26 14:32:52 UTC — [ticket-581] tour 1 — reviewer terminé (18828ms)
+- 2026-10-26 14:37:05 UTC — [ticket-581] validateur: fichiers cités joints : Bulle.tsx, Dossiers.tsx, BureauConnecte.tsx, ListeView.tsx, BaieDeServeurs.tsx, FenetreDeQuota.tsx, backend/ (dossier, 6 fichiers)
+- 2026-10-26 14:37:05 UTC — [ticket-581] validateur: APPROVED — Tous les critères d'acceptation ont été vérifiés et respectés. Le code a été mis (271407ms)
+- 2026-10-26 14:37:05 UTC — [ticket-581] APPROVED après 1 tour(s)
+- 2026-10-26 14:39:29 UTC — [ide-core] ticket-582 retiré de la file
+- 2026-10-26 14:39:29 UTC — [ide-core] ticket-583 retiré de la file
+- 2026-10-26 14:39:29 UTC — [ide-core] ticket-586 retiré de la file
+- 2026-10-26 14:39:29 UTC — [ide-core] ticket-585 retiré de la file
+- 2026-10-26 14:39:29 UTC — [ide-core] ticket-584 retiré de la file
+- 2026-10-26 14:39:29 UTC — [ide-core] ticket-578 retiré de la file
+- 2026-10-26 14:39:29 UTC — [ide-core] ticket-577 retiré de la file
+- 2026-10-26 14:39:29 UTC — [ide-core] ticket-569 retiré de la file
+- 2026-10-26 14:39:29 UTC — [ide-core] ticket-555 retiré de la file
+- 2026-10-26 14:39:29 UTC — [ide-core] ticket-575 retiré de la file
+- 2026-10-26 14:39:29 UTC — [ide-core] ticket-573 retiré de la file
+- 2026-10-26 14:39:29 UTC — [ide-core] ticket-574 retiré de la file
+- 2026-10-26 14:39:29 UTC — [ide-core] ticket-576 retiré de la file
+- 2026-10-26 14:39:29 UTC — [ide-core] ticket-570 retiré de la file
+- 2026-10-26 14:40:13 UTC — [ticket-581] documentation: 0 fichier(s) (182796ms) — après tour de correction
+- 2026-10-26 14:48:40 UTC — [ide-core] ticket-581 PR #656 mergée (CI verte)
+- 2026-10-26 14:48:42 UTC — [ide-core] ticket-581 : base réalignée sur develop
+- 2026-10-26 14:48:42 UTC — [ide-core] ticket-581 PR #656 confiée au CIWatcher
+- 2026-10-26 14:48:45 UTC — [ticket-587] branche ticket-587-steps-that-work-silently-are-no-longer-reported-a
+- 2026-10-26 14:48:47 UTC — [ticket-587] tour 1 — codeur démarré
+- 2026-10-26 14:58:32 UTC — [ticket-587] tour 1 — codeur terminé (585139ms)
+- 2026-10-26 15:10:16 UTC — [ticket-587] testeur: 1 failed, 1663 passed, 64 warnings in 700.64s (0:11:40)
+- 2026-10-26 15:10:16 UTC — [ticket-587] tests rouges au tour 1
+- 2026-10-26 15:10:16 UTC — [ticket-587] tour 2 — codeur démarré
+- 2026-10-26 15:12:07 UTC — [ticket-587] tour 2 — codeur terminé (110688ms)
+- 2026-10-26 15:15:41 UTC — [ide-core] ticket-578 retiré de la file
+- 2026-10-26 15:15:41 UTC — [ide-core] ticket-577 retiré de la file
+- 2026-10-26 15:15:41 UTC — [ide-core] ticket-569 retiré de la file
+- 2026-10-26 15:15:41 UTC — [ide-core] ticket-555 retiré de la file
+- 2026-10-26 15:15:41 UTC — [ide-core] ticket-575 retiré de la file
+- 2026-10-26 15:15:41 UTC — [ide-core] ticket-573 retiré de la file
+- 2026-10-26 15:15:41 UTC — [ide-core] ticket-574 retiré de la file
+- 2026-10-26 15:15:41 UTC — [ide-core] ticket-576 retiré de la file
+- 2026-10-26 15:15:41 UTC — [ide-core] ticket-570 retiré de la file
+- 2026-10-26 15:22:38 UTC — [ticket-587] testeur: OK (exit 0)
+- 2026-10-26 15:24:47 UTC — [ticket-587] securite: PASS — Audit sans découverte. Ticket-587 ajoute l'événement TEST_STARTED pour signaler  (128468ms)
+- 2026-10-26 15:24:47 UTC — [ticket-587] tour 2 — reviewer démarré
+- 2026-10-26 15:25:10 UTC — [ticket-587] tour 2 — reviewer terminé (23219ms)
+- 2026-10-26 15:29:47 UTC — [ticket-587] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-26 15:31:03 UTC — [ticket-587] validateur: fichiers cités joints : test_event_types_alignment.py, notifications.ts, postesDuRun.ts
+- 2026-10-26 15:31:03 UTC — [ticket-587] validateur: APPROVED — Tous les critères sont satisfaits. L'événement `test_started` est ajouté au pipe (376280ms)
+- 2026-10-26 15:31:03 UTC — [ticket-587] APPROVED après 2 tour(s)
+- 2026-10-26 15:34:10 UTC — [ticket-587] documentation: 0 fichier(s) (182045ms)
+- 2026-10-26 15:34:31 UTC — [ide-core] ticket-583 retiré de la file
+- 2026-10-26 15:34:31 UTC — [ide-core] ticket-586 retiré de la file
+- 2026-10-26 15:34:31 UTC — [ide-core] ticket-585 retiré de la file
+- 2026-10-26 15:34:31 UTC — [ide-core] ticket-584 retiré de la file
+- 2026-10-26 15:34:31 UTC — [ide-core] ticket-589 retiré de la file
+- 2026-10-26 15:34:31 UTC — [ide-core] ticket-578 retiré de la file
+- 2026-10-26 15:34:31 UTC — [ide-core] ticket-577 retiré de la file
+- 2026-10-26 15:34:31 UTC — [ide-core] ticket-569 retiré de la file
+- 2026-10-26 15:34:31 UTC — [ide-core] ticket-555 retiré de la file
+- 2026-10-26 15:34:31 UTC — [ide-core] ticket-575 retiré de la file
+- 2026-10-26 15:34:31 UTC — [ide-core] ticket-573 retiré de la file
+- 2026-10-26 15:34:31 UTC — [ide-core] ticket-574 retiré de la file
+- 2026-10-26 15:34:31 UTC — [ide-core] ticket-576 retiré de la file
+- 2026-10-26 15:34:31 UTC — [ide-core] ticket-570 retiré de la file
+- 2026-10-26 15:43:41 UTC — [ide-core] ticket-587 PR #660 confiée au CIWatcher
+- 2026-10-26 15:43:43 UTC — [ticket-582] branche ticket-582-clicking-an-agent-in-the-office-shows-the-chosen
+- 2026-10-26 15:44:41 UTC — [ticket-582] plan rendu (56297ms)
+- 2026-10-26 15:44:41 UTC — [ticket-582] tour 1 — codeur démarré
+- 2026-10-26 15:46:53 UTC — [ticket-582] tour 1 — codeur terminé (131875ms)
+- 2026-10-26 15:48:44 UTC — [ticket-582] testeur: OK (exit 0)
+- 2026-10-26 15:49:43 UTC — [ide-core] ticket-587 PR #660 mergée (CI verte)
+- 2026-10-26 15:50:38 UTC — [ticket-582] securite: PASS — Aucune vulnérabilité critique ou haute introduite. Le code utilise correctement  (114500ms)
+- 2026-10-26 15:50:38 UTC — [ticket-582] tour 1 — reviewer démarré
+- 2026-10-26 15:50:58 UTC — [ticket-582] tour 1 — reviewer terminé (17968ms)
+- 2026-10-26 15:55:15 UTC — [ticket-582] validateur: fichiers cités joints : backend/ (dossier, 6 fichiers)
+- 2026-10-26 15:55:15 UTC — [ticket-582] validateur: APPROVED — Tous les critères sont respectés : le clic sur un poste occupé affiche correctem (275469ms)
+- 2026-10-26 15:55:15 UTC — [ticket-582] APPROVED après 1 tour(s)
+- 2026-10-26 15:59:10 UTC — [ticket-582] documentation: 0 fichier(s) (229500ms) — après tour de correction
+- 2026-10-26 15:59:38 UTC — [ticket-582] livraison: résolveur tenté : frontend/src/components/BureauView/Piece.tsx (20235ms)
+- 2026-10-26 15:59:38 UTC — [ticket-582] livraison: arrêt — Conflit avec develop sur : frontend/src/components/BureauView/Piece.tsx — résolveur tenté sur fronte
+- 2026-10-26 15:59:39 UTC — [ide-core] file interrompue : ticket-582 n'a pas été livré
+- 2026-10-26 16:05:22 UTC — [ide-core] ticket-582 PR #661 non reprise : aucun commit poussé noté (résolution de conflit ou livraison interrompue)
+- 2026-10-26 16:05:34 UTC — [ticket-590] branche ticket-590-the-queue-is-one-pile-of-folders-with-its-count-a
+- 2026-10-26 16:05:35 UTC — [ticket-590] tour 1 — codeur démarré
+- 2026-10-26 16:07:51 UTC — [ticket-590] tour 1 — codeur terminé (135890ms)
+- 2026-10-26 16:09:37 UTC — [ticket-590] testeur: OK (exit 0)
+- 2026-10-26 16:11:42 UTC — [ticket-590] securite: PASS — Refactorisation React de l'affichage des tickets. Pas de vulnérabilité détectée  (124875ms)
+- 2026-10-26 16:11:42 UTC — [ticket-590] tour 1 — reviewer démarré
+- 2026-10-26 19:32:18 UTC — [ticket-590] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-26 19:32:24 UTC — [ticket-590] INTERROMPU au tour 1 — ProviderIndisponible: agent silencieux depuis 1200 s
+- 2026-10-27 07:44:05 UTC — [ticket-590] validateur: fichiers cités joints : backend/ (dossier, 8 fichiers)
+- 2026-10-27 07:44:05 UTC — [ticket-590] validateur: CHANGES_REQUESTED — Validation indisponible : durée maximale dépassée (900 s) (55935172ms)
+- 2026-10-27 07:44:42 UTC — [ide-core] file interrompue : ticket-590 non approuvé
+- 2026-10-27 07:46:25 UTC — [ticket-590] branche ticket-590-the-queue-is-one-pile-of-folders-with-its-count-a
+- 2026-10-27 07:49:08 UTC — [ticket-590] testeur: OK (exit 0)
+- 2026-10-27 07:49:08 UTC — [ticket-590] branche reprise (3 commit(s)) — tests green, codeur sauté
+- 2026-10-27 07:50:40 UTC — [ticket-590] securite: PASS — Aucune vulnérabilité détectée. Le code affiche les titres de tickets issus de l' (91125ms)
+- 2026-10-27 07:50:40 UTC — [ticket-590] tour 1 — reviewer démarré
+- 2026-10-27 07:50:57 UTC — [ticket-590] tour 1 — reviewer terminé (17156ms)
+- 2026-10-27 07:53:00 UTC — [ticket-590] validateur: fichiers cités joints : backend/ (dossier, 6 fichiers)
+- 2026-10-27 07:53:00 UTC — [ticket-590] validateur: APPROVED — Tous les critères d'acceptation ont été implémentés et vérifiés via les tests. L (140141ms)
+- 2026-10-27 07:53:00 UTC — [ticket-590] APPROVED après 1 tour(s)
+- 2026-10-27 07:57:38 UTC — [ticket-590] documentation: 0 fichier(s) (271641ms) — après tour de correction
+- 2026-10-27 07:57:56 UTC — [ide-core] ticket-590 PR #663 confiée au CIWatcher
+- 2026-10-27 07:57:59 UTC — [ticket-592] branche ticket-592-the-conflict-resolver-checks-and-stages-the-resol
+- 2026-10-27 07:58:00 UTC — [ticket-592] tour 1 — codeur démarré
+- 2026-10-27 08:00:13 UTC — [ticket-592] tour 1 — codeur terminé (132500ms)
+- 2026-10-27 08:01:32 UTC — [ide-core] ticket-590 PR #663 mergée (CI verte)
+- 2026-10-27 08:08:17 UTC — [ticket-592] testeur: OK (exit 0)
+- 2026-10-27 08:10:40 UTC — [ticket-592] securite: PASS — Aucune vulnérabilité détectée. Le diff corrige un bug de résolution de conflits  (142172ms)
+- 2026-10-27 08:10:40 UTC — [ticket-592] tour 1 — reviewer démarré
+- 2026-10-27 08:11:00 UTC — [ticket-592] tour 1 — reviewer terminé (19813ms)
+- 2026-10-27 08:14:04 UTC — [ticket-592] validateur: fichiers cités joints : conflits.py, frontend/ (dossier, 16 fichiers)
+- 2026-10-27 08:14:04 UTC — [ticket-592] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code modifie correctement la  (204250ms)
+- 2026-10-27 08:14:04 UTC — [ticket-592] APPROVED après 1 tour(s)
+- 2026-10-27 08:15:28 UTC — [ticket-592] documentation: 0 fichier(s) (78531ms)
+- 2026-10-27 08:24:01 UTC — [ide-core] ticket-592 PR #664 confiée au CIWatcher
+- 2026-10-27 08:24:04 UTC — [ticket-591] branche ticket-591-every-agent-of-the-pipeline-stays-visible-waiting
+- 2026-10-27 08:24:05 UTC — [ticket-591] tour 1 — codeur démarré
+- 2026-10-27 08:26:49 UTC — [ticket-591] tour 1 — codeur terminé (163578ms)
+- 2026-10-27 08:28:27 UTC — [ticket-591] testeur: OK (exit 0)
+- 2026-10-27 08:28:45 UTC — [ide-core] ticket-592 PR #664 mergée (CI verte)
+- 2026-10-27 08:29:02 UTC — [ticket-591] securite: PASS — Aucune vulnérabilité détectée. Le diff modifie uniquement l'UI frontend : libell (34531ms)
+- 2026-10-27 08:29:02 UTC — [ticket-591] tour 1 — reviewer démarré
+- 2026-10-27 08:29:33 UTC — [ticket-591] tour 1 — reviewer terminé (31483ms)
+- 2026-10-27 08:32:46 UTC — [ticket-591] validateur: fichiers cités joints : design/bureau/sources.test.ts, backend/ (dossier, 8 fichiers)
+- 2026-10-27 08:32:46 UTC — [ticket-591] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (224764ms)
+- 2026-10-27 08:32:46 UTC — [ticket-591] APPROVED après 1 tour(s)
+- 2026-10-27 08:36:37 UTC — [ticket-591] documentation: 0 fichier(s) (225500ms) — après tour de correction
+- 2026-10-27 08:38:36 UTC — [ide-core] ticket-591 PR #665 confiée au CIWatcher
+- 2026-10-27 08:38:40 UTC — [ticket-583] branche ticket-583-the-break-room-and-the-meeting-room-keep-their-fu
+- 2026-10-27 08:38:41 UTC — [ticket-583] tour 1 — codeur démarré
+- 2026-10-27 08:40:28 UTC — [ticket-583] tour 1 — codeur terminé (106500ms)
+- 2026-10-27 08:42:03 UTC — [ticket-583] testeur: OK (exit 0)
+- 2026-10-27 08:43:18 UTC — [ide-core] ticket-591 PR #665 mergée (CI verte)
+- 2026-10-27 08:43:25 UTC — [ticket-583] securite: PASS — Diff d'ajout de mobilier visuel (machine à café, table de réunion) aux salles du (82531ms)
+- 2026-10-27 08:43:26 UTC — [ticket-583] tour 1 — reviewer démarré
+- 2026-10-27 08:43:42 UTC — [ticket-583] tour 1 — reviewer terminé (16468ms)
+- 2026-10-27 08:45:53 UTC — [ticket-583] validateur: fichiers cités joints : design/bureau/sources.test.ts, backend/ (dossier, 8 fichiers) ; absents : design/bureau/
+- 2026-10-27 08:45:53 UTC — [ticket-583] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les salles de pause et réunion a (147938ms)
+- 2026-10-27 08:45:53 UTC — [ticket-583] APPROVED après 1 tour(s)
+- 2026-10-27 08:47:49 UTC — [ide-core] ticket-586 retiré de la file
+- 2026-10-27 08:47:49 UTC — [ide-core] ticket-585 retiré de la file
+- 2026-10-27 08:47:49 UTC — [ide-core] ticket-584 retiré de la file
+- 2026-10-27 08:47:49 UTC — [ide-core] ticket-589 retiré de la file
+- 2026-10-27 08:47:49 UTC — [ide-core] ticket-578 retiré de la file
+- 2026-10-27 08:47:49 UTC — [ide-core] ticket-577 retiré de la file
+- 2026-10-27 08:47:49 UTC — [ide-core] ticket-569 retiré de la file
+- 2026-10-27 08:47:49 UTC — [ide-core] ticket-555 retiré de la file
+- 2026-10-27 08:47:49 UTC — [ide-core] ticket-575 retiré de la file
+- 2026-10-27 08:47:49 UTC — [ide-core] ticket-573 retiré de la file
+- 2026-10-27 08:47:49 UTC — [ide-core] ticket-574 retiré de la file
+- 2026-10-27 08:47:49 UTC — [ide-core] ticket-576 retiré de la file
+- 2026-10-27 08:47:49 UTC — [ide-core] ticket-570 retiré de la file
+- 2026-10-27 08:48:26 UTC — [ticket-583] documentation: 0 fichier(s) (147781ms)
+- 2026-10-27 09:06:15 UTC — [ticket-586] branche ticket-586-the-projects-view-drops-its-duplicate-side-list-a
+- 2026-10-27 09:06:17 UTC — [ticket-586] tour 1 — codeur démarré
+- 2026-10-27 09:09:46 UTC — [ticket-586] tour 1 — codeur terminé (209156ms)
+- 2026-10-27 09:11:44 UTC — [ticket-586] testeur: OK (exit 0)
+- 2026-10-27 09:12:57 UTC — [ticket-586] securite: PASS — Refactoring UI component (project list sidebar → center panel). No security vuln (72750ms)
+- 2026-10-27 09:12:57 UTC — [ticket-586] tour 1 — reviewer démarré
+- 2026-10-27 09:13:17 UTC — [ticket-586] tour 1 — reviewer terminé (20250ms)
+- 2026-10-27 09:17:57 UTC — [ticket-586] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-27 09:18:19 UTC — [ticket-586] validateur: fichiers cités joints : frontend/src (dossier, 8 fichiers), backend/ (dossier, 6 fichiers)
+- 2026-10-27 09:18:19 UTC — [ticket-586] validateur: APPROVED — Tous les critères sont satisfaits. Le diff supprime `ProjectNav.tsx` et ses usag (321562ms)
+- 2026-10-27 09:18:19 UTC — [ticket-586] APPROVED après 1 tour(s)
+- 2026-10-27 09:22:12 UTC — [ticket-586] documentation: 1 fichier(s) (220921ms)
+- 2026-10-27 09:22:35 UTC — [ide-core] ticket-586 PR #669 confiée au CIWatcher
+- 2026-10-27 09:22:39 UTC — [ticket-585] branche ticket-585-the-office-shows-when-a-run-is-writing-its-docume
+- 2026-10-27 09:22:40 UTC — [ticket-585] tour 1 — codeur démarré
+- 2026-10-27 09:24:30 UTC — [ticket-585] tour 1 — codeur terminé (110187ms)
+- 2026-10-27 09:26:29 UTC — [ide-core] ticket-586 PR #669 mergée (CI verte)
+- 2026-10-27 09:26:52 UTC — [ticket-585] testeur: OK (exit 0)
+- 2026-10-27 09:27:58 UTC — [ticket-585] securite: PASS — Le diff ajoute l'affichage des étapes documentation et livraison via une fonctio (65733ms)
+- 2026-10-27 09:27:58 UTC — [ticket-585] tour 1 — reviewer démarré
+- 2026-10-27 09:28:16 UTC — [ticket-585] tour 1 — reviewer terminé (17406ms)
+- 2026-10-27 09:30:50 UTC — [ticket-585] validateur: fichiers cités joints : design/bureau/sources.test.ts, backend/ (dossier, 6 fichiers)
+- 2026-10-27 09:30:50 UTC — [ticket-585] validateur: APPROVED — Tous les critères d'acceptation ont été respectés. Le code implémente correcteme (171889ms)
+- 2026-10-27 09:30:50 UTC — [ticket-585] APPROVED après 1 tour(s)
+- 2026-10-27 09:33:29 UTC — [ticket-585] documentation: 0 fichier(s) (152014ms) — après tour de correction
+- 2026-10-27 08:50:34 UTC — [ide-core] ticket-583 PR #667 confiée au CIWatcher
+- 2026-10-27 08:50:37 UTC — [ticket-593] branche ticket-593-office-rooms-get-a-floor-and-plants-the-queue-too
+- 2026-10-27 08:50:38 UTC — [ticket-593] tour 1 — codeur démarré
+- 2026-10-27 08:53:57 UTC — [ticket-593] tour 1 — codeur terminé (199108ms)
+- 2026-10-27 08:55:15 UTC — [ide-core] ticket-583 PR #667 mergée (CI verte)
+- 2026-10-27 08:55:34 UTC — [ticket-593] testeur: OK (exit 0)
+- 2026-10-27 08:57:04 UTC — [ticket-593] securite: PASS — Aucune vulnérabilité de sécurité détectée. Les modifications sont purement UI :  (90389ms)
+- 2026-10-27 08:57:04 UTC — [ticket-593] tour 1 — reviewer démarré
+- 2026-10-27 08:57:32 UTC — [ticket-593] tour 1 — reviewer terminé (27343ms)
+- 2026-10-27 09:02:05 UTC — [ticket-593] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-27 09:02:55 UTC — [ticket-593] validateur: fichiers cités joints : Plante.tsx, design/bureau/sources.test.ts, backend/ (dossier, 6 fichiers) ; absents : design/bureau/
+- 2026-10-27 09:02:55 UTC — [ticket-593] validateur: APPROVED — Tous les critères sont satisfaits. L'infobulle est correctement portée vers docu (350750ms)
+- 2026-10-27 09:02:55 UTC — [ticket-593] APPROVED après 1 tour(s)
+- 2026-10-27 09:05:01 UTC — [ticket-593] documentation: 0 fichier(s) (120125ms)
+- 2026-10-27 09:06:11 UTC — [ticket-593] livraison: résolveur tenté : frontend/src/components/BureauView/BureauView.test.tsx, frontend/src/components/BureauView/Salle.tsx, frontend/src/components/BureauView/Salles.test.tsx, frontend/src/design/bureau/sources.test.ts, frontend/src/index.css (61203ms)
+- 2026-10-27 09:06:11 UTC — [ticket-593] livraison: arrêt — Conflit avec develop sur : frontend/src/components/BureauView/BureauView.test.tsx, frontend/src/comp
+- 2026-10-27 09:36:08 UTC — [ide-core] ticket-585 PR #670 confiée au CIWatcher
+- 2026-10-27 09:36:11 UTC — [ticket-584] branche ticket-584-the-post-rebase-retest-runs-only-when-the-base-br
+- 2026-10-27 09:36:13 UTC — [ticket-584] tour 1 — codeur démarré
+- 2026-10-27 09:41:12 UTC — [ticket-584] tour 1 — codeur terminé (299046ms)
+- 2026-10-27 09:43:44 UTC — [ticket-584] testeur: 1 failed, 1079 passed, 64 warnings in 148.75s (0:02:28)
+- 2026-10-27 09:43:44 UTC — [ticket-584] tests rouges au tour 1
+- 2026-10-27 09:43:44 UTC — [ticket-584] tour 2 — codeur démarré
+- 2026-10-27 09:44:16 UTC — [ticket-584] tour 2 — codeur terminé (31500ms)
+- 2026-10-27 09:50:14 UTC — [ide-core] ticket-585 PR #670 mergée (CI verte)
+- 2026-10-27 09:52:40 UTC — [ticket-584] testeur: OK (exit 0)
+- 2026-10-27 09:55:52 UTC — [ticket-584] securite: PASS — Aucune vulnérabilité détectée. Le diff ajoute une logique d'optimisation de rete (191406ms)
+- 2026-10-27 09:55:52 UTC — [ticket-584] tour 2 — reviewer démarré
+- 2026-10-27 09:56:13 UTC — [ticket-584] tour 2 — reviewer terminé (20968ms)
+- 2026-10-27 10:00:52 UTC — [ticket-584] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-27 10:01:28 UTC — [ticket-584] validateur: fichiers cités joints : frontend/ (dossier, 16 fichiers), backend/ (dossier, 6 fichiers), scripts/ (dossier, 6 fichiers), scripts/verifier.py
+- 2026-10-27 10:01:28 UTC — [ticket-584] validateur: APPROVED — Tous les critères sont satisfaits. Le diff introduit une chaîne de décision dans (336546ms)
+- 2026-10-27 10:01:28 UTC — [ticket-584] APPROVED après 2 tour(s)
+- 2026-10-27 10:05:05 UTC — [ticket-584] documentation: 0 fichier(s) (213218ms) — après tour de correction — refusé : doc-technique : docs/configuration.md : texte introuvable — « make dev           # Lance FastAPI sur http://localhost:8000 ». L'agent a proposé une modification
+- 2026-10-27 10:07:06 UTC — [ide-core] ticket-589 retiré de la file
+- 2026-10-27 10:07:06 UTC — [ide-core] ticket-578 retiré de la file
+- 2026-10-27 10:07:06 UTC — [ide-core] ticket-577 retiré de la file
+- 2026-10-27 10:07:06 UTC — [ide-core] ticket-569 retiré de la file
+- 2026-10-27 10:07:06 UTC — [ide-core] ticket-555 retiré de la file
+- 2026-10-27 10:07:06 UTC — [ide-core] ticket-575 retiré de la file
+- 2026-10-27 10:07:06 UTC — [ide-core] ticket-573 retiré de la file
+- 2026-10-27 10:07:06 UTC — [ide-core] ticket-574 retiré de la file
+- 2026-10-27 10:07:06 UTC — [ide-core] ticket-576 retiré de la file
+- 2026-10-27 10:07:06 UTC — [ide-core] ticket-570 retiré de la file
+- 2026-10-27 10:07:06 UTC — [ide-core] ticket-595 retiré de la file
+- 2026-10-27 10:07:06 UTC — [ide-core] ticket-596 retiré de la file
+- 2026-10-27 10:07:06 UTC — [ide-core] ticket-597 retiré de la file
+- 2026-10-27 10:15:23 UTC — [ide-core] ticket-584 PR #673 confiée au CIWatcher
+- 2026-10-27 10:15:26 UTC — [ticket-595] branche ticket-595-office-agents-get-an-outfit-per-role-and-a-look-p
+- 2026-10-27 10:16:36 UTC — [ticket-595] plan rendu (69843ms)
+- 2026-10-27 10:16:36 UTC — [ticket-595] tour 1 — codeur démarré
+- 2026-10-27 10:20:03 UTC — [ide-core] ticket-584 PR #673 mergée (CI verte)
+- 2026-10-27 10:20:44 UTC — [ticket-595] tour 1 — codeur terminé (248187ms)
+- 2026-10-27 10:20:59 UTC — [ide-core] ticket-596 retiré de la file
+- 2026-10-27 10:20:59 UTC — [ide-core] ticket-597 retiré de la file
+- 2026-10-27 10:20:59 UTC — [ide-core] ticket-589 retiré de la file
+- 2026-10-27 10:20:59 UTC — [ide-core] ticket-578 retiré de la file
+- 2026-10-27 10:20:59 UTC — [ide-core] ticket-577 retiré de la file
+- 2026-10-27 10:20:59 UTC — [ide-core] ticket-569 retiré de la file
+- 2026-10-27 10:20:59 UTC — [ide-core] ticket-555 retiré de la file
+- 2026-10-27 10:20:59 UTC — [ide-core] ticket-575 retiré de la file
+- 2026-10-27 10:20:59 UTC — [ide-core] ticket-573 retiré de la file
+- 2026-10-27 10:20:59 UTC — [ide-core] ticket-574 retiré de la file
+- 2026-10-27 10:20:59 UTC — [ide-core] ticket-576 retiré de la file
+- 2026-10-27 10:20:59 UTC — [ide-core] ticket-570 retiré de la file
+- 2026-10-27 10:23:01 UTC — [ticket-595] testeur: OK (exit 0)
+- 2026-10-27 10:24:47 UTC — [ticket-595] securite: PASS — Aucune vulnérabilité détectée. Le code utilise TypeScript strict, des types énum (106172ms)
+- 2026-10-27 10:24:47 UTC — [ticket-595] tour 1 — reviewer démarré
+- 2026-10-27 10:25:11 UTC — [ticket-595] tour 1 — reviewer terminé (23609ms)
+- 2026-10-27 10:29:48 UTC — [ticket-595] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-27 10:30:32 UTC — [ticket-595] validateur: fichiers cités joints : design/bureau/sources.test.ts, backend/ (dossier, 6 fichiers)
+- 2026-10-27 10:30:32 UTC — [ticket-595] validateur: APPROVED — Tous les critères du ticket-595 sont satisfaits. Le codeur a implémenté une solu (344906ms)
+- 2026-10-27 10:30:32 UTC — [ticket-595] APPROVED après 1 tour(s)
+- 2026-10-27 10:32:13 UTC — [ticket-595] documentation: 0 fichier(s) (95781ms)
+- 2026-10-27 10:32:57 UTC — [ticket-595] livraison: résolveur tenté : frontend/src/components/BureauView/Piece.tsx (35937ms)
+- 2026-10-27 10:32:57 UTC — [ticket-595] livraison: arrêt — Conflit avec develop sur : frontend/src/components/BureauView/Piece.tsx — résolveur tenté sur fronte
+- 2026-10-27 11:03:28 UTC — [ticket-596] branche ticket-596-finished-agents-vary-what-they-do-walk-to-the-roo
+- 2026-10-27 11:04:50 UTC — [ticket-596] plan rendu (79952ms)
+- 2026-10-27 11:04:50 UTC — [ticket-596] tour 1 — codeur démarré
+- 2026-10-27 11:12:25 UTC — [ticket-596] tour 1 — codeur terminé (454639ms)
+- 2026-10-27 11:14:13 UTC — [ticket-596] testeur: OK (exit 0)
+- 2026-10-27 11:16:32 UTC — [ticket-596] securite: PASS — Le diff introduit une refactorisation de l'interface Bureau pour ajouter des ani (139891ms)
+- 2026-10-27 11:16:33 UTC — [ticket-596] tour 1 — reviewer démarré
+- 2026-10-27 11:17:01 UTC — [ticket-596] tour 1 — reviewer terminé (28157ms)
+- 2026-10-27 11:21:33 UTC — [ticket-596] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-27 11:22:08 UTC — [ticket-596] validateur: fichiers cités joints : design/bureau/sources.test.ts, backend/ (dossier, 8 fichiers)
+- 2026-10-27 11:22:08 UTC — [ticket-596] validateur: APPROVED — Tous les critères sont satisfaits. Le code ajoute une couche d'agents animés san (335610ms)
+- 2026-10-27 11:22:08 UTC — [ticket-596] CHANGES_REQUESTED tour 1: Reviewer : ## Problèmes bloquants
+- 2026-10-27 11:22:08 UTC — [ticket-596] tour 2 — codeur démarré
+- 2026-10-27 11:22:56 UTC — [ticket-596] tour 2 — codeur terminé (48125ms)
+- 2026-10-27 11:24:43 UTC — [ticket-596] testeur: OK (exit 0)
+- 2026-10-27 11:26:08 UTC — [ticket-596] securite: PASS — Aucune vulnérabilité détectée. Le code est bien structuré, fortement typé, et ne (84640ms)
+- 2026-10-27 11:26:08 UTC — [ticket-596] tour 2 — reviewer démarré
+- 2026-10-27 11:26:08 UTC — [ticket-596] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-10-27 11:26:22 UTC — [ticket-596] tour 2 — reviewer terminé (13625ms)
+- 2026-10-27 11:26:37 UTC — [ticket-596] validateur: fichiers cités joints : design/bureau/sources.test.ts, backend/ (dossier, 6 fichiers)
+- 2026-10-27 11:26:37 UTC — [ticket-596] validateur: APPROVED — Le ticket-596 est complet : tous les critères sont satisfaits par le code fourni (29108ms)
+- 2026-10-27 11:26:37 UTC — [ticket-596] APPROVED après 2 tour(s)
+- 2026-10-27 11:32:36 UTC — [ticket-596] documentation: 0 fichier(s) (355264ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : section « Synchronisation de la base avant livraison » introuvable.
+- 2026-10-27 11:47:29 UTC — [ide-core] ticket-596 PR #677 mergée (CI verte)
+- 2026-10-27 11:47:31 UTC — [ide-core] ticket-596 : base réalignée sur develop
+- 2026-10-27 11:47:31 UTC — [ide-core] ticket-596 PR #677 confiée au CIWatcher
+- 2026-10-27 11:47:34 UTC — [ticket-597] branche ticket-597-shared-rooms-across-the-top-the-director-s-office
+- 2026-10-27 11:49:08 UTC — [ticket-597] plan rendu (93656ms)
+- 2026-10-27 11:49:08 UTC — [ticket-597] tour 1 — codeur démarré
+- 2026-10-27 11:59:23 UTC — [ticket-597] tour 1 — codeur terminé (614985ms)
+- 2026-10-27 12:01:15 UTC — [ticket-597] testeur: OK (exit 0)
+- 2026-10-27 12:03:18 UTC — [ticket-597] securite: PASS — Ticket-597 : ajout des salles communes (directeur, RH, réunion, pause) avec gest (122437ms)
+- 2026-10-27 12:03:18 UTC — [ticket-597] tour 1 — reviewer démarré
+- 2026-10-27 12:03:58 UTC — [ticket-597] tour 1 — reviewer terminé (40312ms)
+- 2026-10-27 12:08:18 UTC — [ticket-597] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-27 12:08:54 UTC — [ticket-597] validateur: fichiers cités joints : backend/src/ (dossier, 0 fichiers)
+- 2026-10-27 12:08:54 UTC — [ticket-597] validateur: APPROVED — Tous les critères sont satisfaits. Les quatre salles communes (directeur, réunio (336562ms)
+- 2026-10-27 12:08:54 UTC — [ticket-597] CHANGES_REQUESTED tour 1: Reviewer : ## Problèmes bloquants
+- 2026-10-27 12:08:54 UTC — [ticket-597] tour 2 — codeur démarré
+- 2026-10-27 12:13:27 UTC — [ticket-597] tour 2 — codeur terminé (272342ms)
+- 2026-10-27 12:15:14 UTC — [ticket-597] testeur: OK (exit 0)
+- 2026-10-27 12:18:21 UTC — [ticket-597] securite: PASS — Aucune vulnérabilité OWASP Top 10 critique ou haute détectée. Le code utilise Re (187093ms)
+- 2026-10-27 12:18:21 UTC — [ticket-597] tour 2 — reviewer démarré
+- 2026-10-27 12:18:36 UTC — [ticket-597] tour 2 — reviewer terminé (15077ms)
+- 2026-10-27 12:23:21 UTC — [ticket-597] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-27 12:23:57 UTC — [ticket-597] validateur: fichiers cités joints : backend/src/ (dossier, 0 fichiers)
+- 2026-10-27 12:23:57 UTC — [ticket-597] validateur: APPROVED — Les sept critères sont tous satisfaits. Le diff ajoute les quatre salles commune (335437ms)
+- 2026-10-27 12:23:57 UTC — [ticket-597] APPROVED après 2 tour(s)
+- 2026-10-27 12:31:04 UTC — [ticket-597] documentation: 1 fichier(s) (423000ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « preuve » — l'extrait « PREFIXES_BACKEND: tuple[str, ...] = ("backend/", "scripts/") » (backend/src/tessera/servic
+- 2026-10-27 12:36:00 UTC — [ide-core] ticket-597 PR #678 mergée (CI verte)
+- 2026-10-27 12:36:02 UTC — [ide-core] ticket-597 : base réalignée sur develop
+- 2026-10-27 12:36:02 UTC — [ide-core] ticket-597 PR #678 confiée au CIWatcher
+- 2026-10-27 12:36:05 UTC — [ticket-598] branche ticket-598-the-room-celebrates-a-merged-pr-and-a-beacon-turn
+- 2026-10-27 12:36:06 UTC — [ticket-598] tour 1 — codeur démarré
+- 2026-10-27 12:41:11 UTC — [ticket-598] tour 1 — codeur terminé (305063ms)
+- 2026-10-27 12:43:03 UTC — [ticket-598] testeur: OK (exit 0)
+- 2026-10-27 12:44:31 UTC — [ticket-598] securite: PASS — Aucune vulnérabilité de sécurité détectée. Le diff ajoute une fonctionnalité de  (88063ms)
+- 2026-10-27 12:44:31 UTC — [ticket-598] tour 1 — reviewer démarré
+- 2026-10-27 12:44:56 UTC — [ticket-598] tour 1 — reviewer terminé (24375ms)
+- 2026-10-27 12:49:02 UTC — [ticket-598] validateur: fichiers cités joints : backend/ (dossier, 6 fichiers)
+- 2026-10-27 12:49:02 UTC — [ticket-598] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (270734ms)
+- 2026-10-27 12:49:02 UTC — [ticket-598] APPROVED après 1 tour(s)
+- 2026-10-27 12:52:18 UTC — [ticket-598] documentation: 0 fichier(s) (191000ms) — après tour de correction
+- 2026-10-27 12:57:47 UTC — [ide-core] ticket-598 PR #679 mergée (CI verte)
+- 2026-10-27 12:57:49 UTC — [ide-core] ticket-598 : base réalignée sur develop
+- 2026-10-27 12:57:49 UTC — [ide-core] ticket-598 PR #679 confiée au CIWatcher
+- 2026-10-27 12:57:53 UTC — [ticket-599] branche ticket-599-when-changes-are-requested-the-reviewer-brings-it
+- 2026-10-27 12:57:56 UTC — [ticket-599] tour 1 — codeur démarré
+- 2026-10-27 13:01:02 UTC — [ticket-599] tour 1 — codeur terminé (186157ms)
+- 2026-10-27 13:02:54 UTC — [ticket-599] testeur: OK (exit 0)
+- 2026-10-27 13:04:29 UTC — [ticket-599] securite: PASS — Audit sécurité complet : aucune vulnérabilité détectée. Code frontend TypeScript (95672ms)
+- 2026-10-27 13:04:29 UTC — [ticket-599] tour 1 — reviewer démarré
+- 2026-10-27 13:04:55 UTC — [ticket-599] tour 1 — reviewer terminé (25483ms)
+- 2026-10-27 13:07:43 UTC — [ticket-599] validateur: fichiers cités joints : backend/ (dossier, 6 fichiers)
+- 2026-10-27 13:07:43 UTC — [ticket-599] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (194156ms)
+- 2026-10-27 13:07:43 UTC — [ticket-599] APPROVED après 1 tour(s)
+- 2026-10-27 13:10:30 UTC — [ticket-599] documentation: 0 fichier(s) (161266ms)
+- 2026-10-27 13:10:47 UTC — [ide-core] ticket-599 PR #680 confiée au CIWatcher
+- 2026-10-27 13:10:50 UTC — [ticket-600] branche ticket-600-a-whiteboard-on-the-room-s-wall-shows-the-ticket
+- 2026-10-27 13:10:51 UTC — [ticket-600] tour 1 — codeur démarré
+- 2026-10-27 13:16:11 UTC — [ticket-600] tour 1 — codeur terminé (319735ms)
+- 2026-10-27 13:16:51 UTC — [ide-core] ticket-599 PR #680 mergée (CI verte)
+- 2026-10-27 13:18:10 UTC — [ticket-600] testeur: OK (exit 0)
+- 2026-10-27 13:20:58 UTC — [ticket-600] securite: PASS — Aucune vulnérabilité OWASP Top 10 ou CVE détectée dans le code ajouté. Cependant (168391ms)
+- 2026-10-27 13:20:58 UTC — [ticket-600] tour 1 — reviewer démarré
+- 2026-10-27 13:21:23 UTC — [ticket-600] tour 1 — reviewer terminé (25031ms)
+- 2026-10-27 13:25:59 UTC — [ticket-600] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-27 13:26:32 UTC — [ticket-600] validateur: fichiers cités joints : TableauBlanc.tsx, design/bureau/sources.test.ts, backend/src/ (dossier, 0 fichiers)
+- 2026-10-27 13:26:32 UTC — [ticket-600] validateur: APPROVED — Tous les critères sont satisfaits. Le tableau blanc affiche correctement les cri (333843ms)
+- 2026-10-27 13:26:32 UTC — [ticket-600] APPROVED après 1 tour(s)
+- 2026-10-27 13:28:02 UTC — [ticket-600] documentation: 0 fichier(s) (85296ms)
+- 2026-10-27 13:30:47 UTC — [ide-core] ticket-600 PR #682 confiée au CIWatcher
+- 2026-10-27 13:30:53 UTC — [ticket-601] branche ticket-601-a-bubble-above-the-working-agent-says-which-tool
+- 2026-10-27 13:30:56 UTC — [ticket-601] tour 1 — codeur démarré
+- 2026-10-27 13:34:51 UTC — [ticket-601] tour 1 — codeur terminé (235032ms)
+- 2026-10-27 13:37:09 UTC — [ide-core] ticket-600 PR #682 mergée (CI verte)
+- 2026-10-27 13:37:52 UTC — [ticket-601] testeur: Tests  1 failed | 1763 passed (1764)
+- 2026-10-27 13:37:52 UTC — [ticket-601] tests rouges au tour 1
+- 2026-10-27 13:37:52 UTC — [ticket-601] tour 2 — codeur démarré
+- 2026-10-27 13:38:21 UTC — [ide-core] ticket-602 retiré de la file
+- 2026-10-27 13:38:21 UTC — [ide-core] ticket-603 retiré de la file
+- 2026-10-27 13:38:21 UTC — [ide-core] ticket-578 retiré de la file
+- 2026-10-27 13:38:21 UTC — [ide-core] ticket-577 retiré de la file
+- 2026-10-27 13:38:21 UTC — [ide-core] ticket-569 retiré de la file
+- 2026-10-27 13:38:21 UTC — [ide-core] ticket-555 retiré de la file
+- 2026-10-27 13:38:21 UTC — [ide-core] ticket-575 retiré de la file
+- 2026-10-27 13:38:21 UTC — [ide-core] ticket-573 retiré de la file
+- 2026-10-27 13:38:21 UTC — [ide-core] ticket-574 retiré de la file
+- 2026-10-27 13:38:21 UTC — [ide-core] ticket-576 retiré de la file
+- 2026-10-27 13:38:21 UTC — [ide-core] ticket-570 retiré de la file
+- 2026-10-27 13:38:21 UTC — [ide-core] ticket-589 retiré de la file
+- 2026-10-27 13:40:10 UTC — [ticket-601] tour 2 — codeur terminé (138703ms)
+- 2026-10-27 13:43:12 UTC — [ticket-601] testeur: OK (exit 0)
+- 2026-10-27 13:44:04 UTC — [ticket-601] securite: PASS — Aucune vulnérabilité détectée. Le nouveau composant BulleDOutil affiche une desc (51250ms)
+- 2026-10-27 13:44:04 UTC — [ticket-601] tour 2 — reviewer démarré
+- 2026-10-27 13:44:24 UTC — [ticket-601] tour 2 — reviewer terminé (20078ms)
+- 2026-10-27 13:48:53 UTC — [ticket-601] validateur: fichiers cités joints : backend/ (dossier, 6 fichiers)
+- 2026-10-27 13:48:53 UTC — [ticket-601] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (289202ms)
+- 2026-10-27 13:48:53 UTC — [ticket-601] APPROVED après 2 tour(s)
+- 2026-10-27 13:52:59 UTC — [ticket-601] documentation: 0 fichier(s) (238187ms)
+- 2026-10-27 13:54:15 UTC — [ide-core] ticket-578 retiré de la file
+- 2026-10-27 13:54:15 UTC — [ide-core] ticket-577 retiré de la file
+- 2026-10-27 13:54:15 UTC — [ide-core] ticket-569 retiré de la file
+- 2026-10-27 13:54:15 UTC — [ide-core] ticket-555 retiré de la file
+- 2026-10-27 13:54:15 UTC — [ide-core] ticket-575 retiré de la file
+- 2026-10-27 13:54:15 UTC — [ide-core] ticket-573 retiré de la file
+- 2026-10-27 13:54:15 UTC — [ide-core] ticket-574 retiré de la file
+- 2026-10-27 13:54:15 UTC — [ide-core] ticket-576 retiré de la file
+- 2026-10-27 13:54:15 UTC — [ide-core] ticket-570 retiré de la file
+- 2026-10-27 13:54:15 UTC — [ide-core] ticket-589 retiré de la file
+- 2026-10-27 13:56:20 UTC — [ide-core] ticket-601 PR #684 confiée au CIWatcher
+- 2026-10-27 13:56:26 UTC — [ticket-606] branche ticket-606-work-rooms-stack-one-per-row-and-fill-the-view-s
+- 2026-10-27 13:56:29 UTC — [ticket-606] tour 1 — codeur démarré
+- 2026-10-27 13:58:16 UTC — [ticket-606] tour 1 — codeur terminé (107093ms)
+- 2026-10-27 14:00:58 UTC — [ticket-606] testeur: OK (exit 0)
+- 2026-10-27 14:01:32 UTC — [ticket-606] securite: PASS — Refactoring frontend du layout du Bureau (responsive avec ResizeObserver, calcul (34546ms)
+- 2026-10-27 14:01:32 UTC — [ticket-606] tour 1 — reviewer démarré
+- 2026-10-27 14:01:58 UTC — [ticket-606] tour 1 — reviewer terminé (26172ms)
+- 2026-10-27 14:05:40 UTC — [ide-core] ticket-601 PR #684 mergée (CI verte)
+- 2026-10-27 14:06:33 UTC — [ticket-606] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-27 14:07:26 UTC — [ticket-606] validateur: fichiers cités joints : components/BureauView/index.tsx, components/BureauView/Piece.tsx, lib/bureau/echelleDuSol.ts, Piece.test.tsx (tronqué) ; non joints (budget épuisé) : lib/bureau/activites.ts
+- 2026-10-27 14:07:26 UTC — [ticket-606] validateur: CHANGES_REQUESTED — Quatre critères confirmés : le changement de layout en une colonne, suppression  (353906ms)
+- 2026-10-27 14:07:26 UTC — [ticket-606] CHANGES_REQUESTED tour 1: Validateur : Quatre critères confirmés : le changement de layout en une colonne, suppression du `overflow-x-auto`, nouvelle fonction `echelleDuSol` avec tests corrects, et test mis à jour pour vérifie
+- 2026-10-27 14:07:26 UTC — [ticket-606] tour 2 — codeur démarré
+- 2026-10-27 14:07:41 UTC — [ticket-606] tour 2 — codeur terminé (14936ms)
+- 2026-10-27 14:09:50 UTC — [ticket-606] testeur: OK (exit 0)
+- 2026-10-27 14:10:43 UTC — [ticket-606] securite: PASS — Code de refactoring React/TypeScript pour le scaling du sol avec ResizeObserver. (52297ms)
+- 2026-10-27 14:10:43 UTC — [ticket-606] tour 2 — reviewer démarré
+- 2026-10-27 14:10:44 UTC — [ticket-606] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-10-27 14:11:02 UTC — [ticket-606] tour 2 — reviewer terminé (18750ms)
+- 2026-10-27 14:11:08 UTC — [ticket-606] validateur: fichiers cités joints : components/BureauView/index.tsx, components/BureauView/Piece.tsx, lib/bureau/echelleDuSol.ts, Piece.test.tsx (tronqué) ; non joints (budget épuisé) : lib/bureau/activites.ts
+- 2026-10-27 14:11:08 UTC — [ticket-606] validateur: APPROVED — Les cinq critères d'acceptation sont satisfaits. Le changement de layout passe d (25500ms)
+- 2026-10-27 14:11:08 UTC — [ticket-606] APPROVED après 2 tour(s)
+- 2026-10-27 14:12:29 UTC — [ticket-606] documentation: 0 fichier(s) (76687ms)
+- 2026-10-27 14:14:55 UTC — [ide-core] ticket-606 PR #685 non surveillée (livraison arrêtée)
+- 2026-10-27 14:14:58 UTC — [ticket-607] branche ticket-607-agents-hair-reads-as-hair-it-frames-the-face-and
+- 2026-10-27 14:15:00 UTC — [ticket-607] tour 1 — codeur démarré
+- 2026-10-27 14:16:21 UTC — [ticket-607] tour 1 — codeur terminé (80875ms)
+- 2026-10-27 14:18:26 UTC — [ticket-607] testeur: OK (exit 0)
+- 2026-10-27 14:18:52 UTC — [ticket-607] securite: PASS — Aucune vulnérabilité de sécurité détectée. Le diff porte sur des modifications p (25985ms)
+- 2026-10-27 14:18:52 UTC — [ticket-607] tour 1 — reviewer démarré
+- 2026-10-27 14:19:21 UTC — [ticket-607] tour 1 — reviewer terminé (29141ms)
+- 2026-10-27 14:22:59 UTC — [ticket-607] validateur: fichiers cités joints : design/bureau/Tete.tsx, Personnage.test.tsx, PersonnageAssis.tsx, PersonnageDebout.tsx
+- 2026-10-27 14:22:59 UTC — [ticket-607] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code modifie correctement le  (246328ms)
+- 2026-10-27 14:22:59 UTC — [ticket-607] CHANGES_REQUESTED tour 1: Reviewer : ## Problèmes bloquants
+- 2026-10-27 14:22:59 UTC — [ticket-607] tour 2 — codeur démarré
+- 2026-10-27 14:24:43 UTC — [ticket-607] tour 2 — codeur terminé (103906ms)
+- 2026-10-27 14:26:41 UTC — [ticket-607] testeur: OK (exit 0)
+- 2026-10-27 14:26:59 UTC — [ticket-607] securite: PASS — Diff exclusivement composé de rendu UI statique (SVG) et de tests frontends. Pas (18766ms)
+- 2026-10-27 14:26:59 UTC — [ticket-607] tour 2 — reviewer démarré
+- 2026-10-27 14:27:19 UTC — [ticket-607] tour 2 — reviewer terminé (19625ms)
+- 2026-10-27 14:30:43 UTC — [ticket-607] validateur: fichiers cités joints : design/bureau/Tete.tsx, Personnage.test.tsx, PersonnageAssis.tsx, PersonnageDebout.tsx
+- 2026-10-27 14:30:43 UTC — [ticket-607] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code modifie correctement le  (223250ms)
+- 2026-10-27 14:30:43 UTC — [ticket-607] APPROVED après 2 tour(s)
+- 2026-10-27 14:32:29 UTC — [ticket-607] documentation: 0 fichier(s) (101469ms)
+- 2026-10-27 14:34:53 UTC — [ide-core] ticket-607 PR #686 confiée au CIWatcher
+- 2026-10-27 14:34:56 UTC — [ticket-602] branche ticket-602-a-window-follows-day-and-night-the-director-s-off
+- 2026-10-27 14:34:56 UTC — [ticket-602] tour 1 — codeur démarré
+- 2026-10-27 14:40:23 UTC — [ide-core] ticket-607 PR #686 mergée (CI verte)
+- 2026-10-27 14:46:33 UTC — [ticket-602] tour 1 — codeur terminé (696687ms)
+- 2026-10-27 14:48:47 UTC — [ticket-602] testeur: OK (exit 0)
+- 2026-10-27 14:51:26 UTC — [ticket-602] securite: PASS — Aucune vulnérabilité introductive détectée. Les nouvelles fonctionnalités (jour/ (158953ms)
+- 2026-10-27 14:51:26 UTC — [ticket-602] tour 1 — reviewer démarré
+- 2026-10-27 14:52:07 UTC — [ticket-602] tour 1 — reviewer terminé (41218ms)
+- 2026-10-27 14:56:26 UTC — [ticket-602] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-27 14:57:03 UTC — [ticket-602] validateur: fichiers cités joints : backend/ (dossier, 6 fichiers)
+- 2026-10-27 14:57:03 UTC — [ticket-602] validateur: APPROVED — Le codeur a implémenté complètement les trois idées du Bureau vivant : fenêtres  (337468ms)
+- 2026-10-27 14:57:03 UTC — [ticket-602] CHANGES_REQUESTED tour 1: Reviewer : ## Problèmes bloquants
+- 2026-10-27 14:57:03 UTC — [ticket-602] tour 2 — codeur démarré
+- 2026-10-27 14:57:13 UTC — [ticket-602] codeur: outil Bash refusé par le CLI
+- 2026-10-27 14:57:13 UTC — [ticket-602] tour 2 — codeur terminé (9610ms)
+- 2026-10-27 14:59:23 UTC — [ticket-602] testeur: OK (exit 0)
+- 2026-10-27 15:02:12 UTC — [ticket-602] securite: PASS — La vulnérabilité détectée est une inconsistance pré-existante dans l'API client  (169000ms)
+- 2026-10-27 15:02:12 UTC — [ticket-602] tour 2 — reviewer démarré
+- 2026-10-27 15:02:12 UTC — [ticket-602] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-10-27 15:02:32 UTC — [ticket-602] tour 2 — reviewer terminé (20108ms)
+- 2026-10-27 15:02:45 UTC — [ticket-602] validateur: fichiers cités joints : backend/ (dossier, 6 fichiers)
+- 2026-10-27 15:02:45 UTC — [ticket-602] validateur: APPROVED — Implémentation complète des trois idées du Bureau vivant : fenêtres jour/nuit, e (32968ms)
+- 2026-10-27 15:02:45 UTC — [ticket-602] CHANGES_REQUESTED tour 2: Reviewer : ## Problèmes bloquants
+- 2026-10-27 15:02:45 UTC — [ticket-602] tour 3 — codeur démarré
+- 2026-10-27 15:05:05 UTC — [ticket-602] tour 3 — codeur terminé (139327ms)
+- 2026-10-27 15:07:00 UTC — [ticket-602] testeur: OK (exit 0)
+- 2026-10-27 15:08:56 UTC — [ticket-602] securite: PASS — Aucune vulnérabilité détectée. Le diff introduit une amélioration de sécurité av (115546ms)
+- 2026-10-27 15:08:56 UTC — [ticket-602] tour 3 — reviewer démarré
+- 2026-10-27 15:09:15 UTC — [ticket-602] tour 3 — reviewer terminé (19062ms)
+- 2026-10-27 15:13:56 UTC — [ticket-602] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-27 15:14:24 UTC — [ticket-602] validateur: fichiers cités joints : backend/ (dossier, 6 fichiers)
+- 2026-10-27 15:14:24 UTC — [ticket-602] validateur: APPROVED — Le ticket-602 implémente complètement les trois idées du Bureau vivant. Les fenê (328000ms)
+- 2026-10-27 15:14:24 UTC — [ticket-602] APPROVED après 3 tour(s)
+- 2026-10-27 15:19:56 UTC — [ticket-602] documentation: 1 fichier(s) (327671ms) — après tour de correction
+- 2026-10-27 15:22:08 UTC — [ide-core] ticket-602 PR #687 confiée au CIWatcher
+- 2026-10-27 15:22:14 UTC — [ticket-603] branche ticket-603-optional-office-sounds-a-fanfare-on-merge-an-alar
+- 2026-10-27 15:22:15 UTC — [ticket-603] tour 1 — codeur démarré
+- 2026-10-27 15:24:53 UTC — [ticket-603] tour 1 — codeur terminé (157921ms)
+- 2026-10-27 15:26:49 UTC — [ticket-603] testeur: OK (exit 0)
+- 2026-10-27 15:27:09 UTC — [ide-core] ticket-602 PR #687 mergée (CI verte)
+- 2026-10-27 15:28:08 UTC — [ticket-603] securite: PASS — Aucune vulnérabilité détectée. Le code ajoute une synthèse audio saine : énums f (79077ms)
+- 2026-10-27 15:28:08 UTC — [ticket-603] tour 1 — reviewer démarré
+- 2026-10-27 15:28:25 UTC — [ticket-603] tour 1 — reviewer terminé (17422ms)
+- 2026-10-27 15:30:51 UTC — [ticket-603] validateur: fichiers cités joints : backend/ (dossier, 8 fichiers)
+- 2026-10-27 15:30:51 UTC — [ticket-603] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (162750ms)
+- 2026-10-27 15:30:51 UTC — [ticket-603] APPROVED après 1 tour(s)
+- 2026-10-27 15:33:40 UTC — [ticket-603] documentation: 1 fichier(s) (165125ms)
+- 2026-10-27 15:36:20 UTC — [ide-core] ticket-603 PR #688 non surveillée (livraison arrêtée)
+- 2026-10-27 15:36:23 UTC — [ticket-608] branche ticket-608-the-reviewer-looks-for-the-callers-of-any-route-e
+- 2026-10-27 15:36:25 UTC — [ticket-608] tour 1 — codeur démarré
+- 2026-10-27 15:36:58 UTC — [ticket-608] tour 1 — codeur terminé (33187ms)
+- 2026-10-27 15:45:02 UTC — [ticket-608] testeur: OK (exit 0)
+- 2026-10-27 15:45:23 UTC — [ticket-608] securite: PASS — Le diff ajoute une instruction au prompt du reviewer (meilleure pratique pour vé (21171ms)
+- 2026-10-27 15:45:23 UTC — [ticket-608] tour 1 — reviewer démarré
+- 2026-10-27 15:45:33 UTC — [ticket-608] tour 1 — reviewer terminé (10219ms)
+- 2026-10-27 15:47:13 UTC — [ticket-608] validateur: fichiers cités joints : agents/prompts/reviewer.md, backend/tests/ (dossier, 302 fichiers, tronqué)
+- 2026-10-27 15:47:13 UTC — [ticket-608] validateur: APPROVED — Tous les critères d'acceptation sont respectés : le fichier reviewer.md a été mi (110031ms)
+- 2026-10-27 15:47:13 UTC — [ticket-608] APPROVED après 1 tour(s)
+- 2026-10-27 15:48:30 UTC — [ticket-608] documentation: 0 fichier(s) (72452ms)
+- 2026-10-27 16:30:26 UTC — [ide-core] ticket-578 PR #690 confiée au CIWatcher
+- 2026-10-27 16:30:30 UTC — [ticket-577] branche ticket-577-the-status-of-a-single-ticket-run-shows-its-ticke
+- 2026-10-27 16:30:31 UTC — [ticket-577] tour 1 — codeur démarré
+- 2026-10-27 16:31:41 UTC — [ticket-577] tour 1 — codeur terminé (69391ms)
+- 2026-10-27 16:39:47 UTC — [ticket-577] testeur: OK (exit 0)
+- 2026-10-27 16:41:54 UTC — [ticket-577] securite: PASS — Aucune vulnérabilité CRITICAL ou HIGH détectée. Le diff améliore la gestion des  (127093ms)
+- 2026-10-27 16:41:54 UTC — [ticket-577] tour 1 — reviewer démarré
+- 2026-10-27 16:42:28 UTC — [ticket-577] tour 1 — reviewer terminé (33562ms)
+- 2026-10-27 16:43:57 UTC — [ticket-577] validateur: APPROVED — Tous les critères sont respectés : les tests montrent que les runs single foncti (122030ms)
+- 2026-10-27 16:43:57 UTC — [ticket-577] APPROVED après 1 tour(s)
+- 2026-10-27 16:45:33 UTC — [ticket-577] documentation: 0 fichier(s) (90797ms)
+- 2026-10-27 15:48:48 UTC — [ide-core] ticket-608 PR #689 confiée au CIWatcher
+- 2026-10-27 15:48:50 UTC — [ticket-578] branche ticket-578-a-run-launched-in-fast-mode-uses-each-role-s-fall
+- 2026-10-27 15:49:52 UTC — [ticket-578] plan rendu (60765ms)
+- 2026-10-27 15:49:52 UTC — [ticket-578] tour 1 — codeur démarré
+- 2026-10-27 15:53:33 UTC — [ticket-578] tour 1 — codeur terminé (220531ms)
+- 2026-10-27 15:54:50 UTC — [ide-core] ticket-608 PR #689 mergée (CI verte)
+- 2026-10-27 16:00:17 UTC — [ticket-578] testeur: 1 failed, 2408 passed, 64 warnings in 400.94s (0:06:40)
+- 2026-10-27 16:00:17 UTC — [ticket-578] tests rouges au tour 1
+- 2026-10-27 16:00:17 UTC — [ticket-578] tour 2 — codeur démarré
+- 2026-10-27 16:01:34 UTC — [ticket-578] tour 2 — codeur terminé (77282ms)
+- 2026-10-27 16:09:25 UTC — [ticket-578] testeur: OK (exit 0)
+- 2026-10-27 16:12:06 UTC — [ticket-578] securite: PASS — Le diff introduit le mode « rapide » (ticket-578) pour forcer l'utilisation dire (161406ms)
+- 2026-10-27 16:12:06 UTC — [ticket-578] tour 2 — reviewer démarré
+- 2026-10-27 16:12:28 UTC — [ticket-578] tour 2 — reviewer terminé (22202ms)
+- 2026-10-27 16:17:06 UTC — [ticket-578] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-27 16:17:36 UTC — [ticket-578] validateur: fichiers cités joints : backend/src/tessera/routers/orchestrator.py (tronqué) ; non joints (budget épuisé) : memory/pipeline-log.md
+- 2026-10-27 16:17:36 UTC — [ticket-578] validateur: APPROVED — Tous les critères sont satisfaits. L'implémentation ajoute un champ `rapide: boo (330391ms)
+- 2026-10-27 16:17:36 UTC — [ticket-578] APPROVED après 2 tour(s)
+- 2026-10-27 16:20:31 UTC — [ticket-578] documentation: 2 fichier(s) (165000ms)
+- 2026-10-27 16:49:27 UTC — [ticket-569] branche ticket-569-a-ticket-that-does-not-merge-stops-only-the-queue
+- 2026-10-27 16:50:09 UTC — [ticket-569] plan rendu (40218ms)
+- 2026-10-27 16:50:09 UTC — [ticket-569] tour 1 — codeur démarré
+- 2026-10-27 16:55:29 UTC — [ticket-569] tour 1 — codeur terminé (320031ms)
+- 2026-10-27 17:01:32 UTC — [ticket-569] testeur: 1 failed, 1469 passed, 64 warnings in 358.72s (0:05:58)
+- 2026-10-27 17:01:32 UTC — [ticket-569] tests rouges au tour 1
+- 2026-10-27 17:01:32 UTC — [ticket-569] tour 2 — codeur démarré
+- 2026-10-27 17:02:05 UTC — [ticket-569] tour 2 — codeur terminé (32703ms)
+- 2026-10-27 17:13:14 UTC — [ticket-569] testeur: 1 failed, 1601 passed, 64 warnings in 664.70s (0:11:04)
+- 2026-10-27 17:13:14 UTC — [ticket-569] tests rouges au tour 2
+- 2026-10-27 17:13:14 UTC — [ticket-569] tour 3 — codeur démarré
+- 2026-10-27 17:16:16 UTC — [ticket-569] tour 3 — codeur terminé (182343ms)
+- 2026-10-27 17:28:42 UTC — [ticket-569] testeur: OK (exit 0)
+- 2026-10-27 17:30:15 UTC — [ticket-569] securite: PASS — Aucune vulnérabilité détectée. Le diff effectue un refactoring sûr : extraction  (93218ms)
+- 2026-10-27 17:30:15 UTC — [ticket-569] tour 3 — reviewer démarré
+- 2026-10-27 17:30:40 UTC — [ticket-569] tour 3 — reviewer terminé (25031ms)
+- 2026-10-27 17:33:13 UTC — [ide-core] ticket-555 retiré de la file
+- 2026-10-27 17:33:13 UTC — [ide-core] ticket-575 retiré de la file
+- 2026-10-27 17:33:13 UTC — [ide-core] ticket-573 retiré de la file
+- 2026-10-27 17:33:13 UTC — [ide-core] ticket-574 retiré de la file
+- 2026-10-27 17:33:13 UTC — [ide-core] ticket-576 retiré de la file
+- 2026-10-27 17:33:13 UTC — [ide-core] ticket-570 retiré de la file
+- 2026-10-27 17:33:13 UTC — [ide-core] ticket-589 retiré de la file
+- 2026-10-27 17:35:15 UTC — [ticket-569] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-27 17:35:38 UTC — [ticket-569] validateur: fichiers cités joints : memory/pipeline-log.md (tronqué) ; non joints (budget épuisé) : memory/decisions.md
+- 2026-10-27 17:35:38 UTC — [ticket-569] validateur: APPROVED — Tous les critères sont satisfaits. Le diff ajoute quatre tests unitaires complet (323015ms)
+- 2026-10-27 17:35:38 UTC — [ticket-569] APPROVED après 3 tour(s)
+- 2026-10-27 17:39:51 UTC — [ticket-569] documentation: 1 fichier(s) (247858ms)
+- 2026-10-27 17:47:34 UTC — [ide-core] ticket-569 PR #694 confiée au CIWatcher
+- 2026-10-27 17:47:37 UTC — [ticket-610] branche ticket-610-a-blocked-merge-no-longer-leaves-the-checkout-dir
+- 2026-10-27 17:47:38 UTC — [ticket-610] tour 1 — codeur démarré
+- 2026-10-27 17:53:33 UTC — [ticket-610] tour 1 — codeur terminé (355235ms)
+- 2026-10-27 17:53:34 UTC — [ide-core] ticket-569 PR #694 mergée (CI verte)
+- 2026-10-27 18:01:15 UTC — [ticket-610] testeur: OK (exit 0)
+- 2026-10-27 18:03:32 UTC — [ticket-610] securite: PASS — Audit complet du ticket-610 : aucune vulnérabilité critique ou élevée détectée.  (136797ms)
+- 2026-10-27 18:03:32 UTC — [ticket-610] tour 1 — reviewer démarré
+- 2026-10-27 18:04:09 UTC — [ticket-610] tour 1 — reviewer terminé (37422ms)
+- 2026-10-27 18:08:32 UTC — [ticket-610] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-27 18:08:52 UTC — [ticket-610] validateur: fichiers cités joints : backend/tests/ (dossier, 305 fichiers, tronqué), memory/pipeline-log.md (tronqué)
+- 2026-10-27 18:08:52 UTC — [ticket-610] validateur: APPROVED — Tous les critères sont satisfaits. Le code implémente correctement le mécanisme  (320172ms)
+- 2026-10-27 18:08:52 UTC — [ticket-610] APPROVED après 1 tour(s)
+- 2026-10-27 18:13:04 UTC — [ticket-610] documentation: 0 fichier(s) (247968ms) — après tour de correction
+- 2026-10-27 18:20:54 UTC — [ide-core] ticket-610 PR #695 confiée au CIWatcher
+- 2026-10-27 18:20:57 UTC — [ticket-555] branche ticket-555-a-session-or-weekly-quota-under-10-is-notified
+- 2026-10-27 18:20:58 UTC — [ticket-555] tour 1 — codeur démarré
+- 2026-10-27 18:23:29 UTC — [ticket-555] tour 1 — codeur terminé (151594ms)
+- 2026-10-27 18:25:28 UTC — [ticket-555] testeur: OK (exit 0)
+- 2026-10-27 18:26:25 UTC — [ide-core] ticket-610 PR #695 mergée (CI verte)
+- 2026-10-27 18:27:14 UTC — [ticket-555] securite: PASS — Aucune vulnérabilité critique ou haute détectée. L'endpoint `/api/v1/usage/quota (105485ms)
+- 2026-10-27 18:27:14 UTC — [ticket-555] tour 1 — reviewer démarré
+- 2026-10-27 18:27:36 UTC — [ticket-555] tour 1 — reviewer terminé (21828ms)
+- 2026-10-27 18:29:05 UTC — [ticket-555] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le code implémente une logique (111031ms)
+- 2026-10-27 18:29:05 UTC — [ticket-555] APPROVED après 1 tour(s)
+- 2026-10-27 18:31:38 UTC — [ticket-555] documentation: 0 fichier(s) (148437ms)
+- 2026-10-27 18:34:02 UTC — [ide-core] ticket-555 PR #696 confiée au CIWatcher
+- 2026-10-27 18:34:05 UTC — [ticket-575] branche ticket-575-a-system-prompt-too-long-for-a-windows-command-li
+- 2026-10-27 18:35:09 UTC — [ticket-575] plan rendu (63422ms)
+- 2026-10-27 18:35:09 UTC — [ticket-575] tour 1 — codeur démarré
+- 2026-10-27 18:36:18 UTC — [ticket-575] tour 1 — codeur terminé (68452ms)
+- 2026-10-27 18:40:04 UTC — [ide-core] ticket-555 PR #696 mergée (CI verte)
+- 2026-10-27 18:42:30 UTC — [ticket-575] testeur: 1 failed, 1611 passed, 64 warnings in 370.04s (0:06:10)
+- 2026-10-27 18:42:30 UTC — [ticket-575] tests rouges au tour 1
+- 2026-10-27 18:42:30 UTC — [ticket-575] tour 2 — codeur démarré
+- 2026-10-27 18:44:33 UTC — [ticket-575] tour 2 — codeur terminé (122452ms)
+- 2026-10-27 18:52:04 UTC — [ticket-575] testeur: OK (exit 0)
+- 2026-10-27 18:54:36 UTC — [ticket-575] securite: PASS — Diff sécurisé : refactoring + gestion des prompts longs via fichier temporaire.  (152062ms)
+- 2026-10-27 18:54:36 UTC — [ticket-575] tour 2 — reviewer démarré
+- 2026-10-27 18:55:02 UTC — [ticket-575] tour 2 — reviewer terminé (26077ms)
+- 2026-10-27 18:58:06 UTC — [ticket-575] validateur: fichiers cités joints : services/providers/agent_sdk.py (tronqué)
+- 2026-10-27 18:58:06 UTC — [ticket-575] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (209952ms)
+- 2026-10-27 18:58:06 UTC — [ticket-575] APPROVED après 2 tour(s)
+- 2026-10-27 18:59:25 UTC — [ticket-575] documentation: 0 fichier(s) (74187ms)
+- 2026-10-27 19:07:50 UTC — [ide-core] ticket-575 PR #697 confiée au CIWatcher
+- 2026-10-27 19:07:53 UTC — [ticket-573] branche ticket-573-each-role-can-declare-its-reasoning-effort-in-age
+- 2026-10-27 19:07:53 UTC — [ticket-573] tour 1 — codeur démarré
+- 2026-10-27 19:10:04 UTC — [ticket-573] tour 1 — codeur terminé (130500ms)
+- 2026-10-27 19:12:02 UTC — [ide-core] ticket-575 PR #697 mergée (CI verte)
+- 2026-10-27 19:16:03 UTC — [ticket-573] testeur: 1 failed, 2255 passed, 64 warnings in 356.79s (0:05:56)
+- 2026-10-27 19:16:03 UTC — [ticket-573] tests rouges au tour 1
+- 2026-10-27 19:16:03 UTC — [ticket-573] tour 2 — codeur démarré
+- 2026-10-27 19:16:57 UTC — [ticket-573] tour 2 — codeur terminé (53500ms)
+- 2026-10-27 19:24:12 UTC — [ticket-573] testeur: OK (exit 0)
+- 2026-10-27 19:25:31 UTC — [ticket-573] securite: PASS — Aucune vulnérabilité détectée. Le diff ajoute un champ optionnel de configuratio (78937ms)
+- 2026-10-27 19:25:31 UTC — [ticket-573] tour 2 — reviewer démarré
+- 2026-10-27 19:25:46 UTC — [ticket-573] tour 2 — reviewer terminé (15687ms)
+- 2026-10-27 19:29:06 UTC — [ticket-573] validateur: fichiers cités joints : backend/src/tessera/models/agent.py, agents.json
+- 2026-10-27 19:29:06 UTC — [ticket-573] validateur: APPROVED — Tous les critères d'acceptation ont été respectés : le champ `effort` a été ajou (215172ms)
+- 2026-10-27 19:29:06 UTC — [ticket-573] APPROVED après 2 tour(s)
+- 2026-10-27 19:30:32 UTC — [ticket-573] documentation: 0 fichier(s) (81687ms)
+- 2026-10-27 19:39:06 UTC — [ide-core] ticket-573 PR #698 non surveillée (livraison arrêtée)
+- 2026-10-27 19:39:09 UTC — [ticket-574] branche ticket-574-reviewer-findings-carry-a-confidence-score-and-on
+- 2026-10-27 19:39:53 UTC — [ticket-574] plan rendu (43343ms)
+- 2026-10-27 19:39:53 UTC — [ticket-574] tour 1 — codeur démarré
+- 2026-10-27 19:42:07 UTC — [ticket-574] tour 1 — codeur terminé (134235ms)
+- 2026-10-27 19:48:00 UTC — [ticket-574] testeur: 1 failed, 1625 passed, 64 warnings in 349.86s (0:05:49)
+- 2026-10-27 19:48:00 UTC — [ticket-574] tests rouges au tour 1
+- 2026-10-27 19:48:00 UTC — [ticket-574] tour 2 — codeur démarré
+- 2026-10-27 19:48:57 UTC — [ticket-574] tour 2 — codeur terminé (57764ms)
+- 2026-10-27 19:56:20 UTC — [ticket-574] testeur: OK (exit 0)
+- 2026-10-27 19:58:05 UTC — [ticket-574] securite: PASS — Aucune vulnérabilité de sécurité détectée. Le nouveau système de scores de confi (105531ms)
+- 2026-10-27 19:58:05 UTC — [ticket-574] tour 2 — reviewer démarré
+- 2026-10-27 19:58:23 UTC — [ticket-574] tour 2 — reviewer terminé (17718ms)
+- 2026-10-27 20:02:18 UTC — [ticket-574] validateur: fichiers cités joints : agents/prompts/reviewer.md
+- 2026-10-27 20:02:18 UTC — [ticket-574] validateur: APPROVED — Tous les critères sont satisfaits. Le codeur a implémenté un nouveau mécanisme b (252264ms)
+- 2026-10-27 20:02:18 UTC — [ticket-574] APPROVED après 2 tour(s)
+- 2026-10-27 20:06:12 UTC — [ticket-574] documentation: 0 fichier(s) (228968ms) — après tour de correction
+- 2026-10-27 20:16:33 UTC — [ide-core] ticket-574 PR #699 mergée (CI verte)
+- 2026-10-27 20:16:35 UTC — [ide-core] ticket-574 : base réalignée sur develop
+- 2026-10-27 20:16:35 UTC — [ide-core] ticket-574 PR #699 confiée au CIWatcher
+- 2026-10-27 20:16:38 UTC — [ticket-576] branche ticket-576-design-of-structured-verdicts-for-reviewer-securi
+- 2026-10-27 20:18:17 UTC — [ticket-576] plan rendu (98735ms)
+- 2026-10-27 20:18:17 UTC — [ticket-576] tour 1 — codeur démarré
+- 2026-10-27 20:22:47 UTC — [ticket-576] tour 1 — architect terminé (269234ms)
+- 2026-10-27 20:22:50 UTC — [ticket-576] testeur: Aucun fichier de backend/ ni de frontend/ modifié : rien à tester.
+- 2026-10-27 20:23:12 UTC — [ticket-576] securite: PASS — Aucune vulnérabilité détectée. Le diff ajoute uniquement de la documentation : u (22172ms)
+- 2026-10-27 20:23:12 UTC — [ticket-576] tour 1 — reviewer démarré
+- 2026-10-27 20:23:49 UTC — [ticket-576] tour 1 — reviewer terminé (36156ms)
+- 2026-10-27 20:27:27 UTC — [ticket-576] validateur: fichiers cités joints : memory/decisions.md (tronqué)
+- 2026-10-27 20:27:27 UTC — [ticket-576] validateur: APPROVED — Les deux critères d'acceptation sont satisfaits. Un nouvel ADR (061) décrit clai (253797ms)
+- 2026-10-27 20:27:27 UTC — [ticket-576] APPROVED après 1 tour(s)
+- 2026-10-27 20:27:32 UTC — [ticket-576] fichiers non suivis laissés par le run : tickets/todo/ticket-611-structured-output-spike-on-the-pinned-sdk.md, tickets/todo/ticket-612-providers-carry-a-schema-and-return-structured-output.md, tickets/todo/ticket-613-security-and-validator-read-their-verdict-from-a-schema.md, tickets/todo/ticket-614-reviewer-verdict-comes-from-a-structured-output.md, tickets/todo/ticket-615-the-interface-reads-the-reviewer-verdict-from-its-event-field.md (à ignorer dans .gitignore ?)
+- 2026-10-27 20:29:53 UTC — [ticket-576] documentation: 0 fichier(s) (141078ms) — après tour de correction
+- 2026-10-27 20:30:12 UTC — [ide-core] ticket-576 PR #700 confiée au CIWatcher
+- 2026-10-27 20:30:15 UTC — [ticket-570] branche ticket-570-design-of-an-opt-in-visual-check-screenshots-at-t
+- 2026-10-27 20:31:14 UTC — [ticket-570] plan rendu (58592ms)
+- 2026-10-27 20:31:14 UTC — [ticket-570] tour 1 — codeur démarré
+- 2026-10-27 20:33:27 UTC — [ticket-570] tour 1 — architect terminé (132594ms)
+- 2026-10-27 20:33:29 UTC — [ticket-570] testeur: Aucun fichier de backend/ ni de frontend/ modifié : rien à tester.
+- 2026-10-27 20:34:02 UTC — [ticket-570] securite: PASS — Diff purement documentaire : ajout d'une contrainte proposée et de son ADR-061.  (32500ms)
+- 2026-10-27 20:34:02 UTC — [ticket-570] tour 1 — reviewer démarré
+- 2026-10-27 20:34:30 UTC — [ticket-570] tour 1 — reviewer terminé (28608ms)
+- 2026-10-27 20:36:12 UTC — [ide-core] ticket-576 PR #700 mergée (CI verte)
+- 2026-10-27 20:38:27 UTC — [ticket-570] validateur: fichiers cités joints : memory/decisions.md (tronqué)
+- 2026-10-27 20:38:27 UTC — [ticket-570] validateur: APPROVED — Tous les critères sont satisfaits. L'ADR-061 a été créée pour documenter le cont (265625ms)
+- 2026-10-27 20:38:27 UTC — [ticket-570] CHANGES_REQUESTED tour 1: Reviewer : ## Problèmes bloquants
+- 2026-10-27 20:38:27 UTC — [ticket-570] tour 2 — codeur démarré
+- 2026-10-27 20:38:50 UTC — [ticket-570] tour 2 — architect terminé (22984ms)
+- 2026-10-27 20:38:52 UTC — [ticket-570] testeur: Aucun fichier de backend/ ni de frontend/ modifié : rien à tester.
+- 2026-10-27 20:39:13 UTC — [ticket-570] securite: PASS — Aucune vulnérabilité détectée. Le diff ajoute une règle architecturale (ADR-061) (20890ms)
+- 2026-10-27 20:39:13 UTC — [ticket-570] tour 2 — reviewer démarré
+- 2026-10-27 20:39:31 UTC — [ticket-570] tour 2 — reviewer terminé (17687ms)
+- 2026-10-27 20:43:51 UTC — [ticket-570] validateur: fichiers cités joints : memory/decisions.md (tronqué)
+- 2026-10-27 20:43:51 UTC — [ticket-570] validateur: CHANGES_REQUESTED — Le premier critère est satisfait avec la création de l'ADR-061. Le troisième cri (277547ms)
+- 2026-10-27 20:43:51 UTC — [ticket-570] CHANGES_REQUESTED tour 2: Validateur : Le premier critère est satisfait avec la création de l'ADR-061. Le troisième critère est également respecté avec la liste des tickets d'implémentation. Le second critère n'est pas vérifia
+- 2026-10-27 20:43:51 UTC — [ticket-570] tour 3 — codeur démarré
+- 2026-10-27 20:44:07 UTC — [ticket-570] tour 3 — architect terminé (16530ms)
+- 2026-10-27 20:44:09 UTC — [ticket-570] testeur: Aucun fichier de backend/ ni de frontend/ modifié : rien à tester.
+- 2026-10-27 20:44:44 UTC — [ticket-570] securite: PASS — Le diff modifie uniquement deux fichiers de documentation (contraintes.md et dec (34921ms)
+- 2026-10-27 20:44:44 UTC — [ticket-570] tour 3 — reviewer démarré
+- 2026-10-27 20:45:05 UTC — [ticket-570] tour 3 — reviewer terminé (20250ms)
+- 2026-10-27 20:49:44 UTC — [ticket-570] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-27 20:50:23 UTC — [ticket-570] validateur: fichiers cités joints : memory/decisions.md (tronqué)
+- 2026-10-27 20:50:23 UTC — [ticket-570] validateur: APPROVED — Ticket de conception complet : l'ADR-061 décrit une architecture opt-in (déclara (338781ms)
+- 2026-10-27 20:50:23 UTC — [ticket-570] APPROVED après 3 tour(s)
+- 2026-10-27 20:50:27 UTC — [ticket-570] fichiers non suivis laissés par le run : tickets/todo/ticket-611-capture-widths-and-themes-are-configurable.md, tickets/todo/ticket-612-visual-check-is-declared-and-triggered-by-interface-files.md, tickets/todo/ticket-613-pipeline-step-captures-the-run-from-its-worktree.md, tickets/todo/ticket-614-relire-mode-holds-the-merge-until-a-human-has-seen-the-captures.md, tickets/todo/ticket-615-run-detail-shows-the-captures-taken-for-the-run.md (à ignorer dans .gitignore ?)
+- 2026-10-27 20:52:23 UTC — [ticket-570] documentation: 0 fichier(s) (116562ms)
+- 2026-10-27 20:53:12 UTC — [ticket-570] livraison: rebase sur develop (31907ms)
+- 2026-10-27 20:53:12 UTC — [ticket-570] livraison: conflit résolu : projects/ide-core/memory/contraintes.md, projects/ide-core/memory/decisions.md (0ms)
+- 2026-10-27 20:53:12 UTC — [ticket-570] livraison: tests relancés après rebase : verts (Aucun fichier de backend/ ni de frontend/ modifié : rien à tester.) (578ms)
+- 2026-10-27 20:53:12 UTC — [ticket-570] livraison: PR #701 ouverte (5281ms)
+- 2026-10-27 20:53:12 UTC — [ticket-570] livraison: arrêt — Conflit résolu sur projects/ide-core/memory/contraintes.md, projects/ide-core/memory/decisions.md : 
+- 2026-10-28 08:06:14 UTC — [ticket-589] branche ticket-589-design-evaluate-headroom-to-compress-the-context
+- 2026-10-28 08:07:32 UTC — [ticket-589] plan rendu (76922ms)
+- 2026-10-28 08:07:32 UTC — [ticket-589] tour 1 — codeur démarré
+- 2026-10-28 08:09:36 UTC — [ticket-589] tour 1 — architect terminé (123952ms)
+- 2026-10-28 08:09:38 UTC — [ticket-589] testeur: Aucun fichier de backend/ ni de frontend/ modifié : rien à tester.
+- 2026-10-28 08:10:09 UTC — [ticket-589] securite: PASS — Aucune vulnérabilité. Diff contenant une spécification et une ADR documentant un (31344ms)
+- 2026-10-28 08:10:09 UTC — [ticket-589] tour 1 — reviewer démarré
+- 2026-10-28 08:10:34 UTC — [ticket-589] tour 1 — reviewer terminé (24656ms)
+- 2026-10-28 08:15:09 UTC — [ticket-589] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-28 08:15:51 UTC — [ticket-589] validateur: fichiers cités joints : memory/decisions.md (tronqué)
+- 2026-10-28 08:15:51 UTC — [ticket-589] validateur: APPROVED — Conception complète et pragmatique : l'ADR décide de reporter sans écarter (mesu (341547ms)
+- 2026-10-28 08:15:51 UTC — [ticket-589] APPROVED après 1 tour(s)
+- 2026-10-28 08:19:08 UTC — [ticket-589] documentation: 0 fichier(s) (192577ms)
+- 2026-10-28 08:19:28 UTC — [ide-core] ticket-589 PR #702 confiée au CIWatcher
+- 2026-10-28 08:19:32 UTC — [ticket-604] branche ticket-604-agent-calls-records-the-cache-creation-tokens-of
+- 2026-10-28 08:20:05 UTC — [ticket-604] plan rendu (30280ms)
+- 2026-10-28 08:20:05 UTC — [ticket-604] tour 1 — codeur démarré
+- 2026-10-28 08:22:53 UTC — [ticket-604] tour 1 — codeur terminé (168281ms)
+- 2026-10-28 08:25:38 UTC — [ide-core] ticket-589 PR #702 mergée (CI verte)
+- 2026-10-28 08:33:07 UTC — [ticket-604] testeur: 1 failed, 2984 passed, 64 warnings in 609.87s (0:10:09)
+- 2026-10-28 08:33:07 UTC — [ticket-604] tests rouges au tour 1
+- 2026-10-28 08:33:07 UTC — [ticket-604] tour 2 — codeur démarré
+- 2026-10-28 08:34:49 UTC — [ticket-604] tour 2 — codeur terminé (102655ms)
+- 2026-10-28 08:42:59 UTC — [ticket-604] testeur: OK (exit 0)
+- 2026-10-28 08:44:20 UTC — [ticket-604] securite: PASS — Refactorisation propre d'une fonction de persistance et ajout d'une nouvelle col (80905ms)
+- 2026-10-28 08:44:20 UTC — [ticket-604] tour 2 — reviewer démarré
+- 2026-10-28 08:44:40 UTC — [ticket-604] tour 2 — reviewer terminé (19485ms)
+- 2026-10-28 08:46:51 UTC — [ticket-604] validateur: APPROVED — Tous les critères sont respectés. Le ticket ajoute une colonne `cache_creation_t (150672ms)
+- 2026-10-28 08:46:51 UTC — [ticket-604] APPROVED après 2 tour(s)
+- 2026-10-28 08:47:58 UTC — [ticket-604] documentation: 0 fichier(s) (61577ms)
+- 2026-10-28 09:05:37 UTC — [ide-core] ticket-604 PR #704 mergée (CI verte)
+- 2026-10-28 09:05:41 UTC — [ide-core] ticket-604 : base réalignée sur develop
+- 2026-10-28 09:05:41 UTC — [ide-core] ticket-604 PR #704 confiée au CIWatcher
+- 2026-10-28 09:05:45 UTC — [ticket-605] branche ticket-605-a-script-measures-the-input-tokens-per-role-and-w
+- 2026-10-28 09:06:54 UTC — [ticket-605] plan rendu (67844ms)
+- 2026-10-28 09:06:54 UTC — [ticket-605] tour 1 — codeur démarré
+- 2026-10-28 09:13:40 UTC — [ticket-605] tour 1 — codeur terminé (406609ms)
+- 2026-10-28 09:25:04 UTC — [ticket-605] testeur: OK (exit 0)
+- 2026-10-28 09:27:18 UTC — [ticket-605] securite: PASS — Deux vulnérabilités détectées (MEDIUM et LOW) mais aucune CRITICAL ou HIGH avec  (133703ms)
+- 2026-10-28 09:27:18 UTC — [ticket-605] tour 1 — reviewer démarré
+- 2026-10-28 09:28:04 UTC — [ticket-605] tour 1 — reviewer terminé (45844ms)
+- 2026-10-28 09:32:18 UTC — [ticket-605] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-28 09:33:58 UTC — [ticket-605] validateur: fichiers cités joints : backend/pyproject.toml, uv.lock (tronqué)
+- 2026-10-28 09:33:58 UTC — [ticket-605] validateur: APPROVED — Le ticket-605 livre l'outillage complet de mesure sans toucher aux dépendances d (400234ms)
+- 2026-10-28 09:33:58 UTC — [ticket-605] CHANGES_REQUESTED tour 1: Reviewer : ## Problèmes bloquants
+- 2026-10-28 09:33:58 UTC — [ticket-605] tour 2 — codeur démarré
+- 2026-10-28 09:41:02 UTC — [ticket-605] tour 2 — codeur terminé (423890ms)
+- 2026-10-28 09:49:05 UTC — [ticket-605] testeur: OK (exit 0)
+- 2026-10-28 09:51:12 UTC — [ticket-605] securite: PASS — Aucune vulnérabilité critique ou haute détectée. Les scripts de mesure utilisent (126094ms)
+- 2026-10-28 09:51:12 UTC — [ticket-605] tour 2 — reviewer démarré
+- 2026-10-28 09:51:36 UTC — [ticket-605] tour 2 — reviewer terminé (24797ms)
+- 2026-10-28 09:56:12 UTC — [ticket-605] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-28 09:56:54 UTC — [ticket-605] validateur: fichiers cités joints : backend/pyproject.toml, uv.lock (tronqué)
+- 2026-10-28 09:56:54 UTC — [ticket-605] validateur: APPROVED — Le ticket-605 livre l'outillage complet : quatre modules de mesure sans toucher  (341967ms)
+- 2026-10-28 09:56:54 UTC — [ticket-605] APPROVED après 2 tour(s)
+- 2026-10-28 10:00:02 UTC — [ticket-605] documentation: 0 fichier(s) (155546ms)
+- 2026-10-28 10:11:02 UTC — [ide-core] ticket-605 PR #708 confiée au CIWatcher
+- 2026-10-28 10:11:05 UTC — [ticket-611] branche ticket-611-spike-structured-output-on-the-pinned-sdk-keeps-t
+- 2026-10-28 10:11:06 UTC — [ticket-611] tour 1 — codeur démarré
+- 2026-10-28 10:16:01 UTC — [ide-core] ticket-605 PR #708 mergée (CI verte)
+- 2026-10-28 10:26:57 UTC — [ticket-611] tour 1 — codeur terminé (950688ms)
+- 2026-10-28 10:38:48 UTC — [ticket-611] testeur: OK (exit 0)
+- 2026-10-28 10:40:10 UTC — [ticket-611] securite: PASS — Script de mesure interne (ticket-611) ; aucune vulnérabilité CRITICAL ou HIGH. L (82327ms)
+- 2026-10-28 10:40:10 UTC — [ticket-611] tour 1 — reviewer démarré
+- 2026-10-28 10:40:39 UTC — [ticket-611] tour 1 — reviewer terminé (28422ms)
+- 2026-10-28 10:44:14 UTC — [ticket-611] validateur: fichiers cités joints : backend/src/ (dossier, 0 fichiers), scripts/ (dossier, 7 fichiers)
+- 2026-10-28 10:44:14 UTC — [ticket-611] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le ticket contient une réponse c (243890ms)
+- 2026-10-28 10:44:14 UTC — [ticket-611] APPROVED après 1 tour(s)
+- 2026-10-28 10:48:41 UTC — [ticket-611] documentation: 1 fichier(s) (259469ms) — après tour de correction
+- 2026-10-28 11:04:41 UTC — [ide-core] ticket-611 PR #710 mergée (CI verte)
+- 2026-10-28 11:04:53 UTC — [ide-core] ticket-611 : base réalignée sur develop
+- 2026-10-28 11:04:53 UTC — [ide-core] ticket-611 PR #710 confiée au CIWatcher
+- 2026-10-28 11:05:14 UTC — [ticket-612] branche ticket-612-providers-accept-a-json-schema-and-return-the-val
+- 2026-10-28 11:05:23 UTC — [ticket-612] tour 1 — codeur démarré
+- 2026-10-28 11:10:53 UTC — [ticket-612] tour 1 — codeur terminé (330296ms)
+- 2026-10-28 11:19:16 UTC — [ticket-612] testeur: 1 failed, 1643 passed, 64 warnings in 499.74s (0:08:19)
+- 2026-10-28 11:19:16 UTC — [ticket-612] tests rouges au tour 1
+- 2026-10-28 11:19:16 UTC — [ticket-612] tour 2 — codeur démarré
+- 2026-10-28 11:21:28 UTC — [ticket-612] tour 2 — codeur terminé (131672ms)
+- 2026-10-28 11:29:05 UTC — [ticket-612] testeur: OK (exit 0)
+- 2026-10-28 11:31:02 UTC — [ticket-612] securite: PASS — Aucune vulnérabilité détectée. Ce diff ajoute le support des schémas JSON pour l (116875ms)
+- 2026-10-28 11:31:02 UTC — [ticket-612] tour 2 — reviewer démarré
+- 2026-10-28 11:31:23 UTC — [ticket-612] tour 2 — reviewer terminé (21234ms)
+- 2026-10-28 11:36:02 UTC — [ticket-612] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-28 11:36:48 UTC — [ticket-612] validateur: APPROVED — Les sept critères sont satisfaits : `ProviderResult.structured` est défini dans  (345484ms)
+- 2026-10-28 11:36:48 UTC — [ticket-612] APPROVED après 2 tour(s)
+- 2026-10-28 11:38:41 UTC — [ticket-612] documentation: 0 fichier(s) (108280ms)
+- 2026-10-28 11:52:19 UTC — [ide-core] ticket-612 PR #712 mergée (CI verte)
+- 2026-10-28 11:52:20 UTC — [ide-core] ticket-612 : base réalignée sur develop
+- 2026-10-28 11:52:20 UTC — [ide-core] ticket-612 PR #712 confiée au CIWatcher
+- 2026-10-28 11:52:24 UTC — [ticket-613] branche ticket-613-security-audit-and-validator-read-their-verdict-f
+- 2026-10-28 11:52:25 UTC — [ticket-613] tour 1 — codeur démarré
+- 2026-10-28 11:56:58 UTC — [ticket-613] tour 1 — codeur terminé (273188ms)
+- 2026-10-28 12:03:13 UTC — [ticket-613] testeur: 1 failed, 1712 passed, 64 warnings in 371.92s (0:06:11)
+- 2026-10-28 12:03:13 UTC — [ticket-613] tests rouges au tour 1
+- 2026-10-28 12:03:13 UTC — [ticket-613] tour 2 — codeur démarré
+- 2026-10-28 12:04:08 UTC — [ticket-613] tour 2 — codeur terminé (54781ms)
+- 2026-10-28 12:14:37 UTC — [ticket-613] testeur: OK (exit 0)
+- 2026-10-28 12:16:26 UTC — [ticket-613] securite: PASS — Aucune vulnérabilité détectée. Le passage de la validation JSON du texte local à (108890ms)
+- 2026-10-28 12:16:26 UTC — [ticket-613] tour 2 — reviewer démarré
+- 2026-10-28 12:16:50 UTC — [ticket-613] tour 2 — reviewer terminé (23875ms)
+- 2026-10-28 12:20:47 UTC — [ide-core] ticket-614 retiré de la file
+- 2026-10-28 12:20:47 UTC — [ide-core] ticket-615 retiré de la file
+- 2026-10-28 12:20:47 UTC — [ide-core] ticket-616 retiré de la file
+- 2026-10-28 12:20:47 UTC — [ide-core] ticket-617 retiré de la file
+- 2026-10-28 12:20:47 UTC — [ide-core] ticket-618 retiré de la file
+- 2026-10-28 12:20:47 UTC — [ide-core] ticket-619 retiré de la file
+- 2026-10-28 12:20:47 UTC — [ide-core] ticket-620 retiré de la file
+- 2026-10-28 12:20:47 UTC — [ide-core] ticket-625 retiré de la file
+- 2026-10-28 12:20:47 UTC — [ide-core] ticket-626 retiré de la file
+- 2026-10-28 12:20:47 UTC — [ide-core] ticket-623 retiré de la file
+- 2026-10-28 12:20:47 UTC — [ide-core] ticket-624 retiré de la file
+- 2026-10-28 12:20:47 UTC — [ide-core] ticket-628 retiré de la file
+- 2026-10-28 12:20:47 UTC — [ide-core] ticket-629 retiré de la file
+- 2026-10-28 12:20:47 UTC — [ide-core] ticket-630 retiré de la file
+- 2026-10-28 12:20:47 UTC — [ide-core] ticket-631 retiré de la file
+- 2026-10-28 12:21:09 UTC — [ticket-613] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les deux services lisent désorm (282858ms)
+- 2026-10-28 12:21:09 UTC — [ticket-613] APPROVED après 2 tour(s)
+- 2026-10-28 12:28:19 UTC — [ticket-613] documentation: 0 fichier(s) (425250ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « preuve » — l'extrait « #: Le projet fait tourner chaque run dans un worktree (ADR-0 » (backend/src/tessera/servic
+- 2026-10-28 12:36:24 UTC — [ide-core] ticket-613 PR #715 confiée au CIWatcher
+- 2026-10-28 12:42:32 UTC — [ide-core] ticket-613 PR #715 mergée (CI verte)
+- 2026-10-28 12:43:31 UTC — [ide-core] ticket-636 PR #716 non reprise : aucun commit poussé noté (résolution de conflit ou livraison interrompue)
+- 2026-10-28 12:43:50 UTC — [ticket-614] branche ticket-614-the-reviewer-verdict-comes-from-a-structured-outp
+- 2026-10-28 12:43:51 UTC — [ticket-614] tour 1 — codeur démarré
+- 2026-10-28 12:59:41 UTC — [ticket-614] tour 1 — codeur terminé (949827ms)
+- 2026-10-28 13:07:27 UTC — [ticket-614] testeur: 1 failed, 3251 passed, 64 warnings in 462.83s (0:07:42)
+- 2026-10-28 13:07:27 UTC — [ticket-614] tests rouges au tour 1
+- 2026-10-28 13:07:27 UTC — [ticket-614] tour 2 — codeur démarré
+- 2026-10-28 13:09:50 UTC — [ticket-614] tour 2 — codeur terminé (143155ms)
+- 2026-10-28 13:17:27 UTC — [ticket-614] testeur: OK (exit 0)
+- 2026-10-28 13:20:28 UTC — [ticket-614] securite: PASS — This diff migrates reviewer verdict parsing from fragile keyword extraction to s (180421ms)
+- 2026-10-28 13:20:28 UTC — [ticket-614] tour 2 — reviewer démarré
+- 2026-10-28 13:20:47 UTC — [ticket-614] tour 2 — reviewer terminé (18734ms)
+- 2026-10-28 13:25:28 UTC — [ticket-614] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-28 13:26:39 UTC — [ticket-614] validateur: fichiers cités joints : agents/prompts/reviewer.md, test_consignes_coherentes.py (tronqué)
+- 2026-10-28 13:26:39 UTC — [ticket-614] validateur: APPROVED — Tous les critères d'acceptation du ticket-614 sont satisfaits. Le diff remplace  (371389ms)
+- 2026-10-28 13:26:39 UTC — [ticket-614] APPROVED après 2 tour(s)
+- 2026-10-28 13:36:19 UTC — [ticket-614] documentation: 2 fichier(s) (575485ms) — après tour de correction
+- 2026-10-28 13:55:50 UTC — [ide-core] ticket-614 PR #719 mergée (CI verte)
+- 2026-10-28 13:55:52 UTC — [ide-core] ticket-614 : base réalignée sur develop
+- 2026-10-28 13:55:52 UTC — [ide-core] ticket-614 PR #719 confiée au CIWatcher
+- 2026-10-28 13:55:55 UTC — [ticket-615] branche ticket-615-the-interface-reads-the-reviewer-verdict-from-the
+- 2026-10-28 13:55:55 UTC — [ticket-615] tour 1 — codeur démarré
+- 2026-10-28 13:59:00 UTC — [ticket-615] tour 1 — codeur terminé (184686ms)
+- 2026-10-28 14:01:27 UTC — [ticket-615] testeur: Tests  1 failed | 1886 passed (1887)
+- 2026-10-28 14:01:27 UTC — [ticket-615] tests rouges au tour 1
+- 2026-10-28 14:01:27 UTC — [ticket-615] tour 2 — codeur démarré
+- 2026-10-28 14:03:04 UTC — [ticket-615] tour 2 — codeur terminé (97000ms)
+- 2026-10-28 14:05:43 UTC — [ticket-615] testeur: OK (exit 0)
+- 2026-10-28 14:07:17 UTC — [ticket-615] securite: PASS — Ce diff implémente une validation stricte du champ `verdict` du reviewer avec pr (94234ms)
+- 2026-10-28 14:07:17 UTC — [ticket-615] tour 2 — reviewer démarré
+- 2026-10-28 14:07:40 UTC — [ticket-615] tour 2 — reviewer terminé (23389ms)
+- 2026-10-28 14:11:27 UTC — [ticket-615] validateur: fichiers cités joints : verdict.test.ts, lib/bureau/copie.ts
+- 2026-10-28 14:11:27 UTC — [ticket-615] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code a été mis à jour pour q (249610ms)
+- 2026-10-28 14:11:27 UTC — [ticket-615] CHANGES_REQUESTED tour 2: Reviewer : **Verdict : APPROVED**
+- 2026-10-28 14:11:27 UTC — [ticket-615] tour 3 — codeur démarré
+- 2026-10-28 14:13:04 UTC — [ticket-615] tour 3 — codeur terminé (97296ms)
+- 2026-10-28 14:17:46 UTC — [ticket-615] testeur: OK (exit 0)
+- 2026-10-28 14:18:55 UTC — [ticket-615] securite: PASS — Le diff implémente un champ structuré `verdict` pour les réponses du reviewer, a (68781ms)
+- 2026-10-28 14:18:56 UTC — [ticket-615] tour 3 — reviewer démarré
+- 2026-10-28 14:19:24 UTC — [ticket-615] tour 3 — reviewer terminé (27452ms)
+- 2026-10-28 14:22:59 UTC — [ticket-615] validateur: fichiers cités joints : verdict.test.ts, lib/bureau/copie.ts
+- 2026-10-28 14:22:59 UTC — [ticket-615] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code a été mis à jour pour li (244438ms)
+- 2026-10-28 14:22:59 UTC — [ticket-615] APPROVED après 3 tour(s)
+- 2026-10-28 14:25:39 UTC — [ticket-615] documentation: 0 fichier(s) (151735ms) — après tour de correction
+- 2026-10-28 14:30:41 UTC — [ide-core] ticket-615 PR #721 confiée au CIWatcher
+- 2026-10-28 14:30:47 UTC — [ticket-616] branche ticket-616-capture-widths-and-themes-are-configurable-per-pr
+- 2026-10-28 14:30:49 UTC — [ticket-616] tour 1 — codeur démarré
+- 2026-10-28 14:36:15 UTC — [ticket-616] tour 1 — codeur terminé (326046ms)
+- 2026-10-28 14:36:31 UTC — [ide-core] ticket-615 PR #721 mergée (CI verte)
+- 2026-10-28 14:51:17 UTC — [ticket-616] testeur: OK (exit 0)
+- 2026-10-28 14:53:17 UTC — [ticket-616] securite: PASS — Le diff relâche le motif regex pour accepter les largeurs personnalisées (de 1 à (120296ms)
+- 2026-10-28 14:53:18 UTC — [ticket-616] tour 1 — reviewer démarré
+- 2026-10-28 14:53:35 UTC — [ticket-616] tour 1 — reviewer terminé (16313ms)
+- 2026-10-28 14:55:34 UTC — [ticket-616] validateur: fichiers cités joints : agents.json ; absents : x-1024-clair.png, ../x.png
+- 2026-10-28 14:55:34 UTC — [ticket-616] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (136937ms)
+- 2026-10-28 14:55:34 UTC — [ticket-616] APPROVED après 1 tour(s)
+- 2026-10-28 14:57:37 UTC — [ticket-616] documentation: 0 fichier(s) (116500ms)
+- 2026-10-28 15:13:34 UTC — [ide-core] ticket-616 PR #725 mergée (CI verte)
+- 2026-10-28 15:13:36 UTC — [ide-core] ticket-616 : base réalignée sur develop
+- 2026-10-28 15:13:36 UTC — [ide-core] ticket-616 PR #725 confiée au CIWatcher
+- 2026-10-28 15:13:39 UTC — [ticket-617] branche ticket-617-a-project-declares-its-visual-check-and-the-inter
+- 2026-10-28 15:13:40 UTC — [ticket-617] tour 1 — codeur démarré
+- 2026-10-28 15:15:17 UTC — [ticket-617] tour 1 — codeur terminé (96984ms)
+- 2026-10-28 15:24:08 UTC — [ticket-617] testeur: 1 failed, 2506 passed, 64 warnings in 528.49s (0:08:48)
+- 2026-10-28 15:24:08 UTC — [ticket-617] tests rouges au tour 1
+- 2026-10-28 15:24:08 UTC — [ticket-617] tour 2 — codeur démarré
+- 2026-10-28 15:24:32 UTC — [ticket-617] tour 2 — codeur terminé (23813ms)
+- 2026-10-28 15:34:50 UTC — [ticket-617] testeur: OK (exit 0)
+- 2026-10-28 15:37:04 UTC — [ticket-617] securite: PASS — Aucune vulnérabilité CRITICAL ou HIGH détectée. Le code implémente une validatio (134156ms)
+- 2026-10-28 15:37:04 UTC — [ticket-617] tour 2 — reviewer démarré
+- 2026-10-28 15:37:57 UTC — [ticket-617] tour 2 — reviewer terminé (51640ms)
+- 2026-10-28 15:39:37 UTC — [ticket-617] validateur: fichiers cités joints : agents.json
+- 2026-10-28 15:39:37 UTC — [ticket-617] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (152671ms)
+- 2026-10-28 15:39:37 UTC — [ticket-617] APPROVED après 2 tour(s)
+- 2026-10-28 15:41:58 UTC — [ticket-617] documentation: 0 fichier(s) (126780ms)
+- 2026-10-28 15:45:46 UTC — [ide-core] ticket-662 PR #727 non reprise : aucun commit poussé noté (résolution de conflit ou livraison interrompue)
+- 2026-10-28 15:46:12 UTC — [ticket-617] branche ticket-617-a-project-declares-its-visual-check-and-the-inter
+- 2026-10-28 15:50:26 UTC — [ide-core] ticket-662 PR #727 non reprise : aucun commit poussé noté (résolution de conflit ou livraison interrompue)
+- 2026-10-28 15:50:43 UTC — [ticket-617] branche ticket-617-a-project-declares-its-visual-check-and-the-inter
+- 2026-10-28 16:06:56 UTC — [ticket-617] branche ticket-617-a-project-declares-its-visual-check-and-the-inter
+- 2026-10-28 16:36:39 UTC — [ticket-617] testeur: délai dépassé, suite relancée
+- 2026-10-28 16:36:39 UTC — [ticket-617] testeur: délai dépassé (1500 s, durée réelle 1780 s) — ../scripts/verifier.py coupé après 1780 s
+- 2026-10-29 07:16:29 UTC — [ticket-617] testeur: délai dépassé (1500 s, durée réelle 52790 s) — ../scripts/verifier.py coupé après 52790 s
+- 2026-10-29 07:16:29 UTC — [ticket-617] branche reprise (2 commit(s)) — tests red, codeur en premier
+- 2026-10-29 07:16:29 UTC — [ticket-617] tour 1 — codeur démarré
+- 2026-10-29 07:20:23 UTC — [ticket-617] tour 1 — codeur terminé (233891ms)
+- 2026-10-29 07:39:28 UTC — [ticket-617] testeur: OK (exit 0)
+- 2026-10-29 07:41:40 UTC — [ticket-617] securite: PASS — This diff implements ticket-617 (visual check declaration) with secure design pa (132203ms)
+- 2026-10-29 07:41:40 UTC — [ticket-617] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-10-29 07:41:40 UTC — [ticket-617] tour 1 — reviewer démarré
+- 2026-10-29 07:42:02 UTC — [ticket-617] tour 1 — reviewer terminé (22235ms)
+- 2026-10-29 07:43:24 UTC — [ticket-617] validateur: fichiers cités joints : agents.json
+- 2026-10-29 07:43:24 UTC — [ticket-617] validateur: APPROVED — Tous les critères sont satisfaits. Le module `controle_visuel.py` lit correcteme (103875ms)
+- 2026-10-29 07:43:24 UTC — [ticket-617] APPROVED après 1 tour(s)
+- 2026-10-29 07:45:08 UTC — [ticket-617] documentation: 1 fichier(s) (99438ms)
+- 2026-10-29 08:01:07 UTC — [ide-core] ticket-617 PR #730 mergée (CI verte)
+- 2026-10-29 08:01:09 UTC — [ide-core] ticket-617 : base réalignée sur develop
+- 2026-10-29 08:01:09 UTC — [ide-core] ticket-617 PR #730 confiée au CIWatcher
+- 2026-10-29 08:01:12 UTC — [ticket-618] branche ticket-618-a-run-that-changes-an-interface-captures-it-from
+- 2026-10-29 08:01:13 UTC — [ticket-618] tour 1 — codeur démarré
+- 2026-10-29 08:06:11 UTC — [ticket-618] tour 1 — codeur terminé (297171ms)
+- 2026-10-29 08:14:39 UTC — [ticket-618] testeur: 1 failed, 1932 passed, 64 warnings in 503.88s (0:08:23)
+- 2026-10-29 08:14:39 UTC — [ticket-618] tests rouges au tour 1
+- 2026-10-29 08:14:39 UTC — [ticket-618] tour 2 — codeur démarré
+- 2026-10-29 08:15:04 UTC — [ide-core] ticket-619 retiré de la file
+- 2026-10-29 08:15:04 UTC — [ide-core] ticket-620 retiré de la file
+- 2026-10-29 08:15:04 UTC — [ide-core] ticket-625 retiré de la file
+- 2026-10-29 08:15:04 UTC — [ide-core] ticket-626 retiré de la file
+- 2026-10-29 08:15:04 UTC — [ide-core] ticket-623 retiré de la file
+- 2026-10-29 08:15:04 UTC — [ide-core] ticket-624 retiré de la file
+- 2026-10-29 08:15:04 UTC — [ide-core] ticket-628 retiré de la file
+- 2026-10-29 08:15:04 UTC — [ide-core] ticket-629 retiré de la file
+- 2026-10-29 08:15:04 UTC — [ide-core] ticket-630 retiré de la file
+- 2026-10-29 08:15:04 UTC — [ide-core] ticket-631 retiré de la file
+- 2026-10-29 08:15:04 UTC — [ide-core] ticket-635 retiré de la file
+- 2026-10-29 08:15:04 UTC — [ide-core] ticket-658 retiré de la file
+- 2026-10-29 08:15:04 UTC — [ide-core] ticket-659 retiré de la file
+- 2026-10-29 08:15:04 UTC — [ide-core] ticket-660 retiré de la file
+- 2026-10-29 08:15:04 UTC — [ide-core] ticket-661 retiré de la file
+- 2026-10-29 08:15:04 UTC — [ide-core] ticket-665 retiré de la file
+- 2026-10-29 08:19:31 UTC — [ticket-618] tour 2 — codeur terminé (292532ms)
+- 2026-10-29 08:28:51 UTC — [ticket-618] testeur: [36m [2m\u276f[22m src/longueur-des-fichiers.test.ts:[2m99:51[22m[39m
+- 2026-10-29 08:28:51 UTC — [ticket-618] tests rouges au tour 2
+- 2026-10-29 08:28:51 UTC — [ticket-618] tour 3 — codeur démarré
+- 2026-10-29 08:29:41 UTC — [ticket-618] tour 3 — codeur terminé (50046ms)
+- 2026-10-29 08:37:55 UTC — [ticket-618] testeur: OK (exit 0)
+- 2026-10-29 08:40:48 UTC — [ticket-618] securite: PASS — Le diff introduit un système de capture d'écran pour les runs approuvés (ticket- (172657ms)
+- 2026-10-29 08:40:48 UTC — [ticket-618] tour 3 — reviewer démarré
+- 2026-10-29 08:41:12 UTC — [ticket-618] tour 3 — reviewer terminé (24234ms)
+- 2026-10-29 08:45:00 UTC — [ticket-618] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (251781ms)
+- 2026-10-29 08:45:00 UTC — [ticket-618] APPROVED après 3 tour(s)
+- 2026-10-29 08:49:32 UTC — [ticket-618] documentation: 0 fichier(s) (266891ms) — après tour de correction
+- 2026-10-29 09:00:05 UTC — [ide-core] ticket-618 PR #733 confiée au CIWatcher
+- 2026-10-29 09:05:04 UTC — [ide-core] ticket-618 PR #733 mergée (CI verte)
+- 2026-10-29 09:06:36 UTC — [ticket-619] branche ticket-619-relire-mode-a-pull-request-with-visual-checks-is
+- 2026-10-29 09:06:37 UTC — [ticket-619] tour 1 — codeur démarré
+- 2026-10-29 09:08:59 UTC — [ticket-619] tour 1 — codeur terminé (142264ms)
+- 2026-10-29 09:14:38 UTC — [ticket-619] testeur: 1 failed, 1712 passed, 64 warnings in 335.68s (0:05:35)
+- 2026-10-29 09:14:38 UTC — [ticket-619] tests rouges au tour 1
+- 2026-10-29 09:14:38 UTC — [ticket-619] tour 2 — codeur démarré
+- 2026-10-29 09:16:01 UTC — [ticket-619] tour 2 — codeur terminé (83155ms)
+- 2026-10-29 09:25:37 UTC — [ticket-619] testeur: OK (exit 0)
+- 2026-10-29 09:30:16 UTC — [ticket-619] securite: PASS — Aucune vulnérabilité critique ou haute sécurité détectée dans le code backend vi (279265ms)
+- 2026-10-29 09:30:16 UTC — [ticket-619] tour 2 — reviewer démarré
+- 2026-10-29 09:30:35 UTC — [ticket-619] tour 2 — reviewer terminé (18781ms)
+- 2026-10-29 09:30:46 UTC — [ticket-619] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : créneau occupé depuis plus de 30 s
+- 2026-10-29 09:31:26 UTC — [ticket-619] validateur: APPROVED — Ticket-619 implémente complètement le mode `relire` : captures déclenchées (succ (70031ms)
+- 2026-10-29 09:31:26 UTC — [ticket-619] APPROVED après 2 tour(s)
+- 2026-10-29 09:36:27 UTC — [ticket-619] documentation: 0 fichier(s) (286062ms) — après tour de correction
+- 2026-10-29 09:36:50 UTC — [ide-core] ticket-619 PR #734 confiée au CIWatcher
+- 2026-10-29 09:36:54 UTC — [ticket-620] branche ticket-620-the-run-detail-shows-the-captures-taken-for-that
+- 2026-10-29 09:36:55 UTC — [ticket-620] tour 1 — codeur démarré
+- 2026-10-29 09:41:14 UTC — [ticket-620] tour 1 — codeur terminé (259109ms)
+- 2026-10-29 09:41:48 UTC — [ide-core] ticket-619 PR #734 mergée (CI verte)
+- 2026-10-29 09:51:00 UTC — [ticket-620] testeur: OK (exit 0)
+- 2026-10-29 09:52:35 UTC — [ticket-620] securite: PASS — Ticket-620 ajoute un endpoint GET pour lister les captures d'un run, avec servic (95484ms)
+- 2026-10-29 09:52:35 UTC — [ticket-620] tour 1 — reviewer démarré
+- 2026-10-29 09:53:01 UTC — [ticket-620] tour 1 — reviewer terminé (25234ms)
+- 2026-10-29 09:54:37 UTC — [ticket-620] validateur: APPROVED — Les critères d'acceptation sont tous satisfaits. Le code implémente un endpoint  (121110ms)
+- 2026-10-29 09:54:37 UTC — [ticket-620] APPROVED après 1 tour(s)
+- 2026-10-29 09:58:03 UTC — [ticket-620] documentation: 0 fichier(s) (201656ms) — après tour de correction
+- 2026-10-29 10:08:02 UTC — [ide-core] ticket-620 PR #735 confiée au CIWatcher
+- 2026-10-29 10:08:06 UTC — [ticket-625] branche ticket-625-the-break-room-keeps-a-pull-request-waiting-for-c
+- 2026-10-29 10:08:09 UTC — [ticket-625] tour 1 — codeur démarré
+- 2026-10-29 10:09:38 UTC — [ticket-625] tour 1 — codeur terminé (89655ms)
+- 2026-10-29 10:12:23 UTC — [ticket-625] testeur: OK (exit 0)
+- 2026-10-29 10:13:49 UTC — [ticket-625] securite: PASS — Audit terminé : aucune vulnérabilité de sécurité détectée. Le diff ajoute une lo (86391ms)
+- 2026-10-29 10:13:49 UTC — [ticket-625] tour 1 — reviewer démarré
+- 2026-10-29 10:14:10 UTC — [ticket-625] tour 1 — reviewer terminé (21264ms)
+- 2026-10-29 10:14:21 UTC — [ide-core] ticket-620 PR #735 mergée (CI verte)
+- 2026-10-29 10:15:39 UTC — [ticket-625] validateur: fichiers cités joints : lib/bureau/salles.ts
+- 2026-10-29 10:15:39 UTC — [ticket-625] validateur: APPROVED — Les tests ont été ajoutés pour couvrir les quatre critères d'acceptation. Le cod (110062ms)
+- 2026-10-29 10:15:39 UTC — [ticket-625] APPROVED après 1 tour(s)
+- 2026-10-29 10:18:49 UTC — [ticket-625] documentation: 0 fichier(s) (184093ms) — après tour de correction
+- 2026-10-29 10:21:37 UTC — [ide-core] ticket-625 PR #736 confiée au CIWatcher
+- 2026-10-29 10:21:40 UTC — [ticket-626] branche ticket-626-design-a-server-room-view-of-running-apps-with-ea
+- 2026-10-29 10:23:53 UTC — [ticket-626] plan rendu (131750ms)
+- 2026-10-29 10:23:53 UTC — [ticket-626] tour 1 — codeur démarré
+- 2026-10-29 10:26:34 UTC — [ide-core] ticket-625 PR #736 mergée (CI verte)
+- 2026-10-29 10:26:44 UTC — [ticket-626] tour 1 — architect terminé (170578ms)
+- 2026-10-29 10:26:47 UTC — [ticket-626] testeur: Aucun fichier de backend/ ni de frontend/ modifi� : rien � tester.
+- 2026-10-29 10:28:34 UTC — [ticket-626] securite: PASS — Diff introduces a well-designed security-conscious specification for agent activ (107141ms)
+- 2026-10-29 10:28:34 UTC — [ticket-626] tour 1 — reviewer démarré
+- 2026-10-29 10:29:01 UTC — [ticket-626] tour 1 — reviewer terminé (26812ms)
+- 2026-10-29 10:33:06 UTC — [ticket-626] validateur: fichiers cités joints : memory/decisions.md (tronqué)
+- 2026-10-29 10:33:06 UTC — [ticket-626] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Un ADR a été ajouté pour décri (272312ms)
+- 2026-10-29 10:33:06 UTC — [ticket-626] APPROVED après 1 tour(s)
+- 2026-10-29 10:33:12 UTC — [ticket-626] fichiers non suivis laissés par le run : tickets/blocked/ticket-672-running-apps-view-shows-one-room-per-app.md, tickets/todo/ticket-671-services-declare-an-activity-file-the-backend-reads.md, tickets/todo/ticket-673-product-agents-are-drawn-from-the-activity-file.md (à ignorer dans .gitignore ?)
+- 2026-10-29 10:34:32 UTC — [ticket-626] documentation: 0 fichier(s) (79875ms)
+- 2026-10-29 10:34:54 UTC — [ide-core] ticket-626 PR #737 confiée au CIWatcher
+- 2026-10-29 10:34:58 UTC — [ticket-623] branche ticket-623-in-the-bureau-the-architect-has-its-own-look-and
+- 2026-10-29 10:34:59 UTC — [ticket-623] tour 1 — codeur démarré
+- 2026-10-29 10:39:36 UTC — [ide-core] ticket-626 PR #737 mergée (CI verte)
+- 2026-10-29 10:40:38 UTC — [ticket-623] tour 1 — codeur terminé (339015ms)
+- 2026-10-29 10:42:51 UTC — [ticket-623] testeur: OK (exit 0)
+- 2026-10-29 10:44:28 UTC — [ticket-623] securite: PASS — Ce diff ajoute un support UI pour le rôle "architect" et la logique du tour de p (97108ms)
+- 2026-10-29 10:44:28 UTC — [ticket-623] tour 1 — reviewer démarré
+- 2026-10-29 10:44:53 UTC — [ticket-623] tour 1 — reviewer terminé (25125ms)
+- 2026-10-29 10:48:48 UTC — [ticket-623] validateur: fichiers cités joints : lib/bureau/physique.ts, lib/bureau/activites.ts
+- 2026-10-29 10:48:48 UTC — [ticket-623] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le codeur et l'architecte ont m (260358ms)
+- 2026-10-29 10:48:48 UTC — [ticket-623] APPROVED après 1 tour(s)
+- 2026-10-29 10:51:35 UTC — [ticket-623] documentation: 0 fichier(s) (160281ms)
+- 2026-10-29 10:59:21 UTC — [ide-core] ticket-623 PR #738 mergée (CI verte)
+- 2026-10-29 10:59:23 UTC — [ide-core] ticket-623 : base réalignée sur develop
+- 2026-10-29 10:59:23 UTC — [ide-core] ticket-623 PR #738 confiée au CIWatcher
+- 2026-10-29 10:59:31 UTC — [ticket-624] branche ticket-624-in-the-bureau-documentation-delivery-and-conflict
+- 2026-10-29 10:59:33 UTC — [ticket-624] tour 1 — codeur démarré
+- 2026-10-29 11:04:48 UTC — [ticket-624] tour 1 — codeur terminé (315046ms)
+- 2026-10-29 11:07:10 UTC — [ticket-624] testeur: OK (exit 0)
+- 2026-10-29 11:08:30 UTC — [ticket-624] securite: PASS — Audit de sécurité complété sur le diff du composant Bureau (redacteurs.ts, suite (80375ms)
+- 2026-10-29 11:08:31 UTC — [ticket-624] tour 1 — reviewer démarré
+- 2026-10-29 11:08:50 UTC — [ticket-624] tour 1 — reviewer terminé (19187ms)
+- 2026-10-29 11:13:28 UTC — [ticket-624] validateur: fichiers cités joints : lib/bureau/activites.ts, lib/bureau/physique.ts
+- 2026-10-29 11:13:28 UTC — [ticket-624] validateur: APPROVED — Tous les critères sont satisfaits. Les tests vérifient que les rédacteurs se tie (298218ms)
+- 2026-10-29 11:13:28 UTC — [ticket-624] APPROVED après 1 tour(s)
+- 2026-10-29 11:15:01 UTC — [ticket-624] documentation: 0 fichier(s) (86437ms)
+- 2026-10-29 11:19:45 UTC — [ide-core] ticket-624 PR #739 mergée (CI verte)
+- 2026-10-29 11:19:50 UTC — [ide-core] ticket-624 : base réalignée sur develop
+- 2026-10-29 11:19:50 UTC — [ide-core] ticket-624 PR #739 confiée au CIWatcher
+- 2026-10-29 11:20:16 UTC — [ticket-628] branche ticket-628-each-bureau-agent-has-a-stable-name-shown-on-hove
+- 2026-10-29 11:20:22 UTC — [ticket-628] tour 1 — codeur démarré
+- 2026-10-29 11:25:31 UTC — [ticket-628] tour 1 — codeur terminé (308766ms)
+- 2026-10-29 11:27:59 UTC — [ticket-628] testeur: OK (exit 0)
+- 2026-10-29 11:30:02 UTC — [ticket-628] securite: PASS — Audit sécurité du diff : ajout de fonctions de noms d'agents (`nomDeLAgent`, `av (123360ms)
+- 2026-10-29 11:30:03 UTC — [ticket-628] tour 1 — reviewer démarré
+- 2026-10-29 11:30:22 UTC — [ticket-628] tour 1 — reviewer terminé (18952ms)
+- 2026-10-29 11:34:23 UTC — [ticket-628] validateur: fichiers cités joints : lib/bureau/noms.ts, PosteDeTravail.tsx, AgentsDeLaPiece.tsx, PanneauAgentChoisi.tsx
+- 2026-10-29 11:34:23 UTC — [ticket-628] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests ont été mis à jour po (261046ms)
+- 2026-10-29 11:34:23 UTC — [ticket-628] APPROVED après 1 tour(s)
+- 2026-10-29 11:39:32 UTC — [ticket-628] documentation: 0 fichier(s) (301671ms) — après tour de correction
+- 2026-10-29 11:44:49 UTC — [ide-core] ticket-628 PR #740 mergée (CI verte)
+- 2026-10-29 11:44:51 UTC — [ide-core] ticket-628 : base réalignée sur develop
+- 2026-10-29 11:44:51 UTC — [ide-core] ticket-628 PR #740 confiée au CIWatcher
+- 2026-10-29 11:44:57 UTC — [ticket-629] branche ticket-629-each-desk-screen-shows-what-its-step-is-really-do
+- 2026-10-29 11:44:59 UTC — [ticket-629] tour 1 — codeur démarré
+- 2026-10-29 11:50:41 UTC — [ticket-629] tour 1 — codeur terminé (342171ms)
+- 2026-10-29 11:53:11 UTC — [ticket-629] testeur: OK (exit 0)
+- 2026-10-29 11:54:23 UTC — [ticket-629] securite: PASS — Audit of ticket-629 (écrans d'étape): 7 new files, 5 modified. All code is prope (71952ms)
+- 2026-10-29 11:54:23 UTC — [ticket-629] tour 1 — reviewer démarré
+- 2026-10-29 11:54:41 UTC — [ticket-629] tour 1 — reviewer terminé (17577ms)
+- 2026-10-29 11:57:44 UTC — [ticket-629] validateur: APPROVED — Les tests couvrent tous les critères d'acceptation : l'écran affiche les bonnes  (201234ms)
+- 2026-10-29 11:57:44 UTC — [ticket-629] APPROVED après 1 tour(s)
+- 2026-10-29 12:00:50 UTC — [ticket-629] documentation: 0 fichier(s) (180312ms) — après tour de correction
+- 2026-10-29 12:01:11 UTC — [ide-core] ticket-629 PR #741 confiée au CIWatcher
+- 2026-10-29 12:01:16 UTC — [ticket-630] branche ticket-630-the-chosen-agent-panel-shows-the-agent-s-record-o
+- 2026-10-29 12:01:17 UTC — [ticket-630] tour 1 — codeur démarré
+- 2026-10-29 12:04:20 UTC — [ticket-630] tour 1 — codeur terminé (182875ms)
+- 2026-10-29 12:05:37 UTC — [ide-core] ticket-629 PR #741 mergée (CI verte)
+- 2026-10-29 12:06:45 UTC — [ticket-630] testeur: [36m [2m\u276f[22m src/longueur-des-fichiers.test.ts:[2m99:51[22m[39m
+- 2026-10-29 12:06:45 UTC — [ticket-630] tests rouges au tour 1
+- 2026-10-29 12:06:45 UTC — [ticket-630] tour 2 — codeur démarré
+- 2026-10-29 12:09:03 UTC — [ticket-630] tour 2 — codeur terminé (138077ms)
+- 2026-10-29 12:11:47 UTC — [ticket-630] testeur: OK (exit 0)
+- 2026-10-29 12:14:25 UTC — [ticket-630] securite: PASS — Audit de sécurité du ticket-630 (bilan de l'agent choisi) : aucune vulnérabilité (158703ms)
+- 2026-10-29 12:14:25 UTC — [ticket-630] tour 2 — reviewer démarré
+- 2026-10-29 12:14:44 UTC — [ticket-630] tour 2 — reviewer terminé (19110ms)
+- 2026-10-29 12:16:10 UTC — [ticket-630] validateur: fichiers cités joints : aucun ; absents : usage/breakdown
+- 2026-10-29 12:16:10 UTC — [ticket-630] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Un test vérifie que le panneau (105077ms)
+- 2026-10-29 12:16:10 UTC — [ticket-630] APPROVED après 2 tour(s)
+- 2026-10-29 12:19:27 UTC — [ticket-630] documentation: 0 fichier(s) (192077ms)
+- 2026-10-29 12:27:06 UTC — [ide-core] ticket-630 PR #742 mergée (CI verte)
+- 2026-10-29 12:27:08 UTC — [ide-core] ticket-630 : base réalignée sur develop
+- 2026-10-29 12:27:08 UTC — [ide-core] ticket-630 PR #742 confiée au CIWatcher
+- 2026-10-29 12:27:15 UTC — [ticket-631] branche ticket-631-bureau-consolidation-one-wall-component-and-one-s
+- 2026-10-29 12:28:35 UTC — [ticket-631] plan rendu (78110ms)
+- 2026-10-29 12:28:35 UTC — [ticket-631] tour 1 — codeur démarré
+- 2026-10-29 12:31:23 UTC — [ticket-631] tour 1 — codeur terminé (167266ms)
+- 2026-10-29 12:33:43 UTC — [ticket-631] testeur: OK (exit 0)
+- 2026-10-29 12:35:40 UTC — [ticket-631] securite: PASS — Diff de refactoring frontend (React/TypeScript) : extraction de composants et co (117562ms)
+- 2026-10-29 12:35:40 UTC — [ticket-631] tour 1 — reviewer démarré
+- 2026-10-29 12:36:02 UTC — [ticket-631] tour 1 — reviewer terminé (22093ms)
+- 2026-10-29 12:38:24 UTC — [ticket-631] validateur: fichiers cités joints : Salle.tsx, FondDeLaPiece.tsx, BoutonLumiere.tsx
+- 2026-10-29 12:38:24 UTC — [ticket-631] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le composant partagé `MurLumin (164141ms)
+- 2026-10-29 12:38:24 UTC — [ticket-631] APPROVED après 1 tour(s)
+- 2026-10-29 12:40:29 UTC — [ticket-631] documentation: 0 fichier(s) (117797ms)
+- 2026-10-29 12:45:45 UTC — [ide-core] ticket-631 PR #743 mergée (CI verte)
+- 2026-10-29 12:45:47 UTC — [ide-core] ticket-631 : base réalignée sur develop
+- 2026-10-29 12:45:47 UTC — [ide-core] ticket-631 PR #743 confiée au CIWatcher
+- 2026-10-29 12:45:53 UTC — [ticket-635] branche ticket-635-the-bureau-rooms-gain-a-wall-clock-a-wall-shelf-a
+- 2026-10-29 12:45:54 UTC — [ticket-635] tour 1 — codeur démarré
+- 2026-10-29 12:53:54 UTC — [ticket-635] tour 1 — codeur terminé (479859ms)
+- 2026-10-29 12:56:14 UTC — [ticket-635] testeur: OK (exit 0)
+- 2026-10-29 12:58:21 UTC — [ticket-635] securite: PASS — Audit sécurité du diff ticket-635 (horloge, cadre, étagère, corbeille) : aucune  (126406ms)
+- 2026-10-29 12:58:21 UTC — [ticket-635] tour 1 — reviewer démarré
+- 2026-10-29 12:58:44 UTC — [ticket-635] tour 1 — reviewer terminé (23389ms)
+- 2026-10-29 13:02:01 UTC — [ticket-635] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les tests vérifient que l'horlog (220891ms)
+- 2026-10-29 13:02:01 UTC — [ticket-635] APPROVED après 1 tour(s)
+- 2026-10-29 13:05:21 UTC — [ticket-635] documentation: 0 fichier(s) (193718ms) — après tour de correction
+- 2026-10-29 13:05:40 UTC — [ide-core] ticket-635 PR #744 confiée au CIWatcher
+- 2026-10-29 13:05:46 UTC — [ticket-658] branche ticket-658-appending-to-a-queue-reports-every-requested-id-a
+- 2026-10-29 13:05:48 UTC — [ticket-658] tour 1 — codeur démarré
+- 2026-10-29 13:07:49 UTC — [ticket-658] tour 1 — codeur terminé (121764ms)
+- 2026-10-29 13:10:37 UTC — [ide-core] ticket-635 PR #744 mergée (CI verte)
+- 2026-10-29 13:14:43 UTC — [ticket-658] testeur: 1 failed, 3221 passed, 64 warnings in 409.76s (0:06:49)
+- 2026-10-29 13:14:43 UTC — [ticket-658] tests rouges au tour 1
+- 2026-10-29 13:14:43 UTC — [ticket-658] tour 2 — codeur démarré
+- 2026-10-29 13:15:52 UTC — [ticket-658] tour 2 — codeur terminé (68906ms)
+- 2026-10-29 13:23:54 UTC — [ticket-658] testeur: OK (exit 0)
+- 2026-10-29 13:26:13 UTC — [ticket-658] securite: PASS — Le diff corrige une race condition (ticket-658) où des tickets pouvaient être pe (138953ms)
+- 2026-10-29 13:26:13 UTC — [ticket-658] tour 2 — reviewer démarré
+- 2026-10-29 13:26:33 UTC — [ticket-658] tour 2 — reviewer terminé (20187ms)
+- 2026-10-29 13:26:43 UTC — [ticket-658] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : créneau occupé depuis plus de 30 s
+- 2026-10-29 13:27:12 UTC — [ticket-658] validateur: APPROVED — Les deux critères sont satisfaits. Le test `test_every_requested_id_lands_in_exa (59562ms)
+- 2026-10-29 13:27:12 UTC — [ticket-658] APPROVED après 2 tour(s)
+- 2026-10-29 13:29:55 UTC — [ticket-658] documentation: 0 fichier(s) (156703ms)
+- 2026-10-29 13:37:26 UTC — [ide-core] ticket-658 PR #745 confiée au CIWatcher
+- 2026-10-29 13:37:31 UTC — [ticket-659] branche ticket-659-ticket-and-adr-numbers-are-allocated-by-code-and
+- 2026-10-29 13:38:36 UTC — [ticket-659] plan rendu (63266ms)
+- 2026-10-29 13:38:36 UTC — [ticket-659] tour 1 — codeur démarré
+- 2026-10-29 13:42:25 UTC — [ide-core] ticket-658 PR #745 mergée (CI verte)
+- 2026-10-29 13:50:41 UTC — [ticket-659] tour 1 — codeur terminé (725389ms)
+- 2026-10-29 13:57:07 UTC — [ticket-659] testeur: 1 failed, 1925 passed, 64 warnings in 381.64s (0:06:21)
+- 2026-10-29 13:57:07 UTC — [ticket-659] tests rouges au tour 1
+- 2026-10-29 13:57:07 UTC — [ticket-659] tour 2 — codeur démarré
+- 2026-10-29 14:01:29 UTC — [ticket-659] tour 2 — codeur terminé (262156ms)
+- 2026-10-29 14:10:40 UTC — [ticket-659] testeur: 1 failed, 3421 passed, 64 warnings in 546.95s (0:09:06)
+- 2026-10-29 14:10:40 UTC — [ticket-659] tests rouges au tour 2
+- 2026-10-29 14:10:40 UTC — [ticket-659] tour 3 — codeur démarré
+- 2026-10-29 14:12:44 UTC — [ticket-659] tour 3 — codeur terminé (124452ms)
+- 2026-10-29 14:20:45 UTC — [ticket-659] testeur: OK (exit 0)
+- 2026-10-29 14:24:13 UTC — [ticket-659] securite: PASS — Pas de vulnérabilités CRITICAL ou HIGH introduites par ce ticket. Une vulnérabil (207875ms)
+- 2026-10-29 14:24:13 UTC — [ticket-659] tour 3 — reviewer démarré
+- 2026-10-29 14:24:51 UTC — [ticket-659] tour 3 — reviewer terminé (37843ms)
+- 2026-10-29 14:29:14 UTC — [ticket-659] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-29 14:29:47 UTC — [ticket-659] validateur: fichiers cités joints : scripts/prochain_numero.py, memory/decisions.md (tronqué) ; absents : origin/develop ; non joints (budget épuisé) : memory/pipeline-log.md
+- 2026-10-29 14:29:47 UTC — [ticket-659] validateur: APPROVED — Les quatre critères sont satisfaits. Les tests couvrent : (1) un numéro ne figur (334094ms)
+- 2026-10-29 14:29:47 UTC — [ticket-659] CHANGES_REQUESTED tour 3: Reviewer : 1. `_adr_en_collision` prend pour une ADR ajoutée toute ligne de titre `## ADR-N` qui figure dans les lignes ajoutées du diff, puis compare son texte à celui de la base. Quand un run modifi
+- 2026-10-29 14:29:47 UTC — [ticket-659] BLOCKED après 3 tour(s) sans approbation
+- 2026-10-29 14:29:52 UTC — [ide-core] file interrompue : ticket-659 non approuvé
+- 2026-10-29 14:56:27 UTC — [ticket-659] branche ticket-659-ticket-and-adr-numbers-are-allocated-by-code-and
+- 2026-10-29 14:57:46 UTC — [ticket-659] plan rendu (76781ms)
+- 2026-10-29 14:57:46 UTC — [ticket-659] branche reprise (3 commit(s)) — refus précédent : revue, codeur en premier
+- 2026-10-29 14:57:46 UTC — [ticket-659] tour 1 — codeur démarré
+- 2026-10-29 14:59:55 UTC — [ticket-659] tour 1 — codeur terminé (129452ms)
+- 2026-10-29 15:12:02 UTC — [ticket-659] testeur: OK (exit 0)
+- 2026-10-29 15:14:17 UTC — [ticket-659] securite: PASS — Implémentation de renumération robuste avec une exception : `reecriture_des_nume (134360ms)
+- 2026-10-29 15:14:18 UTC — [ticket-659] tour 1 — reviewer démarré
+- 2026-10-29 15:14:47 UTC — [ticket-659] tour 1 — reviewer terminé (29218ms)
+- 2026-10-29 15:19:18 UTC — [ticket-659] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-29 15:19:54 UTC — [ticket-659] validateur: fichiers cités joints : scripts/prochain_numero.py, memory/decisions.md (tronqué) ; absents : origin/develop ; non joints (budget épuisé) : memory/pipeline-log.md
+- 2026-10-29 15:19:54 UTC — [ticket-659] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le diff ajoute les tests requis (337264ms)
+- 2026-10-29 15:19:54 UTC — [ticket-659] APPROVED après 1 tour(s)
+- 2026-10-29 15:26:32 UTC — [ticket-659] documentation: 0 fichier(s) (393139ms) — après tour de correction — refusé : doc-fonctionnelle : docs/guide-utilisateur.md : règle « preuve » — l'extrait « **Pas de « `uv run pytest` passe » ni de « `npm run test` pa » (.claude/skills/ne
+- 2026-10-29 15:37:44 UTC — [ide-core] ticket-659 PR #748 confiée au CIWatcher
+- 2026-10-29 15:37:47 UTC — [ticket-665] branche ticket-665-startup-recovery-also-cleans-the-repository-of-a
+- 2026-10-29 15:37:48 UTC — [ticket-665] tour 1 — codeur démarré
+- 2026-10-29 15:40:04 UTC — [ticket-665] tour 1 — codeur terminé (135983ms)
+- 2026-10-29 15:41:32 UTC — [ticket-659] livraison: arrêt — PR #748 non mergée : CI failing : la PR #748 reste ouverte.
+- 2026-10-29 15:49:40 UTC — [ticket-665] testeur: 1 failed, 3220 passed, 64 warnings in 571.57s (0:09:31)
+- 2026-10-29 15:49:40 UTC — [ticket-665] tests rouges au tour 1
+- 2026-10-29 15:49:40 UTC — [ticket-665] tour 2 — codeur démarré
+- 2026-10-29 15:52:34 UTC — [ticket-665] tour 2 — codeur terminé (174375ms)
+- 2026-10-29 16:02:54 UTC — [ticket-665] testeur: OK (exit 0)
+- 2026-10-29 16:05:04 UTC — [ticket-665] securite: PASS — Code audit passed. The diff refactors database migrations (moving them to a sepa (129782ms)
+- 2026-10-29 16:05:04 UTC — [ticket-665] tour 2 — reviewer démarré
+- 2026-10-29 16:05:30 UTC — [ticket-665] tour 2 — reviewer terminé (26358ms)
+- 2026-10-29 16:07:11 UTC — [ticket-665] validateur: fichiers cités joints : aucun ; absents : in-progress/
+- 2026-10-29 16:07:11 UTC — [ticket-665] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le code inclut une nouvelle co (127264ms)
+- 2026-10-29 16:07:11 UTC — [ticket-665] APPROVED après 2 tour(s)
+- 2026-10-29 16:10:34 UTC — [ticket-665] documentation: 0 fichier(s) (194686ms)
+- 2026-10-29 16:19:58 UTC — [ide-core] ticket-665 PR #750 confiée au CIWatcher
+- 2026-10-29 16:20:01 UTC — [ticket-660] branche ticket-660-done-tickets-are-archived-by-hundreds-and-every-t
+- 2026-10-29 16:20:02 UTC — [ticket-660] tour 1 — codeur démarré
+- 2026-10-29 16:23:24 UTC — [ticket-660] tour 1 — codeur terminé (200764ms)
+- 2026-10-29 16:24:57 UTC — [ide-core] ticket-665 PR #750 mergée (CI verte)
+- 2026-10-29 16:29:52 UTC — [ticket-660] testeur: 1 failed, 1798 passed, 64 warnings in 383.17s (0:06:23)
+- 2026-10-29 16:29:52 UTC — [ticket-660] tests rouges au tour 1
+- 2026-10-29 16:29:52 UTC — [ticket-660] tour 2 — codeur démarré
+- 2026-10-29 16:32:36 UTC — [ticket-660] tour 2 — codeur terminé (163890ms)
+- 2026-10-29 16:43:24 UTC — [ticket-660] testeur: OK (exit 0)
+- 2026-10-29 16:45:42 UTC — [ticket-660] securite: PASS — Ticket archiving feature (ticket-660) introduces no CRITICAL or HIGH security vu (137610ms)
+- 2026-10-29 16:45:42 UTC — [ticket-660] tour 2 — reviewer démarré
+- 2026-10-29 16:45:42 UTC — [ticket-660] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-10-29 16:46:08 UTC — [ticket-660] tour 2 — reviewer terminé (26391ms)
+- 2026-10-29 16:46:42 UTC — [ticket-660] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. La mise en œuvre complète du se (59953ms)
+- 2026-10-29 16:46:42 UTC — [ticket-660] APPROVED après 2 tour(s)
+- 2026-10-29 16:50:43 UTC — [ticket-660] documentation: 0 fichier(s) (235562ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « preuve » — l'extrait « Son numéro vient de `python ../../scripts/prochain_numero.py » (agents/prompts/codeur.md) 
+- 2026-10-29 17:00:33 UTC — [ide-core] ticket-660 PR #751 confiée au CIWatcher
+- 2026-10-29 17:00:38 UTC — [ticket-661] branche ticket-661-the-director-walks-to-a-room-whose-run-turns-sile
+- 2026-10-29 17:01:56 UTC — [ticket-661] plan rendu (77125ms)
+- 2026-10-29 17:01:56 UTC — [ticket-661] tour 1 — codeur démarré
+- 2026-10-29 17:06:53 UTC — [ide-core] ticket-660 PR #751 mergée (CI verte)
+- 2026-10-29 17:07:14 UTC — [ticket-661] tour 1 — codeur terminé (318171ms)
+- 2026-10-29 17:10:42 UTC — [ticket-661] testeur: OK (exit 0)
+- 2026-10-29 17:12:20 UTC — [ticket-661] securite: PASS — The director's round feature (ticket-661) introduces a new visitor behavior with (97656ms)
+- 2026-10-29 17:12:20 UTC — [ticket-661] tour 1 — reviewer démarré
+- 2026-10-29 17:12:45 UTC — [ticket-661] tour 1 — reviewer terminé (24390ms)
+- 2026-10-29 17:15:53 UTC — [ticket-661] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (213235ms)
+- 2026-10-29 17:15:53 UTC — [ticket-661] APPROVED après 1 tour(s)
+- 2026-10-29 17:18:40 UTC — [ticket-661] documentation: 1 fichier(s) (159078ms)
+- 2026-10-29 17:21:51 UTC — [ide-core] ticket-661 PR #752 confiée au CIWatcher
+- 2026-10-29 17:21:58 UTC — [ticket-667] branche ticket-667-the-launcher-refuses-a-checkout-off-develop-or-be
+- 2026-10-29 17:22:01 UTC — [ticket-667] tour 1 — codeur démarré
+- 2026-10-29 17:26:18 UTC — [ticket-667] tour 1 — codeur terminé (257031ms)
+- 2026-10-29 17:26:33 UTC — [ide-core] ticket-661 PR #752 mergée (CI verte)
+- 2026-10-29 17:32:25 UTC — [ticket-667] testeur: 1 failed, 1344 passed, 64 warnings in 363.27s (0:06:03)
+- 2026-10-29 17:32:25 UTC — [ticket-667] tests rouges au tour 1
+- 2026-10-29 17:32:25 UTC — [ticket-667] tour 2 — codeur démarré
+- 2026-10-29 17:32:58 UTC — [ticket-667] tour 2 — codeur terminé (33407ms)
+- 2026-10-29 17:41:50 UTC — [ticket-667] testeur: OK (exit 0)
+- 2026-10-29 17:44:24 UTC — [ticket-667] securite: PASS — Aucune vulnérabilité CRITICAL ou HIGH détectée. Un problème LOW (construction de (153889ms)
+- 2026-10-29 17:44:24 UTC — [ticket-667] tour 2 — reviewer démarré
+- 2026-10-29 17:44:46 UTC — [ticket-667] tour 2 — reviewer terminé (21218ms)
+- 2026-10-29 17:44:54 UTC — [ticket-667] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : créneau occupé depuis plus de 30 s
+- 2026-10-29 17:45:30 UTC — [ticket-667] validateur: fichiers cités joints : scripts/tessera.ps1 ; absents : origin/develop
+- 2026-10-29 17:45:30 UTC — [ticket-667] validateur: APPROVED — Tous les critères d'acceptation du ticket 667 sont satisfaits. La fonction `chec (65906ms)
+- 2026-10-29 17:45:30 UTC — [ticket-667] APPROVED après 2 tour(s)
+- 2026-10-29 17:49:55 UTC — [ticket-667] documentation: 0 fichier(s) (254702ms)
+- 2026-10-29 17:59:46 UTC — [ide-core] ticket-667 PR #753 confiée au CIWatcher
+- 2026-10-29 17:59:53 UTC — [ticket-669] branche ticket-669-a-provider-for-any-openai-compatible-endpoint-dec
+- 2026-10-29 18:00:48 UTC — [ticket-669] plan rendu (54108ms)
+- 2026-10-29 18:00:48 UTC — [ticket-669] tour 1 — codeur démarré
+- 2026-10-29 18:04:44 UTC — [ide-core] ticket-667 PR #753 mergée (CI verte)
+- 2026-10-29 18:06:49 UTC — [ticket-669] tour 1 — codeur terminé (360891ms)
+- 2026-10-29 18:13:45 UTC — [ticket-669] testeur: 1 failed, 1876 passed, 64 warnings in 412.54s (0:06:52)
+- 2026-10-29 18:13:45 UTC — [ticket-669] tests rouges au tour 1
+- 2026-10-29 18:13:45 UTC — [ticket-669] tour 2 — codeur démarré
+- 2026-10-29 18:17:04 UTC — [ticket-669] tour 2 — codeur terminé (199093ms)
+- 2026-10-29 18:27:45 UTC — [ticket-669] testeur: OK (exit 0)
+- 2026-10-29 18:31:09 UTC — [ticket-669] securite: PASS — L'ajout du provider `openai_compatible` (ticket-669) respecte les bonnes pratiqu (203905ms)
+- 2026-10-29 18:31:09 UTC — [ticket-669] tour 2 — reviewer démarré
+- 2026-10-29 18:31:37 UTC — [ticket-669] tour 2 — reviewer terminé (27687ms)
+- 2026-10-29 18:35:13 UTC — [ticket-669] validateur: fichiers cités joints : agents.json
+- 2026-10-29 18:35:13 UTC — [ticket-669] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests vérifient que le prov (243921ms)
+- 2026-10-29 18:35:13 UTC — [ticket-669] APPROVED après 2 tour(s)
+- 2026-10-29 18:37:18 UTC — [ticket-669] documentation: 0 fichier(s) (109281ms)
+- 2026-10-29 18:48:37 UTC — [ide-core] ticket-669 PR #754 confiée au CIWatcher
+- 2026-10-29 18:48:41 UTC — [ticket-670] branche ticket-670-a-test-keeps-backend-imports-flowing-from-routers
+- 2026-10-29 18:48:42 UTC — [ticket-670] tour 1 — codeur démarré
+- 2026-10-29 18:49:59 UTC — [ticket-670] tour 1 — codeur terminé (76937ms)
+- 2026-10-29 18:53:36 UTC — [ide-core] ticket-669 PR #754 mergée (CI verte)
+- 2026-10-29 18:59:23 UTC — [ticket-670] testeur: OK (exit 0)
+- 2026-10-29 19:00:44 UTC — [ticket-670] securite: PASS — Aucune vulnérabilité critique ou haute détectée. Le test d'architecture utilise  (81218ms)
+- 2026-10-29 19:00:44 UTC — [ticket-670] tour 1 — reviewer démarré
+- 2026-10-29 19:01:01 UTC — [ticket-670] tour 1 — reviewer terminé (16625ms)
+- 2026-10-29 19:02:31 UTC — [ticket-670] validateur: fichiers cités joints : backend/tests/test_sens_des_imports.py ; absents : models/, services/
+- 2026-10-29 19:02:31 UTC — [ticket-670] validateur: APPROVED — Le test `backend/tests/test_sens_des_imports.py` a été implémenté conformément a (106468ms)
+- 2026-10-29 19:02:31 UTC — [ticket-670] APPROVED après 1 tour(s)
+- 2026-10-29 19:05:45 UTC — [ticket-670] documentation: 0 fichier(s) (188375ms) — après tour de correction
+- 2026-10-29 19:17:23 UTC — [ide-core] ticket-670 PR #755 confiée au CIWatcher
+- 2026-10-29 19:17:27 UTC — [ticket-671] branche ticket-671-a-service-declares-an-activity-file-and-the-backe
+- 2026-10-29 19:17:29 UTC — [ticket-671] tour 1 — codeur démarré
+- 2026-10-29 19:21:00 UTC — [ticket-671] tour 1 — codeur terminé (211875ms)
+- 2026-10-29 19:23:42 UTC — [ide-core] ticket-670 PR #755 mergée (CI verte)
+- 2026-10-29 19:27:49 UTC — [ticket-671] testeur: 1 failed, 1834 passed, 64 warnings in 405.57s (0:06:45)
+- 2026-10-29 19:27:49 UTC — [ticket-671] tests rouges au tour 1
+- 2026-10-29 19:27:49 UTC — [ticket-671] tour 2 — codeur démarré
+- 2026-10-29 19:34:06 UTC — [ticket-671] tour 2 — codeur terminé (376469ms)
+- 2026-10-29 19:42:34 UTC — [ticket-671] testeur: OK (exit 0)
+- 2026-10-29 19:44:27 UTC — [ticket-671] securite: PASS — Le ticket introduit un routeur API et des services pour lire les fichiers d'acti (113203ms)
+- 2026-10-29 19:44:27 UTC — [ticket-671] tour 2 — reviewer démarré
+- 2026-10-29 19:44:46 UTC — [ticket-671] tour 2 — reviewer terminé (19187ms)
+- 2026-10-29 19:46:57 UTC — [ticket-671] validateur: fichiers cités joints : agents.json
+- 2026-10-29 19:46:57 UTC — [ticket-671] validateur: APPROVED — Tous les critères d'acceptation ont été implémentés et vérifiés. Le code gère co (150125ms)
+- 2026-10-29 19:46:57 UTC — [ticket-671] APPROVED après 2 tour(s)
+- 2026-10-29 19:50:24 UTC — [ticket-671] documentation: 0 fichier(s) (200000ms) — après tour de correction
+- 2026-10-29 20:04:25 UTC — [ide-core] ticket-671 PR #756 mergée (CI verte)
+- 2026-10-29 20:04:28 UTC — [ide-core] ticket-671 : base réalignée sur develop
+- 2026-10-29 20:04:28 UTC — [ide-core] ticket-671 PR #756 confiée au CIWatcher
+- 2026-10-29 20:04:32 UTC — [ticket-533] branche ticket-533-les-pr-d-une-file-deviennent-conflictuelles-sur-l
+- 2026-10-29 20:04:33 UTC — [ticket-533] tour 1 — codeur démarré
+- 2026-10-29 20:16:34 UTC — [ticket-533] tour 1 — codeur terminé (720469ms)
+- 2026-10-29 20:24:53 UTC — [ticket-533] testeur: OK (exit 0)
+- 2026-10-29 20:27:11 UTC — [ticket-533] securite: PASS — Audit de sécurité du changement ticket-533 (attente des merges) : le nouveau mod (138046ms)
+- 2026-10-29 20:27:11 UTC — [ticket-533] tour 1 — reviewer démarré
+- 2026-10-29 20:27:39 UTC — [ticket-533] tour 1 — reviewer terminé (27687ms)
+- 2026-10-29 20:28:53 UTC — [ticket-533] validateur: APPROVED — Le critère d'acceptation 1, initialement à écrire au triage, est maintenant sati (101625ms)
+- 2026-10-29 20:28:53 UTC — [ticket-533] APPROVED après 1 tour(s)
+- 2026-10-29 20:28:59 UTC — [ticket-533] fichiers non suivis laissés par le run : tickets/todo/ticket-674-an-open-pr-turned-conflicting-is-updated-without-forcing-a-push.md (à ignorer dans .gitignore ?)
+- 2026-10-29 20:33:38 UTC — [ticket-533] documentation: 1 fichier(s) (278406ms) — après tour de correction
+- 2026-10-29 20:33:59 UTC — [ide-core] ticket-533 PR #757 confiée au CIWatcher
+- 2026-10-29 20:34:07 UTC — [ticket-537] branche ticket-537-le-validateur-ignore-une-r-ponse-du-dialogue-qui
+- 2026-10-29 20:34:08 UTC — [ticket-537] tour 1 — codeur démarré
+- 2026-10-29 20:36:07 UTC — [ticket-537] tour 1 — codeur terminé (118453ms)
+- 2026-10-29 20:42:10 UTC — [ide-core] ticket-533 PR #757 mergée (CI verte)
+- 2026-10-29 20:43:34 UTC — [ticket-537] testeur: 1 failed, 2566 passed, 64 warnings in 443.17s (0:07:23)
+- 2026-10-29 20:43:34 UTC — [ticket-537] tests rouges au tour 1
+- 2026-10-29 20:43:34 UTC — [ticket-537] tour 2 — codeur démarré
+- 2026-10-29 20:45:46 UTC — [ticket-537] tour 2 — codeur terminé (132467ms)
+- 2026-10-29 20:54:01 UTC — [ticket-537] testeur: OK (exit 0)
+- 2026-10-29 20:56:50 UTC — [ticket-537] securite: PASS — Vulnérabilité d'injection de prompt identifiée : les réponses de dialogue non éc (169110ms)
+- 2026-10-29 20:56:50 UTC — [ticket-537] tour 2 — reviewer démarré
+- 2026-10-29 20:57:11 UTC — [ticket-537] tour 2 — reviewer terminé (20687ms)
+- 2026-10-29 20:59:08 UTC — [ticket-537] validateur: fichiers cités joints : services/validator.py, agents/prompts/validateur.md
+- 2026-10-29 20:59:08 UTC — [ticket-537] validateur: APPROVED — Tous les critères sont satisfaits. Le code implémente correctement la gestion de (138358ms)
+- 2026-10-29 20:59:08 UTC — [ticket-537] APPROVED après 2 tour(s)
+- 2026-10-29 21:02:06 UTC — [ticket-537] documentation: 0 fichier(s) (170921ms) — après tour de correction
+- 2026-10-29 21:10:59 UTC — [ide-core] ticket-537 PR #758 confiée au CIWatcher
+- 2026-10-29 21:11:03 UTC — [ticket-539] branche ticket-539-un-push-refus-en-reference-already-exists-alors-q
+- 2026-10-29 21:11:04 UTC — [ticket-539] tour 1 — codeur démarré
+- 2026-10-29 21:13:24 UTC — [ticket-539] tour 1 — codeur terminé (139906ms)
+- 2026-10-29 21:15:41 UTC — [ide-core] ticket-537 PR #758 mergée (CI verte)
+- 2026-10-29 21:23:22 UTC — [ticket-539] testeur: OK (exit 0)
+- 2026-10-29 21:26:30 UTC — [ticket-539] securite: PASS — This diff refactors git push logic into a dedicated class with race condition re (188032ms)
+- 2026-10-29 21:26:30 UTC — [ticket-539] tour 1 — reviewer démarré
+- 2026-10-29 21:26:52 UTC — [ticket-539] tour 1 — reviewer terminé (21891ms)
+- 2026-10-29 21:27:36 UTC — [ticket-539] validateur: APPROVED — Le critère d'acceptation est satisfait. Le code implémente une gestion robuste d (66484ms)
+- 2026-10-29 21:27:36 UTC — [ticket-539] APPROVED après 1 tour(s)
+- 2026-10-29 21:29:57 UTC — [ticket-539] documentation: 0 fichier(s) (133844ms)
+- 2026-10-29 21:39:55 UTC — [ide-core] ticket-539 PR #759 confiée au CIWatcher
+- 2026-10-29 21:39:59 UTC — [ticket-650] branche ticket-650-audit-give-every-adr-a-status-and-find-the-ones-r
+- 2026-10-29 21:40:54 UTC — [ticket-650] plan rendu (53078ms)
+- 2026-10-29 21:40:54 UTC — [ticket-650] tour 1 — codeur démarré
+- 2026-10-29 21:44:19 UTC — [ide-core] ticket-539 PR #759 mergée (CI verte)
+- 2026-10-29 21:46:45 UTC — [ticket-650] tour 1 — architect terminé (351187ms)
+- 2026-10-29 21:46:48 UTC — [ticket-650] testeur: Aucun fichier de backend/ ni de frontend/ modifi� : rien � tester.
+- 2026-10-29 21:47:02 UTC — [ticket-650] securite: PASS — Le diff n'ajoute qu'un fichier de documentation statique (`docs/audit/adr.md`) l (14219ms)
+- 2026-10-29 21:47:02 UTC — [ticket-650] tour 1 — reviewer démarré
+- 2026-10-29 21:47:25 UTC — [ticket-650] tour 1 — reviewer terminé (23265ms)
+- 2026-10-29 21:52:02 UTC — [ticket-650] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-29 21:52:30 UTC — [ticket-650] validateur: fichiers cités joints : docs/audit/adr.md (tronqué) ; non joints (budget épuisé) : memory/contraintes.md
+- 2026-10-29 21:52:30 UTC — [ticket-650] validateur: APPROVED — Le fichier `docs/audit/adr.md` contient l'audit complet demandé : tableau de sta (327781ms)
+- 2026-10-29 21:52:30 UTC — [ticket-650] APPROVED après 1 tour(s)
+- 2026-10-29 21:54:11 UTC — [ticket-650] documentation: 0 fichier(s) (94719ms)
+- 2026-10-29 21:58:58 UTC — [ide-core] ticket-650 PR #760 mergée (CI verte)
+- 2026-10-29 21:59:00 UTC — [ide-core] ticket-650 : base réalignée sur develop
+- 2026-10-29 21:59:00 UTC — [ide-core] ticket-650 PR #760 confiée au CIWatcher
+- 2026-10-29 21:59:04 UTC — [ticket-651] branche ticket-651-audit-check-the-code-against-the-constraints-in-f
+- 2026-10-29 21:59:56 UTC — [ticket-651] plan rendu (51141ms)
+- 2026-10-29 21:59:56 UTC — [ticket-651] tour 1 — codeur démarré
+- 2026-10-29 22:06:23 UTC — [ticket-651] tour 1 — architect terminé (386703ms)
+- 2026-10-29 22:06:26 UTC — [ticket-651] testeur: Aucun fichier de backend/ ni de frontend/ modifi� : rien � tester.
+- 2026-10-29 22:07:02 UTC — [ticket-651] securite: PASS — Le diff ajoute un document markdown de documentation (`docs/audit/regles.md`) qu (35671ms)
+- 2026-10-29 22:07:02 UTC — [ticket-651] tour 1 — reviewer démarré
+- 2026-10-29 22:07:30 UTC — [ticket-651] tour 1 — reviewer terminé (28407ms)
+- 2026-10-29 22:11:56 UTC — [ticket-651] validateur: fichiers cités joints : docs/audit/regles.md (tronqué) ; non joints (budget épuisé) : contraintes.md
+- 2026-10-29 22:11:56 UTC — [ticket-651] validateur: APPROVED — Les trois critères d'acceptation sont respectés : le fichier `docs/audit/regles. (293625ms)
+- 2026-10-29 22:11:56 UTC — [ticket-651] APPROVED après 1 tour(s)
+- 2026-10-29 22:13:48 UTC — [ticket-651] documentation: 0 fichier(s) (106592ms)
+- 2026-10-29 22:14:08 UTC — [ide-core] ticket-651 PR #761 confiée au CIWatcher
+- 2026-10-29 22:14:13 UTC — [ticket-652] branche ticket-652-audit-find-duplicated-logic-and-components-and-wh
+- 2026-10-29 22:14:52 UTC — [ticket-652] plan rendu (37530ms)
+- 2026-10-29 22:14:52 UTC — [ticket-652] tour 1 — codeur démarré
+- 2026-10-29 22:18:48 UTC — [ide-core] ticket-651 PR #761 mergée (CI verte)
+- 2026-10-29 22:21:34 UTC — [ticket-652] tour 1 — architect terminé (402546ms)
+- 2026-10-29 22:21:38 UTC — [ticket-652] testeur: Aucun fichier de backend/ ni de frontend/ modifi� : rien � tester.
+- 2026-10-29 22:21:58 UTC — [ticket-652] securite: PASS — Le diff ajoute un fichier de documentation statique (`docs/audit/doublons.md`) q (20046ms)
+- 2026-10-29 22:21:58 UTC — [ticket-652] tour 1 — reviewer démarré
+- 2026-10-29 22:22:30 UTC — [ticket-652] tour 1 — reviewer terminé (31983ms)
+- 2026-10-29 22:26:58 UTC — [ticket-652] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-29 22:27:44 UTC — [ticket-652] validateur: fichiers cités joints : docs/audit/doublons.md
+- 2026-10-29 22:27:44 UTC — [ticket-652] validateur: APPROVED — L'audit de ticket-652 est complet. Le fichier `docs/audit/doublons.md` énumère t (345515ms)
+- 2026-10-29 22:27:44 UTC — [ticket-652] APPROVED après 1 tour(s)
+- 2026-10-29 22:27:50 UTC — [ticket-652] fichiers non suivis laissés par le run : tickets/todo/ticket-675-one-reader-for-the-agents-json-manifest.md, tickets/todo/ticket-676-one-walk-up-to-the-repository-root.md, tickets/todo/ticket-677-one-git-runner-with-hooks-disabled.md, tickets/todo/ticket-678-one-cost-by-role-aggregate-and-a-response-model.md, tickets/todo/ticket-679-response-models-for-the-services-routes.md, tickets/todo/ticket-680-one-http-client-in-the-frontend.md, tickets/todo/ticket-681-shared-duration-date-and-cost-formatters.md, tickets/todo/ticket-682-a-shared-modal-component.md, tickets/todo/ticket-683-a-shared-polling-hook-and-clock.md, tickets/todo/ticket-684-a-contract-test-between-routes-types-and-fixtures.md (à ignorer dans .gitignore ?)
+- 2026-10-29 22:28:54 UTC — [ticket-652] documentation: 0 fichier(s) (63812ms)
+- 2026-10-29 22:35:01 UTC — [ide-core] ticket-652 PR #762 mergée (CI verte)
+- 2026-10-29 22:35:04 UTC — [ide-core] ticket-652 : base réalignée sur develop
+- 2026-10-29 22:35:04 UTC — [ide-core] ticket-652 PR #762 confiée au CIWatcher
+- 2026-10-29 22:35:08 UTC — [ticket-653] branche ticket-653-audit-list-the-refactors-the-code-needs-ranked-by
+- 2026-10-29 22:35:53 UTC — [ticket-653] plan rendu (44000ms)
+- 2026-10-29 22:35:53 UTC — [ticket-653] tour 1 — codeur démarré
+- 2026-10-29 22:41:27 UTC — [ticket-653] tour 1 — architect terminé (333532ms)
+- 2026-10-29 22:41:30 UTC — [ticket-653] testeur: Aucun fichier de backend/ ni de frontend/ modifi� : rien � tester.
+- 2026-10-29 22:41:58 UTC — [ticket-653] securite: PASS — Le diff ajoute un document d'audit technique en lecture seule qui analyse la str (27296ms)
+- 2026-10-29 22:41:58 UTC — [ticket-653] tour 1 — reviewer démarré
+- 2026-10-29 22:42:29 UTC — [ticket-653] tour 1 — reviewer terminé (31077ms)
+- 2026-10-29 22:46:58 UTC — [ticket-653] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-29 22:47:19 UTC — [ticket-653] validateur: fichiers cités joints : docs/audit/refactos.md (tronqué)
+- 2026-10-29 22:47:19 UTC — [ticket-653] validateur: APPROVED — Le ticket-653 remplit tous ses critères. `docs/audit/refactos.md` §1 liste les 3 (321171ms)
+- 2026-10-29 22:47:19 UTC — [ticket-653] CHANGES_REQUESTED tour 1: Reviewer : 1. Le premier critère du ticket-687 est `grep -rn "from tessera.routers" backend/src/tessera/routers backend/src/tessera/services` ne rend aucune ligne. Ce critère est impossible à tenir. L
+- 2026-10-29 22:47:19 UTC — [ticket-653] tour 2 — codeur démarré
+- 2026-10-29 22:48:35 UTC — [ticket-653] tour 2 — architect terminé (76014ms)
+- 2026-10-29 22:48:38 UTC — [ticket-653] testeur: Aucun fichier de backend/ ni de frontend/ modifi� : rien � tester.
+- 2026-10-29 22:49:08 UTC — [ticket-653] securite: PASS — Ajout d'un document de documentation technique dans `docs/audit/refactos.md`. Au (29890ms)
+- 2026-10-29 22:49:08 UTC — [ticket-653] tour 2 — reviewer démarré
+- 2026-10-29 22:49:08 UTC — [ticket-653] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-10-29 22:49:24 UTC — [ticket-653] tour 2 — reviewer terminé (15203ms)
+- 2026-10-29 22:49:43 UTC — [ticket-653] validateur: fichiers cités joints : docs/audit/refactos.md (tronqué)
+- 2026-10-29 22:49:43 UTC — [ticket-653] validateur: APPROVED — Le ticket-653 remplit tous ses critères. Le document d'audit liste les 30 fichie (34422ms)
+- 2026-10-29 22:49:43 UTC — [ticket-653] APPROVED après 2 tour(s)
+- 2026-10-29 22:49:49 UTC — [ticket-653] fichiers non suivis laissés par le run : tickets/todo/ticket-685-queue-and-autonomous-modes-leave-the-orchestrator-class.md, tickets/todo/ticket-686-end-of-queue-steps-leave-the-orchestrator-class.md, tickets/todo/ticket-687-run-assembly-leaves-the-orchestrator-router.md, tickets/todo/ticket-688-pipeline-stages-split-by-stage.md, tickets/todo/ticket-689-projects-router-split-by-resource.md, tickets/todo/ticket-690-database-module-split-by-domain.md, tickets/todo/ticket-691-project-loader-split-by-role.md, tickets/todo/ticket-692-documentation-module-split-in-three.md, tickets/todo/ticket-693-api-types-split-by-domain.md, tickets/todo/ticket-694-api-client-split-by-domain.md et 7 autres (à ignorer dans .gitignore ?)
+- 2026-10-29 22:52:37 UTC — [ticket-653] documentation: 0 fichier(s) (167890ms) — après tour de correction
+- 2026-10-29 22:53:01 UTC — [ide-core] ticket-653 PR #763 confiée au CIWatcher
+- 2026-10-29 22:53:04 UTC — [ticket-654] branche ticket-654-audit-security-review-of-the-backend-the-agent-gu
+- 2026-10-29 22:54:10 UTC — [ticket-654] plan rendu (64812ms)
+- 2026-10-29 22:54:10 UTC — [ticket-654] tour 1 — codeur démarré
+- 2026-10-29 22:58:13 UTC — [ide-core] ticket-653 PR #763 mergée (CI verte)
+- 2026-10-29 23:02:24 UTC — [ticket-654] tour 1 — architect terminé (493905ms)
+- 2026-10-29 23:02:28 UTC — [ticket-654] testeur: Aucun fichier de backend/ ni de frontend/ modifi� : rien � tester.
+- 2026-10-29 23:03:25 UTC — [ticket-654] securite: PASS — Ce diff ajoute un document d'audit de sécurité statique qui révèle 22 failles da (57328ms)
+- 2026-10-29 23:03:25 UTC — [ticket-654] tour 1 — reviewer démarré
+- 2026-10-29 23:04:00 UTC — [ticket-654] tour 1 — reviewer terminé (34875ms)
+- 2026-10-29 23:08:25 UTC — [ticket-654] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-29 23:09:05 UTC — [ticket-654] validateur: fichiers cités joints : docs/audit/securite.md (tronqué)
+- 2026-10-29 23:09:05 UTC — [ticket-654] validateur: APPROVED — L'audit de sécurité est complet : 22 constats classifiés avec gravité, fichiers/ (340172ms)
+- 2026-10-29 23:09:05 UTC — [ticket-654] APPROVED après 1 tour(s)
+- 2026-10-29 23:10:18 UTC — [ticket-654] documentation: 0 fichier(s) (66717ms)
+- 2026-10-29 23:10:41 UTC — [ide-core] ticket-654 PR #764 confiée au CIWatcher
+- 2026-10-29 23:10:44 UTC — [ticket-668] branche ticket-668-design-split-a-run-into-sub-tasks-implemented-rev
+- 2026-10-29 23:11:36 UTC — [ticket-668] plan rendu (50328ms)
+- 2026-10-29 23:11:36 UTC — [ticket-668] tour 1 — codeur démarré
+- 2026-10-29 23:14:59 UTC — [ticket-654] livraison: arrêt — PR #764 non mergée : CI failing : la PR #764 reste ouverte.
+- 2026-10-29 23:17:05 UTC — [ticket-668] tour 1 — architect terminé (328953ms)
+- 2026-10-29 23:17:08 UTC — [ticket-668] testeur: Aucun fichier de backend/ ni de frontend/ modifi� : rien � tester.
+- 2026-10-29 23:17:45 UTC — [ticket-668] securite: PASS — Le diff ajoute une spécification de conception (Markdown) et une ADR-066 documen (36531ms)
+- 2026-10-29 23:17:45 UTC — [ticket-668] tour 1 — reviewer démarré
+- 2026-10-29 23:17:45 UTC — [ticket-668] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-10-29 23:18:10 UTC — [ticket-668] tour 1 — reviewer terminé (25125ms)
+- 2026-10-29 23:18:34 UTC — [ticket-668] validateur: fichiers cités joints : memory/decisions.md (tronqué) ; non joints (budget épuisé) : memory/pipeline-log.md
+- 2026-10-29 23:18:34 UTC — [ticket-668] validateur: APPROVED — Les trois critères sont satisfaits. L'ADR-066 capture la décision d'écarter les  (49312ms)
+- 2026-10-29 23:18:34 UTC — [ticket-668] APPROVED après 1 tour(s)
+- 2026-10-29 23:18:41 UTC — [ticket-668] fichiers non suivis laissés par le run : tickets/todo/ticket-702-the-codeur-exhausted-turns-are-recorded.md (à ignorer dans .gitignore ?)
+- 2026-10-29 23:21:09 UTC — [ticket-668] documentation: 0 fichier(s) (148375ms)
+- 2026-10-29 23:21:30 UTC — [ide-core] ticket-668 PR #765 confiée au CIWatcher
+- 2026-10-29 23:21:35 UTC — [ticket-672] branche ticket-672-the-running-apps-view-shows-one-server-room-per-a
+- 2026-10-29 23:21:37 UTC — [ticket-672] tour 1 — codeur démarré
+- 2026-10-29 23:25:53 UTC — [ide-core] ticket-668 PR #765 mergée (CI verte)
+- 2026-10-29 23:28:18 UTC — [ticket-672] tour 1 — codeur terminé (401327ms)
+- 2026-10-29 23:30:52 UTC — [ticket-672] testeur: OK (exit 0)
+- 2026-10-29 23:32:56 UTC — [ticket-672] securite: PASS — No security vulnerabilities detected in this diff. The new UI components for the (123516ms)
+- 2026-10-29 23:32:56 UTC — [ticket-672] tour 1 — reviewer démarré
+- 2026-10-29 23:33:17 UTC — [ticket-672] tour 1 — reviewer terminé (21125ms)
+- 2026-10-29 23:37:56 UTC — [ticket-672] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-29 23:38:45 UTC — [ticket-672] validateur: fichiers cités joints : index.css, design/bureau/sources.test.ts (tronqué) ; absents : design/bureau/
+- 2026-10-29 23:38:45 UTC — [ticket-672] validateur: APPROVED — Ticket-672 is complete: all six acceptance criteria are satisfied. The server ro (349547ms)
+- 2026-10-29 23:38:45 UTC — [ticket-672] APPROVED après 1 tour(s)
+- 2026-10-29 23:43:43 UTC — [ticket-672] documentation: 1 fichier(s) (291657ms) — après tour de correction
+- 2026-10-29 23:51:30 UTC — [ide-core] ticket-672 PR #767 mergée (CI verte)
+- 2026-10-29 23:51:33 UTC — [ide-core] ticket-672 : base réalignée sur develop
+- 2026-10-29 23:51:33 UTC — [ide-core] ticket-672 PR #767 confiée au CIWatcher
+- 2026-10-29 23:51:36 UTC — [ticket-673] branche ticket-673-a-product-s-agents-are-drawn-in-its-room-from-the
+- 2026-10-29 23:51:38 UTC — [ticket-673] tour 1 — codeur démarré
+- 2026-10-29 23:56:20 UTC — [ticket-673] tour 1 — codeur terminé (281281ms)
+- 2026-10-29 23:58:39 UTC — [ticket-673] testeur: [36m [2m\u276f[22m src/longueur-des-fichiers.test.ts:[2m99:51[22m[39m
+- 2026-10-29 23:58:39 UTC — [ticket-673] tests rouges au tour 1
+- 2026-10-29 23:58:39 UTC — [ticket-673] tour 2 — codeur démarré
+- 2026-10-30 00:01:29 UTC — [ticket-673] tour 2 — codeur terminé (170187ms)
+- 2026-10-30 00:03:45 UTC — [ticket-673] testeur: OK (exit 0)
+- 2026-10-30 00:06:18 UTC — [ticket-673] securite: PASS — Audit de sécurité complet : frontend et backend intègrent les agents de produit  (153030ms)
+- 2026-10-30 00:06:18 UTC — [ticket-673] tour 2 — reviewer démarré
+- 2026-10-30 00:06:36 UTC — [ticket-673] tour 2 — reviewer terminé (17967ms)
+- 2026-10-30 00:10:11 UTC — [ticket-673] validateur: APPROVED — Tous les critères d'acceptation sont respectés : les agents de produit sont corr (232812ms)
+- 2026-10-30 00:10:11 UTC — [ticket-673] APPROVED après 2 tour(s)
+- 2026-10-30 00:14:08 UTC — [ticket-673] documentation: 0 fichier(s) (230905ms) — après tour de correction
+- 2026-10-30 08:54:59 UTC — [ide-core] file interrompue : ticket-703 n'a pas été livré
+- 2026-10-30 11:07:34 UTC — [ticket-704] branche ticket-704-the-api-refuses-a-foreign-host-or-origin
+- 2026-10-30 11:07:35 UTC — [ticket-704] tour 1 — codeur démarré
+- 2026-10-30 11:10:52 UTC — [ticket-704] tour 1 — codeur terminé (196936ms)
+- 2026-10-30 11:16:28 UTC — [ticket-704] testeur: 1 failed, 1585 passed, 64 warnings in 332.71s (0:05:32)
+- 2026-10-30 11:16:28 UTC — [ticket-704] tests rouges au tour 1
+- 2026-10-30 11:16:28 UTC — [ticket-704] tour 2 — codeur démarré
+- 2026-10-30 11:16:56 UTC — [ticket-704] tour 2 — codeur terminé (28063ms)
+- 2026-10-30 11:26:49 UTC — [ticket-704] testeur: OK (exit 0)
+- 2026-10-30 11:29:47 UTC — [ticket-704] securite: PASS — Ce diff ajoute un middleware de protection contre le DNS rebinding et les attaqu (177390ms)
+- 2026-10-30 11:29:47 UTC — [ticket-704] configuration des tests modifiée : backend/tests/conftest.py
+- 2026-10-30 11:29:47 UTC — [ticket-704] tour 2 — reviewer démarré
+- 2026-10-30 11:30:11 UTC — [ticket-704] tour 2 — reviewer terminé (23718ms)
+- 2026-10-30 11:34:11 UTC — [ticket-704] validateur: fichiers cités joints : docs/configuration.md ; absents : http://tauri.localhost
+- 2026-10-30 11:34:11 UTC — [ticket-704] validateur: APPROVED — Tous les critères d'acceptation ont été satisfaits. Le middleware `HostOriginMid (263860ms)
+- 2026-10-30 11:34:11 UTC — [ticket-704] APPROVED après 2 tour(s)
+- 2026-10-30 11:43:26 UTC — [ticket-704] documentation: 0 fichier(s) (550452ms) — après tour de correction — refusé : doc-technique : CLAUDE.md : règle « preuve » — l'extrait « **TypeScript** — `strict: true`, jamais de `any` ; composant » (CLAUDE.md) n'est ni dans le diff ni d — refusé : doc-fonctionnelle : docs/guide-utilisateur.md : règle « preuve » — l'extrait « const projets = groupeParProjet(apps); » (frontend/src/components/EnCoursView/Sal
+- 2026-10-30 11:43:26 UTC — [ticket-711] documentation: pas de diff retrouvable, non documenté
+- 2026-10-30 12:13:06 UTC — [ide-core] file interrompue : ticket-706 n'a pas été livré
+- 2026-10-30 12:27:03 UTC — [ticket-705] branche ticket-705-the-git-and-gh-guard-becomes-an-allowlist-of-read
+- 2026-10-30 12:27:05 UTC — [ticket-705] tour 1 — codeur démarré
+- 2026-10-30 12:29:15 UTC — [ticket-705] tour 1 — codeur terminé (130467ms)
+- 2026-10-30 12:38:03 UTC — [ticket-705] testeur: OK (exit 0)
+- 2026-10-30 12:41:22 UTC — [ticket-705] securite: PASS — Refactoring from blacklist to whitelist for git/gh command guarding is a positiv (199328ms)
+- 2026-10-30 12:41:22 UTC — [ticket-705] tour 1 — reviewer démarré
+- 2026-10-30 12:42:08 UTC — [ticket-705] tour 1 — reviewer terminé (45655ms)
+- 2026-10-30 12:46:22 UTC — [ticket-705] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-30 12:47:28 UTC — [ticket-705] validateur: fichiers cités joints : backend/tests/test_git_guard.py
+- 2026-10-30 12:47:28 UTC — [ticket-705] validateur: APPROVED — Ticket-705 passe tous les critères. La refonte du garde git/gh fonctionne : une  (365968ms)
+- 2026-10-30 12:47:28 UTC — [ticket-705] APPROVED après 1 tour(s)
+- 2026-10-30 12:50:22 UTC — [ticket-705] documentation: 0 fichier(s) (168985ms)
+- 2026-10-30 12:50:42 UTC — [ide-core] ticket-705 PR #780 confiée au CIWatcher
+- 2026-10-30 12:50:46 UTC — [ticket-707] branche ticket-707-the-fs-api-refuses-git-hooks-and-cli-settings-and
+- 2026-10-30 12:50:47 UTC — [ticket-707] tour 1 — codeur démarré
+- 2026-10-30 12:51:55 UTC — [ticket-707] tour 1 — codeur terminé (68266ms)
+- 2026-10-30 12:57:05 UTC — [ide-core] ticket-705 PR #780 mergée (CI verte)
+- 2026-10-30 13:02:17 UTC — [ticket-707] testeur: OK (exit 0)
+- 2026-10-30 13:05:21 UTC — [ticket-707] securite: PASS — Le diff ajoute deux protections de sécurité robustes : refus d'écriture sur `.gi (184000ms)
+- 2026-10-30 13:05:21 UTC — [ticket-707] tour 1 — reviewer démarré
+- 2026-10-30 13:05:47 UTC — [ticket-707] tour 1 — reviewer terminé (24358ms)
+- 2026-10-30 13:10:21 UTC — [ticket-707] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-30 13:11:00 UTC — [ticket-707] validateur: fichiers cités joints : backend/tests/test_fs_router.py, <projet>/.claude/settings.local.json, <projet>/agents.json, backend/tests/test_project_importer.py (tronqué)
+- 2026-10-30 13:11:00 UTC — [ticket-707] validateur: APPROVED — Tous les critères de sécurité sont correctement implémentés et testés. L'API ref (338264ms)
+- 2026-10-30 13:11:00 UTC — [ticket-707] APPROVED après 1 tour(s)
+- 2026-10-30 13:14:59 UTC — [ticket-707] documentation: 0 fichier(s) (207875ms)
+- 2026-10-30 13:31:49 UTC — [ide-core] ticket-707 PR #786 confiée au CIWatcher
+- 2026-10-30 13:31:54 UTC — [ticket-718] branche ticket-718-a-red-retest-after-rebase-runs-once-more-before-s
+- 2026-10-30 13:31:56 UTC — [ticket-718] tour 1 — codeur démarré
+- 2026-10-30 13:33:58 UTC — [ticket-718] tour 1 — codeur terminé (121719ms)
+- 2026-10-30 13:40:08 UTC — [ticket-707] livraison: arrêt — PR #786 non mergée : erreur inattendue : ConnectTimeout
+- 2026-10-30 13:55:59 UTC — [ticket-718] testeur: OK (exit 0)
+- 2026-10-30 13:57:35 UTC — [ticket-718] securite: PASS — Le diff implémente un retry logic sûr pour les tests flaky : re-exécute une fois (96594ms)
+- 2026-10-30 13:57:35 UTC — [ticket-718] tour 1 — reviewer démarré
+- 2026-10-30 13:57:56 UTC — [ticket-718] tour 1 — reviewer terminé (20905ms)
+- 2026-10-30 13:58:06 UTC — [ticket-718] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : créneau occupé depuis plus de 30 s
+- 2026-10-30 13:58:44 UTC — [ticket-718] validateur: fichiers cités joints : backend/tests/test_retest_apres_rebase.py
+- 2026-10-30 13:58:44 UTC — [ticket-718] validateur: APPROVED — Tous les critères sont satisfaits. Le code implémente correctement la logique de (68640ms)
+- 2026-10-30 13:58:44 UTC — [ticket-718] APPROVED après 1 tour(s)
+- 2026-10-30 14:03:15 UTC — [ticket-718] documentation: 1 fichier(s) (257875ms)
+- 2026-10-30 14:17:17 UTC — [ide-core] ticket-718 PR #789 confiée au CIWatcher
+- 2026-10-30 14:17:20 UTC — [ticket-677] branche ticket-677-one-git-runner-with-hooks-disabled
+- 2026-10-30 14:17:21 UTC — [ticket-677] tour 1 — codeur démarré
+- 2026-10-30 14:24:13 UTC — [ticket-718] livraison: arrêt — PR #789 non mergée : erreur inattendue : ReadTimeout
+- 2026-10-30 14:32:59 UTC — [ticket-677] tour 1 — codeur terminé (937375ms)
+- 2026-10-30 14:41:49 UTC — [ticket-677] testeur: 1 failed, 2197 passed, 64 warnings in 525.06s (0:08:45)
+- 2026-10-30 14:41:49 UTC — [ticket-677] tests rouges au tour 1
+- 2026-10-30 14:41:49 UTC — [ticket-677] tour 2 — codeur démarré
+- 2026-10-30 14:42:32 UTC — [ticket-677] tour 2 — codeur terminé (43390ms)
+- 2026-10-30 14:59:47 UTC — [ticket-677] testeur: OK (exit 0)
+- 2026-10-30 15:01:41 UTC — [ticket-677] securite: PASS — Refactoring successfully centralizes git execution with comprehensive hook neutr (114046ms)
+- 2026-10-30 15:01:42 UTC — [ticket-677] tour 2 — reviewer démarré
+- 2026-10-30 15:02:10 UTC — [ticket-677] tour 2 — reviewer terminé (28359ms)
+- 2026-10-30 15:06:42 UTC — [ticket-677] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-30 15:07:26 UTC — [ticket-677] validateur: fichiers cités joints : branch_cleanup.py, journal_en_attente.py, project_removal.py, realignement_base.py (tronqué) ; non joints (budget épuisé) : reprise_orphelin.py, ticket_diff.py, temporary_worktree.py
+- 2026-10-30 15:07:26 UTC — [ticket-677] validateur: APPROVED — Ticket-677 satisfait tous les critères d'acceptation. Un exécuteur unique `git_r (344405ms)
+- 2026-10-30 15:07:26 UTC — [ticket-677] APPROVED après 2 tour(s)
+- 2026-10-30 15:11:30 UTC — [ticket-677] documentation: 0 fichier(s) (238890ms) — après tour de correction
+- 2026-10-30 15:30:19 UTC — [ide-core] ticket-677 PR #791 mergée (CI verte)
+- 2026-10-30 15:30:21 UTC — [ide-core] ticket-677 : base réalignée sur develop
+- 2026-10-30 15:30:21 UTC — [ide-core] ticket-677 PR #791 confiée au CIWatcher
+- 2026-10-30 15:30:24 UTC — [ticket-708] branche ticket-708-a-multi-line-proof-excerpt-matches-the-diff-witho
+- 2026-10-30 15:30:25 UTC — [ticket-708] tour 1 — codeur démarré
+- 2026-10-30 15:33:01 UTC — [ticket-708] tour 1 — codeur terminé (155625ms)
+- 2026-10-30 15:42:28 UTC — [ticket-708] testeur: OK (exit 0)
+- 2026-10-30 15:43:27 UTC — [ticket-708] securite: PASS — Audit de sécurité PASS. La nouvelle fonction `_texte_du_diff()` traite les diffs (58610ms)
+- 2026-10-30 15:43:27 UTC — [ticket-708] tour 1 — reviewer démarré
+- 2026-10-30 15:43:50 UTC — [ticket-708] tour 1 — reviewer terminé (23436ms)
+- 2026-10-30 15:47:36 UTC — [ticket-708] validateur: fichiers cités joints : backend/tests/test_documentation_preuve.py
+- 2026-10-30 15:47:36 UTC — [ticket-708] validateur: APPROVED — Tous les critères d'acceptation ont été satisfaits. Le code modifie la fonction  (249420ms)
+- 2026-10-30 15:47:36 UTC — [ticket-708] APPROVED après 1 tour(s)
+- 2026-10-30 15:53:42 UTC — [ticket-708] documentation: 0 fichier(s) (269921ms) — après tour de correction
+- 2026-10-30 16:01:24 UTC — [ide-core] ticket-708 PR #792 mergée (CI verte)
+- 2026-10-30 16:01:26 UTC — [ide-core] ticket-708 : base réalignée sur develop
+- 2026-10-30 16:01:26 UTC — [ide-core] ticket-708 PR #792 confiée au CIWatcher
+- 2026-10-30 16:01:29 UTC — [ticket-713] branche ticket-713-a-merge-request-that-times-out-rereads-the-pr-bef
+- 2026-10-30 16:01:30 UTC — [ticket-713] tour 1 — codeur démarré
+- 2026-10-30 16:04:32 UTC — [ticket-713] tour 1 — codeur terminé (181561ms)
+- 2026-10-30 16:59:16 UTC — [ticket-713] testeur: délai dépassé, suite relancée
+- 2026-10-30 16:59:17 UTC — [ticket-713] testeur: délai dépassé (1500 s, durée réelle 3283 s) — ../scripts/verifier.py coupé après 3283 s
+- 2026-10-30 18:22:45 UTC — [ticket-713] testeur: délai dépassé (1500 s, durée réelle 5008 s) — ../scripts/verifier.py coupé après 5008 s
+- 2026-10-30 18:22:45 UTC — [ticket-713] BLOCKED — testeur: délai dépassé deux fois
+- 2026-10-30 18:22:57 UTC — [ide-core] file interrompue : ticket-713 non approuvé
+- 2026-10-30 18:26:50 UTC — [ticket-713] branche ticket-713-a-merge-request-that-times-out-rereads-the-pr-bef
+- 2026-10-30 18:32:12 UTC — [ticket-713] testeur: 1 failed, 2202 passed, 64 warnings in 319.53s (0:05:19)
+- 2026-10-30 18:32:12 UTC — [ticket-713] branche reprise (3 commit(s)) — tests red, codeur en premier
+- 2026-10-30 18:32:12 UTC — [ticket-713] tour 1 — codeur démarré
+- 2026-10-30 18:33:19 UTC — [ticket-713] tour 1 — codeur terminé (66156ms)
+- 2026-10-30 18:40:04 UTC — [ticket-713] testeur: OK (exit 0)
+- 2026-10-30 18:42:06 UTC — [ticket-713] securite: PASS — Refactoring du merge de livraison (ticket-713) : extraction en module séparé ave (122062ms)
+- 2026-10-30 18:42:06 UTC — [ticket-713] tour 1 — reviewer démarré
+- 2026-10-30 18:42:29 UTC — [ticket-713] tour 1 — reviewer terminé (23280ms)
+- 2026-10-30 18:46:23 UTC — [ticket-713] validateur: fichiers cités joints : backend/tests/test_livraison.py (tronqué)
+- 2026-10-30 18:46:23 UTC — [ticket-713] validateur: APPROVED — Les quatre critères d'acceptation sont satisfaits. Le code implémente correcteme (257343ms)
+- 2026-10-30 18:46:23 UTC — [ticket-713] APPROVED après 1 tour(s)
+- 2026-10-30 18:51:55 UTC — [ticket-713] documentation: 0 fichier(s) (327014ms) — après tour de correction
+- 2026-10-30 18:52:15 UTC — [ide-core] ticket-713 PR #793 confiée au CIWatcher
+- 2026-10-30 18:52:18 UTC — [ticket-725] branche ticket-725-a-test-configuration-change-the-ticket-does-not-n
+- 2026-10-30 18:52:18 UTC — [ticket-725] tour 1 — codeur démarré
+- 2026-10-30 18:54:47 UTC — [ticket-725] tour 1 — codeur terminé (148906ms)
+- 2026-10-30 19:00:18 UTC — [ticket-725] testeur: 1 failed, 2551 passed, 64 warnings in 327.35s (0:05:27)
+- 2026-10-30 19:00:18 UTC — [ticket-725] tests rouges au tour 1
+- 2026-10-30 19:00:18 UTC — [ticket-725] tour 2 — codeur démarré
+- 2026-10-30 19:01:36 UTC — [ticket-725] tour 2 — codeur terminé (78858ms)
+- 2026-10-30 19:01:59 UTC — [ide-core] ticket-713 PR #793 mergée (CI verte)
+- 2026-10-30 19:08:29 UTC — [ticket-725] testeur: OK (exit 0)
+- 2026-10-30 19:10:50 UTC — [ticket-725] securite: PASS — Le diff implémente une porte de validation pour la pipeline qui s'assure que les (140235ms)
+- 2026-10-30 19:10:50 UTC — [ticket-725] tour 2 — reviewer démarré
+- 2026-10-30 19:11:09 UTC — [ticket-725] tour 2 — reviewer terminé (18750ms)
+- 2026-10-30 19:14:33 UTC — [ticket-725] validateur: fichiers cités joints : backend/tests/test_config_tests_touchee.py, vitest.config.ts, pyproject.toml, package.json
+- 2026-10-30 19:14:33 UTC — [ticket-725] validateur: APPROVED — Les quatre critères d'acceptation sont satisfaits. Le code implémente une porte  (223110ms)
+- 2026-10-30 19:14:33 UTC — [ticket-725] APPROVED après 2 tour(s)
+- 2026-10-30 19:17:40 UTC — [ticket-725] documentation: 0 fichier(s) (182218ms)
+- 2026-10-30 19:24:51 UTC — [ide-core] ticket-725 PR #794 confiée au CIWatcher
+- 2026-10-30 19:24:54 UTC — [ticket-714] branche ticket-714-a-local-provider-hands-an-oversized-prompt-straig
+- 2026-10-30 19:24:55 UTC — [ticket-714] tour 1 — codeur démarré
+- 2026-10-30 19:26:39 UTC — [ticket-714] tour 1 — codeur terminé (104061ms)
+- 2026-10-30 19:31:28 UTC — [ide-core] ticket-725 PR #794 mergée (CI verte)
+- 2026-10-30 19:34:15 UTC — [ticket-714] testeur: OK (exit 0)
+- 2026-10-30 19:36:06 UTC — [ticket-714] securite: PASS — Aucune vulnérabilité de sécurité détectée. Le diff ajoute une feature de fallbac (111750ms)
+- 2026-10-30 19:36:06 UTC — [ticket-714] tour 1 — reviewer démarré
+- 2026-10-30 19:36:26 UTC — [ticket-714] tour 1 — reviewer terminé (19311ms)
+- 2026-10-30 19:40:31 UTC — [ticket-714] validateur: fichiers cités joints : backend/tests/test_provider_par_role.py (tronqué)
+- 2026-10-30 19:40:31 UTC — [ticket-714] validateur: APPROVED — Tous les critères d'acceptation ont été implémentés correctement. Le code ajoute (264375ms)
+- 2026-10-30 19:40:31 UTC — [ticket-714] APPROVED après 1 tour(s)
+- 2026-10-30 19:42:00 UTC — [ticket-714] documentation: 0 fichier(s) (84250ms)
+- 2026-10-30 19:49:34 UTC — [ide-core] ticket-714 PR #795 confiée au CIWatcher
+- 2026-10-30 19:49:37 UTC — [ticket-712] branche ticket-712-a-server-room-shows-the-pipeline-run-live-on-its
+- 2026-10-30 19:49:38 UTC — [ticket-712] tour 1 — codeur démarré
+- 2026-10-30 19:53:40 UTC — [ticket-712] tour 1 — codeur terminé (242203ms)
+- 2026-10-30 19:55:46 UTC — [ticket-712] testeur: OK (exit 0)
+- 2026-10-30 19:55:50 UTC — [ide-core] ticket-714 PR #795 mergée (CI verte)
+- 2026-10-30 19:57:34 UTC — [ticket-712] securite: PASS — Le diff ajoute l'affichage du run de pipeline actif dans les salles de projet. L (108530ms)
+- 2026-10-30 19:57:34 UTC — [ticket-712] tour 1 — reviewer démarré
+- 2026-10-30 19:57:50 UTC — [ticket-712] tour 1 — reviewer terminé (16139ms)
+- 2026-10-30 20:00:30 UTC — [ticket-712] validateur: fichiers cités joints : frontend/src/components/EnCoursView/SallesDesServeurs.test.tsx
+- 2026-10-30 20:00:30 UTC — [ticket-712] validateur: APPROVED — Les trois critères d'acceptation sont respectés : le code affiche correctement l (175641ms)
+- 2026-10-30 20:00:30 UTC — [ticket-712] APPROVED après 1 tour(s)
+- 2026-10-30 20:03:16 UTC — [ticket-712] documentation: 0 fichier(s) (161563ms)
+- 2026-10-30 20:05:48 UTC — [ticket-712] livraison: rebase sur develop (1125ms)
+- 2026-10-30 20:05:48 UTC — [ticket-712] livraison: tests relancés après rebase : verts (OK (exit 0)) (133015ms)
+- 2026-10-30 20:05:48 UTC — [ticket-712] livraison: PR #796 ouverte (4969ms)
+- 2026-10-30 20:05:49 UTC — [ide-core] ticket-712 PR #796 confiée au CIWatcher
+- 2026-10-30 20:05:52 UTC — [ticket-724] branche ticket-724-the-documentation-batch-also-keeps-agents-md-and
+- 2026-10-30 20:06:54 UTC — [ticket-724] plan rendu (60485ms)
+- 2026-10-30 20:06:54 UTC — [ticket-724] tour 1 — codeur démarré
+- 2026-10-30 20:12:09 UTC — [ticket-724] tour 1 — codeur terminé (315250ms)
+- 2026-10-30 20:17:50 UTC — [ticket-712] livraison: arrêt — PR #796 non mergée : GitHub a refusé le merge de la PR #796.
+- 2026-10-30 20:19:35 UTC — [ticket-724] testeur: 1 failed, 3504 passed, 64 warnings in 443.39s (0:07:23)
+- 2026-10-30 20:19:35 UTC — [ticket-724] tests rouges au tour 1
+- 2026-10-30 20:19:35 UTC — [ticket-724] tour 2 — codeur démarré
+- 2026-10-30 20:22:16 UTC — [ticket-724] tour 2 — codeur terminé (161031ms)
+- 2026-10-30 20:29:43 UTC — [ticket-724] testeur: OK (exit 0)
+- 2026-10-30 20:34:12 UTC — [ticket-724] securite: PASS — Le diff implémente la proposition de description de projet via doc-technique en  (268250ms)
+- 2026-10-30 20:34:12 UTC — [ticket-724] tour 2 — reviewer démarré
+- 2026-10-30 20:34:42 UTC — [ticket-724] tour 2 — reviewer terminé (30609ms)
+- 2026-10-30 20:39:12 UTC — [ticket-724] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-30 20:40:20 UTC — [ticket-724] validateur: fichiers cités joints : backend/tests/test_documentation_claude_md.py, AGENTS.md, agents.json, agents/prompts/doc-technique.md, memory/contraintes.md (tronqué) ; non joints (budget épuisé) : memory/decisions.md
+- 2026-10-30 20:40:20 UTC — [ticket-724] validateur: APPROVED — Le ticket-724 livre l'intégration complète de la gestion des descriptions de pro (368453ms)
+- 2026-10-30 20:40:20 UTC — [ticket-724] APPROVED après 2 tour(s)
+- 2026-10-30 20:42:49 UTC — [ticket-724] documentation: 0 fichier(s) (143563ms) — après tour de correction
+- 2026-10-30 20:53:29 UTC — [ticket-675] branche ticket-675-one-reader-for-the-agents-json-manifest
+- 2026-10-30 20:53:30 UTC — [ticket-675] tour 1 — codeur démarré
+- 2026-10-30 21:03:39 UTC — [ticket-675] tour 1 — codeur terminé (609078ms)
+- 2026-10-30 21:09:09 UTC — [ticket-675] testeur: 1 failed, 2026 passed, 64 warnings in 325.69s (0:05:25)
+- 2026-10-30 21:09:09 UTC — [ticket-675] tests rouges au tour 1
+- 2026-10-30 21:09:09 UTC — [ticket-675] tour 2 — codeur démarré
+- 2026-10-30 21:11:06 UTC — [ticket-675] tour 2 — codeur terminé (117125ms)
+- 2026-10-30 21:18:24 UTC — [ticket-675] testeur: OK (exit 0)
+- 2026-10-30 21:21:03 UTC — [ticket-675] securite: PASS — Centralisation sécurisée de la lecture/écriture de `agents.json` dans un nouveau (158843ms)
+- 2026-10-30 21:21:03 UTC — [ticket-675] tour 2 — reviewer démarré
+- 2026-10-30 21:21:50 UTC — [ticket-675] tour 2 — reviewer terminé (46436ms)
+- 2026-10-30 21:26:03 UTC — [ticket-675] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-30 21:27:15 UTC — [ticket-675] validateur: fichiers cités joints : agents.json, git_link.py
+- 2026-10-30 21:27:15 UTC — [ticket-675] validateur: APPROVED — Le refactoring centralise avec succès les 30+ lectures de `agents.json` dans un  (371391ms)
+- 2026-10-30 21:27:15 UTC — [ticket-675] APPROVED après 2 tour(s)
+- 2026-10-30 21:29:20 UTC — [ticket-675] documentation: 0 fichier(s) (120360ms)
+- 2026-10-30 21:36:30 UTC — [ide-core] ticket-675 PR #798 mergée (CI verte)
+- 2026-10-30 21:36:32 UTC — [ide-core] ticket-675 : base réalignée sur develop
+- 2026-10-30 21:36:32 UTC — [ide-core] ticket-675 PR #798 confiée au CIWatcher
+- 2026-10-30 21:36:36 UTC — [ticket-676] branche ticket-676-one-walk-up-to-the-repository-root
+- 2026-10-30 21:36:37 UTC — [ticket-676] tour 1 — codeur démarré
+- 2026-10-30 21:44:31 UTC — [ticket-676] tour 1 — codeur terminé (473905ms)
+- 2026-10-30 21:51:21 UTC — [ticket-676] testeur: 1 failed, 3421 passed, 64 warnings in 406.83s (0:06:46)
+- 2026-10-30 21:51:21 UTC — [ticket-676] tests rouges au tour 1
+- 2026-10-30 21:51:21 UTC — [ticket-676] tour 2 — codeur démarré
+- 2026-10-30 21:52:30 UTC — [ticket-676] tour 2 — codeur terminé (68765ms)
+- 2026-10-30 22:00:04 UTC — [ticket-676] testeur: OK (exit 0)
+- 2026-10-30 22:02:36 UTC — [ticket-676] securite: PASS — Refactorisation sûre de la logique de recherche du dépôt git. Le nouveau module  (151985ms)
+- 2026-10-30 22:02:36 UTC — [ticket-676] tour 2 — reviewer démarré
+- 2026-10-30 22:03:04 UTC — [ticket-676] tour 2 — reviewer terminé (28547ms)
+- 2026-10-30 22:06:10 UTC — [ticket-676] validateur: fichiers cités joints : project_removal.py
+- 2026-10-30 22:06:10 UTC — [ticket-676] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code a été refactoré pour ce (214656ms)
+- 2026-10-30 22:06:10 UTC — [ticket-676] APPROVED après 2 tour(s)
+- 2026-10-30 22:07:28 UTC — [ticket-676] documentation: 0 fichier(s) (72656ms)
+- 2026-10-30 22:07:48 UTC — [ide-core] ticket-676 PR #799 confiée au CIWatcher
+- 2026-10-30 22:07:52 UTC — [ticket-678] branche ticket-678-one-cost-by-role-aggregate-and-a-response-model
+- 2026-10-30 22:07:53 UTC — [ticket-678] tour 1 — codeur démarré
+- 2026-10-30 22:10:16 UTC — [ticket-678] tour 1 — codeur terminé (143078ms)
+- 2026-10-30 22:14:52 UTC — [ide-core] ticket-676 PR #799 mergée (CI verte)
+- 2026-10-30 22:16:12 UTC — [ticket-678] testeur: 1 failed, 2033 passed, 64 warnings in 352.44s (0:05:52)
+- 2026-10-30 22:16:12 UTC — [ticket-678] tests rouges au tour 1
+- 2026-10-30 22:16:12 UTC — [ticket-678] tour 2 — codeur démarré
+- 2026-10-30 22:18:11 UTC — [ticket-678] tour 2 — codeur terminé (119171ms)
+- 2026-10-30 22:25:15 UTC — [ticket-678] testeur: OK (exit 0)
+- 2026-10-30 22:28:10 UTC — [ticket-678] securite: PASS — Le diff refactorise les requêtes d'agrégation de coûts pour consolider le code d (174766ms)
+- 2026-10-30 22:28:10 UTC — [ticket-678] tour 2 — reviewer démarré
+- 2026-10-30 22:28:33 UTC — [ticket-678] tour 2 — reviewer terminé (22453ms)
+- 2026-10-30 22:30:21 UTC — [ticket-678] validateur: fichiers cités joints : aucun ; absents : usage/breakdown
+- 2026-10-30 22:30:21 UTC — [ticket-678] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code intègre une unique requ (131108ms)
+- 2026-10-30 22:30:21 UTC — [ticket-678] APPROVED après 2 tour(s)
+- 2026-10-30 22:32:25 UTC — [ticket-678] documentation: 0 fichier(s) (118000ms)
+- 2026-10-30 22:46:40 UTC — [ide-core] ticket-678 PR #800 mergée (CI verte)
+- 2026-10-30 22:46:42 UTC — [ide-core] ticket-678 : base réalignée sur develop
+- 2026-10-30 22:46:42 UTC — [ide-core] ticket-678 PR #800 confiée au CIWatcher
+- 2026-10-30 22:46:45 UTC — [ticket-679] branche ticket-679-response-models-for-the-services-routes
+- 2026-10-30 22:46:47 UTC — [ticket-679] tour 1 — codeur démarré
+- 2026-10-30 22:49:44 UTC — [ticket-679] tour 1 — codeur terminé (177031ms)
+- 2026-10-30 22:56:47 UTC — [ticket-679] testeur: 1 failed, 2033 passed, 64 warnings in 418.58s (0:06:58)
+- 2026-10-30 22:56:47 UTC — [ticket-679] tests rouges au tour 1
+- 2026-10-30 22:56:47 UTC — [ticket-679] tour 2 — codeur démarré
+- 2026-10-30 22:57:58 UTC — [ticket-679] tour 2 — codeur terminé (71936ms)
+- 2026-10-30 23:05:56 UTC — [ticket-679] testeur: OK (exit 0)
+- 2026-10-30 23:07:28 UTC — [ticket-679] securite: PASS — Refactorisation de sécurité positive : migration des réponses des routes vers de (91921ms)
+- 2026-10-30 23:07:28 UTC — [ticket-679] tour 2 — reviewer démarré
+- 2026-10-30 23:07:44 UTC — [ticket-679] tour 2 — reviewer terminé (15671ms)
+- 2026-10-30 23:10:01 UTC — [ticket-679] validateur: fichiers cités joints : types/api.ts
+- 2026-10-30 23:10:01 UTC — [ticket-679] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les routes de services utilisen (152500ms)
+- 2026-10-30 23:10:01 UTC — [ticket-679] APPROVED après 2 tour(s)
+- 2026-10-30 23:12:14 UTC — [ticket-679] documentation: 0 fichier(s) (128046ms)
+- 2026-10-30 23:19:22 UTC — [ide-core] ticket-679 PR #801 mergée (CI verte)
+- 2026-10-30 23:19:24 UTC — [ide-core] ticket-679 : base réalignée sur develop
+- 2026-10-30 23:19:24 UTC — [ide-core] ticket-679 PR #801 confiée au CIWatcher
+- 2026-10-30 23:19:28 UTC — [ticket-680] branche ticket-680-one-http-client-in-the-frontend
+- 2026-10-30 23:19:29 UTC — [ticket-680] tour 1 — codeur démarré
+- 2026-10-30 23:24:54 UTC — [ticket-680] tour 1 — codeur terminé (324578ms)
+- 2026-10-30 23:27:07 UTC — [ticket-680] testeur: OK (exit 0)
+- 2026-10-30 23:29:15 UTC — [ticket-680] securite: PASS — Refactorisation centralisée des appels HTTP en nouveau fichier `http.ts`, sans c (127281ms)
+- 2026-10-30 23:29:15 UTC — [ticket-680] tour 1 — reviewer démarré
+- 2026-10-30 23:29:36 UTC — [ticket-680] tour 1 — reviewer terminé (21218ms)
+- 2026-10-30 23:33:28 UTC — [ticket-680] validateur: fichiers cités joints : lib/http.ts, api.ts, quota.ts, statutDuRun.ts, ventilation.ts, capturesDuRun.ts, fs.ts
+- 2026-10-30 23:33:28 UTC — [ticket-680] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le client HTTP a été centralisé (253750ms)
+- 2026-10-30 23:33:28 UTC — [ticket-680] APPROVED après 1 tour(s)
+- 2026-10-30 23:34:55 UTC — [ticket-680] documentation: 0 fichier(s) (80844ms)
+- 2026-10-30 23:42:03 UTC — [ide-core] ticket-680 PR #802 mergée (CI verte)
+- 2026-10-30 23:42:05 UTC — [ide-core] ticket-680 : base réalignée sur develop
+- 2026-10-30 23:42:05 UTC — [ide-core] ticket-680 PR #802 confiée au CIWatcher
+- 2026-10-30 23:42:09 UTC — [ticket-681] branche ticket-681-shared-duration-date-and-cost-formatters
+- 2026-10-30 23:42:10 UTC — [ticket-681] tour 1 — codeur démarré
+- 2026-10-30 23:50:30 UTC — [ticket-681] tour 1 — codeur terminé (499313ms)
+- 2026-10-30 23:52:44 UTC — [ticket-681] testeur: [36m [2m\u276f[22m src/longueur-des-fichiers.test.ts:[2m99:51[22m[39m
+- 2026-10-30 23:52:44 UTC — [ticket-681] tests rouges au tour 1
+- 2026-10-30 23:52:44 UTC — [ticket-681] tour 2 — codeur démarré
+- 2026-10-30 23:53:11 UTC — [ticket-681] tour 2 — codeur terminé (26686ms)
+- 2026-10-30 23:55:26 UTC — [ticket-681] testeur: OK (exit 0)
+- 2026-10-30 23:57:11 UTC — [ticket-681] securite: PASS — This is a safe, clean code organization refactoring that consolidates duplicate  (105218ms)
+- 2026-10-30 23:57:12 UTC — [ticket-681] tour 2 — reviewer démarré
+- 2026-10-30 23:57:38 UTC — [ticket-681] tour 2 — reviewer terminé (26061ms)
+- 2026-10-31 00:01:02 UTC — [ticket-681] validateur: fichiers cités joints : RunHistory.tsx, HistoriqueView/runs.ts ; absents : design/charts/
+- 2026-10-31 00:01:02 UTC — [ticket-681] validateur: CHANGES_REQUESTED — Le ticket a permis d'extraire les formateurs de durée, date et coût dans un modu (230406ms)
+- 2026-10-31 00:01:02 UTC — [ticket-681] CHANGES_REQUESTED tour 2: Validateur : Le ticket a permis d'extraire les formateurs de durée, date et coût dans un module commun `frontend/src/lib/format.ts`, ce qui respecte les critères 1, 2, 4 et 5. Cependant, le critère 3 
+- 2026-10-31 00:01:02 UTC — [ticket-681] tour 3 — codeur démarré
+- 2026-10-31 00:03:46 UTC — [ticket-681] tour 3 — codeur terminé (164078ms)
+- 2026-10-31 00:06:04 UTC — [ticket-681] testeur: OK (exit 0)
+- 2026-10-31 00:09:12 UTC — [ticket-681] securite: PASS — Refactorisation de consolidation des fonctions de formatting frontend (dates, du (187921ms)
+- 2026-10-31 00:09:13 UTC — [ticket-681] tour 3 — reviewer démarré
+- 2026-10-31 00:09:40 UTC — [ticket-681] tour 3 — reviewer terminé (27063ms)
+- 2026-10-31 00:13:38 UTC — [ticket-681] validateur: fichiers cités joints : RunHistory.tsx, HistoriqueView/runs.ts ; absents : design/charts/
+- 2026-10-31 00:13:38 UTC — [ticket-681] validateur: APPROVED — Tous les critères d'acceptation ont été respectés. Le code a été refactoré pour  (266281ms)
+- 2026-10-31 00:13:38 UTC — [ticket-681] APPROVED après 3 tour(s)
+- 2026-10-31 00:15:21 UTC — [ticket-681] documentation: 0 fichier(s) (96500ms)
+- 2026-10-31 00:21:08 UTC — [ide-core] ticket-681 PR #803 mergée (CI verte)
+- 2026-10-31 00:21:10 UTC — [ide-core] ticket-681 : base réalignée sur develop
+- 2026-10-31 00:21:10 UTC — [ide-core] ticket-681 PR #803 confiée au CIWatcher
+- 2026-10-31 00:21:14 UTC — [ticket-682] branche ticket-682-a-shared-modal-component
+- 2026-10-31 00:21:15 UTC — [ticket-682] tour 1 — codeur démarré
+- 2026-10-31 00:25:00 UTC — [ticket-682] tour 1 — codeur terminé (225062ms)
+- 2026-10-31 00:27:14 UTC — [ticket-682] testeur: [36m [2m\u276f[22m src/longueur-des-fichiers.test.ts:[2m99:51[22m[39m
+- 2026-10-31 00:27:14 UTC — [ticket-682] tests rouges au tour 1
+- 2026-10-31 00:27:14 UTC — [ticket-682] tour 2 — codeur démarré
+- 2026-10-31 00:27:43 UTC — [ticket-682] tour 2 — codeur terminé (28093ms)
+- 2026-10-31 00:29:58 UTC — [ticket-682] testeur: OK (exit 0)
+- 2026-10-31 00:31:45 UTC — [ticket-682] securite: PASS — Refactoring de sécurité: centralisation des modales React dans un composant `Mod (106921ms)
+- 2026-10-31 00:31:45 UTC — [ticket-682] tour 2 — reviewer démarré
+- 2026-10-31 00:32:03 UTC — [ticket-682] tour 2 — reviewer terminé (17656ms)
+- 2026-10-31 00:36:24 UTC — [ticket-682] validateur: fichiers cités joints : PlanEvolutionModal.tsx
+- 2026-10-31 00:36:24 UTC — [ticket-682] validateur: APPROVED — Le ticket a été implémenté avec succès : un composant `Modale` partagé a été cré (279125ms)
+- 2026-10-31 00:36:24 UTC — [ticket-682] APPROVED après 2 tour(s)
+- 2026-10-31 00:37:49 UTC — [ticket-682] documentation: 0 fichier(s) (79406ms)
+- 2026-10-31 00:44:41 UTC — [ide-core] ticket-682 PR #804 mergée (CI verte)
+- 2026-10-31 00:44:43 UTC — [ide-core] ticket-682 : base réalignée sur develop
+- 2026-10-31 00:44:43 UTC — [ide-core] ticket-682 PR #804 confiée au CIWatcher
+- 2026-10-31 00:44:47 UTC — [ticket-683] branche ticket-683-a-shared-polling-hook-and-clock
+- 2026-10-31 00:44:48 UTC — [ticket-683] tour 1 — codeur démarré
+- 2026-10-31 00:49:30 UTC — [ticket-683] tour 1 — codeur terminé (281375ms)
+- 2026-10-31 00:51:46 UTC — [ticket-683] testeur: OK (exit 0)
+- 2026-10-31 00:54:21 UTC — [ticket-683] securite: PASS — Ce diff est un refactoring React qui consolide le code de polling périodique. Au (155781ms)
+- 2026-10-31 00:54:22 UTC — [ticket-683] tour 1 — reviewer démarré
+- 2026-10-31 00:54:46 UTC — [ticket-683] tour 1 — reviewer terminé (24139ms)
+- 2026-10-31 00:57:21 UTC — [ticket-683] validateur: fichiers cités joints : Chrono.tsx
+- 2026-10-31 00:57:21 UTC — [ticket-683] validateur: CHANGES_REQUESTED — Le ticket a été implémenté avec succès. Un hook `usePolling` centralisé remplace (179468ms)
+- 2026-10-31 00:57:21 UTC — [ticket-683] CHANGES_REQUESTED tour 1: Validateur : Le ticket a été implémenté avec succès. Un hook `usePolling` centralisé remplace les cinq anciens `setInterval`, et le composant `Chrono.tsx` utilise désormais `useMaintenant`. Les tests 
+- 2026-10-31 00:57:21 UTC — [ticket-683] tour 2 — codeur démarré
+- 2026-10-31 00:57:37 UTC — [ticket-683] tour 2 — codeur terminé (16000ms)
+- 2026-10-31 00:59:59 UTC — [ticket-683] testeur: OK (exit 0)
+- 2026-10-31 01:02:06 UTC — [ticket-683] securite: PASS — Ce diff refactorise la logique de polling du frontend React en extrayant un hook (126406ms)
+- 2026-10-31 01:02:06 UTC — [ticket-683] tour 2 — reviewer démarré
+- 2026-10-31 01:02:27 UTC — [ticket-683] tour 2 — reviewer terminé (20671ms)
+- 2026-10-31 01:04:18 UTC — [ticket-683] validateur: fichiers cités joints : Chrono.tsx
+- 2026-10-31 01:04:18 UTC — [ticket-683] validateur: CHANGES_REQUESTED — Le ticket a réussi à implémenter un hook `usePolling` centralisé qui remplace le (132421ms)
+- 2026-10-31 01:04:18 UTC — [ticket-683] CHANGES_REQUESTED tour 2: Validateur : Le ticket a réussi à implémenter un hook `usePolling` centralisé qui remplace les cinq anciens `setInterval`, et `Chrono.tsx` utilise désormais `useMaintenant`. Les tests du nouveau hook 
+- 2026-10-31 01:04:18 UTC — [ticket-683] tour 3 — codeur démarré
+- 2026-10-31 01:05:26 UTC — [ticket-683] tour 3 — codeur terminé (67421ms)
+- 2026-10-31 01:07:46 UTC — [ticket-683] testeur: OK (exit 0)
+- 2026-10-31 01:11:12 UTC — [ticket-683] securite: PASS — Refactorisation frontend pour centraliser la logique de polling (5 hooks). Pas d (206343ms)
+- 2026-10-31 01:11:12 UTC — [ticket-683] tour 3 — reviewer démarré
+- 2026-10-31 01:11:33 UTC — [ticket-683] tour 3 — reviewer terminé (20422ms)
+- 2026-10-31 01:14:42 UTC — [ticket-683] validateur: fichiers cités joints : Chrono.tsx
+- 2026-10-31 01:14:42 UTC — [ticket-683] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le ticket a été implémenté avec  (209453ms)
+- 2026-10-31 01:14:42 UTC — [ticket-683] APPROVED après 3 tour(s)
+- 2026-10-31 01:15:28 UTC — [ticket-683] documentation: 0 fichier(s) (40985ms)
+- 2026-10-31 02:35:28 UTC — [ticket-685] branche ticket-685-queue-and-autonomous-run-modes-leave-the-orchestr
+- 2026-10-31 02:35:29 UTC — [ticket-685] tour 1 — codeur démarré
+- 2026-10-31 02:40:30 UTC — [ticket-685] tour 1 — codeur terminé (300827ms)
+- 2026-10-31 02:48:51 UTC — [ticket-685] testeur: OK (exit 0)
+- 2026-10-31 02:50:41 UTC — [ticket-685] securite: PASS — Refactorisation de l'orchestrateur : extraction de `run_queue` et `run_autonomou (109562ms)
+- 2026-10-31 02:50:41 UTC — [ticket-685] tour 1 — reviewer démarré
+- 2026-10-31 02:51:03 UTC — [ticket-685] tour 1 — reviewer terminé (22280ms)
+- 2026-10-31 02:55:41 UTC — [ticket-685] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-31 02:56:28 UTC — [ticket-685] validateur: fichiers cités joints : services/orchestrator.py (tronqué) ; non joints (budget épuisé) : backend/tests/test_longueur_des_fichiers.py
+- 2026-10-31 02:56:28 UTC — [ticket-685] validateur: APPROVED — La refactorisation du ticket-685 est complète et conforme. Les deux méthodes `ru (346703ms)
+- 2026-10-31 02:56:28 UTC — [ticket-685] APPROVED après 1 tour(s)
+- 2026-10-31 02:58:20 UTC — [ticket-685] documentation: 0 fichier(s) (107156ms) — après tour de correction
+- 2026-10-31 03:12:55 UTC — [ide-core] ticket-685 PR #807 mergée (CI verte)
+- 2026-10-31 03:12:58 UTC — [ide-core] ticket-685 : base réalignée sur develop
+- 2026-10-31 03:12:58 UTC — [ide-core] ticket-685 PR #807 confiée au CIWatcher
+- 2026-10-31 03:13:01 UTC — [ticket-686] branche ticket-686-end-of-queue-steps-leave-the-orchestrator-class
+- 2026-10-31 03:13:03 UTC — [ticket-686] tour 1 — codeur démarré
+- 2026-10-31 03:18:54 UTC — [ticket-686] tour 1 — codeur terminé (351358ms)
+- 2026-10-31 03:27:34 UTC — [ticket-686] testeur: OK (exit 0)
+- 2026-10-31 03:29:06 UTC — [ticket-686] securite: PASS — This is a clean refactoring that extracts orchestrator cleanup logic into focuse (92375ms)
+- 2026-10-31 03:29:06 UTC — [ticket-686] tour 1 — reviewer démarré
+- 2026-10-31 03:29:32 UTC — [ticket-686] tour 1 — reviewer terminé (25796ms)
+- 2026-10-31 03:34:06 UTC — [ticket-686] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-31 03:34:32 UTC — [ticket-686] validateur: fichiers cités joints : services/orchestrator.py (tronqué)
+- 2026-10-31 03:34:32 UTC — [ticket-686] validateur: APPROVED — Tous les critères sont satisfaits. Le refactoring extrait complètement les sept  (326140ms)
+- 2026-10-31 03:34:32 UTC — [ticket-686] APPROVED après 1 tour(s)
+- 2026-10-31 03:38:04 UTC — [ticket-686] documentation: 1 fichier(s) (205593ms)
+- 2026-10-31 03:38:24 UTC — [ide-core] ticket-686 PR #808 confiée au CIWatcher
+- 2026-10-31 03:38:29 UTC — [ticket-687] branche ticket-687-run-assembly-leaves-the-orchestrator-router
+- 2026-10-31 03:38:30 UTC — [ticket-687] tour 1 — codeur démarré
+- 2026-10-31 03:45:11 UTC — [ide-core] ticket-686 PR #808 mergée (CI verte)
+- 2026-10-31 03:48:31 UTC — [ticket-687] tour 1 — codeur terminé (601234ms)
+- 2026-10-31 03:56:34 UTC — [ticket-687] testeur: OK (exit 0)
+- 2026-10-31 03:58:52 UTC — [ticket-687] securite: PASS — Clean refactoring moving orchestrator-building logic from routers to dedicated s (138452ms)
+- 2026-10-31 03:58:53 UTC — [ticket-687] tour 1 — reviewer démarré
+- 2026-10-31 03:59:16 UTC — [ticket-687] tour 1 — reviewer terminé (23375ms)
+- 2026-10-31 04:03:53 UTC — [ticket-687] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-31 04:04:27 UTC — [ticket-687] validateur: fichiers cités joints : routers/chat.py, routers/orchestrator.py (tronqué) ; absents : services/
+- 2026-10-31 04:04:27 UTC — [ticket-687] validateur: APPROVED — Refactoring completed successfully: orchestrator assembly moved from `routers/or (335061ms)
+- 2026-10-31 04:04:27 UTC — [ticket-687] APPROVED après 1 tour(s)
+- 2026-10-31 04:06:57 UTC — [ticket-687] documentation: 0 fichier(s) (144328ms)
+- 2026-10-31 04:15:28 UTC — [ide-core] ticket-687 PR #809 confiée au CIWatcher
+- 2026-10-31 04:15:32 UTC — [ticket-688] branche ticket-688-pipeline-stages-split-by-stage
+- 2026-10-31 04:15:33 UTC — [ticket-688] tour 1 — codeur démarré
+- 2026-10-31 04:21:02 UTC — [ticket-688] tour 1 — codeur terminé (328389ms)
+- 2026-10-31 04:21:10 UTC — [ide-core] ticket-687 PR #809 mergée (CI verte)
+- 2026-10-31 04:29:54 UTC — [ticket-688] testeur: OK (exit 0)
+- 2026-10-31 04:31:15 UTC — [ticket-688] securite: PASS — Refactorisation de `pipeline_stages.py` en 4 modules spécialisés (branche, contr (81218ms)
+- 2026-10-31 04:31:15 UTC — [ticket-688] tour 1 — reviewer démarré
+- 2026-10-31 04:31:40 UTC — [ticket-688] tour 1 — reviewer terminé (25031ms)
+- 2026-10-31 04:36:16 UTC — [ticket-688] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-31 04:37:22 UTC — [ticket-688] validateur: fichiers cités joints : aucun ; absents : services/pipeline_stages.py
+- 2026-10-31 04:37:22 UTC — [ticket-688] validateur: APPROVED — Le découpage de `pipeline_stages.py` est complet : 4 nouveaux modules créés, tou (366797ms)
+- 2026-10-31 04:37:22 UTC — [ticket-688] APPROVED après 1 tour(s)
+- 2026-10-31 04:41:20 UTC — [ticket-688] documentation: 0 fichier(s) (232967ms) — après tour de correction
+- 2026-10-31 04:50:16 UTC — [ticket-688] livraison: rebase sur develop (23422ms)
+- 2026-10-31 04:50:16 UTC — [ticket-688] livraison: conflit résolu : backend/tests/test_run_worktree.py (0ms)
+- 2026-10-31 04:50:16 UTC — [ticket-688] livraison: tests relancés après rebase : verts (OK (exit 0)) (493625ms)
+- 2026-10-31 04:50:16 UTC — [ticket-688] livraison: PR #810 ouverte (5281ms)
+- 2026-10-31 04:50:16 UTC — [ticket-688] livraison: arrêt — Conflit résolu sur backend/tests/test_run_worktree.py : la PR #810 est ouverte, à relire. Une résolu
+- 2026-10-31 04:50:18 UTC — [ide-core] ticket-688 PR #810 non surveillée (livraison arrêtée)
+- 2026-10-31 04:50:22 UTC — [ticket-689] branche ticket-689-projects-router-split-by-resource
+- 2026-10-31 04:50:23 UTC — [ticket-689] tour 1 — codeur démarré
+- 2026-10-31 04:56:27 UTC — [ticket-689] tour 1 — codeur terminé (364297ms)
+- 2026-10-31 05:05:29 UTC — [ticket-689] testeur: OK (exit 0)
+- 2026-10-31 05:09:25 UTC — [ticket-689] securite: PASS — Refactorisation pure du routeur /projects en modules logiques. Aucune vulnérabil (235297ms)
+- 2026-10-31 05:09:25 UTC — [ticket-689] tour 1 — reviewer démarré
+- 2026-10-31 05:09:45 UTC — [ticket-689] tour 1 — reviewer terminé (20483ms)
+- 2026-10-31 05:14:25 UTC — [ticket-689] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-31 05:15:15 UTC — [ticket-689] validateur: fichiers cités joints : routers/projects.py
+- 2026-10-31 05:15:15 UTC — [ticket-689] validateur: APPROVED — Le routeur `routers/projects.py` (818 lignes) est découpé en 11 modules sous 300 (350015ms)
+- 2026-10-31 05:15:15 UTC — [ticket-689] APPROVED après 1 tour(s)
+- 2026-10-31 05:16:57 UTC — [ticket-689] documentation: 0 fichier(s) (95765ms)
+- 2026-10-31 05:57:59 UTC — [ticket-690] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-10-31 05:58:02 UTC — [ticket-690] validateur: fichiers cités joints : services/database.py
+- 2026-10-31 05:58:02 UTC — [ticket-690] validateur: CHANGES_REQUESTED — Validation indisponible : Claude Code returned an error result: You've hit your  (303406ms)
+- 2026-11-01 07:09:49 UTC — [ide-core] ticket-688 PR #810 non reprise : aucun commit poussé noté (résolution de conflit ou livraison interrompue)
+- 2026-11-01 07:09:49 UTC — [ide-core] ticket-712 PR #796 reprise par le CIWatcher après redémarrage
+- 2026-11-01 07:09:52 UTC — [ticket-712] livraison: arrêt — PR #796 non mergée : GitHub a refusé le merge de la PR #796.
+- 2026-11-02 08:25:14 UTC — [ide-core] ticket-688 PR #810 non reprise : aucun commit poussé noté (résolution de conflit ou livraison interrompue)
+- 2026-11-02 08:25:14 UTC — [ide-core] ticket-712 PR #796 reprise par le CIWatcher après redémarrage
+- 2026-11-02 08:25:15 UTC — [ticket-712] livraison: arrêt — PR #796 non mergée : PR #796 en conflit avec develop : à rebaser. La PR reste ouverte.
+- 2026-11-02 08:43:29 UTC — [ticket-693] branche ticket-693-api-types-split-by-domain
+- 2026-11-02 08:43:29 UTC — [ticket-693] tour 1 — codeur démarré
+- 2026-11-02 08:47:23 UTC — [ticket-693] tour 1 — codeur terminé (233875ms)
+- 2026-11-02 08:58:15 UTC — [ticket-693] testeur: OK (exit 0)
+- 2026-11-02 08:59:17 UTC — [ticket-693] securite: PASS — Code organization refactoring that splits a 676-line TypeScript types file into  (61733ms)
+- 2026-11-02 08:59:17 UTC — [ticket-693] tour 1 — reviewer démarré
+- 2026-11-02 08:59:40 UTC — [ticket-693] tour 1 — reviewer terminé (22750ms)
+- 2026-11-02 09:04:17 UTC — [ticket-693] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-02 09:05:03 UTC — [ticket-693] validateur: fichiers cités joints : types/api.ts, frontend/src/longueur-des-fichiers.test.ts
+- 2026-11-02 09:05:03 UTC — [ticket-693] validateur: APPROVED — Tous les critères sont satisfaits. Le split de `types/api.ts` (676 → 9 lignes) e (345594ms)
+- 2026-11-02 09:05:03 UTC — [ticket-693] APPROVED après 1 tour(s)
+- 2026-11-02 09:05:55 UTC — [ticket-693] documentation: 0 fichier(s) (47125ms)
+- 2026-11-02 09:24:03 UTC — [ide-core] ticket-693 PR #816 confiée au CIWatcher
+- 2026-11-02 09:24:11 UTC — [ticket-694] branche ticket-694-api-client-split-by-domain
+- 2026-11-02 09:24:15 UTC — [ticket-694] tour 1 — codeur démarré
+- 2026-11-02 09:27:34 UTC — [ticket-694] tour 1 — codeur terminé (199233ms)
+- 2026-11-02 09:31:22 UTC — [ide-core] ticket-693 PR #816 mergée (CI verte)
+- 2026-11-02 09:34:45 UTC — [ticket-694] testeur: OK (exit 0)
+- 2026-11-02 09:36:17 UTC — [ticket-694] securite: PASS — Refactoring pur qui divise `frontend/src/lib/api.ts` (312 lignes) en 7 modules s (91796ms)
+- 2026-11-02 09:36:17 UTC — [ticket-694] tour 1 — reviewer démarré
+- 2026-11-02 09:36:20 UTC — [ticket-694] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-11-02 09:36:41 UTC — [ticket-694] tour 1 — reviewer terminé (23671ms)
+- 2026-11-02 09:37:34 UTC — [ticket-694] validateur: fichiers cités joints : lib/api.ts, lib/http.ts ; absents : lib/
+- 2026-11-02 09:37:34 UTC — [ticket-694] validateur: APPROVED — Tous les critères sont satisfaits. La refonte de `lib/api.ts` (312→26 lignes) en (75484ms)
+- 2026-11-02 09:37:34 UTC — [ticket-694] APPROVED après 1 tour(s)
+- 2026-11-02 09:41:02 UTC — [ticket-694] documentation: 0 fichier(s) (192327ms)
+- 2026-11-02 09:46:17 UTC — [ide-core] ticket-694 PR #817 non surveillée (livraison arrêtée)
+- 2026-11-02 09:46:28 UTC — [ticket-695] branche ticket-695-stream-state-reducer-split-by-event-family
+- 2026-11-02 09:46:30 UTC — [ticket-695] tour 1 — codeur démarré
+- 2026-11-02 09:47:50 UTC — [ticket-695] tour 1 — codeur terminé (80250ms)
+- 2026-11-02 09:47:53 UTC — [ticket-695] testeur: Aucun fichier de backend/ ni de frontend/ modifi� : rien � tester.
+- 2026-11-02 09:48:19 UTC — [ticket-695] securite: PASS — Aucun fichier n'a été modifié dans ce run. Le garde-fou d'écriture (hook PreTool (26561ms)
+- 2026-11-02 09:48:20 UTC — [ticket-695] tour 1 — reviewer démarré
+- 2026-11-02 09:48:38 UTC — [ticket-695] tour 1 — reviewer terminé (17765ms)
+- 2026-11-02 09:53:20 UTC — [ticket-695] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-02 09:53:55 UTC — [ticket-695] validateur: fichiers cités joints : hooks/streamState.ts (tronqué)
+- 2026-11-02 09:53:55 UTC — [ticket-695] validateur: CHANGES_REQUESTED — Le ticket est **BLOCKED** : le garde-fou interdit toute écriture vers `frontend/ (336155ms)
+- 2026-11-02 09:53:55 UTC — [ticket-695] CHANGES_REQUESTED tour 1: Reviewer : 1. Aucune modification de code : `appliquerEvenement` n'est pas découpé, l'entrée `hooks/streamState.ts` de `PLAFONDS` n'est pas baissée, et il n'y a ni fixture commitée ni test de rejeu. A
+- 2026-11-02 09:53:55 UTC — [ticket-695] tour 2 — codeur démarré
+- 2026-11-02 09:57:09 UTC — [ticket-695] tour 2 — codeur terminé (193984ms)
+- 2026-11-02 10:00:07 UTC — [ticket-695] testeur: OK (exit 0)
+- 2026-11-02 10:00:58 UTC — [ticket-695] securite: PASS — Refactoring de sécurité inerte : split du réducteur streamState en familles d'év (51640ms)
+- 2026-11-02 10:00:58 UTC — [ticket-695] tour 2 — reviewer démarré
+- 2026-11-02 10:00:59 UTC — [ticket-695] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-11-02 10:01:29 UTC — [ticket-695] tour 2 — reviewer terminé (30500ms)
+- 2026-11-02 10:01:34 UTC — [ticket-695] validateur: fichiers cités joints : hooks/streamState.ts
+- 2026-11-02 10:01:34 UTC — [ticket-695] validateur: APPROVED — La refactorisation a bien scindé `appliquerEvenement` en 5 modules spécialisés ( (35844ms)
+- 2026-11-02 10:01:34 UTC — [ticket-695] APPROVED après 2 tour(s)
+- 2026-11-02 10:05:01 UTC — [ticket-695] documentation: 0 fichier(s) (198813ms) — après tour de correction
+- 2026-11-02 10:12:04 UTC — [ide-core] ticket-695 PR #819 confiée au CIWatcher
+- 2026-11-02 10:12:04 UTC — [ticket-696] fichiers non suivis laissés par le run : tickets/blocked/ticket-696-cockpit-hook-split-by-region.md (à ignorer dans .gitignore ?)
+- 2026-11-02 10:12:04 UTC — [ide-core] file interrompue : ticket-696 non approuvé
+- 2026-11-02 10:19:11 UTC — [ide-core] ticket-695 PR #819 mergée (CI verte)
+- 2026-11-02 10:37:54 UTC — [ticket-696] branche ticket-696-cockpit-hook-split-by-region
+- 2026-11-02 10:37:57 UTC — [ticket-696] tour 1 — codeur démarré
+- 2026-11-02 10:44:26 UTC — [ticket-696] tour 1 — codeur terminé (388797ms)
+- 2026-11-02 10:50:33 UTC — [ticket-696] testeur: OK (exit 0)
+- 2026-11-02 10:52:16 UTC — [ticket-696] securite: PASS — Ce diff effectue un refactoring pur du hook `useCockpit.ts` (532 lignes) en le d (102625ms)
+- 2026-11-02 10:52:16 UTC — [ticket-696] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-11-02 10:52:16 UTC — [ticket-696] tour 1 — reviewer démarré
+- 2026-11-02 10:52:36 UTC — [ticket-696] tour 1 — reviewer terminé (19952ms)
+- 2026-11-02 10:53:01 UTC — [ticket-696] validateur: fichiers cités joints : App.tsx, hooks/useCockpit.ts
+- 2026-11-02 10:53:01 UTC — [ticket-696] validateur: CHANGES_REQUESTED — 4/5 critères validés. La refactorisation crée 7 hooks régionaux bien rangés (< 3 (45577ms)
+- 2026-11-02 10:53:01 UTC — [ticket-696] CHANGES_REQUESTED tour 1: Validateur : 4/5 critères validés. La refactorisation crée 7 hooks régionaux bien rangés (< 300 lignes chacun), avec une réduction drastique de useCockpit (532 → 45 lignes). L'API reste identique et A
+- 2026-11-02 10:53:01 UTC — [ticket-696] tour 2 — codeur démarré
+- 2026-11-02 10:56:29 UTC — [ticket-696] tour 2 — codeur terminé (207578ms)
+- 2026-11-02 11:00:04 UTC — [ticket-696] testeur: OK (exit 0)
+- 2026-11-02 11:01:09 UTC — [ticket-696] securite: PASS — Refactorisation sûre : le fichier `useCockpit.ts` (532 l.) est scindé en 8 fichi (65140ms)
+- 2026-11-02 11:01:11 UTC — [ticket-696] tour 2 — reviewer démarré
+- 2026-11-02 11:01:40 UTC — [ticket-696] tour 2 — reviewer terminé (29031ms)
+- 2026-11-02 11:06:24 UTC — [ticket-696] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-02 11:06:49 UTC — [ticket-696] validateur: fichiers cités joints : App.tsx, hooks/useCockpit.ts
+- 2026-11-02 11:06:49 UTC — [ticket-696] validateur: APPROVED — La refactorisation divise `useCockpit` (532 lignes) en 7 hooks régionaux spécial (339641ms)
+- 2026-11-02 11:06:49 UTC — [ticket-696] APPROVED après 2 tour(s)
+- 2026-11-02 11:09:55 UTC — [ticket-696] documentation: 0 fichier(s) (181015ms) — après tour de correction
+- 2026-11-02 11:10:12 UTC — [ide-core] ticket-696 PR #820 confiée au CIWatcher
+- 2026-11-02 11:10:16 UTC — [ticket-697] branche ticket-697-import-project-modal-split-by-step
+- 2026-11-02 11:10:17 UTC — [ticket-697] tour 1 — codeur démarré
+- 2026-11-02 11:12:25 UTC — [ticket-697] tour 1 — codeur terminé (128250ms)
+- 2026-11-02 11:15:26 UTC — [ticket-697] testeur: OK (exit 0)
+- 2026-11-02 11:17:17 UTC — [ide-core] ticket-696 PR #820 mergée (CI verte)
+- 2026-11-02 11:17:23 UTC — [ticket-697] securite: PASS — Refactoring of ImportProjectModal into smaller components (ImportProgression, Im (117765ms)
+- 2026-11-02 11:17:24 UTC — [ticket-697] tour 1 — reviewer démarré
+- 2026-11-02 11:17:38 UTC — [ticket-697] tour 1 — reviewer terminé (14452ms)
+- 2026-11-02 11:22:24 UTC — [ticket-697] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-02 11:22:42 UTC — [ticket-697] validateur: fichiers cités joints : components/Sidebar/ImportProjectModal.tsx
+- 2026-11-02 11:22:42 UTC — [ticket-697] validateur: APPROVED — Refactoring réussi : `ImportProjectModal` a été découpée en 4 fichiers distincts (318843ms)
+- 2026-11-02 11:22:42 UTC — [ticket-697] APPROVED après 1 tour(s)
+- 2026-11-02 11:24:54 UTC — [ticket-697] documentation: 0 fichier(s) (108859ms)
+- 2026-11-02 11:49:14 UTC — [ide-core] ticket-698 PR #822 non surveillée (livraison arrêtée)
+- 2026-11-02 11:49:21 UTC — [ticket-674] branche ticket-674-an-open-pr-turned-conflicting-is-brought-up-to-da
+- 2026-11-02 11:49:22 UTC — [ticket-674] tour 1 — codeur démarré
+- 2026-11-02 11:52:20 UTC — [ticket-674] tour 1 — architect terminé (177563ms)
+- 2026-11-02 11:52:23 UTC — [ticket-674] testeur: Aucun fichier de backend/ ni de frontend/ modifi� : rien � tester.
+- 2026-11-02 11:52:44 UTC — [ticket-674] securite: PASS — Diff documentaire sans code exécutable. Ajout d'une contrainte architecturale (A (20750ms)
+- 2026-11-02 11:52:44 UTC — [ticket-674] tour 1 — reviewer démarré
+- 2026-11-02 11:53:02 UTC — [ticket-674] tour 1 — reviewer terminé (18422ms)
+- 2026-11-02 11:54:46 UTC — [ticket-674] validateur: APPROVED — Les deux critères d'acceptation sont satisfaits : la conception décrit clairemen (122766ms)
+- 2026-11-02 11:54:46 UTC — [ticket-674] APPROVED après 1 tour(s)
+- 2026-11-02 11:54:51 UTC — [ticket-674] fichiers non suivis laissés par le run : tickets/todo/ticket-732-a-conflicting-pr-branch-is-merged-with-its-base-in-a-throwaway-worktree.md, tickets/todo/ticket-733-the-ci-watcher-updates-a-conflicting-pr-once-and-rebinds-the-pushed-head.md (à ignorer dans .gitignore ?)
+- 2026-11-02 11:54:51 UTC — [ticket-674] documentation: 0 fichier(s) (14ms)
+- 2026-11-02 11:28:18 UTC — [ide-core] ticket-697 PR #821 confiée au CIWatcher
+- 2026-11-02 11:28:22 UTC — [ticket-698] branche ticket-698-three-barely-oversized-components-go-under-300-li
+- 2026-11-02 11:28:26 UTC — [ticket-698] tour 1 — codeur démarré
+- 2026-11-02 11:32:39 UTC — [ticket-698] tour 1 — codeur terminé (253608ms)
+- 2026-11-02 11:35:11 UTC — [ide-core] ticket-697 PR #821 mergée (CI verte)
+- 2026-11-02 11:35:56 UTC — [ticket-698] testeur: OK (exit 0)
+- 2026-11-02 11:37:25 UTC — [ticket-698] securite: PASS — Refactoring propre de composants React frontend sans introduction de vulnérabili (88063ms)
+- 2026-11-02 11:37:25 UTC — [ticket-698] tour 1 — reviewer démarré
+- 2026-11-02 11:37:42 UTC — [ticket-698] tour 1 — reviewer terminé (16780ms)
+- 2026-11-02 11:42:28 UTC — [ticket-698] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-02 11:43:20 UTC — [ticket-698] validateur: fichiers cités joints : FilDuRun/index.tsx, Sidebar/TicketCard.tsx, Sidebar/TicketList.tsx (tronqué)
+- 2026-11-02 11:43:20 UTC — [ticket-698] validateur: APPROVED — Le refactoring a réussi : les quatre vues du fil du run et la barre d'outils de  (354703ms)
+- 2026-11-02 11:43:20 UTC — [ticket-698] APPROVED après 1 tour(s)
+- 2026-11-02 11:43:24 UTC — [ticket-698] fichiers non suivis laissés par le run : tickets/todo/ticket-731-the-security-audit-knows-what-the-ticket-leaves-to-the-next.md (à ignorer dans .gitignore ?)
+- 2026-11-02 11:45:58 UTC — [ticket-698] documentation: 0 fichier(s) (154031ms)
+- 2026-11-02 11:55:08 UTC — [ide-core] ticket-674 PR #823 confiée au CIWatcher
+- 2026-11-02 11:55:14 UTC — [ticket-690] branche ticket-690-database-module-split-by-domain
+- 2026-11-02 11:55:16 UTC — [ticket-690] tour 1 — codeur démarré
+- 2026-11-02 11:59:59 UTC — [ticket-690] tour 1 — codeur terminé (283171ms)
+- 2026-11-02 12:00:48 UTC — [ticket-674] livraison: arrêt — PR #823 non mergée : CI failing : la PR #823 reste ouverte.
+- 2026-11-02 12:09:19 UTC — [ticket-690] testeur: OK (exit 0)
+- 2026-11-02 12:10:48 UTC — [ticket-690] securite: BLOCK — Audit sécurité indisponible : Claude Code returned an error result: You've hit y (88890ms)
+- 2026-11-02 12:10:53 UTC — [ide-core] file interrompue : ticket-690 non approuvé
+- 2026-11-02 13:26:53 UTC — [ticket-690] branche ticket-690-database-module-split-by-domain
+- 2026-11-02 13:26:58 UTC — [ticket-690] branche reprise (3 commit(s)) — refus précédent : securite, codeur en premier
+- 2026-11-02 13:26:58 UTC — [ticket-690] tour 1 — codeur démarré
+- 2026-11-02 13:30:34 UTC — [ticket-690] tour 1 — codeur terminé (216421ms)
+- 2026-11-02 13:43:00 UTC — [ticket-690] testeur: OK (exit 0)
+- 2026-11-02 13:44:51 UTC — [ticket-690] securite: PASS — Refactoring de code sans vulnérabilité introduite. Division correcte et cohérent (111264ms)
+- 2026-11-02 13:44:51 UTC — [ticket-690] tour 1 — reviewer démarré
+- 2026-11-02 13:45:09 UTC — [ticket-690] tour 1 — reviewer terminé (17953ms)
+- 2026-11-02 13:45:21 UTC — [ticket-690] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : créneau occupé depuis plus de 30 s
+- 2026-11-02 13:46:41 UTC — [ticket-690] validateur: fichiers cités joints : services/database.py
+- 2026-11-02 13:46:41 UTC — [ticket-690] validateur: APPROVED — Le découpage de `services/database.py` en cinq modules thématiques est complet e (109765ms)
+- 2026-11-02 13:46:41 UTC — [ticket-690] APPROVED après 1 tour(s)
+- 2026-11-02 13:47:41 UTC — [ticket-690] documentation: 0 fichier(s) (51358ms)
+- 2026-11-02 13:57:36 UTC — [ide-core] ticket-690 PR #827 confiée au CIWatcher
+- 2026-11-02 13:57:43 UTC — [ticket-691] branche ticket-691-project-loader-split-into-reading-writing-and-tex
+- 2026-11-02 13:57:46 UTC — [ticket-691] tour 1 — codeur démarré
+- 2026-11-02 14:01:22 UTC — [ticket-691] tour 1 — codeur terminé (216014ms)
+- 2026-11-02 14:04:14 UTC — [ide-core] ticket-690 PR #827 mergée (CI verte)
+- 2026-11-02 14:10:12 UTC — [ticket-691] testeur: OK (exit 0)
+- 2026-11-02 14:12:31 UTC — [ticket-691] securite: PASS — Refactorisation de `project_loader.py` en trois modules spécialisés (extraction_ (139905ms)
+- 2026-11-02 14:12:32 UTC — [ticket-691] tour 1 — reviewer démarré
+- 2026-11-02 14:12:57 UTC — [ticket-691] tour 1 — reviewer terminé (25030ms)
+- 2026-11-02 14:17:32 UTC — [ticket-691] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-02 14:18:14 UTC — [ticket-691] validateur: fichiers cités joints : services/project_loader.py, CLAUDE.md
+- 2026-11-02 14:18:14 UTC — [ticket-691] validateur: APPROVED — Le refactoring de `project_loader.py` est complet et correctement découplé : ext (342375ms)
+- 2026-11-02 14:18:14 UTC — [ticket-691] APPROVED après 1 tour(s)
+- 2026-11-02 14:24:40 UTC — [ticket-691] documentation: 1 fichier(s) (313890ms) — après tour de correction
+- 2026-11-02 14:34:43 UTC — [ide-core] ticket-691 PR #829 confiée au CIWatcher
+- 2026-11-02 14:34:48 UTC — [ticket-692] branche ticket-692-documentation-module-split-into-edits-selection-a
+- 2026-11-02 14:34:50 UTC — [ticket-692] tour 1 — codeur démarré
+- 2026-11-02 14:40:23 UTC — [ide-core] ticket-691 PR #829 mergée (CI verte)
+- 2026-11-02 14:41:16 UTC — [ticket-692] tour 1 — codeur terminé (386250ms)
+- 2026-11-02 14:59:00 UTC — [ticket-692] testeur: OK (exit 0)
+- 2026-11-02 15:01:12 UTC — [ticket-692] securite: PASS — Refactoring pur : extraction de code de `documentation.py` vers deux nouveaux mo (132436ms)
+- 2026-11-02 15:01:12 UTC — [ticket-692] tour 1 — reviewer démarré
+- 2026-11-02 15:01:13 UTC — [ticket-692] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-11-02 15:01:33 UTC — [ticket-692] tour 1 — reviewer terminé (21094ms)
+- 2026-11-02 15:02:10 UTC — [ticket-692] validateur: fichiers cités joints : services/documentation.py
+- 2026-11-02 15:02:10 UTC — [ticket-692] validateur: APPROVED — Le refactoring a extrait avec succès les fonctions pures d'édition et de sélecti (58110ms)
+- 2026-11-02 15:02:10 UTC — [ticket-692] APPROVED après 1 tour(s)
+- 2026-11-02 15:04:47 UTC — [ticket-692] documentation: 0 fichier(s) (151734ms) — après tour de correction
+- 2026-11-02 15:16:00 UTC — [ide-core] ticket-692 PR #831 confiée au CIWatcher
+- 2026-11-02 15:16:04 UTC — [ticket-699] branche ticket-699-forge-parsing-leaves-the-github-workflow-module
+- 2026-11-02 15:16:06 UTC — [ticket-699] tour 1 — codeur démarré
+- 2026-11-02 15:17:43 UTC — [ticket-699] tour 1 — codeur terminé (97125ms)
+- 2026-11-02 15:21:04 UTC — [ide-core] ticket-692 PR #831 mergée (CI verte)
+- 2026-11-02 15:30:25 UTC — [ticket-699] testeur: OK (exit 0)
+- 2026-11-02 15:33:47 UTC — [ticket-699] securite: PASS — Refactoring sûr : déplacement de fonctions pures de parsing d'URLs de `github_wo (201639ms)
+- 2026-11-02 15:33:47 UTC — [ticket-699] tour 1 — reviewer démarré
+- 2026-11-02 15:34:13 UTC — [ticket-699] tour 1 — reviewer terminé (25250ms)
+- 2026-11-02 15:36:54 UTC — [ticket-699] validateur: fichiers cités joints : project_loader.py, services/github_workflow.py (tronqué)
+- 2026-11-02 15:36:54 UTC — [ticket-699] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code a été refactoré pour dép (187296ms)
+- 2026-11-02 15:36:54 UTC — [ticket-699] APPROVED après 1 tour(s)
+- 2026-11-02 15:42:31 UTC — [ticket-699] documentation: 1 fichier(s) (329235ms) — après tour de correction
+- 2026-11-03 07:54:19 UTC — [ticket-700] branche ticket-700-delivery-phase-one-in-named-steps
+- 2026-11-03 07:54:20 UTC — [ticket-700] tour 1 — codeur démarré
+- 2026-11-03 07:58:36 UTC — [ticket-700] tour 1 — codeur terminé (256156ms)
+- 2026-11-03 08:07:28 UTC — [ticket-700] testeur: OK (exit 0)
+- 2026-11-03 08:09:43 UTC — [ticket-700] securite: PASS — Refactorisation de `livraison.py` pour réduire sa taille : extraction de trois m (135672ms)
+- 2026-11-03 08:09:43 UTC — [ticket-700] tour 1 — reviewer démarré
+- 2026-11-03 08:10:04 UTC — [ticket-700] tour 1 — reviewer terminé (20187ms)
+- 2026-11-03 08:14:44 UTC — [ticket-700] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-03 08:16:28 UTC — [ticket-700] validateur: fichiers cités joints : services/livraison.py (tronqué)
+- 2026-11-03 08:16:28 UTC — [ticket-700] validateur: APPROVED — Refactorisation complète. Toutes les étapes de livraison sont maintenant des fon (404281ms)
+- 2026-11-03 08:16:28 UTC — [ticket-700] APPROVED après 1 tour(s)
+- 2026-11-03 08:18:15 UTC — [ticket-700] documentation: 0 fichier(s) (101062ms)
+- 2026-11-03 08:18:35 UTC — [ide-core] ticket-700 PR #833 confiée au CIWatcher
+- 2026-11-03 08:18:39 UTC — [ticket-701] branche ticket-701-the-github-service-guard-leaves-the-tickets-route
+- 2026-11-03 08:18:40 UTC — [ticket-701] tour 1 — codeur démarré
+- 2026-11-03 08:20:32 UTC — [ticket-701] tour 1 — codeur terminé (111796ms)
+- 2026-11-03 08:25:29 UTC — [ide-core] ticket-700 PR #833 mergée (CI verte)
+- 2026-11-03 08:27:36 UTC — [ticket-701] testeur: 1 failed, 3425 passed, 64 warnings in 419.98s (0:06:59)
+- 2026-11-03 08:27:36 UTC — [ticket-701] tests rouges au tour 1
+- 2026-11-03 08:27:36 UTC — [ticket-701] tour 2 — codeur démarré
+- 2026-11-03 08:28:50 UTC — [ticket-701] tour 2 — codeur terminé (74062ms)
+- 2026-11-03 08:36:57 UTC — [ticket-701] testeur: OK (exit 0)
+- 2026-11-03 08:39:08 UTC — [ticket-701] securite: PASS — This diff safely refactors `_require_github_service()` from a private function i (131125ms)
+- 2026-11-03 08:39:08 UTC — [ticket-701] tour 2 — reviewer démarré
+- 2026-11-03 08:39:23 UTC — [ticket-701] tour 2 — reviewer terminé (15514ms)
+- 2026-11-03 08:41:01 UTC — [ticket-701] validateur: fichiers cités joints : routers/dependencies.py
+- 2026-11-03 08:41:01 UTC — [ticket-701] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code a été refactoré pour dé (113108ms)
+- 2026-11-03 08:41:01 UTC — [ticket-701] APPROVED après 2 tour(s)
+- 2026-11-03 08:45:04 UTC — [ticket-701] documentation: 1 fichier(s) (236875ms) — après tour de correction
+- 2026-11-03 08:58:26 UTC — [ide-core] ticket-701 PR #837 confiée au CIWatcher
+- 2026-11-03 08:58:30 UTC — [ticket-702] branche ticket-702-the-codeur-s-exhausted-turns-are-recorded-and-jou
+- 2026-11-03 08:58:32 UTC — [ticket-702] tour 1 — codeur démarré
+- 2026-11-03 09:03:23 UTC — [ticket-702] tour 1 — codeur terminé (291219ms)
+- 2026-11-03 09:05:07 UTC — [ide-core] ticket-701 PR #837 mergée (CI verte)
+- 2026-11-03 09:12:10 UTC — [ticket-702] testeur: 2 failed, 2007 passed, 56 warnings in 518.18s (0:08:38)
+- 2026-11-03 09:12:10 UTC — [ticket-702] tests rouges au tour 1
+- 2026-11-03 09:12:10 UTC — [ticket-702] tour 2 — codeur démarré
+- 2026-11-03 09:13:28 UTC — [ticket-702] tour 2 — codeur terminé (78077ms)
+- 2026-11-03 09:22:38 UTC — [ticket-702] testeur: 1 failed, 2724 passed, 64 warnings in 533.28s (0:08:53)
+- 2026-11-03 09:22:38 UTC — [ticket-702] tests rouges au tour 2
+- 2026-11-03 09:22:38 UTC — [ticket-702] tour 3 — codeur démarré
+- 2026-11-03 09:23:55 UTC — [ticket-702] tour 3 — codeur terminé (76250ms)
+- 2026-11-03 09:36:20 UTC — [ticket-702] testeur: OK (exit 0)
+- 2026-11-03 09:37:54 UTC — [ticket-702] securite: PASS — Le diff ajoute le suivi de l'épuisement du quota d'actions des agents (ticket-70 (94187ms)
+- 2026-11-03 09:37:54 UTC — [ticket-702] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-11-03 09:37:54 UTC — [ticket-702] tour 3 — reviewer démarré
+- 2026-11-03 09:38:09 UTC — [ticket-702] tour 3 — reviewer terminé (15139ms)
+- 2026-11-03 09:38:33 UTC — [ticket-702] validateur: fichiers cités joints : test_provider_agent_sdk.py
+- 2026-11-03 09:38:33 UTC — [ticket-702] validateur: APPROVED — Le ticket-702 implémente correctement le suivi des tours épuisés du codeur. Les  (38906ms)
+- 2026-11-03 09:38:33 UTC — [ticket-702] APPROVED après 3 tour(s)
+- 2026-11-03 09:42:16 UTC — [ticket-702] documentation: 0 fichier(s) (218312ms) — après tour de correction
+- 2026-11-03 09:56:09 UTC — [ide-core] ticket-702 PR #838 confiée au CIWatcher
+- 2026-11-03 09:56:13 UTC — [ticket-731] branche ticket-731-the-security-audit-knows-what-the-ticket-leaves-t
+- 2026-11-03 09:56:16 UTC — [ticket-731] tour 1 — codeur démarré
+- 2026-11-03 09:59:36 UTC — [ticket-702] livraison: arrêt — PR #838 non mergée : erreur inattendue : RemoteProtocolError: Server disconnected without sending a response.
+- 2026-11-03 10:03:07 UTC — [ticket-731] tour 1 — codeur terminé (411672ms)
+- 2026-11-03 10:10:52 UTC — [ticket-731] testeur: 1 failed, 2122 passed, 64 warnings in 456.92s (0:07:36)
+- 2026-11-03 10:10:52 UTC — [ticket-731] tests rouges au tour 1
+- 2026-11-03 10:10:52 UTC — [ticket-731] tour 2 — codeur démarré
+- 2026-11-03 10:11:23 UTC — [ticket-731] tour 2 — codeur terminé (31358ms)
+- 2026-11-03 10:19:33 UTC — [ticket-731] testeur: 1 failed, 2438 passed, 64 warnings in 485.63s (0:08:05)
+- 2026-11-03 10:19:33 UTC — [ticket-731] tests rouges au tour 2
+- 2026-11-03 10:19:33 UTC — [ticket-731] tour 3 — codeur démarré
+- 2026-11-03 10:20:38 UTC — [ticket-731] tour 3 — codeur terminé (64141ms)
+- 2026-11-03 10:34:31 UTC — [ticket-731] testeur: OK (exit 0)
+- 2026-11-03 10:37:14 UTC — [ticket-731] securite: PASS — Ce ticket améliore l'audit de sécurité en fournissant du contexte au LLM (sectio (162687ms)
+- 2026-11-03 10:37:14 UTC — [ticket-731] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-11-03 10:37:14 UTC — [ticket-731] tour 3 — reviewer démarré
+- 2026-11-03 10:37:35 UTC — [ticket-731] tour 3 — reviewer terminé (21031ms)
+- 2026-11-03 10:37:46 UTC — [ticket-731] validateur: fichiers cités joints : agents/prompts/securite.md, agents/prompts/planificateur.md
+- 2026-11-03 10:37:46 UTC — [ticket-731] validateur: APPROVED — Tous les critères sont satisfaits. Le code implémente correctement la transmissi (31906ms)
+- 2026-11-03 10:37:46 UTC — [ticket-731] APPROVED après 3 tour(s)
+- 2026-11-03 10:38:56 UTC — [ticket-731] documentation: 0 fichier(s) (64405ms)
+- 2026-11-03 10:50:21 UTC — [ide-core] ticket-731 PR #840 confiée au CIWatcher
+- 2026-11-03 10:50:25 UTC — [ticket-732] branche ticket-732-a-conflicting-pr-branch-is-merged-with-its-base-i
+- 2026-11-03 10:50:26 UTC — [ticket-732] tour 1 — codeur démarré
+- 2026-11-03 10:57:14 UTC — [ticket-732] tour 1 — codeur terminé (407750ms)
+- 2026-11-03 10:57:30 UTC — [ide-core] ticket-731 PR #840 mergée (CI verte)
+- 2026-11-03 11:11:00 UTC — [ticket-732] testeur: OK (exit 0)
+- 2026-11-03 11:14:45 UTC — [ticket-732] securite: PASS — Le module `mise_a_jour_branche.py` fusionne la base d'une PR dans sa branche en  (225187ms)
+- 2026-11-03 11:14:46 UTC — [ticket-732] tour 1 — reviewer démarré
+- 2026-11-03 11:15:16 UTC — [ticket-732] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : créneau occupé depuis plus de 30 s
+- 2026-11-03 11:15:38 UTC — [ticket-732] tour 1 — reviewer terminé (51625ms)
+- 2026-11-03 11:16:12 UTC — [ticket-732] validateur: fichiers cités joints : documentation.json, scripts/verifier.py (tronqué)
+- 2026-11-03 11:16:12 UTC — [ticket-732] validateur: APPROVED — All acceptance criteria are met. The implementation provides a robust merge-a-PR (86641ms)
+- 2026-11-03 11:16:12 UTC — [ticket-732] APPROVED après 1 tour(s)
+- 2026-11-03 11:20:19 UTC — [ticket-732] documentation: 0 fichier(s) (174110ms)
+- 2026-11-03 11:36:04 UTC — [ticket-732] livraison: arrêt — PR #841 non mergée : erreur inattendue : ConnectTimeout
+- 2026-11-03 11:36:04 UTC — [ide-core] ticket-733 sauté : dépend de ticket-732, non mergé
+- 2026-11-03 11:36:04 UTC — [ide-core] ticket-732 PR #841 confiée au CIWatcher
+- 2026-11-03 11:36:13 UTC — [ticket-736] branche ticket-736-a-queue-skips-a-ticket-already-finished-on-the-ba
+- 2026-11-03 11:36:15 UTC — [ticket-736] tour 1 — codeur démarré
+- 2026-11-03 11:43:17 UTC — [ticket-736] tour 1 — codeur terminé (421858ms)
+- 2026-11-03 11:52:16 UTC — [ticket-736] testeur: 2 failed, 1644 passed, 64 warnings in 528.19s (0:08:48)
+- 2026-11-03 11:52:16 UTC — [ticket-736] tests rouges au tour 1
+- 2026-11-03 11:52:16 UTC — [ticket-736] tour 2 — codeur démarré
+- 2026-11-03 11:53:25 UTC — [ticket-736] tour 2 — codeur terminé (68672ms)
+- 2026-11-03 12:02:36 UTC — [ticket-736] testeur: 1 failed, 2134 passed, 64 warnings in 546.94s (0:09:06)
+- 2026-11-03 12:02:36 UTC — [ticket-736] tests rouges au tour 2
+- 2026-11-03 12:02:36 UTC — [ticket-736] tour 3 — codeur démarré
+- 2026-11-03 12:03:36 UTC — [ticket-736] tour 3 — codeur terminé (60483ms)
+- 2026-11-03 12:13:56 UTC — [ticket-736] testeur: 1 failed, 4516 passed, 64 warnings in 615.75s (0:10:15)
+- 2026-11-03 12:13:56 UTC — [ticket-736] tests rouges au tour 3
+- 2026-11-03 12:13:56 UTC — [ticket-736] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-03 12:14:01 UTC — [ide-core] file interrompue : ticket-736 non approuvé
+- 2026-11-03 12:31:44 UTC — [ticket-739] branche ticket-739-a-delivery-cut-by-a-network-error-is-retried-once
+- 2026-11-03 12:31:44 UTC — [ticket-739] base non réalignée — fetch origin develop échoué : From https://github.com/BenjaminCharmes/Tessera
+ * branch              develop    -> FETCH_HEAD
+   18d77ecf..be6b8bc5  develop    -> origin/develop
+error: fetching ref refs/remotes/origin/develop failed: incorrect old value provided
+- 2026-11-03 12:31:45 UTC — [ticket-739] tour 1 — codeur démarré
+- 2026-11-03 12:34:11 UTC — [ticket-739] tour 1 — codeur terminé (146000ms)
+- 2026-11-03 12:44:56 UTC — [ticket-739] testeur: 1 failed, 3485 passed, 64 warnings in 639.54s (0:10:39)
+- 2026-11-03 12:44:56 UTC — [ticket-739] tests rouges au tour 1
+- 2026-11-03 12:44:56 UTC — [ticket-739] tour 2 — codeur démarré
+- 2026-11-03 12:48:42 UTC — [ticket-739] tour 2 — codeur terminé (225562ms)
+- 2026-11-03 13:01:04 UTC — [ticket-739] testeur: OK (exit 0)
+- 2026-11-03 13:03:35 UTC — [ticket-739] securite: PASS — Refactorisation sécurisée du CIWatcher avec extraction de code et ajout de retry (151218ms)
+- 2026-11-03 13:03:35 UTC — [ticket-739] tour 2 — reviewer démarré
+- 2026-11-03 13:03:35 UTC — [ticket-739] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-11-03 13:03:51 UTC — [ticket-739] tour 2 — reviewer terminé (15968ms)
+- 2026-11-03 13:04:10 UTC — [ticket-739] validateur: APPROVED — Le ticket-739 implémente correctement la reprise unique de la phase 2 après une  (34546ms)
+- 2026-11-03 13:04:10 UTC — [ticket-739] APPROVED après 2 tour(s)
+- 2026-11-03 13:07:35 UTC — [ticket-739] documentation: 0 fichier(s) (200125ms) — après tour de correction
+- 2026-11-03 13:21:27 UTC — [ide-core] ticket-739 PR #844 confiée au CIWatcher
+- 2026-11-03 13:21:32 UTC — [ticket-733] branche ticket-733-the-ci-watcher-updates-a-conflicting-pr-once-and
+- 2026-11-03 13:21:34 UTC — [ticket-733] tour 1 — codeur démarré
+- 2026-11-03 13:28:34 UTC — [ide-core] ticket-739 PR #844 mergée (CI verte)
+- 2026-11-03 13:33:34 UTC — [ticket-733] tour 1 — codeur terminé (719483ms)
+- 2026-11-03 13:43:24 UTC — [ticket-733] testeur: OK (exit 0)
+- 2026-11-03 13:46:57 UTC — [ticket-733] securite: PASS — Le ticket-733 refactorise la surveillance des PR avec une nouvelle capacité de m (213046ms)
+- 2026-11-03 13:46:57 UTC — [ticket-733] tour 1 — reviewer démarré
+- 2026-11-03 13:47:41 UTC — [ticket-733] tour 1 — reviewer terminé (44422ms)
+- 2026-11-03 13:51:57 UTC — [ticket-733] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-03 13:53:11 UTC — [ticket-733] validateur: fichiers cités joints : docs/architecture.md (tronqué) ; non joints (budget épuisé) : scripts/verifier.py
+- 2026-11-03 13:53:11 UTC — [ticket-733] validateur: APPROVED — Le watcher met à jour une PR conflictuelle une seule fois : tête notée en base a (373796ms)
+- 2026-11-03 13:53:11 UTC — [ticket-733] CHANGES_REQUESTED tour 1: Reviewer : 1. `assemblage_run.py` passe à `surveillance_pour` le `retest` du run (`retest_du_run(git_workspace, …, racine_run, …)`). Ce retest est transmis à `mettre_a_jour_branche` (ticket-733, point
+- 2026-11-03 13:53:11 UTC — [ticket-733] tour 2 — codeur démarré
+- 2026-11-03 13:54:15 UTC — [ticket-733] tour 2 — codeur terminé (64562ms)
+- 2026-11-03 14:03:40 UTC — [ticket-733] testeur: OK (exit 0)
+- 2026-11-03 14:07:32 UTC — [ticket-733] securite: PASS — Ce diff refactorise la surveillance des PR conflictuelles (ticket-733) et ajoute (232094ms)
+- 2026-11-03 14:07:32 UTC — [ticket-733] tour 2 — reviewer démarré
+- 2026-11-03 14:07:52 UTC — [ticket-733] tour 2 — reviewer terminé (19139ms)
+- 2026-11-03 14:12:32 UTC — [ticket-733] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-03 14:13:32 UTC — [ticket-733] validateur: fichiers cités joints : docs/architecture.md (tronqué) ; non joints (budget épuisé) : scripts/verifier.py
+- 2026-11-03 14:13:32 UTC — [ticket-733] validateur: APPROVED — Le ticket-733 implémente complètement la capacité du watcher à mettre à jour une (359578ms)
+- 2026-11-03 14:13:32 UTC — [ticket-733] APPROVED après 2 tour(s)
+- 2026-11-03 14:16:04 UTC — [ticket-733] documentation: 0 fichier(s) (146906ms) — après tour de correction
+- 2026-11-03 14:34:03 UTC — [ticket-733] livraison: rebase sur develop (90250ms)
+- 2026-11-03 14:34:03 UTC — [ticket-733] livraison: conflit résolu : backend/src/tessera/services/ci_watcher.py, backend/src/tessera/services/controle_tete.py, backend/tests/test_longueur_des_fichiers.py (0ms)
+- 2026-11-03 14:34:03 UTC — [ticket-733] livraison: tests relancés après rebase : rouges (FAILED tests/test_ci_watcher_reprise.py::test_network_error_then_open_pr_replays_phase_2_and_succeeds !!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!! !!!!!!!!!!!! xdist.dsession.Interrupted: stopping after 1 failures !!!!!!!!!!!! 1 failed, 2302 passed, 64 warnings in ) (978953ms)
+- 2026-11-03 14:34:03 UTC — [ticket-733] livraison: arrêt — Tests rouges après rebase sur develop : rien n'est poussé. La base a avancé pendant le run et le tra

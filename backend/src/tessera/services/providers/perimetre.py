@@ -21,21 +21,23 @@ ce que ce module garantit. Ce qui ne se lit pas avec certitude passe, plutôt
 que de refuser une commande légitime : un faux refus coûte à l'agent son moyen
 de vérifier son travail.
 """
-import json
 from pathlib import Path
 from typing import Any, Awaitable, Callable
 
 from claude_agent_sdk import HookContext, HookInput, HookJSONOutput
 
+from tessera.services.racine_depot import declare_ancestor, racine_ecriture_projet
 from tessera.services.providers.chemins_proteges import (
     INTERPRETE_PROTEGE_REFUS,
     motif_de_protection,
     refus_de_protection,
 )
+from tessera.services.providers.refus_garde import JournalDesRefus
 from tessera.services.providers.redirections_bash import (
     cibles_ecrites,
     cibles_interpreteur_ecriture,
 )
+from tessera.services.providers.script_verification import script_de_verification
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -66,25 +68,7 @@ def racine_autorisee(project_path: Path) -> Path:
     Seule cette valeur exacte élargit le périmètre : une valeur inconnue ou un
     fichier illisible ne désarme rien.
     """
-    racine = project_path.resolve()
-    agents_json = project_path / "agents.json"
-    if not agents_json.is_file():
-        return racine
-    try:
-        data = json.loads(agents_json.read_text(encoding="utf-8"))
-    except (json.JSONDecodeError, OSError):
-        return racine
-    if data.get("git_root") == "ancestor":
-        return _depot_contenant(racine)
-    return racine
-
-
-def _depot_contenant(depart: Path) -> Path:
-    """Le premier ancêtre qui porte un `.git`, ou le parent à défaut."""
-    for candidat in depart.parents:
-        if (candidat / ".git").exists():
-            return candidat
-    return depart.parent
+    return racine_ecriture_projet(project_path, declare_ancestor(project_path))
 
 
 def hors_perimetre(
@@ -117,8 +101,13 @@ def hors_perimetre(
 def hook_refus_hors_perimetre(
     project_path: Path | None,
     racine: Path | None = None,
+    journal: JournalDesRefus | None = None,
+    commande_effective: str | None = None,
 ) -> Callable[[HookInput, str | None, HookContext], Awaitable[HookJSONOutput]]:
     """Fabrique le hook `PreToolUse` qui enferme les écritures dans le projet.
+
+    `commande_effective` est la commande de test d'un worktree, déjà résolue :
+    c'est son script qui se protège, plutôt que celui du manifeste (ticket-524).
 
     Sans projet — les services texte→JSON tournent sans contexte et sans
     outils — le hook laisse tout passer : il n'y a pas de périmètre à tenir.
@@ -127,11 +116,22 @@ def hook_refus_hors_perimetre(
     même hook sert à chaque écriture d'un agent, et relire `agents.json` à
     chacune d'elles laisserait un codeur élargir son propre périmètre en
     cours de run (ticket-119).
+
+    Chaque refus est aussi noté dans `journal`, s'il y en a un : c'est ce qui
+    permet au reviewer et au validateur de le savoir (ticket-476).
     """
     racine_figee = (
         racine
         if racine is not None
         else racine_autorisee(project_path)
+        if project_path is not None
+        else None
+    )
+    # Le script que `test_command` lance est figé comme la racine : lu à chaque
+    # écriture, il suivrait ce qu'un codeur aurait écrit dans `agents.json`
+    # (ticket-490).
+    script = (
+        script_de_verification(project_path, commande_effective)
         if project_path is not None
         else None
     )
@@ -156,6 +156,7 @@ def hook_refus_hors_perimetre(
                     noms[0],
                     project_path,
                     INTERPRETE_PROTEGE_REFUS,
+                    journal,
                 )
         elif outil in _OUTILS_QUI_ECRIVENT:
             chemin = str(entrees.get("file_path", ""))
@@ -167,17 +168,19 @@ def hook_refus_hors_perimetre(
         for cible in cibles:
             if hors_perimetre(cible, project_path, racine):
                 return _refus(
-                    "ecriture_hors_perimetre_refusee", cible, project_path, ECRITURE_REFUS
+                    "ecriture_hors_perimetre_refusee", cible, project_path,
+                    ECRITURE_REFUS, journal,
                 )
             # Dans le projet, mais porteur de ses règles : `agents.json`, `.git/`,
             # `.claude/settings*.json`, `.github/workflows/` (ticket-119).
-            motif = motif_de_protection(cible, project_path, racine)
+            motif = motif_de_protection(cible, project_path, racine, script)
             if motif is not None:
                 return _refus(
                     "ecriture_protegee_refusee",
                     cible,
                     project_path,
                     refus_de_protection(motif),
+                    journal,
                 )
         return {}
 
@@ -185,8 +188,14 @@ def hook_refus_hors_perimetre(
 
 
 def _refus(
-    evenement: str, chemin: str, project_path: Path, raison: str
+    evenement: str,
+    chemin: str,
+    project_path: Path,
+    raison: str,
+    journal: JournalDesRefus | None = None,
 ) -> HookJSONOutput:
+    if journal is not None:
+        journal.noter(chemin, raison)
     _logger.warning(
         evenement, extra={"chemin": chemin[:200], "projet": str(project_path)}
     )

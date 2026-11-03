@@ -1,0 +1,80 @@
+// Capture les écrans d'un projet lancé — ticket-432.
+//
+// Lancé par le backend (services/captures.py) : la configuration arrive en
+// JSON sur stdin, le dossier de sortie en premier argument. Le Playwright
+// utilisé est celui du frontend de Tessera, déjà installé pour les tests de
+// bout en bout ; `scripts/` ne résout pas `frontend/node_modules`, d'où le
+// require ancré sur `frontend/package.json`.
+import { createRequire } from "node:module";
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const racine = join(dirname(fileURLToPath(import.meta.url)), "..");
+const require = createRequire(join(racine, "frontend", "package.json"));
+const { chromium } = require("@playwright/test");
+
+const HAUTEUR = { 390: 844, 1440: 900 };
+const HAUTEUR_PAR_DEFAUT = 900;
+const SCHEMA = { clair: "light", sombre: "dark" };
+
+// Une largeur déclarée par le projet (1024, 768…) n'a pas de hauteur propre.
+function hauteurPour(largeur) {
+  return HAUTEUR[largeur] ?? HAUTEUR_PAR_DEFAUT;
+}
+
+// Échange le jeton contre le cookie de session, dans le contexte du navigateur :
+// le cookie y reste pour les captures. Le jeton arrive par stdin (jamais en
+// argument) et n'est écrit nulle part, pas même dans un message d'erreur.
+async function ouvrirLaSession(contexte, config) {
+  if (!config.session) return;
+  const reponse = await contexte.request.post(config.url + config.session.chemin, {
+    data: { token: config.session.jeton },
+  });
+  if (!reponse.ok()) {
+    throw new Error(`L'ouverture de session a échoué (HTTP ${reponse.status()}).`);
+  }
+}
+
+async function capturer(navigateur, config, sortie, largeur, theme, ecran) {
+  const contexte = await navigateur.newContext({
+    viewport: { width: largeur, height: hauteurPour(largeur) },
+    colorScheme: SCHEMA[theme],
+  });
+  try {
+    await ouvrirLaSession(contexte, config);
+    const page = await contexte.newPage();
+    await page.goto(config.url + ecran.chemin, { waitUntil: "networkidle" });
+    if (ecran.clic) {
+      await page.getByText(ecran.clic, { exact: true }).first().click();
+      await page.waitForLoadState("networkidle");
+    }
+    const fichier = `${ecran.nom}-${largeur}-${theme}.png`;
+    await page.screenshot({ path: join(sortie, fichier), fullPage: true });
+  } finally {
+    await contexte.close();
+  }
+}
+
+async function main() {
+  const sortie = process.argv[2];
+  if (!sortie) throw new Error("Dossier de sortie manquant.");
+  const config = JSON.parse(readFileSync(0, "utf-8"));
+  const navigateur = await chromium.launch();
+  try {
+    for (const ecran of config.ecrans) {
+      for (const largeur of config.largeurs) {
+        for (const theme of config.themes) {
+          await capturer(navigateur, config, sortie, largeur, theme, ecran);
+        }
+      }
+    }
+  } finally {
+    await navigateur.close();
+  }
+}
+
+main().catch((erreur) => {
+  process.stderr.write(`${erreur instanceof Error ? erreur.message : erreur}\n`);
+  process.exit(1);
+});

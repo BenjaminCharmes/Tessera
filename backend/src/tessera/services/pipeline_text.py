@@ -4,6 +4,10 @@ Split out of `orchestrator.py` so they can be read and tested on their own —
 none of them touch git, the ticket store or the agents.
 """
 import re
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from tessera.services.pipeline_run import PipelineRun
 
 _CRITERIA_HEADING = re.compile(r"##\s*(critères|acceptance criteria)", re.IGNORECASE)
 _CRITERIA_ITEM = re.compile(r"\s*-\s*\[[ xX]?\]\s*(.+)")
@@ -66,49 +70,56 @@ def _extract_criteria(ticket_body: str) -> list[str]:
     return criteria
 
 
-_APPROVED_WORD = re.compile(r"\bAPPROVED\b")
-_APPROVED_LEADING = re.compile(r"APPROVED\b")
-# Ce qui entoure un verdict sans en changer le sens : `**APPROVED**`,
-# `## CHANGES_REQUESTED`, `` `APPROVED` ``.
-_DECORATION = " \t*_`#>"
+OBJECTION_MAX_CHARS = 4000
+_TRUNCATION_MARK = "\n[…] tronqué"
 
 
-def _verdict_line(line: str) -> tuple[bool, str] | None:
-    """The verdict a line opens with, or None when it opens with something else."""
-    s = line.strip().strip(_DECORATION)
-    if s.upper().startswith("CHANGES_REQUESTED"):
-        reason = s.split(":", 1)[-1].strip() if ":" in s else ""
-        return False, reason
-    if _APPROVED_LEADING.match(s):
-        # « APPROVED serait prématuré : CHANGES_REQUESTED » reste un refus.
-        if "CHANGES_REQUESTED" in s.upper():
-            return False, s
-        return True, ""
-    return None
+def _truncate_objection(text: str) -> str:
+    """Cap an objection at `OBJECTION_MAX_CHARS`, flagging the cut."""
+    if len(text) <= OBJECTION_MAX_CHARS:
+        return text
+    return text[:OBJECTION_MAX_CHARS] + _TRUNCATION_MARK
 
 
-def _parse_reviewer_verdict(content: str) -> tuple[bool, str]:
-    """Returns (approved, reason) from the reviewer's answer.
+def _first_line(text: str) -> str:
+    """The first non-blank line of `text`, stripped; empty when there is none."""
+    for line in text.splitlines():
+        if line.strip():
+            return line.strip()
+    return ""
 
-    Le reviewer est prompté pour ouvrir sa réponse par le verdict, seul sur sa
-    ligne (ADR-009). La première ligne qui *commence* par un verdict le
-    porte : un reviewer qui cite `CHANGES_REQUESTED` dans le corps d'une
-    approbation n'est plus lu comme un refus (ticket-298, trois APPROVED
-    refusés sur le ticket-288).
 
-    Sans ligne de verdict, la règle d'avant tient : `CHANGES_REQUESTED`
-    n'importe où l'emporte, puis `APPROVED` en mot entier et en majuscules —
-    « this should not be approved » n'approuve rien (ticket-122).
+def _compose_feedback(
+    rev_approved: bool,
+    rev_reason: str,
+    raw_verdict: str,
+    val_approved: bool,
+    val_reason: str,
+) -> str:
+    """The feedback handed back to the coder after a refused round.
+
+    Names the author when both refuse: the coder sees a single feedback at the
+    next round and must know who objects to what.
     """
-    lines = content.splitlines()
-    for line in lines:
-        verdict = _verdict_line(line)
-        if verdict is not None:
-            return verdict
-    for line in lines:
-        if "CHANGES_REQUESTED" in line.upper():
-            reason = line.split(":", 1)[-1].strip() if ":" in line else ""
-            return False, reason
-    if any(_APPROVED_WORD.search(line) for line in lines):
-        return True, ""
-    return False, content[:200]
+    parts: list[str] = []
+    if not rev_approved:
+        parts.append(f"Reviewer : {_truncate_objection(rev_reason or raw_verdict)}")
+    if not val_approved:
+        parts.append(f"Validateur : {val_reason}")
+    return "\n\n".join(parts) if parts else _truncate_objection(raw_verdict)
+
+
+def _echec_de_tests(run: "PipelineRun") -> str:
+    """Ce que le codeur lit au tour suivant : le fait, puis les erreurs.
+
+    Sans les erreurs, le second tour recommence à l'aveugle et produit
+    souvent la même chose.
+    """
+    resultat = run.test_result
+    if resultat is None:
+        return "Les tests du projet ont échoué. Corrige-les avant toute chose."
+    erreurs = "\n".join(resultat.errors[:10])
+    return (
+        "Les tests du projet échouent — corrige-les avant toute autre chose.\n"
+        f"{resultat.output_summary}\n{erreurs}"
+    )

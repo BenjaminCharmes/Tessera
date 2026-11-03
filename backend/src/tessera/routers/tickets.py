@@ -1,3 +1,4 @@
+import asyncio
 from pathlib import Path
 from typing import Literal
 
@@ -8,9 +9,9 @@ from pydantic import BaseModel
 from tessera.config import settings
 from tessera.services.ticket_diff import TicketDiff, diff_du_ticket
 from tessera.models.ticket import Ticket, TicketBatchCreate, TicketBatchResponse, TicketCreate, TicketListResponse, TicketStatus, TicketStatusUpdate
-from tessera.services.github_service import GitHubService, PRStatus
+from tessera.services.github_service import CiStatus, GitHubService, PRStatus
 from tessera.services.autonomie import lire_niveau
-from tessera.services.database import list_runs, list_runs_for_ticket
+from tessera.services.database_runs import list_runs, list_runs_for_ticket
 from tessera.services.pr_status_cache import get_cached_status
 from tessera.services.event_hub import EVENT_HUB
 from tessera.services.pipeline_events import EventType, OrchestratorEvent
@@ -20,10 +21,11 @@ _logger = get_logger(__name__)
 from tessera.services.git_workspace import GitWorkspaceError, GitWorkspaceService
 from tessera.services.github_workflow import GitHubWorkflowService, WorkflowError
 from tessera.services.politique_run import PolitiqueRun
-from tessera.routers.dependencies import require_valid_project_id
+from tessera.routers.dependencies import require_github_service, require_valid_project_id
 from tessera.services.project_loader import load_project
 from tessera.services.project_loader import ProjectLoader
 from tessera.services.sync_map import SyncMapService
+from tessera.services.ticket_check import Probleme, verifier_tickets
 from tessera.services.ticket_service import TicketService
 
 router = APIRouter(
@@ -92,6 +94,14 @@ async def list_archived_tickets(project_id: str) -> list[Ticket]:
     return await _svc(project_id).list_archived_tickets()
 
 
+@router.get("/{project_id}/tickets/check", response_model=list[Probleme])
+async def check_tickets(project_id: str) -> list[Probleme]:
+    """Les défauts des fichiers de tickets du projet ; liste vide si tout va bien."""
+    return await asyncio.to_thread(
+        verifier_tickets, settings.ide_workspace_dir / project_id
+    )
+
+
 @router.get("/{project_id}/tickets/{ticket_id}", response_model=Ticket)
 async def get_ticket(project_id: str, ticket_id: str) -> Ticket:
     ticket = await _svc(project_id).get_ticket(ticket_id)
@@ -144,7 +154,7 @@ class CreatePrResponse(BaseModel):
 
 class PrStatusResponse(BaseModel):
     state: Literal["open", "closed", "merged"]
-    ci_status: Literal["pending", "passing", "failing", "none"]
+    ci_status: CiStatus
     pr_url: str
     pr_number: int
 
@@ -155,7 +165,7 @@ class PrStatusEntry(BaseModel):
     ticket_id: str
     pr_number: int
     state: Literal["open", "closed", "merged"]
-    ci_status: Literal["pending", "passing", "failing", "none"]
+    ci_status: CiStatus
     pr_url: str
 
 
@@ -173,20 +183,6 @@ def _resoudre_base_branch(project_path: Path) -> str:
     return politique.base_branch or settings.github_base_branch
 
 
-def _require_github_service(github_remote: str | None) -> GitHubService:
-    if not github_remote:
-        raise HTTPException(
-            status_code=422,
-            detail="Ce projet n'a pas de github_remote configuré dans agents.json.",
-        )
-    if not settings.github_token:
-        raise HTTPException(
-            status_code=422,
-            detail="GITHUB_TOKEN non configuré dans les settings.",
-        )
-    return GitHubService(token=settings.github_token, repo=github_remote)
-
-
 @router.post("/{project_id}/tickets/{ticket_id}/create-pr", response_model=CreatePrResponse, status_code=201)
 async def create_pull_request(
     project_id: str, ticket_id: str, body: CreatePrRequest
@@ -197,7 +193,7 @@ async def create_pull_request(
     except ValueError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
 
-    github_svc = _require_github_service(project.github_remote)
+    github_svc = require_github_service(project.github_remote)
     ticket_svc = _svc(project_id)
 
     ticket = await ticket_svc.get_ticket(ticket_id)
@@ -236,7 +232,7 @@ async def get_pr_status(project_id: str, ticket_id: str) -> PrStatusResponse:
     except ValueError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
 
-    github_svc = _require_github_service(project.github_remote)
+    github_svc = require_github_service(project.github_remote)
     ticket_svc = _svc(project_id)
 
     ticket = await ticket_svc.get_ticket(ticket_id)
@@ -251,7 +247,7 @@ async def get_pr_status(project_id: str, ticket_id: str) -> PrStatusResponse:
 
     # Capture narrowed non-None values for use inside the lambda and error
     # messages — mypy cannot narrow through closure captures or the
-    # _require_github_service guard.
+    # require_github_service guard.
     pr_number: int = ticket.pr_number
     repo: str = project.github_remote or ""
 
@@ -296,7 +292,7 @@ async def get_all_pr_statuses_endpoint(project_id: str) -> AllPrStatusesResponse
     except ValueError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
 
-    github_svc = _require_github_service(project.github_remote)
+    github_svc = require_github_service(project.github_remote)
     tickets, _ = await _svc(project_id).list_tickets_with_unreadable(None)
     repo: str = project.github_remote or ""
 

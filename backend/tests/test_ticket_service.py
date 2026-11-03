@@ -9,7 +9,11 @@ import frontmatter  # type: ignore[import-untyped]
 import pytest
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services.ticket_service import TicketService, _normalize_depends_on
+from tessera.services.ticket_service import (
+    TicketService,
+    _normalize_depends_on,
+    validate_ticket,
+)
 
 
 def _svc(project_path: Path) -> TicketService:
@@ -46,6 +50,18 @@ def _write_ticket(
 async def test_list_tickets_empty(tmp_path: Path) -> None:
     result = await _svc(tmp_path).list_tickets()
     assert result == []
+
+
+async def test_list_tickets_ignores_gitkeep_only_folders(tmp_path: Path) -> None:
+    """A status folder holding only .gitkeep yields zero tickets and no error."""
+    for status_dir in ("todo", "in-progress", "in-review", "done", "blocked"):
+        folder = tmp_path / "tickets" / status_dir
+        folder.mkdir(parents=True)
+        (folder / ".gitkeep").touch()
+
+    svc = _svc(tmp_path)
+
+    assert await svc.list_tickets() == []
 
 
 async def test_list_tickets_returns_all(tmp_path: Path) -> None:
@@ -316,35 +332,82 @@ async def test_create_ticket_sets_created_date(tmp_path: Path) -> None:
 
 
 # ------------------------------------------------------------------
-# archive_old_tickets
+# archive_done_tickets
 # ------------------------------------------------------------------
 
 
-def _age_file(path: Path, seconds: int) -> None:
-    ts = time.time() - seconds
-    os.utime(path, (ts, ts))
+async def test_archive_files_old_done_ticket_by_hundred(tmp_path: Path) -> None:
+    old = tmp_path / "tickets/done/ticket-612-old.md"
+    _write_ticket(old, "ticket-612", status="done")
+    _write_ticket(tmp_path / "tickets/todo/ticket-720-top.md", "ticket-720")
+
+    archived = await _svc(tmp_path).archive_done_tickets()
+
+    assert archived == ["ticket-612"]
+    assert not old.exists()
+    assert (tmp_path / "tickets/archive/done/600-699/ticket-612-old.md").is_file()
 
 
-async def test_archive_old_tickets_moves_old(tmp_path: Path) -> None:
-    ticket_path = tmp_path / "tickets/done/ticket-001-old.md"
-    _write_ticket(ticket_path, "ticket-001", status="done")
-    _age_file(ticket_path, 31 * 86400)
+async def test_archive_keeps_recent_done_and_not_done_tickets(tmp_path: Path) -> None:
+    # Le plus grand numéro est 720 : le seuil est 620.
+    recent = tmp_path / "tickets/done/ticket-621-recent.md"
+    _write_ticket(recent, "ticket-621", status="done")
+    blocked = tmp_path / "tickets/blocked/ticket-100-stuck.md"
+    _write_ticket(blocked, "ticket-100", status="blocked")
+    _write_ticket(tmp_path / "tickets/todo/ticket-720-top.md", "ticket-720")
 
-    archived = await _svc(tmp_path).archive_old_tickets(days=30)
-
-    assert len(archived) == 1
-    assert not ticket_path.exists()
-    assert any((tmp_path / "tickets/archive").rglob("ticket-001-old.md"))
-
-
-async def test_archive_old_tickets_keeps_recent(tmp_path: Path) -> None:
-    ticket_path = tmp_path / "tickets/done/ticket-002-new.md"
-    _write_ticket(ticket_path, "ticket-002", status="done")
-
-    archived = await _svc(tmp_path).archive_old_tickets(days=30)
+    archived = await _svc(tmp_path).archive_done_tickets()
 
     assert archived == []
-    assert ticket_path.exists()
+    assert recent.exists()
+    assert blocked.exists()
+
+
+async def test_archive_threshold_counts_the_archive(tmp_path: Path) -> None:
+    _write_ticket(tmp_path / "tickets/archive/done/700-799/ticket-790-x.md", "ticket-790")
+    old = tmp_path / "tickets/done/ticket-650-old.md"
+    _write_ticket(old, "ticket-650", status="done")
+
+    assert await _svc(tmp_path).archive_done_tickets() == ["ticket-650"]
+
+
+async def test_archive_keeps_leading_zeros_and_small_numbers(tmp_path: Path) -> None:
+    _write_ticket(tmp_path / "tickets/done/ticket-005-x.md", "ticket-005", status="done")
+    _write_ticket(tmp_path / "tickets/todo/ticket-300-top.md", "ticket-300")
+
+    assert await _svc(tmp_path).archive_done_tickets() == ["ticket-005"]
+    assert (tmp_path / "tickets/archive/done/000-099/ticket-005-x.md").is_file()
+
+
+async def test_archive_without_done_folder_is_a_noop(tmp_path: Path) -> None:
+    assert await _svc(tmp_path).archive_done_tickets() == []
+
+
+async def test_get_ticket_finds_an_archived_ticket(tmp_path: Path) -> None:
+    path = tmp_path / "tickets/archive/done/600-699/ticket-612-old.md"
+    _write_ticket(path, "ticket-612", status="todo")  # le frontmatter dérive
+
+    ticket = await _svc(tmp_path).get_ticket("ticket-612")
+
+    assert ticket is not None
+    assert ticket.status == TicketStatus.done
+
+
+async def test_archived_ticket_stays_out_of_the_listing(tmp_path: Path) -> None:
+    _write_ticket(
+        tmp_path / "tickets/archive/done/600-699/ticket-612-old.md", "ticket-612"
+    )
+
+    assert await _svc(tmp_path).list_tickets() == []
+
+
+async def test_next_n_counts_the_archive(tmp_path: Path) -> None:
+    _write_ticket(
+        tmp_path / "tickets/archive/done/600-699/ticket-698-old.md", "ticket-698"
+    )
+    _write_ticket(tmp_path / "tickets/todo/ticket-003-a.md", "ticket-003")
+
+    assert _svc(tmp_path)._next_n() == 699
 
 
 # ------------------------------------------------------------------
@@ -645,3 +708,39 @@ async def test_le_dossier_fait_foi_sur_le_statut(tmp_path: Path) -> None:
 
     assert await svc.list_tickets(TicketStatus.todo) == []
     assert [t.id for t in await svc.list_tickets(TicketStatus.done)] == ["ticket-017"]
+
+
+# ------------------------------------------------------------------
+# validate_ticket — ticket-479
+# ------------------------------------------------------------------
+
+_VALID = (
+    "---\nid: ticket-010\ntitle: Demo\ntype: chore\nstatus: todo\n"
+    "priority: medium\nagent: codeur\n---\n\nCorps.\n"
+)
+
+
+def test_validate_ticket_accepts_a_loadable_file() -> None:
+    ticket = validate_ticket("ticket-010-demo.md", _VALID)
+    assert (ticket.id, ticket.type, ticket.status) == (
+        "ticket-010", TicketType.chore, TicketStatus.todo,
+    )
+
+
+@pytest.mark.parametrize(
+    ("name", "content", "fragment"),
+    [
+        ("ticket-010-demo.md", _VALID.replace("type: chore", "type: inconnu"), "frontmatter invalide"),
+        ("ticket-010-demo.md", _VALID.replace("agent: codeur\n", ""), "agent"),
+        ("ticket-010-demo.md", "pas de frontmatter", "manquant"),
+        ("ticket-011-demo.md", _VALID, "ne correspond pas"),
+        ("../ticket-010.md", _VALID, "Nom de fichier"),
+        ("ticket-010/../x.md", _VALID, "Nom de fichier"),
+        ("notes.md", _VALID, "Nom de fichier"),
+    ],
+)
+def test_validate_ticket_refuses_what_loading_would_refuse(
+    name: str, content: str, fragment: str
+) -> None:
+    with pytest.raises(ValueError, match=fragment):
+        validate_ticket(name, content)

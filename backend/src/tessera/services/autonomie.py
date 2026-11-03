@@ -16,10 +16,10 @@ racine git (ADR-028). Trois fois maintenant que le dépôt utilise cette forme,
 et pour la même raison : **le défaut protège, l'exception s'énonce**, et une
 valeur inconnue ne désarme rien.
 """
-import json
 from enum import Enum
 from pathlib import Path
 
+from tessera.services.manifeste import lire_valeur
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -38,18 +38,13 @@ class NiveauAutonomie(str, Enum):
 
 def lire_niveau(project_path: Path) -> NiveauAutonomie:
     """Le niveau déclaré dans `agents.json`, `commit` à défaut."""
-    agents_json = project_path / "agents.json"
-    if not agents_json.is_file():
+    valeur = lire_valeur(project_path, "autonomy")
+    if valeur is None:
         return NiveauAutonomie.commit
     try:
-        data = json.loads(agents_json.read_text(encoding="utf-8"))
-    except (json.JSONDecodeError, OSError):
-        _logger.warning("agents_json_illisible", extra={"path": str(agents_json)})
-        return NiveauAutonomie.commit
-    try:
-        return NiveauAutonomie(data.get("autonomy", "commit"))
+        return NiveauAutonomie(valeur)
     except ValueError:
-        _logger.warning("autonomie_inconnue", extra={"valeur": data.get("autonomy")})
+        _logger.warning("autonomie_inconnue", extra={"valeur": valeur})
         return NiveauAutonomie.commit
 
 

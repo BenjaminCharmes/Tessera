@@ -9,20 +9,39 @@ from pathlib import Path
 
 from tessera.services.pipeline_events import EventType
 
-_TS_TYPES = Path(__file__).resolve().parents[2] / "frontend" / "src" / "types" / "api.ts"
+_TS_TYPES = Path(__file__).resolve().parents[2] / "frontend" / "src" / "types" / "runs.ts"
+
+# Émis par le backend avant que l'UI ne les lise : une entrée ici dit « pas
+# encore côté frontend ». Vide depuis le ticket-564, qui a déclaré
+# `external_wait` et `conflict_resolution` dans l'union.
+_EN_ATTENTE_DU_FRONTEND: frozenset[str] = frozenset()
 
 
 def test_chaque_evenement_backend_existe_cote_frontend() -> None:
     source = _TS_TYPES.read_text(encoding="utf-8")
     union = re.search(r"export type EventType =(.*?);", source, re.S)
-    assert union is not None, "union EventType introuvable dans api.ts"
+    assert union is not None, "union EventType introuvable dans runs.ts"
 
     declared = set(re.findall(r'"([a-z_]+)"', union.group(1)))
-    emitted = {e.value for e in EventType}
+    emitted = {e.value for e in EventType} - _EN_ATTENTE_DU_FRONTEND
 
     assert emitted <= declared, (
         "Événements émis par le backend et absents du frontend : "
         f"{sorted(emitted - declared)}"
+    )
+
+
+def test_la_liste_d_attente_du_frontend_ne_garde_que_l_absent() -> None:
+    # Une entrée déjà déclarée côté UI n'attend plus rien : on la retire.
+    source = _TS_TYPES.read_text(encoding="utf-8")
+    union = re.search(r"export type EventType =(.*?);", source, re.S)
+    assert union is not None
+
+    declared = set(re.findall(r'"([a-z_]+)"', union.group(1)))
+
+    assert _EN_ATTENTE_DU_FRONTEND.isdisjoint(declared), (
+        "Déclarés côté frontend : retirer de _EN_ATTENTE_DU_FRONTEND "
+        f"{sorted(_EN_ATTENTE_DU_FRONTEND & declared)}"
     )
 
 

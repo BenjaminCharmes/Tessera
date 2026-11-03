@@ -107,6 +107,20 @@ def test_les_claude_md_tiennent_leur_budget(chemin: str, budget: int) -> None:
     assert taille <= budget, f"{chemin} : {taille} caractères pour {budget} permis"
 
 
+def test_claude_md_states_the_enforced_length() -> None:
+    """CLAUDE.md gives the file-length ceiling the ratchet actually enforces.
+
+    It said « < 200 lignes » while the test enforced 300 (audit des règles, K2) :
+    a rule that the test contradicts teaches the wrong number.
+    """
+    from tests.test_longueur_des_fichiers import PLAFOND_GENERAL
+
+    ligne = next(l for l in _lire("CLAUDE.md").splitlines() if "petits fichiers" in l)
+    nombres = [int(n) for n in re.findall(r"\d+", ligne.split("**")[-1])]
+
+    assert nombres and nombres[0] == PLAFOND_GENERAL, ligne
+
+
 def test_les_skills_annonces_existent() -> None:
     # `CLAUDE.md` liste les skills disponibles. Un nom qui ne correspond à
     # rien envoie Claude chercher un fichier absent.
@@ -198,8 +212,14 @@ def test_aucun_reglage_de_pipeline_n_est_mort() -> None:
     from tessera.models.agent import AgentPipelineConfig
     from tessera.services import orchestrator as orch_service
     from tessera.routers import orchestrator as orch_router
+    from tessera.services import assemblage_run, documenteur_run
 
-    sources = inspect.getsource(orch_service) + inspect.getsource(orch_router)
+    sources = (
+        inspect.getsource(orch_service)
+        + inspect.getsource(orch_router)
+        + inspect.getsource(assemblage_run)
+        + inspect.getsource(documenteur_run)
+    )
     morts = [
         champ
         for champ in AgentPipelineConfig.model_fields
@@ -373,7 +393,7 @@ def _clefs_mortes(manifeste: dict[str, object]) -> list[str]:
     # ne s'en servait. Le générateur et les déclarations de modèles sont donc
     # retirés des sources avant la recherche.
     exclus = [
-        _RACINE / "backend" / "src" / "tessera" / "services" / "project_loader.py",
+        _RACINE / "backend" / "src" / "tessera" / "services" / "gabarits_projet.py",
         _RACINE / "backend" / "src" / "tessera" / "models" / "agent.py",
     ]
     ailleurs = sources
@@ -600,3 +620,21 @@ def test_contraintes_md_tient_sous_12000_caracteres() -> None:
     assert taille <= 12_000, (
         f"contraintes.md : {taille} caractères pour 12 000 permis"
     )
+
+
+@pytest.mark.parametrize("role", ["doc-technique", "doc-fonctionnelle"])
+def test_prompts_de_documentation_decrivent_ce_que_le_brief_donne(role: str) -> None:
+    """The documentation prompts match the four blocks `_brief` sends (ticket-541).
+
+    Le prompt disait « Pas les diffs » et « n'invente rien qui ne soit pas dans
+    les tickets » au moment où le brief a commencé à livrer le diff : l'agent
+    recevait des diffs qu'on lui disait de ne pas lire.
+    """
+    texte = _lire(f"agents/prompts/{role}.md")
+
+    assert "Pas les diffs" not in texte
+    assert "N'invente rien qui ne soit pas dans les tickets" not in texte
+    for bloc in ("Les tickets", "Le diff de chaque ticket", "Les fichiers touchés", "Le contenu actuel"):
+        assert bloc in texte, f"{role} : le bloc « {bloc} » n'est pas décrit"
+    assert "ni dans le diff ni dans les fichiers touchés" in texte
+    assert '{"editions": []}' in texte

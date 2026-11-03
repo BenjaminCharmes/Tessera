@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Mettre en ligne — déroulé des étapes</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:#c4b5fd}a:hover{color:#ddd6fe}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; display: flex; background: #0f0f11; color: #e4e4e7; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 13px; overflow: hidden">
+
+  <nav aria-label="Navigation principale" style="width: 96px; flex-shrink: 0; background: #121214; border-right: 1px solid #27272a; display: flex; flex-direction: column; padding: 10px 8px; gap: 2px">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 0 12px; color: #a1a1aa; font-size: 10px"><span style="width: 22px; height: 22px; border-radius: 5px; background: #8b5cf6"></span>Tessera</div>
+    <div style="font-size: 9px; letter-spacing: 0.8px; text-transform: uppercase; color: #71717a; padding: 6px 4px 2px">Pilotage</div>
+    <a href="#" aria-current="page" style="text-decoration: none; color: #f4f4f5; background: rgba(139,92,246,0.18); box-shadow: inset 0 0 0 1px rgba(139,92,246,0.45); font-size: 11px; text-align: center; padding: 9px 0; border-radius: 6px">Projets</a>
+    <a href="#" style="text-decoration: none; color: #a1a1aa; font-size: 11px; text-align: center; padding: 9px 0; border-radius: 6px">En cours</a>
+    <a href="#" style="text-decoration: none; color: #a1a1aa; font-size: 11px; text-align: center; padding: 9px 0; border-radius: 6px">Supervision</a>
+    <div style="height: 1px; background: #27272a; margin: 8px 6px"></div>
+    <div style="font-size: 9px; letter-spacing: 0.8px; text-transform: uppercase; color: #71717a; padding: 0 4px 2px">Projet</div>
+    <a href="#" style="text-decoration: none; color: #a1a1aa; font-size: 11px; text-align: center; padding: 9px 0; border-radius: 6px">Tickets</a>
+    <a href="#" style="text-decoration: none; color: #a1a1aa; font-size: 11px; text-align: center; padding: 9px 0; border-radius: 6px">Fichiers</a>
+    <a href="#" style="text-decoration: none; color: #a1a1aa; font-size: 11px; text-align: center; padding: 9px 0; border-radius: 6px">Historique</a>
+    <div style="height: 1px; background: #27272a; margin: 8px 6px"></div>
+    <div style="font-size: 9px; letter-spacing: 0.8px; text-transform: uppercase; color: #71717a; padding: 0 4px 2px">Outils</div>
+    <a href="#" style="text-decoration: none; color: #a1a1aa; font-size: 11px; text-align: center; padding: 9px 0; border-radius: 6px">Agents</a>
+    <a href="#" style="text-decoration: none; color: #a1a1aa; font-size: 11px; text-align: center; padding: 9px 0; border-radius: 6px">Statistiques</a>
+    <a href="#" style="text-decoration: none; color: #a1a1aa; font-size: 11px; text-align: center; padding: 9px 0; border-radius: 6px">Chat</a>
+  </nav>
+
+  <main style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column">
+    <div style="height: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; border-bottom: 1px solid #27272a">
+      <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase"><span style="width: 3px; height: 14px; background: #8b5cf6; border-radius: 2px"></span>Mise en ligne</div>
+      <button style="height: 26px; padding: 0 8px; border: 0; background: transparent; color: #a1a1aa; font-size: 12px">← Retour aux projets</button>
+    </div>
+
+    <div style="flex-grow: 1; min-height: 0; overflow: auto; padding: 20px 24px; display: flex; flex-direction: column; gap: 16px">
+
+      <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 24px">
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <div style="display: flex; align-items: center; gap: 10px">
+            <h1 style="margin: 0; font-size: 20px; font-weight: 600; color: #f4f4f5">Guessimo</h1>
+            <span style="padding: 2px 8px; border-radius: 4px; background: rgba(248,113,113,0.12); color: #fca5a5; font-size: 11px">interrompue</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px; color: #a1a1aa; font-size: 12px">
+            <span style="font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; color: #e4e4e7">guessimo.com</span>
+            <span style="padding: 2px 8px; border-radius: 4px; background: rgba(251,191,36,0.12); color: #fcd34d; font-size: 11px">Stripe test</span>
+            <span>Lancée à 14:32 · terminée en 1 min 12 s</span>
+          </div>
+        </div>
+        <div style="display: flex; gap: 8px">
+          <button style="height: 30px; padding: 0 12px; border-radius: 5px; border: 1px solid #3f3f46; background: transparent; color: #e4e4e7; font-size: 13px">Ouvrir sur Vercel</button>
+          <button style="height: 30px; padding: 0 14px; border-radius: 5px; border: 0; background: #7c3aed; color: #ffffff; font-size: 13px; font-weight: 500">Relancer</button>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px">
+        <div style="background: #18181b; border: 1px solid #27272a; border-radius: 6px; padding: 10px 12px"><div style="font-size: 11px; color: #a1a1aa">En place</div><div style="font-size: 18px; font-weight: 600; color: #86efac">5 <span style="font-size: 12px; font-weight: 400; color: #a1a1aa">sur 10</span></div></div>
+        <div style="background: #18181b; border: 1px solid #27272a; border-radius: 6px; padding: 10px 12px"><div style="font-size: 11px; color: #a1a1aa">T'attendent</div><div style="font-size: 18px; font-weight: 600; color: #fcd34d">2</div></div>
+        <div style="background: #18181b; border: 1px solid #27272a; border-radius: 6px; padding: 10px 12px"><div style="font-size: 11px; color: #a1a1aa">En cours</div><div style="font-size: 18px; font-weight: 600; color: #93c5fd">1</div></div>
+        <div style="background: #18181b; border: 1px solid #27272a; border-radius: 6px; padding: 10px 12px"><div style="font-size: 11px; color: #a1a1aa">Échec</div><div style="font-size: 18px; font-weight: 600; color: #fca5a5">1</div></div>
+      </div>
+
+      <div role="alert" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 6px; border: 1px solid rgba(248,113,113,0.35); background: rgba(248,113,113,0.08); color: #fecaca; font-size: 12px">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/></svg>
+        <span>Le webhook Stripe a échoué : l'étape suivante n'a pas été lancée. Ce qui est fait reste fait — corrige, puis relance.</span>
+      </div>
+
+      <div style="border: 1px solid #27272a; border-radius: 6px; overflow: hidden">
+        <div style="display: grid; grid-template-columns: 40px 220px minmax(0, 1fr) 110px 170px; align-items: center; height: 32px; padding: 0 12px; background: #18181b; border-bottom: 1px solid #27272a; font-size: 11px; letter-spacing: 0.5px; text-transform: uppercase; color: #a1a1aa">
+          <span>#</span><span>Étape</span><span>Ce qui s'est passé</span><span>Service</span><span style="text-align: right">État</span>
+        </div>
+        <ol style="margin: 0; padding: 0; list-style: none">
+          <sc-for list="{{ etapes }}" as="e" hint-placeholder-count="10">
+            <li style="display: grid; grid-template-columns: 40px 220px minmax(0, 1fr) 110px 170px; align-items: center; min-height: 44px; padding: 0 12px; border-bottom: 1px solid #27272a">
+              <span style="color: #71717a; font-size: 12px">{{ e.num }}</span>
+              <span style="color: #f4f4f5">{{ e.nom }}</span>
+              <span style="color: {{ e.couleurDetail }}; font-size: 12px; padding: 6px 12px 6px 0; line-height: 1.4">{{ e.detail }}</span>
+              <span style="color: #a1a1aa; font-size: 12px">{{ e.service }}</span>
+              <span style="display: flex; justify-content: flex-end; align-items: center; gap: 8px">
+                <sc-if value="{{ e.aOuvrir }}" hint-placeholder-val="{{ false }}">
+                  <button style="height: 22px; padding: 0 6px; border: 0; background: transparent; color: #d4d4d8; font-size: 11px">Détail ›</button>
+                </sc-if>
+                <span style="padding: 2px 8px; border-radius: 4px; font-size: 11px; white-space: nowrap; background: {{ e.fond }}; color: {{ e.texte }}">{{ e.libelle }}</span>
+              </span>
+            </li>
+          </sc-for>
+        </ol>
+      </div>
+    </div>
+
+    <section aria-label="Journal" style="flex-shrink: 0; border-top: 1px solid #27272a; background: #0b0b0d">
+      <button style="width: 100%; height: 32px; display: flex; align-items: center; gap: 10px; padding: 0 16px; background: transparent; border: 0; color: #e4e4e7; text-align: left">
+        <span style="font-size: 11px; font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase">Journal</span>
+        <span style="width: 6px; height: 6px; border-radius: 3px; background: #f87171"></span>
+        <span style="color: #a1a1aa; font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-grow: 1">[14:33:24] guessimo · mise en ligne · stripe-webhook : failed (HTTP 403 · permission_error)</span>
+        <span style="color: #71717a; font-size: 12px">Déplier ▴</span>
+      </button>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const etats = {
+      todo:        { libelle: 'à faire',            fond: 'rgba(161,161,170,0.12)', texte: '#d4d4d8' },
+      done:        { libelle: 'fait',               fond: 'rgba(74,222,128,0.12)',  texte: '#86efac' },
+      skipped:     { libelle: 'déjà là',            fond: 'rgba(74,222,128,0.06)',  texte: '#bbf7d0' },
+      pending:     { libelle: 'en cours',           fond: 'rgba(96,165,250,0.14)',  texte: '#93c5fd' },
+      manual:      { libelle: 'à faire à la main',  fond: 'rgba(251,191,36,0.12)',  texte: '#fcd34d' },
+      needs_human: { libelle: 'ton action requise', fond: 'rgba(251,191,36,0.20)',  texte: '#fde68a' },
+      failed:      { libelle: 'échec',              fond: 'rgba(248,113,113,0.12)', texte: '#fca5a5' }
+    };
+    const liste = [
+      ['Projet Vercel', 'Vercel', 'skipped', 'Projet « guessimo » trouvé, relié au dépôt ; guessimo.com déjà ajouté.'],
+      ['Base Neon', 'Neon', 'done', 'Projet Neon « guessimo » créé ; DATABASE_URL écrite dans Vercel.'],
+      ['Variables', 'Vercel', 'done', 'NEXT_PUBLIC_APP_URL, SESSION_SECRET, CRON_SECRET posées. Aucune écrasée.'],
+      ['Domaine Resend', 'Resend', 'done', 'Domaine créé, 3 enregistrements collectés ; clé d’envoi écrite dans RESEND_API_KEY.'],
+      ['DNS', 'Cloudflare', 'manual', 'Zone guessimo.com absente du compte Cloudflare : 5 enregistrements à poser chez ton registrar.'],
+      ['Vérification Resend', 'Resend', 'pending', 'En attente des DNS. Ce n’est pas un échec : une relance la relit.'],
+      ['Clé Stripe du site', 'Vercel', 'needs_human', 'STRIPE_SECRET_KEY absente du projet Vercel : l’API Stripe ne crée pas de clé.'],
+      ['Stripe — produit et prix', 'Stripe', 'done', 'Produit « Guessimo Premium » et prix 4,99 € (guessimo_premium) créés en mode test.'],
+      ['Stripe — webhook', 'Stripe', 'failed', 'Stripe a refusé : HTTP 403 · permission_error. La clé restreinte n’a pas l’écriture sur les webhooks.'],
+      ['Redéploiement', 'Vercel', 'todo', 'Pas lancé : l’étape précédente a échoué.']
+    ];
+    return {
+      etapes: liste.map((l, i) => {
+        const s = etats[l[2]];
+        return {
+          num: i + 1, nom: l[0], service: l[1], detail: l[3],
+          libelle: s.libelle, fond: s.fond, texte: s.texte,
+          couleurDetail: l[2] === 'failed' ? '#fca5a5' : '#a1a1aa',
+          aOuvrir: l[2] === 'manual' || l[2] === 'needs_human' || l[2] === 'failed'
+        };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

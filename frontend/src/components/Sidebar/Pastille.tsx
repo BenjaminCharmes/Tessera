@@ -9,10 +9,13 @@ import type { AlerteDeSupervision } from "./panels";
  */
 export default function Pastille({
   nombre,
-  alerte,
+  alerte = null,
+  unite = "run",
 }: {
   nombre: number;
-  alerte: AlerteDeSupervision;
+  alerte?: AlerteDeSupervision;
+  /** Ce que la pastille compte : « run » pour la supervision, « app » pour En cours. */
+  unite?: string;
 }) {
   if (nombre === 0) return null;
   const couleur =
@@ -21,12 +24,13 @@ export default function Pastille({
       : alerte === "attente"
         ? "bg-amber-500/20 text-amber-200"
         : "bg-blue-500/20 text-blue-200";
+  const noms = `${nombre} ${unite}${nombre > 1 ? "s" : ""}`;
   const titre =
     alerte === "bloque"
-      ? `${nombre} run${nombre > 1 ? "s" : ""}, dont un bloqué`
+      ? `${noms}, dont un bloqué`
       : alerte === "attente"
-        ? `${nombre} run${nombre > 1 ? "s" : ""}, dont un attend une réponse`
-        : `${nombre} run${nombre > 1 ? "s" : ""} en cours`;
+        ? `${noms}, dont un attend une réponse`
+        : `${noms} en cours`;
   return (
     <span
       title={titre}

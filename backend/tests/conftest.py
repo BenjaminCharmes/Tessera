@@ -1,10 +1,19 @@
 """Shared pytest fixtures and environment probes."""
+import asyncio
 import os
+import shutil
 import tempfile
 from pathlib import Path
 
 import pytest
 from collections.abc import Iterator
+
+# Avant tout import de `tessera` : `settings` se construit à l'import et lirait
+# sinon le vrai `.env`. Une variable inconnue qui y traîne (cas du ticket-487)
+# ferait échouer la collecte de toute la suite. Le fichier pointé n'existe pas.
+os.environ.setdefault(
+    "IDE_ENV_FILE", str(Path(tempfile.gettempdir()) / "tessera-tests-absent.env")
+)
 
 
 def _symlinks_available() -> bool:
@@ -99,6 +108,19 @@ def _singletons_propres() -> Iterator[None]:
 
 
 @pytest.fixture(autouse=True)
+def _hote_du_client_de_test(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Admit the `Host` that Starlette's `TestClient` sends — ticket-704.
+
+    `TestClient(app)` s'adresse à `testserver`, pas au loopback : sans cette
+    entrée, le contrôle de `Host` refuserait chaque requête de la suite. Elle ne
+    vaut que pour les tests ; `test_auth_host_origin.py` fixe sa propre liste.
+    """
+    from tessera.config import settings
+
+    monkeypatch.setattr(settings, "allowed_hosts", "testserver")
+
+
+@pytest.fixture(autouse=True)
 def _aucun_terme_interdit_de_la_machine(monkeypatch: pytest.MonkeyPatch) -> None:
     """Les tests ne lisent jamais la vraie liste de `.env` (ADR-048).
 
@@ -110,6 +132,87 @@ def _aucun_terme_interdit_de_la_machine(monkeypatch: pytest.MonkeyPatch) -> None
 
     monkeypatch.setattr(settings, "forbidden_terms", "")
     monkeypatch.delenv("FORBIDDEN_TERMS", raising=False)
+
+
+@pytest.fixture(autouse=True)
+def _aucun_jeton_de_mise_en_ligne_de_la_machine(
+    monkeypatch: pytest.MonkeyPatch,
+) -> Iterator[None]:
+    """Neither the real tokens nor a registered secret leak between tests (ADR-053).
+
+    Les jetons de `.env` alimentent le registre des secrets et le contrôle de
+    push : sans cette fixture, un test passerait ou échouerait selon la machine.
+    """
+    from pydantic import SecretStr
+
+    from tessera.config import CHAMPS_JETONS, VARIABLES_JETONS, settings
+    from tessera.utils.secrets import SECRETS
+
+    for champ in CHAMPS_JETONS:
+        monkeypatch.setattr(settings, champ, SecretStr(""))
+    for variable in VARIABLES_JETONS:
+        monkeypatch.delenv(variable, raising=False)
+    avant = SECRETS.valeurs()
+    SECRETS.clear()
+    yield
+    SECRETS.clear()
+    SECRETS.register_all(avant)
+
+
+@pytest.fixture(scope="session")
+def _modele_de_base(tmp_path_factory: pytest.TempPathFactory) -> Path:
+    """Schéma de la base, créé une seule fois pour toute la suite."""
+    from tessera.services.database import init_db
+
+    modele = tmp_path_factory.mktemp("modele_base") / "tessera.db"
+    asyncio.run(init_db(modele))
+    return modele
+
+
+@pytest.fixture(autouse=True)
+def _base_de_test_isolee(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path_factory: pytest.TempPathFactory,
+    _modele_de_base: Path,
+) -> Path:
+    """Point `settings.ide_db_path` at a throwaway copy of the schema — ticket-422.
+
+    Sans cela, un test qui démarre un run (`POST /orchestrator/run`) l'écrivait
+    dans `backend/tessera.db`, la base réelle : le 2026-10-13 elle contenait un
+    run ouvert pour un projet inexistant, ce qui faussait la liste des runs à
+    attendre avant un redémarrage et les statistiques. Chaque test reçoit sa
+    propre copie, dans un dossier dédié (le fichier des signalements en attente
+    vit à côté de la base). Les tests qui fixent leur base la remplacent par
+    `monkeypatch`, après cette fixture.
+    """
+    from tessera.config import settings
+
+    dossier = tmp_path_factory.mktemp("base_test")
+    base = dossier / "tessera.db"
+    shutil.copyfile(_modele_de_base, base)
+    monkeypatch.setattr(settings, "ide_db_path", base)
+    return base
+
+
+@pytest.fixture(autouse=True)
+def _dossier_de_donnees_isole(
+    monkeypatch: pytest.MonkeyPatch, tmp_path_factory: pytest.TempPathFactory
+) -> Path:
+    """Point the state folder and the legacy queue path at throwaway locations — ticket-430.
+
+    Sans cela, un test écrirait la file des signalements dans le vrai dossier de
+    données, et le démarrage de l'app (`TestClient(app)`) migrerait, puis
+    supprimerait, un vrai `backend/signalements_en_attente.json`.
+    """
+    from tessera.config import settings
+    from tessera.services import signalements_en_attente
+
+    dossier = tmp_path_factory.mktemp("etat_test")
+    monkeypatch.setattr(settings, "ide_state_dir", dossier / "etat")
+    monkeypatch.setattr(
+        signalements_en_attente, "ANCIEN_CHEMIN", dossier / "ancien" / "signalements_en_attente.json"
+    )
+    return dossier / "etat"
 
 
 @pytest.fixture(autouse=True, scope="session")
@@ -143,4 +246,7 @@ def _pas_de_vrai_journal() -> Iterator[None]:
         # `test_runs_orphelins.py` et `test_reprise_run_orphelin.py`.
         mp.setattr(tessera.main, "solder_les_runs_orphelins", _aucun_run_solde)
         mp.setattr(tessera.main, "reprendre_depots_orphelins", _aucune_reprise)
+        # Même raison pour les worktrees : le dossier réel de l'utilisateur ne
+        # se commite ni ne se supprime depuis un `TestClient` (ticket-520).
+        mp.setattr(tessera.main, "reprendre_worktrees_orphelins", _aucune_reprise)
         yield

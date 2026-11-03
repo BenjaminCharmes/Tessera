@@ -10,13 +10,17 @@ En mémoire du process, comme le verrou dont il reprend le rôle : un backend
 local n'a pas de second process à protéger (ADR-038).
 """
 import uuid
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Callable
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Optional
 
 from tessera.services import eveil
+from tessera.services.file_vivante import FileVivante
+from tessera.utils.logger import get_logger
+
+_logger = get_logger(__name__)
 
 
 class RunAlreadyInProgress(Exception):
@@ -44,6 +48,10 @@ class RunActif:
     #: Titre lisible du ticket en cours — absent tant qu'il n'a pas pu être lu
     #: ou que le run n'a pas encore de ticket (autonome) (ticket-286).
     ticket_titre: str | None = None
+    #: Le ticket auquel `ticket_titre` se rapporte. Le titre est relu dès que
+    #: `ticket_id` en diffère, quel que soit l'évènement qui a fait changer de
+    #: ticket (ticket-445). Déduit de `ticket_id` quand le run naît avec son titre.
+    ticket_titre_de: str | None = None
     #: Identifiant en base (table `pipeline_runs`) — positionné dès que la
     #: ligne existe, pour que le frontend puisse relire les événements persistés
     #: au rechargement de page (ticket-325).
@@ -86,6 +94,10 @@ class RunActif:
     #: observateur de répondre à un agent qui pose une question (ADR-025),
     #: au lieu du seul onglet qui a lancé le run.
     dialogue: Any = None
+    #: La file vivante d'un run en mode `queue` : c'est elle que
+    #: `POST /runs/{run_id}/append` complète pendant que le run tourne
+    #: (ticket-478). Hors de `en_dict()`, comme le dialogue.
+    file: FileVivante | None = None
     #: Étapes actuellement en cours sur ce run — renseigné par `run_executor`
     #: quand le reviewer et le validateur tournent en parallèle (ticket-289).
     #: ``"revue"`` et ``"validation"`` peuvent coexister ; ``etape`` garde la
@@ -94,6 +106,22 @@ class RunActif:
     demarre_a: datetime = field(
         default_factory=lambda: datetime.now(timezone.utc)
     )
+
+    def __post_init__(self) -> None:
+        # Un run créé avec son titre le tient pour celui de son ticket courant.
+        if self.ticket_titre is not None and self.ticket_titre_de is None:
+            self.ticket_titre_de = self.ticket_id
+
+    def restants(self) -> list[str]:
+        """The tickets waiting behind the current one.
+
+        Une file vivante est la source : elle voit les ajouts et les retraits
+        faits depuis le dernier `queue_progress`. Sans file, ce que ce
+        dernier a annoncé (ticket-560).
+        """
+        if self.file is not None:
+            return self.file.restants()
+        return list(self.file_restants)
 
     def en_dict(self) -> dict[str, Any]:
         """Serialisable view — the dialogue channel is deliberately left out."""
@@ -117,7 +145,7 @@ class RunActif:
             "question_expire_a": self.question_expire_a,
             "file_index": self.file_index,
             "file_total": self.file_total,
-            "file_restants": list(self.file_restants),
+            "file_restants": self.restants(),
             "file_faits": list(self.file_faits),
             "etapes_en_cours": list(self.etapes_en_cours),
             "demarre_a": self.demarre_a.isoformat(),
@@ -129,6 +157,7 @@ class RunRegistry:
 
     def __init__(self) -> None:
         self._runs: dict[str, RunActif] = {}
+        self._rappels_de_fermeture: list[Callable[[str], None]] = []
 
     # -- lecture ---------------------------------------------------------
 
@@ -199,10 +228,24 @@ class RunRegistry:
             eveil.retenir()
         return run
 
+    def sur_fermeture(self, rappel: Callable[[str], None]) -> None:
+        """Register ``rappel(project_id)``, called each time a run is closed."""
+        self._rappels_de_fermeture.append(rappel)
+
     def fermer(self, run_id: str) -> None:
-        self._runs.pop(run_id, None)
+        run = self._runs.pop(run_id, None)
         if not self._runs:
             eveil.relacher()
+        if run is not None:
+            self._notifier_fermeture(run.project_id)
+
+    def _notifier_fermeture(self, project_id: str) -> None:
+        """Run the close callbacks; one failing never prevents the others."""
+        for rappel in self._rappels_de_fermeture:
+            try:
+                rappel(project_id)
+            except Exception:  # noqa: BLE001 — la fermeture d'un run ne doit jamais échouer
+                _logger.warning("rappel_de_fermeture_en_echec", exc_info=True)
 
     @asynccontextmanager
     async def acquire(

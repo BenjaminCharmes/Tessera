@@ -57,8 +57,8 @@ describe("TicketCard", () => {
         onRun={vi.fn()}
       />,
     );
-    expect(screen.getByText("todo")).toBeInTheDocument();
-    expect(screen.getByText("high")).toBeInTheDocument();
+    expect(screen.getByText("À faire")).toBeInTheDocument();
+    expect(screen.getByText("Haute")).toBeInTheDocument();
   });
 
   it("calls onSelect when card is clicked", () => {
@@ -475,7 +475,7 @@ describe("TicketCard — infobulle d'arrêt (ticket-218)", () => {
         onRun={vi.fn()}
       />,
     );
-    const badge = screen.getByText("blocked");
+    const badge = screen.getByText("Bloqué");
     expect(badge).toHaveAttribute("title", "Reached maximum number of turns (30)");
   });
 
@@ -489,7 +489,7 @@ describe("TicketCard — infobulle d'arrêt (ticket-218)", () => {
         onRun={vi.fn()}
       />,
     );
-    const badge = screen.getByText("blocked");
+    const badge = screen.getByText("Bloqué");
     expect(badge).not.toHaveAttribute("title");
   });
 
@@ -504,7 +504,7 @@ describe("TicketCard — infobulle d'arrêt (ticket-218)", () => {
         onRun={vi.fn()}
       />,
     );
-    const badge = screen.getByText("todo");
+    const badge = screen.getByText("À faire");
     expect(badge).not.toHaveAttribute("title");
   });
 });

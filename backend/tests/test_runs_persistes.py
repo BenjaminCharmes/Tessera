@@ -12,6 +12,7 @@ import aiosqlite
 import pytest
 from fastapi.testclient import TestClient
 
+from tests.revue_structuree import revue
 from tests.test_providers_base import FakeProvider
 from tessera.config import settings
 from tessera.main import app
@@ -81,9 +82,9 @@ def _orchestrateur(tmp_path: Path, db_path: Path, tickets: _Tickets) -> Orchestr
     for role in ("codeur", "reviewer"):
         (prompts / f"{role}.md").write_text(f"Tu es le {role}.", encoding="utf-8")
     # Le reviewer approuve du premier coup : le meme contenu sert au codeur.
-    runner = AgentRunner(
-        FakeProvider(content="APPROVED"), AgentRegistryService(prompts), db_path=db_path
-    )
+    provider = FakeProvider(content="APPROVED")
+    provider.set_structured(revue("APPROVED"))
+    runner = AgentRunner(provider, AgentRegistryService(prompts), db_path=db_path)
     return Orchestrator(
         runner=runner,
         ticket_service=tickets,  # type: ignore[arg-type]
@@ -212,7 +213,7 @@ def test_une_panne_inattendue_clot_le_run_en_base(
     async def _build(project_id: str) -> _OrchestrateurQuiCasse:
         return _OrchestrateurQuiCasse()
 
-    monkeypatch.setattr("tessera.routers.orchestrator._build_orchestrator", _build)
+    monkeypatch.setattr("tessera.routers.orchestrator.build_orchestrator", _build)
 
     with TestClient(app) as client:
         with client.websocket_connect("/api/v1/orchestrator/observe") as ws:
@@ -241,8 +242,8 @@ async def test_l_orchestrateur_construit_par_le_routeur_enregistre_ses_runs(
     workspace: Path,
 ) -> None:
     # C'est par la que passent `/chat/run`, la file et le run autonome.
-    from tessera.routers.orchestrator import _build_orchestrator
+    from tessera.services.assemblage_run import build_orchestrator
 
-    orchestrator = await _build_orchestrator("mon-projet")
+    orchestrator = await build_orchestrator("mon-projet")
 
     assert isinstance(orchestrator._run_recorder, RunRecorder)

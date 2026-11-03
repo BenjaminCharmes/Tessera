@@ -36,8 +36,9 @@ class _FakeGit:
 
 
 class _FakeStatut:
-    def __init__(self, ci_status: str) -> None:
+    def __init__(self, ci_status: str, mergeable_state: str | None = None) -> None:
         self.ci_status = ci_status
+        self.mergeable_state = mergeable_state
 
 
 class _FakeGitHub:
@@ -45,8 +46,10 @@ class _FakeGitHub:
         self,
         pr: tuple[int, str] = (7, "https://github.com/o/r/pull/7"),
         ci_status: str = "passing",
+        mergeable_state: str | None = None,
     ) -> None:
         self.pr = pr
+        self._mergeable_state = mergeable_state
         self.created: list[dict[str, object]] = []
         self.merged: list[int] = []
         self.merge_calls: list[dict[str, object]] = []
@@ -57,7 +60,7 @@ class _FakeGitHub:
         return self.pr
 
     async def get_pull_request_status(self, pr_number: int) -> _FakeStatut:
-        return _FakeStatut(self._ci_status)
+        return _FakeStatut(self._ci_status, self._mergeable_state)
 
     async def merge_pull_request(
         self,

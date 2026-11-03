@@ -10,6 +10,7 @@ Ce module ne répare rien : il constate, et dit quoi faire.
 import platform
 import shutil
 import socket
+import subprocess
 import sys
 import tempfile
 from dataclasses import dataclass
@@ -19,6 +20,8 @@ from tessera.config import settings
 
 _BACKEND_PORT = 8100
 _FRONTEND_PORT = 5173
+_GIT_TIMEOUT_S = 30
+_REPO_ROOT = Path(__file__).resolve().parents[3]
 
 
 @dataclass
@@ -183,6 +186,47 @@ def check_ports() -> Check:
     )
 
 
+def _git(repo: Path, *args: str) -> tuple[int, str]:
+    """Run a read-only git command; a missing binary or a timeout reads as a failure."""
+    try:
+        done = subprocess.run(
+            ["git", "-C", str(repo), *args],
+            capture_output=True,
+            text=True,
+            timeout=_GIT_TIMEOUT_S,
+        )
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        return 1, str(exc)
+    return done.returncode, done.stdout.strip()
+
+
+def check_checkout(repo: Path | None = None) -> Check:
+    """Le backend charge son code depuis le checkout : hors `develop`, ou en
+    retard sur `origin/develop`, il mélange les versions (ticket-667)."""
+    root = repo or _REPO_ROOT
+    name = "Checkout sur develop"
+    code, branch = _git(root, "rev-parse", "--abbrev-ref", "HEAD")
+    if code != 0:
+        return Check(name, False, f"{root} — pas un dépôt git lisible", "Lance depuis un clone de Tessera.")
+    if branch != "develop":
+        return Check(name, False, f"branche courante : {branch}", "Reviens sur develop : `git switch develop`.")
+    code, out = _git(root, "fetch", "origin", "develop")
+    if code != 0:
+        return Check(name, False, f"fetch origin develop impossible — {out}", "Vérifie le réseau et le remote `origin`.")
+    _, head = _git(root, "rev-parse", "HEAD")
+    _, remote = _git(root, "rev-parse", "origin/develop")
+    if head == remote:
+        return Check(name, True, "develop == origin/develop")
+    _, counts = _git(root, "rev-list", "--left-right", "--count", "HEAD...origin/develop")
+    ahead, _, behind = counts.partition("\t")
+    fix = (
+        "Mets à jour : `git pull --ff-only origin develop`."
+        if behind not in ("", "0")
+        else "HEAD porte des commits absents d'origin/develop : pousse-les, ou revérifie la branche."
+    )
+    return Check(name, False, f"HEAD diffère d'origin/develop ({ahead or '?'} en avance, {behind or '?'} en retard)", fix)
+
+
 def run_checks() -> list[Check]:
     return [
         check_python(),
@@ -193,6 +237,7 @@ def run_checks() -> list[Check]:
         check_symlinks(),
         check_rust(),
         check_ports(),
+        check_checkout(),
     ]
 
 

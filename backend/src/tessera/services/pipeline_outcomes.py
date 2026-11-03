@@ -1,6 +1,6 @@
 """How a pipeline run ends — ticket-046.
 
-Split from `pipeline_stages.py`: the stages describe what the agents do, these
+Split from the stage modules (`pipeline_*.py`): the stages describe what the agents do, these
 functions describe how a run terminates and what it leaves behind in git. They
 are the part where a mistake writes something wrong into the user's repository,
 so they are worth reading on their own.
@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING
 
 from tessera.models.ticket import TicketStatus
 from tessera.services.git_workspace import GitWorkspaceError
+from tessera.services.pipeline_approbation import noter_tete_approuvee
 from tessera.services.pipeline_events import EventType, PipelineResult
 from tessera.services.pipeline_run import PipelineRun, emit, set_status
 from tessera.services.pipeline_text import _single_line, _unapproved_commit_message
@@ -208,6 +209,8 @@ async def finish_approved(orch: "Orchestrator", run: PipelineRun) -> PipelineRes
         approved=True,
         branch=run.branch,
         commit_sha=commit_sha,
+        approved_sha=await noter_tete_approuvee(orch, run),
+        run_id=run.run_id,
     )
 
 
@@ -386,6 +389,46 @@ async def finish_session_limit(
         approved=False,
         rounds=run.round_num,
         reason="session_limit",
+        branch=run.branch,
+    )
+    return PipelineResult(
+        ticket_id=run.ticket_id,
+        final_status=TicketStatus.todo,
+        rounds=run.round_num,
+        approved=False,
+        branch=run.branch,
+        commit_sha=commit_sha,
+        arret=raison,
+    )
+
+
+async def finish_quota_exhausted(
+    orch: "Orchestrator", run: PipelineRun, cause: BaseException, resume: str
+) -> PipelineResult:
+    """End a run cut by an exhausted subscription quota (ticket-498).
+
+    Same exit as `finish_session_limit`: the ticket goes back to `todo` with
+    its work committed (ADR-018, ADR-037), and the queue stops on `arret`.
+    The log says "quota épuisé" instead of the bare `ProcessError` the CLI
+    produces, with the resume time when the last snapshot gave one.
+    """
+    raison = f"quota_exhausted (reprise : {resume})"
+    # Le log avant le commit, comme finish_session_limit : la ligne doit
+    # figurer dans le commit final.
+    orch._log(f"[{run.ticket_id}] quota épuisé — reprise vers {resume}")
+    await set_status(orch, run, TicketStatus.todo)
+    await emit(run, EventType.ERROR, reason="quota_exhausted", resume=resume)
+    commit_sha, echec_commit = await commit_ou_bloquer(
+        orch, run, _unapproved_commit_message(run.ticket_id, f"quota exhausted ({resume})")
+    )
+    if echec_commit is not None:
+        raison = f"{echec_commit} (après {raison})"
+    await emit(
+        run,
+        EventType.PIPELINE_DONE,
+        approved=False,
+        rounds=run.round_num,
+        reason="quota_exhausted",
         branch=run.branch,
     )
     return PipelineResult(

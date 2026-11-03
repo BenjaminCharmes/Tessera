@@ -12,6 +12,7 @@ import pytest
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.livraison import Livraison
 from tessera.services.orchestrator import Orchestrator
+from tessera.services.pipeline_fin_de_file import nettoyer_apres_file
 from tessera.services.pipeline_events import (
     EventType,
     OrchestratorEvent,
@@ -246,6 +247,58 @@ async def test_run_approuve_appelle_livrer_phase_1_puis_surveiller(
     assert surveilles == [("proj", "ticket-001", 7)]
 
 
+async def test_pr_orpheline_est_confiee_a_la_surveillance_malgre_son_arret(
+    tmp_path: Path,
+) -> None:
+    """Une phase 1 qui a levé après l'ouverture de la PR passe quand même en phase 2."""
+    surveilles: list[tuple[str, str, int]] = []
+
+    async def _livrer(result: PipelineResult) -> Livraison:
+        return Livraison(
+            pr_number=13,
+            arret="Livraison interrompue : TimeoutError",
+            pr_orpheline=True,
+        )
+
+    async def _surveiller(
+        project_id: str, ticket_id: str, pr_number: int, on_event: Any
+    ) -> None:
+        surveilles.append((project_id, ticket_id, pr_number))
+
+    orch = _construire_avec_surveiller(
+        tmp_path, [_resultat("ticket-001")], _livrer, surveiller=_surveiller
+    )
+
+    await orch.run_pipeline("proj", "ticket-001", _rien)
+
+    assert surveilles == [("proj", "ticket-001", 13)]
+
+
+async def test_conflit_resolu_reste_sans_surveillance(tmp_path: Path) -> None:
+    """ADR-033 : une PR avec arret mais sans `pr_orpheline` n'est jamais surveillée."""
+    surveilles: list[int] = []
+
+    async def _livrer(result: PipelineResult) -> Livraison:
+        return Livraison(
+            pr_number=13,
+            conflits=("src/app.py",),
+            arret="Conflit résolu sur src/app.py : la PR #13 est ouverte, à relire.",
+        )
+
+    async def _surveiller(
+        project_id: str, ticket_id: str, pr_number: int, on_event: Any
+    ) -> None:
+        surveilles.append(pr_number)
+
+    orch = _construire_avec_surveiller(
+        tmp_path, [_resultat("ticket-001")], _livrer, surveiller=_surveiller
+    )
+
+    await orch.run_pipeline("proj", "ticket-001", _rien)
+
+    assert surveilles == []
+
+
 async def test_surveiller_non_appele_sans_pr(tmp_path: Path) -> None:
     """Pas de surveillance quand la phase 1 n'a pas ouvert de PR."""
     surveilles: list[str] = []
@@ -336,7 +389,9 @@ async def test_ticket_dependant_attend_le_merge_avant_de_demarrer(
         def en_attente(self, project_id: str) -> tuple[str, ...]:
             return ("ticket-001",)
 
-        async def attendre_merge(self, project_id: str, ticket_id: str) -> bool:
+        async def attendre_merge(
+            self, project_id: str, ticket_id: str, **_: Any
+        ) -> bool:
             await gate.wait()
             return True  # merge succeeded
 
@@ -403,7 +458,9 @@ async def test_ticket_sans_dependance_demarre_sans_attendre(
     departs: list[str] = []
 
     class _FakeCIWatcher:
-        async def attendre_merge(self, project_id: str, ticket_id: str) -> None:
+        async def attendre_merge(
+            self, project_id: str, ticket_id: str, **_: Any
+        ) -> None:
             # Ne doit jamais être appelé pour un ticket sans dépendance.
             raise AssertionError(f"attendre_merge appelé pour {ticket_id}")
 
@@ -451,7 +508,9 @@ async def test_livraison_sans_pr_ne_bloque_pas_le_ticket_suivant(
     departs: list[str] = []
 
     class _FakeCIWatcher:
-        async def attendre_merge(self, project_id: str, ticket_id: str) -> None:
+        async def attendre_merge(
+            self, project_id: str, ticket_id: str, **_: Any
+        ) -> None:
             raise AssertionError("attendre_merge ne doit pas être appelé")
 
     def _make_ticket(tid: str) -> Ticket:
@@ -796,7 +855,9 @@ async def test_file_s_arrete_quand_dependance_non_mergee(
     from tessera.models.ticket import Ticket, TicketType, TicketPriority, TicketStatus
 
     class _FakeCIWatcherFail:
-        async def attendre_merge(self, project_id: str, ticket_id: str) -> bool:
+        async def attendre_merge(
+            self, project_id: str, ticket_id: str, **_: Any
+        ) -> bool:
             return False  # merge failed
 
     def _make_ticket(tid: str, depends_on: list[str]) -> Ticket:
@@ -850,7 +911,9 @@ async def test_ticket_independant_continue_quand_dependance_non_mergee(
     from tessera.models.ticket import Ticket, TicketType, TicketPriority, TicketStatus
 
     class _FakeCIWatcherFail:
-        async def attendre_merge(self, project_id: str, ticket_id: str) -> bool:
+        async def attendre_merge(
+            self, project_id: str, ticket_id: str, **_: Any
+        ) -> bool:
             return False  # merge failed — but caller should never reach this
 
     def _make_ticket(tid: str) -> Ticket:
@@ -880,6 +943,112 @@ async def test_ticket_independant_continue_quand_dependance_non_mergee(
     assert len(results) == 2
     assert results[0].ticket_id == "ticket-001"
     assert results[1].ticket_id == "ticket-003"
+
+
+# ------------------------------------------------------------------
+# ticket-569 — un ticket non mergé n'arrête que ceux qui en dépendent
+# ------------------------------------------------------------------
+
+
+async def _file_avec_dependances(
+    tmp_path: Path, deps: dict[str, list[str]], lances: list[str]
+) -> tuple[list[PipelineResult], str]:
+    """Run a queue of ``deps`` keys whose first ticket never merges.
+
+    ``lances`` are the ids expected to start, in order: the double hands out
+    one result per start, whatever ticket is actually run.
+
+    Returns the results and the content of the pipeline log.
+    """
+    from unittest.mock import AsyncMock
+    from tessera.models.ticket import Ticket, TicketType, TicketPriority, TicketStatus
+
+    class _FakeCIWatcherFail:
+        async def attendre_merge(
+            self, project_id: str, ticket_id: str, **_: Any
+        ) -> bool:
+            return False
+
+    par_id = {
+        tid: Ticket(
+            id=tid, title="titre", type=TicketType.feat,
+            status=TicketStatus.todo, priority=TicketPriority.medium,
+            agent="codeur", body="corps", depends_on=dependances,
+        )
+        for tid, dependances in deps.items()
+    }
+    tickets = AsyncMock()
+    tickets.get_ticket.side_effect = lambda tid: par_id.get(tid)
+
+    async def _livrer(result: PipelineResult) -> Livraison:
+        return Livraison(pr_number=7, arret=None)
+
+    orch = _construire_avec_surveiller(
+        tmp_path,
+        [_resultat(tid) for tid in lances],
+        _livrer,
+        ci_watcher=_FakeCIWatcherFail(),
+        ticket_service=tickets,
+    )
+    results = await orch.run_queue("proj", list(deps))
+    log_path = tmp_path / "memory" / "log.md"
+    return results, log_path.read_text(encoding="utf-8") if log_path.exists() else ""
+
+
+async def test_dependant_saute_et_la_file_continue_avec_un_independant(
+    tmp_path: Path,
+) -> None:
+    results, _ = await _file_avec_dependances(
+        tmp_path,
+        {"ticket-001": [], "ticket-002": ["ticket-001"], "ticket-003": []},
+        ["ticket-001", "ticket-003"],
+    )
+
+    assert [r.ticket_id for r in results] == ["ticket-001", "ticket-003"]
+
+
+async def test_dependant_transitif_saute_aussi(tmp_path: Path) -> None:
+    results, log = await _file_avec_dependances(
+        tmp_path,
+        {
+            "ticket-001": [],
+            "ticket-002": ["ticket-001"],
+            "ticket-003": ["ticket-002"],
+            "ticket-004": [],
+        },
+        ["ticket-001", "ticket-004"],
+    )
+
+    assert [r.ticket_id for r in results] == ["ticket-001", "ticket-004"]
+    assert "ticket-003 sauté : dépend de ticket-002, sauté" in log
+
+
+async def test_ticket_saute_ecrit_sa_dependance_au_journal(tmp_path: Path) -> None:
+    _, log = await _file_avec_dependances(
+        tmp_path,
+        {"ticket-001": [], "ticket-002": ["ticket-001"], "ticket-003": []},
+        ["ticket-001", "ticket-003"],
+    )
+
+    assert "ticket-002 sauté : dépend de ticket-001, non mergé" in log
+    assert "file interrompue" not in log
+
+
+async def test_file_s_arrete_quand_tous_les_restants_dependent_du_non_merge(
+    tmp_path: Path,
+) -> None:
+    results, log = await _file_avec_dependances(
+        tmp_path,
+        {
+            "ticket-001": [],
+            "ticket-002": ["ticket-001"],
+            "ticket-003": ["ticket-002"],
+        },
+        ["ticket-001"],
+    )
+
+    assert [r.ticket_id for r in results] == ["ticket-001"]
+    assert "file interrompue : ticket-001 non mergé" in log
 
 
 # ------------------------------------------------------------------
@@ -931,7 +1100,9 @@ async def test_merge_without_ci_attend_le_merge_avant_ticket_suivant(
     departs: list[str] = []
 
     class _FakeCIWatcher:
-        async def attendre_merge(self, project_id: str, ticket_id: str) -> bool:
+        async def attendre_merge(
+            self, project_id: str, ticket_id: str, **_: Any
+        ) -> bool:
             await gate.wait()
             return True
 
@@ -983,7 +1154,9 @@ async def test_sans_merge_without_ci_ticket_independant_demarre_sans_attendre(
     from unittest.mock import AsyncMock
 
     class _FakeCIWatcherNeverResolves:
-        async def attendre_merge(self, project_id: str, ticket_id: str) -> bool:
+        async def attendre_merge(
+            self, project_id: str, ticket_id: str, **_: Any
+        ) -> bool:
             raise AssertionError("attendre_merge ne doit pas être appelé")
 
     def _make_ticket(tid: str) -> Ticket:
@@ -1023,7 +1196,9 @@ async def test_merge_without_ci_sync_base_depuis_distant_appele(
     from unittest.mock import AsyncMock
 
     class _FakeCIWatcher:
-        async def attendre_merge(self, project_id: str, ticket_id: str) -> bool:
+        async def attendre_merge(
+            self, project_id: str, ticket_id: str, **_: Any
+        ) -> bool:
             return True  # merge immédiat
 
     def _make_ticket(tid: str) -> Ticket:
@@ -1240,7 +1415,9 @@ async def test_merge_without_ci_timeout_continue_et_log(
     from unittest.mock import AsyncMock
 
     class _FakeCIWatcherBlocking:
-        async def attendre_merge(self, project_id: str, ticket_id: str) -> bool:
+        async def attendre_merge(
+            self, project_id: str, ticket_id: str, **_: Any
+        ) -> bool:
             # Ne se résout jamais — simule un merge qui tarde.
             await asyncio.Event().wait()
             return True  # jamais atteint
@@ -1303,7 +1480,7 @@ async def test_aucun_commit_de_journal_sur_la_branche_de_base(tmp_path: Path) ->
     )
 
     await orch.run_pipeline("proj", "ticket-001", _rien)
-    await orch._nettoyer_apres_file()
+    await nettoyer_apres_file(orch)
 
     git_ws.commit_bookkeeping.assert_not_called()
     git_ws.retourner_sur_base.assert_called_with("main")
@@ -1321,7 +1498,9 @@ async def test_le_ticket_dependant_part_de_la_base_realignee_apres_le_merge(
     ordre: list[str] = []
 
     class _FakeCIWatcher:
-        async def attendre_merge(self, project_id: str, ticket_id: str) -> bool:
+        async def attendre_merge(
+            self, project_id: str, ticket_id: str, **_: Any
+        ) -> bool:
             ordre.append(f"merge:{ticket_id}")
             return True
 
@@ -1409,8 +1588,12 @@ def _espace_git_double(ordre: list[str], branche_courante: str = "develop") -> A
         ordre.append("create_branch")
         return f"{ticket_id}-slug"
 
+    async def _retour(base: str) -> None:
+        ordre.append(f"checkout:{base}")
+
     git_ws.sync_base_depuis_distant.side_effect = _sync
     git_ws.create_branch.side_effect = _creer
+    git_ws.retourner_sur_base.side_effect = _retour
     return git_ws
 
 
@@ -1431,13 +1614,13 @@ def _run_de_depart() -> Any:
 async def test_la_base_est_realignee_avant_la_creation_de_la_branche(
     tmp_path: Path,
 ) -> None:
-    from tessera.services import pipeline_stages as stages
+    from tessera.services import pipeline_branche
 
     ordre: list[str] = []
     git_ws = _espace_git_double(ordre)
     orch = _orchestrateur_de_depart(tmp_path, git_ws, "develop")
 
-    refused = await stages.create_branch(orch, _run_de_depart())
+    refused = await pipeline_branche.create_branch(orch, _run_de_depart())
 
     assert refused is None
     assert ordre == ["sync:develop", "create_branch"]
@@ -1446,7 +1629,7 @@ async def test_la_base_est_realignee_avant_la_creation_de_la_branche(
 async def test_un_realignement_refuse_n_empeche_pas_le_run_et_est_journalise(
     tmp_path: Path,
 ) -> None:
-    from tessera.services import pipeline_stages as stages
+    from tessera.services import pipeline_branche
 
     ordre: list[str] = []
     git_ws = _espace_git_double(ordre)
@@ -1455,7 +1638,7 @@ async def test_un_realignement_refuse_n_empeche_pas_le_run_et_est_journalise(
     orch = _orchestrateur_de_depart(tmp_path, git_ws, "develop")
     run = _run_de_depart()
 
-    refused = await stages.create_branch(orch, run)
+    refused = await pipeline_branche.create_branch(orch, run)
 
     assert refused is None
     assert run.branch == "ticket-001-slug"
@@ -1466,29 +1649,104 @@ async def test_un_realignement_refuse_n_empeche_pas_le_run_et_est_journalise(
 async def test_aucun_realignement_sans_espace_git_ni_branche_de_base(
     tmp_path: Path,
 ) -> None:
-    from tessera.services import pipeline_stages as stages
+    from tessera.services import pipeline_branche
 
     ordre: list[str] = []
     git_ws = _espace_git_double(ordre)
     sans_base = _orchestrateur_de_depart(tmp_path, git_ws, None)
 
-    assert await stages.create_branch(sans_base, _run_de_depart()) is None
+    assert await pipeline_branche.create_branch(sans_base, _run_de_depart()) is None
     git_ws.sync_base_depuis_distant.assert_not_called()
 
     sans_espace = _orchestrateur_de_depart(tmp_path, None, "develop")
-    assert await stages.create_branch(sans_espace, _run_de_depart()) is None
+    assert await pipeline_branche.create_branch(sans_espace, _run_de_depart()) is None
 
 
-async def test_aucun_realignement_quand_l_arbre_n_est_pas_sur_la_base(
+async def test_l_arbre_reste_sur_une_branche_de_ticket_revient_sur_la_base_avant_le_realignement(
     tmp_path: Path,
 ) -> None:
-    from tessera.services import pipeline_stages as stages
+    from tessera.services import pipeline_branche
 
     ordre: list[str] = []
     git_ws = _espace_git_double(ordre, branche_courante="ticket-000-ancien")
     orch = _orchestrateur_de_depart(tmp_path, git_ws, "develop")
 
-    assert await stages.create_branch(orch, _run_de_depart()) is None
+    assert await pipeline_branche.create_branch(orch, _run_de_depart()) is None
+
+    assert ordre == ["checkout:develop", "sync:develop", "create_branch"]
+
+
+async def test_un_retour_sur_la_base_refuse_est_journalise_et_le_run_demarre(
+    tmp_path: Path,
+) -> None:
+    from tessera.services import pipeline_branche
+    from tessera.services.git_workspace import GitCommandError
+
+    ordre: list[str] = []
+    git_ws = _espace_git_double(ordre, branche_courante="ticket-000-ancien")
+    git_ws.retourner_sur_base.side_effect = GitCommandError(
+        command=["git", "checkout", "develop"], returncode=1, stderr="refused"
+    )
+    orch = _orchestrateur_de_depart(tmp_path, git_ws, "develop")
+    run = _run_de_depart()
+
+    assert await pipeline_branche.create_branch(orch, run) is None
 
     git_ws.sync_base_depuis_distant.assert_not_called()
-    assert ordre == ["create_branch"]
+    assert run.branch == "ticket-001-slug"
+    journal = (tmp_path / "memory" / "log.md").read_text(encoding="utf-8")
+    assert "base non réalignée" in journal
+
+
+async def test_le_depart_sur_la_base_ne_commite_pas_la_tenue_de_livres(
+    tmp_path: Path,
+) -> None:
+    from tessera.services import pipeline_branche
+
+    git_ws = _espace_git_double([], branche_courante="develop")
+    orch = _orchestrateur_de_depart(tmp_path, git_ws, "develop")
+
+    assert await pipeline_branche.create_branch(orch, _run_de_depart()) is None
+
+    git_ws.commit_bookkeeping.assert_not_called()
+
+
+async def test_merge_without_ci_une_pr_non_mergee_fait_sauter_ses_dependants(
+    tmp_path: Path,
+) -> None:
+    """ticket-666: with merge_without_ci, an unmerged PR skips its dependents
+    (ADR-060) instead of letting them start without its code."""
+    from unittest.mock import AsyncMock
+
+    class _CIWatcherNonMerge:
+        async def attendre_merge(self, project_id: str, ticket_id: str, **_: Any) -> bool:
+            return False
+
+    deps = {"ticket-001": [], "ticket-002": ["ticket-001"], "ticket-003": []}
+    par_id = {
+        tid: Ticket(
+            id=tid, title="t", type=TicketType.feat,
+            status=TicketStatus.todo, priority=TicketPriority.medium,
+            agent="codeur", body="b", depends_on=d,
+        )
+        for tid, d in deps.items()
+    }
+    tickets = AsyncMock()
+    tickets.get_ticket.side_effect = lambda tid: par_id.get(tid)
+
+    async def _livrer(result: PipelineResult) -> Livraison:
+        return Livraison(pr_number=39, arret=None)
+
+    orch = _construire_merge_without_ci(
+        tmp_path,
+        [_resultat("ticket-001"), _resultat("ticket-003")],
+        _livrer,
+        ci_watcher=_CIWatcherNonMerge(),
+        ticket_service=tickets,
+    )
+    results = await orch.run_queue("proj", list(deps))
+
+    assert [r.ticket_id for r in results] == ["ticket-001", "ticket-003"]
+    log = (tmp_path / "memory" / "log.md").read_text(encoding="utf-8")
+    assert "ticket-002 sauté : dépend de ticket-001, non mergé" in log
+

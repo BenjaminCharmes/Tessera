@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Salle Tessera</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#18181b}
+a{color:#c4b5fd}a:hover{color:#ddd6fe}
+.blink{animation:bl 1.4s steps(2) infinite}
+@keyframes bl{50%{opacity:.3}}
+.spin{animation:sp 1.2s steps(4) infinite;transform-origin:50% 50%}
+@keyframes sp{to{transform:rotate(90deg)}}
+@media (prefers-reduced-motion:reduce){.blink,.spin{animation:none}}
+</style>
+</helmet>
+<div style="font-family: Inter, system-ui, sans-serif; color: #e4e4e7; background: #18181b; min-height: 760px; padding: 20px 24px; box-sizing: border-box">
+  <article aria-label="Salle Tessera" style="background: #202024; border: 1px solid #4c1d95; border-radius: 10px; overflow: hidden">
+
+    <!-- Plaque -->
+    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 12px 14px; border-bottom: 1px solid #2f2f35; background: rgba(24,24,27,.6)">
+      <span style="width: 10px; height: 10px; border-radius: 2px; background: #8b5cf6; display: block"></span>
+      <h2 style="margin: 0; font-size: 14px; font-weight: 600">Tessera — l'IDE qui se construit lui-même</h2>
+      <span style="font-size: 12px; color: #a1a1aa">3 services · 1,21 Go · démarré à 13:05</span>
+      <span style="font-size: 11px; color: #ddd6fe; background: #2e1065; border: 1px solid #6d28d9; border-radius: 999px; padding: 3px 9px">fait tourner l'IDE</span>
+      <span style="margin-left: auto; font-size: 11px; color: #a1a1aa">Pas de bouton d'arrêt : on n'éteint pas la salle d'où l'on regarde.</span>
+    </div>
+
+    <!-- Mur -->
+    <div style="position: relative; padding: 40px 24px 0; background: #2a2a31">
+      <div style="position: absolute; left: 0; right: 0; top: 0; height: 8px; background: repeating-linear-gradient(90deg,#3f3f46 0 10px,#33333a 10px 14px)"></div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px 24px">
+        <!-- Tableau des départs : la file -->
+        <div>
+          <div style="width: 40px; height: 8px; background: #52525b; margin: 0 auto"></div>
+          <div style="border: 4px solid #3f3f46; border-bottom-width: 10px; border-radius: 3px; background: #0a0a0c; font-family: 'JetBrains Mono', monospace; font-size: 11px; line-height: 1.6">
+            <div style="background: #18181b; color: #a1a1aa; padding: 2px 8px; display: flex; justify-content: space-between"><span>file ide-core</span><span style="color: #93c5fd">3 / 40</span></div>
+            <div style="padding: 4px 8px">
+              <div style="color: #93c5fd">▶ ticket-718 · testeur · 4 min</div>
+              <div style="color: #d4d4d8">  ticket-677 · un exécuteur git</div>
+              <div style="color: #d4d4d8">  ticket-708 · preuve multi-lignes</div>
+              <div style="color: #d4d4d8">  ticket-713 · merge qui expire</div>
+              <div style="color: #71717a">  + 35 autres</div>
+            </div>
+          </div>
+        </div>
+        <!-- CIWatcher -->
+        <div>
+          <div style="width: 40px; height: 8px; background: #52525b; margin: 0 auto"></div>
+          <div style="border: 4px solid #3f3f46; border-bottom-width: 10px; border-radius: 3px; background: #0a0a0c; font-family: 'JetBrains Mono', monospace; font-size: 11px; line-height: 1.6">
+            <div style="background: #18181b; color: #a1a1aa; padding: 2px 8px; display: flex; justify-content: space-between"><span>CIWatcher</span><span>2 PR</span></div>
+            <div style="padding: 4px 8px">
+              <div><span style="color: #fcd34d">●</span> Tessera #789 · CI en cours · 3 min</div>
+              <div><span style="color: #4ade80">●</span> curio #102 · mergée à 13:52</div>
+              <div style="color: #71717a">dernier merge : ticket-707, à la main</div>
+            </div>
+          </div>
+        </div>
+        <!-- Journal du backend -->
+        <div>
+          <div style="width: 40px; height: 8px; background: #52525b; margin: 0 auto"></div>
+          <div style="border: 4px solid #3f3f46; border-bottom-width: 10px; border-radius: 3px; background: #0a0a0c; font-family: 'JetBrains Mono', monospace; font-size: 11px; line-height: 1.6">
+            <div style="background: #18181b; color: #a1a1aa; padding: 2px 8px">tessera.log</div>
+            <div style="padding: 4px 8px">
+              <div style="color: #d4d4d8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">14:02:11 run_started ide-core ticket-718</div>
+              <div style="color: #fcd34d; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">14:03:40 provider_fallback validateur → haiku</div>
+              <div style="color: #d4d4d8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">14:05:02 git_agent_refuse « git push »</div>
+              <div style="color: #d4d4d8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">14:06:19 GET /health 200</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sol : mobilier et baies -->
+      <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; margin-top: 26px; border-bottom: 4px solid #3f3f46; flex-wrap: wrap">
+        <div style="display: flex; align-items: flex-end; gap: 16px">
+          <!-- baies -->
+          <div title="backend · :8100 · pid 2788 · 412 Mo" style="display: flex; flex-direction: column; align-items: center; gap: 3px">
+            <div style="width: 40px; height: 104px; background: #52525b; border: 3px solid #3f3f46; box-sizing: border-box; padding: 4px; display: flex; flex-direction: column; gap: 4px"><span style="width: 6px; height: 6px; background: #60a5fa; align-self: flex-end"></span><span style="height: 5px; background: #3f3f46"></span><span style="height: 5px; background: #3f3f46"></span><span style="height: 5px; background: #3f3f46"></span><span style="height: 5px; background: #3f3f46"></span></div>
+          </div>
+          <div title="frontend · :5173 · pid 3010 · 196 Mo" style="display: flex; flex-direction: column; align-items: center">
+            <div style="width: 40px; height: 104px; background: #52525b; border: 3px solid #3f3f46; box-sizing: border-box; padding: 4px; display: flex; flex-direction: column; gap: 4px"><span style="width: 6px; height: 6px; background: #60a5fa; align-self: flex-end"></span><span style="height: 5px; background: #3f3f46"></span><span style="height: 5px; background: #3f3f46"></span><span style="height: 5px; background: #3f3f46"></span></div>
+          </div>
+          <!-- baie GPU Ollama : ambre en refroidissement -->
+          <div title="Ollama · :11434 · en refroidissement après un délai dépassé · modèle chargé : qwen" style="display: flex; flex-direction: column; align-items: center">
+            <div style="width: 56px; height: 104px; background: #52525b; border: 3px solid #3f3f46; box-sizing: border-box; padding: 4px; display: flex; flex-direction: column; gap: 4px">
+              <span class="blink" style="width: 6px; height: 6px; background: #f59e0b; align-self: flex-end"></span>
+              <span style="height: 14px; background: repeating-linear-gradient(90deg,#3f3f46 0 3px,#27272a 3px 5px)"></span>
+              <span style="height: 14px; background: repeating-linear-gradient(90deg,#3f3f46 0 3px,#27272a 3px 5px)"></span>
+              <span style="font: 500 8px 'JetBrains Mono', monospace; color: #fcd34d; text-align: center">GPU</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Compteurs : quota et coût, base et worktrees -->
+        <div style="display: flex; gap: 14px; align-items: flex-end; padding-bottom: 6px">
+          <div style="background: #3f3f46; border: 3px solid #27272a; border-radius: 4px; padding: 6px 10px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #d4d4d8; min-width: 150px">
+            <div style="color: #a1a1aa; font-size: 10px">QUOTA DE LA SEMAINE</div>
+            <div style="height: 8px; background: #18181b; margin: 4px 0"><div style="height: 8px; width: 62%; background: #60a5fa"></div></div>
+            <div>62 % · aujourd'hui 4,80 $</div>
+          </div>
+          <div style="background: #3f3f46; border: 3px solid #27272a; border-radius: 4px; padding: 6px 10px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #d4d4d8">
+            <div style="color: #a1a1aa; font-size: 10px">BASE · WORKTREES</div>
+            <div>tessera.db 48 Mo</div>
+            <div>0 worktree ouvert</div>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: flex-end; gap: 12px">
+          <!-- VMC -->
+          <div style="width: 42px; height: 42px; background: #52525b; border: 3px solid #3f3f46; box-sizing: border-box; position: relative; align-self: flex-start; margin-bottom: 60px">
+            <div class="spin" style="position: absolute; inset: 6px; background: conic-gradient(#71717a 0 25%, transparent 0 50%, #71717a 0 75%, transparent 0)"></div>
+          </div>
+          <div style="width: 10px; height: 36px; background: #dc2626; border-radius: 3px 3px 0 0"></div>
+          <div style="width: 70px; height: 118px; background: #52525b; border: 3px solid #3f3f46; box-sizing: border-box"></div>
+        </div>
+      </div>
+    </div>
+    <div style="height: 34px; background-color: #26262c; background-image: linear-gradient(#1f1f24 2px, transparent 2px), linear-gradient(90deg, #1f1f24 2px, transparent 2px); background-size: 34px 34px"></div>
+  </article>
+
+  <p style="font-size: 12px; color: #a1a1aa; max-width: 900px; line-height: 1.6; margin: 16px 2px 0">
+    Toujours en tête des salles, encadrée de violet (c'est l'identité de Tessera, pas un état).
+    Chaque élément lit une donnée qui existe déjà : l'inventaire (baies 8100 et 5173), l'état
+    d'Ollama (refroidissement), la file vivante et le CIWatcher, la fin de <code>tessera.log</code>, le quota
+    et le coût du jour, la taille de la base et les worktrees ouverts.
+  </p>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":760}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

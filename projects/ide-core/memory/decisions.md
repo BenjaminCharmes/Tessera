@@ -86,13 +86,13 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 
 ---
 
-## ADR-009 — Verdict reviewer parsé par mot-clé structuré
+## ADR-009 — Verdict reviewer : parseur par mot-clé retiré (ADR-061)
 
 **Date** : 2026-06  
 **Portée** : architect, codeur, reviewer  
-**Décision** : L'orchestrateur parse la sortie du reviewer en cherchant `CHANGES_REQUESTED` (prioritaire) puis `APPROVED`. Absence des deux = rejet. Amendé 2026-10-01 (ticket-298) : la première ligne qui **commence** par un verdict l'emporte ; la priorité ne joue qu'en son absence.  
-**Raison** : Le reviewer est prompté pour répondre dans ce format. La priorité de `CHANGES_REQUESTED` évite les faux positifs si les deux mots apparaissent ("sinon APPROVED").  
-**Alternative rejetée** : Parser un JSON structuré — trop contraignant pour un LLM qui génère aussi du texte libre.
+**Décision** : L'orchestrateur ne lit plus le texte du reviewer (amendé 2026-10-28, ticket-614) : il lit `verdict`, `summary` et `blocking[{text, location, confidence}]` dans la sortie structurée d'ADR-061. Un `CHANGES_REQUESTED` dont **toutes** les remarques sont sous `reviewer_confidence_threshold` (80 par défaut, 0 = filtre éteint) est lu comme une approbation avec remarques (ticket-574). Une sortie absente ou hors schéma, ou un `APPROVED` avec une remarque au-dessus du seuil, refuse.  
+**Raison** : le parseur par mot-clé a coûté trois rustines (tickets 122, 298, 574) ; un champ typé le remplace.  
+**Alternative rejetée** : garder le mot-clé en repli — une réponse ambiguë approuverait.
 
 ---
 
@@ -475,3 +475,180 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 **Décision** : `memory/decisions.md` reste le journal complet. `memory/contraintes.md` en extrait les règles actives, regroupées par thème, une ou deux phrases à l'impératif. `memory/adr-audit.md` classe chaque ADR (règle, histoire, obsolète, fusion). Les agents liront `contraintes.md` à la place du journal une fois ticket-311 livré.
 **Raison** : le journal fait 43 Ko et 51 ADR ; un codeur en reçoit 39 après filtrage par portée. La moitié raconte *pourquoi* un choix a été fait, pas ce qu'un agent doit faire. Les règles de design (ADR-026, ADR-047) ont été régulièrement ignorées — une règle noyée dans un journal se lit mal.
 **Alternative rejetée** : raccourcir `decisions.md` — on perd l'histoire et la justification ; n'archiver que les ADR obsolètes — la dilution reste, la taille change peu.
+
+---
+
+## ADR-053 — Les jetons de mise en ligne ne quittent pas le backend
+
+**Date** : 2026-10-16
+**Décision** : seule une action de l'utilisateur crée les ressources en ligne d'un projet (Vercel, base, Resend, Stripe, Cloudflare), jamais un agent. Les jetons ne vivent que dans le `.env` de Tessera : aucun agent ne les reçoit ni ne lit ce fichier (amende ADR-031), aucun dépôt, ticket, journal ou réponse d'API ne les porte, les logs les masquent. Portée minimale : Stripe restreinte et en test, Vercel expirant, Cloudflare limité à la zone DNS. Relancer complète l'existant, sans doublon. Restent humains : comptes, achat du domaine, mode réel Stripe.
+**Raison** : un jeton Vercel ouvre tout le compte, et ADR-031 laisse lire hors du projet : un agent lirait le `.env`.
+**Alternative rejetée** : un agent qui déploie avec le jeton — le contrôle de `Bash` attrape une erreur, pas une évasion (ADR-031).
+
+---
+
+## ADR-054 — Proposer des tickets passe par un worktree temporaire, et le CIWatcher merge
+
+**Date** : 2026-10-18
+**Décision** : `POST /api/v1/projects/{id}/tickets/propose` valide le lot avant la configuration GitHub, puis écrit dans un worktree temporaire créé depuis `origin/<base>` : commit, push, PR vers la base, worktree supprimé même si le push échoue. L'arbre principal n'est jamais touché ; le `fetch` ne met à jour que `refs/remotes/origin/<base>`. Le merge n'a pas lieu dans la requête : en `autonomy: merge`, la PR est remise au `CIWatcher`, sinon elle reste ouverte.
+**Raison** : la route sert quand un run tient l'arbre. Une requête HTTP n'attend pas une CI (ADR-051).
+**Alternative rejetée** : merge synchrone dans la requête — bloque sur la CI (ADR-029).
+
+---
+
+## ADR-055 — Un run n'écrit une règle commune que sous « Proposées »
+
+**Date** : 2026-10-19
+**Décision** : `contraintes.md` porte en tête une section `## Proposées` que le chargeur n'injecte dans aucun appel d'agent. Un diff de run qui modifie ce fichier hors de cette section met le run en `blocked` à la fin du tour du codeur, raison au journal. Une règle nouvelle s'écrit sous `## Proposées`, avec son ADR ; un humain l'accepte en la déplaçant dans sa section. `decisions.md` n'est pas concerné : il n'est injecté nulle part.
+**Raison** : `contraintes.md` part dans chaque appel d'agent. Un run qui y ajoute une ligne et se merge seul sur CI verte change la consigne de tous les suivants sans relecture (ADR-053, PR #482).
+**Alternative rejetée** : une interface d'acceptation — un déplacement de texte suffit.
+
+## ADR-056 — Un run travaille dans son worktree
+
+**Date** : 2026-10-19
+**Décision** : un projet `tracked` qui déclare `worktree` dans `agents.json` exécute chaque run dans `<IDE_WORKTREES_DIR>/<projet>/<ticket>`, créé depuis `origin/<base>` avec `core.longpaths`. Ce dossier est la racine d'écriture (amende ADR-031) ; `git_root: ancestor` désigne le dépôt dont il est le worktree (amende ADR-028). `populate` copie ce qui s'édite, lie le reste s'il est ignoré par git, jamais le `.env` de Tessera. Un lien se retire avant toute suppression récursive. Le dossier disparaît au commit final, sauf travail non commité ; au démarrage, un orphelin se commite (ADR-037) puis disparaît. `RunLock` reste, base partagée (ADR-051) : "même arbre" (ADR-038) devient "même base".
+**Raison** : le 16/10 un run a sali le checkout d'une session et commité un ticket écrit à la main (#508) ; le 14/10 une jonction a vidé `node_modules`.
+**Alternative rejetée** : des gardes sur le checkout partagé — le partage nuit.
+**Détail** : `docs/superpowers/specs/2026-10-19-worktree-par-run-design.md`
+
+---
+
+## ADR-057 — La doc par lot se lit dans le code livré
+
+**Date** : 2026-10-23
+**Portée** : architect, codeur
+**Décision** : amende ADR-035. `doc-technique` et `doc-fonctionnelle` reçoivent, en plus des tickets, le diff livré de chaque ticket (borné) et le contenu des fichiers qu'il touche. Chaque édition cite un extrait de ce code, recopié ; les nombres, ADR et noms qu'elle introduit doivent y figurer, sinon elle est refusée. Le lot tient en 5 tickets, les plus anciens d'abord ; un ticket sans diff retrouvable n'est pas documenté, et le journal le dit. Une édition ne réécrit qu'un volume borné. Le modèle par défaut des deux rôles est Sonnet.
+**Raison** : le 22/10, Haiku a deviné noms, numéros et chiffres que seul le code porte ; deux lots ont été jetés.
+**Alternative rejetée** : un outil `Read` — ces rôles n'ont pas d'outils, et un modèle qui explore coûte sans rien prouver.
+**Détail** : `docs/superpowers/specs/2026-10-23-documentation-depuis-le-code-design.md`
+
+---
+
+## ADR-058 — Le Bureau remplace Supervision, et rien n'y est décoratif
+
+**Date** : 2026-10-23
+**Décision** : la vue Bureau devient la vue par défaut de Supervision ; elle garde toutes ses fonctions (cartes, fil, rangement, services) et la vue Liste reste dans le sélecteur. Chaque sprite, objet ou bulle rend un état réel que le store de run ou l'API fournit déjà ; sans donnée, rien n'est dessiné, sauf le mobilier d'une salle, fixe et sans voyant (ticket-583). Les sprites sont des SVG inline en pixels, sous `design/bureau/`, animés par `transform` et `opacity`, coupés par `prefers-reduced-motion`.
+**Raison** : la Liste reste nécessaire au clavier et au lecteur d'écran ; un décor qui ment sur l'état ruine la confiance dans la vue.
+**Alternative rejetée** : canvas — il ne se teste pas avec Testing Library et un lecteur d'écran ne le lit pas.
+**Détail** : `docs/superpowers/specs/2026-10-23-vue-bureau-design.md`
+
+---
+
+## ADR-059 — Un run « rapide » prend le repli d'emblée
+
+**Date** : 2026-10-27
+**Décision** : complète ADR-046. À côté de l'indisponibilité, un second déclencheur du repli : le choix explicite, au lancement (`rapide` dans `RunRequest`, faux par défaut). Un rôle qui déclare un `fallback` est alors construit directement avec lui, sans principal, et chaque appel porte le modèle du repli. Un rôle sans repli ne change pas. Le choix s'écrit une fois par run dans `memory/pipeline-log.md`. Une réponse illisible ne déclenche toujours aucun repli.
+**Raison** : sur ce PC, le validateur local prend environ 5 min 30 par ticket contre environ 1 min sur Haiku. Ollama reste le premier choix, Haiku quand on est pressé.
+**Alternative rejetée** : changer le défaut des `agents.json` — le réglage par défaut économise le quota.
+
+---
+
+## ADR-060 — Un ticket non mergé n'arrête que ceux qui en dépendent
+
+**Date** : 2026-10-27
+**Décision** : complète ADR-051. Quand un ticket de la file n'est pas mergé, les tickets restants qui en dépendent par `depends_on`, directement ou par transitivité, sont retirés de la file ; chacun s'écrit dans `memory/pipeline-log.md` avec sa dépendance (« ticket-546 sauté : dépend de ticket-544, non mergé »). La file continue avec les autres et ne s'arrête que s'il ne reste plus rien. Le ticket non mergé reste `blocked`, PR ouverte, comme dans ADR-051.
+**Raison** : le 23/10, la CI rouge du ticket-544 a arrêté onze tickets alors qu'un seul en dépendait.
+**Alternative rejetée** : arrêter toute la file par prudence — un ticket indépendant n'a pas besoin du code manquant.
+
+---
+
+## ADR-061 — Un verdict de rôle se rend en JSON validé par un schéma
+
+**Date** : 2026-10-27
+**Décision** : reviewer, sécurité et validateur rendent leur verdict dans une sortie structurée que le provider valide : `output_format` du SDK, `format` d'Ollama, outil forcé de l'API Anthropic. `ProviderResult.structured` la porte ; le repli reçoit le même schéma. Une sortie absente, hors schéma ou contradictoire refuse (`CHANGES_REQUESTED` / `BLOCK`), sans relecture du texte par mot-clé. Le reviewer rend `verdict`, `summary` et `blocking[{text, location, confidence}]` : le seuil du ticket-574 s'applique au champ, et `APPROVED` avec une remarque au-dessus du seuil refuse. ADR-009 est amendée à la livraison du reviewer.
+**Raison** : le texte libre a coûté trois tickets de rustines (122, 298, 574) ; un champ typé remplace une regex.
+**Alternative rejetée** : garder le mot-clé en repli d'un JSON invalide — une réponse ambiguë approuverait, ce que l'échec fermé interdit.
+
+---
+
+## ADR-062 — Le contrôle visuel d'un run se déclare, se joint au run et ne juge pas
+
+**Date** : 2026-10-27
+**Décision** : un projet déclare `pipeline.controle_visuel` (`joindre` ou `relire` ; absent, rien ne tourne) et, dans `captures`, ses fichiers d'interface et le démarrage de l'app. Si le diff approuvé touche l'interface, Tessera lance l'app depuis le worktree (ADR-056) sur un port libre, capture hors du dépôt (ADR-021), l'arrête et joint les images au run, pas à la PR. Aucun modèle ne les juge. `joindre` : un échec se journalise. `relire` : la PR ne se merge jamais seule (ADR-033), échec de capture compris (ADR-039).
+**Raison** : le 23/10 un chevauchement entre 1024 et 1150 px a passé reviewer et validateur, qui lisent un diff.
+**Mesure** : non faite ; borne haute 7 min par run, durée réelle journalisée (ticket-618).
+**Alternative rejetée** : un validateur à vision — le contrat de chaque provider à étendre.
+
+---
+
+## ADR-063 — Reporter la compression du contexte des agents
+
+**Date** : 2026-10-28
+**Portée** : architect
+**Décision** : headroom n'entre pas dans le pipeline. Si le sujet rouvre, le point d'entrée est la compression du texte du prompt, pour reviewer et sécurité seulement, avec un garde qui renvoie l'original quand une ligne `FAILED` ou un nom de test disparaît. Le proxy ne s'envisage qu'après un spike sur l'abonnement et le cache. Seuils chiffrés : spec `2026-10-27-compression-contexte-design`, section 4.
+**Raison** : le codeur pèse 66 % du coût et n'est atteignable que par le proxy, dont on ignore l'effet sur le cache de prompt et sur le jeton d'abonnement.
+**Mesure** : non faite ; estimation 5-10 % du coût, à confirmer (tickets 604, 605).
+**Alternative rejetée** : adopter le proxy d'emblée — un gain annoncé par le projet, sans mesure ici, ne justifie pas un composant sur le chemin du jeton.
+
+---
+
+## ADR-064 — Un agent de produit se dessine depuis un fichier d'activité
+
+**Date** : 2026-10-29
+**Décision** : complète ADR-058. « En cours » devient une salle par app lancée, qui montre d'abord l'état connu (`AppEnCours`, `ServiceActif`). Un agent n'y est dessiné que si `services[]` de `agents.json` déclare `activite`, chemin d'un JSON que le produit écrit et que Tessera lit. Fichier absent, périmé, hors schéma, hors du projet, ou service arrêté : personne n'est dessiné (ADR-039).
+**Raison** : zéro token, valable pour une app lancée à la main, aucune route à interroger.
+**Mesure** : non faite ; aucun produit n'émet encore.
+**Alternative rejetée** : route de santé enrichie (app arrêtée muette, contrat HTTP par produit) ; sortie du service (seules les apps lancées par Tessera, texte à parser).
+**Détail** : `docs/superpowers/specs/2026-10-29-salle-des-serveurs-design.md`
+
+---
+
+## ADR-065 — La livraison d'un ticket attend le merge des PR déjà confiées au watcher
+
+**Date** : 2026-10-29
+**Décision** : complète ADR-051. Avant son rebase, la phase 1 attend que les autres tickets du projet tenus par `CIWatcher` aient fini, mergés ou bloqués. Attente bornée (1 500 s) ; passé le délai, la livraison part comme avant. Aucun push forcé : la tête poussée reste celle que le reviewer a lue.
+**Raison** : une PR de file est devenue conflictuelle sur la documentation quand sa voisine a été mergée après coup. Rebaser après ce merge supprime la cause (ADR-022, ADR-039).
+**Mesure** : non faite ; coût : un ticket prêt attend la CI du précédent.
+**Alternative rejetée** : push forcé depuis le watcher (`pushed_sha` périmé) ; `merge=union` côté dépôt (GitHub l'ignore) ; partir de la branche du précédent (défait ADR-056).
+**Limite** : une PR rendue conflictuelle hors file reste arrêtée sur « à rebaser » (ticket-674).
+
+---
+
+## ADR-066 — Écarter les sous-tâches d'un run
+
+**Date** : 2026-10-30
+**Portée** : architect
+**Décision** : un run garde un diff, un commit et une revue par tour (ADR-018) : ni sous-tâches tirées du plan, ni écrites dans le ticket. Un ticket trop gros se découpe en tickets. Le ticket-702 journalise l'épuisement des actions. Rouvrir si, sur 30 runs, 10 % des appels du codeur l'épuisent, ou si son tour 1 dépasse 12 min au p90 (8 min aujourd'hui).
+**Raison** : le codeur pèse 19 % de la durée d'un ticket ; tests et audit se paient par diff. Des sous-tâches relues ajoutent 3 à 4 min et 47 à 66 % de coût.
+**Mesure** : 358 approbations ; 118 tours à tests rouges, 105 refus dont 46 du validateur, qu'une sous-tâche ne voit pas.
+**Alternative rejetée** : sous-tâches tirées du plan — son échec est toléré, le run changerait de forme sans le dire.
+**Détail** : `docs/superpowers/specs/2026-10-30-sous-taches-dans-un-run-design.md`
+
+---
+
+## ADR-067 — Le garde git et gh n'admet que des lectures nommées
+
+**Date** : 2026-10-30
+**Décision** : amende ADR-027. Le hook refuse toute sous-commande `git` ou `gh` absente d'une liste blanche de lectures (`status`, `diff`, `log`, `show`, `gh auth status`…). Les options globales (`-c`, `--repo`, `-R`) se lisent avant la sous-commande ; `-c` n'accepte que des clés cosmétiques ; `--output` est refusé. Une assignation ou un mot-clé de shell en tête de segment se saute ; `cmd` et `powershell` sont des shells.
+**Raison** : la liste noire laisse passer des formes naturelles — `<VAR>=<valeur> git push`, `gh --repo <o/r> pr merge`, `git bisect run`. Un faux refus se corrige d'une ligne ; un faux passage est un push (ADR-022).
+**Alternative rejetée** : allonger la liste noire — chaque trou comblé en révèle un autre ; analyser le shell en entier — hors de portée, ADR-027 le dit déjà.
+
+---
+
+## ADR-068 — Le service de documentation n'écrit dans `agents.json` que la clé `description`
+
+**Date** : 2026-10-30
+**Portée** : doc-technique
+**Décision** : précise ADR-027. Aucun agent n'écrit `agents.json`. doc-technique propose une `description` (220 caractères, une ligne, avec `preuve`) dans sa sortie ; le service la contrôle comme toute édition (ADR-057) et ne remplace que cette clé, par substitution de texte : le reste du fichier reste octet pour octet. Un refus est journalisé et ne bloque pas le lot. L'écriture vise la copie du run, jamais le checkout (ADR-056). `AGENTS.md` suit `CLAUDE.md` (`doc_claude_md`).
+**Raison** : les descriptions affichées dataient de la création des projets, et un humain relisait 17 projets à la main.
+**Alternative rejetée** : donner `agents.json` à l'agent (ADR-027) ; réécrire le fichier par `json.dumps` — il reformaterait tout.
+
+---
+
+## ADR-069 — Une PR conflictuelle se met à jour par un merge, sans push forcé
+
+**Date** : 2026-11-02
+**Décision** : complète ADR-065. Sur une PR `conflicting`, le watcher fusionne `origin/<base>` dans la tête poussée, puis pousse sans forcer. Il n'agit que si la tête de la PR est encore `pushed_sha`, et n'admet que des conflits de journaux résolus en union ; aucun agent n'écrit ici. Les tests rejouent avant le push, `pushed_sha` prend la nouvelle tête avant l'attente de la CI, puis le merge reste automatique.
+**Raison** : même règle qu'au rebase de phase 1 : une résolution par règle se merge sur CI verte, celle d'un agent se relit (ADR-033). L'approbation suit la lignée des têtes, jamais une tête étrangère (ADR-039).
+**Alternative rejetée** : `update-branch` de GitHub — il refuse un conflit, le cas visé ; rebase puis push forcé (ADR-022) ; ne rien faire — l'arrêt actuel (ticket-452).
+**Détail** : tickets 732 et 733.
+
+---
+
+## ADR-070 — Les sprites du Bureau se dessinent avec le moteur, en symboles partagés
+
+**Date** : 2026-11-03
+**Décision** : complète ADR-058. Un sprite est une grille de jetons `famille.ton` calculée par le moteur de l'atelier (`lib/bureau/sprites/`), colorée par les variables `--sprite-*` de `sprites-theme.css`, redéfinies la nuit. Chaque calque devient un `<symbol>` adressé par son contenu dans un `<defs>` commun ; une instance n'est qu'un `<use>`, qui lie peau, cheveux et haut. Sol et murs sont des `<pattern>`. Le cosmétique sans état (reflets, étoiles, marche) est permis ; un état reste soumis à ADR-058, en jetons `etat-*` fixes jour et nuit, jamais contourés (ADR-026).
+**Raison** : un `<path>` par jeton portait dix pièces à 3 974 nœuds SVG pour un plafond de 2 250 ; partagées, elles en font 1 815.
+**Alternative rejetée** : relever le plafond — la vue se relit toutes les 10 s ; un canvas — ADR-058.
+**Détail** : ticket-727.

@@ -14,9 +14,10 @@ import type { ServiceActif } from "../../types/api";
  * après un clic de plus : l'information était là et restait introuvable.
  *
  * `RienDeclare` est atteignable depuis ticket-156 : `PanneauxDuProjet` ouvre
- * ce panneau d'office quand rien n'est déclaré, comme il le fait déjà pour le
- * projet qui fait tourner l'IDE. Une absence de bouton s'explique là où le
- * bouton manquerait, pas ailleurs.
+ * ce panneau d'office quand rien n'est déclaré. Une absence de bouton
+ * s'explique là où le bouton manquerait, pas ailleurs. Le projet qui fait
+ * tourner l'IDE n'a pas de panneau : ce qu'il est se lit dans l'infobulle de
+ * son nom (ticket-441).
  *
  * Replié par défaut, et sans le moindre geste de lancement : ADR-042 pose que
  * ne rien déclarer **est** la réponse « ce projet ne se lance pas depuis
@@ -30,8 +31,6 @@ interface PanneauServicesProps {
   projectId: string;
   /** Pour proposer d'ouvrir `agents.json` là où il est réellement. */
   cheminDuProjet: string | null;
-  /** Ce projet exécute l'IDE : il n'y a rien à lancer (ticket-152). */
-  faitTournerLIde?: boolean;
 }
 
 const EXEMPLE = `"services": [
@@ -43,16 +42,11 @@ export default function PanneauServices({
   sortieDe,
   projectId,
   cheminDuProjet,
-  faitTournerLIde = false,
 }: PanneauServicesProps) {
   // Un ensemble, pas un seul nom : un projet qui lance un backend **et** un
   // frontend veut voir les deux sorties en même temps. L'accordéon fermait
   // l'une en ouvrant l'autre (ticket-148).
   const [ouverts, setOuverts] = useState<ReadonlySet<string>>(new Set());
-
-  if (faitTournerLIde) {
-    return <CestLIde projectId={projectId} />;
-  }
 
   if (!services.declare) {
     return <RienDeclare projectId={projectId} chemin={cheminDuProjet} />;
@@ -154,27 +148,6 @@ function LigneDeService({
         </pre>
       ) : null}
     </div>
-  );
-}
-
-/**
- * Le projet bootstrap, qui exécute l'IDE — ticket-152.
- *
- * Lui proposer « Lancer » démarrerait un second backend sur un port déjà
- * pris, et le cas utile n'existe pas : il faut que l'IDE tourne pour qu'on
- * voie cet écran. Il vaut mieux dire ce qu'il est.
- */
-function CestLIde({ projectId }: { projectId: string }) {
-  // Une ligne, pas quatre : dire qu'il n'y a rien à faire ne mérite pas le
-  // quart du panneau. Le détail reste au survol (ticket-154).
-  return (
-    <p
-      className="p-3 text-micro text-zinc-500"
-      aria-label="Services du projet"
-      title={`« ${projectId} » fait tourner l'IDE que tu utilises en ce moment. Il n'y a rien à lancer : ses serveurs sont déjà là, démarrés hors de l'IDE. Pour les arrêter ou lire leurs journaux, passe par le terminal qui les a lancés.`}
-    >
-      {`« ${projectId} » fait tourner l'IDE.`}
-    </p>
   );
 }
 

@@ -3,6 +3,7 @@ import {
   classeDeLEtat,
   etatDuService,
   libelleDeLEtat,
+  codeDeSortieLisible,
 } from "./etatDuService";
 import type { ServiceActif } from "../types/api";
 
@@ -95,5 +96,18 @@ describe("etatDuService — l'arrêt demandé (ticket-151)", () => {
     });
 
     expect(etatDuService(mortSeul)).toBe("echoue");
+  });
+});
+
+describe("codeDeSortieLisible", () => {
+  it("reads a Windows unsigned exit code as its signed value", () => {
+    expect(codeDeSortieLisible(4294967295)).toBe(-1);
+    expect(libelleDeLEtat(service({ en_cours: false, code_de_sortie: 4294967295 }))).toBe(
+      "arrêté — code -1",
+    );
+  });
+
+  it("keeps an ordinary exit code as is", () => {
+    expect(codeDeSortieLisible(1)).toBe(1);
   });
 });

@@ -23,6 +23,9 @@ function vue(id: string, extra: Partial<ProjectOverview> = {}): ProjectOverview 
     tickets: { todo: 0, in_progress: 0, in_review: 0, blocked: 0, done: 0 },
     run_actif: false,
     icon: false,
+    services_declares: false,
+    services_en_cours: false,
+    online_declared: false,
     ...extra,
   };
 }

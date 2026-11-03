@@ -12,12 +12,12 @@ Ce module ne fait rien de destructif : il n'initialise que si `.git` est
 absent, et ne remplace jamais un remote existant sans confirmation.
 """
 import asyncio
-import json
 import re
 from dataclasses import dataclass
 from pathlib import Path
 
 from tessera.services.artifacts import apply_artifact_mode, read_artifact_mode
+from tessera.services.manifeste import ecrire_clef
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -107,18 +107,26 @@ async def git_status(project_path: Path) -> GitStatus:
     return GitStatus(is_own_repository=True, has_commits=has_commits, remote_url=remote)
 
 
-async def init_repository(project_path: Path) -> GitStatus:
+async def init_repository(
+    project_path: Path, initial_branch: str | None = None
+) -> GitStatus:
     """Initialise un dépôt et y commite l'état courant. Sans effet s'il existe.
 
     Le premier commit compte : sans lui, tout le contenu existant du projet
     apparaîtrait au pipeline comme des modifications non suivies, et finirait
     balayé dans le commit du premier ticket.
+
+    `initial_branch` fixe la branche de naissance (`git init -b`) ; sans elle,
+    git applique `init.defaultBranch` de la machine.
     """
     status = await git_status(project_path)
     if status.is_own_repository:
         return status
 
-    code, _, err = await _run(project_path, "init", "-q")
+    init_args = ["init", "-q"]
+    if initial_branch:
+        init_args += ["-b", initial_branch]
+    code, _, err = await _run(project_path, *init_args)
     if code != 0:
         raise GitLinkError(f"Impossible d'initialiser un dépôt git : {err.strip()}")
 
@@ -190,16 +198,4 @@ async def link_remote(
 
 def _store_github_remote(project_path: Path, repo_url: str) -> None:
     """Consigne l'URL dans `agents.json`, où les endpoints PR et sync la lisent."""
-    agents_json = project_path / "agents.json"
-    data: dict[str, object] = {}
-    if agents_json.exists():
-        try:
-            data = json.loads(agents_json.read_text(encoding="utf-8"))
-        except json.JSONDecodeError:
-            _logger.warning("agents_json_illisible", extra={"path": str(agents_json)})
-            data = {}
-
-    agents_json.write_text(
-        json.dumps({**data, "github_remote": repo_url}, indent=2, ensure_ascii=False) + "\n",
-        encoding="utf-8",
-    )
+    ecrire_clef(project_path, "github_remote", repo_url)

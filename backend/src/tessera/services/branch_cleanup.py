@@ -22,11 +22,11 @@ Le quatrième est le plus important. Une branche dont tous les commits sont déj
 dans la base ne contient rien qui puisse être perdu — c'est la seule condition
 sous laquelle une suppression est sans conséquence.
 """
-import asyncio
 from pathlib import Path
 
 from pydantic import BaseModel, Field
 
+from tessera.services.git_runner import git
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -46,39 +46,30 @@ class PlanDeNettoyage(BaseModel):
     conservees: list[tuple[str, str]] = Field(default_factory=list)
 
 
-async def _git(project_path: Path, *args: str) -> tuple[int, str]:
-    proc = await asyncio.create_subprocess_exec(
-        "git", *args, cwd=str(project_path),
-        stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE,
-    )
-    out, _ = await proc.communicate()
-    return proc.returncode or 0, out.decode("utf-8", errors="replace")
-
-
 async def _branche_courante(project_path: Path) -> str:
-    code, sortie = await _git(project_path, "symbolic-ref", "--short", "HEAD")
-    return sortie.strip() if code == 0 else ""
+    resultat = await git(project_path, "symbolic-ref", "--short", "HEAD")
+    return resultat.out.strip() if resultat.ok else ""
 
 
 async def _base(project_path: Path, courante: str) -> str:
     """La branche de référence : `main` si elle existe, sinon la courante."""
-    code, _ = await _git(project_path, "rev-parse", "--verify", "--quiet", "main")
-    return "main" if code == 0 else courante
+    resultat = await git(project_path, "rev-parse", "--verify", "--quiet", "main")
+    return "main" if resultat.ok else courante
 
 
 async def plan_de_nettoyage(project_path: Path) -> PlanDeNettoyage:
     """Ce qu'on peut supprimer sans rien perdre, et ce qu'on garde, avec la raison."""
-    code, sortie = await _git(
+    liste = await git(
         project_path, "branch", "--format=%(refname:short)%09%(upstream)"
     )
-    if code != 0:
+    if not liste.ok:
         return PlanDeNettoyage()
 
     courante = await _branche_courante(project_path)
     base = await _base(project_path, courante)
     plan = PlanDeNettoyage()
 
-    for ligne in sortie.splitlines():
+    for ligne in liste.out.splitlines():
         if not ligne.strip():
             continue
         nom, _, upstream = ligne.partition("\t")
@@ -93,10 +84,10 @@ async def plan_de_nettoyage(project_path: Path) -> PlanDeNettoyage:
             plan.conservees.append((nom, "elle a été poussée sur un dépôt distant"))
             continue
 
-        fusionnee, _ = await _git(
+        fusionnee = await git(
             project_path, "merge-base", "--is-ancestor", nom, base
         )
-        if fusionnee != 0:
+        if not fusionnee.ok:
             plan.conservees.append((nom, "porte du travail absent de la base"))
             continue
 
@@ -119,8 +110,7 @@ async def supprimer_branches(project_path: Path, demandees: list[str]) -> list[s
         if nom not in autorisees:
             _logger.info("branche_hors_plan", extra={"branch": nom})
             continue
-        code, _ = await _git(project_path, "branch", "-D", nom)
-        if code == 0:
+        if (await git(project_path, "branch", "-D", nom)).ok:
             supprimees.append(nom)
 
     return supprimees

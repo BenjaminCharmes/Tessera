@@ -81,3 +81,90 @@ async def test_without_a_declared_base_nothing_is_restored(tmp_path: Path) -> No
 
     assert await service.restaurer_ticket_depuis_base("ticket-040") is False
     assert not (local / _TICKET).exists()
+
+
+# ----------------------------------------------------------------------
+# Base active en retard sur le distant — ticket-572
+# ----------------------------------------------------------------------
+
+_TICKET_A = "tickets/todo/ticket-a.md"
+_TICKET_B = "tickets/todo/ticket-b.md"
+
+
+async def _base_active_en_retard(tmp_path: Path) -> Path:
+    """Local `main` checked out, one commit behind a remote that added a and b."""
+    bare = tmp_path / "remote.git"
+    bare.mkdir()
+    await _git(bare, "init", "--bare", "-q")
+
+    local = tmp_path / "local"
+    await _clone(local, bare)
+    (local / "README.md").write_text("# projet\n", encoding="utf-8")
+    await _git(local, "add", ".")
+    await _git(local, "commit", "-q", "-m", "init")
+    await _git(local, "branch", "-M", "main")
+    await _git(local, "push", "-q", "--set-upstream", "origin", "main")
+
+    autre = tmp_path / "autre"
+    await _clone(autre, bare)
+    await _git(autre, "fetch", "-q", "origin")
+    await _git(autre, "checkout", "-q", "-b", "main", "origin/main")
+    (autre / _TICKET_A).parent.mkdir(parents=True)
+    (autre / _TICKET_A).write_text("---\nid: ticket-a\n---\n", encoding="utf-8")
+    (autre / _TICKET_B).write_text("---\nid: ticket-b\n---\n", encoding="utf-8")
+    await _git(autre, "add", ".")
+    await _git(autre, "commit", "-q", "-m", "chore: add tickets a and b")
+    await _git(autre, "push", "-q", "origin", "main")
+    return local
+
+
+def _service(local: Path) -> GitWorkspaceService:
+    return GitWorkspaceService(local, politique=PolitiqueRun(base_branch="main"))
+
+
+async def test_a_stale_active_base_keeps_the_index_in_step_with_the_ref(
+    tmp_path: Path,
+) -> None:
+    local = await _base_active_en_retard(tmp_path)
+    service = _service(local)
+
+    assert await service.restaurer_ticket_depuis_base("ticket-a") is True
+    await service.create_branch("ticket-a", "premier")
+
+    assert await _git(local, "diff", "--cached", "--name-status", "HEAD") == ""
+    assert (local / _TICKET_B).is_file()
+
+
+async def test_the_run_commit_does_not_delete_what_the_base_just_added(
+    tmp_path: Path,
+) -> None:
+    local = await _base_active_en_retard(tmp_path)
+    service = _service(local)
+
+    await service.restaurer_ticket_depuis_base("ticket-a")
+    await service.create_branch("ticket-a", "premier")
+    (local / "feature.py").write_text("x = 1\n", encoding="utf-8")
+    await service.commit_all("feat: first")
+
+    changes = await _git(local, "show", "--name-status", "--format=", "HEAD")
+    assert "feature.py" in changes
+    assert "D\t" not in changes
+    assert _TICKET_B in await _git(local, "ls-tree", "-r", "--name-only", "HEAD")
+
+
+async def test_a_refused_fast_forward_returns_a_reason_and_leaves_the_ref(
+    tmp_path: Path,
+) -> None:
+    local = await _base_active_en_retard(tmp_path)
+    # Un fichier non suivi que l'avance rapide écraserait : git la refuse.
+    (local / _TICKET_B).parent.mkdir(parents=True)
+    (local / _TICKET_B).write_text("brouillon local\n", encoding="utf-8")
+    avant = await _git(local, "rev-parse", "refs/heads/main")
+    service = _service(local)
+
+    raison = await service.initialiser_base_ref()
+
+    assert raison is not None
+    assert "avance rapide" in raison
+    assert await _git(local, "rev-parse", "refs/heads/main") == avant
+    assert service._base_ref is None

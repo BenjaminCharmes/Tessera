@@ -1,6 +1,12 @@
+import os
+import sys
 from pathlib import Path
+from typing import ClassVar
 
+from pydantic import SecretStr, ValidationError
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from tessera.config_errors import ConfigurationError, describe_validation_error
 
 # Racine du dépôt : backend/src/tessera/config.py -> remonter de 4 niveaux.
 _REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -11,9 +17,56 @@ _REPO_ROOT = Path(__file__).resolve().parents[3]
 # silencieusement ignoré — même classe de bug que ticket-050.
 _ENV_FILE = str(_REPO_ROOT / ".env")
 
+# Fichier réellement lu par `Settings`. `IDE_ENV_FILE` le remplace : la suite de
+# tests le pointe vers un fichier absent, pour qu'une variable égarée dans le
+# `.env` du développeur ne fasse pas échouer toute la collecte. `_ENV_FILE`
+# reste le vrai `.env`, celui que le hook de lecture protège (ADR-053).
+_SETTINGS_ENV_FILE = os.environ.get("IDE_ENV_FILE") or _ENV_FILE
+
+# Les jetons de mise en ligne (ADR-053) : noms des champs de `Settings`. La
+# variable d'environnement est le même nom en majuscules. `VERCEL_TEAM_ID`
+# n'en fait pas partie : un identifiant d'équipe n'est pas un secret.
+CHAMPS_JETONS: tuple[str, ...] = (
+    "vercel_token",
+    "neon_api_key",
+    "resend_api_key",
+    "stripe_api_key",
+    "cloudflare_api_token",
+)
+VARIABLES_JETONS: tuple[str, ...] = tuple(champ.upper() for champ in CHAMPS_JETONS)
+
+
+def default_state_dir() -> Path:
+    """Return the per-user data folder, always outside the repository."""
+    if sys.platform == "win32":
+        base = os.environ.get("LOCALAPPDATA")
+        return (Path(base) if base else Path.home() / "AppData" / "Local") / "Tessera"
+    return Path.home() / ".local" / "state" / "tessera"
+
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=_ENV_FILE, env_file_encoding="utf-8")
+    # `hide_input_in_errors` : pydantic recopie sinon la valeur fautive dans le
+    # message (`input_value='sk_test_…'`), donc un jeton dans les logs.
+    model_config = SettingsConfigDict(
+        env_file=_SETTINGS_ENV_FILE, env_file_encoding="utf-8", hide_input_in_errors=True
+    )
+
+    # Le `.env` de Tessera, que le hook de lecture refuse aux agents (ADR-053).
+    env_file: ClassVar[Path] = Path(_ENV_FILE)
+
+    # Jetons de mise en ligne (ADR-053). `SecretStr` : ni `repr` ni `model_dump`
+    # ne montrent la valeur. Vides : la mise en ligne reste inactive. Portée
+    # minimale et expiration : voir `.env.example`.
+    vercel_token: SecretStr = SecretStr("")
+    neon_api_key: SecretStr = SecretStr("")
+    resend_api_key: SecretStr = SecretStr("")
+    stripe_api_key: SecretStr = SecretStr("")
+    cloudflare_api_token: SecretStr = SecretStr("")
+    # Identifiant d'équipe Vercel : pas un secret.
+    vercel_team_id: str = ""
+    # Identifiant d'organisation Neon : pas un secret. Vide, le client le lit
+    # sur le compte quand celui-ci n'a qu'une organisation (ticket-499).
+    neon_org_id: str = ""
 
     # Optionnel : vide lorsque le provider est `agent_sdk` (auth par abonnement).
     anthropic_api_key: str = ""
@@ -36,6 +89,10 @@ class Settings(BaseSettings):
     # qu'on lui a collé, c'est un budget de codeur donné à un lecteur
     # (ticket-199).
     llm_max_turns_reviewer: int = 10
+    # L'audit lit le projet hors du diff (ticket-485) et un gros diff y passe
+    # plus de tours qu'une relecture : à dix, puis vingt, il épuisait sa limite
+    # sans rendre de verdict (ticket-495). Budget propre, annoncé à l'auditeur.
+    llm_max_turns_securite: int = 30
     # Le plan lit les services pour décider d'une approche : il n'a pas le
     # diff dans son prompt et doit découvrir la base de code. Dix tours
     # échouaient systématiquement sur les tickets de taille ordinaire
@@ -47,6 +104,12 @@ class Settings(BaseSettings):
     # dérapage, il empêche le travail. Le dépassement est désormais rattrapé
     # (ADR-037), donc l'atteindre coûte un run bloqué, plus un arbre sale.
     llm_max_budget_usd: float = 2.0
+    # Durée totale maximale d'un appel de rôle texte — validateur, audit,
+    # documentation —, attente de créneau comprise (ticket-518). Les bornes
+    # d'Ollama (lecture) et du SDK (silence) sont relatives : un flux qui
+    # continue d'émettre n'y a pas de fin. Dépassée, l'appel lève
+    # `ProviderIndisponible` et le repli joue. 0 désactive la borne.
+    llm_duree_max_role_texte_s: float = 900.0
 
     # Au-delà, un agent qui a posé une question reprend seul en énonçant son
     # hypothèse (ticket-066). Le délai existe parce qu'un run suspendu tient
@@ -54,6 +117,11 @@ class Settings(BaseSettings):
     # (ADR-018) : attendre indéfiniment une réponse coûte plus cher qu'une
     # hypothèse explicite et relisible.
     dialogue_timeout_s: float = 300.0
+    # Seuil de confiance (0-100) des remarques bloquantes du reviewer
+    # (ticket-574) : un refus dont toutes les remarques portent un score
+    # inférieur est lu comme une approbation avec remarques. Le score est requis
+    # par le schéma (ADR-061). 0 désactive le filtre.
+    reviewer_confidence_threshold: int = 80
     # Plafond de dépense d'une CONVERSATION du chat (ticket-048).
     # `llm_max_budget_usd` borne un appel ; sans ce second plafond, une
     # longue discussion épuiserait le quota de l'abonnement sans que
@@ -81,10 +149,22 @@ class Settings(BaseSettings):
     # entre eux avant qu'ils n'atteignent l'état publiable.
     github_base_branch: str = "develop"
     ide_db_path: Path = Path("tessera.db")
+    # Données d'exécution qui ne doivent jamais entrer dans un commit (file des
+    # signalements en attente, ticket-430). Hors du dépôt : un fichier posé dans
+    # l'arbre part dans le commit du run en cours, puis disparaît au changement
+    # de branche. Surchargeable via IDE_STATE_DIR.
+    ide_state_dir: Path = default_state_dir()
+    # Racine des worktrees de run (ADR-056, ticket-521) : un dossier par projet
+    # et par ticket. Hors de tout dépôt — rien à exclure, rien qu'un `git add`
+    # balaie — et court, à cause des chemins longs de Windows.
+    ide_worktrees_dir: Path = Path.home() / ".tessera" / "worktrees"
     # Fichier de log tournant (5 × 10 Mo). Ancré sur la racine du dépôt pour
     # ne pas dépendre du répertoire de lancement (ticket-330).
     ide_log_file: Path = _REPO_ROOT / "backend" / "logs" / "tessera.log"
     static_token: str = ""  # if set, all API requests require Authorization: Bearer <token>
+    # Noms de `Host` admis en plus du loopback, séparés par des virgules
+    # (ticket-704). Vide : 127.0.0.1, localhost et [::1] seuls.
+    allowed_hosts: str = ""
     # Borne le nombre de suites de tests lancées simultanément sur la machine.
     # 0 ou moins : pas de borne. Voir ticket-348.
     max_parallel_test_runs: int = 2
@@ -127,5 +207,27 @@ class Settings(BaseSettings):
     # Désactivable si un outil externe gère déjà la veille.
     keep_awake_during_runs: bool = True
 
+    def valeurs_des_jetons(self) -> list[str]:
+        """Return the non-empty values of the online-service tokens (ADR-053)."""
+        valeurs = (getattr(self, champ).get_secret_value() for champ in CHAMPS_JETONS)
+        return [valeur for valeur in valeurs if valeur]
 
-settings = Settings()
+
+def load_settings(env_file: Path | None = None) -> Settings:
+    """Build the settings, turning a validation error into a value-free one.
+
+    `env_file` replaces the default `.env`; it exists for tests.
+    """
+    try:
+        if env_file is None:
+            return Settings()
+        # `_env_file` est un argument d'init de pydantic-settings que le plugin
+        # mypy du projet ne connaît pas.
+        return Settings(_env_file=env_file)  # type: ignore[call-arg]
+    except ValidationError as error:
+        # `from None` : l'exception d'origine ne doit pas réapparaître dans la
+        # trace chaînée.
+        raise ConfigurationError(describe_validation_error(error)) from None
+
+
+settings = load_settings()

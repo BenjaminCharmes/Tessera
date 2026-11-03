@@ -186,3 +186,54 @@ def test_un_lien_pose_dans_le_workspace_ne_donne_pas_acces_a_l_exterieur(
 
     assert resp.status_code == 403
     assert "clef-privee" not in resp.text
+
+
+# ------------------------------------------------------------------
+# Fichiers qui s'exécutent seuls — ticket-707
+# ------------------------------------------------------------------
+
+
+def test_fs_write_to_git_hooks_is_refused(workspace: Path) -> None:
+    hook = workspace / "mon-projet" / ".git" / "hooks" / "pre-commit"
+
+    resp = _client().put("/api/v1/fs/write", json={"path": str(hook), "content": "#!/bin/sh\n"})
+
+    assert resp.status_code == 403
+    assert not hook.exists()
+
+
+def test_fs_write_to_claude_settings_is_refused(workspace: Path) -> None:
+    settings_file = workspace / "mon-projet" / ".claude" / "settings.local.json"
+
+    resp = _client().put("/api/v1/fs/write", json={"path": str(settings_file), "content": "{}"})
+
+    assert resp.status_code == 403
+    assert not settings_file.exists()
+
+
+def test_fs_write_to_other_claude_files_still_passes(workspace: Path) -> None:
+    skill = workspace / "mon-projet" / ".claude" / "skills" / "x" / "SKILL.md"
+
+    resp = _client().put("/api/v1/fs/write", json={"path": str(skill), "content": "# x\n"})
+
+    assert resp.status_code == 204
+
+
+def test_fs_write_to_agents_json_still_passes(workspace: Path) -> None:
+    agents = workspace / "mon-projet" / "agents.json"
+
+    resp = _client().put("/api/v1/fs/write", json={"path": str(agents), "content": "{}"})
+
+    assert resp.status_code == 204
+    assert agents.read_text(encoding="utf-8") == "{}"
+
+
+def test_read_of_a_protected_file_is_still_allowed(workspace: Path) -> None:
+    head = workspace / "mon-projet" / ".git" / "HEAD"
+    head.parent.mkdir()
+    head.write_text("ref: refs/heads/main\n", encoding="utf-8")
+
+    resp = _client().get("/api/v1/fs/read", params={"path": str(head)})
+
+    assert resp.status_code == 200
+    assert "refs/heads/main" in resp.text

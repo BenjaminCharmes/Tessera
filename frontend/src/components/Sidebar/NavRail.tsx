@@ -1,8 +1,13 @@
 import type { ReactElement } from "react";
 import type { AlerteDeSupervision, SidebarPanel } from "./panels";
 import Pastille from "./Pastille";
+import BoutonReglages from "./BoutonReglages";
+import Cloche from "./Cloche";
+import type { DonneesDeLaCloche } from "../../hooks/useNotificationsSysteme";
+import type { ReglageDesNotifications } from "./ReglageNotifications";
 import { BAND } from "../../design/layout";
 import {
+  IconActivity,
   IconChart,
   IconChat,
   IconFolder,
@@ -35,8 +40,14 @@ interface NavRailProps {
    * serait faux.
    */
   runsActifs?: number;
+  /** Combien d'apps de projet tournent sur la machine (ticket-417). */
+  appsEnCours?: number;
   /** Ce qui mérite d'être vu avant le reste, quand c'est le cas. */
   alerte?: AlerteDeSupervision;
+  /** Le réglage des notifications système, ouvert par « Réglages » (ticket-441). */
+  notifications?: ReglageDesNotifications;
+  /** L'historique du jour et les réglages par type, derrière la cloche (ticket-554). */
+  cloche?: DonneesDeLaCloche;
 }
 
 interface Destination {
@@ -45,75 +56,139 @@ interface Destination {
   icon: ReactElement;
 }
 
-const DESTINATIONS: Destination[] = [
-  { panel: "projects", label: "Projets", icon: <IconLayers size={20} /> },
-  { panel: "tickets", label: "Tickets", icon: <IconList size={20} /> },
-  { panel: "files", label: "Fichiers", icon: <IconFolder size={20} /> },
-  { panel: "history", label: "Historique", icon: <IconHistory size={20} /> },
-  { panel: "agents", label: "Agents", icon: <IconRobot size={20} /> },
+interface Groupe {
+  titre: string;
+  destinations: Destination[];
+}
+
+/**
+ * Trois groupes, par usage (ticket-426) : ce qui pilote tous les projets, ce
+ * qui concerne le projet actif, les outils.
+ */
+const GROUPES: Groupe[] = [
   {
-    panel: "supervision",
-    label: "Supervision",
-    icon: <IconRadar size={20} />,
+    titre: "Pilotage",
+    destinations: [
+      { panel: "projects", label: "Projets", icon: <IconLayers size={20} /> },
+      {
+        panel: "running",
+        label: "En cours",
+        icon: <IconActivity size={20} />,
+      },
+      {
+        panel: "supervision",
+        label: "Supervision",
+        icon: <IconRadar size={20} />,
+      },
+    ],
   },
-  { panel: "usage", label: "Statistiques", icon: <IconChart size={20} /> },
-  { panel: "chat", label: "Chat", icon: <IconChat size={20} /> },
+  {
+    titre: "Projet",
+    destinations: [
+      { panel: "tickets", label: "Tickets", icon: <IconList size={20} /> },
+      { panel: "files", label: "Fichiers", icon: <IconFolder size={20} /> },
+      {
+        panel: "history",
+        label: "Historique",
+        icon: <IconHistory size={20} />,
+      },
+    ],
+  },
+  {
+    titre: "Outils",
+    destinations: [
+      { panel: "agents", label: "Agents", icon: <IconRobot size={20} /> },
+      { panel: "usage", label: "Statistiques", icon: <IconChart size={20} /> },
+      { panel: "chat", label: "Chat", icon: <IconChat size={20} /> },
+    ],
+  },
 ];
 
 export default function NavRail({
   activePanel,
   onChangePanel,
   runsActifs = 0,
+  appsEnCours = 0,
   alerte = null,
+  notifications,
+  cloche,
 }: NavRailProps) {
   return (
-    <nav
-      role="tablist"
-      aria-orientation="vertical"
-      aria-label="Navigation principale"
-      className="flex h-full flex-col items-stretch gap-0.5 bg-zinc-900 px-1.5 pb-3 pt-2"
-    >
-      {/*
-        Zone d'identité — ticket-101.
-        ADR-026 : l'accent d'identité est une barre, jamais la couleur d'un
-        mot. Le violet porte la marque (SVG), le nom se rend en neutre (zinc).
-      */}
-      <div
-        className={`${BAND} mb-1 flex-col justify-center gap-0.5 border-b border-zinc-800`}
+    <div className="flex h-full flex-col bg-zinc-900">
+      <nav
+        role="tablist"
+        aria-orientation="vertical"
+        aria-label="Navigation principale"
+        className="flex min-h-0 flex-1 flex-col items-stretch px-1.5 pt-2"
       >
         {/*
-          La marque vient du favicon plutôt que d'un SVG recopié ici : deux
-          dessins d'une même marque finissent toujours par diverger, et c'est
-          celui qu'on ne regarde pas qui dérive.
+          Zone d'identité — ticket-101.
+          ADR-026 : l'accent d'identité est une barre, jamais la couleur d'un
+          mot. Le violet porte la marque (SVG), le nom se rend en neutre (zinc).
         */}
-        <img src="/favicon.svg" width={18} height={18} alt="" aria-hidden />
-        <span className="text-micro leading-none text-zinc-400">Tessera</span>
-      </div>
-      {DESTINATIONS.map(({ panel, label, icon }) => {
-        const actif = activePanel === panel;
-        return (
-          <button
-            key={panel}
-            type="button"
-            role="tab"
-            aria-selected={actif}
-            onClick={() => onChangePanel(panel)}
-            className={`relative flex flex-col items-center gap-1 rounded-md px-1 py-2 transition-colors ${
-              actif
-                ? "bg-violet-500/15 text-zinc-100 ring-1 ring-inset ring-violet-500/40"
-                : "text-zinc-500 hover:bg-zinc-800/60 hover:text-zinc-200"
-            }`}
+        <div
+          className={`${BAND} mb-1 flex-col justify-center gap-0.5 border-b border-zinc-800`}
+        >
+          {/*
+            La marque vient du favicon plutôt que d'un SVG recopié ici : deux
+            dessins d'une même marque finissent toujours par diverger, et c'est
+            celui qu'on ne regarde pas qui dérive.
+          */}
+          <img src="/favicon.svg" width={18} height={18} alt="" aria-hidden />
+          <span className="text-micro leading-none text-zinc-400">Tessera</span>
+        </div>
+        {GROUPES.map(({ titre, destinations }, index) => (
+          <div
+            key={titre}
+            className={
+              index === 0 ? "" : "mt-2 border-t border-zinc-800 pt-2"
+            }
           >
-            {panel === "supervision" ? (
-              <Pastille nombre={runsActifs} alerte={alerte} />
-            ) : null}
-            {icon}
-            <span className="w-full text-center text-micro leading-none">
-              {label}
-            </span>
-          </button>
-        );
-      })}
-    </nav>
+            <p className="px-1 pb-1 text-center text-micro uppercase leading-none tracking-wider text-zinc-500">
+              {titre}
+            </p>
+            <ul aria-label={titre} className="flex flex-col gap-0.5">
+              {destinations.map(({ panel, label, icon }) => {
+                const actif = activePanel === panel;
+                return (
+                  <li key={panel} className="flex flex-col">
+                    <button
+                      type="button"
+                      role="tab"
+                      aria-selected={actif}
+                      aria-current={actif ? "page" : undefined}
+                      onClick={() => onChangePanel(panel)}
+                      className={`relative flex flex-col items-center gap-1 rounded-lg px-1 py-2 transition-colors ${
+                        actif
+                          ? "bg-violet-500/15 text-zinc-50"
+                          : "text-zinc-400 hover:bg-zinc-800/70 hover:text-zinc-100"
+                      }`}
+                    >
+                      {/* La barre d'identité de l'élément actif, comme devant un titre de région. */}
+                      {actif ? (
+                        <span aria-hidden="true" className="absolute inset-y-2 left-0 w-0.5 rounded-full bg-violet-400" />
+                      ) : null}
+                      {panel === "supervision" ? (
+                        <Pastille nombre={runsActifs} alerte={alerte} />
+                      ) : null}
+                      {panel === "running" ? (
+                        <Pastille nombre={appsEnCours} unite="app" />
+                      ) : null}
+                      {icon}
+                      <span className="w-full text-center text-micro leading-none">
+                        {label}
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        ))}
+      </nav>
+      {/* Hors du `tablist` : ce ne sont pas des destinations, mais la cloche et un réglage. */}
+      {cloche ? <Cloche cloche={cloche} /> : null}
+      <BoutonReglages notifications={notifications} />
+    </div>
   );
 }

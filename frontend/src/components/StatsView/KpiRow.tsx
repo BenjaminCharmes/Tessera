@@ -1,11 +1,12 @@
-import { formatCount, formatDurationMs, formatUsd } from "../../design/charts/palette";
+import { formatCount } from "../../design/charts/palette";
+import { formatDurationMs, formatUsd } from "../../lib/format";
 import type { RunQuality, UsageTotals } from "../../types/api";
 
 function Tile({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
-    <div className="min-w-0 rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3">
+    <div className="min-w-0 rounded-xl border border-zinc-800/80 bg-zinc-900/70 px-4 py-3.5 shadow-sm shadow-black/30">
       <p className="truncate text-mini text-zinc-500">{label}</p>
-      <p className="mt-1 text-xl font-semibold tabular-nums text-zinc-100">{value}</p>
+      <p className="mt-1 text-2xl font-semibold tracking-tight tabular-nums text-zinc-50">{value}</p>
       {sub && <p className="mt-0.5 truncate text-micro text-zinc-500">{sub}</p>}
     </div>
   );
@@ -15,7 +16,7 @@ function Tile({ label, value, sub }: { label: string; value: string; sub?: strin
 export default function KpiRow({ totals, quality }: { totals: UsageTotals; quality: RunQuality }) {
   const rate = quality.approval_rate;
   return (
-    <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+    <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
       <Tile label="Runs" value={formatCount(totals.runs)} sub={`${totals.calls} appels d'agent`} />
       <Tile
         label="Tokens entrants"

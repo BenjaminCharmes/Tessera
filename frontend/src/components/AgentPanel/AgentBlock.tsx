@@ -3,6 +3,7 @@ import { IconCheck, IconChevronDown, IconChevronRight } from "../../design/icons
 import TokenStream from "./TokenStream";
 import VerdictBanner from "./VerdictBanner";
 import type { AgentRole } from "../../types/api";
+import type { VerdictReviewer } from "../FilDuRun/verdict";
 
 // Le nom du rôle suffit. La carte précédente n'associait une émoji qu'à trois
 // rôles sur treize : les dix autres s'affichaient sans, et l'en-tête du panneau
@@ -14,6 +15,8 @@ interface AgentBlockProps {
   isActive: boolean;
   isDone: boolean;
   reviewContent?: string;
+  /** Champ `verdict` de `agent_done` du reviewer (ticket-614), absent d'un run plus ancien. */
+  reviewVerdict?: VerdictReviewer;
   /** Contenu complet de agent_done pour le codeur, rejoué après reconnexion. */
   doneContent?: string;
 }
@@ -54,6 +57,7 @@ export default function AgentBlock({
   isActive,
   isDone,
   reviewContent,
+  reviewVerdict,
   doneContent,
 }: AgentBlockProps) {
   // Préférer doneContent quand le codeur a terminé et que les tokens live sont
@@ -92,7 +96,7 @@ export default function AgentBlock({
         )}
         {useDoneContent && <CompteRenduCodeur content={doneContent} />}
         {agent === "reviewer" && reviewContent && (
-          <VerdictBanner content={reviewContent} />
+          <VerdictBanner content={reviewContent} verdict={reviewVerdict} />
         )}
         {isActive && !tokens && !reviewContent && !useDoneContent && (
           <div className="text-zinc-600 text-xs italic">Génération…</div>

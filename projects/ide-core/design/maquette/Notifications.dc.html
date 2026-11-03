@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Tessera — Notifications</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:#c4b5fd}a:hover{color:#ddd6fe}
+.mono{font-family:ui-monospace,'Cascadia Code',Consolas,monospace}
+.ligne{background:none;border:0;margin:0;width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer;display:grid;grid-template-columns:96px minmax(0,1fr) 52px;gap:10px;align-items:start;padding:10px 16px;border-bottom:1px solid #27272a}
+.ligne:hover{background:#1f1f23}
+.ligne:focus-visible{outline:2px solid #8b5cf6;outline-offset:-2px}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; display: flex; background: #0f0f11; color: #e4e4e7; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 13px; overflow: hidden; position: relative">
+
+  <nav aria-label="Navigation principale" style="width: 96px; flex-shrink: 0; background: #121214; border-right: 1px solid #27272a; display: flex; flex-direction: column; align-items: stretch; padding: 10px 8px; gap: 2px">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 0 12px; color: #a1a1aa; font-size: 10px"><span style="width: 22px; height: 22px; border-radius: 5px; background: #8b5cf6"></span>Tessera</div>
+    <a href="#" aria-current="page" style="text-decoration: none; color: #e4e4e7; background: #27272a; font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 7px 0; border-radius: 6px">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/></svg>Supervision</a>
+    <span style="flex: 1"></span>
+    <button type="button" onClick="{{basculer}}" aria-expanded="{{ouvert}}" aria-label="Notifications, 4 non lues" style="position: relative; background: {{fondCloche}}; border: 0; border-radius: 6px; color: #e4e4e7; font: inherit; font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 7px 0; cursor: pointer">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+      <span style="position: absolute; top: 3px; right: 18px; min-width: 16px; height: 16px; border-radius: 8px; background: #8b5cf6; color: #ffffff; font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center">4</span>
+      Alertes</button>
+  </nav>
+
+  <main style="flex: 1; min-width: 0; display: flex; flex-direction: column; opacity: .45">
+    <div style="height: 40px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #27272a; background: #18181b">
+      <span style="width: 3px; height: 40px; background: #8b5cf6"></span>
+      <span style="font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase">Supervision</span>
+    </div>
+    <div style="flex: 1; padding: 20px; color: #a1a1aa">La vue Bureau reste derrière le panneau.</div>
+  </main>
+
+  <sc-if value="{{ouvert}}" hint-placeholder-val="{{ true }}">
+    <section role="dialog" aria-label="Notifications" style="position: absolute; left: 104px; bottom: 16px; width: 460px; height: 760px; background: #18181b; border: 1px solid #3f3f46; border-radius: 8px; box-shadow: 0 16px 40px rgba(0,0,0,.5); display: flex; flex-direction: column; overflow: hidden">
+      <div style="height: 40px; flex-shrink: 0; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #27272a; padding-right: 8px">
+        <span style="width: 3px; height: 40px; background: #8b5cf6"></span>
+        <span style="font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase">Notifications</span>
+        <span style="flex: 1"></span>
+        <div role="group" aria-label="Onglet" style="display: flex; background: #18181b; border: 1px solid #27272a; border-radius: 6px; padding: 2px; gap: 2px">
+          <button type="button" onClick="{{versHistorique}}" aria-pressed="{{surHistorique}}" style="{{styleOngletH}}">Aujourd'hui</button>
+          <button type="button" onClick="{{versReglages}}" aria-pressed="{{surReglages}}" style="{{styleOngletR}}">Réglages</button>
+        </div>
+      </div>
+
+      <sc-if value="{{surHistorique}}" hint-placeholder-val="{{ true }}">
+        <div style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-bottom: 1px solid #27272a; font-size: 11px; color: #a1a1aa">
+          <span>4 non lues sur 9</span>
+          <span style="flex: 1"></span>
+          <button type="button" style="height: 24px; padding: 0 8px; border: 0; background: transparent; color: #a1a1aa; font: inherit; font-size: 11px; cursor: pointer">Tout marquer comme lu</button>
+        </div>
+        <div style="flex: 1; overflow: auto">
+          <sc-for list="{{notifs}}" as="n" hint-placeholder-count="9">
+            <button type="button" class="ligne" aria-label="{{n.label}}">
+              <span style="{{n.stylePastille}}">{{n.type}}</span>
+              <span style="display: flex; flex-direction: column; gap: 3px; min-width: 0">
+                <span style="{{n.styleTitre}}">{{n.titre}}</span>
+                <span style="font-size: 12px; color: #a1a1aa; line-height: 1.4">{{n.corps}}</span>
+              </span>
+              <span style="font-size: 11px; color: #a1a1aa; text-align: right">{{n.heure}}</span>
+            </button>
+          </sc-for>
+        </div>
+        <div style="padding: 8px 16px; border-top: 1px solid #27272a; font-size: 11px; color: #a1a1aa">L'historique garde la journée. Un clic ouvre le projet, ou la question à laquelle répondre.</div>
+      </sc-if>
+
+      <sc-if value="{{surReglages}}" hint-placeholder-val="{{ false }}">
+        <div style="flex: 1; overflow: auto; padding: 8px 0">
+          <div style="display: grid; grid-template-columns: minmax(0, 1fr) 70px 70px; padding: 6px 16px; font-size: 11px; text-transform: uppercase; letter-spacing: .6px; color: #a1a1aa">
+            <span>Événement</span><span style="text-align: center">Système</span><span style="text-align: center">Son</span>
+          </div>
+          <sc-for list="{{reglages}}" as="r" hint-placeholder-count="7">
+            <div style="display: grid; grid-template-columns: minmax(0, 1fr) 70px 70px; align-items: center; padding: 8px 16px; border-bottom: 1px solid #27272a">
+              <span style="display: flex; flex-direction: column; gap: 2px"><span>{{r.nom}}</span><span style="font-size: 11px; color: #a1a1aa">{{r.aide}}</span></span>
+              <span style="display: flex; justify-content: center"><input type="checkbox" checked="{{r.systeme}}" aria-label="{{r.labelSysteme}}" style="width: 16px; height: 16px; accent-color: #8b5cf6"></span>
+              <span style="display: flex; justify-content: center"><input type="checkbox" checked="{{r.son}}" aria-label="{{r.labelSon}}" style="width: 16px; height: 16px; accent-color: #8b5cf6"></span>
+            </div>
+          </sc-for>
+          <div style="padding: 12px 16px; display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: #a1a1aa; line-height: 1.45">
+            <span>Notifications du système : <strong style="color: #86efac; font-weight: 600">autorisées</strong>.</span>
+            <span>Quand tu regardes déjà le projet concerné, seule l'alerte dans l'appli s'affiche.</span>
+          </div>
+        </div>
+      </sc-if>
+    </section>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { ouvert: true, onglet: 'historique' };
+  }
+  renderVals() {
+    const T = {
+      question: ['question', 'rgba(245,158,11,.12)', '#fcd34d'],
+      fige: ['figé ?', 'rgba(239,68,68,.12)', '#fca5a5'],
+      bloque: ['bloqué', 'rgba(239,68,68,.12)', '#fca5a5'],
+      merge: ['mergé', 'rgba(34,197,94,.12)', '#86efac'],
+      ci: ['CI rouge', 'rgba(239,68,68,.12)', '#fca5a5'],
+      fini: ['terminé', 'rgba(59,130,246,.12)', '#93c5fd'],
+      quota: ['quota', 'rgba(245,158,11,.12)', '#fcd34d']
+    };
+    const brut = [
+      ['question', 'Kadoomi · ticket-106', 'Le critère 3 vise-t-il aussi les listes d’un enfant archivé ?', '10:52', true],
+      ['fige', 'Devinoo · ticket-091', 'Le testeur est silencieux depuis 4 min.', '10:49', true],
+      ['quota', 'Quota de la semaine', '18 % restant, reprise lundi 9 h.', '10:41', true],
+      ['merge', 'Kadoomi · PR #155', 'Release en production : 104, 105, 109.', '10:37', true],
+      ['ci', 'Curio · PR #41', 'La CI a échoué : PR laissée ouverte, ticket bloqué.', '10:20', false],
+      ['fini', 'ide-core · ticket-540', 'Approuvé en 1 tour, PR mergée.', '10:05', false],
+      ['bloque', 'Affût · ticket-061', 'Bloqué après 3 tours : critère 2 non tenu.', '09:44', false],
+      ['merge', 'Vigie · PR #72', 'Mergée sur develop.', '09:41', false],
+      ['fini', 'ide-core · ticket-535', 'Conception livrée : ADR-057, 4 tickets.', '09:26', false]
+    ];
+    const notifs = brut.map((b) => {
+      const t = T[b[0]];
+      return {
+        type: t[0], titre: b[1], corps: b[2], heure: b[3],
+        label: (b[4] ? 'Non lu, ' : '') + t[0] + ', ' + b[1] + ', ' + b[2],
+        stylePastille: 'justify-self: start; padding: 2px 6px; border-radius: 4px; font-size: 11px; white-space: nowrap; background: ' + t[1] + '; color: ' + t[2],
+        styleTitre: 'font-weight: ' + (b[4] ? '600' : '400') + '; color: ' + (b[4] ? '#e4e4e7' : '#a1a1aa')
+      };
+    });
+    const R = [
+      ['Un agent pose une question', 'il attend ta réponse', true, true],
+      ['Un agent semble figé', 'aucun événement depuis 3 min', true, false],
+      ['Un run se bloque', 'non approuvé, ou erreur', true, false],
+      ['Un run ou une file se termine', 'avec son issue', true, false],
+      ['Une PR est mergée', 'après la CI, ou sans CI', true, false],
+      ['La CI échoue ou le merge est refusé', 'la PR reste ouverte', true, true],
+      ['Le quota passe sous 10 %', 'session ou semaine', true, false]
+    ];
+    const reglages = R.map((r) => ({ nom: r[0], aide: r[1], systeme: r[2], son: r[3], labelSysteme: 'Notification système : ' + r[0], labelSon: 'Son : ' + r[0] }));
+    const onglet = (actif) => 'height: 26px; padding: 0 10px; border: 0; border-radius: 4px; font: inherit; font-size: 12px; cursor: pointer; background: ' + (actif ? '#27272a' : 'transparent') + '; color: ' + (actif ? '#e4e4e7' : '#a1a1aa');
+    const surHistorique = this.state.onglet === 'historique';
+    return {
+      ouvert: this.state.ouvert,
+      fondCloche: this.state.ouvert ? '#27272a' : 'transparent',
+      basculer: () => this.setState({ ouvert: !this.state.ouvert }),
+      surHistorique: surHistorique, surReglages: !surHistorique,
+      versHistorique: () => this.setState({ onglet: 'historique' }),
+      versReglages: () => this.setState({ onglet: 'reglages' }),
+      styleOngletH: onglet(surHistorique), styleOngletR: onglet(!surHistorique),
+      notifs: notifs, reglages: reglages
+    };
+  }
+}
+</script>
+</body>
+</html>

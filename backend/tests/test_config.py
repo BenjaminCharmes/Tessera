@@ -2,7 +2,10 @@ from pathlib import Path
 
 import pytest
 
-from tessera.config import Settings
+from pydantic import ValidationError
+
+from tessera.config import Settings, load_settings
+from tessera.config_errors import ConfigurationError
 
 
 def test_settings_boot_sans_cle_api(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -86,6 +89,66 @@ def test_settings_accept_the_forbidden_terms_variable(
     env = tmp_path / ".env"
     env.write_text("FORBIDDEN_TERMS=alpha,beta\n", encoding="utf-8")
     assert Settings(_env_file=env).forbidden_terms == "alpha,beta"
+
+
+def _env_with(tmp_path: Path, content: str) -> Path:
+    env = tmp_path / ".env"
+    env.write_text(content, encoding="utf-8")
+    return env
+
+
+def test_unknown_variable_value_is_not_in_the_raised_error(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.delenv("STRIPE_SECRET_KEY", raising=False)
+    env = _env_with(tmp_path, "STRIPE_SECRET_KEY=sk_test_secret123\n")
+
+    with pytest.raises(ValidationError) as raw:
+        Settings(_env_file=env)
+    with pytest.raises(ConfigurationError) as rewritten:
+        load_settings(env)
+
+    assert "secret123" not in str(raw.value)
+    assert "secret123" not in str(rewritten.value)
+    assert "secret123" not in repr(rewritten.value)
+    assert rewritten.value.__cause__ is None
+
+
+def test_rewritten_message_names_the_unknown_variable(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.delenv("STRIPE_SECRET_KEY", raising=False)
+    env = _env_with(tmp_path, "STRIPE_SECRET_KEY=sk_test_secret123\n")
+
+    with pytest.raises(ConfigurationError, match="STRIPE_SECRET_KEY") as error:
+        load_settings(env)
+
+    assert "variable inconnue dans .env" in str(error.value)
+    assert "à retirer" in str(error.value)
+
+
+def test_invalid_value_of_a_known_variable_is_not_echoed(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.delenv("LLM_MAX_TURNS", raising=False)
+    env = _env_with(tmp_path, "LLM_MAX_TURNS=oops_secret456\n")
+
+    with pytest.raises(ValidationError) as raw:
+        Settings(_env_file=env)
+    with pytest.raises(ConfigurationError) as rewritten:
+        load_settings(env)
+
+    assert "secret456" not in str(raw.value)
+    assert "secret456" not in str(rewritten.value)
+    assert "LLM_MAX_TURNS" in str(rewritten.value)
+
+
+def test_load_settings_returns_settings_when_the_env_file_is_valid(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.delenv("FORBIDDEN_TERMS", raising=False)
+    env = _env_with(tmp_path, "FORBIDDEN_TERMS=alpha\n")
+    assert load_settings(env).forbidden_terms == "alpha"
 
 
 def test_settings_forbidden_terms_empty_by_default(monkeypatch: pytest.MonkeyPatch) -> None:

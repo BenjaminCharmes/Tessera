@@ -1,10 +1,12 @@
 """Vérification des prérequis — ticket-056."""
+import subprocess
 from pathlib import Path
 
 import pytest
 
 from tessera.config import settings
 from tessera.doctor import (
+    check_checkout,
     check_prompts_dir,
     check_provider_auth,
     check_workspace,
@@ -89,6 +91,7 @@ def test_le_rapport_couvre_tous_les_controles() -> None:
         "Liens symboliques",
         "Toolchain Rust (Tauri)",
         "Ports libres",
+        "Checkout sur develop",
     }
 
 
@@ -98,3 +101,71 @@ def test_rust_absent_n_est_jamais_bloquant() -> None:
     from tessera.doctor import check_rust
 
     assert check_rust().ok is True
+
+
+def _git(repo: Path, *args: str) -> str:
+    done = subprocess.run(
+        ["git", "-C", str(repo), "-c", "user.name=t", "-c", "user.email=t@example.com", *args],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    return done.stdout.strip()
+
+
+def _clone_on_develop(tmp_path: Path) -> Path:
+    """A clone on `develop` whose `origin` is a local bare repository."""
+    origin = tmp_path / "origin.git"
+    seed = tmp_path / "seed"
+    seed.mkdir()
+    _git(seed, "init", "-b", "develop")
+    _git(seed, "commit", "--allow-empty", "-m", "first")
+    subprocess.run(["git", "clone", "--bare", str(seed), str(origin)], check=True, capture_output=True)
+    clone = tmp_path / "clone"
+    subprocess.run(["git", "clone", str(origin), str(clone)], check=True, capture_output=True)
+    return clone
+
+
+def test_checkout_fails_on_a_branch_other_than_develop_and_names_it(tmp_path: Path) -> None:
+    clone = _clone_on_develop(tmp_path)
+    _git(clone, "switch", "-c", "ticket-999-autre")
+
+    check = check_checkout(clone)
+
+    assert check.ok is False
+    assert "ticket-999-autre" in check.detail
+    assert "git switch develop" in check.fix
+
+
+def test_checkout_fails_when_head_differs_from_origin_develop(tmp_path: Path) -> None:
+    clone = _clone_on_develop(tmp_path)
+    _git(clone, "commit", "--allow-empty", "-m", "local only")
+
+    check = check_checkout(clone)
+
+    assert check.ok is False
+    assert "1 en avance" in check.detail
+
+
+def test_checkout_fails_when_behind_origin_develop_and_gives_the_pull_command(
+    tmp_path: Path,
+) -> None:
+    clone = _clone_on_develop(tmp_path)
+    other = tmp_path / "other"
+    subprocess.run(["git", "clone", str(tmp_path / "origin.git"), str(other)], check=True, capture_output=True)
+    _git(other, "commit", "--allow-empty", "-m", "upstream")
+    _git(other, "push", "origin", "develop")
+
+    check = check_checkout(clone)
+
+    assert check.ok is False
+    assert "1 en retard" in check.detail
+    assert "pull --ff-only" in check.fix
+
+
+def test_checkout_passes_when_head_equals_origin_develop(tmp_path: Path) -> None:
+    assert check_checkout(_clone_on_develop(tmp_path)).ok is True
+
+
+def test_checkout_fails_outside_a_git_repository(tmp_path: Path) -> None:
+    assert check_checkout(tmp_path).ok is False

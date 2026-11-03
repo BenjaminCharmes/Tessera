@@ -1,8 +1,12 @@
 from enum import Enum
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
 from tessera.models.ticket import TicketStatus
+
+
+EffortLevel = Literal["low", "medium", "high", "xhigh", "max"]
 
 
 class AgentCreatedInfo(BaseModel):
@@ -32,6 +36,17 @@ class FallbackConfig(BaseModel):
     model: str
 
 
+class ServiceDeclare(BaseModel):
+    """Un service déclaré dans `services[]` d'un `agents.json` (ADR-042)."""
+
+    nom: str
+    commande: str
+    cwd: str | None = None
+    #: Le fichier d'activité que ce service écrit, relatif à la racine du
+    #: projet (ADR-064). Une déclaration humaine : Tessera ne l'écrit jamais.
+    activite: str | None = None
+
+
 class AgentConfig(BaseModel):
     """Un agent tel que décrit dans agents.json d'un projet."""
 
@@ -48,10 +63,23 @@ class AgentConfig(BaseModel):
     # backend, comme avant — un manifeste muet ne change pas de comportement.
     provider: str = "agent_sdk"
     fallback: FallbackConfig | None = None
+    #: Au-delà de cette taille de prompt (système + utilisateur, en caractères),
+    #: un rôle sur `ollama` part d'emblée sur son repli (ticket-714). Absent :
+    #: rien ne change. Ignorée sans repli et pour un autre provider qu'`ollama`.
+    fallback_above_chars: int | None = Field(default=None, gt=0)
+    #: Le point d'accès d'un rôle `openai_compatible` : l'URL de base, sans
+    #: `/chat/completions`. Obligatoire pour ce provider, ignorée des autres.
+    base_url: str | None = None
+    #: Le NOM de la variable d'environnement qui porte la clé de ce point
+    #: d'accès, jamais la clé elle-même : `agents.json` se versionne.
+    api_key_env: str | None = None
     #: Les skills que ce rôle peut charger (ticket-242). Vide : pas d'outil
     #: `Skill`. La liste borne aussi ce que le CLI découvrirait seul — les
     #: skills de la racine du dépôt et ceux qu'il intègre.
     skills: list[str] = Field(default_factory=list)
+    #: L'effort de raisonnement du modèle (ticket-573), parmi les cinq valeurs
+    #: du SDK. Absent : rien n'est passé au SDK, qui garde son défaut.
+    effort: EffortLevel | None = None
 
 
 class AgentPipelineConfig(BaseModel):
@@ -94,6 +122,16 @@ class AgentResult(BaseModel):
     # La conversation du provider, à reprendre au tour suivant (ticket-187).
     # None quand le provider n'en rend pas : le tour suivant repart à froid.
     session_id: str | None = None
+    # Les outils que le CLI a refusés pendant l'appel (ticket-515), pour que
+    # l'étape les écrive au journal.
+    outils_refuses: list[str] = Field(default_factory=list)
+    # La sortie validée par le schéma posé à l'appel (ADR-061) ; None sans
+    # schéma, ou quand le provider n'a rendu aucune sortie valide.
+    structured: dict[str, Any] | None = None
+    # Les actions consommées et l'épuisement de la limite (ticket-702), remontés
+    # du provider pour que l'étape du codeur les journalise.
+    num_turns: int | None = None
+    max_turns_reached: bool = False
 
 
 class AgentRunRequest(BaseModel):

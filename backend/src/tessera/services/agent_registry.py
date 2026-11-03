@@ -1,8 +1,9 @@
-import json
 import re
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
+
+from tessera.services.manifeste import lire_fichier
 
 _ROLE_PATTERN = re.compile(r"^[a-z][a-z0-9-]*$")
 
@@ -158,12 +159,9 @@ class AgentRegistryService:
             return frozenset()
         branches: set[str] = set()
         for agents_json in self._projects_dir.glob("*/agents.json"):
-            try:
-                data = json.loads(agents_json.read_text(encoding="utf-8"))
-            except (json.JSONDecodeError, OSError):
-                continue
-            for agent in data.get("agents", []):
-                if agent.get("role") not in self.ROLES_PIPELINE:
+            agents = lire_fichier(agents_json).get("agents")
+            for agent in agents if isinstance(agents, list) else []:
+                if not isinstance(agent, dict) or agent.get("role") not in self.ROLES_PIPELINE:
                     continue
                 if fichier := agent.get("prompt_file"):
                     branches.add(Path(str(fichier)).stem)

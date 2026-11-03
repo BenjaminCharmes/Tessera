@@ -1,15 +1,7 @@
 import BandeAutonome from "./BandeAutonome";
 import QueueBar from "./QueueBar";
-import { BAND } from "../../design/layout";
-import RegionTitle from "../../design/RegionTitle";
-import {
-  IconBoard,
-  IconPlay,
-  IconBolt,
-  IconChevronDown,
-  IconChevronRight,
-  IconPlus,
-} from "../../design/icons";
+import BarreDOutilsDesTickets from "./BarreDOutilsDesTickets";
+import { IconChevronDown, IconChevronRight } from "../../design/icons";
 import { useMemo, useState } from "react";
 import TicketCard from "./TicketCard";
 import CreateTicketModal from "./CreateTicketModal";
@@ -28,12 +20,12 @@ interface StatusGroup {
 }
 
 const STATUS_GROUPS: StatusGroup[] = [
-  { status: "todo", label: "TODO", collapsible: true },
-  { status: "in-progress", label: "IN PROGRESS", collapsible: true },
-  { status: "in-review", label: "IN REVIEW", collapsible: true },
-  { status: "blocked", label: "BLOCKED", collapsible: true },
-  { status: "done", label: "DONE", collapsible: true },
-  { status: "cancelled", label: "CANCELLED", collapsible: true },
+  { status: "todo", label: "À faire", collapsible: true },
+  { status: "in-progress", label: "En cours", collapsible: true },
+  { status: "in-review", label: "En revue", collapsible: true },
+  { status: "blocked", label: "Bloqués", collapsible: true },
+  { status: "done", label: "Faits", collapsible: true },
+  { status: "cancelled", label: "Annulés", collapsible: true },
 ];
 
 interface TicketListProps {
@@ -138,55 +130,14 @@ export default function TicketList({
   return (
     <>
       <div className="flex flex-col h-full">
-        <div
-          className={`${BAND} justify-between border-b border-zinc-700 px-3`}
-        >
-          {/* Pas le nom du projet : `ProjectHeader` le porte juste au-dessus,
-              et il apparaissait deux fois à quarante pixels d'intervalle. */}
-          <RegionTitle>Tickets</RegionTitle>
-          <div className="flex items-center gap-1 shrink-0 ml-2">
-            <button
-              onClick={() => setShowPlanModal(true)}
-              title="Planifier une évolution"
-              aria-label="Planifier une évolution"
-              className="w-6 h-6 flex items-center justify-center rounded-sm text-zinc-500 hover:text-zinc-200 hover:bg-zinc-700 transition-colors text-sm leading-none"
-            >
-              <IconBolt size={14} />
-            </button>
-            <button
-              onClick={() => setShowCreateModal(true)}
-              title="Nouveau ticket"
-              aria-label="Créer un ticket"
-              className="w-6 h-6 flex items-center justify-center rounded-sm text-zinc-500 hover:text-zinc-200 hover:bg-zinc-700 transition-colors text-base leading-none"
-            >
-              <IconPlus size={14} />
-            </button>
-            {/* Sans ce retour, quitter la vue du run la rendait injoignable
-                depuis cet onglet jusqu'à la fin du run (ticket-178). */}
-            {runCache && onVoirLeRun ? (
-              <button
-                onClick={onVoirLeRun}
-                title="Revenir au run en cours"
-                aria-label="Revenir au run en cours"
-                className="flex h-6 w-6 items-center justify-center rounded-sm text-blue-300 transition-colors hover:bg-zinc-700"
-              >
-                <IconPlay size={14} />
-              </button>
-            ) : null}
-            <button
-              onClick={onToggleKanban}
-              title={showKanban ? "Éditeur" : "Vue tableau"}
-              aria-label={showKanban ? "Éditeur" : "Vue tableau"}
-              className={`w-6 h-6 flex items-center justify-center rounded text-sm transition-colors ${
-                showKanban
-                  ? "bg-zinc-600 text-white"
-                  : "text-zinc-500 hover:text-zinc-200 hover:bg-zinc-700"
-              }`}
-            >
-              <IconBoard size={14} />
-            </button>
-          </div>
-        </div>
+        <BarreDOutilsDesTickets
+          showKanban={showKanban}
+          runCache={runCache}
+          onVoirLeRun={onVoirLeRun}
+          onPlanifier={() => setShowPlanModal(true)}
+          onCreer={() => setShowCreateModal(true)}
+          onToggleKanban={onToggleKanban}
+        />
 
         {filtres && onChangeFiltres && (
           <BarreDeFiltres

@@ -15,6 +15,7 @@ export default function BoutonServices({
   services,
   libelleDuProjet,
   onOuvrirLePanneau,
+  enPastille = false,
 }: {
   services: UseServicesResult;
   libelleDuProjet: string;
@@ -24,6 +25,8 @@ export default function BoutonServices({
    * sans ça, l'utilisateur ne sait pas s'il s'est passé quoi que ce soit.
    */
   onOuvrirLePanneau?: () => void;
+  /** À la hauteur d'une StatusPill : dans l'en-tête d'une pièce du Bureau, parmi les badges. */
+  enPastille?: boolean;
 }) {
   if (!services.declare) return null;
 
@@ -51,7 +54,7 @@ export default function BoutonServices({
           ? `Arrêter les services de ${libelleDuProjet}`
           : `Lancer les services de ${libelleDuProjet}`
       }
-      className={`shrink-0 whitespace-nowrap rounded border px-2 py-1 text-mini transition-colors ${classe}`}
+      className={`shrink-0 whitespace-nowrap rounded border px-2 text-mini transition-colors ${enPastille ? "h-5" : "py-1"} ${classe}`}
     >
       {enCours ? "Arrêter" : enEchec ? "Relancer" : "Lancer"}
     </button>

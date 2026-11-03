@@ -1,12 +1,30 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { isTauri } from "@tauri-apps/api/core";
 import {
   isPermissionGranted,
   requestPermission,
   sendNotification,
 } from "@tauri-apps/plugin-notification";
-import { notificationsPour, type Instantane, type Notif } from "../lib/notifications";
+import type { EntreeHistorique } from "../lib/historiqueNotifications";
+import {
+  masqueeParToast,
+  notificationsPour,
+  type Instantane,
+  type Notif,
+  type TypeNotif,
+} from "../lib/notifications";
+import {
+  CLE_REGLAGES_PAR_TYPE,
+  estReglagesParType,
+  reglagesParDefaut,
+  type ReglageDuType,
+  type ReglagesParType,
+} from "../lib/reglagesNotifications";
+import { enEtapeSilencieuse, santeAgent, type SanteAgent } from "../lib/santeAgent";
 import { useEtatPersistant } from "./useEtatPersistant";
+import { useHistoriqueNotifications } from "./useHistoriqueNotifications";
+import { useMaintenant } from "./useMaintenant";
+import { useQuotaLu } from "./useQuotaLu";
 import type { UseSupervisionResult } from "./useSupervision";
 
 /**
@@ -18,8 +36,16 @@ import type { UseSupervisionResult } from "./useSupervision";
  *
  * Le réglage est mémorisé par onglet (ticket-193). Une permission refusée
  * par le navigateur ne se redemande plus : `etat` le dit pour que l'écran
- * distingue « coupé » de « bloqué ». Le plugin, lui, n'a pas de clic : la
- * fenêtre ne se ramène pas au premier plan depuis une notification desktop.
+ * distingue « coupé » de « bloqué ».
+ *
+ * Pas de clic côté desktop (ticket-556), vérifié sur
+ * `@tauri-apps/plugin-notification` 2.5.0 : `onAction` et
+ * `onNotificationReceived` y sont documentés « only emitted on mobile », et
+ * `onAction` exige en plus un type d'action posé par `registerActionTypes`,
+ * lui aussi mobile. Aucune API 2.x ne donne donc le clic d'une notification
+ * desktop : la fenêtre ne se ramène pas au premier plan, et la branche Tauri
+ * de `envoyer` n'appelle pas `ouvrir`. À reprendre si une version ultérieure
+ * ajoute un clic desktop.
  */
 export type EtatDesNotifications = "actives" | "coupees" | "bloquees" | "indisponibles";
 
@@ -72,33 +98,85 @@ async function envoyer(n: Notif, ouvrir: (projectId: string) => void): Promise<v
   };
 }
 
+/** Ce que la cloche affiche et règle : l'historique du jour et les cases par type. */
+export interface DonneesDeLaCloche {
+  historique: EntreeHistorique[];
+  nonLus: number;
+  toutMarquerLu: () => void;
+  reglages: ReglagesParType;
+  setReglage: (type: TypeNotif, champ: keyof ReglageDuType, valeur: boolean) => void;
+  ouvrir: (projectId: string) => void;
+}
+
 export function useNotificationsSysteme(
   supervision: Pick<UseSupervisionResult, "runs" | "etatDe">,
   projetActif: string | null,
   ouvrir: (projectId: string) => void,
-): { active: boolean; setActive: (v: boolean) => void; etat: EtatDesNotifications } {
+): {
+  active: boolean;
+  setActive: (v: boolean) => void;
+  etat: EtatDesNotifications;
+  cloche: DonneesDeLaCloche;
+} {
   const [active, setActive] = useEtatPersistant<boolean>(
     CLE_REGLAGE,
     true,
     (v): v is boolean => typeof v === "boolean",
   );
+  const [reglages, setReglages] = useEtatPersistant<ReglagesParType>(
+    CLE_REGLAGES_PAR_TYPE,
+    reglagesParDefaut(),
+    estReglagesParType,
+  );
+  const { historique, nonLus, enregistrer, toutMarquerLu } = useHistoriqueNotifications();
+  const setReglage = useCallback(
+    (type: TypeNotif, champ: keyof ReglageDuType, valeur: boolean) =>
+      setReglages((prev) => ({ ...prev, [type]: { ...prev[type], [champ]: valeur } })),
+    [setReglages],
+  );
   const precedent = useRef<Instantane>({ runs: [], etats: {} });
   const { runs, etatDe } = supervision;
+  // La santé dépend du temps : sans tick, un agent muet ne changerait jamais d'état.
+  const maintenant = useMaintenant();
+  const quota = useQuotaLu(maintenant);
 
   useEffect(() => {
     const etats: Record<string, ReturnType<typeof etatDe>> = {};
-    for (const r of runs) etats[r.run_id] = etatDe(r.run_id);
-    const courant: Instantane = { runs, etats };
+    const sante: Record<string, SanteAgent> = {};
+    for (const r of runs) {
+      const etat = etatDe(r.run_id);
+      etats[r.run_id] = etat;
+      if (etat.status === "running") {
+        sante[r.run_id] = santeAgent(
+          etat.dernierEvenementA,
+          maintenant,
+          etat.pendingQuestion,
+          etat.attenteExterieure !== null,
+          enEtapeSilencieuse(etat),
+        );
+      }
+    }
+    const courant: Instantane = { runs, etats, sante, quota, maintenant };
     const avant = precedent.current;
     precedent.current = courant;
 
+    // L'historique prend tout, avant les filtres de l'envoi (ticket-554).
+    const notifs = notificationsPour(avant, courant);
+    if (notifs.length > 0) enregistrer(notifs);
+
     if (!active || !supportees()) return;
     const vue = { projetActif, visible: document.visibilityState === "visible" };
-    for (const n of notificationsPour(avant, courant, vue)) {
+    for (const n of notifs) {
+      if (!reglages[n.type].systeme || masqueeParToast(n, vue)) continue;
       // Une notification qui ne part pas ne casse rien.
       void envoyer(n, ouvrir).catch(() => undefined);
     }
-  }, [runs, etatDe, active, projetActif, ouvrir]);
+  }, [runs, etatDe, maintenant, quota, active, projetActif, ouvrir, reglages, enregistrer]);
 
-  return { active, setActive, etat: etatDesNotifications(active) };
+  return {
+    active,
+    setActive,
+    etat: etatDesNotifications(active),
+    cloche: { historique, nonLus, toutMarquerLu, reglages, setReglage, ouvrir },
+  };
 }

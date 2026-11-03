@@ -65,6 +65,10 @@ class PipelineRun:
     # pour calculer le diff d'artefacts à la fin de chaque tour (ticket-274).
     # None quand aucun chemin de projet n'est configuré.
     artifact_snapshot: dict[str, str] | None = None
+    # Problèmes de fiches déjà présents avant le premier agent (ticket-526) : un
+    # défaut ancien ne renvoie pas un tour qui n'y touche pas. Valeurs de
+    # `pipeline_tickets._cle`.
+    problemes_tickets_initiaux: frozenset[str] = frozenset()
 
     # --- remis à zéro à chaque tour ---
     round_num: int = 0
@@ -80,6 +84,9 @@ class PipelineRun:
     # Transmis au reviewer et au validateur uniquement — jamais à l'audit
     # sécurité (code uniquement) et jamais dans un commit (ticket-274).
     artifact_diff: str = ""
+    # Les écritures que le garde-fou a refusées au codeur ce tour-ci, déjà mises
+    # en forme pour le reviewer et le validateur (ticket-476). Vide : aucun refus.
+    refus_du_tour: str = ""
 
     @property
     def stop_requested(self) -> bool:
@@ -98,6 +105,7 @@ class PipelineRun:
         self.security_context = ""
         self.contexte_du_tour = ""
         self.artifact_diff = ""
+        self.refus_du_tour = ""
 
 
 async def emit(run: PipelineRun, event_type: EventType, **data: Any) -> None:

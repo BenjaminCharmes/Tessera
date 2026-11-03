@@ -203,3 +203,126 @@ def test_le_durcissement_ne_refuse_pas_la_lecture(commande: str) -> None:
     # durcissement porte sur la *forme* d'appel, pas sur ce que git a le droit
     # de faire : lire reste lire, même derrière un `sh -c`.
     assert commande_git_interdite(commande) is False
+
+
+@pytest.mark.parametrize("commande", ["FOO=bar git push", "A=1 B=2 git commit -m x"])
+def test_leading_assignment_is_skipped(commande: str) -> None:
+    assert commande_git_interdite(commande) is True
+
+
+@pytest.mark.parametrize(
+    "commande",
+    [
+        "if true; then git push; fi",
+        "for x in a; do git push; done",
+        "{ git push; }",
+        "! git push",
+    ],
+)
+def test_shell_keywords_are_skipped(commande: str) -> None:
+    assert commande_git_interdite(commande) is True
+
+
+@pytest.mark.parametrize(
+    "commande",
+    ["cmd /c git push", 'powershell -Command "git push"', 'pwsh -c "git push"'],
+)
+def test_cmd_and_powershell_are_unwrapped(commande: str) -> None:
+    assert commande_git_interdite(commande) is True
+
+
+@pytest.mark.parametrize(
+    "commande",
+    [
+        "FOO=bar git status",
+        "then git log",
+        "cmd /c git status",
+        'pwsh -c "git diff"',
+        "FOO=bar",
+        "cmd /c",
+    ],
+)
+def test_reads_behind_an_assignment_still_pass(commande: str) -> None:
+    assert commande_git_interdite(commande) is False
+
+
+# ------------------------------------------------------------------
+# Liste blanche des lectures — ticket-705, ADR-067
+# ------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "commande",
+    [
+        "git bisect run ./x.sh",
+        "git credential fill",
+        "git commit-tree HEAD^{tree}",
+        "git symbolic-ref HEAD refs/heads/x",
+        "git update-index --assume-unchanged f",
+        "git gc",
+        "git notes add -m x",
+        "git init",
+    ],
+)
+def test_unlisted_git_subcommand_is_refused(commande: str) -> None:
+    assert commande_git_interdite(commande) is True
+
+
+@pytest.mark.parametrize(
+    ("commande", "refusee"),
+    [
+        ("git -c core.fsmonitor=x status", True),
+        ("git -c core.pager=x log", True),
+        ("git -ccore.fsmonitor=x status", True),
+        ("git --config-env=core.pager=X status", True),
+        ("git -c color.ui=false status", False),
+        ("git -c core.quotepath=false status", False),
+    ],
+)
+def test_git_config_override_is_refused_unless_cosmetic(commande: str, refusee: bool) -> None:
+    assert commande_git_interdite(commande) is refusee
+
+
+@pytest.mark.parametrize(
+    "commande",
+    ["git diff --output=f", "git log --output f", "git show --outp=f HEAD"],
+)
+def test_git_output_option_is_refused(commande: str) -> None:
+    assert commande_git_interdite(commande) is True
+
+
+def test_git_grep_pager_option_is_refused() -> None:
+    assert commande_git_interdite("git grep -Ocmd foo") is True
+    assert commande_git_interdite("git grep -n foo") is False
+
+
+@pytest.mark.parametrize(
+    "commande",
+    ["gh --repo o/r pr merge 1", "gh -R o/r pr merge 1", "gh --hostname h pr merge 1"],
+)
+def test_gh_global_option_does_not_hide_the_subcommand(commande: str) -> None:
+    assert commande_git_interdite(commande) is True
+
+
+@pytest.mark.parametrize(
+    "commande",
+    [
+        "gh auth token",
+        "gh auth status --show-token",
+        "gh alias set p 'pr merge'",
+        "gh secret list",
+        "gh issue create",
+        "gh run rerun 1",
+    ],
+)
+def test_gh_unlisted_subcommand_is_refused(commande: str) -> None:
+    assert commande_git_interdite(commande) is True
+    assert commande_git_interdite("gh auth status") is False
+
+
+@pytest.mark.parametrize(
+    "commande",
+    ["git status", "git diff HEAD", "git log --oneline", "git show HEAD", "git -C sub status"],
+)
+def test_allowlist_keeps_status_diff_log_show(commande: str) -> None:
+    assert commande_git_interdite(commande) is False

@@ -56,6 +56,12 @@ planificateur, project-analyzer, agent-creator, project-creator, doc-technique,
 doc-fonctionnelle) qui
 écrivent eux-mêmes leurs fichiers en Python.
 
+### Isolation du contexte CLAUDE.md pour les projets hébergés
+
+Les projets situés sous `projects/` ne doivent lire que leurs propres consignes dans `CLAUDE.md`, pas celles de Tessera. Seul le projet bootstrap `projects/ide-core/` — qui définit l'IDE lui-même — hérite du `CLAUDE.md` racine et de ses dépendances (`@`-imports).
+
+Lors de la création des `ClaudeAgentOptions` (fournisseur Agent SDK), le service exclut les CLAUDE.md ancêtres pour tout projet hébergé qui n'est pas un projet `ancestor`. L'exclusion est posée via le paramètre `claudeMdExcludes` (liste de chemins) dans les `settings` de l'agent. Cette isolation évite que les consignes système — `STATIC_TOKEN`, termes interdits, limites de budget — contaminent le contexte d'un projet autonome ayant ses propres règles.
+
 ### Shell des agents (Windows — ticket-319)
 
 Sous Windows, Claude Code n'active `Bash` que s'il trouve Git Bash à un emplacement standard.
@@ -286,6 +292,125 @@ Un run dont le commit **échoue** ne peut pas s'annoncer approuvé : le ticket
 passe `blocked` et la raison est émise. « Rien à committer » reste un succès, et
 s'en distingue.
 
+#### Préservation des fichiers suivis lors de l'exclusion en mode local (ticket-446)
+
+Le mode `local` pour les artefacts écrit les règles d'exclusion dans `.git/info/exclude` (ADR-021, ADR-023). Avant de commiter, la purge des fichiers stagés mais ignorés (`_purger_stage_ignoré` dans `git_workspace.py`) s'est compliquée : elle vérifie maintenant qu'un fichier n'existe pas dans `HEAD` avant de le retirer de l'index. Un fichier suivi par le dépôt initial reste suivi, même s'il est marqué ignoré après coup. Sur un dépôt sans commit (`HEAD` absent), la purge agit comme avant.
+
+### Isolation des runs par worktree (ticket-494)
+
+Chaque run s'exécute dans un `git worktree` dédié, jamais dans le checkout principal. Cela isole le travail du pipeline de celui de l'utilisateur : aucun changement de branche n'affecte la session humaine, aucun commit du pipeline ne salit l'arbre de travail.
+
+La conception (ticket-494) établit comment les worktrees naissent et disparaissent, quels fichiers sensibles (`.env`, `CLAUDE.md`, `.venv`, `node_modules`) ils héritent par copie ou lien symbolique, et comment le hook d'écriture (ADR-031) s'adapte. Les contraintes intègrent les accidents documentés : jonction `node_modules` vidant le dépôt principal, chemins longs cassant `git worktree add` sous Windows, `uv` refusé par le contrôle d'applications, outils de sécurité ne suivant pas les liens symboliques, et fichiers ignorés par git manquant à la création. Les worktrees orphelins après un redémarrage du backend sont nettoyés au démarrage suivant.
+
+#### Déclaration et validation du worktree par projet (ticket-521)
+
+Un projet déclare son worktree optionnellement dans `agents.json` sous la clé `worktree`. Cette configuration est lue **une fois** par `PolitiqueRun.lire()` au démarrage du run, avec le reste de `PolitiqueRun`, et gelée — la copie ne peut plus être modifiée pendant l'exécution (ADR-056).
+
+`ConfigWorktree` contient :
+- `populate` : liste des fichiers et dossiers à copier ou lier (`EntreePopulate` avec `path` et `mode` en `["copy", "link"]`)
+- `env` : variables d'environnement du worktree
+- `test_command` : commande de test spécifique au worktree
+
+Validation à la lecture :
+- Une entrée est retirée et journalisée si son `mode` est inconnu, son chemin est absolu, contient `..`, ou résout au `.env` de Tessera
+- Les entrées valides sont conservées
+- Un projet en `artifacts: local` qui déclare `worktree` → configuration ignorée, raison journalisée
+- Configuration absente, illisible ou mal typée → `PolitiqueRun.worktree` vaut `None`
+
+Aucun comportement de run ne change : les tickets 522 et 523 consommeront cette valeur.
+
+#### Peuplement et suppression sécurisée des liens (ticket-523)
+
+Un worktree neuf est peuplé avant tout lancement : ses entrées déclarées (fichiers et dossiers) sont copiées depuis le checkout, ou liées si la configuration l'exige. Les liens sont des jonctions Windows ou symboliques ailleurs. Un lien sur un chemin suivi par git est refusé et journalisé.
+
+**Protection contre la suppression de liens traversés** : avant tout `worktree remove` ou `rmtree`, une étape retire chaque jonction et lien sans jamais en traverser l'intérieur — cela évite le bug du 14/10 où une jonction vidait le `node_modules` du dépôt principal. Sous Windows, la détection s'appuie sur l'attribut de point d'analyse (`st_file_attributes`). Si un lien subsiste après, la suppression du worktree s'arrête sans effacer le reste.
+
+Implémentation : `services/run_worktree_populate.py` (ticket-523, ADR-056).
+
+Sous Windows, les chemins de plus de 260 caractères (courant avec pnpm et les arbres imbriqués de `node_modules`) levaient `WinError 3` lors de la suppression du worktree, interrompant le run même après la livraison de la PR (ticket-531). La correction applique le préfixe étendu `\?\` pour les appels système du nettoyage et rattrape les erreurs `OSError` et `GitWorkspaceError` : le résultat du run reste inchangé (livré reste livré), un avertissement `run_worktree_non_supprime` est journalisé, et le dossier peut être nettoyé au prochain démarrage (ticket-520).
+
+#### Exécution des commandes dans le worktree (ticket-524)
+
+Quand un projet déclare `worktree` dans `agents.json`, ses tests tournent en
+isolation dans le worktree. L'IDE n'y installe pas `uv` (ticket-512, WDAC) :
+les commandes doivent utiliser l'interpréteur du `.venv` principal, avec
+`PYTHONPATH` pointé sur le worktree.
+
+Deux fonctions pures résolvent la commande et l'environnement effectifs :
+
+- `commande_effective(politique, racine_worktree, depot) -> str | None` :
+  lit `worktree.test_command` s'il est déclaré, sinon `test_command` (hors
+  worktree). Remplace les placeholders `{worktree}` (chemin absolu du
+  worktree) et `{repo}` (racine du dépôt). Un placeholder inconnu est refusé
+  avec raison ; `None` signale l'absence de commande.
+
+- `environnement_effectif(config, racine_worktree, depot) -> dict[str, str]` :
+  même résolution des placeholders, pour la déclaration optionnelle
+  `worktree.env`.
+
+`TestRunnerService.__init__` reçoit `env: Mapping[str, str] | None = None`.
+Injecté à chaque lancement, cet `env` est fusionné **par-dessus** `os.environ` —
+ses valeurs surchargent les variables système. Sans `env`, le comportement est
+inchangé.
+
+La commande effective est résolue depuis le `test_cwd` du projet déclaré dans
+le worktree (`agents.json`, clé `worktree.test_cwd`) : son premier mot doit
+être trouvable comme commande système ou chemin existant depuis ce répertoire.
+`controles_depart` vérifie désormais la commande effective, pas la déclarée —
+ce qui permet de valider en amont que le test est lançable.
+
+Le script de test reste protégé en écriture (ADR-027). Un diff qui le modifie
+est signalé au reviewer ; un test confirme qu'il se refuse en écriture quand
+il est dans le worktree.
+
+Le branchement — création effective des worktrees — est ticket-519. Ce ticket
+prépare les fonctions pures et les modifications de service, sans créer
+aucun worktree.
+
+#### Le hook d'écriture et l'exclusion des CLAUDE.md suivent le worktree (ticket-525)
+
+Trois services du backend sont adaptés pour accepter un worktree avant que le branchement (ticket-519) ne le demande :
+
+- **`PolitiqueRun.racine_ecriture`** : en paramètre optionnel `RunWorktree`, la racine d'écriture du hook (ADR-031) désigne soit `wt.racine` (projet `ancestor`), soit `wt.projet`, au lieu de `_REPO_ROOT`.
+- **`GitWorkspaceService._ensure_own_repository`** : accepte la racine d'un worktree et valide qu'elle y appartient. `git --show-toplevel` ne doit pas exiger `git_root: ancestor`, puisque le worktree a sa propre racine.
+- **`claude_md_ancetres_a_exclure`** : calcule depuis la racine d'écriture reçue, pas depuis `_REPO_ROOT`, car un worktree en est hors par définition.
+
+Ce refactor isole la préparation du branchement : le ticket-519 ne s'occupera que du démarrage en worktree, sachant que les trois composants le soutiennent déjà.
+
+#### Orchestration et cycle de vie (ticket-519)
+
+Quand un projet déclare `worktree`, le cycle de vie du run s'en trouve modifié :
+
+**Création et initialisation** : Dès l'acquisition du `RunLock` et avant `ensure_clean_tree`, le worktree est créé et peuplé de copies des fichiers du projet. À partir de ce point, tous les chemins sensibles (dépôt, configuration) sont lus sur le checkout réel, tandis que l'exécution et l'écriture se font dans le worktree isolé.
+
+**Adaptation des services** : `_build_orchestrator` reçoit le `RunWorktree` créé et adapte les chemins passés aux agents. `TicketService`, `pipeline_log_path`, `AgentRunner` et `carte_du_depot` travaillent sur `wt.projet` ; `PolitiqueRun` reste lue sur le dossier réel, mais sa `racine_ecriture` pointe le worktree. `TestRunnerService` reçoit l'environnement et la commande effective du ticket-524, et exécute les tests dans `wt.projet`.
+
+**Nettoyage** : Après le commit final du run et à la fin de la phase 1 de livraison, le worktree est supprimé. Si une exception se produit à tout moment, le nettoyage se fait dans le bloc `finally`. Un `TravailNonSauve` met le run en `blocked`, nomme le dossier dans `arret` et le préserve pour inspection manuelle.
+
+**Cas d'erreur** : Une branche déjà extraite dans le checkout, ou un worktree déjà occupé, bloquent le run immédiatement avec l'état `blocked`. Aucun commit n'a lieu, car aucun fichier n'a été écrit.
+
+La phase 2 de livraison (CIWatcher) n'a que l'API GitHub en mode worktree : aucun appel ne lit ni n'écrit l'arbre (tout ce qui lirait `retourner_sur_base` est exclu).
+
+#### Restriction des modes de run pour les projets à worktree (ticket-532)
+
+Un projet qui déclare `worktree` dans sa configuration ne supporte que le mode `single` — un ticket à la fois, exécuté dans son propre worktree. Les modes `queue` et `autonomous` sont refusés avec une 422 (`Unprocessable Entity`), car les files devraient tourner dans des worktrees successifs (un par ticket). Cette architecture reste à concevoir (voir ADR-056, qui définit comment les worktrees isolent les runs).
+
+#### Initialisation du worktree avec commande setup (ticket-536)
+
+Un projet peut déclarer une commande d'initialisation optionnelle : `worktree.setup`
+(chaîne) dans `agents.json`. Après peuplement du worktree, cette commande tourne
+**avant le premier appel au codeur**, avec les variables d'environnement du worktree.
+
+Objectif : le codeur dispose des dépendances (types, packages) dès le premier tour,
+sans attendre que le testeur les installe.
+
+**Délai et erreurs** : respecte le délai du testeur (`pipeline.test_timeout_s`).
+En cas d'échec ou dépassement, le run passe en `blocked` avec la sortie de la commande
+— le codeur n'est pas appelé (ADR-037).
+
+**Validation** : validée à la lecture du projet par `services/worktree_politique.py`
+(ticket-521). Absente, aucune commande ne s'exécute avant le codeur.
+
 ### Reprise de runs orphelins (ticket-369)
 
 Au démarrage du backend, après la solidification des runs orphelins en base (`solder_les_runs_orphelins`, ticket-177), une étape remet les dépôts en état quand un arrêt les a laissés sales pendant un run.
@@ -302,6 +427,43 @@ Si la copie de travail est sur une autre branche, aucune action n'est prise. Les
 
 Quand une branche de ticket est reprise au démarrage, sa fiche est validée. Si le ticket a été déplacé de `tickets/todo/` vers `tickets/in-progress/` ou `tickets/in-review/` mais que ce déplacement n'a pas été committé (fichier non suivi), la reprise ajoute explicitement le fichier au commit « unapproved work ». Seule la fiche du ticket est ajoutée ; aucun autre fichier non suivi ne peut y entrer.
 
+### Diagnostic des refus d'outils lors de reprises de session (ticket-515)
+
+Quand un agent reprend sa session SDK (ex. tour 2 d'un codeur après interruption du tour 1), les options de l'SDK (`cwd`, `allowed_tools`, `permission_mode`) conservent leurs valeurs initiales. Les refus du CLI pour les appels d'outils sont diagnostiqués et loggés dans `memory/pipeline-log.md` sous la forme `codeur: outil <nom> refusé par le CLI`, ce qui permet de distinguer un refus du CLI lui-même d'un refus du garde-fou de Tessera (message `PreToolUse:<outil> hook error`).
+
+### Reprise des worktrees orphelins au démarrage (ticket-520)
+
+Quand le backend redémarre, les worktrees de run laissés en attente 
+(`<IDE_WORKTREES_DIR>/<projet>/<ticket>`) sont repris au lifespan pour préserver 
+le travail et éviter des dossiers traînants.
+
+Pour chaque worktree orphelin, la fonction `reprendre_worktrees_orphelins()` :
+
+1. **Arbre sale** : commit automatique des changements suivis et non ignorés, 
+   avec le message typé d'un run arrêté (ADR-018) — rien n'est perdu ;
+2. **Retrait des liens** : `retirer_les_liens()` (ticket-523) dissout les liens 
+   avant suppression (notamment `node_modules`) ;
+3. **Suppression** : le dossier du worktree est enlevé ;
+4. **Erreur de commit** : le dossier est laissé en place et journalisé — jamais 
+   de destruction forcée ;
+5. **Nettoyage git** : `git worktree prune` sur chaque projet retire les 
+   enregistrements dont le dossier a disparu ;
+6. **Dossier inconnu** : les dossiers non enregistrés dans aucun dépôt connu 
+   restent en place et sont journalisés.
+
+L'erreur n'empêche jamais le démarrage. Pour les projets sans worktree, 
+`reprise_orphelin` s'exécute sans modification.
+
+#### Relance du codeur après refus de porte (ticket-528)
+
+Quand un run se termine sur un refus — `securite: BLOCK`, validateur `CHANGES_REQUESTED`, ou reviewer `BLOCKED après N tour(s)` — la reprise de la branche ne saute plus le codeur même si les tests passaient. Le motif du refus est lu en base (ou dans le journal) et fourni au codeur en contexte.
+
+**Invariants de la reprise** :
+- Un ticket approuvé mais non livré (fiche `done`, pas de PR) n'est jamais relancé.
+- Un run interrompu sans verdict (redémarrage du backend) saute le codeur si les tests sont verts — même comportement qu'avant ce ticket.
+
+La ligne de journal de la reprise dit pourquoi : `… — refus précédent : <porte>, codeur en premier` pour une relance forcée, ou `… — tests green, codeur sauté` pour une reprise après coupure.
+
 ### Récupération des fichiers neufs et gestion des tickets approuvés (ticket-389)
 
 Lors d'une reprise au démarrage, deux garanties préviennent la perte de travail :
@@ -313,6 +475,43 @@ Les fichiers créés par le codeur après le `started_at` du run, mais non encor
 **Tickets approuvés mais non livrés**
 
 Si un run avait atteint l'état `APPROVED` (fiche marquée `done` sur sa branche) avant d'être interrompu, la reprise ne le remet pas en `todo`. Il reste `done` et un événement est enregistré dans `memory/pipeline-log.md` : `[<ticket>] approuvé mais non livré : livraison à reprendre`. La livraison n'est pas relancée automatiquement ; elle demande une action manuelle.
+
+### Reprise des PR du CIWatcher après redémarrage (ticket-510)
+
+Au démarrage du backend, après la reprise des runs orphelins, une nouvelle étape relance la surveillance des PR que le CIWatcher suivait avant un arrêt. Cette étape évite qu'une PR approuvée et verte ne reste oubliée indéfiniment après un redémarrage.
+
+**Logique**
+
+Pour chaque projet dont l'autonomie est `merge` :
+
+1. Identifier les tickets en `in-review` qui portent un `pr_number`
+2. Exclure les PR issues d'une résolution de conflit approuvée — elles ne doivent jamais se merger seules, car leur résolution doit être relue (ADR-033)
+3. Consulter l'état de chaque PR auprès de GitHub
+4. Selon le statut :
+   - **PR ouverte** : la confier de nouveau à `CIWatcher.surveiller` avec les mêmes règles qu'avant (CI verte si requise, tête de branche inchangée)
+   - **PR déjà mergée** : mettre le ticket en `done` sans nouvelle surveillance
+   - **PR fermée sans merge** : écrire une ligne d'information dans `memory/pipeline-log.md`, ne rien faire d'autre
+
+**Journalisation**
+
+Chaque PR reprise écrit une ligne au format : `[<projet>] ticket-XXX PR #N reprise par le CIWatcher après redémarrage` dans `memory/pipeline-log.md`.
+
+Une PR fermée sans merge écrit également une ligne : `[<projet>] ticket-XXX PR #N fermée sans merge, non reprise`.
+
+**Résilience**
+
+Une erreur lors de la lecture de l'état GitHub (indisponibilité du service, permissions insuffisantes) est journalisée mais n'empêche pas le démarrage du backend. La reprise s'achèvera au prochain redémarrage.
+
+
+#### Ticket-516 : récupération des PR sur GitHub
+
+Ticket-516 ajoute une deuxième source de reprise : les PR ouvertes sur GitHub
+dont la branche suit le motif `ticket-NNN-*` et cible la `base_branch`. Les deux
+sources (fiches locales `in-review` + PR GitHub) sont dédupliquées.
+
+**Attention** : en autonomie `merge`, toute PR sur `ticket-NNN-*` est mergée si
+la CI est verte — y compris les PR manuelles. Pour tester une PR sans la
+merger, utilisez une branche temporaire (`wip/*`, `tmp/*`).
 
 ### Dialogue pendant un run (ADR-025)
 
@@ -357,6 +556,14 @@ Chaque agent reçoit un contexte filtré selon sa portée définie dans les ADR 
 
 `adr_pertinents` (`backend/src/tessera/services/adr.py`) découpe à cette limite. Les ADRs au format `contraintes.md` (`contraintes_pour`) n'en ont pas besoin : leurs blocs s'arrêtent déjà au titre de niveau 2 suivant.
 
+### Contraintes proposées (ticket-493)
+
+Les règles communes à tous les agents (`memory/contraintes.md`) sont injectées réduites au rôle dans chaque appel. Depuis le ticket-493, tout run qui doit proposer une nouvelle règle ne peut l'écrire que dans la section `## Proposées` en tête du fichier. Cette section n'est jamais injectée : seul le reste du fichier l'est dans les contextes des agents.
+
+Une règle proposée n'influe donc jamais sur les agents suivants tant qu'un humain ne l'a pas acceptée — ce qui consiste simplement à la déplacer de `## Proposées` à sa section permanente. Le merge de ce déplacement suit le flux normal de livraison.
+
+Un diff qui tenterait de modifier `memory/contraintes.md` en dehors de la section proposée met le run en `blocked` à la fin du tour du codeur, avec la raison affichée. Les prompts `architect.md` et `codeur.md` précisent : « une règle nouvelle s'écrit sous `## Proposées` ». Ce mécanisme protège les consignes partagées : elles ne changent que par un acte humain volontaire, même sur un projet en `autonomy: merge`.
+
 ### Système visuel du frontend (ADR-026)
 
 `frontend/src/design/` porte ce qui doit rester cohérent d'un panneau à l'autre :
@@ -389,6 +596,16 @@ arbitraire ou d'un glyphe utilisé comme affordance.
 
 Ce système est imposé aux agents créant une interface via le skill `tessera:design-ui`, chargé par défaut par le codeur et l'architect : toute UI doit partir d'une charte déclarée (couleurs, typographie, espacement), et n'en sortir sur aucune valeur.
 
+#### Composants UI partagés
+
+Le frontend centralise les composants visuels dans `frontend/src/design/ui/`, pour respecter la charte et les familles de couleurs d'ADR-026 :
+- `StatusPill.tsx` : pastilles d'état (en-cours, reussi, attention, echec, neutre)
+- `Button.tsx` : boutons avec variantes plein/borde/discret/arret, tailles normal/compact
+- `ViewSwitcher.tsx` : sélecteur horizontal de vue
+- `ViewState.tsx` : états composites (vide, chargement, erreur)
+
+Les trois sélecteurs de vue du frontend (Historique, Fichiers, Agents) utilisent `ViewSwitcher`, éliminant les copies locales et garantissant la cohérence visuelle.
+
 ### Limite de silence des agents (ticket-381)
 
 Un processus d'agent qui n'émet aucun message pendant plus de `AGENT_SILENCE_MAX_S` secondes (défaut : 1200 s, soit 20 min) est interrompu.
@@ -404,6 +621,24 @@ Quand le silence est détecté :
 Le repli ou l'échec fermé existant (ADR-037, ADR-039) reprend aussitôt le run ou en demande l'approbation.
 
 Ce mécanisme ne détecte pas la veille du PC en tant que telle : il mesure le silence du flux. Deux cas réels qui l'ont motivé (octobre 2026) ont impliqué une veille du PC et un CLI bloqué.
+
+### Durée maximale des rôles texte (ticket-518)
+
+Les rôles texte (validateur, sécurité, documentation) ont une durée totale maximale
+par appel, réglable via `LLM_DUREE_MAX_ROLE_TEXTE_S` (défaut 900 s). Cette borne
+inclut l'attente du créneau Ollama et la génération complète de la réponse.
+
+Dès que l'appel dépasse cette durée, l'IDE lève `ProviderIndisponible` pour basculer
+sur le repli (par exemple, Claude si le fournisseur principal est Ollama). Le passage
+au repli est écrit dans `pipeline-log.md` sous la forme `<rôle>: repli vers <provider>/<modèle> — <cause>`.
+Si le repli dépasse aussi la durée maximale, il échoue fermé et le ticket passe en non approuvé (ADR-039).
+
+Ce système garantit qu'aucun appel texte ne peut geler une file. Il s'ajoute à la
+limite de silence (ticket-381) qui coupe après 1200 s sans message.
+
+### Lancement isolé des services (ticket-664)
+
+Les services lancés par Tessera (backends, workers déclarés par les projets) ne doivent pas arrêter le backend orchestrateur. Sous Windows, un processus enfant qui reçoit `CTRL_C_EVENT` (ex: `uvicorn --reload`) le propage à toute sa console ; partagée, elle arrête le backend et tous ses enfants. Tessera isole chaque service dans sa propre console, son groupe de processus (`CREATE_NO_WINDOW | CREATE_NEW_PROCESS_GROUP` sur Windows, `start_new_session` ailleurs). La fonction `options_de_lancement(systeme)` dans `services/lancement.py` est appelée par `ProcessRegistry._lancer()`.
 
 ## Endpoints implémentés
 
@@ -424,6 +659,35 @@ Ce mécanisme ne détecte pas la veille du PC en tant que telle : il mesure le s
 | `GET` | `/api/v1/projects/{id}/tickets/{tid}` | Détail d'un ticket |
 | `PATCH` | `/api/v1/projects/{id}/tickets/{tid}/status` | Déplace le ticket dans le bon dossier |
 
+#### Proposition de tickets en parallèle d'un run (ticket-479)
+
+Un endpoint `POST /api/v1/projects/{id}/tickets/propose` permet aux sessions de créer de nouveaux tickets pendant qu'un run occupe l'arbre d'un projet, sans créer manuellement de worktree ou de PR.
+
+Le processus crée un worktree temporaire depuis la base distante, écrit les nouveaux tickets dans `tickets/todo/`, les commite et les pousse. L'IDE ouvre une PR et la merge immédiatement si le projet est en `autonomy: merge`, sinon la laisse ouverte. Le worktree est supprimé à la fin, même en cas d'erreur.
+
+Chaque frontmatter est validé avec le même modèle que le chargement ordinaire. Une validation échouée refuse l'opération en 422 sans rien pousser. L'arbre principal du projet reste intact pendant toute l'opération.
+
+#### Ajout de tickets à une file en cours (ticket-504)
+
+Un ticket peut être ajouté à une file pendant qu'elle tourne via `POST /api/v1/runs/{run_id}/append`. Quand un ticket vient d'être mergé sur la branche de base (pull request intégrée), l'endpoint l'accepte sans l'exiger sur l'arbre de travail du run.
+
+La lecture du ticket se fait par `git show origin/<base>:<chemin>` après un `fetch`, sans modifier l'arbre du run ni le changer de branche (ADR-018). Le ticket absent de `origin/<base>` reste refusé (« ticket introuvable »).
+
+La branche du ticket ajouté part toujours d'une base à jour (fetch puis départ de `origin/<base>`), ce que le ticket-480 garantit en fin de run.
+
+#### Retrait de tickets d'une file en cours (ticket-513)
+
+L'endpoint `POST /orchestrator/runs/{run_id}/remove` permet de retirer des tickets pas encore commencés d'une file vivante, sans arrêter la file ni interrompre le ticket en cours.
+
+Service : `FileVivante.retirer` accepte une liste de `ticket_ids`. Pour chaque ticket, elle :
+- Refuse les tickets en cours (« en cours : utiliser stop »)
+- Refuse les tickets déjà traités par la file (« déjà traité par la file »)
+- Ignore les tickets absents de la file
+
+Un ticket retiré écrit `[<projet>] ticket-XXX retiré de la file` dans `memory/pipeline-log.md`. La fiche du ticket garde son statut inchangé : retirer n'est pas annuler ; le ticket peut être relancé plus tard.
+
+Réponse : `{ "retires": [...], "ignores": {...}, "refuses": {...} }`. Erreur `409 Conflict` si le run est inconnu, terminé, ou n'est pas une file.
+
 ### Agents
 | Méthode | Route | Description |
 |---------|-------|-------------|
@@ -437,6 +701,26 @@ Ce mécanisme ne détecte pas la veille du PC en tant que telle : il mesure le s
 | `POST` | `/api/v1/orchestrator/run` | Lance le pipeline codeur→reviewer (sauvegarde en DB) |
 | `POST` | `/api/v1/orchestrator/run-autonomous` | Mode autonome (N tickets en séquence) |
 | `WS` | `/api/v1/orchestrator/stream/{project_id}` | Stream des OrchestratorEvents + sauvegarde en DB |
+
+
+#### Validation de configuration avant le run
+
+Avant de lancer le pipeline sur un projet (`POST /orchestrator/run`), l'orchestrateur
+vérifie que le projet est configurable pour sa stratégie de livraison :
+
+- **Projet `autonomy: pr` ou `merge`** : exige à la fois `github_remote` (déclaré dans
+  `agents.json` du projet) et `GITHUB_TOKEN` (variable d'environnement du backend).
+- **Projet `autonomy: commit`** : aucune exigence GitHub — les changements restent locaux.
+
+Si la vérification échoue — `github_remote` manquant, ou `GITHUB_TOKEN` absent — le serveur
+rejette la requête avec un code **422**. Le message indique ce qui manque et comment
+corriger (« ajoute `github_remote` dans agents.json » / « renseigne GITHUB_TOKEN »).
+
+Le projet **n'est pas réservé** après ce refus : une tentative suivante, après correction,
+s'exécutera normalement.
+
+Cette vérification est une optimisation (ticket-413) : elle évite de dépenser un run complet
+à découvrir à la livraison qu'on ne peut rien pousser.
 
 ## Flux d'un ticket
 
@@ -524,6 +808,83 @@ Ce mécanisme ne détecte pas la veille du PC en tant que telle : il mesure le s
 L'enregistrement du pipeline écrit « testeur: délai dépassé, suite relancée » dans le `pipeline-log.md` à chaque relance.
 
 
+#### Destruction d'arbres de processus à l'expiration (ticket-507)
+
+Quand une étape de test dépasse le délai `test_timeout_s`, l'étape expire et reprend immédiatement en rendant `expiree=True`, sans attendre la fin des processus enfants.
+
+Pour éviter que des petits-enfants orphelins ne gardent les tubes ouverts et ne bloquent indéfiniment :
+
+1. Chaque étape lancée par `_executer` est attachée à un groupe de processus neuf :
+   - **Windows** : création d'un job (`creer_groupe`), où l'étape s'exécute, et tous les enfants en héritent
+   - **Unix** : lancement avec `start_new_session=True`, qui crée une session neuve avec son propre groupe de processus
+
+2. À l'expiration du délai :
+   - Destruction immédiate du groupe entier (fermer le job Windows, ou `tuer_l_arbre` sous Unix)
+   - Attente bornée (quelques secondes) de la fin du processus direct
+   - Passé ce délai, l'étape rend son résultat sans attendre plus longtemps
+
+3. Aucune attente non bornée ne persiste après un timeout : chaque groupe est créé au lancement de l'étape, jamais réutilisé, et fermé à la fin pour le nettoyer.
+
+#### Commandes sans entrée standard (ticket-512)
+
+Chaque lancement de commande non-interactive du pipeline (`test_runner.py`, vérifications, services) reçoit `stdin=asyncio.subprocess.DEVNULL`. Cela ferme immédiatement l'entrée standard du processus, empêchant tout blocage si une dépendance ou script tente une interaction utilisateur — par exemple `pnpm install` qui appelle `prisma generate` en postinstall.
+
+#### Mesure des durées par étape (ticket-514)
+
+Quand une suite de tests dépasse son délai `test_timeout_s`, le résultat ne dit plus simplement « Timeout » : il liste les étapes terminées avec leur durée en millisecondes, puis l'étape en cours au moment de la coupure avec le temps qu'elle avait déjà consommé. Cela permet d'identifier rapidement quel segment a débordé sans relancer la suite manuellement.
+
+Exemple d'affichage au journal : `testeur: délai dépassé (420 s) — install 6 s, lint 28 s, …, check:build coupé après 190 s`.
+
+Chaque `EtapeTest` porte un champ `duree_ms` renseigné pendant l'exécution.
+
+### Audit de sécurité
+
+L'agent sécurité audite le diff avant la revue. Selon ADR-039, une réponse JSON invalide bloque toujours le run — aucun repli n'est possible pour le jugement de sécurité.
+
+**Robustesse en cas de réponse invalide** (ticket-436) :
+
+Quand le modèle rend un JSON non-valide du premier coup, l'IDE lui redemande une seule fois avec une consigne explicite : « Ta réponse précédente n'était pas un JSON valide ; réponds uniquement par l'objet JSON demandé. »
+
+- Si la deuxième réponse est valide → elle fait foi, l'audit rend son verdict (PASS ou BLOCK)
+- Si les deux réponses sont invalides → audit BLOCK avec motif indiquant deux réponses illisibles
+- Exception du provider (timeout, erreur réseau) → pas de seconde tentative ; ADR-046 gère le fallback
+
+Journal : `security_auditor_invalid_json` enregistre le numéro de tentative (1 ou 2) pour chaque réponse invalide.
+
+
+L'agent de sécurité (`securite`) analyse le diff de chaque run pour détecter des failles OWASP — injections SQL, path traversal, SSRF, authentification — avant le reviewer.
+
+#### Outils de relecture
+
+Comme le reviewer, l'agent a accès aux outils de relecture du projet (`Read`, `Glob`, `Grep`) et est borné au projet (ADR-031). Il n'a ni `Write`, `Edit` ni `Bash` : il observe sans modifier.
+
+#### Lecture du code hors diff
+
+Avant de bloquer un run sur une faille qui passerait par du code absent du diff — par exemple une URL arrivant à une fonction `request()` sans garde —, l'audit lit ce code pour vérifier si les protections existent déjà. Si l'audit ne trouve pas la garde soupçonnée manquante, il la cite dans son verdict ou confirme son absence.
+
+Cela réduit les faux positifs : un nouveau flux HTTP vers une fonction qui refuse déjà les IP privées n'est pas une faille (ticket-485).
+
+#### Verdict fermé
+
+En cas d'erreur du provider ou réponse illisible, le run s'arrête sur BLOCK. C'est une règle de sécurité (ADR-039) : un doute = arrêt.
+
+#### Budget et repli sur le diff seul
+
+Depuis le ticket-495, l'audit de sécurité dispose d'un budget propre, `LLM_MAX_TURNS_SECURITE` (défaut 30 tours), distinct du plafond global. Le prompt annonce ce budget au modèle : « Tu disposes d'au plus N lectures. Lis d'abord ce qui peut changer un BLOCK en PASS ; garde le dernier tour pour ton verdict. »
+
+Si l'appel avec outils épuise le budget avant de rendre un verdict, `SecurityAuditorService` retombe sur un **second appel sans outil**, sur le diff seul — la stratégie d'avant le ticket-485. Un événement `security_audit_fallback` le signale. Si ce second appel échoue, le verdict reste `BLOCK` (ADR-039).
+
+Cette approche empêche un gros diff de bloquer la file sur une limite de tours : l'audit conclut avec ce qu'il a lu, ou revient à sa forme minimale.
+
+
+#### Quota épuisé pendant l'audit
+
+Quand une exception de quota épuisé est levée pendant l'audit de sécurité, celle-ci n'est pas convertie en verdict fermé (`BLOCK`, ADR-039), mais remontée comme arrêt de quota : le run s'arrête, le ticket est remis en `todo`, et la file s'interrompt pour reprendre ultérieurement (ticket-498, ticket-505). Le même traitement s'applique au validateur.
+
+#### Validation par schéma JSON
+
+L'audit retourne son verdict validé par un schéma JSON (draft-07, ADR-061). Le fournisseur reçoit `schema=SECURITY_SCHEMA`, et l'audit lit directement `result.structured` sans passer par `extract_json`. Une sortie structurée absente ou sans champ `verdict` requis provoque un refus fermé.
+
 ### Résultats des tests et extraction d'erreurs (ticket-393)
 
 Quand les tests échouent, `test_runner.py` extrait :
@@ -532,6 +893,20 @@ Quand les tests échouent, `test_runner.py` extrait :
 - **Détails** (`failure_details` dans `TestResult`) : synthèse courte et bloc de défaillances, tronqués à 8 000 caractères
 
 Le prompt du codeur (tour suivant) reçoit `failure_details`, remplaçant une liste brute. Le journal n'affiche que le résumé. Cela concentre l'attention sur le test échoué même quand des centaines passent.
+
+
+#### Distinction panne d'environnement vs test en échec (ticket-496)
+
+Quand une étape de test échoue, le système distingue maintenant une **panne d'environnement** (outil introuvable) d'un **test réellement en échec** (code du projet en cause).
+
+Le module `outil_introuvable.py` reconnaît dans la sortie d'une étape les erreurs suivantes comme des pannes d'environnement :
+
+- Commande shell non trouvée : `ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL` avec `Command "<x>" not found`, ou messages `sh: <x>: command not found` / `<x>: not found` / `'<x>' is not recognized as an internal or external command`
+- Module Node absent ou lien périmé : `Cannot find module '…/node_modules/…'` quand le chemin cité est sous `node_modules`, n'existe pas ou pointe hors du dossier du projet (exemple : liens cassés après un renommage)
+
+Un `Cannot find module` sur un fichier du projet lui-même (hors `node_modules`) reste un test en échec : le code en est responsable.
+
+Une étape reconnue comme panne d'environnement produit un `TestResult` avec `demarree=False` et un message : « panne d'environnement, outil `<x>` introuvable, réinstaller les dépendances du projet ». Ce n'est pas un test rouge : le codeur n'y peut rien, et le lancement du run s'arrête sans approuver le ticket.
 
 ### Validation et fichiers cités (ticket-316)
 
@@ -550,6 +925,94 @@ actuel au message du validateur, dans une section distincte du diff. Cette secti
 
 Le prompt du validateur (`agents/prompts/validateur.md`) l'instruit sur cette section 
 et sur le fait qu'un critère satisfait par du code visible dedans ne doit pas être refusé.
+
+Les fichiers cités dans les critères d'acceptation (entre backticks) sont trouvés et joints au validateur pour qu'il puisse vérifier le travail. Pour un projet déclaré `git_root: ancestor` (comme ide-core), la recherche s'étend au dépôt git qui contient le projet, pas seulement à son dossier (ticket-448). Les garde-fous restent en place : aucun chemin absolu, aucun fichier hors de la racine du dépôt. Les textes entre backticks qui contiennent une espace (p. ex. `git ls-files CLAUDE.md`) sont ignorés, ce qui évite de confondre des commandes avec des noms de fichiers.
+
+#### Dossiers cités dans les critères (ticket-509)
+
+Un critère peut désormais citer un dossier entre backticks. Quand le dossier existe, le validateur joint une liste avec les noms de ses fichiers (premier niveau, sans récursion). La liste est bornée en nombre d'entrées et compte dans le plafond global des fichiers joints.
+
+Un dossier cité avec ou sans slash final (`design/maquette` ou `design/maquette/`) est traité identiquement. Un dossier absent est marqué comme absent dans le rapport de validation.
+
+Dans les journaux de pipeline, l'entrée est marquée comme dossier : « `design/maquette/` (dossier, 9 fichiers) ». Cela permet de vérifier des critères du type « la maquette existe dans `design/maquette/` » sans nommer un fichier spécifique.
+
+#### Validation par schéma JSON
+
+Le validateur retourne son jugement validé par un schéma JSON (draft-07, ADR-061). Le fournisseur reçoit `schema=VALIDATOR_SCHEMA`, et le validateur lit directement `result.structured` sans passer par `extract_json`. Une sortie structurée absente ou sans champ `criteria` requis provoque un refus fermé.
+
+### Feedback du reviewer au codeur (ticket-474, ADR-009)
+
+Après chaque passe du reviewer, le retour au codeur comprend le verdict et une raison détaillée.
+
+**Extraction de la raison** : Le reviewer énonce son verdict seul sur sa ligne (ADR-009 — APPROVED, CHANGES_REQUESTED, etc.). La raison est le texte qui suit cette ligne ; s'il n'y a rien, la raison reste vide.
+
+**Limitation de longueur** : Le retour stocké en `run.review_feedback` est limité à 4 000 caractères (augmenté depuis 500 en ticket-474 pour capturer les objections complètes). Au-delà, le texte est suffixé par « [...] tronqué ».
+
+**Affichage dans le journal** : La ligne du pipeline affiche la première ligne non vide de la raison, pas le verdict seul. Cela permet au codeur de voir d'un coup d'œil la substance de l'objection — « interface manque un bouton » plutôt que juste « CHANGES_REQUESTED ».
+
+### Détection de travail existant et optimisation du démarrage (ticket-497)
+
+Quand un run reprend un ticket (redémarrage après interruption, quota épuisé ou autre raison), le pipeline détecte si la branche porte déjà des commits au-delà de son point de départ (`_fork_point`). Si c'est le cas, il optimise le démarrage avant de relancer le codeur :
+
+**Avec testeur actif** : Le pipeline lance d'abord le testeur sur l'arbre existant.
+- **Tests verts** : Saut du premier tour du codeur, enchaînement direct vers l'audit de sécurité, la revue et la validation — comme après un tour de codeur normal.
+- **Tests rouges, panne d'environnement ou délai dépassé** : Reprise du déroulé habituel (codeur en premier), avec les résultats du test dans son prompt.
+
+**Sans testeur** : Reprise du déroulé habituel (codeur en premier).
+
+Un refus de la revue ou du validateur renvoie au codeur comme d'habitude : cette optimisation n'affecte que le choix de la première étape.
+
+L'événement `run_resumed_from_existing_work` (ticket, commits repris, verdict des tests) est émis et tracé dans `pipeline-log.md`.
+
+### Vérification des identifiants de tickets en double (ticket-526)
+
+Après chaque tour de production (codeur ou architecte) et avant les tests, le pipeline appelle `verifier_tickets()` pour vérifier l'intégrité des tickets du projet :
+- Aucun identifiant n'est dupliqué
+- Les statuts de frontmatter (todo, in-progress, done, etc.) correspondent aux dossiers
+- Les valeurs de frontmatter sont valides
+
+Si un problème est détecté (doublon, statut incohérent, frontmatter invalide) :
+- Le tour est renvoyé au producteur sans progression dans le pipeline
+- Le contexte affiche la liste des problèmes (comme des tests échoués)
+- Une ligne de journal `[ticket-XXX] tickets: <n> problème(s) — <détail court>` s'écrit dans `pipeline-log.md`
+
+Le producteur corrige les fiches (fusion de doublons, suppression des fiches remplacées) et relance le tour. Cette vérification porte uniquement sur le diff du run, pas sur l'historique du projet : un ancien doublon hors du diff courant ne bloque pas.
+
+## Protection des fichiers sensibles et validation pré-run
+
+Certains fichiers sont critiques pour le fonctionnement de l'IDE et ne peuvent jamais être modifiés par les agents : `CLAUDE.md`, `agents.json`, `.claude/`, `.github/workflows/`, `.git/` (et `CLAUDE.local.md`).
+
+### Validation pré-run des critères impossibles
+
+Avant le premier tour, l'orchestrateur vérifie qu'aucun critère d'acceptation ne demande une modification impossible.
+
+Un critère qui cite un fichier protégé (entre backticks) **avec un verbe d'écriture** (modifier, ajouter, créer, supprimer, contient, etc.) déclenche un blocage. Le run s'arrête en statut `blocked` avant d'appeler le codeur, avec le message : « le critère N demande d'écrire `<chemin>`, que le pipeline refuse aux agents : à faire à la main ».
+
+En revanche, un critère qui cite un fichier protégé uniquement en lecture (« d'après `CLAUDE.md` ») ne bloque pas le run.
+
+### Propagation des refus du garde-fou
+
+Pendant un tour, si le garde-fou refuse une écriture sur un fichier protégé, le refus est collecté (chemin + raison) et transmis au reviewer et au validateur avec le diff, sous le titre « Écritures refusées par le garde-fou pendant ce tour ».
+
+Cela permet aux deux rôles de reconnaître une tentative que le pipeline interdit et de ne pas redemander sa correction.
+
+### Script de vérification et modifications de configuration (ticket-490)
+
+Le script désigné par `test_command` — par exemple `../scripts/verifier.py` sur
+ide-core — est identifié au démarrage du run et protégé contre l'écriture. Le
+hook `PreToolUse` refuse toute modification avec un message explicite. Si
+`test_command` ne nomme qu'une commande (`npm test`, `uv run pytest`), aucune
+protection supplémentaire n'est activée.
+
+Un diff qui modifie la configuration des tests — `conftest.py`, les sections
+`[tool.pytest*]` ou `[tool.mypy]` de `pyproject.toml`, `vitest.config.*`,
+`eslint.config.*`, `tsconfig*.json`, ou la clé `scripts` de `package.json` —
+est signalé au reviewer au début de son message, avec une ligne dans
+`pipeline-log.md`. Le reviewer doit vérifier que la modification ne rend pas la
+vérification plus faible.
+
+**Ce qui n'est pas fait** : le commit n'est jamais refusé même si la
+vérification s'affaiblit — c'est le rôle du reviewer et du validateur.
 
 ## Synchronisation de la base au démarrage
 
@@ -571,6 +1034,66 @@ Depuis le ticket-388, une erreur de limite de session provoque :
 
 Contrairement à `blocked`, `todo` ne bloque pas le projet. La file peut reprendre après l'heure indiquée. Aucun ticket n'est abîmé.
 
+
+## Gestion du quota d'abonnement (ticket-498)
+
+Quand l'appel d'un agent échoue parce que le quota d'abonnement Claude est épuisé, l'orchestrateur le reconnaît et l'enregistre distinctement d'un autre `ProcessError`.
+
+### Reconnaissance de l'épuisement
+
+L'orchestrateur reconnaît un épuisement du quota si :
+- Le `QuotaSnapshot` récent indique le statut `rejected`, ou
+- Le message d'erreur de l'appel contient un terme indiquant une limite d'usage (`usage limit`, `rate limit`, `allowance`), ou
+- C'est un `ProcessError` à `stderr` vide alors que le dernier snapshot indiquait `allowed_warning`.
+
+### Arrêt et reprise
+
+Lors de l'épuisement du quota :
+- La ligne du journal enregistre « quota épuisé — reprise vers <HH:MM UTC> » (heure lue depuis le snapshot si disponible, sinon « heure inconnue »)
+- Le ticket revient en `todo` sur sa branche, avec son travail déjà commité (en cohérence avec ADR-037)
+- La file s'arrête immédiatement avec le message « file interrompue : quota épuisé »
+
+Tout autre `ProcessError` (crash du SDK, erreur réseau, etc.) conserve le traitement standard : propagation de l'erreur et passage du ticket en état d'échec.
+
+### Hors scope
+
+Ce mécanisme ne relance pas la file automatiquement quand le quota se rétablit, et ne change pas les seuils du mode autonome (ADR-020).
+
+## Réalignement automatique du workspace avant un run (ticket-457)
+
+Avant le lancement du pipeline, l'orchestrateur prépare l'arbre de travail si l'une des conditions est remplie :
+- L'arbre n'est pas sur la branche de base du projet, OU
+- Seul `memory/pipeline-log.md` porte des modifications non commitees
+
+**Procédure** :
+1. Sauvegarder les lignes non commitees du journal de pipeline
+2. Revenir à la branche de base (reset hard)
+3. Réaligner la branche locale sur le distant (`git pull --ff-only`)
+4. Réappliquer les lignes sauvegardées du journal (union, sans doublon)
+
+**Garanties** :
+- Toute ligne du journal écrite précédemment reste présente une seule fois
+- Tout autre fichier modifié bloque le départ du run — pas de nettoyage auto
+
+**Contexte** : Après un run approuvé, la livraison en phase 2 (confiée au CIWatcher) écrit des lignes dans le journal *après* le commit de tenue de livres. Sans ce mécanisme, l'arbre resterait modifié, et le prochain run ne pourrait ni revenir à la base (arbre non propre) ni se réaligner (modifications bloquent le pull). Les tickets 378 et 406 ne couvraient que le cas où l'arbre était resté sur la branche de ticket — pas celui-ci.
+
+### Reconnaissance des tickets bloqués livrés manuellement (ticket-482)
+
+Quand un ticket passe en `blocked` après trois tours infructueux du pipeline, mais que sa PR est ensuite mergée manuellement (hors du pipeline), le ticket reste marqué `blocked` en tant que trace historique. Le réalignement de la base détecte ce cas et le range automatiquement en `done/`.
+
+**Mécanique** :
+- Au réalignement de la base (ticket-457) ou au départ d'une file
+- Pour chaque ticket en `blocked/`
+- Chercher une PR mergée dont la branche commence par `<ticket-id>-`
+- Si elle existe :
+  - Déplacer le ticket dans `done/`
+  - Passer son `status` à `done`
+  - Renseigner son `pr_number`
+  - Inclure ce déplacement dans le commit de tenue de livres du run suivant
+  - Journaliser : « ticket-N rangé en done : PR #M mergée »
+
+Cas d'usage : un ticket bloqué après le pipeline, livré manuellement, est reconnu lors de la prochaine synchronisation sans intervention manuelle.
+
 ## Documentation par lot (ADR-035, ticket-292)
 
 Après approbation, le pipeline met à jour la documentation technique et fonctionnelle 
@@ -588,6 +1111,40 @@ Un ticket peut se déclarer `light: true` dans son frontmatter. Les conséquence
 
 Cas limite : une file qui se termine sur des tickets légers les laisse sans documentation 
 jusqu'à l'appel suivant d'un agent de documentation (mode autonome, chat, nouveau run).
+
+### Sélection des rôles actifs (ticket-534)
+
+La `DocumentationService` n'appelle que les rôles de documentation déclarés **et** marqués actifs dans `agents.json` du projet. Un rôle absent d'`agents.json` ou déclaré `"active": false` n'est jamais appelé.
+
+Conséquences :
+
+- **Aucun rôle actif** → aucun fichier écrit, `memory/documentation.json` n'avance pas, aucun appel LLM.
+- **Plusieurs rôles actifs** → tous sont appelés comme avant (ticket-292).
+
+La sélection s'effectue dans `routers/orchestrator.py` (`_documenteur`), qui lit la configuration du projet sur son dossier réel.
+
+### Contenu fourni aux agents de documentation
+
+Le ticket-535 définit une règle : la documentation par lot se base sur le **code livré**, non sur des spéculations.
+
+**Problème** : les agents recevaient le texte des tickets et la doc actuelle — pas le code. Cela produisait des erreurs : structures mal attribuées, versions inventées, features documentées sans code.
+
+**Solution** : les agents reçoivent le **diff livré** du lot, ce qui les force à documenter la réalité du code.
+
+Exemples d'erreurs ainsi empêchées :
+- Groupes attribués au mauvais modèle → le diff montre lequel existe
+- Versions de migrations inventées → le diff liste les vraies
+- Features sans code → le diff refuse l'affirmation
+
+Une ADR (ticket-535) formalise cette règle.
+
+Le module `services/documentation_code.py` (ticket-540) produit ce contenu. Pour chaque ticket d'une file, il extrait :
+
+- **Diff filtré** : les changements du ticket, en excluant `tickets/`, `memory/`, `agents.json`, `README.md`, `docs/` et en réduisant les lockfiles à une seule ligne. Le diff est prélevé depuis la racine du dépôt, même pour un projet situé sous `projects/` (les exclusions portent alors le chemin complet du projet). Un diff supérieur à 12 000 caractères par ticket est tronqué, avec un total de 60 000 caractères par lot ; la troncature nomme les fichiers non affichés.
+- **Fichiers modifiés ou ajoutés** : le contenu des fichiers du diff, jusqu'à 8 000 caractères par fichier et 40 000 au total, trié par nombre de lignes changées décroissant. Un fichier trop long reste représenté par ses hunks.
+- **Tickets sans diff** : ceux dont le diff filtré est vide ou introuvable figurent dans une liste séparée.
+
+La fonction accepte une base explicite (commit ou branche) pour le diff, ce qui permet au run d'extraire les changements depuis le commit de la branche de travail — utile si la branche n'a pas encore été rebasée sur `main`. Les appelants existants gardent leur comportement (diff contre `main` par défaut).
 
 ## Livraison (ADR-029, ADR-030, ADR-051)
 
@@ -608,6 +1165,37 @@ de commencer pendant l'attente de CI.
 
 Hors pipeline (appels directs depuis le chat ou l'interface), la méthode 
 `livrer()` enchaîne les deux phases pour livrer entièrement en synchrone.
+
+### Approbation et vérification du SHA du commit (ticket-492)
+
+L'approbation lie le verdict du reviewer et du validateur à un commit précis (`approved_sha`). Avant le merge, deux vérifications garantissent que seul ce commit est livré.
+
+**Phase 1 (avant push)** : les commits entre `approved_sha` et la tête doivent tous être des commits de rangement du pipeline (touchant uniquement `projects/<id>/tickets/**` et `memory/pipeline-log.md`). Tout autre commit met le run en `blocked`. Le SHA poussé est enregistré (`pushed_sha`).
+
+**Phase 2 (au merge)** : `CIWatcher` vérifie que la tête de la PR est toujours `pushed_sha`. Un changement (rebase de la CI, push externe) met le ticket en `blocked`. Les rebases du pipeline lui-même mettent `pushed_sha` à jour.
+
+
+#### Fallback sur git ls-remote pour les clones single-branch (ticket-517)
+
+Lors du clonage d'un dépôt, si le refspec de `remote.origin.fetch` ne suit que la branche principale (ex : `+refs/heads/main:refs/remotes/origin/main`), les branches de ticket poussées ne créent pas de références `refs/remotes/origin/<branche>` en local.
+
+Le CIWatcher vérifie que la PR à merger contient le commit réel qui a été poussé. Pour cela, `GitWorkspaceService.sha_distant()` retrouve le SHA de la branche distante :
+
+1. Il tente d'abord `git rev-parse refs/remotes/origin/<branche>` (référence locale, rapide)
+2. Si la référence n'existe pas, il bascule sur `git ls-remote origin refs/heads/<branche>` (appel réseau, fiable)
+3. Si le distant est injoignable, il renvoie `None` et le merge reste fermé (ADR-039)
+
+Lors du clonage, `git_clone.py` rétablit un refspec complet (`+refs/heads/*:refs/remotes/origin/*`) pour éviter ce problème. Un dépôt dont le refspec reste réduit est signalé dans les logs du backend avec son projet en cause.
+
+#### Relecture avec fenêtre de grâce pour décalage GitHub (ticket-527)
+
+Quand l'API GitHub signale une tête de PR différente du commit que le pipeline vient de pousser, il est possible que la lecture soit simplement en retard : GitHub n'a pas encore propagé le push au-delà de quelques secondes. Pour éviter de refuser prématurément une PR valide, le `CIWatcher` vérifie si la tête lue est un ancêtre du commit poussé.
+
+- **Cas 1 : la tête lue est un ancêtre du commit poussé** — c'est un retard normal. Le contrôle relira la tête jusqu'à 5 fois sur une fenêtre courte (60 s par défaut, réglable). Si à la fin de la fenêtre la tête est devenue le commit poussé, aucun refus. Si elle est restée différente, le merge est refusé avec le même message qu'avant : la PR ne peut pas avancer si la tête ne correspond pas.
+- **Cas 2 : la tête lue n'est pas un ancêtre du commit poussé** — quelqu'un a changé la cible. Le refus est immédiat, sans relecture.
+- **Cas 3 : l'ascendance ne peut pas être vérifiée** (erreur du clone, repo corrompu) — par prudence, le contrôle relira quand même pendant la fenêtre, puis refusera si la vérification reste impossible.
+
+Aucune relecture n'enchaîne un merge : elle retarde seulement le refus, et reste fermée (ADR-039) — une tête différente ne peut pas s'approuver.
 
 ### Garanties de la phase 2 (ticket-328)
 
@@ -685,6 +1273,44 @@ pointe d'origine de la branche du ticket, **sans perdre ce qui était commité**
 Après l'échec, `.git/rebase-merge` n'existe plus : l'arbre est propre pour le
 ticket suivant, même en mode file.
 
+#### Résolution automatique pour fichiers d'ajout seul (ticket-418)
+
+Deux fichiers où chaque run ne fait que ajouter des entrées ne bloquent plus une livraison sur conflit de rebase :
+
+- **`memory/pipeline-log.md`** : le service de préparation de l'espace git (avant chaque run) configure `merge=union` pour ce fichier dans `.git/info/attributes` du dépôt du projet. Ce paramètre reste en `.git/`, jamais versionné (configuration locale propre à chaque clone, voir ADR-021). Le pilote d'union natif à git résout automatiquement les conflits par concaténation ligne à ligne.
+
+- **`memory/documentation.json`** : si c'est le seul fichier en conflit lors du rebase, il est résolu mécaniquement en prenant l'union des listes d'identifiants de run (JSON parcouru et réécrit en mémoire), puis le rebase continue.
+
+Si d'autres fichiers sont en conflit, c'est un scénario complexe : le rebase s'arrête, la branche reste intacte, et un agent tente la résolution de ces ambiguïtés intrinsèques, toujours relue avant approbation (voir ADR-033). Cette automatisation élimine les blocages sur des fichiers où l'ajout séquentiel de deux branches ne crée aucune ambiguïté.
+
+#### Résolution mécanique pour schémas Prisma et migrations en collision (ticket-484)
+
+Avant d'appeler le résolveur-conflit, deux cas d'ajouts strictement additifs sont résolus mécaniquement :
+
+1. **Schéma Prisma (`.prisma`)** : quand aucun côté ne modifie un bloc existant mais ajoute seulement des blocs complets (`model`, `enum`, `type`), ils sont fusionnés dans l'ordre base puis ticket, en réparant l'accolade partagée pour un schéma valide sans marque de conflit.
+
+2. **Migrations en collision** : après le rebase, si deux dossiers de `prisma/migrations/` portent le même préfixe numérique, celui du ticket est renommé au numéro libre suivant et journalisé. Cette détection s'adapte aux horodatages utilisés par certains projets à la place des numéros séquentiels.
+
+Si le conflit modifie un bloc existant ou s'applique à un autre type de fichier, le résolveur-conflit est appelé normalement.
+
+#### Appel du résolveur-conflit pour les conflits complexes
+
+Quand l'auto-résolution échoue (fichiers modifiés des deux côtés, structures complexes), l'orchestrateur appelle le `resolveur-conflit` — un agent spécialisé en résolution de conflits (ADR-033) — **s'il est déclaré dans `agents.json` du projet**.
+
+Si le résolveur n'est pas déclaré ou ne peut pas tenter, la ligne d'arrêt affiche : « résolveur non tenté : [raison] ». L'utilisateur peut alors ajouter le rôle dans `agents.json` et relancer le run.
+
+### Union merge sur le journal du pipeline
+
+Le fichier `memory/pipeline-log.md` enregistre toutes les étapes du pipeline. Quand plusieurs runs livrent leurs changements en parallèle, chacun y ajoute ses lignes de log. Git utilise la stratégie `merge=union` pour ce fichier : en cas de conflit, les deux versions sont fusionnées, et garder toutes les lignes est toujours correct car chaque run est indépendant (ADR-051).
+
+
+
+Les runs lancés en parallèle ajoutent chacun leurs lignes au journal `memory/pipeline-log.md`. Plutôt que de traiter les conflits git, ce fichier utilise l'union merge (`.gitattributes`) : les deux versions y sont fusionnées. C'est la bonne résolution quand deux tickets indépendants enrichissent le même log — garder les deux lignes a du sens. `decisions.md` reste un fichier à résolution humaine : pas d'union merge.
+
+Lors d'une file de tickets en parallèle, chaque run ajoute des lignes à `memory/pipeline-log.md`. Quand deux PRs se créent simultanément, leurs écritures peuvent conflictuer au merge.
+
+L'attribut `.gitattributes merge=union` sur ce fichier demande à Git de combiner automatiquement les deux ensembles de lignes — la bonne résolution pour un journal qui ne fait que croître. Aucune intervention manuelle n'est requise pour ce fichier.
+
 ### Délai de grâce pour l'enregistrement des checks
 
 GitHub n'enregistre pas les checks de CI instantanément après l'ouverture 
@@ -710,6 +1336,14 @@ Avant de conclure `none` (aucun check enregistré), la livraison vérifie que le
 
 Sur une erreur réseau pendant la phase 2 (`httpx.TransportError`, dont `ReadTimeout`), le CIWatcher relit l'état de la PR avant d'abandonner. Si la PR est déjà mergée (`merged=True`), le run est marqué réussi avec un journal « mergée malgré une erreur réseau ». Tout message d'erreur inclut le type de l'exception, même si son contenu est vide (ticket-405).
 
+### Arrêt sur permissions insuffisantes pour la CI
+
+Quand le jeton GitHub ne peut pas accéder aux check-runs du dépôt (réponse HTTP 403 ou 404 sur l'endpoint `check-runs`), la livraison s'arrête immédiatement avec un message qui nomme les permissions manquantes, au lieu d'attendre le délai complet de CI.
+
+`_get_ci_status` (github_service.py) rend l'état `"unreadable"` dans ce cas. `_attendre_la_ci` le reconnaît et l'arrête aussitôt, sans délai. La PR reste ouverte (ADR-030 : aucun merge sans CI lue). Une fois les permissions ajoutées au jeton, l'agent peut relancer le run.
+
+`CIWatcher` applique la même logique quand il surveille le statut après l'ouverture de la PR.
+
 ### Méthode de merge configurable
 
 Une PR de ticket est mergée selon la méthode déclarée dans `agents.json` du 
@@ -726,6 +1360,20 @@ Dès qu'une PR est ouverte, elle se voit assigner un `pr_number`. Celui-ci est �
 dans le fichier du ticket et commité **avant** le merge de la PR, garantissant que
 le `pr_number` remonte à la branche de base lors du merge. Aucun suivi n'est écrit
 après le merge : la branche du ticket ne reçoit pas de commit une fois fusionnée.
+
+#### Détection des PR non fusionables
+
+Le CIWatcher lit le statut `mergeable_state` de la PR pendant l'attente de CI. Si ce statut devient `dirty` (la PR a un conflit avec la base), la surveillance s'arrête immédiatement avec une ligne d'arrêt dans `memory/pipeline-log.md`. Le ticket passe en échec, et les dépendants qui l'attendent le reçoivent aussi en échec (ticket-452).
+
+#### Récupération d'une PR créée malgré une erreur réseau (ticket-455)
+
+Quand l'appel d'ouverture de la PR échoue avec une erreur de transport (`httpx.TransportError`, notamment `ReadTimeout`), Tessera ne connaît pas le numéro de la PR créée — la livraison s'arrête sans pouvoir la confier au CIWatcher.
+
+Pour récupérer cette PR orpheline, la phase 1 cherche une PR ouverte dont la branche de tête est celle du run courant (`GET /pulls?head=<owner>:<branche>&state=open`). Si elle existe, elle est traitée comme une `LivraisonInterrompue` avec `pr_orpheline=True` : elle passe au CIWatcher pour le suivi du statut CI. Si la recherche elle-même échoue ou qu'aucune PR n'est trouvée, l'arrêt d'origine est conservé sans nouvelle erreur.
+
+#### Retry automatique pour les indisponibilités GitHub
+
+Lors de la lecture du statut CI ou du merge d'une PR, une indisponibilité passagère de GitHub (502 Bad Gateway, 503 Service Unavailable, 504 Gateway Timeout) n'arrête plus le run. Le CIWatcher réessaye jusqu'à trois fois avec une attente croissante (1 s, 2 s, 4 s) avant abandon définitif. Les erreurs 4xx (403 Forbidden, 404 Not Found…) ne déclenchent pas de retry — elles reflètent une vraie permission manquante ou une ressource disparue (ticket-461).
 
 ### Attente du statut mergeable avant le merge
 
@@ -775,6 +1423,23 @@ tant qu'elle n'aura pas mergé.
 **Divergence** : Si la branche locale et distante divergent hors d'une avance
 rapide, la branche n'est pas réécrite ; la raison s'ajoute à `Livraison.arret`.
 
+### Réalignement de la base locale après merge du CIWatcher (ticket-420)
+
+Après qu'un run autonome soit mergé par le `CIWatcher` (`services/ci_watcher.py`), la base locale doit être réalignée sur la base distante pour que les services du projet servent le code à jour.
+
+**Condition** : le réalignement ne s'effectue que si :
+- Aucun run n'occupe actuellement le projet (`RUN_REGISTRY.projet_occupe()` retourne faux)
+- L'arbre local est sur la branche de base configurée
+- Les seules modifications locales portent sur `memory/pipeline-log.md`
+
+**Procédure** :
+1. Extraire les lignes du journal non encore commitées
+2. `git checkout -- memory/pipeline-log.md` pour nettoyer le journal
+3. `git pull --ff-only` pour aligner l'arbre sur le distant
+4. Réécrire les lignes du journal qui n'y sont pas déjà présentes
+
+**Cas d'erreur** : tout échec du réalignement (autre branche, autre fichier modifié, pull impossible, dépôt sur une autre branche) est journalisé avec raison (`realignement_ignore`) mais n'affecte pas l'état du run — `merged` reste vrai. Aucun fichier n'est modifié en cas d'erreur.
+
 ### État du dépôt après livraison (ticket-378)
 
 Après la livraison d'un run, le dépôt local finit dans un état garanti :
@@ -785,6 +1450,16 @@ Après la livraison d'un run, le dépôt local finit dans un état garanti :
 
 Cela permet d'enchaîner plusieurs runs sans accumulation d'état en attente de nettoyage manuel.
 
+
+
+#### Gestion des fichiers non suivis après livraison (ticket-480)
+
+Après le merge d'une PR, le workspace se réaligne sur la branche de base. Deux cas spéciaux évitent les blocages :
+
+- **`memory/pipeline-log.md` non suivi localement mais présent distamment** : ses lignes locales sont mises de côté avant pull, puis réintégrées en union. Le pull passe sans refus.
+- **Fichiers non suivis et non ignorés laissés par le run** : listés au journal du pipeline, sans être supprimés.
+
+Résultat : `git pull` ne refuse jamais, et le workspace est propre pour le ticket suivant.
 
 ### Finalisation de tous les runs et journalisation des défaillances (tickets-377, 390)
 
@@ -817,6 +1492,25 @@ Après le merge du ticket précédent (ou l'expiration du plafond), la base du t
 Cette mécanique prévient les conflits causés par plusieurs tickets qui réécrivent les mêmes fichiers — en particulier `memory/architecture.md` et les guides de documentation — sans voir le changement du ticket précédent, qui a déjà fusionné.
 
 Pour les projets avec une vraie CI, le comportement reste inchangé : le ticket suivant démarre sans attendre le merge (ADR-051) et n'attend que ses dépendances explicites (`depends_on`).
+
+### Capture et dénomination des exceptions (ticket-415)
+
+Quand une exception survient durant la phase 1 de livraison, elle doit être nommée lisiblement — y compris les exceptions sans message (`asyncio.TimeoutError`, `CancelledError` relayée, erreurs réseau). L'utilitaire `decrire_exception()` renvoie le message de l'exception s'il n'est pas vide, sinon son type (`TimeoutError`), toujours préfixé du type quand le message seul ne le contient pas.
+
+La journalisation (`livraison_echouee`) inclut la pile complète (`exc_info=True`) pour aider au diagnostic.
+
+**Cas critique** : une exception survient **après** l'ouverture de la PR. Le numéro de PR n'est jamais perdu — la `Livraison` le porte même en cas d'erreur, et la phase 2 (attente CI, merge) est confiée au `CIWatcher` comme pour une livraison réussie. Les PRs orphelines — ouvertes mais jamais relancées — ne peuvent donc plus se produire.
+
+### Renumérotation des collisions de numéro (ticket-659)
+
+Quand deux branches partent du même `develop`, elles allouent indépendamment
+les numéros de ticket et d'ADR. La branche livrée en seconde risque de réutiliser
+un numéro déjà pris. Avant le rebase, l'étape de renumérotation détecte les collisions
+sur `origin/<base>` et alloue les numéros libres suivants. Elle réécrit les fichiers affectés
+(noms, identifiants, titres, références) et journalise chaque renumérotation en union dans
+`memory/pipeline-log.md` (ADR-051). `scripts/prochain_numero.py` expose la même logique d'allocation
+pour les agents qui créent des tickets — architecte et codeur l'utilisent avant d'écrire
+une fiche pour garantir que le numéro n'est pris ni sur l'arbre, ni sur `origin/<base>`, ni sur d'autres branches `origin/ticket-*` en cours.
 
 ## Caching des statuts GitHub (ticket-364)
 
@@ -881,6 +1575,81 @@ Chaque projet est associé à une icône, cherchée dans cet ordre :
 
 Pour un projet déclaré `git_root: ancestor` (qui habite un sous-dossier d'un dépôt), la recherche s'effectue aussi à la racine du dépôt qui le contient, dans le même ordre. Un projet frère sans `.tessera/icon.svg` ni chemin standard ne reçoit pas d'icône (ticket-404).
 
+### Caching des services (ticket-410)
+
+Chaque carte de projet dans la vue d'ensemble affiche deux états :
+- `services_declares` : le projet a-t-il déclaré des services dans `agents.json` ?
+- `services_en_cours` : au moins un de ces services est-il en cours d'exécution ?
+
+Contrairement aux autres champs de `ProjectOverview`, ces deux états ne sont **jamais cachés** : ils sont calculés à chaque appel sur l'état réel :
+
+- `services_declares` lit `load_services_config` à la racine du projet
+- `services_en_cours` interroge `PROCESS_REGISTRY` pour y chercher un service vivant du projet
+
+Cette absence de cache garantit qu'une nouvelle requête `GET /api/v1/projects/overview` reflète immédiatement les changements : un service démarré entre deux appels apparaît aussitôt, de même qu'un arrêt.
+
+### Contrôle des services depuis les cartes (ticket-411)
+
+Chaque carte de projet affiche un bouton de contrôle de service (« Lancer » ou « Arrêter ») si le projet déclare un service (`services_declares`). Le clic appelle `api.services.start` ou `api.services.stop` sans naviguer, puis relit la vue d'ensemble pour refléter le nouvel état.
+
+**Invariants d'interaction** :
+- Le clic sur le bouton **n'appelle pas** `onSelect` : `stopPropagation` bloque la sélection de la carte et la navigation
+- Le bouton est désactivé pendant l'appel API
+- Un échec affiche un message court sous le bouton en rouge (ADR-026) et laisse le bouton réactivé
+- Pas de bouton si `services_declares` est faux
+
+Le rechargement de la vue d'ensemble (`/api/v1/projects/overview`) après succès tient les états à jour en cas de lancements parallèles depuis plusieurs sessions.
+
+### Détection des services locaux (ticket-416)
+
+Tessera détecte et peut arrêter les apps de projet qui tournent localement, qu'elles soient lancées par l'IDE ou manuellement, pour libérer les ressources.
+
+L'endpoint `GET /api/v1/services/running` énumère chaque app avec les champs :
+
+- `project_id`, `project_name` : projet auquel elle appartient
+- `nom`, `pid` : nom du service et identifiant de processus
+- `origine: "tessera" | "externe"` : lancée par l'IDE ou détectée en dehors
+- `ports: [int]` : ports écoutés
+- `demarre_a` : timestamp de lancement
+- `memoire_mo` : consommation mémoire RSS en Mo
+
+**Services `tessera`** — enregistrés dans `PROCESS_REGISTRY` (lancés par l'IDE). Mémoire incluant les descendants du processus.
+
+**Services `externe`** — processus écoutant un port déclaré par un projet (`--port N` dans une commande d'`agents.json`, ou `server.port` dans `vite.config.ts`) mais lancés en dehors de l'IDE. Détection cherche tous les ports du projet, exclut 8100 (backend Tessera) et 5173 (frontend Vite).
+
+Mesure de mémoire : `psutil` si disponible (le backend le teste au startup) ; sinon repli sur `netstat -ano` + `tasklist` sous Windows, `ss` + `ps` ailleurs — interface unique derrière un mock testable (ADR-031).
+
+L'endpoint `POST /api/v1/services/running/{pid}/stop` arrête l'arbre de processus, seulement si ce pid figure dans l'inventaire courant (404 sinon). Services `tessera` passent par `PROCESS_REGISTRY.arreter` ; services externes sont tués directement.
+
+#### Attribution aux projets (ticket-435)
+
+Une app externe n'est attribuée au projet que si son processus (ou parent direct) s'exécute sous le dossier du projet — chemins résolus, casse Windows ignorée.
+
+Un port déclaré occupé par un processus étranger apparaît comme avertissement, sans pid arrêtable. L'endpoint `POST /services/running/{pid}/stop` refuse (404) pour ces avertissements.
+
+Le projet qui fait tourner l'IDE n'a jamais d'app externe.
+
+### Vue « En cours » (ticket-417)
+
+La vue « En cours » supervise les services de projet actifs sur la machine, exposant
+les endpoints d'arrêt implémentés par ticket-416 (`GET /api/v1/services/running` et
+`POST /api/v1/services/running/{pid}/stop`).
+
+**Polling autonome** : la liste se met à jour toutes les 10 secondes tant que la vue
+est visible. Ce polling est suspendu quand l'utilisateur quitte la vue (gestion de
+visibilité fenêtre, ticket-356), réduisant la charge en arrière-plan.
+
+**Affichage et tri** : en tête, le total de mémoire consommée par tous les services.
+La liste, groupée par projet et triée par mémoire décroissante, affiche par service :
+le nom du projet et du service, son origine (Tessera ou externe), ses ports en liens,
+sa durée et sa consommation mémoire, plus un bouton d'arrêt.
+
+**Arrêt sélectif** : un service lancé par l'IDE (Tessera) s'arrête immédiatement.
+Un service externe demande une confirmation avant d'être tué, afin d'éviter une
+interruption accidentelle. Après l'arrêt, la liste est rechargée.
+
+**États** : vide (aucune app active), chargement (récupération en cours), ou erreur.
+
 ## Contrôle des termes interdits dans la livraison (ADR-048, ADR-050)
 
 Après approbation du pipeline, avant l'ouverture de la PR, `GitHubWorkflowService`
@@ -899,6 +1668,50 @@ Deux étapes complètent la protection hors du pipeline :
 En local, une liste vide désactive le contrôle. En CI, son absence bloque le
 merge — c'est intentionnel.
 
+
+## Détection de secrets dans les diffs (ticket-547)
+
+Avant de pousser une branche, `GitHubWorkflowService.open_pull_request()` vérifie que les lignes ajoutées ne contiennent pas de secrets reconnaissables — jetons, clés, identifiants. La détection est **déterministe**, sans appel LLM.
+
+**Motifs reconnus** :
+- Clés d'accès AWS : `AKIA[0-9A-Z]{16}`
+- Jetons GitHub et GitLab : `gh[pousr]_[A-Za-z0-9]{36,}`, `github_pat_`, `glpat-`
+- Clés Anthropic : `sk-ant-[A-Za-z0-9_-]{20,}`
+- Clés Stripe : `sk_live_`
+- Clés privées : `-----BEGIN ... PRIVATE KEY-----`
+- Identifiants en URL : `://user:password@`
+- Fichiers sensibles (ajout) : `.env`, `*.pem`, `id_rsa`
+
+**Scope** : seules les lignes ajoutées (signe `+` en diff) sont vérifiées. Suppressions et contexte sont ignorés.
+
+**Exclusions** : le placeholder `sk-ant-...` ne déclenche pas d'alerte, ni une chaîne trop courte.
+
+**Rapport** : les violations nomment le fichier, la ligne et le type de secret, jamais la valeur. Exemple : `src/app.py:2 (aws-access-key)`.
+
+**Refus** : si une violation est détectée, le push est refusé avec un `WorkflowError`. La restriction s'applique quel que soit le niveau de confidentialité du run.
+
+Cette détection est la deuxième porte de l'ADR-050, après le hook `pre-push` et avant la CI GitHub.
+
+
+## Détection des consignes modifiées (ticket-734)
+
+Lorsqu'un diff ne touche que des fichiers de consignes — dans `projects/*/memory/` (contraintes et décisions), `agents/prompts/` (system prompts), `.claude/skills/` (skills), ou tout `CLAUDE.md` — le script `verifier.py` lance automatiquement `test_consignes_coherentes.py` même sans modification de code (ticket-734). Cela empêche les changements de configuration ou de règles de dépasser sans vérification.
+
+## Gestion des signalements en attente (ticket-421)
+
+Quand un signalement (`POST /api/v1/signalements`, ticket-407) arrive pendant qu'un run ide-core est actif, il n'est pas écrit immédiatement dans l'arbre. Cela évite qu'il soit emporté dans le commit du run en cours — ce qui poluerait le diff réel avec une métadonnée Tessera.
+
+**Flux** :
+
+1. Requête `POST /api/v1/signalements` reçue
+2. Vérification : `RUN_REGISTRY.projet_occupe("ide-core")` ?
+   - **Oui** : le signalement est écrit dans `signalements_en_attente.json` (à côté de la base SQLite, sous `settings.ide_db_path`) ; réponse **202** avec `{ "en_attente": true, "position": n }`
+   - **Non** : comportement standard, ticket créé dans `tickets/todo/` ; réponse **201**
+3. À la fermeture du run ide-core (évènement de fin ou appel `RUN_REGISTRY.fermer`), les signalements en attente sont convertis en tickets et écrits, en ordre d'arrivée, chacun recevant un numéro distinct
+4. Fichier `signalements_en_attente.json` vidé
+
+L'ordre est garanti : deux signalements reçoivent des `position` croissantes et sont écrits dans cet ordre.
+
 ## Validation des identifiants de projet (ticket-370)
 
 Toutes les routes contenant un paramètre `project_id` valident cet identifiant pour assurer que le chemin du projet reste conforme au dossier des projets configuré. Un `project_id` invalide — contenant `.`, `..`, `/`, `\` ou tout caractère ne correspondant pas au pattern `^[A-Za-z0-9][A-Za-z0-9._-]*$` — retourne une `404` sans jamais accéder au disque.
@@ -909,6 +1722,12 @@ La validation est centralisée dans `backend/src/tessera/services/project_loader
 2. **Corps de requête** — les objets `RunRequest` et `RunAutonomousRequest` rejettent un `project_id` invalide (→ `422`)
 
 Cette approche centralise la prévention des path traversals pour l'ensemble des routes via une seule décision.
+
+### Cohérence du project_id avec le dossier (ticket-481)
+
+Au chargement d'un projet, si `project_id` dans `agents.json` diffère du nom du dossier du projet, un avertissement est journalisé et ajouté au champ `avertissements` de `ProjectOverview`. Le nom du dossier reste l'identifiant unique du projet dans toutes les requêtes API.
+
+Cela prévient les problèmes de renommage : un projet renommé (dossier, historique git) dont `project_id` n'a pas été mis à jour sera détecté et signalé.
 
 ## Couche SQLite (ticket-015)
 
@@ -959,6 +1778,10 @@ CREATE TABLE agent_calls (
 
 WAL mode activé pour éviter les locks en écriture concurrente.
 `tessera.db` configurable via `IDE_DB_PATH` (default: `tessera.db` à la racine du projet).
+
+### Isolation des tests de la base de production
+
+Les tests du backend (`pytest`) redirectent `settings.ide_db_path` vers un fichier SQLite temporaire pour chacune de leurs exécutions (fixture `autouse` dans `backend/tests/conftest.py`, ticket-422). Aucun run de test n'écrit jamais dans `backend/tessera.db`, même quand les tests lancent le serveur complet via `TestClient(app)`.
 
 ## Récupération de l'historique d'un run (ticket-280, ticket-281, ticket-327)
 
@@ -1091,6 +1914,28 @@ Une optimisation de ticket-365 raffine le mécanisme précédent. Quand la PR pa
 
 Cette optimisation élimine les appels redondants sur les cartes dont la PR est réglée depuis longtemps.
 
+## Vue Historique (ticket-427)
+
+Chaque onglet du cockpit affiche une vue différente au centre : Tickets, Agents, Usage, Chat, ou Historique.
+
+`CenterView.tsx` route vers le composant approprié selon le panneau actif (`panel`). L'onglet **Historique** rend `HistoriqueView`, qui remplace la liste de tickets pour montrer l'historique des runs du projet.
+
+### Structure de HistoriqueView
+
+La vue Historique offre deux modes, sélectionnables via un en-tête avec deux boutons :
+
+1. **Détail du run** (défaut) : affiche le détail du run sélectionné ou le plus récent. Affiche le ticket, son titre, le verdict du run, le nombre de tours, et le fil complet du run rendu par `RunHistorique` (ticket-281). Sans run sélectionné : le plus récent ; sans aucun run : l'état vide.
+
+2. **Tous les runs** : tableau filtrable de tous les runs du projet. Colonnes : ticket, titre, verdict, nombre de tours, coût, date. Filtres : « Tous », « Approuvés », « Refusés ou bloqués ». Le filtre « Plusieurs tours » garde seulement les runs avec `rounds > 1`. Un clic sur une ligne ouvre le détail de ce run.
+
+### Interaction avec la colonne de gauche
+
+La colonne de gauche (`RunHistory.tsx`) liste les runs du projet. Un clic sur un run **sélectionne ce run** dans l'état du cockpit (à côté du ticket sélectionné), ce qui met à jour `HistoriqueView` pour afficher son détail. Le sélecteur de run est distinct du sélecteur de ticket.
+
+### Couleurs et statuts
+
+Les verdicts des runs sont colorés selon ADR-026 : vert approuvé, ambre plusieurs tours, rouge refusé ou bloqué.
+
 ## Structure des fichiers de tickets
 
 ```
@@ -1127,6 +1972,24 @@ Les tickets créés par lot depuis un plan conservent leurs critères d'acceptat
 Les critères d'acceptation d'un ticket sont extraits du corps Markdown par le service `pipeline_text`. La section de critères commence dès qu'une ligne **commence** par `## Critères d'acceptation` (insensible à la casse, ignorant l'indentation). Les références au titre dans la prose — même entre backticks, même sur la même ligne — ne sont jamais prises pour un en-tête réel.
 
 Chaque ligne non vide de la liste de critères devient un critère distinct. Un critère dont le texte cite le titre (ex. « Vérifier `## Critères d'acceptation` en début de ligne ») reste lisible et est compté normalement. Cette règle évite les faux positifs où une citation du titre de section dans le contexte ou la prose aurait fermé prématurément la section avant les vrais critères.
+
+### Validation des tickets avant commit (ticket-433)
+
+La fonction `verifier_tickets(racine_projet)` exécute les mêmes validations que `TicketService` au chargement, et renvoie une liste de problèmes — ou une liste vide si tous les tickets sont valides.
+
+Elle signale :
+- Un champ hors enum (ex. `type: invalid`) avec le chemin du fichier et le nom du champ
+- Un fichier rangé dans le dossier qui ne correspond pas à son `status` (ex. `status: done` dans `todo/`)
+- Deux fichiers portant le même `id`
+
+Un `created` lu par YAML comme une date (ex. `2026-10-14`) est accepté.
+
+Trois interfaces la proposent :
+- **Endpoint** : `GET /api/v1/projects/{id}/tickets/check` renvoie `{ "valides": true, "problemes": [] }`
+- **Commande Make** : `make check-tickets PROJET=<id>`
+- **Script PowerShell** : `.\scripts\tessera.ps1 check-tickets <id>`
+
+Elle s'intègre dans le workflow de vérification avant commit : si elle signale un problème, la branche locale n'est pas committée.
 
 ## Chat conversationnel (ticket-048, 225)
 
@@ -1322,3 +2185,360 @@ POST /orchestrator/run { project_id, ticket_id }
 > suivant. Seul un ticket **approuvé** fait avancer la ref de base, de sorte
 > qu'un plan de tickets séquentiels s'empile correctement sans jamais hériter
 > du travail rejeté d'un ticket précédent.
+## Design et maquettes
+
+Chaque projet peut déclarer une maquette d'interface validée dans `design/maquette/` (fichiers `.dc.html` exportés depuis l'éditeur Claude Design). Quand la maquette existe, elle fait autorité pour :
+
+- **Structure** : ordre des composants, hiérarchie visuelle
+- **Espacements** : tailles, marges, padding
+- **États** : hover, focus, disabled, et autres variantes
+- **Couleurs** : chaque teinte définie dans la maquette devient un token de la charte CSS (`memory/design.md`)
+
+Les textes affichés dans la maquette sont des données fictives, jamais du contenu à recopier. Les agents (codeur en premier, reviewer en validation) reproduisent d'abord la structure et les espacements de la maquette, puis y appliquent la charte de couleurs et typographie.
+
+Le gabarit `fastapi-react` inclut un dossier `design/maquette/` avec un `README.md` qui explique ce rôle. Les nouveaux projets créés depuis ce gabarit ont donc la structure prête.
+
+## Vue Bureau (ADR-058)
+
+La vue `BureauView` affiche les pièces des projets avec leurs postes de travail.
+
+- **`BureauView`** : conteneur principal qui monte un seul `setInterval` de 5 secondes via le hook `useSanteDuBureau`. Bascule automatiquement entre la grille (`Piece`) et la liste compacte (`Compact`) selon le nombre de projets.
+- **`Piece`** : affiche une pièce complète avec cinq postes.
+- **`PosteDeTravail`** : un poste unique, rendu comme un `button` avec `aria-label` décrivant le rôle et son état.
+- **`Compact`** : rangée compacte d'un projet.
+
+Les sprites sont tracés en SVG pixels. Aucune couleur hexadécimale n'apparaît dans `frontend/src/design/bureau/` — toutes les teintes utilisent des jetons `--sprite-*` dans `index.css`, avec états en `zinc`, `red`, `amber`, `green`, `blue`.
+
+Les animations ne modifient que `transform` et `opacity`, et sont neutralisées sous `prefers-reduced-motion`. Dix pièces rendues produisent moins de 2 000 nœuds SVG.
+
+## Mise en ligne (ADR-053, ticket-463)
+
+> Conçue, pas encore construite : les tickets 464 à 472 la réalisent.
+
+Tessera crée et relie les ressources en ligne d'un projet — Vercel, base de
+données, Resend, Stripe, DNS Cloudflare — sur une **action explicite de
+l'utilisateur** (`POST /api/v1/projects/{id}/provision`, puis un bouton « Mettre
+en ligne »). Aucun agent du pipeline ne la lance, et aucun outil d'agent ne
+l'expose.
+
+### Garde des jetons
+
+- Les jetons (`VERCEL_TOKEN`, `NEON_API_KEY`, `RESEND_API_KEY`,
+  `STRIPE_API_KEY`, `CLOUDFLARE_API_TOKEN`) se lisent dans le `.env` de Tessera,
+  par le backend seul (`config.Settings`). Ils ne sont jamais transmis à un
+  sous-processus agent : `agent_sdk` les vide dans l'environnement du CLI, comme
+  `ANTHROPIC_API_KEY`.
+- Un hook `PreToolUse` refuse à `Read`, `Glob`, `Grep` et `Bash` le `.env` de
+  Tessera (le chemin de `Settings.env_file`). Comme le contrôle d'écriture
+  d'ADR-031, il attrape une erreur, pas une évasion : le vrai plafond d'un jeton
+  est sa portée, pas ce hook.
+- Un secret reçu d'une API (clé Resend, `whsec_…` Stripe, URL de base) passe
+  **d'une API à l'autre** : il est écrit dans une variable Vercel de type
+  `sensitive` et n'est ni stocké, ni loggé, ni renvoyé. Les événements de la
+  mise en ligne ne portent que des noms d'étapes et des états.
+- Le masquage des logs porte sur les valeurs des jetons configurés et sur tout
+  secret reçu pendant l'appel. Une erreur de service se réduit au statut HTTP et
+  au code d'erreur de l'API, jamais à son corps (qui peut répéter la valeur).
+- La porte de push (ADR-048) traite les valeurs des jetons configurés comme des
+  termes interdits : un jeton ajouté dans un diff arrête le push.
+
+Cinq jetons gèrent l'accès aux services de mise en ligne : `VERCEL_TOKEN`, `NEON_API_KEY`, `RESEND_API_KEY`, `STRIPE_API_KEY`, `CLOUDFLARE_API_TOKEN`. Chacun est un champ `SecretStr` dans `config.Settings`, vide par défaut.
+
+Le backend seul les lit et les stocke. Aucun agent ne les reçoit, aucun log ne les montre, aucun push ne les emporte. Les valeurs sont masquées dans les logs par `SecretRegistry`, et l'agent SDK vide ces variables de son environnement avant chaque appel.
+
+Un hook `PreToolUse` refuse les outils `Read`, `Glob`, `Grep` et `Bash` qui tenteraient d'accéder au `.env` de Tessera (à la racine du dépôt). Pour `Bash`, le repérage lexical détecte les chemins ; il attrape une erreur, pas une évasion — voir ADR-031.
+
+**Portée minimale et expiration** : chaque jeton doit être créé avec les permissions strictement nécessaires à son service (déployer pour Vercel, migrer pour Neon, etc.) et configuré avec une date d'expiration — la plupart des fournisseurs la supportent. Sans expiration, les jetons entrent dans `FORBIDDEN_TERMS` au moment du push, et le diff s'arrête si la valeur y apparaît (ADR-048, ADR-050).
+
+### Portée minimale
+
+| Service | Jeton | Limite |
+|---|---|---|
+| Stripe | clé restreinte | produits, prix, webhooks en écriture ; **mode test** par défaut |
+| Vercel | jeton de compte | expiration obligatoire ; équipe limitée au scope du compte |
+| Cloudflare | jeton d'API | `Zone.DNS` en édition, sur la seule zone du projet |
+| Resend | clé d'API | création de domaines et de clés d'envoi |
+| Neon | clé d'API | projets du compte |
+
+Le mode réel de Stripe n'est jamais activé par Tessera : il suppose une clé
+restreinte `live`, posée à la main, et une déclaration explicite
+(`"stripe": {"mode": "live"}`).
+
+### Déclaration par projet
+
+Dans `agents.json`, un bloc `online` (distinct de `services`, qui désigne les
+commandes locales d'ADR-042) ; `agents.json` reste interdit en écriture aux
+agents (ADR-027) :
+
+```json
+"online": {
+  "domain": "pronosti.fr",
+  "resources": ["vercel", "database", "resend", "dns", "stripe"],
+  "stripe": {
+    "webhook_path": "/api/stripe/webhook",
+    "events": ["checkout.session.completed"],
+    "product": "Publication d'un événement",
+    "price_cents": 990
+  }
+}
+```
+
+`webhook_path` et `events` sont obligatoires dès que `stripe` est listé : les
+événements dépendent du code du projet, Tessera ne les devine pas.
+`product` et `price_cents` sont facultatifs — un projet qui passe son prix en
+ligne à Stripe n'a besoin ni de l'un ni de l'autre.
+
+Deux clés facultatives règlent l'étape Variables :
+
+```json
+"online": {
+  "domain": "kadoomi.com",
+  "generate": ["BETTER_AUTH_SECRET", "CRON_SECRET"],
+  "derive": {"BETTER_AUTH_URL": "https://{domain}"}
+}
+```
+
+`generate` liste les secrets aléatoires (`secrets.token_urlsafe(32)`) ; sans
+elle, le défaut reste `SESSION_SECRET` et `CRON_SECRET`. `derive` associe un nom
+à une valeur calculée, `{domain}` étant remplacé par le domaine déclaré.
+Dans les deux cas, une variable déjà présente dans Vercel n'est jamais
+réécrite ; `NEXT_PUBLIC_APP_URL` reste posée comme avant. Une valeur générée
+n'apparaît dans aucun log ni retour d'API.
+
+Quand `resend` fait partie des ressources, l'étape Variables pose aussi
+`RESEND_FROM_EMAIL`, l'adresse d'expéditeur, si elle est absente de Vercel. Par
+défaut : `<Nom> <bonjour@<domaine>>`, où `<Nom>` est le nom du projet (premier
+titre de son `CLAUDE.md`, à défaut son identifiant). Pour la surcharger,
+déclarer la variable dans `derive` :
+
+```json
+"derive": {"RESEND_FROM_EMAIL": "Équipe <contact@{domain}>"}
+```
+
+La valeur de `derive` l'emporte ; une variable déjà présente n'est jamais
+réécrite, et l'inspection (dry-run) la liste parmi les variables manquantes.
+L'adresse n'est pas un secret : elle n'entre pas dans le registre des valeurs
+masquées.
+
+Une clé facultative règle le contrôle final :
+
+```json
+"online": {
+  "domain": "kadoomi.com",
+  "health_path": "/api/health"
+}
+```
+
+`health_path` désigne une route du projet qui lit au moins une table et rend
+200 si tout va bien. Elle doit commencer par `/`. Tessera ne l'écrit pas, et
+n'applique pas les migrations : c'est le build du projet qui le fait. Sans
+`health_path`, l'étape `health_check` contrôle seulement `https://<domaine>/`
+et le dit dans son détail (`database not checked: declare health_path`).
+
+Absent : pas de bouton, pas d'endpoint utile. Une ressource non listée n'est ni
+créée ni contrôlée. Le nom du projet Vercel, de la base et de la clé Resend est
+l'identifiant du projet.
+
+### Étapes, dans l'ordre
+
+1. **Projet Vercel** : trouvé par son nom, sinon créé et relié au dépôt
+   `github_remote` ; le domaine est ajouté au projet.
+2. **Base** : projet Neon trouvé par son nom, sinon créé ; `DATABASE_URL`
+   écrite dans Vercel. Sans `NEON_API_KEY` (compte géré par l'intégration
+   Vercel), l'étape passe `manual` : elle vérifie seulement que `DATABASE_URL`
+   existe dans Vercel.
+3. **Variables** : `NEXT_PUBLIC_APP_URL`, les secrets de `generate` (défaut
+   `SESSION_SECRET`, `CRON_SECRET`), les valeurs de `derive` et, avec la
+   ressource `resend`, `RESEND_FROM_EMAIL`, posés **seulement si absents**.
+4. **Domaine Resend** : trouvé ou créé ; ses enregistrements DNS sont
+   collectés, une clé d'envoi dédiée est créée et écrite dans Vercel.
+5. **DNS** : les enregistrements demandés par Vercel et Resend sont publiés
+   dans la zone Cloudflare. Sans Cloudflare déclaré, ils sont listés pour
+   l'utilisateur (`manual`).
+6. **Vérification Resend** : déclenchée après les DNS ; `pending` n'est pas un
+   échec, une relance la relit.
+7. **Stripe** : produit (trouvé par `metadata.tessera_project`) et prix (par
+   `lookup_key`) s'ils sont déclarés, webhook (par URL) toujours ; le secret du
+   webhook va dans Vercel.
+8. **Redéploiement** : seulement si une variable a été écrite pendant la
+   relance.
+9. **Contrôle de santé** (`health_check`, avec `vercel`) : `GET
+   https://<domaine><health_path>`, six essais espacés de 10 s le temps que le
+   déploiement réponde. 200 : `done` ; autre statut ou délai dépassé : `failed`,
+   avec le statut et les 200 premiers caractères de la réponse. Une base vide
+   ou injoignable se voit donc le jour même.
+
+### Reprise et idempotence
+
+Aucun état local n'est écrit : **le monde est la source de vérité**. Chaque
+relance lit d'abord chaque service (`inspect`), puis ne crée que ce qui
+manque (`apply`). Une variable Vercel `sensitive` ne se relit pas : on n'en
+contrôle que le nom, et on n'écrase jamais une valeur existante.
+
+Une ressource trouvée en double refuse l'étape. Un secret qui n'est montré
+qu'à la création (clé Resend, `whsec_…`) trouvé **sans** sa variable Vercel est
+perdu : l'étape s'arrête en `needs_human` et nomme la ressource à supprimer
+dans le tableau de bord, puis la relance la recrée. Tessera ne supprime jamais.
+Une étape en échec arrête les suivantes ; les étapes déjà faites restent faites.
+
+### Ce qui reste humain
+
+Création des comptes, achat du domaine, activation du mode réel Stripe, et la
+clé Stripe du **site** : l'API Stripe ne crée pas de clé, `STRIPE_SECRET_KEY`
+du projet se pose donc à la main dans Vercel. Tessera en vérifie le nom
+(`needs_human` s'il manque), jamais la valeur.
+
+### Observation
+
+Chaque étape émet `provisioning_step` (`nom`, `etat` : `done`, `skipped`,
+`pending`, `manual`, `needs_human`, `failed` ; `todo` en lecture seule) sur le canal d'ADR-041. Un
+verrou par projet, distinct de `RunLock` (la mise en ligne ne touche pas à
+l'arbre), refuse une seconde mise en ligne simultanée avec un 409.
+
+### Endpoints de provisioning
+
+Les deux points d'entrée HTTP du plan :
+
+- **`POST /api/v1/projects/{project_id}/provision`** : déclenche le plan en tâche de fond. Répond `202` sans attendre. Le plan s'observe sur `WS /api/v1/orchestrator/observe` (ADR-041). L'authentification exige `STATIC_TOKEN` si elle est renseignée.
+- **`GET /api/v1/projects/{project_id}/provision`** : lit l'état du plan via `dry_run=True` — chaque étape appelle `inspect`, aucune `apply`. Utile pour vérifier l'état sans risque.
+
+Le verrou de mise en ligne est distinct de `RunLock` : le même projet ne peut pas lancer deux provisioning en même temps. Une étape qui lève une exception libère le verrou et devient un événement `failed`. La réponse HTTP ne porte aucune trace d'appel ni de jeton (ADR-053).
+
+Aucun module du pipeline (routers, services d'orchestration), du chat ni des agents n'importe `services.provisioning` : le provisioning reste isolé et utile seulement à l'utilisateur.
+
+### Moteur de provisioning (ticket-465)
+
+Package `services/provisioning/` : orchestrateur des étapes de mise en ligne, exécutées dans l'ordre déclaré dans le bloc `online` d'`agents.json`.
+
+**Principes généraux**
+
+- Aucun fichier d'état : le **monde est la source de vérité**. Les services eux-mêmes (via leurs API publiques) disent ce qui existe. Chaque relaunch relit tout.
+- Chaque étape lit d'abord (`inspect`) pour déterminer s'il faut agir, puis crée le manquant (`apply`).
+- Un échec (`failed`) ou demande d'intervention humaine (`needs_human`) arrête la suite sans annuler ce qui est déjà fait : idempotence garantie.
+
+**Architecture**
+
+- `StepState` (enum) : `todo`, `done`, `skipped`, `pending`, `manual`, `needs_human`, `failed`
+- `StepResult` : état + détail (nom de ressource, instruction — jamais un secret)
+- `ProvisioningStep` (Protocol) :
+  - `name` — identifiant unique
+  - `inspect(ctx)` — lit le monde, retourne un `StepResult` (lecture seule)
+  - `apply(ctx)` — crée ce qui manque (jamais appelé en `dry_run`)
+- `ProvisioningContext` : paramètres partagés (project_id, OnlineConfig, env_writer, DNS voulu, envs modifiés, DNS publié)
+- `OnlineConfig` (Pydantic v2) : lit le bloc `online` d'`agents.json` (domaine, ressources, configuration Stripe)
+- `ProvisioningPlan.run(ctx, dry_run)` :
+  - `dry_run = true` → rend `todo` pour ce qui manque, n'appelle jamais `apply`
+  - Si `skipped` → passe à la suivante
+  - Sinon : appelle `apply`, continue
+  - Si `failed` ou `needs_human` → arrête les suivantes (laisse au statut `todo`)
+- `ServiceError(service, status, code)` : message limité au statut HTTP et au code d'erreur de l'API, jamais le corps de la réponse (qui peut contenir un secret)
+
+**Observation**
+
+Chaque appel à `inspect` ou `apply` émet un événement `provisioning_step` sur le WebSocket (ADR-041) :
+
+- `step` — nom de l'étape
+- `state` — le StepState obtenu
+- `detail` — instruction ou nom de ressource créée
+- **Invariant** : aucun secret du registre (`SecretRegistry`, ticket-464) ne figure dans `detail`
+
+**Branchement des services**
+
+Les tickets 466–470 implémentent chacun un `ProvisioningStep` pour un service (domaine, DNS, email, paiement…) et s'y branchent.
+
+### Client Vercel (ticket-466)
+
+Trois étapes coordonnées pour provisionner un projet Vercel :
+
+1. **`vercel_project`** : trouve ou crée un projet par son nom, ajoute le domaine s'il manque, et verse les enregistrements DNS attendus dans `ctx.wanted_dns`.
+2. **`variables`** : pose les variables d'environnement (`NEXT_PUBLIC_APP_URL`, `SESSION_SECRET`, `CRON_SECRET`) si elles sont absentes, en type `sensitive` sauf la variable publique. **Aucune variable existante n'est jamais réécrite** — c'est une garantie de sécurité (ADR-053).
+3. **`redeploy`** : redéploie le dernier déploiement si une variable a été écrite (si `ctx.changed_env` n'est pas vide).
+
+Idempotence garantie : rejouer le passage ne change rien si le projet, le domaine et les variables sont déjà en place. Les jetons et valeurs sensibles ne sont jamais loggés ni inclus dans les erreurs.
+
+### Domaine www et redirection (ticket-502)
+
+La mise en ligne ajoute automatiquement le domaine `www.<domaine>` au projet Vercel avec une redirection 308 vers le domaine principal (`<domaine>`). Cela évite que les visiteurs qui tapent `https://www.example.com` ne trouvent une page d'erreur NXDOMAIN.
+
+L'étape `vercel_project` :
+- Crée le domaine `www.<domaine>` s'il n'existe pas, avec `redirect` pointant vers `<domaine>` et `redirectStatusCode: 308`
+- N'ajoute rien si le domaine déclaré commence déjà par `www.` (pas de `www.www.example.com`)
+- Ajoute la recommandation DNS de Vercel pour le domaine `www` à `ctx.wanted_dns`, comme pour l'apex
+- Laisse intouché un domaine `www` déjà configuré manuellement avec une autre cible
+
+### Étapes Resend (ticket-468)
+
+Deux étapes de configuration du domaine d'envoi dans l'API Resend, servant à la livraison des e-mails transactionnels.
+
+**`resend_domain`** : cherche ou crée un domaine d'envoi dans Resend. À la création, l'API retourne ses enregistrements DNS (DKIM, SPF, DMARC) que l'étape range dans `ctx.wanted_dns` pour que le DNS soit publié avant vérification. Crée aussi une clé d'API limitée au domaine seul, nommée d'après le projet, et l'écrit dans Vercel sous `RESEND_API_KEY`. Idempotente : un domaine existant n'est pas recréé. Cas particulier : si une clé existe sans variable Vercel, l'étape rend `needs_human`, nomme la clé à supprimer, et n'émet aucun appel de suppression.
+
+**`resend_verify`** : après publication du DNS, lance la vérification du domaine (`POST /domains/{id}/verify`). N'agit que si `ctx.dns_published` est vrai. Les statuts du domaine rendent : `verified` → `done`, en attente → `pending`, `failed` → `failed`.
+
+L'ordre global est : domaine créé et enregistrements récupérés, DNS publié (ticket-469), puis vérification lancée. Dépend de ticket-466 (Vercel) et ticket-469 (DNS).
+#### Inspection de l'étape de vérification Resend (ticket-506)
+
+L'inspection (`dry_run=True`) de l'étape `resend_verify` rapporte l'état réel du domaine tel que le serveur Resend le connaît, sans déclencher d'appel au serveur :
+
+- **Domaine au statut `not_started` ou sans statut** : `TODO` — la vérification doit être lancée
+- **Domaine au statut `pending`, `partially_verified`, ou `temporary_failure`** : `PENDING` — des vérifications de DNS sont en cours (MX, TXT, etc.)
+- **Domaine au statut `failed`** : `FAILED` — la vérification a échoué
+- **Domaine au statut `verified`** : `DONE` — le domaine est vérifié
+
+Ce comportement d'inspection diffère de l'application (`apply`) : l'inspection ne lit que l'état du domaine déjà connu sans le relancer, tandis que `apply` réexécute la vérification si nécessaire.
+
+### Client Neon (ticket-467)
+
+Le client Neon crée ou cherche un projet PostgreSQL chez Neon via l'API `https://api.neon.tech`. Localisation : `services/provisioning/neon.py`.
+
+Même discipline d'erreurs et de logs que le client Vercel. Trois opérations :
+1. **Chercher** un projet par nom (identifiant du projet)
+2. **Créer** s'il n'existe pas
+3. **Lire l'URI** de connexion et la passer à `env_writer.set_env("DATABASE_URL", …)` pour inscription dans `SecretRegistry`
+
+L'URI de connexion n'apparaît jamais dans les logs, les événements, ni dans le corps d'une `ServiceError`. Seul le statut de l'opération est rapporté.
+
+La docstring cite les pages de documentation Neon : projets, branches, URI de connexion.
+
+### Étape database (ticket-467)
+
+L'étape `database` du provisioning assure qu'un projet a une base de données PostgreSQL chez Neon et que `DATABASE_URL` est inscrit dans Vercel.
+
+Flux :
+1. Vérifier si `DATABASE_URL` existe dans Vercel
+2. Si oui → retour `skipped`, sans appel à Neon
+3. Si non, chercher un projet Neon portant le nom du projet Tessera
+4. Si trouvé → lire l'URI ; si absent → créer, puis lire l'URI
+5. Écrire `DATABASE_URL` dans Vercel → retour `done`
+
+Cas particuliers :
+- **Deux projets Neon portent le même nom** → collision détectée, rien n'est créé, retour `failed`
+- **`NEON_API_KEY` vide** (clef API non renseignée) :
+  - `DATABASE_URL` existe dans Vercel → retour `manual` (base fournie manuellement)
+  - `DATABASE_URL` n'existe pas → retour `needs_human` avec instruction d'en fournir une ou de renseigner `NEON_API_KEY`
+
+L'idempotence est garantie : un relancement immédiat ou après redémarrage retrouve la même base et ne la recrée pas.
+
+L'étape ne supprime jamais de base, ne migre pas de schéma — c'est du ressort du projet lors de son déploiement.
+
+
+### Client Cloudflare (ticket-469)
+
+Gère les enregistrements DNS de la zone du projet. Le jeton `CLOUDFLARE_API_TOKEN` est limité à `Zone.DNS` en édition sur la seule zone du projet (ADR-053).
+
+La zone est identifiée via `online.domain` dans la configuration de mise en ligne. L'achat du domaine et son ajout à Cloudflare restent humains. Les enregistrements DNS sont publics : leur nom, type et contenu peuvent être documentés sans restriction d'accès.
+
+### Étape DNS (ticket-469)
+
+Publie dans la zone Cloudflare les enregistrements demandés par les étapes antérieures (Vercel, Resend), listés dans `ctx.wanted_dns`.
+
+**Comportement** :
+- Chaque enregistrement est créé s'il n'existe pas à l'identique (type, nom, contenu)
+- Les enregistrements identiques sont ignorés
+- Aucun enregistrement n'est jamais modifié ou supprimé (pas d'appel DELETE)
+- Deux enregistrements de même type et nom mais contenu différent déclenchent `needs_human` ; l'étape n'effectue aucune écriture
+
+**Résultats possibles** :
+- Succès : tous les enregistrements demandés existent (`ctx.dns_published = true`)
+- `needs_human` : conflit détecté (même type/nom, contenu différent)
+- `manual` : `CLOUDFLARE_API_TOKEN` absent ou `dns` non déclaré dans `online.resources` ; l'étape liste les enregistrements à ajouter manuellement
+

@@ -1,7 +1,9 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import RunView from "./index";
+import { OuvrirTicketContext } from "../../hooks/useOuvrirTicket";
+import type { OuvrirTicket } from "../../hooks/useOuvrirTicket";
 import type { UseRunActifResult, PassageAgent } from "../../hooks/streamState";
 
 function flux(over: Partial<UseRunActifResult> = {}) {
@@ -17,6 +19,7 @@ function flux(over: Partial<UseRunActifResult> = {}) {
     errorMessage: null,
     quota: null,
     pendingQuestion: null,
+    etapesEnCours: [],
     queue: null,
     connect: () => {},
     connectQueue: () => {},
@@ -77,6 +80,44 @@ describe("RunView", () => {
   });
 });
 
+describe("RunView — santé de l'agent (ticket-549)", () => {
+  const MAINTENANT = new Date("2026-10-23T10:00:00.000Z");
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(MAINTENANT);
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("shows a stall suspicion after 181 seconds of silence", () => {
+    const dernier = new Date(MAINTENANT.getTime() - 181_000).toISOString();
+
+    render(<RunView stream={flux({ dernierEvenementA: dernier })} />);
+
+    expect(screen.getByText("figé ?")).toBeInTheDocument();
+  });
+
+  it("shows no pill once the run is done", () => {
+    render(<RunView stream={flux({ status: "done" })} />);
+
+    expect(screen.queryByText("travaille")).toBeNull();
+  });
+
+  it("shows no pill once the run is closed", () => {
+    render(<RunView stream={flux({ runClosed: true })} />);
+
+    expect(screen.queryByText("travaille")).toBeNull();
+  });
+
+  it("treats a missing timestamp as an active agent", () => {
+    render(<RunView stream={flux()} />);
+
+    expect(screen.getByText("travaille")).toBeInTheDocument();
+  });
+});
+
 describe("RunView — fil chronologique (ticket-222)", () => {
   it("replie une entrée terminée, affiche son résumé, et la déplie au clic", async () => {
     // Trois entrées : codeur tour 1 (terminé), reviewer tour 1 (terminé),
@@ -120,5 +161,41 @@ describe("RunView — fil chronologique (ticket-222)", () => {
     // Aucun libellé "Tour 1 — CODEUR" ni "Tour 1 — REVIEWER" dans les en-têtes.
     expect(screen.queryByText(/Tour 1\s*[—–]\s*CODEUR/i)).toBeNull();
     expect(screen.queryByText(/Tour 1\s*[—–]\s*REVIEWER/i)).toBeNull();
+  });
+});
+
+describe("RunView — le numéro du ticket ouvre le ticket (ticket-460)", () => {
+  function rendreAvecAction(projectId: string | null) {
+    const ouvrir = vi.fn<OuvrirTicket>().mockResolvedValue("ok");
+    render(
+      <OuvrirTicketContext.Provider value={ouvrir}>
+        <RunView stream={flux()} projectId={projectId} />
+      </OuvrirTicketContext.Provider>,
+    );
+    return ouvrir;
+  }
+
+  it("opens the ticket of the run from the header", async () => {
+    const ouvrir = rendreAvecAction("p1");
+
+    await userEvent.click(screen.getByRole("button", { name: "ticket-001" }));
+
+    expect(ouvrir).toHaveBeenCalledWith("p1", "ticket-001");
+  });
+
+  it("is activated by Enter", async () => {
+    const ouvrir = rendreAvecAction("p1");
+
+    screen.getByRole("button", { name: "ticket-001" }).focus();
+    await userEvent.keyboard("{Enter}");
+
+    expect(ouvrir).toHaveBeenCalledWith("p1", "ticket-001");
+  });
+
+  it("keeps the id as plain text without a project", () => {
+    rendreAvecAction(null);
+
+    expect(screen.queryByRole("button", { name: "ticket-001" })).toBeNull();
+    expect(screen.getByText("ticket-001")).toBeInTheDocument();
   });
 });

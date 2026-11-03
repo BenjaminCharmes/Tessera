@@ -1,8 +1,12 @@
-import { describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { api } from "../../lib/api";
 import NavRail from "./NavRail";
+import type { ReglageDesNotifications } from "./ReglageNotifications";
 import type { SidebarPanel } from "./panels";
+import type { DonneesDeLaCloche } from "../../hooks/useNotificationsSysteme";
+import { reglagesParDefaut } from "../../lib/reglagesNotifications";
 
 describe("NavRail", () => {
   it("affiche le nom du produit dans la zone d'identite", () => {
@@ -18,10 +22,100 @@ describe("NavRail", () => {
     expect(nom.className).not.toMatch(/text-violet-/);
   });
 
-  it("rend toujours les huit destinations sans regression", () => {
+  it("rend les neuf destinations sans regression", () => {
     render(<NavRail activePanel="projects" onChangePanel={() => {}} />);
     const tabs = screen.getAllByRole("tab");
-    expect(tabs).toHaveLength(8);
+    expect(tabs).toHaveLength(9);
+  });
+
+  it("place En cours juste apres Projets", () => {
+    render(<NavRail activePanel="projects" onChangePanel={() => {}} />);
+    const noms = screen.getAllByRole("tab").map((t) => t.textContent);
+    expect(noms[0]).toMatch(/Projets/);
+    expect(noms[1]).toMatch(/En cours/);
+  });
+
+  it("ordonne les neuf destinations par groupe", () => {
+    render(<NavRail activePanel="projects" onChangePanel={() => {}} />);
+    const noms = screen.getAllByRole("tab").map((t) => t.textContent ?? "");
+    const attendu = [
+      "Projets",
+      "En cours",
+      "Supervision",
+      "Tickets",
+      "Fichiers",
+      "Historique",
+      "Agents",
+      "Statistiques",
+      "Chat",
+    ];
+    expect(noms).toHaveLength(attendu.length);
+    attendu.forEach((nom, i) => expect(noms[i]).toMatch(nom));
+  });
+
+  it("place chaque intitule avant les destinations de son groupe", () => {
+    render(<NavRail activePanel="projects" onChangePanel={() => {}} />);
+    const ordre = (a: Node, b: Node): boolean =>
+      Boolean(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+    const groupes: Array<[string, RegExp, RegExp]> = [
+      ["Pilotage", /Projets/, /Supervision/],
+      ["Projet", /Tickets/, /Historique/],
+      ["Outils", /Agents/, /Chat/],
+    ];
+    for (const [titre, premier, dernier] of groupes) {
+      const intitule = screen.getByText(titre);
+      expect(ordre(intitule, screen.getByRole("tab", { name: premier }))).toBe(
+        true,
+      );
+      expect(ordre(intitule, screen.getByRole("tab", { name: dernier }))).toBe(
+        true,
+      );
+    }
+  });
+
+  it("nomme chaque groupe comme une liste a part", () => {
+    render(<NavRail activePanel="projects" onChangePanel={() => {}} />);
+    for (const [titre, nombre] of [
+      ["Pilotage", 3],
+      ["Projet", 3],
+      ["Outils", 3],
+    ] as const) {
+      const liste = screen.getByRole("list", { name: titre });
+      expect(within(liste).getAllByRole("listitem")).toHaveLength(nombre);
+    }
+  });
+
+  it("marque la destination active par aria-current", () => {
+    render(<NavRail activePanel="files" onChangePanel={() => {}} />);
+    expect(screen.getByRole("tab", { name: /Fichiers/ })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    expect(screen.getByRole("tab", { name: /Tickets/ })).not.toHaveAttribute(
+      "aria-current",
+    );
+  });
+
+  it("remonte la destination En cours", async () => {
+    const onChangePanel = vi.fn();
+    render(<NavRail activePanel="projects" onChangePanel={onChangePanel} />);
+    await userEvent.click(screen.getByRole("tab", { name: /En cours/ }));
+    expect(onChangePanel).toHaveBeenCalledWith<[SidebarPanel]>("running");
+  });
+
+  it("porte le nombre d'apps sur En cours", () => {
+    render(
+      <NavRail activePanel="projects" onChangePanel={() => {}} appsEnCours={4} />,
+    );
+    expect(screen.getByLabelText("4 apps en cours")).toHaveTextContent("4");
+  });
+
+  it("n'affiche aucune pastille d'apps quand aucune ne tourne", () => {
+    render(
+      <NavRail activePanel="projects" onChangePanel={() => {}} appsEnCours={0} />,
+    );
+    expect(screen.queryByLabelText(/app/)).not.toBeInTheDocument();
+    expect(screen.queryByText("0")).not.toBeInTheDocument();
   });
 
   it("propose une entree Chat", () => {
@@ -118,3 +212,108 @@ describe("NavRail", () => {
     expect(screen.getByText("1").className).toMatch(/blue/);
   });
 });
+
+describe("NavRail — le bouton Réglages (ticket-441)", () => {
+  const notifications: ReglageDesNotifications = {
+    active: true,
+    etat: "bloquees",
+    onChange: () => {},
+  };
+
+  beforeEach(() => {
+    vi.restoreAllMocks();
+    vi.spyOn(api.orchestrator, "limits").mockResolvedValue({
+      run_max_budget_usd: 1.5,
+      llm_max_budget_usd: 0,
+    });
+  });
+
+  function rendre() {
+    render(
+      <NavRail
+        activePanel="projects"
+        onChangePanel={() => {}}
+        notifications={notifications}
+      />,
+    );
+  }
+
+  it("offers a Réglages button, outside the tab list", () => {
+    rendre();
+
+    const bouton = screen.getByRole("button", { name: "Réglages" });
+    expect(bouton).toBeInTheDocument();
+    expect(bouton).toHaveAttribute("aria-expanded", "false");
+    expect(screen.getAllByRole("tab")).toHaveLength(9);
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("opens the panel holding the notification setting and the spending caps", async () => {
+    rendre();
+
+    await userEvent.click(screen.getByRole("button", { name: "Réglages" }));
+
+    const panneau = screen.getByRole("dialog", { name: "Réglages" });
+    expect(
+      within(panneau).getByLabelText("Notifications système"),
+    ).toBeInTheDocument();
+    expect(within(panneau).getByText(/bloquées par le navigateur/)).toBeInTheDocument();
+    expect(await within(panneau).findByText("$1.50")).toBeInTheDocument();
+  });
+
+  it("closes the panel on Escape", async () => {
+    rendre();
+    await userEvent.click(screen.getByRole("button", { name: "Réglages" }));
+
+    await userEvent.keyboard("{Escape}");
+
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("closes the panel on a click outside", async () => {
+    rendre();
+    await userEvent.click(screen.getByRole("button", { name: "Réglages" }));
+
+    await userEvent.click(screen.getByRole("tab", { name: /Agents/ }));
+
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("relays a change of the notification setting", async () => {
+    const onChange = vi.fn();
+    render(
+      <NavRail
+        activePanel="projects"
+        onChangePanel={() => {}}
+        notifications={{ ...notifications, etat: "actives", onChange }}
+      />,
+    );
+    await userEvent.click(screen.getByRole("button", { name: "Réglages" }));
+
+    await userEvent.click(screen.getByLabelText("Notifications système"));
+
+    expect(onChange).toHaveBeenCalledWith(false);
+  });
+
+  it("shows the bell with the unread count, outside the destinations", () => {
+    const cloche: DonneesDeLaCloche = {
+      historique: [],
+      nonLus: 4,
+      toutMarquerLu: vi.fn(),
+      reglages: reglagesParDefaut(),
+      setReglage: vi.fn(),
+      ouvrir: vi.fn(),
+    };
+    render(<NavRail activePanel="projects" onChangePanel={() => {}} cloche={cloche} />);
+
+    expect(screen.getByRole("button", { name: "Notifications, 4 non lues" })).toBeInTheDocument();
+    expect(screen.getByText("4")).toBeInTheDocument();
+    expect(screen.getAllByRole("tab")).toHaveLength(9);
+  });
+
+  it("shows no bell without notification data", () => {
+    render(<NavRail activePanel="projects" onChangePanel={() => {}} />);
+    expect(screen.queryByRole("button", { name: /^Notifications/ })).not.toBeInTheDocument();
+  });
+});
+

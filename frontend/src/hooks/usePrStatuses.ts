@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { api } from "../lib/api";
-import { useFenetreVisible } from "./useFenetreVisible";
+import { usePolling } from "./usePolling";
 import type { PRStatus, Ticket } from "../types/api";
 
 const POLL_INTERVAL_MS = 30_000;
@@ -40,64 +40,50 @@ export function usePrStatuses(
     projet: string;
     table: Record<string, PRStatus>;
   } | null>(null);
-  const fenetreVisible = useFenetreVisible();
 
-  // Évite de redemander après que toutes les PR sont réglées.
-  const allSettledRef = useRef(false);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  // Nouveau projet ou nouvelle PR : repartir de zéro. Déclaré avant l'effet
-  // de polling : React exécute les effets dans l'ordre de déclaration.
+  // Toutes les PR sont réglées (ou la requête ne peut plus aboutir) : plus
+  // rien à demander tant que le projet ou `clePr` ne change pas.
+  const cle = `${projectId ?? ""}|${clePr ?? "?"}`;
+  const [reglee, setReglee] = useState(false);
+  const [cleVue, setCleVue] = useState(cle);
+  if (cleVue !== cle) {
+    setCleVue(cle);
+    setReglee(false);
+  }
+  const cleCourante = useRef(cle);
   useEffect(() => {
-    allSettledRef.current = false;
-  }, [projectId, clePr]);
+    cleCourante.current = cle;
+  }, [cle]);
 
-  useEffect(() => {
-    // `clePr` vide : aucun ticket ne porte de PR, rien à demander.
-    if (!projectId || clePr === "" || !fenetreVisible || allSettledRef.current) return;
-
-    let cancelled = false;
-
-    const arreter = () => {
-      allSettledRef.current = true;
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
+  const lire = useCallback(async () => {
+    if (!projectId) return;
+    try {
+      const entries = await api.github.getPrStatuses(projectId);
+      if (cleCourante.current !== cle) return;
+      const table: Record<string, PRStatus> = {};
+      for (const e of entries) {
+        table[e.ticket_id] = {
+          state: e.state,
+          ci_status: e.ci_status,
+          pr_url: e.pr_url,
+          pr_number: e.pr_number,
+        };
       }
-    };
+      setCharge({ projet: projectId, table });
+      if (!entries.some((e) => e.state === "open")) setReglee(true);
+    } catch (err) {
+      if (cleCourante.current !== cle) return;
+      if (err instanceof Error && /^API 4\d\d\b/.test(err.message)) setReglee(true);
+    }
+  }, [projectId, cle]);
 
-    const doFetch = async () => {
-      if (allSettledRef.current) return;
-      try {
-        const entries = await api.github.getPrStatuses(projectId);
-        if (cancelled) return;
-        const table: Record<string, PRStatus> = {};
-        for (const e of entries) {
-          table[e.ticket_id] = {
-            state: e.state,
-            ci_status: e.ci_status,
-            pr_url: e.pr_url,
-            pr_number: e.pr_number,
-          };
-        }
-        setCharge({ projet: projectId, table });
-        if (!entries.some((e) => e.state === "open")) arreter();
-      } catch (err) {
-        if (err instanceof Error && /^API 4\d\d\b/.test(err.message)) arreter();
-      }
-    };
-
-    doFetch();
-    intervalRef.current = setInterval(doFetch, POLL_INTERVAL_MS);
-
-    return () => {
-      cancelled = true;
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-    };
-  }, [projectId, clePr, fenetreVisible]);
+  // `clePr` vide : aucun ticket ne porte de PR, rien à demander.
+  const actif = projectId !== null && clePr !== "" && !reglee;
+  usePolling(lire, {
+    cadenceMs: actif ? POLL_INTERVAL_MS : null,
+    immediat: true,
+    relance: cle,
+  });
 
   return charge !== null && charge.projet === projectId ? charge.table : VIDE;
 }

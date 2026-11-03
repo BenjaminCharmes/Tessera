@@ -1,21 +1,21 @@
-import re
 import time
 from collections.abc import Awaitable, Callable
 from pathlib import Path
 from typing import Any
 
 from tessera.models.agent import AgentConfig, AgentResult, AgentRole
-from tessera.models.ticket import Ticket, TicketStatus
+from tessera.models.ticket import Ticket
 from tessera.services.adr import adr_pertinents
 from tessera.services.agent_registry import AgentNotFoundError, AgentRegistryService
 from tessera.services.cost_calculator import DEFAULT_MODEL, calculate_cost
-from tessera.services.database import save_agent_call
+from tessera.services.agent_calls import save_agent_call
 from tessera.services.providers.base import (
     LLMProvider,
     ProviderResult,
     ToolEventCallback,
 )
 from tessera.services.prompt_loader import MissingPromptError
+from tessera.services.statut_suggere import _parse_suggested_status
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -39,7 +39,7 @@ _INSTRUCTIONS: dict[str, str] = {
         "Fournis le code complet et les tests."
     ),
     AgentRole.reviewer.value: (
-        "Relis le code produit. Indique CHANGES_REQUESTED ou APPROVED avec justification."
+        "Relis le code produit et rends ta revue dans le format structuré demandé."
     ),
     AgentRole.orchestrateur.value: (
         "Décompose ce ticket en sous-tickets si nécessaire. Assigne les rôles appropriés."
@@ -89,6 +89,7 @@ class AgentRunner:
         run_id: str | None = None,
         ask_user: Callable[[str], Awaitable[str]] | None = None,
         session: str | None = None,
+        schema: dict[str, Any] | None = None,
     ) -> AgentResult:
         role_str = role.value if isinstance(role, AgentRole) else role
         t0 = time.monotonic()
@@ -114,6 +115,9 @@ class AgentRunner:
         extra: dict[str, Any] = {"ask_user": ask_user} if ask_user is not None else {}
         if session is not None:
             extra["session"] = session
+        # Comme `session` : transmis seulement s'il est posé (ADR-061).
+        if schema is not None:
+            extra["schema"] = schema
 
         provider = self._provider_pour(role_str)
         provider_result: ProviderResult
@@ -137,7 +141,6 @@ class AgentRunner:
                 cwd=cwd,
                 **extra,
             )
-
         content = provider_result.content
         duration_ms = int((time.monotonic() - t0) * 1000)
 
@@ -183,6 +186,7 @@ class AgentRunner:
                     cost_usd,
                     duration_ms,
                     provider=provider_result.provider_name,
+                    cache_creation_tokens=provider_result.cache_creation_tokens,
                 )
             except Exception as exc:
                 _logger.warning("agent_call_save_failed", extra={"error": str(exc)})
@@ -195,6 +199,10 @@ class AgentRunner:
             duration_ms=duration_ms,
             cost_usd=cost_usd,
             session_id=provider_result.session_id,
+            outils_refuses=list(provider_result.outils_refuses),
+            structured=provider_result.structured,
+            num_turns=provider_result.num_turns,
+            max_turns_reached=provider_result.max_turns_reached,
         )
 
     def _provider_pour(self, role: str) -> LLMProvider:
@@ -268,27 +276,6 @@ class AgentRunner:
             "et corrige-le selon ces retours. Ne recommence pas depuis zéro : "
             "ce que tu as déjà lu et écrit est toujours là."
         )
-
-
-def _parse_suggested_status(content: str) -> TicketStatus:
-    """Extracts the suggested status from the agent's dedicated response section."""
-    in_section = False
-    for line in content.splitlines():
-        if re.search(r"statut\s+sugg[eé]r[eé]", line, re.IGNORECASE):
-            in_section = True
-            continue
-        if in_section and line.strip():
-            upper = line.upper()
-            if "IN_REVIEW" in upper or "IN-REVIEW" in upper:
-                return TicketStatus.in_review
-            if "BLOCKED" in upper:
-                return TicketStatus.blocked
-            if "DONE" in upper:
-                return TicketStatus.done
-            if "TODO" in upper:
-                return TicketStatus.todo
-            break
-    return TicketStatus.in_review
 
 
 def _nom_de_prompt(agent_config: "AgentConfig | None") -> str | None:

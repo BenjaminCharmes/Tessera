@@ -1,4 +1,4 @@
-.PHONY: help setup doctor dev dev-frontend tauri-dev tauri-build run stop verify test test-fast test-coverage lint clean install-hooks
+.PHONY: help setup doctor dev dev-frontend tauri-dev tauri-build run stop verify test test-fast test-coverage lint openapi check-tickets clean install-hooks
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Tessera — Makefile
@@ -17,6 +17,8 @@ help:
 	@echo "  make tauri-build  — Bundle de production Tauri (backend auto-démarré par l'app)"
 	@echo "  make test         — Lance la suite de tests"
 	@echo "  make lint         — Type-check avec mypy"
+	@echo "  make openapi      — Régénère docs/openapi.json (le contrat que lisent les tests frontend)"
+	@echo "  make check-tickets PROJET=<id> — Vérifie les tickets d'un projet avant de les committer"
 	@echo "  make clean        — Supprime les artefacts de build et cache"
 	@echo "  make install-hooks — Installe les hooks git locaux (recommandé après le premier clone)"
 	@echo ""
@@ -98,8 +100,19 @@ test-coverage:
 	@echo "→ Frontend coverage"
 	cd frontend && npm run test:coverage
 
+# Lit les tickets d'un projet comme le chargeur et nomme le fichier et le champ
+# fautifs ; sort en erreur au moindre problème (ticket-433).
+check-tickets:
+	@[ -n "$(PROJET)" ] || { echo "usage : make check-tickets PROJET=<id>"; exit 2; }
+	cd backend && uv run python -m tessera.services.ticket_check "$(PROJET)"
+
 lint:
 	cd backend && uv run mypy src/ && uv run mypy --platform linux src/
+
+# Un test backend échoue quand docs/openapi.json est périmé : à relancer après
+# toute route ou tout modèle de réponse modifié (ticket-684).
+openapi:
+	cd backend && uv run python -m tessera.openapi_export
 
 install-hooks:
 	cp scripts/hooks/pre-push .git/hooks/pre-push

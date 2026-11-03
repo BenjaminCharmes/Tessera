@@ -1,11 +1,11 @@
 """Service GitCloneService — ticket-030."""
 import asyncio
-import json
 import re
 import shutil
 from pathlib import Path
 
 from tessera.models.project import CloneProjectResponse, Project
+from tessera.services.manifeste import ecrire_clef
 from tessera.services.project_analyzer import ProjectAnalyzerService
 from tessera.services.project_importer import _scaffold_artifact_dirs
 from tessera.services.artifacts import (
@@ -93,7 +93,10 @@ class GitCloneService:
 
     async def _run_clone(self, url: str, dest: Path) -> None:
         proc = await asyncio.create_subprocess_exec(
-            "git", "clone", "--depth=1", url, str(dest),
+            # `--depth` implique `--single-branch` : le refspec se réduisait à
+            # la seule branche clonée, et un push de la branche du ticket ne
+            # laissait aucune référence `origin/<branche>` (ticket-517).
+            "git", "clone", "--depth=1", "--no-single-branch", url, str(dest),
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
         )
@@ -117,16 +120,4 @@ class GitCloneService:
             )
 
     def _store_github_remote(self, project_path: Path, repo_url: str) -> None:
-        agents_json = project_path / "agents.json"
-        if agents_json.exists():
-            try:
-                data = json.loads(agents_json.read_text(encoding="utf-8"))
-            except Exception:
-                data = {}
-        else:
-            data = {}
-        updated = {**data, "github_remote": repo_url}
-        agents_json.write_text(
-            json.dumps(updated, indent=2, ensure_ascii=False) + "\n",
-            encoding="utf-8",
-        )
+        ecrire_clef(project_path, "github_remote", repo_url)

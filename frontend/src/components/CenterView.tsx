@@ -2,6 +2,7 @@ import { lazy, Suspense } from "react";
 import type { useSupervision } from "../hooks/useSupervision";
 import type { useRunActif } from "../hooks/useRunActif";
 import type { SidebarPanel } from "./Sidebar/panels";
+import ChoixDuProjet from "./ChoixDuProjet";
 import type {
   Project,
   ServiceActif,
@@ -14,9 +15,15 @@ import type { FiltresTickets } from "../lib/filtresTickets";
 import type { VueCentre } from "../vueDuCentre";
 import AgentDetail from "./AgentDetail";
 import SupervisionView from "./SupervisionView";
+import type { ReglageSon } from "./BureauView/ColonneAToi";
 import RunView from "./RunView";
 import KanbanView from "./KanbanView";
 import ProjetsView from "./ProjetsView";
+import EnCoursView from "./EnCoursView";
+import HistoriqueView from "./HistoriqueView";
+import type { HistoriqueProps } from "./HistoriqueView";
+import FichiersView from "./FichiersView";
+import type { UseAppsEnCoursResult } from "../hooks/useAppsEnCours";
 
 // Vues lourdes — chargées à la demande, après le premier rendu du cockpit
 // (ticket-355). DiffView et Editor tirent Monaco ; les garder lazy réduit le
@@ -41,19 +48,37 @@ interface CenterViewProps {
   ticket: Ticket | null;
   conversationId: string;
   supervision: ReturnType<typeof useSupervision>;
+  /** Le réglage « Son » de la question, pour le Bureau de Supervision (ticket-567). */
+  son?: ReglageSon;
   servicesDuProjet: ServiceActif[];
+  /** Les apps de projet vivantes sur la machine (ticket-417). */
+  appsEnCours: UseAppsEnCoursResult;
   agentSelectionne: string | null;
+  /** Choisit un rôle depuis le tableau « Comparer » de l'onglet Agents (ticket-429). */
+  onSelectAgent?: (role: string) => void;
+  /** Les runs du projet et celui qu'on regarde, pour l'onglet Historique (ticket-427). */
+  historique: HistoriqueProps;
   stream: ReturnType<typeof useRunActif>;
   byStatus: Record<TicketStatus, Ticket[]>;
   running: Set<string>;
   unreadable: TicketUnreadable[];
   openFilePath: string | null;
+  /** Ouvre un fichier du projet, depuis l'onglet Fichiers (ticket-428). */
+  onOpenFile: (path: string) => void;
+  /** Referme le fichier ouvert (ticket-428). */
+  onCloseFile: () => void;
   /** Nombre de jours de la période stats, géré par useCockpit (ticket-253). */
   statsDays: StatsPeriod;
   /** Projet cible des stats — null si portée "tous projets" (ticket-253). */
   statsProjectId: string | null;
   /** Sélectionne un projet, comme la barre latérale (ticket-399). */
   onSelectProject: (p: Project) => void;
+  /** La porte d'une pièce du Bureau : choisit le projet et ouvre l'onglet Tickets (ticket-602). */
+  onOpenProject?: (p: Project) => void;
+  /** Les projets dont un run attend une réponse (ticket-186). */
+  enAttente?: ReadonlySet<string>;
+  /** Un projet vient d'être créé ou importé depuis la vue Projets (ticket-586). */
+  onProjectCreated?: (p: Project) => void;
   onSelectTicket: (t: Ticket) => void;
   onRunPipeline: (ticketId: string) => void;
   onChangeStatus: (ticketId: string, status: TicketStatus) => void;
@@ -77,6 +102,15 @@ interface CenterViewProps {
   onClearFiltres?: () => void;
 }
 
+/** Les vues qui se lisent projet par projet, et comment l'écran de choix les nomme (ticket-735). */
+const VUES_DE_PROJET: Partial<Record<SidebarPanel, string>> = {
+  tickets: "ses tickets",
+  files: "ses fichiers",
+  history: "l'historique de ses runs",
+  agents: "ses agents",
+  chat: "discuter avec son agent",
+};
+
 function FallbackChargement() {
   return (
     <div className="flex h-full items-center justify-center text-zinc-500 text-sm">
@@ -93,16 +127,25 @@ export default function CenterView({
   ticket,
   conversationId,
   supervision,
+  son,
   servicesDuProjet,
+  appsEnCours,
   agentSelectionne,
+  onSelectAgent,
+  historique,
   stream,
   byStatus,
   running,
   unreadable,
   openFilePath,
+  onOpenFile,
+  onCloseFile,
   statsDays,
   statsProjectId,
   onSelectProject,
+  onOpenProject,
+  enAttente,
+  onProjectCreated,
   onSelectTicket,
   onRunPipeline,
   onChangeStatus,
@@ -133,8 +176,12 @@ export default function CenterView({
         supervision={supervision}
         projects={projets}
         services={servicesDuProjet}
+        son={son}
+        onOpenProject={onOpenProject}
       />
     );
+  } else if (panel === "running") {
+    content = <EnCoursView appsEnCours={appsEnCours} runs={supervision.runs} />;
   } else if (panel === "projects") {
     // Choisir un projet se fait en les voyant : une carte chacun (ticket-399).
     content = (
@@ -142,15 +189,41 @@ export default function CenterView({
         projets={projets}
         activeProject={project}
         onSelectProject={onSelectProject}
+        onProjectCreated={onProjectCreated}
+        enAttente={enAttente}
+        runs={supervision.runs}
+      />
+    );
+  } else if (panel === "history") {
+    // Les runs ont leur propre vue : sans elle, l'onglet retombait sur la
+    // liste des tickets (ticket-427).
+    content = <HistoriqueView {...historique} project={project} />;
+  } else if (panel === "files") {
+    // L'onglet Fichiers a sa propre vue (ticket-428) : il retombait sur la
+    // liste des tickets dès qu'aucun fichier n'était ouvert.
+    content = (
+      <FichiersView
+        project={project}
+        ticket={ticket}
+        byStatus={byStatus}
+        openFilePath={openFilePath}
+        onOpenFile={onOpenFile}
+        onCloseFile={onCloseFile}
       />
     );
   } else if (panel === "agents") {
-    content = <AgentDetail role={agentSelectionne} projectId={project?.id ?? null} />;
+    content = (
+      <AgentDetail
+        role={agentSelectionne}
+        projectId={project?.id ?? null}
+        onSelectRole={onSelectAgent}
+      />
+    );
   } else if (panel === "usage") {
     // La période et la portée viennent de la colonne latérale (ticket-253).
     content = <StatsView projectId={statsProjectId} days={statsDays} />;
   } else if (vueCentre === "run") {
-    content = <RunView stream={stream} />;
+    content = <RunView stream={stream} projectId={project?.id ?? null} />;
   } else if (vueCentre === "diff" && project && ticket) {
     content = <DiffView projectId={project.id} ticketId={ticket.id} />;
   } else if (vueCentre === "kanban") {
@@ -186,9 +259,17 @@ export default function CenterView({
     );
   }
 
+  const vueDeProjet = VUES_DE_PROJET[panel];
+  if (project === null && vueDeProjet !== undefined) {
+    content = <ChoixDuProjet vue={vueDeProjet} projets={projets} onSelectProject={onSelectProject} />;
+  }
+
   return (
     <Suspense fallback={<FallbackChargement />}>
-      {content}
+      {/* Une clé par vue : le fondu d'entrée rejoue à chaque changement (ticket-735). */}
+      <div key={panel} className="entree-de-vue h-full min-h-0">
+        {content}
+      </div>
     </Suspense>
   );
 }

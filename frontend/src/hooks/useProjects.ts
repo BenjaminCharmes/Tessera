@@ -25,6 +25,15 @@ interface UseProjectsResult {
 
 const AUCUN: Project[] = [];
 
+/**
+ * Délai avant de relire une liste en échec — ticket-621.
+ *
+ * Le frontend est prêt avant le backend au démarrage : une seule lecture
+ * ratée laissait la liste vide jusqu'au rechargement, et le clic sur un
+ * projet ne sélectionnait rien, sans un mot.
+ */
+export const DELAI_DE_RELECTURE_MS = 3000;
+
 const listerProjets = () => api.projects.list();
 
 export function useProjects(): UseProjectsResult {
@@ -33,5 +42,10 @@ export function useProjects(): UseProjectsResult {
     window.addEventListener(EVENEMENT_PROJETS, refresh);
     return () => window.removeEventListener(EVENEMENT_PROJETS, refresh);
   }, [refresh]);
+  useEffect(() => {
+    if (error === null) return;
+    const minuteur = window.setTimeout(refresh, DELAI_DE_RELECTURE_MS);
+    return () => window.clearTimeout(minuteur);
+  }, [error, refresh]);
   return { projects: data, loading, error, refresh };
 }

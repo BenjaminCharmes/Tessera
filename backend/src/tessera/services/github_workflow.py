@@ -26,8 +26,13 @@ from tessera.services.autonomie import (
     lire_niveau,
     niveau_peut_merger,
 )
-from tessera.services.github_service import MergeabiliteTimeoutError, PRNonFusionnableError
+from tessera.services.github_service import (
+    MergeabiliteTimeoutError,
+    PRNonFusionnableError,
+    PrOuverte,
+)
 from tessera.services.politique_run import PolitiqueRun
+from tessera.services.secrets_diff import refus_secrets
 from tessera.services.sync_map import SyncMapService
 from tessera.services.termes_interdits import (
     CommitInfo,
@@ -68,7 +73,17 @@ class _GitHub(Protocol):
 
     async def get_pull_request_status(self, pr_number: int) -> Any: ...
 
+    async def find_open_pull_request(self, branch: str) -> int | None: ...
+
+    async def find_merged_pull_request(
+        self, prefix: str, base: str | None = None
+    ) -> int | None: ...
+
+    async def find_open_pull_requests(self, base: str) -> list[PrOuverte]: ...
+
     async def get_pull_request_state(self, pr_number: int) -> str: ...
+
+    async def get_pull_request_head_sha(self, pr_number: int) -> str: ...
 
     async def has_workflows(self) -> bool: ...
 
@@ -85,6 +100,8 @@ class _GitHub(Protocol):
         method: str = "squash",
         commit_title: str | None = None,
         attente_fusionnabilite_max_s: float = 300.0,
+        *,
+        sha: str | None = None,
     ) -> None: ...
 
 
@@ -155,6 +172,9 @@ class GitHubWorkflowService:
         # l'appelant ne le fournit pas : aucun appelant ne le passait, et le
         # contrôle ne tournait donc jamais (ticket-206).
         self._termes = termes if termes is not None else TermesInterditsService()
+        # Code HTTP du dernier refus de lecture de la CI (ticket-449) : la
+        # livraison le cite quand l'état vaut `unreadable`.
+        self.code_http_ci: int | None = None
 
     def _niveau(self) -> NiveauAutonomie:
         """Le niveau qui vaut pour cet appel : figé s'il l'a été, lu sinon."""
@@ -205,6 +225,9 @@ class GitHubWorkflowService:
             )
 
         await self._verifier_termes_interdits(branch)
+        diff = await self._git.diff_de_branche(self._base_branch, branch)
+        if refus := refus_secrets(diff):
+            raise WorkflowError(refus)
 
         await self._git.push_branch(branch)
 
@@ -227,7 +250,6 @@ class GitHubWorkflowService:
         )
         return PullRequestResult(pr_number=pr_number, pr_url=pr_url, branch=branch)
 
-
     async def _verifier_termes_interdits(self, branch: str) -> None:
         """Bloque le push si un terme interdit est trouvé — ADR-048.
 
@@ -248,10 +270,7 @@ class GitHubWorkflowService:
         diff = await self._git.diff_de_branche(self._base_branch, branch)
         lignes_ajoutees = [l for l in diff.splitlines() if l.startswith("+")]
         commits = await self._git.commits_depuis_base(self._base_branch, branch)
-        violations = self._termes.verifier(
-            lignes_ajoutees=lignes_ajoutees,
-            commits=commits,
-        )
+        violations = self._termes.verifier(lignes_ajoutees=lignes_ajoutees, commits=commits)
         if violations:
             sources = ", ".join(v.source for v in violations)
             raise WorkflowError(
@@ -270,7 +289,13 @@ class GitHubWorkflowService:
         return entree.issue if entree else None
 
     async def etat_ci(self, pr_number: int) -> str:
-        """L'état agrégé de la CI de la PR : passing, failing, pending, none.
+        """L'état agrégé de la CI de la PR : passing, failing, pending, none,
+        unreadable (le jeton ne peut pas la lire, code dans `code_http_ci`),
+        conflicting (la PR est en conflit avec sa base, ticket-452).
+
+        `conflicting` prime sur tout état de CI : une PR qu'on ne peut pas
+        fusionner n'a plus rien à attendre. Seul `dirty` le déclenche ;
+        `unknown` (calcul en cours côté GitHub) ne change rien.
 
         Sans GitHub configuré, `none` : aucune CI n'est observable, et
         l'absence de signal n'est pas un signal favorable.
@@ -278,7 +303,45 @@ class GitHubWorkflowService:
         if self._github is None:
             return "none"
         statut = await self._github.get_pull_request_status(pr_number)
+        code = getattr(statut, "ci_http_status", None)
+        self.code_http_ci = code if isinstance(code, int) else None
+        if getattr(statut, "mergeable_state", None) == "dirty":
+            return "conflicting"
         return str(getattr(statut, "ci_status", "none"))
+
+    async def pr_ouverte_de(self, branch: str) -> int | None:
+        """Le numéro de la PR ouverte portée par `branch`, ou `None` (ticket-455).
+
+        Sans GitHub configuré, `None` : il n'y a rien à retrouver.
+        """
+        if self._github is None:
+            return None
+        return await self._github.find_open_pull_request(branch)
+
+    async def prs_ouvertes(self) -> list[PrOuverte]:
+        """Les PR ouvertes vers la base du projet (ticket-516).
+
+        Sans GitHub configuré, aucune : il n'y a rien à retrouver.
+        """
+        if self._github is None:
+            return []
+        return await self._github.find_open_pull_requests(self._base_branch)
+
+    @property
+    def base_branch(self) -> str:
+        """La branche de base des PR de ce projet."""
+        return self._base_branch
+
+    async def pr_mergee_de_branche(self, prefix: str) -> int | None:
+        """Le numéro d'une PR mergée dans la base depuis `prefix…`, ou `None` (ticket-482).
+
+        Sans GitHub configuré, `None` : il n'y a rien à retrouver.
+        """
+        if self._github is None:
+            return None
+        return await self._github.find_merged_pull_request(
+            prefix, self._base_branch
+        )
 
     async def has_workflows(self) -> bool:
         """Le dépôt déclare-t-il au moins un workflow ? Sans GitHub : non."""
@@ -292,8 +355,19 @@ class GitHubWorkflowService:
             return "unknown"
         return str(await self._github.get_pull_request_state(pr_number))
 
-    async def merge_si_la_ci_est_verte(self, pr_number: int) -> bool:
+    async def tete_pr(self, pr_number: int) -> str | None:
+        """Le SHA de tête de la PR, ou `None` sans GitHub (ticket-492)."""
+        if self._github is None:
+            return None
+        return await self._github.get_pull_request_head_sha(pr_number)
+
+    async def merge_si_la_ci_est_verte(
+        self, pr_number: int, sha_attendu: str | None = None
+    ) -> bool:
         """Merge la PR **si** le projet l'autorise et **si** la CI est verte.
+
+        Avec `sha_attendu`, le merge est lié à ce commit : GitHub le refuse si
+        la tête de la PR a bougé entre-temps (ticket-492).
 
         ADR-022 interdisait tout merge. Elle devient conditionnelle (ADR-029) :
         la declaration du projet dit que l'utilisateur renonce a sa relecture
@@ -331,11 +405,14 @@ class GitHubWorkflowService:
         merge_method = "squash"
         if self._politique is not None:
             merge_method = self._politique.merge_method
+        # `sha` ne part que s'il est demandé : sans lui, l'appel reste celui d'avant.
+        lie_au_sha: dict[str, str] = {} if sha_attendu is None else {"sha": sha_attendu}
         try:
             await self._github.merge_quand_fusionnable(
                 pr_number,
                 method=merge_method,
                 attente_fusionnabilite_max_s=settings.attente_fusionnabilite_max_s,
+                **lie_au_sha,
             )
         except (MergeabiliteTimeoutError, PRNonFusionnableError) as exc:
             _logger.warning(
@@ -354,90 +431,3 @@ class GitHubWorkflowService:
             extra={"pr": pr_number, "ci": ci, "methode": merge_method},
         )
         return True
-
-
-#: Les hébergeurs reconnus, pour nommer celui qu'on a devant soi.
-_FORGES = {
-    "github.com": "GitHub",
-    "dev.azure.com": "Azure DevOps",
-    "bitbucket.org": None,  # nommé par son hôte, faute de mieux
-}
-
-
-def _forge_depuis_hote(host: str) -> str | None:
-    """The readable name of a forge from its lowercased hostname."""
-    host = host.lower()
-    for cle, nom in _FORGES.items():
-        if host == cle or host.endswith("." + cle):
-            return nom or host
-    if "gitlab" in host:
-        return "GitLab"
-    return host or None
-
-
-def parse_remote(raw: str | None) -> tuple[str | None, str | None]:
-    """Parse any remote form into (forge_name, 'owner/repo').
-
-    Accepted forms:
-    - 'owner/repo'                              → GitHub assumed
-    - 'https://github.com/owner/repo'
-    - 'https://github.com/owner/repo.git'
-    - 'git@github.com:owner/repo.git'
-
-    Returns (None, None) when the input is empty or unrecognisable.
-    The raw value in agents.json is never rewritten (ADR-036 pattern).
-    """
-    if not raw:
-        return None, None
-
-    raw = raw.strip()
-
-    # SSH form: git@host:owner/repo[.git]
-    if raw.startswith("git@") and ":" in raw:
-        after_at = raw[4:]  # drop 'git@'
-        host, _, path = after_at.partition(":")
-        slug = path.removesuffix(".git")
-        return _forge_depuis_hote(host), slug
-
-    # HTTPS form: https://[user@]host/owner/repo[.git]
-    if "://" in raw:
-        sans_schema = raw.split("://", 1)[1]
-        host_part, sep, rest = sans_schema.partition("/")
-        if not sep:
-            return None, None
-        host = host_part.split("@")[-1]
-        slug = rest.removesuffix(".git")
-        return _forge_depuis_hote(host), slug
-
-    # Short form: owner/repo (no scheme, no host → GitHub assumed)
-    if "/" in raw:
-        return "GitHub", raw
-
-    return None, None
-
-
-def nom_de_la_forge(remote: str | None) -> str | None:
-    """Le nom lisible de l'hébergeur d'un dépôt, ou son hôte à défaut.
-
-    Dire « ce dépôt n'est pas sur GitHub » sans dire où il est n'aide personne
-    à décider quoi faire.
-    """
-    if not remote:
-        return None
-    # Deux formes coexistent : `https://[identifiant@]hote/chemin` et
-    # `git@hote:chemin`. Retirer le schéma d'abord, sinon « https » passe pour
-    # l'hôte.
-    sans_schema = remote.split("://", 1)[-1]
-    hote = sans_schema.split("/")[0].split("@")[-1].split(":")[0].lower()
-    return _forge_depuis_hote(hote)
-
-
-def forge_supportee(remote: str | None) -> bool:
-    """True si l'IDE sait ouvrir une pull request sur ce dépôt.
-
-    Seul GitHub l'est : `GitHubService` tape sur `api.github.com`. Ailleurs, le
-    bouton poussait la branche **puis** échouait sur l'appel d'API — donc il
-    poussait sans rien demander. Sur le dépôt d'un client, pousser est
-    précisément la décision qui ne se prend pas par mégarde (ticket-081).
-    """
-    return nom_de_la_forge(remote) == "GitHub"

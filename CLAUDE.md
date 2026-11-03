@@ -56,8 +56,8 @@ tessera/
 **Python** — type hints partout ; dataclasses ou Pydantic v2 ; `async/await` dans
 FastAPI ; `snake_case`. Docstrings en anglais, commentaires en français (ADR-044).
 
-**TypeScript** — `strict: true`, jamais de `any` ; composants en PascalCase,
-fichiers en kebab-case ; hooks préfixés `use` ; pas de `console.log`, le logger
+**TypeScript** — `strict: true`, jamais de `any` ; composants et leurs fichiers
+en PascalCase, hooks et `lib/` en camelCase ; hooks préfixés `use` ; pas de `console.log`, le logger
 structuré.
 
 **Git**
@@ -108,7 +108,7 @@ précède.
    les ignorer est un choix, pas un oubli
 4. **Écrire dans `memory/decisions.md`** toute décision d'architecture non triviale
 5. **Ne jamais modifier** `CLAUDE.md` sans ticket explicite pour le faire
-6. **Préférer des petits fichiers** (<200 lignes)
+6. **Préférer des petits fichiers** : 300 lignes au plus (plafond testé), viser 200
 7. **Un test par fonction publique** au minimum
 8. **Aucune trace d'écriture par IA** — commits, PR, commentaires, fichiers
    générés : ce que l'IDE écrit atterrit dans le dépôt de l'utilisateur

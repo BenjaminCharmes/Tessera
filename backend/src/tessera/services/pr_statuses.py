@@ -16,7 +16,7 @@ from pathlib import Path
 from typing import Literal
 
 from tessera.models.ticket import Ticket
-from tessera.services.github_service import GitHubService, PRStatus
+from tessera.services.github_service import CiStatus, GitHubService, PRStatus
 from tessera.services import pr_status_cache
 from tessera.utils.logger import get_logger
 
@@ -30,7 +30,7 @@ class TicketPrStatus:
     ticket_id: str
     pr_number: int
     state: Literal["open", "closed", "merged"]
-    ci_status: Literal["pending", "passing", "failing", "none"]
+    ci_status: CiStatus
     pr_url: str
 
 
@@ -75,7 +75,7 @@ async def get_all_pr_statuses(
         _logger.debug("pr_statuses_listing", extra={"count": len(remaining)})
         listing = await github_svc.list_pull_requests(remaining)
         for pr_num, entry in listing.items():
-            ci: Literal["pending", "passing", "failing", "none"]
+            ci: CiStatus
             if entry.state in ("merged", "closed"):
                 ci = "none"
                 status = PRStatus(

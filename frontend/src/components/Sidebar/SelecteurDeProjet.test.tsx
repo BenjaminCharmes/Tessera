@@ -139,4 +139,13 @@ describe("SelecteurDeProjet (ticket-205)", () => {
 
     expect(screen.getByRole("button").className).toContain("max-w-full");
   });
+
+  it("does not offer to remove a project when none is active", async () => {
+    render(<SelecteurDeProjet project={null} onSelectProject={vi.fn()} />);
+
+    await userEvent.click(screen.getByRole("button", { name: /Choisir un projet/ }));
+
+    await screen.findByRole("option", { name: /ide-core/ });
+    expect(screen.queryByRole("button", { name: /Retirer ce projet/ })).toBeNull();
+  });
 });

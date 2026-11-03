@@ -7,15 +7,14 @@ import TimeBars from "../../design/charts/TimeBars";
 import TimeLines from "../../design/charts/TimeLines";
 import Donut from "../../design/charts/Donut";
 import ShareBars from "../../design/charts/ShareBars";
-import {
-  formatCount,
-  formatDay,
-  formatDurationMs,
-  formatUsd,
-} from "../../design/charts/palette";
+import { formatCount } from "../../design/charts/palette";
+import { formatDay, formatDurationMs, formatUsd } from "../../lib/format";
 import type { RecentRun, StatsPeriod, UsageStats } from "../../types/api";
 import Card from "./Card";
+import JaugesDeQuota from "../../design/ui/JaugesDeQuota";
+import { useQuotaLu } from "../../hooks/useQuotaLu";
 import KpiRow from "./KpiRow";
+import { CartesSquelettes, TuilesSquelettes } from "./Squelettes";
 import QualityCard from "./QualityCard";
 import RecentRunsCard from "./RecentRunsCard";
 import RunHistorique from "./RunHistorique";
@@ -45,6 +44,9 @@ export default function StatsView({ projectId, days }: StatsViewProps) {
   const { data, loading } = useResource<UsageStats | null>(fetcher, null);
   // Le run sélectionné dans l'historique — ouvre sa vue en lecture seule (ticket-281).
   const [selectedRun, setSelectedRun] = useState<RecentRun | null>(null);
+  // Le quota réel, relu chaque minute, comme pour les notifications (ticket-726).
+  const [ouvertA] = useState(() => Date.now());
+  const quota = useQuotaLu(ouvertA);
 
   if (selectedRun) {
     return (
@@ -63,18 +65,37 @@ export default function StatsView({ projectId, days }: StatsViewProps) {
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto p-4">
-        {!data && (
-          <p className="text-xs text-zinc-500">
-            {loading ? "Chargement…" : "Statistiques indisponibles."}
+        {!data && loading && (
+          <p role="status" className="sr-only">
+            Chargement…
           </p>
         )}
+        {!data && !loading && <p className="mb-4 text-xs text-zinc-500">Statistiques indisponibles.</p>}
         {data && data.totals.runs === 0 && data.totals.cost_usd === 0 && (
           <p className="mb-4 rounded-lg border border-dashed border-zinc-800 px-4 py-3 text-xs text-zinc-500">
             Aucun run sur les {data.days} derniers jours. Les graphiques se rempliront au premier
             pipeline exécuté.
           </p>
         )}
-        {data && <Dashboard data={data} onSelectRun={setSelectedRun} />}
+        {/* Seul sur sa ligne, le quota laissait deux tiers vides : il rejoint les KPI.
+            La carte garde sa place dans l'arbre quand les données arrivent. */}
+        <div className="mb-4 grid gap-4 xl:grid-cols-3">
+          {data ? (
+            <div className="xl:col-span-2">
+              <KpiRow totals={data.totals} quality={data.quality} />
+            </div>
+          ) : (
+            loading && (
+              <div className="xl:col-span-2">
+                <TuilesSquelettes />
+              </div>
+            )
+          )}
+          <Card title="Quota de l'abonnement" aside="relevé par le SDK">
+            <JaugesDeQuota fenetres={quota} />
+          </Card>
+        </div>
+        {data ? <Dashboard data={data} onSelectRun={setSelectedRun} /> : loading && <CartesSquelettes />}
       </div>
     </div>
   );
@@ -90,7 +111,6 @@ function Dashboard({ data, onSelectRun }: DashboardProps) {
   const global = data.project_id === null;
   return (
     <div className="space-y-4">
-      <KpiRow totals={data.totals} quality={data.quality} />
 
       <div className="grid gap-4 xl:grid-cols-3">
         <Card title="Dépense par jour" aside="chat compris" className="xl:col-span-2">

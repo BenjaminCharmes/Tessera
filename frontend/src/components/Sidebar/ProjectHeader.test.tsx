@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { render, screen, within } from "@testing-library/react";
+import { api } from "../../lib/api";
 import userEvent from "@testing-library/user-event";
 import ProjectHeader from "./ProjectHeader";
 import type { Project } from "../../types/api";
@@ -63,6 +64,26 @@ describe("ProjectHeader", () => {
     expect(screen.queryByRole("link", { name: /VSCode/i })).not.toBeInTheDocument();
   });
 
+  it("lets a project be chosen when none is active", async () => {
+    // Depuis le ticket-586 la colonne n'a plus de liste de projets : sans
+    // sélecteur ici, la vue Tickets n'offrait aucun moyen d'en choisir un.
+    vi.spyOn(api.projects, "list").mockResolvedValue([projet]);
+    const onSelectProject = vi.fn();
+    render(
+      <ProjectHeader
+        project={null}
+        gitOuvert={false}
+        onBasculerGit={() => {}}
+        onSelectProject={onSelectProject}
+      />,
+    );
+
+    await userEvent.click(screen.getByRole("button", { name: /Choisir un projet/ }));
+    await userEvent.click(await screen.findByRole("option", { name: /Lyra/ }));
+
+    expect(onSelectProject).toHaveBeenCalledWith(projet);
+  });
+
   it("offers the Report button on any project", async () => {
     render(<ProjectHeader project={projet} gitOuvert={false} onBasculerGit={() => {}} />);
 
@@ -82,6 +103,45 @@ describe("ProjectHeader", () => {
 
     expect(screen.queryByRole("button", { name: "Signaler" })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Git" })).toBeInTheDocument();
+  });
+
+  it("shows the running pill only while a run is going on this project", () => {
+    const { rerender } = render(
+      <ProjectHeader project={projet} gitOuvert={false} onBasculerGit={() => {}} />,
+    );
+    expect(screen.queryByText("run en cours")).not.toBeInTheDocument();
+
+    rerender(
+      <ProjectHeader
+        project={projet}
+        gitOuvert={false}
+        onBasculerGit={() => {}}
+        runEnCours
+      />,
+    );
+    expect(screen.getByText("run en cours")).toBeInTheDocument();
+  });
+
+  it("carries 'fait tourner l'IDE' in the title of the project name", () => {
+    render(
+      <ProjectHeader
+        project={{ ...projet, fait_tourner_l_ide: true }}
+        gitOuvert={false}
+        onBasculerGit={() => {}}
+      />,
+    );
+
+    expect(screen.getByText("Lyra")).toHaveAttribute(
+      "title",
+      expect.stringContaining("fait tourner l'IDE"),
+    );
+    expect(screen.queryByText(/fait tourner l'IDE/)).not.toBeInTheDocument();
+  });
+
+  it("leaves the title free of that sentence on an ordinary project", () => {
+    render(<ProjectHeader project={projet} gitOuvert={false} onBasculerGit={() => {}} />);
+
+    expect(screen.getByText("Lyra").getAttribute("title")).not.toMatch(/fait tourner/);
   });
 
   it("survit a un projet sans chemin au lieu d'emporter la sidebar", () => {

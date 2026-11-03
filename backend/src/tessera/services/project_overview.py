@@ -8,7 +8,6 @@ aucune commande git.
 from __future__ import annotations
 
 import asyncio
-import json
 import os
 from datetime import datetime, timezone
 from pathlib import Path
@@ -17,6 +16,13 @@ from pydantic import BaseModel
 
 from tessera.models.project import Project
 from tessera.models.ticket import TicketStatus
+from tessera.services.racine_depot import (
+    declare_ancestor,
+    depot_au_dessus,
+    depot_le_plus_proche,
+)
+from tessera.services.online_declaration import StripeMode, read_online_declaration
+from tessera.services.politique_run import PolitiqueRun
 from tessera.services.ticket_service import _STATUS_DIRS
 from tessera.utils.logger import get_logger
 
@@ -72,6 +78,16 @@ class ProjectOverview(BaseModel):
     tickets: TicketCounts
     run_actif: bool = False
     icon: bool = False
+    services_declares: bool = False
+    services_en_cours: bool = False
+    #: `agents.json` déclare un bloc `online` (ticket-472) : la carte offre « Mettre en ligne ».
+    online_declared: bool = False
+    online_domain: str | None = None
+    online_stripe_mode: StripeMode | None = None
+    #: Le projet fait tourner chaque run dans un worktree (ADR-056) : il ne se lance
+    #: qu'un ticket à la fois, la carte n'offre donc pas de file (ticket-633).
+    worktree: bool = False
+    avertissements: list[str] = []
 
 
 class _Calcul(BaseModel):
@@ -103,14 +119,10 @@ def _racine_ancestrale(project_path: Path) -> Path | None:
     Le projet bootstrap (ide-core) vit dans `projects/ide-core/` : son app est
     l'IDE lui-même, dont l'icône est à la racine du dépôt (ADR-028).
     """
-    try:
-        manifeste = json.loads((project_path / "agents.json").read_text(encoding="utf-8"))
-    except (OSError, ValueError):
+    if not declare_ancestor(project_path):
         return None
-    if not isinstance(manifeste, dict) or manifeste.get("git_root") != "ancestor":
-        return None
-    git = _git_dir(project_path)
-    return git.parent.resolve() if git is not None and git.name == ".git" else None
+    depot = depot_au_dessus(project_path)
+    return depot.resolve() if depot is not None else None
 
 
 def find_icon(project_path: Path) -> tuple[Path, str] | None:
@@ -137,18 +149,18 @@ def _mtime(path: Path) -> int:
 def _git_dir(project_path: Path) -> Path | None:
     """Le `.git` qui régit ce dossier : le sien, ou celui d'un ancêtre
     (`git_root: ancestor`, ADR-028). Un `.git` fichier (worktree) est suivi."""
-    for dossier in (project_path, *project_path.parents):
-        candidat = dossier / ".git"
-        if candidat.is_dir():
-            return candidat
-        if candidat.is_file():
-            try:
-                contenu = candidat.read_text(encoding="utf-8").strip()
-            except OSError:
-                return None
-            if contenu.startswith("gitdir:"):
-                return (dossier / contenu.removeprefix("gitdir:").strip()).resolve()
-            return None
+    dossier = depot_le_plus_proche(project_path)
+    if dossier is None:
+        return None
+    candidat = dossier / ".git"
+    if candidat.is_dir():
+        return candidat
+    try:
+        contenu = candidat.read_text(encoding="utf-8").strip()
+    except OSError:
+        return None
+    if contenu.startswith("gitdir:"):
+        return (dossier / contenu.removeprefix("gitdir:").strip()).resolve()
     return None
 
 
@@ -234,10 +246,26 @@ async def _calcul_en_cache(project_path: Path) -> _Calcul:
     return calcul
 
 
-async def build_overview(project: Project, *, run_actif: bool) -> ProjectOverview:
-    """La carte d'un projet. `run_actif` et `icon` se lisent à chaque appel :
-    ils bougent sans toucher ni le dépôt ni les tickets."""
+def _en_worktree(project_path: Path) -> bool:
+    """Vrai quand les runs du projet tournent dans un worktree ; faux s'il est illisible."""
+    try:
+        return PolitiqueRun.lire(project_path).worktree is not None
+    except Exception:  # noqa: BLE001 — une carte ne tombe pas pour un manifeste illisible
+        return False
+
+
+async def build_overview(
+    project: Project,
+    *,
+    run_actif: bool,
+    services_declares: bool = False,
+    services_en_cours: bool = False,
+) -> ProjectOverview:
+    """La carte d'un projet. `run_actif`, `icon` et l'état des services se
+    lisent à chaque appel : ils bougent sans toucher ni le dépôt ni les
+    tickets, le cache ne doit donc pas les figer."""
     calcul = await _calcul_en_cache(project.path)
+    online = read_online_declaration(project.path)
     return ProjectOverview(
         id=project.id,
         name=project.name,
@@ -249,4 +277,11 @@ async def build_overview(project: Project, *, run_actif: bool) -> ProjectOvervie
         tickets=calcul.tickets,
         run_actif=run_actif,
         icon=find_icon(project.path) is not None,
+        services_declares=services_declares,
+        services_en_cours=services_en_cours,
+        online_declared=online.declared,
+        online_domain=online.domain,
+        online_stripe_mode=online.stripe_mode,
+        worktree=_en_worktree(project.path),
+        avertissements=list(project.avertissements),
     )

@@ -176,7 +176,9 @@ async def test_light_ticket_runs_security_audit(tmp_path: Path) -> None:
     audits: list[str] = []
 
     class _FakeAuditor:
-        async def audit(self, code_diff: str, project_path: Path) -> object:
+        async def audit(
+            self, code_diff: str, project_path: Path, contexte: object = None
+        ) -> object:
             audits.append(code_diff)
             return SecurityAuditResult(verdict="PASS", issues=[], summary="ok")
 

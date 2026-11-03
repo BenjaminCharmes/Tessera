@@ -40,32 +40,8 @@ export function niceMax(value: number): number {
   return step * magnitude;
 }
 
-export function formatUsd(usd: number): string {
-  if (usd === 0) return "0 $";
-  return usd < 0.01 ? `${(usd * 100).toFixed(2)} ¢` : `${usd.toFixed(usd < 10 ? 2 : 0)} $`;
-}
-
 export function formatCount(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)} M`;
   if (n >= 10_000) return `${Math.round(n / 1000)} k`;
   return n.toLocaleString("fr-FR");
-}
-
-export function formatDurationMs(ms: number | null): string {
-  if (ms === null) return "—";
-  const s = Math.round(ms / 1000);
-  if (s < 60) return `${s} s`;
-  const m = Math.floor(s / 60);
-  if (m < 60) return `${m} min ${String(s % 60).padStart(2, "0")}`;
-  return `${Math.floor(m / 60)} h ${String(m % 60).padStart(2, "0")}`;
-}
-
-/** « 2026-09-28 » → « 28 sept. », sans décalage de fuseau : le jour est UTC. */
-export function formatDay(day: string): string {
-  const [y, m, d] = day.split("-").map(Number);
-  return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString("fr-FR", {
-    day: "numeric",
-    month: "short",
-    timeZone: "UTC",
-  });
 }

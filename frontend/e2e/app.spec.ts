@@ -2,11 +2,14 @@ import type { Page } from "@playwright/test";
 import { test, expect, TICKETS } from "./fixtures";
 
 test.describe("Flow 1 — Affichage des projets", () => {
-  test("les projets apparaissent dans la sidebar au chargement", async ({
+  test("les projets apparaissent au centre, sans colonne latérale", async ({
     mockedPage,
   }) => {
     await mockedPage.goto("/");
-    await expect(lateral(mockedPage).getByText("ide-core")).toBeVisible();
+    await expect(
+      mockedPage.getByRole("main").getByRole("article", { name: "ide-core" }),
+    ).toBeVisible();
+    await expect(lateral(mockedPage)).toHaveCount(0);
   });
 });
 
@@ -17,16 +20,26 @@ test.describe("Flow 1 — Affichage des projets", () => {
 const lateral = (page: Pick<Page, "getByRole">) =>
   page.getByRole("complementary", { name: "Panneau latéral" });
 
+// Depuis le ticket-425, choisir un projet ne change plus d'onglet : on le
+// sélectionne, puis on ouvre ses tickets soi-même.
+async function ouvrirLesTicketsDe(page: Page, projet: string): Promise<void> {
+  await page
+    .getByRole("main")
+    .getByRole("article", { name: projet })
+    .click();
+  await page
+    .getByRole("tablist", { name: "Navigation principale" })
+    .getByRole("tab", { name: "Tickets" })
+    .click();
+}
+
 test.describe("Flow 2 — Sélection d'un projet → liste de tickets", () => {
-  test("cliquer sur un projet affiche ses tickets dans le panel Tickets", async ({
+  test("choisir un projet puis l'onglet Tickets affiche ses tickets", async ({
     mockedPage,
   }) => {
     await mockedPage.goto("/");
 
-    // Click the project — triggers handleSelectProject → switches to tickets panel.
-    // Depuis le ticket-399 le centre montre aussi une carte de ce projet : la
-    // région latérale lève l'ambiguïté.
-    await lateral(mockedPage).getByText("ide-core").click();
+    await ouvrirLesTicketsDe(mockedPage, "ide-core");
 
     // Only check the "todo" ticket — "done" tickets are collapsed by default
     const todoTicket = TICKETS.find((t) => t.status === "todo")!;
@@ -38,7 +51,7 @@ test.describe("Flow 3 — Création d'un projet", () => {
   test("remplir le formulaire et créer un projet", async ({ mockedPage }) => {
     await mockedPage.goto("/");
 
-    // Open create project modal via the + button in the Projects panel header
+    // Open create project modal via the button of the Projects view bar
     await mockedPage
       .getByRole("button", { name: "Créer un projet" })
       .first()
@@ -58,7 +71,11 @@ test.describe("Flow 3 — Création d'un projet", () => {
     await expect(
       mockedPage.getByRole("button", { name: "Créer", exact: true }),
     ).not.toBeVisible();
-    // The TicketList header shows the selected project name
+    // The created project is now active: the Tickets column shows its name
+    await mockedPage
+      .getByRole("tablist", { name: "Navigation principale" })
+      .getByRole("tab", { name: "Tickets" })
+      .click();
     await expect(lateral(mockedPage).getByText("test-e2e").first()).toBeVisible();
   });
 });
@@ -67,8 +84,7 @@ test.describe("Flow 4 — Création d'un ticket", () => {
   test("créer un ticket dans un projet sélectionné", async ({ mockedPage }) => {
     await mockedPage.goto("/");
 
-    // Select project (auto-switches to tickets panel)
-    await lateral(mockedPage).getByText("ide-core").click();
+    await ouvrirLesTicketsDe(mockedPage, "ide-core");
 
     // Open create ticket modal via the + button in the Tickets panel header
     await lateral(mockedPage)
@@ -105,8 +121,7 @@ test.describe("Flow 5 — Ouverture de l'éditeur Monaco", () => {
   }) => {
     await mockedPage.goto("/");
 
-    // Select project
-    await lateral(mockedPage).getByText("ide-core").click();
+    await ouvrirLesTicketsDe(mockedPage, "ide-core");
 
     // Click on the todo ticket
     const todoTicket = TICKETS.find((t) => t.status === "todo")!;

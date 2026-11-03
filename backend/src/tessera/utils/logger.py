@@ -15,6 +15,11 @@ from pathlib import Path
 from typing import Any
 
 from tessera.config import settings
+from tessera.utils.secrets import SECRETS
+
+# Les jetons configurés sont inscrits dès le chargement du logger, donc avant
+# la première ligne écrite par le backend (ADR-053).
+SECRETS.register_all(settings.valeurs_des_jetons())
 
 # Les attributs qu'un `LogRecord` porte toujours, plus ceux que `Formatter`
 # ajoute en formatant. Tout ce qui n'y figure pas vient d'un `extra` de
@@ -47,7 +52,9 @@ class _JsonFormatter(logging.Formatter):
             payload["exc_info"] = self.formatException(record.exc_info)
         # `default=str` : un `Path` ou une exception dans `extra` ne doit pas
         # faire perdre la ligne entière.
-        return json.dumps(payload, default=str)
+        # Dernière étape, sur la ligne entière : un jeton n'a pas à se cacher
+        # dans le message, un `extra` ou une trace pour être masqué (ADR-053).
+        return SECRETS.mask(json.dumps(payload, default=str))
 
 
 def get_logger(name: str, level: str | None = None) -> logging.Logger:

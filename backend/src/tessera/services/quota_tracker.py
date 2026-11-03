@@ -17,6 +17,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any, Literal, Optional
 
+from tessera.services.quota_registry import QUOTA_REGISTRY
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -96,6 +97,8 @@ class QuotaTracker:
         """Normalise and record an SDK payload; returns what was recorded."""
         snapshot = snapshot_from_rate_limit(info)
         self.record(snapshot)
+        # Le relevé par fenêtre survit au run ; `record` reste propre au tracker.
+        QUOTA_REGISTRY.record(snapshot)
         return snapshot
 
     def is_exhausted(self) -> bool:

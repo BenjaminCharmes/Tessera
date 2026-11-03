@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../../lib/api";
+import Modale from "../../design/ui/Modale";
 import type { Project, RemovalPlan } from "../../types/api";
 
 interface RemoveProjectModalProps {
@@ -53,12 +54,16 @@ export default function RemoveProjectModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-      <div
-        role="dialog"
-        aria-label={`Retirer ${project.id}`}
-        className="w-full max-w-md rounded-sm border border-zinc-700 bg-zinc-900 p-4 text-sm text-zinc-200"
-      >
+    // Escape acquise avec Modale ; le fond reste sans effet, la suppression est
+    // irréversible, et rien ne ferme pendant l'appel (busy).
+    <Modale
+      onFermer={onClose}
+      fermetureSuspendue={busy}
+      fermerSurLeFond={false}
+      className="p-4"
+      aria-label={`Retirer ${project.id}`}
+    >
+      <div className="w-full max-w-md rounded-sm border border-zinc-700 bg-zinc-900 p-4 text-sm text-zinc-200">
         <h2 className="mb-2 text-base font-medium">Retirer « {project.id} »</h2>
 
         {plan && (
@@ -142,6 +147,6 @@ export default function RemoveProjectModal({
           Annuler
         </button>
       </div>
-    </div>
+    </Modale>
   );
 }

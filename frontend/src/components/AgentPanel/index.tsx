@@ -11,6 +11,7 @@ import { blocsDuPanneau } from "./blocsDuPanneau";
 import PipelineSummary from "./PipelineSummary";
 import StageStrip from "./StageStrip";
 import FilDuRun from "../FilDuRun";
+import { revueDeLEvenement } from "../FilDuRun/verdict";
 import type { Project, Ticket, PipelineReglages } from "../../types/api";
 import type { UseRunActifResult } from "../../hooks/streamState";
 
@@ -72,13 +73,11 @@ export default function AgentPanel({
     currentAgent,
   );
 
-  const reviewerContent =
-    ticketEvents
-      .filter((e) => e.type === "agent_done" && e.agent === "reviewer")
-      .map((e) =>
-        typeof e.data["content"] === "string" ? e.data["content"] : "",
-      )
-      .at(-1) ?? "";
+  const revue = ticketEvents
+    .filter((e) => e.type === "agent_done" && e.agent === "reviewer")
+    .map(revueDeLEvenement)
+    .at(-1);
+  const reviewerContent = revue?.content ?? "";
 
   // Compte rendu complet du codeur : rejoué après reconnexion (ticket-216, ADR-041).
   const codeurDoneContent =
@@ -195,6 +194,7 @@ export default function AgentPanel({
                     isActive={currentAgent === "reviewer"}
                     isDone={status === "done"}
                     reviewContent={reviewerContent}
+                    reviewVerdict={revue?.verdict}
                   />
                 )}
               </>

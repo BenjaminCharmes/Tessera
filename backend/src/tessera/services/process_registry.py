@@ -26,7 +26,8 @@ from tessera.services.groupe_de_processus import (
     tuer_l_arbre,
 )
 from tessera.services.providers.perimetre import racine_autorisee
-from tessera.services.lancement import essais_de_commande
+from tessera.services.service_etat import ServiceEtat
+from tessera.services.lancement import essais_de_commande, options_de_lancement
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -112,19 +113,18 @@ class Service:
     def en_cours(self) -> bool:
         return self.processus is not None and self.processus.returncode is None
 
-    def en_dict(self) -> dict[str, Any]:
-        return {
-            "nom": self.nom,
-            "project_id": self.project_id,
-            "pid": self.pid,
-            "demarre_a": self.demarre_a.isoformat(),
-            "en_cours": self.en_cours,
-            "code_de_sortie": (
-                self.processus.returncode if self.processus is not None else None
-            ),
-            "sortie": list(self.sortie),
-            "arrete_a_la_main": self.arrete_a_la_main,
-        }
+    def etat(self) -> ServiceEtat:
+        """The service as the API describes it."""
+        return ServiceEtat(
+            nom=self.nom,
+            project_id=self.project_id,
+            pid=self.pid,
+            demarre_a=self.demarre_a.isoformat(),
+            en_cours=self.en_cours,
+            code_de_sortie=getattr(self.processus, "returncode", None),
+            sortie=list(self.sortie),
+            arrete_a_la_main=self.arrete_a_la_main,
+        )
 
 
 def verifier_la_commande(commande: str) -> list[str]:
@@ -210,9 +210,18 @@ class ProcessRegistry:
         """
         return list(self._services.get(project_id, []))
 
+    def vivants(self) -> list[Service]:
+        """Les services en cours, tous projets confondus (ticket-416)."""
+        return [
+            service
+            for services in self._services.values()
+            for service in services
+            if service.en_cours
+        ]
+
     def instantane(self) -> list[dict[str, Any]]:
         return [
-            service.en_dict()
+            service.etat().model_dump()
             for services in self._services.values()
             for service in services
         ]
@@ -298,11 +307,7 @@ class ProcessRegistry:
                     cwd=str(dossier),
                     stdout=asyncio.subprocess.PIPE,
                     stderr=asyncio.subprocess.STDOUT,
-                    # Son propre groupe, hors Windows : c'est ce qui rend
-                    # `killpg` sûr à l'arrêt. Sans lui, le service hérite du
-                    # groupe du backend, et l'arrêter emporterait le backend
-                    # (ticket-153).
-                    start_new_session=os.name != "nt",
+                    **options_de_lancement(os.name),
                 )
             except FileNotFoundError as exc:
                 derniere = exc

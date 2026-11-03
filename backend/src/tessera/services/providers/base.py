@@ -1,5 +1,5 @@
 from collections.abc import Awaitable, Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Protocol, runtime_checkable
 
@@ -27,6 +27,18 @@ class ProviderResult:
     # Le modèle qui a réellement répondu, quand ce n'est pas celui demandé —
     # un repli (ticket-188). Vide sinon : l'appelant garde le sien.
     model: str = ""
+    # Les outils que le CLI a refusés pendant l'appel, dans l'ordre (ticket-515).
+    # Seul le SDK en relève ; vide pour les autres.
+    outils_refuses: list[str] = field(default_factory=list)
+    # La sortie validée par le schéma posé à l'appel (ADR-061). None quand
+    # aucun schéma n'a été posé, ou que le provider n'a pas rendu de sortie
+    # valide : `content` garde le texte dans tous les cas.
+    structured: dict[str, Any] | None = None
+    # Le nombre d'actions que l'appel a consommées, et si la limite
+    # (`llm_max_turns`) l'a arrêté (ticket-702). Seul le SDK les rapporte ;
+    # les autres providers gardent les défauts.
+    num_turns: int | None = None
+    max_turns_reached: bool = False
 
 
 @runtime_checkable
@@ -45,6 +57,7 @@ class LLMProvider(Protocol):
         cwd: Path | None = None,
         ask_user: Callable[[str], Awaitable[str]] | None = None,
         session: str | None = None,
+        schema: dict[str, Any] | None = None,
     ) -> ProviderResult:
         """Runs a single call and returns the full response.
 
@@ -65,6 +78,16 @@ class LLMProvider(Protocol):
         ``ClaudeAgentOptions`` has no equivalent field, so it is silently
         discarded — callers relying on it to bound output length get no such
         guarantee under the default (``agent_sdk``) provider.
+
+        ``schema`` is a JSON Schema (draft-07) the answer must satisfy
+        (ADR-061). The validated output comes back in
+        ``ProviderResult.structured``, ``content`` keeping the text; it is
+        ``None`` when the provider returned no valid output. Like ``session``
+        it is only passed when there is one, so providers and test doubles
+        that ignore it never see it. Numeric keywords (``minimum``,
+        ``maximum``) are not supported by every backend: keep them out of the
+        schema and check the bounds in the calling code. A provider never
+        retries on an invalid output — refusing is the caller's business.
         """
         ...
 
@@ -80,10 +103,11 @@ class LLMProvider(Protocol):
         on_tool_use: ToolEventCallback | None = None,
         ask_user: Callable[[str], Awaitable[str]] | None = None,
         session: str | None = None,
+        schema: dict[str, Any] | None = None,
     ) -> ProviderResult:
         """Runs a single call, forwarding incremental output to the callbacks.
 
-        See :meth:`complete` for the ``max_tokens`` best-effort caveat — it
-        applies identically here.
+        See :meth:`complete` for the ``max_tokens`` best-effort caveat and the
+        ``schema`` contract — both apply identically here.
         """
         ...

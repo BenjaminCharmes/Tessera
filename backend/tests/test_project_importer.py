@@ -381,3 +381,21 @@ async def test_import_refuse_un_chemin_relatif_avec_un_message_clair(
         await importer.import_project(Path("mon-projet"), mode="copy")
 
     assert "absolu" in str(exc.value).lower()
+
+
+# ------------------------------------------------------------------
+# Sources trop larges — ticket-707
+# ------------------------------------------------------------------
+
+
+async def test_symlink_import_of_home_or_drive_root_is_refused(tmp_path: Path) -> None:
+    ws = _make_workspace(tmp_path)
+    importer = ProjectImporter(ws)
+    home = Path.home().resolve()
+    too_broad = [home, *home.parents, Path(home.anchor)]
+
+    for source in too_broad:
+        with pytest.raises(ImportError):
+            await importer.import_project(source, mode="symlink")
+
+    assert list(ws.iterdir()) == []

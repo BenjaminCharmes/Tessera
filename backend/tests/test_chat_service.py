@@ -8,7 +8,7 @@ from tessera.services.chat_service import (
     ChatReply,
     ChatService,
 )
-from tessera.services.database import ChatMessageRow
+from tessera.services.database_chat import ChatMessageRow
 from tessera.services.providers.base import ProviderResult
 
 

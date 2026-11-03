@@ -3,12 +3,13 @@ import { api } from "../../lib/api";
 import { notifierProjetsModifies } from "../../hooks/useProjects";
 import { useEtatPersistant } from "../../hooks/useEtatPersistant";
 import { useResource } from "../../hooks/useResource";
-import type { Project, ProjectOverview } from "../../types/api";
+import type { Project, ProjectOverview, RunActif } from "../../types/api";
 import { grouperParCategorie } from "../Sidebar/grouperParCategorie";
 import EnTeteDeCategorie from "../Sidebar/EnTeteDeCategorie";
 import { useCategoriesRepliees } from "../../hooks/useCategoriesRepliees";
 import BarreProjets from "./BarreProjets";
 import ProjetCarte from "./ProjetCarte";
+import ModalesDeProjet, { type ModaleDeProjet } from "./ModalesDeProjet";
 import {
   FILTRES_PAR_DEFAUT,
   SANS_CATEGORIE,
@@ -25,6 +26,12 @@ interface ProjetsViewProps {
   projets: Project[];
   activeProject: Project | null;
   onSelectProject: (project: Project) => void;
+  /** Un projet vient d'être créé ou importé ; il devient le projet actif (ticket-586). */
+  onProjectCreated?: (project: Project) => void;
+  /** Les projets dont un run attend une réponse (ticket-186). */
+  enAttente?: ReadonlySet<string>;
+  /** Les runs vivants : une file en cours accepte des tickets depuis la carte (ticket-557). */
+  runs?: RunActif[];
 }
 
 const AUCUN: ProjectOverview[] = [];
@@ -42,7 +49,11 @@ function Squelette() {
   );
 }
 
-function Message({ texte, action, onAction }: {
+function Message({
+  texte,
+  action,
+  onAction,
+}: {
   texte: string;
   action?: string;
   onAction?: () => void;
@@ -74,20 +85,28 @@ export default function ProjetsView({
   projets,
   activeProject,
   onSelectProject,
+  onProjectCreated,
+  enAttente,
+  runs = [],
 }: ProjetsViewProps) {
-  const { data, loading, error, refresh } = useResource(lireVueDEnsemble, AUCUN);
+  const { data, loading, error, refresh } = useResource(
+    lireVueDEnsemble,
+    AUCUN,
+  );
   const [memorises, setFiltres] = useEtatPersistant<FiltresProjets>(
     "projets.vue",
     FILTRES_PAR_DEFAUT,
     estFiltresProjets,
   );
   const [echec, setEchec] = useState<string | null>(null);
+  const [modale, setModale] = useState<ModaleDeProjet>(null);
   const { estRepliee, basculer } = useCategoriesRepliees();
 
   const pastilles = pastillesDeCategories(data);
   // Une catégorie mémorisée mais disparue (retirée depuis) ne doit pas vider la vue.
   const filtres: FiltresProjets =
-    memorises.categorie !== null && !pastilles.some((p) => p.valeur === memorises.categorie)
+    memorises.categorie !== null &&
+    !pastilles.some((p) => p.valeur === memorises.categorie)
       ? { ...memorises, categorie: null }
       : memorises;
   const categories = pastilles
@@ -102,22 +121,41 @@ export default function ProjetsView({
       refresh();
       notifierProjetsModifies();
     } catch (e) {
-      setEchec(e instanceof Error ? e.message : "Changement de catégorie impossible");
+      setEchec(
+        e instanceof Error ? e.message : "Changement de catégorie impossible",
+      );
     }
   }
 
+  // Le projet ajouté devient le projet actif, comme depuis l'ancienne liste.
+  function projetAjoute(projet: Project) {
+    refresh();
+    notifierProjetsModifies();
+    setModale(null);
+    onProjectCreated?.(projet);
+    onSelectProject(projet);
+  }
+
   function carte(projet: ProjectOverview) {
+    const file = runs.find(
+      (r) => r.project_id === projet.id && r.mode === "queue",
+    );
     return (
       <ProjetCarte
         key={projet.id}
         projet={projet}
         actif={activeProject?.id === projet.id}
+        enAttente={enAttente?.has(projet.id) ?? false}
         categories={categories}
         onSelect={() => {
           const complet = projets.find((p) => p.id === projet.id);
           if (complet) onSelectProject(complet);
         }}
         onChangerCategorie={(c) => void changerCategorie(projet, c)}
+        onServicesChange={refresh}
+        onFileLancee={refresh}
+        fileEnCours={file?.run_id ?? null}
+        dejaEnFile={file?.file_restants ?? []}
       />
     );
   }
@@ -132,7 +170,9 @@ export default function ProjetsView({
       <Message
         texte="Aucun projet ne correspond."
         action="Effacer la recherche"
-        onAction={() => setFiltres({ ...filtres, recherche: "", categorie: null })}
+        onAction={() =>
+          setFiltres({ ...filtres, recherche: "", categorie: null })
+        }
       />
     ) : (
       <Message texte="Aucun projet pour l'instant." />
@@ -145,9 +185,13 @@ export default function ProjetsView({
         {grouperParCategorie(visibles).map((groupe) => {
           // Une recherche active montre ses résultats même dans une catégorie
           // repliée, sans toucher à l'état mémorisé (ticket-400).
-          const repliee = estRepliee(groupe.categorie) && !filtres.recherche.trim();
+          const repliee =
+            estRepliee(groupe.categorie) && !filtres.recherche.trim();
           return (
-            <section key={groupe.categorie ?? "__sans__"} className="flex flex-col gap-2">
+            <section
+              key={groupe.categorie ?? "__sans__"}
+              className="flex flex-col gap-2"
+            >
               <h2>
                 <EnTeteDeCategorie
                   categorie={groupe.categorie}
@@ -156,7 +200,9 @@ export default function ProjetsView({
                   onBasculer={() => basculer(groupe.categorie)}
                 />
               </h2>
-              {!repliee && <div className={GRILLE}>{groupe.projets.map(carte)}</div>}
+              {!repliee && (
+                <div className={GRILLE}>{groupe.projets.map(carte)}</div>
+              )}
             </section>
           );
         })}
@@ -171,6 +217,13 @@ export default function ProjetsView({
         pastilles={pastilles}
         total={data.length}
         onChange={setFiltres}
+        onImporter={() => setModale("import")}
+        onCreer={() => setModale("creation")}
+      />
+      <ModalesDeProjet
+        ouverte={modale}
+        onFermer={() => setModale(null)}
+        onAjoute={projetAjoute}
       />
       {echec && (
         <p role="alert" className="px-4 py-2 text-xs text-red-400">

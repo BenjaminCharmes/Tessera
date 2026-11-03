@@ -7,7 +7,8 @@ from fastapi.testclient import TestClient
 
 from tessera.config import settings
 from tessera.main import app
-from tessera.services.database import create_run, finish_run, init_db
+from tessera.services.database import init_db
+from tessera.services.database_runs import create_run, finish_run
 
 _TICKET = """---
 id: {id}
@@ -138,8 +139,15 @@ def test_ouvrir_une_pr_pousse_puis_cree(
         calls.append("create-pr")
         return 7, "https://github.com/owner/repo/pull/7"
 
+    async def _diff(self: object, base: str, branch: str) -> str:
+        # Le contrôle des secrets lit toujours le diff de la branche (ticket-547).
+        return ""
+
     monkeypatch.setattr(
         "tessera.services.git_workspace.GitWorkspaceService.push_branch", _push
+    )
+    monkeypatch.setattr(
+        "tessera.services.git_workspace.GitWorkspaceService.diff_de_branche", _diff
     )
     monkeypatch.setattr(
         "tessera.services.github_service.GitHubService.create_pull_request", _create

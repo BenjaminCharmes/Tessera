@@ -5,7 +5,15 @@ from pathlib import Path
 from typing import Any, Literal, TYPE_CHECKING
 
 from tessera.services.providers.base import LLMProvider
-from tessera.utils.json_extract import extract_json
+from tessera.services.quota_exhaustion import is_quota_exhausted
+from tessera.services.validator_cited_files import (
+    CitedFilesReport,
+    build_cited_files_section,
+    extract_file_refs,
+    format_cited_files_log,
+)
+from tessera.services.validator_decisions import Exchanges, build_decisions_section
+from tessera.services.validator_schema import VALIDATOR_SCHEMA
 from tessera.services.modeles_par_defaut import MODELE_JUGEMENT
 from tessera.utils.logger import get_logger
 
@@ -20,11 +28,6 @@ _PROMPT_FILE = "validateur.md"
 # Same cap as the security audit: at 8 000 chars a branch diff made most
 # criteria unverifiable (ticket-221).
 _CODE_MAX_CHARS = 120_000
-# Max size of the cited-files section -- all entries combined.
-# Beyond this the current file is truncated (ticket-316).
-_CITED_FILES_MAX_CHARS = 20_000
-# Directories to skip during recursive search for a cited file.
-_EXCLUDED_DIRS = {".venv", "node_modules", ".git", "__pycache__", "dist", "build"}
 
 Verdict = Literal["APPROVED", "CHANGES_REQUESTED"]
 
@@ -35,17 +38,9 @@ _CODE_TICKET_TYPES: frozenset[str] = frozenset({"feat", "fix", "refactor"})
 _CHECKBOX_PREFIX = re.compile(r"^\s*-?\s*\[[ xX]?\]\s*")
 # Matches backtick, ASCII quotes, guillemets and typographic curly quotes.
 # \uXXXX escapes keep this file 100 % ASCII on disk (avoids cp1252/UTF-8 mix).
-_QUOTES_AND_TICKS = re.compile(
-    "[\x60\"'«»“”‘’]"
-)
+_QUOTES_AND_TICKS = re.compile("[\x60\"'«»“”‘’]")
 _PUNCTUATION_TAIL = re.compile(r"[.,;:!?]+$")
 _MULTI_SPACE = re.compile(r"\s+")
-# Backtick-quoted content inside a criterion.
-_BACKTICK_REF = re.compile(r"`([^`\n]+)`")
-# Trailing line-number suffix, e.g. ":44" in "BillingTab.test.tsx:44".
-_LINE_SUFFIX = re.compile(r":\d+$")
-# Recognised file extension (1-6 letters).
-_FILE_EXTENSION = re.compile(r"\.[a-zA-Z]{1,6}$")
 
 
 @dataclass
@@ -61,6 +56,8 @@ class ValidationResult:
     criteria: list[CriterionResult]
     verdict: Verdict
     feedback: str
+    # What the validator received of the cited files (ticket-434).
+    cited_files: CitedFilesReport | None = None
 
 
 class ValidatorService:
@@ -80,6 +77,8 @@ class ValidatorService:
         test_result: "TestResult | None",
         project_root: Path | None = None,
         ticket_type: str | None = None,
+        refus: str = "",
+        exchanges: Exchanges = (),
     ) -> ValidationResult:
         if not criteria:
             # Un ticket de code sans critère ne peut pas être validé : rien
@@ -106,8 +105,8 @@ class ValidatorService:
             )
 
         system_prompt = self._load_system_prompt()
-        user_message = self._build_user_message(
-            criteria, code_produced, test_result, project_root
+        user_message, cited_files = self._build_user_message(
+            criteria, code_produced, test_result, project_root, refus, exchanges
         )
 
         try:
@@ -116,19 +115,27 @@ class ValidatorService:
                 user=user_message,
                 model=self._model,
                 max_tokens=_MAX_TOKENS,
+                schema=VALIDATOR_SCHEMA,
             )
         except Exception as exc:
             # Same policy as unreadable JSON: a validation that did not happen
             # must not approve anything (ticket-122).
             _logger.warning("validator_llm_failed", extra={"error": str(exc)})
+            # Un quota épuisé n'est pas un verdict : l'orchestrateur le traite
+            # comme un arrêt de quota (ticket-505).
+            if is_quota_exhausted(exc, None):
+                raise
             return ValidationResult(
                 all_passed=False,
                 criteria=[],
                 verdict="CHANGES_REQUESTED",
                 feedback=f"Validation indisponible : {exc}",
+                cited_files=cited_files,
             )
 
-        return self._parse_response(result.content, criteria)
+        parsed = self._parse_structured(result.structured, result.content, criteria)
+        parsed.cited_files = cited_files
+        return parsed
 
     def _load_system_prompt(self) -> str:
         prompt_path = self._prompts_dir / _PROMPT_FILE
@@ -142,7 +149,9 @@ class ValidatorService:
         code_produced: str,
         test_result: "TestResult | None",
         project_root: Path | None = None,
-    ) -> str:
+        refus: str = "",
+        exchanges: Exchanges = (),
+    ) -> tuple[str, CitedFilesReport]:
         # Number the criteria so the LLM can return an `index`.
         criteria_block = "\n".join(
             f"{i}. {c}" for i, c in enumerate(criteria, start=1)
@@ -165,28 +174,33 @@ class ValidatorService:
                     else ""
                 )
             )
-        cited_block = ""
+        cited_block, report = "", CitedFilesReport()
         if project_root is not None:
             refs = extract_file_refs(criteria)
-            cited_block = _build_cited_files_section(refs, project_root)
-        return (
+            cited_block, report = build_cited_files_section(refs, project_root)
+        message = (
             f"## Critères d'acceptation\n{criteria_block}\n\n"
-            f"## Code produit\n{code_produced[:_CODE_MAX_CHARS]}"
+            + build_decisions_section(exchanges)
+            + f"## Code produit\n{code_produced[:_CODE_MAX_CHARS]}"
+            # Hors de la coupe : un refus tronqué avec le code ne dirait rien.
+            + refus
             + test_block
             + cited_block
         )
+        return message, report
 
-    def _parse_response(
-        self, raw: str, sent_criteria: list[str]
+    def _parse_structured(
+        self, parsed: dict[str, Any] | None, raw: str, sent_criteria: list[str]
     ) -> ValidationResult:
-        parsed = extract_json(raw, required_key="criteria")
-        if not parsed:
+        # Sans sortie structurée, ou sans `criteria`, rien n'a été jugé : la
+        # validation échoue fermée (ADR-039).
+        if not parsed or "criteria" not in parsed:
             _logger.warning("validator_invalid_json", extra={"raw": raw[:200]})
             return ValidationResult(
                 all_passed=False,
                 criteria=[],
                 verdict="CHANGES_REQUESTED",
-                feedback="Réponse du validateur non parseable.",
+                feedback="Réponse du validateur sans sortie structurée valide.",
             )
 
         raw_entries = [c for c in parsed.get("criteria", []) if isinstance(c, dict)]
@@ -241,7 +255,8 @@ def _reconcile_criteria(
         if matched is None:
             matched = tolerant_map.get(_tolerant_normalize(sent))
         if matched is not None:
-            criteria.append(matched)
+            # Texte envoyé : la sortie structurée n'exige que `index` (ticket-662).
+            criteria.append(CriterionResult(sent, matched.passed, matched.note))
         else:
             criteria.append(
                 CriterionResult(
@@ -265,12 +280,6 @@ def _build_feedback(base_feedback: str, criteria: list[CriterionResult]) -> str:
     return prefix + base_feedback
 
 
-def _normalize(text: str) -> str:
-    """Normalize a criterion text for matching: strip checkboxes and lowercase."""
-    text = _CHECKBOX_PREFIX.sub("", text.strip())
-    return text.lower().strip()
-
-
 def _tolerant_normalize(text: str) -> str:
     """Normalize tolerantly: strip checkboxes, backticks, quotes, trailing punctuation."""
     text = _CHECKBOX_PREFIX.sub("", text.strip())
@@ -280,91 +289,11 @@ def _tolerant_normalize(text: str) -> str:
     return text.lower().strip()
 
 
-def extract_file_refs(criteria: list[str]) -> list[str]:
-    """Extract file references from acceptance criteria.
-
-    Picks up any backtick-quoted token that looks like a file path (has an
-    extension), after stripping a trailing ``:N`` line-number suffix.
-    Preserves insertion order and deduplicates.
-    """
-    seen: set[str] = set()
-    refs: list[str] = []
-    for criterion in criteria:
-        for m in _BACKTICK_REF.finditer(criterion):
-            candidate = _LINE_SUFFIX.sub("", m.group(1).strip())
-            if _FILE_EXTENSION.search(candidate):
-                if candidate not in seen:
-                    seen.add(candidate)
-                    refs.append(candidate)
-    return refs
-
-
-def _find_file_in_project(ref: str, project_root: Path) -> Path | None:
-    """Resolve a file reference against the project root.
-
-    Tries the reference as a relative path first, then falls back to a
-    recursive search by filename, skipping common non-source directories.
-    """
-    # Un critère vient d'un ticket, qui peut venir d'une issue GitHub : sans
-    # cette borne, `../../.env` ou un chemin absolu ferait joindre au message
-    # du validateur un fichier hors du projet (audit sécurité du ticket-316).
-    racine = project_root.resolve()
-
-    def _dans_le_projet(chemin: Path) -> bool:
-        try:
-            chemin.resolve().relative_to(racine)
-        except ValueError:
-            return False
-        return True
-
-    if Path(ref).is_absolute():
-        return None
-    candidate = project_root / ref
-    if candidate.is_file() and _dans_le_projet(candidate):
-        return candidate
-    name = Path(ref).name
-    if not name or name in (".", ".."):
-        return None
-    for found in project_root.rglob(name):
-        if any(part in _EXCLUDED_DIRS for part in found.parts):
-            continue
-        if found.is_file() and _dans_le_projet(found):
-            return found
-    return None
-
-
-def _build_cited_files_section(refs: list[str], project_root: Path) -> str:
-    """Build the cited-files section to append to the validator message.
-
-    Each referenced file is read and added up to ``_CITED_FILES_MAX_CHARS``
-    total. A file that does not fit is truncated with a mention; a file that
-    does not exist is noted as absent. Returns an empty string when no refs.
-    """
-    if not refs:
-        return ""
-    entries: list[str] = []
-    budget = _CITED_FILES_MAX_CHARS
-    for ref in refs:
-        found = _find_file_in_project(ref, project_root)
-        if found is None:
-            entry = f"### {ref}\n*(absent du dépôt)*"
-        else:
-            raw = found.read_text(encoding="utf-8", errors="replace")
-            if len(raw) > budget:
-                omitted = len(raw) - budget
-                raw = (
-                    raw[:budget]
-                    + f"\n[... {omitted} caractères tronqués]"
-                )
-            entry = f"### {ref}\n```\n{raw}\n```"
-        budget -= len(entry)
-        entries.append(entry)
-        if budget <= 0:
-            break
-    header = (
-        "## Fichiers cités par les critères"
-        " (tels qu'ils sont après le run)\n\n"
-        "Un critère peut être satisfait par du code"
-        " préexistant visible dans cette section.\n\n"
-    )
-    return "\n\n" + header + "\n\n".join(entries)
+__all__ = [
+    "CitedFilesReport",
+    "CriterionResult",
+    "ValidationResult",
+    "ValidatorService",
+    "extract_file_refs",
+    "format_cited_files_log",
+]

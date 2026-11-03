@@ -17,6 +17,7 @@ vi.mock("./components/RunView", () => ({ default: () => null }));
 vi.mock("./components/Editor", () => ({ default: () => null }));
 vi.mock("./components/KanbanView", () => ({ default: () => null }));
 vi.mock("./components/ProjetsView", () => ({ default: () => null }));
+vi.mock("./components/EnCoursView", () => ({ default: () => null }));
 vi.mock("./components/DiffView", () => ({ default: () => null }));
 vi.mock("./components/BottomPanel", () => ({ default: () => null }));
 vi.mock("./components/Toast", () => ({ default: () => null }));
@@ -128,6 +129,16 @@ vi.mock("./hooks/useServices", () => ({
   useServices: () => ({ services: [], enCours: false }),
 }));
 
+vi.mock("./hooks/useAppsEnCours", () => ({
+  useAppsEnCours: () => ({
+    apps: [],
+    lueA: 0,
+    erreur: null,
+    arreter: vi.fn(),
+    rafraichir: vi.fn(),
+  }),
+}));
+
 vi.mock("./hooks/useProjetMemorise", () => ({
   useProjetMemorise: () => ({ memoriser: vi.fn() }),
 }));
@@ -144,6 +155,7 @@ vi.mock("./hooks/useNotificationsSysteme", () => ({
     active: false,
     etat: "default",
     setActive: vi.fn(),
+    cloche: { reglages: { question: { systeme: true, son: true } }, setReglage: vi.fn() },
   }),
   demanderPermissionNotifications: vi.fn(),
 }));
@@ -153,15 +165,13 @@ beforeEach(() => {
 });
 
 describe("App — panneau Chat", () => {
-  it("choisir Chat affiche ChatPanel dans la zone centrale", async () => {
+  it("choisir Chat sans projet propose d'en choisir un dans la zone centrale (ticket-735)", async () => {
     render(<App />);
 
     await userEvent.click(screen.getByRole("tab", { name: /^Chat$/ }));
 
     const main = screen.getByRole("main");
-    // ChatPanel est chargé en lazy : on attend sa résolution avant l'assertion.
-    const chatPanel = await screen.findByTestId("chat-panel");
-    expect(main).toContainElement(chatPanel);
+    expect(main).toContainElement(await screen.findByRole("heading", { name: "Sur quel projet travailles-tu ?" }));
   });
 
   it("ne rend plus d'onglets Agents et Chat en colonne de droite", () => {
@@ -172,6 +182,35 @@ describe("App — panneau Chat", () => {
     expect(
       screen.queryByRole("tablist", { name: /panneau lat/i }),
     ).not.toBeInTheDocument();
+  });
+});
+
+describe("App — colonne latérale (ticket-580)", () => {
+  it("does not render the side column on the supervision panel", async () => {
+    render(<App />);
+    await userEvent.click(screen.getByRole("tab", { name: /^Supervision/ }));
+
+    expect(screen.queryByLabelText("Panneau latéral")).not.toBeInTheDocument();
+    expect(screen.getByRole("main")).toHaveStyle({ gridColumn: "2" });
+  });
+
+  it("does not render the side column on the projects panel (ticket-586)", async () => {
+    render(<App />);
+    await userEvent.click(screen.getByRole("tab", { name: /^Tickets/ }));
+    expect(screen.getByLabelText("Panneau latéral")).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole("tab", { name: /^Projets/ }));
+
+    expect(screen.queryByLabelText("Panneau latéral")).not.toBeInTheDocument();
+    expect(screen.getByRole("main")).toHaveStyle({ gridColumn: "2" });
+  });
+
+  it("still renders the side column on the tickets panel", async () => {
+    render(<App />);
+    await userEvent.click(screen.getByRole("tab", { name: /^Tickets/ }));
+
+    expect(screen.getByLabelText("Panneau latéral")).toBeInTheDocument();
+    expect(screen.getByRole("main")).toHaveStyle({ gridColumn: "3" });
   });
 });
 

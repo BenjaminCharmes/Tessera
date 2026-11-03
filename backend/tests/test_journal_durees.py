@@ -12,9 +12,10 @@ from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services import pipeline_stages as stages
+from tessera.services import pipeline_controles, pipeline_production, pipeline_testeur
 from tessera.services.livraison import Livraison
 from tessera.services.orchestrator import Orchestrator
+from tessera.services.pipeline_documentation import documenter_le_run
 from tessera.services.pipeline_events import EventType, OrchestratorEvent, PipelineResult
 from tessera.services.pipeline_run import PipelineRun
 from tessera.services.security_auditor import SecurityAuditResult
@@ -100,7 +101,9 @@ def _resultat(ticket_id: str = "ticket-001", approved: bool = True) -> PipelineR
 
 
 class _AuditeurInstant:
-    async def audit(self, code_diff: str, project_path: Path) -> SecurityAuditResult:
+    async def audit(
+        self, code_diff: str, project_path: Path, contexte: object = None
+    ) -> SecurityAuditResult:
         return SecurityAuditResult(
             issues=[],
             verdict="PASS",
@@ -119,7 +122,7 @@ async def test_security_audit_log_contient_la_duree() -> None:
     run = _run()
     run.reviewed_code = "diff"
 
-    await stages.run_security_audit(orch, run)  # type: ignore[arg-type]
+    await pipeline_controles.run_security_audit(orch, run)  # type: ignore[arg-type]
 
     assert orch.logs, "security audit should write at least one log line"
     line = orch.logs[-1]
@@ -147,7 +150,7 @@ async def test_validation_log_contient_la_duree() -> None:
     orch = _OrchStub(_validator=_ValidateurInstant())
     run = _run()
 
-    await stages.run_validation(orch, run)  # type: ignore[arg-type]
+    await pipeline_controles.run_validation(orch, run)  # type: ignore[arg-type]
 
     assert orch.logs, "validation should write at least one log line"
     line = orch.logs[-1]
@@ -181,7 +184,7 @@ async def test_documentation_reussie_log_duree_et_nombre_de_fichiers(
     async def _on_event(e: OrchestratorEvent) -> None:
         events.append(e)
 
-    await orch._documenter_le_run(_resultat(), _on_event)
+    await documenter_le_run(orch, _resultat(), _on_event)
 
     log_content = (tmp_path / "memory" / "log.md").read_text(encoding="utf-8")
     assert "documentation" in log_content, "no documentation log entry"
@@ -201,7 +204,7 @@ async def test_documentation_echouee_log_echec(tmp_path: Path) -> None:
     async def _on_event(e: OrchestratorEvent) -> None:
         events.append(e)
 
-    await orch._documenter_le_run(_resultat(), _on_event)
+    await documenter_le_run(orch, _resultat(), _on_event)
 
     log_content = (tmp_path / "memory" / "log.md").read_text(encoding="utf-8")
     assert "documentation" in log_content, "no documentation log entry"
@@ -276,11 +279,11 @@ async def test_changes_requested_log_reprend_le_verdict_brut(tmp_path: Path) -> 
     run = _run()
 
     with (
-        patch.object(stages, "run_coder", new=AsyncMock()),
-        patch.object(stages, "run_tests", new=AsyncMock(return_value=True)),
-        patch.object(stages, "run_security_audit", new=AsyncMock(return_value=None)),
+        patch.object(pipeline_production, "run_coder", new=AsyncMock()),
+        patch.object(pipeline_testeur, "run_tests", new=AsyncMock(return_value=True)),
+        patch.object(pipeline_controles, "run_security_audit", new=AsyncMock(return_value=None)),
         patch.object(
-            stages, "run_review", new=AsyncMock(return_value=(False, "", raw_verdict))
+            pipeline_controles, "run_review", new=AsyncMock(return_value=(False, "", raw_verdict))
         ),
     ):
         await orch._run_rounds(run, "ticket-001")

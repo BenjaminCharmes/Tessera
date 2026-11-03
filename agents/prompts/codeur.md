@@ -38,6 +38,11 @@ permis et utile pour vérifier ton travail.
 Tu n'écris que sous la racine du projet. Lire ailleurs est permis, écrire
 ailleurs est refusé.
 
+**Une règle nouvelle pour tous les agents** s'écrit dans `memory/contraintes.md`
+**sous `## Proposées`**, avec son ADR (`memory/decisions.md`). Ailleurs dans ce
+fichier, ton diff met le run en `blocked` : un humain accepte la règle en la
+déplaçant dans sa section.
+
 Pour supprimer un fichier, `rm <chemin>` ; ne jamais le vider : un fichier vide reste dans le dépôt.
 
 ## Un refus de hook est définitif
@@ -98,6 +103,10 @@ que tu n'as pas pu vérifier sans les exécuter}
 
 Si en implémentant tu découvres qu'une partie du travail dépasse le scope du ticket actuel,
 **ne l'implémente pas** — crée un nouveau ticket et mentionne-le dans tes notes.
+Son numéro vient de `python ../../scripts/prochain_numero.py ticket` (`adr` pour une
+ADR), lancé juste avant d'écrire la fiche : il compte ce que portent l'arbre,
+`origin/develop` et les autres branches `origin/ticket-*`. Sans ce script dans
+le dépôt, prends le suivant le plus grand déjà pris, tous dossiers confondus.
 
 ## Contexte disponible
 

@@ -20,7 +20,7 @@ from pathlib import Path
 from typing import Any
 
 from tessera.services.cost_calculator import calculate_cost
-from tessera.services.database import save_agent_call
+from tessera.services.agent_calls import save_agent_call
 from tessera.services.providers.base import (
     LLMProvider,
     ProviderResult,
@@ -46,6 +46,11 @@ def activer_enregistrement(run_id: str | None, ticket_id: str | None) -> None:
     """
     _ctx_run_id.set(run_id)
     _ctx_ticket_id.set(ticket_id)
+
+
+def ticket_courant() -> str | None:
+    """The ticket of the run in progress in this async task, or None outside one."""
+    return _ctx_ticket_id.get()
 
 
 class ProviderEnregistrant:
@@ -97,6 +102,7 @@ class ProviderEnregistrant:
         cwd: Path | None = None,
         ask_user: Callable[[str], Awaitable[str]] | None = None,
         session: str | None = None,
+        schema: dict[str, Any] | None = None,
     ) -> ProviderResult:
         """Forward to inner, then record."""
         kw: dict[str, Any] = {}
@@ -106,6 +112,8 @@ class ProviderEnregistrant:
             kw["ask_user"] = ask_user
         if session is not None:
             kw["session"] = session
+        if schema is not None:
+            kw["schema"] = schema
         t0 = time.monotonic()
         result = await self._inner.complete(
             system=system, user=user, model=model, max_tokens=max_tokens, **kw
@@ -126,6 +134,7 @@ class ProviderEnregistrant:
         on_tool_use: ToolEventCallback | None = None,
         ask_user: Callable[[str], Awaitable[str]] | None = None,
         session: str | None = None,
+        schema: dict[str, Any] | None = None,
     ) -> ProviderResult:
         """Forward to inner, then record."""
         kw: dict[str, Any] = {}
@@ -139,6 +148,8 @@ class ProviderEnregistrant:
             kw["ask_user"] = ask_user
         if session is not None:
             kw["session"] = session
+        if schema is not None:
+            kw["schema"] = schema
         t0 = time.monotonic()
         result = await self._inner.stream(
             system=system, user=user, model=model, max_tokens=max_tokens, **kw
@@ -181,6 +192,7 @@ class ProviderEnregistrant:
                 cost_usd,
                 duration_ms,
                 provider=provider_name,
+                cache_creation_tokens=result.cache_creation_tokens,
             )
         except Exception as exc:  # noqa: BLE001 — un enregistrement raté ne casse rien
             _logger.warning(

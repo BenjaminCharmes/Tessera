@@ -3,9 +3,8 @@ import ProjectHeader from "./ProjectHeader";
 import PanneauUsage from "./PanneauUsage";
 import type { UseServicesResult } from "../../hooks/useServices";
 import type { FiltresTickets } from "../../lib/filtresTickets";
-import type { ReglageDesNotifications } from "./PanneauxDuProjet";
+import SectionPipeline from "./SectionPipeline";
 import FileTree from "../FileTree";
-import ProjectNav from "./ProjectNav";
 import TicketList from "./TicketList";
 import PanneauxDuProjet from "./PanneauxDuProjet";
 import RunHistory from "./RunHistory";
@@ -31,16 +30,11 @@ import type { SidebarPanel } from "./panels";
 
 export interface ProjetSidebar {
   actif: Project | null;
-  /** Les projets dont un run attend une réponse (ticket-186). */
-  enAttente?: ReadonlySet<string>;
   /** Les services du projet actif, pour le bouton « Lancer » (ticket-138). */
   services?: UseServicesResult;
   /** La sortie d'un service, pour le panneau du projet (ticket-147). */
   sortieDeService?: (projectId: string, nom: string) => string[];
-  /** Le réglage des notifications système (ticket-192). */
-  notifications?: ReglageDesNotifications;
   onSelect: (project: Project) => void;
-  onCreated?: (project: Project) => void;
 }
 
 export interface TicketsSidebar {
@@ -80,6 +74,9 @@ export interface RunsSidebar {
   liste: PipelineRun[];
   loading: boolean;
   error: string | null;
+  /** Le run regardé au centre, null tant qu'aucun n'est choisi (ticket-427). */
+  selectionne?: string | null;
+  onSelect?: (runId: string) => void;
 }
 
 export interface UsageSidebar {
@@ -147,6 +144,7 @@ export default function Sidebar({
         services={projet.services}
         onOuvrirLesServices={() => setServicesOuverts(true)}
         onSelectProject={projet.onSelect}
+        runEnCours={tickets.running.size > 0}
       />
 
       <PanneauxDuProjet
@@ -155,19 +153,17 @@ export default function Sidebar({
         servicesOuverts={servicesOuverts}
         services={projet.services}
         sortieDeService={projet.sortieDeService}
-        runEnCours={tickets.running.size > 0}
-        notifications={projet.notifications}
       />
 
+      {/* Le réglage du pipeline reste là où il sert (ticket-441). */}
+      {projet.actif && (panel === "agents" || panel === "tickets") ? (
+        <SectionPipeline
+          projectId={projet.actif.id}
+          runEnCours={tickets.running.size > 0}
+        />
+      ) : null}
+
       <div className="flex-1 overflow-y-auto">
-        {panel === "projects" && (
-          <ProjectNav
-            activeProject={projet.actif}
-            onSelectProject={projet.onSelect}
-            onProjectCreated={projet.onCreated}
-            enAttente={projet.enAttente}
-          />
-        )}
         {panel === "tickets" && (
           <TicketList
             project={projet.actif}
@@ -218,6 +214,8 @@ export default function Sidebar({
             loading={runs.loading}
             error={runs.error}
             onSelectTicket={tickets.onSelectById}
+            selectedRunId={runs.selectionne ?? null}
+            onSelectRun={runs.onSelect}
           />
         )}
         {panel === "agents" && (

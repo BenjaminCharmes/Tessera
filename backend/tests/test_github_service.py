@@ -363,11 +363,111 @@ def _check_runs_payload(
     }
 
 
+def _workflow_runs_payload(*runs: tuple[str, str | None]) -> dict:
+    return {
+        "workflow_runs": [
+            {"status": status, "conclusion": conclusion} for status, conclusion in runs
+        ]
+    }
+
+
+def _actions_refuse(code: int = 403) -> None:
+    # Jeton fine-grained sans Actions : `actions/runs` refuse, on se replie sur check-runs.
+    respx.get(f"{_BASE}/repos/{_REPO}/actions/runs").mock(
+        return_value=httpx.Response(code, json={"message": "refused"})
+    )
+
+
+def _actions_repond(payload: dict) -> respx.Route:
+    return respx.get(f"{_BASE}/repos/{_REPO}/actions/runs").mock(
+        return_value=httpx.Response(200, json=payload)
+    )
+
+
+@respx.mock
+async def test_ci_passing_from_workflow_runs_without_calling_check_runs() -> None:
+    _actions_repond(_workflow_runs_payload(("completed", "success"), ("completed", "skipped")))
+    checks = respx.get(f"{_BASE}/repos/{_REPO}/commits/abc123/check-runs")
+    assert await _make_service().get_ci_status("abc123") == "passing"
+    assert not checks.called
+
+
+@respx.mock
+async def test_ci_asks_workflow_runs_for_the_sha() -> None:
+    route = _actions_repond(_workflow_runs_payload(("completed", "success")))
+    await _make_service().get_ci_status("abc123")
+    assert route.calls.last.request.url.params["head_sha"] == "abc123"
+
+
+@respx.mock
+async def test_ci_pending_when_a_workflow_run_is_in_progress() -> None:
+    _actions_repond(_workflow_runs_payload(("completed", "success"), ("in_progress", None)))
+    assert await _make_service().get_ci_status("abc123") == "pending"
+
+
+@respx.mock
+async def test_ci_failing_when_a_workflow_run_failed() -> None:
+    _actions_repond(_workflow_runs_payload(("completed", "success"), ("completed", "failure")))
+    assert await _make_service().get_ci_status("abc123") == "failing"
+
+
+@respx.mock
+async def test_ci_pending_on_action_required_workflow_run() -> None:
+    _actions_repond(_workflow_runs_payload(("completed", "action_required")))
+    assert await _make_service().get_ci_status("abc123") == "pending"
+
+
+@respx.mock
+async def test_ci_none_when_no_workflow_run() -> None:
+    _actions_repond({"workflow_runs": []})
+    checks = respx.get(f"{_BASE}/repos/{_REPO}/commits/abc123/check-runs")
+    assert await _make_service().get_ci_status("abc123") == "none"
+    assert not checks.called
+
+
+@respx.mock
+async def test_ci_falls_back_on_check_runs_when_actions_is_403() -> None:
+    _actions_refuse(403)
+    respx.get(f"{_BASE}/repos/{_REPO}/commits/abc123/check-runs").mock(
+        return_value=httpx.Response(200, json=_check_runs_payload(["success", "failure"]))
+    )
+    assert await _make_service().get_ci_status("abc123") == "failing"
+
+
+@respx.mock
+async def test_ci_falls_back_on_check_runs_when_actions_is_404() -> None:
+    _actions_refuse(404)
+    respx.get(f"{_BASE}/repos/{_REPO}/commits/abc123/check-runs").mock(
+        return_value=httpx.Response(200, json=_check_runs_payload(["success"]))
+    )
+    assert await _make_service().get_ci_status("abc123") == "passing"
+
+
+@respx.mock
+async def test_ci_unreadable_when_both_endpoints_refuse() -> None:
+    _actions_refuse(403)
+    respx.get(f"{_BASE}/repos/{_REPO}/commits/abc123/check-runs").mock(
+        return_value=httpx.Response(403, json={"message": "refused"})
+    )
+    svc = _make_service()
+    assert await svc.get_ci_status("abc123") == "unreadable"
+    assert (await svc._lire_ci("abc123")) == ("unreadable", 403)
+
+
+@respx.mock
+async def test_ci_none_when_actions_runs_errors_out() -> None:
+    respx.get(f"{_BASE}/repos/{_REPO}/actions/runs").mock(
+        return_value=httpx.Response(500, json={"message": "Server Error"})
+    )
+    assert await _make_service().get_ci_status("abc123") == "none"
+
+
 @respx.mock
 async def test_get_pr_status_open_ci_passing() -> None:
     respx.get(f"{_BASE}/repos/{_REPO}/pulls/15").mock(
         return_value=httpx.Response(200, json=_pr_payload())
     )
+    _actions_refuse()
     respx.get(f"{_BASE}/repos/{_REPO}/commits/abc123/check-runs").mock(
         return_value=httpx.Response(200, json=_check_runs_payload(["success", "success"]))
     )
@@ -384,6 +484,7 @@ async def test_get_pr_status_merged() -> None:
     respx.get(f"{_BASE}/repos/{_REPO}/pulls/15").mock(
         return_value=httpx.Response(200, json=_pr_payload(state="closed", merged=True))
     )
+    _actions_refuse()
     respx.get(f"{_BASE}/repos/{_REPO}/commits/abc123/check-runs").mock(
         return_value=httpx.Response(200, json=_check_runs_payload(["success"]))
     )
@@ -397,6 +498,7 @@ async def test_get_pr_status_closed_not_merged() -> None:
     respx.get(f"{_BASE}/repos/{_REPO}/pulls/15").mock(
         return_value=httpx.Response(200, json=_pr_payload(state="closed", merged=False))
     )
+    _actions_refuse()
     respx.get(f"{_BASE}/repos/{_REPO}/commits/abc123/check-runs").mock(
         return_value=httpx.Response(200, json=_check_runs_payload([]))
     )
@@ -410,6 +512,7 @@ async def test_get_pr_status_ci_pending_when_running() -> None:
     respx.get(f"{_BASE}/repos/{_REPO}/pulls/15").mock(
         return_value=httpx.Response(200, json=_pr_payload())
     )
+    _actions_refuse()
     respx.get(f"{_BASE}/repos/{_REPO}/commits/abc123/check-runs").mock(
         return_value=httpx.Response(200, json=_check_runs_payload([None, "success"]))
     )
@@ -423,6 +526,7 @@ async def test_get_pr_status_ci_failing() -> None:
     respx.get(f"{_BASE}/repos/{_REPO}/pulls/15").mock(
         return_value=httpx.Response(200, json=_pr_payload())
     )
+    _actions_refuse()
     respx.get(f"{_BASE}/repos/{_REPO}/commits/abc123/check-runs").mock(
         return_value=httpx.Response(200, json=_check_runs_payload(["success", "failure"]))
     )
@@ -436,6 +540,7 @@ async def test_get_pr_status_ci_none_when_no_checks() -> None:
     respx.get(f"{_BASE}/repos/{_REPO}/pulls/15").mock(
         return_value=httpx.Response(200, json=_pr_payload())
     )
+    _actions_refuse()
     respx.get(f"{_BASE}/repos/{_REPO}/commits/abc123/check-runs").mock(
         return_value=httpx.Response(200, json={"check_runs": []})
     )
@@ -449,12 +554,76 @@ async def test_get_pr_status_ci_none_when_checks_endpoint_fails() -> None:
     respx.get(f"{_BASE}/repos/{_REPO}/pulls/15").mock(
         return_value=httpx.Response(200, json=_pr_payload())
     )
+    _actions_refuse()
     respx.get(f"{_BASE}/repos/{_REPO}/commits/abc123/check-runs").mock(
-        return_value=httpx.Response(404, json={"message": "Not Found"})
+        return_value=httpx.Response(500, json={"message": "Server Error"})
     )
     svc = _make_service()
     status = await svc.get_pull_request_status(15)
     assert status.ci_status == "none"
+    assert status.ci_http_status is None
+
+
+@respx.mock
+async def test_get_pr_status_ci_unreadable_on_403() -> None:
+    # Le jeton n'a pas la permission Checks : ce n'est pas « pas de CI ».
+    respx.get(f"{_BASE}/repos/{_REPO}/pulls/15").mock(
+        return_value=httpx.Response(200, json=_pr_payload())
+    )
+    _actions_refuse()
+    respx.get(f"{_BASE}/repos/{_REPO}/commits/abc123/check-runs").mock(
+        return_value=httpx.Response(
+            403, json={"message": "Resource not accessible by personal access token"}
+        )
+    )
+    svc = _make_service()
+    status = await svc.get_pull_request_status(15)
+    assert status.ci_status == "unreadable"
+    assert status.ci_http_status == 403
+    assert await svc.get_ci_status("abc123") == "unreadable"
+
+
+@respx.mock
+async def test_get_pr_status_ci_unreadable_on_404() -> None:
+    respx.get(f"{_BASE}/repos/{_REPO}/pulls/15").mock(
+        return_value=httpx.Response(200, json=_pr_payload())
+    )
+    _actions_refuse()
+    respx.get(f"{_BASE}/repos/{_REPO}/commits/abc123/check-runs").mock(
+        return_value=httpx.Response(404, json={"message": "Not Found"})
+    )
+    status = await _make_service().get_pull_request_status(15)
+    assert status.ci_status == "unreadable"
+    assert status.ci_http_status == 404
+
+
+@respx.mock
+async def test_get_pr_status_reads_mergeable_state() -> None:
+    # ticket-452 : une PR en conflit avec sa base est `dirty`.
+    respx.get(f"{_BASE}/repos/{_REPO}/pulls/15").mock(
+        return_value=httpx.Response(
+            200, json={**_pr_payload(), "mergeable_state": "dirty"}
+        )
+    )
+    _actions_refuse()
+    respx.get(f"{_BASE}/repos/{_REPO}/commits/abc123/check-runs").mock(
+        return_value=httpx.Response(200, json={"check_runs": []})
+    )
+    status = await _make_service().get_pull_request_status(15)
+    assert status.mergeable_state == "dirty"
+
+
+@respx.mock
+async def test_get_pr_status_mergeable_state_absent_is_none() -> None:
+    respx.get(f"{_BASE}/repos/{_REPO}/pulls/15").mock(
+        return_value=httpx.Response(200, json=_pr_payload())
+    )
+    _actions_refuse()
+    respx.get(f"{_BASE}/repos/{_REPO}/commits/abc123/check-runs").mock(
+        return_value=httpx.Response(200, json={"check_runs": []})
+    )
+    status = await _make_service().get_pull_request_status(15)
+    assert status.mergeable_state is None
 
 
 @respx.mock

@@ -87,6 +87,12 @@ export const IconPlus = (p: IconProps) => (
   </Icon>
 );
 
+export const IconMinus = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M5.5 12h13" />
+  </Icon>
+);
+
 export const IconBoard = (p: IconProps) => (
   <Icon {...p}>
     <rect x="3.5" y="4.5" width="17" height="15" rx="2" />
@@ -179,6 +185,13 @@ export const IconSettings = (p: IconProps) => (
   </Icon>
 );
 
+export const IconBell = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15L6 16Z" />
+    <path d="M10 21h4" />
+  </Icon>
+);
+
 export const IconDiff = (p: IconProps) => (
   <Icon {...p}>
     <path d="M7 4.5v7M3.5 8h7" />
@@ -257,7 +270,13 @@ export const IconChat = (p: IconProps) => (
   </Icon>
 );
 
-export const IconSend = (p: IconProps) => (
+export const IconActivity = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M3 12h4l3-7 4 14 3-7h4" />
+  </Icon>
+);
+
+export const IconSend =(p: IconProps) => (
   <Icon {...p}>
     <path d="M22 2L11 13" />
     <path d="M22 2L15 22L11 13L2 9z" />

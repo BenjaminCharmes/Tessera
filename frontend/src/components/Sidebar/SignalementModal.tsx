@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { signalerATessera } from "../../lib/api";
+import Modale from "../../design/ui/Modale";
 import type { Project, SignalementNature } from "../../types/api";
 
 interface SignalementModalProps {
@@ -54,23 +55,8 @@ export default function SignalementModal({
     }
   }
 
-  function surClicFond(e: React.MouseEvent) {
-    if (e.target === e.currentTarget) onClose();
-  }
-
-  function surTouche(e: React.KeyboardEvent) {
-    if (e.key === "Escape") onClose();
-  }
-
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
-      onClick={surClicFond}
-      onKeyDown={surTouche}
-      role="dialog"
-      aria-modal="true"
-      aria-label="Signaler à Tessera"
-    >
+    <Modale onFermer={onClose} aria-label="Signaler à Tessera">
       <div className="w-full max-w-md rounded-lg border border-zinc-700 bg-zinc-900 p-6 shadow-xl">
         <h2 className="mb-4 text-base font-semibold text-zinc-100">
           Signaler à Tessera
@@ -173,6 +159,6 @@ export default function SignalementModal({
           </form>
         )}
       </div>
-    </div>
+    </Modale>
   );
 }

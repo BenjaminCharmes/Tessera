@@ -61,7 +61,7 @@ describe("cohérence visuelle", () => {
     //
     // Aucune exception déclarée : le test couvre l'ensemble des fichiers .tsx,
     // y compris ceux du ticket-282 (FilDuRun, PipelineSummary, InfoTip,
-    // CreateProjectModal, ImportProjectModal, ProjectNav).
+    // CreateProjectModal, ImportProjectModal).
     const bannies = ["emerald", "purple", "orange", "yellow"];
     const fautifs = FICHIERS.flatMap(({ chemin, contenu }) =>
       bannies

@@ -25,6 +25,10 @@ class EventType(str, Enum):
     TICKET_STATUS_CHANGED = "ticket_status_changed"
     PIPELINE_DONE = "pipeline_done"
     ERROR = "error"
+    #: Le testeur lance la suite du projet (ticket-587). Sans lui, les minutes
+    #: qui séparent le départ de `test_result` ne se distinguent pas d'un
+    #: agent figé. Émis seulement si un testeur et une commande existent.
+    TEST_STARTED = "test_started"
     TEST_RESULT = "test_result"
     SECURITY_AUDIT_STARTED = "security_audit_started"
     SECURITY_AUDIT_DONE = "security_audit_done"
@@ -36,6 +40,9 @@ class EventType(str, Enum):
     #: cet événement, rien à l'écran ne distingue un audit sur le modèle
     #: prévu d'un audit sur son remplaçant.
     PROVIDER_FALLBACK = "provider_fallback"
+    #: L'audit avec outils a épuisé ses tours : un second appel, sur le diff
+    #: seul, a servi (ticket-495). `reason` dit pourquoi.
+    SECURITY_AUDIT_FALLBACK = "security_audit_fallback"
     QUEUE_PROGRESS = "queue_progress"
     #: Ce que la livraison a fait du commit du run (ticket-083).
     LIVRAISON_DONE = "livraison_done"
@@ -75,6 +82,29 @@ class EventType(str, Enum):
     #: question en cours, « deposited » si elle a été déposée en boîte aux
     #: lettres faute de question en attente.
     ANSWER_ACK = "answer_ack"
+    #: Une étape de la mise en ligne a rendu son état (ticket-465). Ne porte
+    #: que le nom de l'étape, son état et un détail sans secret (ADR-053).
+    PROVISIONING_STEP = "provisioning_step"
+    #: Le ticket reprend une branche qui porte déjà des commits (ticket-497) :
+    #: les tests ont tourné avant le codeur. `commits` est le nombre de commits
+    #: repris, `verdict` vaut « green » (le codeur est sauté) ou « red ».
+    RUN_RESUMED_FROM_EXISTING_WORK = "run_resumed_from_existing_work"
+    #: La préparation déclarée du worktree (`worktree.setup`) a tourné
+    #: (ticket-538). `command`, `duration_ms` et `exit_code` (`None` si la
+    #: commande n'a pas démarré ou a été coupée). Absent sans `setup` déclaré.
+    WORKTREE_SETUP = "worktree_setup"
+    #: La file suspend sur un événement extérieur (ticket-559). `reason` vaut
+    #: « dependency », `waiting` passe à vrai avant la suspension et à faux
+    #: après, quelle que soit l'issue ; `ticket` et `pr_number` disent quelle PR.
+    EXTERNAL_WAIT = "external_wait"
+    #: Le résolveur de conflit travaille (ticket-559). `phase` vaut « started »
+    #: (avec `files`) puis « ended », où `outcome` vaut « resolved » ou
+    #: « cancelled ».
+    CONFLICT_RESOLUTION = "conflict_resolution"
+    #: L'étape de capture du run a fini (ticket-618) : `outcome` vaut « captured »
+    #: ou « failed », avec `images`, `startup_ms`, `capture_ms` et, en cas d'échec,
+    #: `reason`. Jamais le jeton de session. Absent sans `controle_visuel`.
+    VISUAL_CHECK = "visual_check"
 
 
 class OrchestratorEvent(BaseModel):
@@ -107,6 +137,16 @@ class PipelineResult(BaseModel):
     #: erreur serveur : sans ce champ, la cause ne serait lisible que dans
     #: les logs du backend, là où l'utilisateur de l'IDE ne va pas.
     arret: str | None = None
+    #: Tête (SHA complet) de la branche du run au moment où il a été approuvé :
+    #: la livraison n'accepte, depuis ce commit, que du rangement du pipeline
+    #: (ticket-492). `None` sur un run non approuvé.
+    approved_sha: str | None = None
+    #: Ligne `pipeline_runs` du run, pour y noter le SHA poussé (ticket-492).
+    run_id: str | None = None
+    #: Pourquoi la PR de ce run attend un humain : contrôle visuel en mode
+    #: `relire` déclenché, captures prises ou échouées (ticket-619, ADR-062).
+    #: `None` : la livraison suit son cours.
+    relecture: str | None = None
 
 
 EventCallback = Callable[[OrchestratorEvent], Awaitable[None]]

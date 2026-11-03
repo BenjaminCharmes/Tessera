@@ -5,6 +5,7 @@ import type { UsageStats } from "../../types/api";
 
 vi.mock("../../lib/api");
 import { api } from "../../lib/api";
+import { apiQuota } from "../../lib/quota";
 
 const stats = vi.mocked(api.usage.stats);
 
@@ -62,6 +63,15 @@ describe("StatsView", () => {
     expect(within(runs).getByText("ticket-007")).toBeInTheDocument();
     // Un seul projet : le ventiler par projet n'apprendrait rien.
     expect(screen.queryByRole("region", { name: "Dépense par projet" })).toBeNull();
+  });
+
+  it("keeps the page's shape with skeletons while the figures load (ticket-735)", () => {
+    stats.mockReturnValue(new Promise(() => {}));
+    render(<StatsView projectId={null} days={7} />);
+
+    expect(document.querySelector("[data-squelette='kpi']")).not.toBeNull();
+    expect(document.querySelector("[data-squelette='cartes']")).not.toBeNull();
+    expect(screen.getByRole("status")).toHaveTextContent("Chargement…");
   });
 
   it("calls the api with the days prop it receives", async () => {
@@ -129,4 +139,17 @@ describe("StatsView", () => {
       kpiTile!.compareDocumentPosition(firstChart) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
   });
+
+  it("shows the real subscription quota, per window (ticket-726)", async () => {
+    stats.mockResolvedValue(payload());
+    vi.spyOn(apiQuota, "fenetres").mockResolvedValue({
+      windows: { seven_day: { status: "allowed", utilization: 0.4, resets_at: null, observed_at: "2026-10-30T14:00:00Z" } },
+    });
+    render(<StatsView projectId={null} days={7} />);
+
+    const carte = await screen.findByRole("region", { name: "Quota de l'abonnement" });
+    expect(await within(carte).findByText("40 %")).toBeInTheDocument();
+    expect(within(carte).getByText("pas de relevé")).toBeInTheDocument();
+  });
 });
+

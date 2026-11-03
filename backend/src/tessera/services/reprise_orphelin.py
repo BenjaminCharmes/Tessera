@@ -25,9 +25,6 @@ Une erreur git est journalisée et n'empêche jamais le démarrage du backend.
 
 from __future__ import annotations
 
-import asyncio
-import json
-import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -35,7 +32,15 @@ import aiosqlite
 import frontmatter as fm
 
 from tessera.models.ticket import TicketStatus
+from tessera.services.git_runner import git
+from tessera.services.manifeste import lire_chaine
 from tessera.services.pipeline_text import _unapproved_commit_message
+from tessera.services.racine_depot import depot_le_plus_proche
+from tessera.services.reprise_marqueur import (
+    lire_runs,
+    marquer_depots_repris,
+    runs_interrompus_a_reprendre,
+)
 from tessera.services.ticket_service import TicketService
 from tessera.utils.logger import get_logger
 
@@ -53,24 +58,12 @@ async def _git(project_path: Path, *args: str) -> str:
 
     Lève `RuntimeError` si git renvoie un code non nul.
     """
-    hooks_dir = Path(tempfile.gettempdir()) / "tessera-sans-hooks"
-    hooks_dir.mkdir(parents=True, exist_ok=True)
-    proc = await asyncio.create_subprocess_exec(
-        "git",
-        "-c", f"core.hooksPath={hooks_dir}",
-        "-c", "core.quotePath=false",
-        *args,
-        cwd=str(project_path),
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-    )
-    out, err = await proc.communicate()
-    if proc.returncode != 0:
+    resultat = await git(project_path, *args)
+    if not resultat.ok:
         raise RuntimeError(
-            f"git {' '.join(args)} a échoué dans {project_path} : "
-            f"{err.decode('utf-8', errors='replace')!r}"
+            f"git {' '.join(args)} a échoué dans {project_path} : {resultat.err!r}"
         )
-    return out.decode("utf-8", errors="replace").strip()
+    return resultat.out.strip()
 
 
 def _lire_base_branch(project_path: Path, fallback: str = "develop") -> str:
@@ -80,15 +73,9 @@ def _lire_base_branch(project_path: Path, fallback: str = "develop") -> str:
     (ticket-XXX → develop → main). Une valeur absente ou illisible ne bloque
     pas la reprise.
     """
-    agents_json = project_path / "agents.json"
-    if agents_json.is_file():
-        try:
-            data = json.loads(agents_json.read_text(encoding="utf-8"))
-            valeur = data.get("base_branch")
-            if isinstance(valeur, str) and valeur.strip():
-                return valeur.strip()
-        except Exception:
-            pass
+    valeur = lire_chaine(project_path, "base_branch")
+    if valeur is not None and valeur.strip():
+        return valeur.strip()
     return fallback
 
 
@@ -112,12 +99,8 @@ def _est_dans_depot_imbrique(racine_depot: Path, fichier: Path) -> bool:
     `git_root: ancestor`) remonterait sinon jusqu'au `.git` du dépôt lui-même.
     """
     racine = racine_depot.resolve()
-    current = fichier.resolve().parent
-    while current != racine and current.is_relative_to(racine):
-        if (current / ".git").exists():
-            return True
-        current = current.parent
-    return False
+    proche = depot_le_plus_proche(fichier.resolve().parent)
+    return proche is not None and proche != racine and proche.is_relative_to(racine)
 
 
 async def _trouver_fichiers_nouveaux(
@@ -354,23 +337,17 @@ async def reprendre_depots_orphelins(
     db_path: Path | str,
     workspace_dir: Path,
 ) -> None:
-    """Pour chaque run orphelin soldé, remet d'aplomb le dépôt de son projet.
+    """Pour chaque run orphelin, remet d'aplomb le dépôt de son projet.
 
     Appelée dans le lifespan après `solder_les_runs_orphelins`. Les `run_ids`
-    sont ceux retournés par le solde : leurs `project_id`, `ticket_id` et
-    `started_at` sont lus en base pour trouver le dépôt à nettoyer.
+    sont ceux du solde (processus tué net) ; s'y ajoutent les runs `interrupted`
+    (arrêt propre) au dépôt pas encore repris, puis marqués : une seule fois
+    (ticket-665). `project_id`, `ticket_id` et `started_at` sont lus en base.
     """
-    if not run_ids:
-        return
-
     async with aiosqlite.connect(str(db_path)) as db:
-        placeholders = ",".join("?" * len(run_ids))
-        async with db.execute(
-            f"SELECT project_id, ticket_id, started_at"
-            f" FROM pipeline_runs WHERE id IN ({placeholders})",
-            run_ids,
-        ) as cursor:
-            rows = await cursor.fetchall()
+        interrompus = await runs_interrompus_a_reprendre(db)
+        rows = await lire_runs(db, [*run_ids, *interrompus])
+        await marquer_depots_repris(db, interrompus)
 
     for project_id, ticket_id, started_at_str in rows:
         try:

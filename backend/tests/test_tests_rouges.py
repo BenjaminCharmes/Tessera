@@ -90,10 +90,10 @@ async def test_une_suite_rouge_n_appelle_pas_le_reviewer(
     async def _codeur(orch: Any, run: Any, contexte: Any) -> None:
         return None
 
-    from tessera.services import pipeline_stages as stages
+    from tessera.services import pipeline_controles, pipeline_production
 
-    monkeypatch.setattr(stages, "run_review", _revue)
-    monkeypatch.setattr(stages, "run_coder", _codeur)
+    monkeypatch.setattr(pipeline_controles, "run_review", _revue)
+    monkeypatch.setattr(pipeline_production, "run_coder", _codeur)
 
     runner = _FauxTestRunner([False, False])
     orch = _orchestrateur(tmp_path, runner)
@@ -117,10 +117,10 @@ async def test_le_codeur_recoit_la_raison_de_l_echec(
     async def _revue(orch: Any, run: Any, contexte: Any) -> tuple[bool, str, str]:
         return True, "", "APPROVED"
 
-    from tessera.services import pipeline_stages as stages
+    from tessera.services import pipeline_controles, pipeline_production
 
-    monkeypatch.setattr(stages, "run_coder", _codeur)
-    monkeypatch.setattr(stages, "run_review", _revue)
+    monkeypatch.setattr(pipeline_production, "run_coder", _codeur)
+    monkeypatch.setattr(pipeline_controles, "run_review", _revue)
 
     orch = _orchestrateur(tmp_path, _FauxTestRunner([False, True]))
 
@@ -142,10 +142,10 @@ async def test_une_suite_verte_laisse_le_pipeline_suivre_son_cours(
     async def _codeur(orch: Any, run: Any, contexte: Any) -> None:
         return None
 
-    from tessera.services import pipeline_stages as stages
+    from tessera.services import pipeline_controles, pipeline_production
 
-    monkeypatch.setattr(stages, "run_review", _revue)
-    monkeypatch.setattr(stages, "run_coder", _codeur)
+    monkeypatch.setattr(pipeline_controles, "run_review", _revue)
+    monkeypatch.setattr(pipeline_production, "run_coder", _codeur)
 
     orch = _orchestrateur(tmp_path, _FauxTestRunner([True]))
 
@@ -167,10 +167,10 @@ async def test_sans_testeur_rien_ne_change(tmp_path: Path, monkeypatch: Any) -> 
     async def _codeur(orch: Any, run: Any, contexte: Any) -> None:
         return None
 
-    from tessera.services import pipeline_stages as stages
+    from tessera.services import pipeline_controles, pipeline_production
 
-    monkeypatch.setattr(stages, "run_review", _revue)
-    monkeypatch.setattr(stages, "run_coder", _codeur)
+    monkeypatch.setattr(pipeline_controles, "run_review", _revue)
+    monkeypatch.setattr(pipeline_production, "run_coder", _codeur)
 
     tickets = AsyncMock()
     tickets.get_ticket.return_value = _ticket()

@@ -11,6 +11,10 @@ from pathlib import Path
 
 import pytest
 
+from tessera.config import Settings
+from tessera.models.worktree_config import ConfigWorktree
+from tessera.services.commande_effective import commande_effective
+from tessera.services.politique_run import PolitiqueRun
 from tessera.services.providers.chemins_proteges import (
     PROTECTION_REFUS,
     motif_de_protection,
@@ -210,3 +214,143 @@ def test_le_motif_nomme_ce_qui_est_protege(tmp_path: Path) -> None:
 
     assert motif_de_protection(str(projet / "agents.json"), projet, projet) is not None
     assert motif_de_protection(str(projet / "src" / "x.py"), projet, projet) is None
+
+
+def _worktree_de_verification(tmp_path: Path) -> Path:
+    """A worktree shaped like ide-core; the manifest command lists no script."""
+    racine = tmp_path / "wt"
+    projet = racine / "projects" / "ide-core"
+    projet.mkdir(parents=True)
+    (racine / "scripts").mkdir()
+    (racine / "scripts" / "verifier.py").write_text("print('ok')\n", encoding="utf-8")
+    manifeste = {
+        "git_root": "ancestor",
+        "pipeline": {"test_command": "npm test", "test_cwd": "../../backend"},
+    }
+    (projet / "agents.json").write_text(json.dumps(manifeste), encoding="utf-8")
+    return racine
+
+
+async def _ecrire_dans(racine: Path, relatif: str, commande: str | None) -> dict[str, object]:
+    projet = racine / "projects" / "ide-core"
+    hook = hook_refus_hors_perimetre(
+        projet, racine=racine.resolve(), commande_effective=commande
+    )
+    entree = {"tool_name": "Write", "tool_input": {"file_path": str(racine / relatif)}}
+    return dict(await hook(entree, None, None))
+
+
+async def test_le_script_de_la_commande_effective_se_refuse_dans_le_worktree(
+    tmp_path: Path,
+) -> None:
+    racine = _worktree_de_verification(tmp_path)
+    commande = commande_effective(
+        PolitiqueRun(
+            test_command="npm test",
+            worktree=ConfigWorktree(test_command="python {worktree}/scripts/verifier.py"),
+        ),
+        racine,
+        tmp_path / "depot",
+    )
+
+    sortie = await _ecrire_dans(racine, "scripts/verifier.py", commande)
+
+    decision = sortie["hookSpecificOutput"]
+    assert isinstance(decision, dict)
+    assert decision["permissionDecision"] == "deny"
+    assert "verifier.py" in decision["permissionDecisionReason"]
+
+
+async def test_sans_commande_effective_le_script_du_worktree_nest_pas_designe(
+    tmp_path: Path,
+) -> None:
+    racine = _worktree_de_verification(tmp_path)
+
+    assert await _ecrire_dans(racine, "scripts/verifier.py", None) == {}
+
+
+async def test_le_script_de_la_commande_effective_se_resout_depuis_test_cwd(
+    tmp_path: Path,
+) -> None:
+    racine = _worktree_de_verification(tmp_path)
+
+    sortie = await _ecrire_dans(racine, "scripts/verifier.py", "python ../scripts/verifier.py")
+
+    assert sortie["hookSpecificOutput"]["permissionDecision"] == "deny"  # type: ignore[index]
+
+
+@pytest.fixture
+def depot_ancestor(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    """A repository shaped like Tessera: an ancestor project, a `.env`, a sibling."""
+    (tmp_path / ".git").mkdir()
+    (tmp_path / ".env").write_text("FORBIDDEN_TERMS=a\n", encoding="utf-8")
+    (tmp_path / "scripts" / "hooks").mkdir(parents=True)
+    projet = _projet(tmp_path, "ide-core")
+    (projet / "agents.json").write_text(json.dumps({"git_root": "ancestor"}), encoding="utf-8")
+    (projet / "CLAUDE.md").write_text("# ide-core\n", encoding="utf-8")
+    autre = _projet(tmp_path, "autre")
+    (autre / "agents.json").write_text("{}", encoding="utf-8")
+    (autre / "CLAUDE.md").write_text("# autre\n", encoding="utf-8")
+    monkeypatch.setattr(Settings, "env_file", tmp_path / ".env")
+    return tmp_path
+
+
+async def _outil(depot: Path, outil: str, entree: dict[str, str]) -> dict[str, object]:
+    hook = hook_refus_hors_perimetre(depot / "projects" / "ide-core", racine=depot.resolve())
+    return dict(await hook({"tool_name": outil, "tool_input": entree}, None, None))
+
+
+async def test_write_to_the_tessera_env_is_refused_under_ancestor(depot_ancestor: Path) -> None:
+    env = str(depot_ancestor / ".env")
+
+    ecriture = await _outil(depot_ancestor, "Write", {"file_path": env})
+    # Slashs : `shlex` en mode POSIX mange les antislashs d'un chemin Windows.
+    commande = f"echo x > {(depot_ancestor / '.env').as_posix()}"
+    redirection = await _outil(depot_ancestor, "Bash", {"command": commande})
+
+    for sortie in (ecriture, redirection):
+        decision = sortie["hookSpecificOutput"]
+        assert isinstance(decision, dict)
+        assert decision["permissionDecision"] == "deny"
+        assert ".env" in decision["permissionDecisionReason"]
+
+
+async def test_a_sibling_project_manifest_is_refused_under_ancestor(
+    depot_ancestor: Path,
+) -> None:
+    cible = str(depot_ancestor / "projects" / "autre" / "agents.json")
+
+    sortie = await _outil(depot_ancestor, "Edit", {"file_path": cible})
+
+    decision = sortie["hookSpecificOutput"]
+    assert isinstance(decision, dict)
+    assert decision["permissionDecision"] == "deny"
+    assert "agents.json" in decision["permissionDecisionReason"]
+
+
+async def test_the_pre_push_hook_script_is_refused(depot_ancestor: Path) -> None:
+    cible = str(depot_ancestor / "scripts" / "hooks" / "pre-push")
+
+    sortie = await _outil(depot_ancestor, "Write", {"file_path": cible})
+
+    decision = sortie["hookSpecificOutput"]
+    assert isinstance(decision, dict)
+    assert decision["permissionDecision"] == "deny"
+    assert "pre-push" in decision["permissionDecisionReason"]
+
+
+@pytest.mark.parametrize(
+    "relatif",
+    [
+        "projects/ide-core/.env",
+        "projects/ide-core/.env.example",
+        "projects/ide-core/tests/fixtures/agents.json",
+        "scripts/verifier.py",
+    ],
+)
+async def test_project_own_env_and_fixtures_still_pass(
+    depot_ancestor: Path, relatif: str
+) -> None:
+    sortie = await _outil(depot_ancestor, "Write", {"file_path": str(depot_ancestor / relatif)})
+
+    assert sortie == {}, relatif

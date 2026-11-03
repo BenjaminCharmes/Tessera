@@ -2,6 +2,7 @@
 import json
 from pathlib import Path
 
+import httpx
 import pytest
 
 from tessera.config import settings
@@ -493,6 +494,28 @@ async def test_livraison_sync_base_avant_rebase(tmp_path: Path) -> None:
     assert g.rejoue == ["develop"], "rejouer_sur must follow the sync"
 
 
+async def test_livraison_journalise_une_migration_renumerotee(tmp_path: Path) -> None:
+    """A renumbered migration shows in the delivery steps (ticket-484)."""
+    git = _FauxGit()
+    git.migrations_renumerotees = (  # type: ignore[attr-defined]
+        ("prisma/migrations/0005_x", "prisma/migrations/0006_x"),
+    )
+    svc, _g, _w = _service(tmp_path, "pr", git=git)
+
+    livraison = await _livrer(svc)
+
+    assert "migration renumérotée : 0005_x → 0006_x" in livraison.etapes
+    assert len(livraison.etapes) == len(livraison.durees_ms)
+
+
+async def test_livraison_sans_renumerotation_ne_journalise_rien(tmp_path: Path) -> None:
+    svc, _g, _w = _service(tmp_path, "pr")
+
+    livraison = await _livrer(svc)
+
+    assert not any("renumérotée" in etape for etape in livraison.etapes)
+
+
 # ------------------------------------------------------------------
 # livrer_phase_1 et livrer_phase_2 — ticket-305
 # ------------------------------------------------------------------
@@ -570,3 +593,126 @@ async def test_phase_2_autonomy_pr_ne_merge_pas(tmp_path: Path) -> None:
     assert phase2.merged is False
     assert workflow.merges == []
     assert phase2.arret is None
+
+
+async def test_phase_1_exception_apres_la_pr_porte_son_numero(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Une exception levée une fois la PR ouverte garde son numéro (ticket-415)."""
+    from tessera.services.livraison import LivraisonInterrompue
+
+    svc, _git, _workflow = _service(tmp_path, "pr")
+
+    async def _callback_en_echec(ticket_id: str, pr: int, branch: str) -> None:
+        raise RuntimeError("push refusé")
+
+    class _JournalCasse:
+        def warning(self, *args: object, **kwargs: object) -> None:
+            raise OSError("journal indisponible")
+
+    svc._post_pr_callback = _callback_en_echec  # type: ignore[assignment]
+    monkeypatch.setattr("tessera.services.livraison._logger", _JournalCasse())
+
+    with pytest.raises(LivraisonInterrompue) as info:
+        await _phase_1(svc)
+
+    assert info.value.pr_number == 7
+    assert isinstance(info.value.cause, OSError)
+
+
+async def test_phase_1_exception_avant_la_pr_n_est_pas_enveloppee(
+    tmp_path: Path,
+) -> None:
+    """Sans PR ouverte, l'exception d'origine remonte telle quelle."""
+
+    class _OuvertureMuette(_FauxWorkflow):
+        async def open_pull_request(self, **kwargs: object) -> object:
+            raise TimeoutError()
+
+    svc, _git, _workflow = _service(tmp_path, "pr", workflow=_OuvertureMuette())
+
+    with pytest.raises(TimeoutError):
+        await _phase_1(svc)
+
+
+# ------------------------------------------------------------------
+# Un merge qui expire relit la PR avant d'arrêter — ticket-713
+# ------------------------------------------------------------------
+
+
+class _MergeQuiLache(_FauxWorkflow):
+    """Merge raising `erreur`; the reread answers `etat` or raises."""
+
+    def __init__(
+        self,
+        erreur: Exception,
+        etat: str = "open",
+        relecture_en_echec: bool = False,
+    ) -> None:
+        super().__init__()
+        self._erreur = erreur
+        self._etat = etat
+        self._relecture_en_echec = relecture_en_echec
+        self.relectures: list[int] = []
+
+    async def pr_state(self, pr_number: int) -> str:
+        self.relectures.append(pr_number)
+        if self._relecture_en_echec:
+            raise httpx.ConnectError("injoignable")
+        return self._etat
+
+    async def merge_si_la_ci_est_verte(self, pr_number: int) -> bool:
+        self.merges.append(pr_number)
+        raise self._erreur
+
+
+def _refus_405() -> httpx.HTTPStatusError:
+    requete = httpx.Request("PUT", "https://api.github.com/repos/o/r/pulls/7/merge")
+    reponse = httpx.Response(405, request=requete)
+    return httpx.HTTPStatusError("405", request=requete, response=reponse)
+
+
+async def test_merge_timeout_on_a_merged_pr_ends_merged(tmp_path: Path) -> None:
+    workflow = _MergeQuiLache(httpx.ReadTimeout("lent"), etat="merged")
+    svc, _git, _w = _service(tmp_path, "merge", workflow=workflow)
+
+    livraison = await _livrer(svc)
+
+    assert livraison.merged is True
+    assert livraison.arret is None
+    assert workflow.relectures == [7]
+    assert any("confirmée après une erreur réseau" in e for e in livraison.etapes)
+
+
+async def test_merge_timeout_on_an_open_pr_stops(tmp_path: Path) -> None:
+    workflow = _MergeQuiLache(httpx.ReadTimeout("lent"), etat="open")
+    svc, _git, _w = _service(tmp_path, "merge", workflow=workflow)
+
+    livraison = await _livrer(svc)
+
+    assert livraison.merged is False
+    assert livraison.pr_number == 7
+    assert "ReadTimeout" in (livraison.arret or "")
+    assert "erreur réseau" in (livraison.arret or "")
+
+
+async def test_merge_timeout_and_failed_reread_stops(tmp_path: Path) -> None:
+    workflow = _MergeQuiLache(httpx.ReadTimeout("lent"), relecture_en_echec=True)
+    svc, _git, _w = _service(tmp_path, "merge", workflow=workflow)
+
+    livraison = await _livrer(svc)
+
+    assert livraison.merged is False
+    assert "ReadTimeout" in (livraison.arret or "")
+    assert workflow.relectures == [7]
+
+
+async def test_merge_refusal_is_not_reread(tmp_path: Path) -> None:
+    workflow = _MergeQuiLache(_refus_405(), etat="merged")
+    svc, _git, _w = _service(tmp_path, "merge", workflow=workflow)
+
+    livraison = await _livrer(svc)
+
+    assert livraison.merged is False
+    assert "refusé le merge" in (livraison.arret or "")
+    assert workflow.relectures == []

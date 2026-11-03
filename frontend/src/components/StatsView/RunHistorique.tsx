@@ -39,9 +39,11 @@ interface RunHistoriqueProps {
   runId: string;
   ticketId: string;
   /** Appelé quand l'utilisateur ferme la vue et revient à l'historique. */
-  onClose: () => void;
+  onClose?: () => void;
   /** Libellé du bouton de fermeture : là d'où l'on vient (ticket-332). */
   libelleRetour?: string;
+  /** Sans bandeau ni bouton : la vue est déjà dans un cadre qui les porte. */
+  sansEntete?: boolean;
 }
 
 type Phase =
@@ -60,6 +62,7 @@ export default function RunHistorique({
   ticketId,
   onClose,
   libelleRetour = "Historique",
+  sansEntete = false,
 }: RunHistoriqueProps) {
   // Le résultat garde le run qu'il décrit : changer de run repasse en
   // chargement sans `setState` synchrone dans l'effet, que la règle
@@ -89,16 +92,18 @@ export default function RunHistorique({
 
   return (
     <div className="flex h-full flex-col bg-zinc-900">
-      <div className={`${BAND} justify-between gap-3 border-b border-zinc-700 px-4`}>
-        <RegionTitle>Run {ticketId}</RegionTitle>
-        <button
-          type="button"
-          onClick={onClose}
-          className="inline-flex items-center gap-1 text-xs text-zinc-400 hover:text-zinc-200"
-        >
-          <IconHistory size={12} /> {libelleRetour}
-        </button>
-      </div>
+      {!sansEntete && (
+        <div className={`${BAND} justify-between gap-3 border-b border-zinc-700 px-4`}>
+          <RegionTitle>Run {ticketId}</RegionTitle>
+          <button
+            type="button"
+            onClick={onClose}
+            className="inline-flex items-center gap-1 text-xs text-zinc-400 hover:text-zinc-200"
+          >
+            <IconHistory size={12} /> {libelleRetour}
+          </button>
+        </div>
+      )}
 
       <div className="min-h-0 flex-1 overflow-y-auto py-3">
         {phase.kind === "loading" && (

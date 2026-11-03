@@ -1,10 +1,10 @@
 """Persistance des conversations du chat — ticket-048."""
 from pathlib import Path
 
-from tessera.services.database import (
+from tessera.services.database import init_db
+from tessera.services.database_chat import (
     ChatMessageRow,
     conversation_cost_usd,
-    init_db,
     list_chat_messages,
     save_chat_message,
 )

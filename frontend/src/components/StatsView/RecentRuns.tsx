@@ -1,6 +1,8 @@
-import { formatCount, formatDurationMs, formatUsd } from "../../design/charts/palette";
+import { formatCount } from "../../design/charts/palette";
+import { formatDurationMs, formatUsd } from "../../lib/format";
 import { IconBlocked, IconCheck, IconDot } from "../../design/icons";
 import type { RecentRun } from "../../types/api";
+import { statutDuRun } from "../../lib/libelles";
 
 function Verdict({ run }: { run: RecentRun }) {
   if (run.approved === true)
@@ -17,7 +19,7 @@ function Verdict({ run }: { run: RecentRun }) {
     );
   return (
     <span className="inline-flex items-center gap-1 text-red-400">
-      <IconBlocked size={12} /> {run.final_status ?? "refusé"}
+      <IconBlocked size={12} /> {run.final_status ? statutDuRun(run.final_status) : "refusé"}
     </span>
   );
 }
