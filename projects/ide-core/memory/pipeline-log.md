@@ -7271,3 +7271,18 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-03 15:56:50 UTC — [ticket-742] validateur: APPROVED — La classe de base `GitWorkspaceDouble` est créée avec toutes les méthodes asynch (325062ms)
 - 2026-11-03 15:56:50 UTC — [ticket-742] APPROVED après 1 tour(s)
 - 2026-11-03 15:58:16 UTC — [ticket-742] documentation: 0 fichier(s) (80092ms)
+- 2026-11-03 16:07:55 UTC — [ide-core] ticket-742 PR #853 confiée au CIWatcher
+- 2026-11-03 16:08:01 UTC — [ticket-740] branche ticket-740-a-red-retest-after-a-rebase-puts-the-branch-back
+- 2026-11-03 16:08:02 UTC — [ticket-740] tour 1 — codeur démarré
+- 2026-11-03 16:11:28 UTC — [ticket-740] tour 1 — codeur terminé (205156ms)
+- 2026-11-03 16:14:50 UTC — [ide-core] ticket-742 PR #853 mergée (CI verte)
+- 2026-11-03 16:19:55 UTC — [ticket-740] testeur: 1 failed, 2297 passed, 64 warnings in 503.75s (0:08:23)
+- 2026-11-03 16:19:55 UTC — [ticket-740] tests rouges au tour 1
+- 2026-11-03 16:19:55 UTC — [ticket-740] tour 2 — codeur démarré
+- 2026-11-03 16:20:56 UTC — [ticket-740] tour 2 — codeur terminé (61187ms)
+- 2026-11-03 16:30:22 UTC — [ticket-740] testeur: OK (exit 0)
+- 2026-11-03 16:32:17 UTC — [ticket-740] securite: PASS — Audit de ticket-740 : récupération après rebase échoué. Le code introduit trois  (115110ms)
+- 2026-11-03 16:32:17 UTC — [ticket-740] tour 2 — reviewer démarré
+- 2026-11-03 16:32:36 UTC — [ticket-740] tour 2 — reviewer terminé (18264ms)
+- 2026-11-03 16:35:42 UTC — [ticket-740] validateur: APPROVED — Tous les critères d'acceptation ont été vérifiés via les tests unitaires fournis (204547ms)
+- 2026-11-03 16:35:42 UTC — [ticket-740] APPROVED après 2 tour(s)
