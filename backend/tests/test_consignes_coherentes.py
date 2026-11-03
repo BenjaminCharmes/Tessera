@@ -614,8 +614,15 @@ def test_tracabilite_chaque_regle_sans_portee_est_citee_dans_contraintes() -> No
     )
 
 
+def _sans_proposees(texte: str) -> str:
+    """The rules agents receive: `## Proposées` is never injected (ADR-055)."""
+    return re.sub(r"## Proposées\n.*?(?=\n## )", "", texte, flags=re.DOTALL)
+
+
 def test_contraintes_md_tient_sous_12000_caracteres() -> None:
-    taille = len(_lire("projects/ide-core/memory/contraintes.md"))
+    # Le plafond borne ce que chaque appel d'agent reçoit : une règle proposée
+    # ne compte qu'une fois acceptée, quand un humain la déplace et la resserre.
+    taille = len(_sans_proposees(_lire("projects/ide-core/memory/contraintes.md")))
 
     assert taille <= 12_000, (
         f"contraintes.md : {taille} caractères pour 12 000 permis"
