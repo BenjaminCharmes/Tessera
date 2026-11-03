@@ -1,12 +1,14 @@
 ---
-id: ticket-732
-title: "A conflicting PR branch is merged with its base in a throwaway worktree"
-type: feat
-status: todo
-priority: low
 agent: codeur
-depends_on: [ticket-674]
 created: 2026-11-02
+depends_on:
+- ticket-674
+id: ticket-732
+pr_number: 841
+priority: low
+status: done
+title: A conflicting PR branch is merged with its base in a throwaway worktree
+type: feat
 ---
 
 # ticket-732 — Fusionner la base dans la branche d'une PR, hors de tout arbre de travail

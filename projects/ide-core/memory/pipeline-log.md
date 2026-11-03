@@ -7180,3 +7180,17 @@ Le diff ajoute :
 - 2026-11-03 10:37:46 UTC — [ticket-731] validateur: APPROVED — Tous les critères sont satisfaits. Le code implémente correctement la transmissi (31906ms)
 - 2026-11-03 10:37:46 UTC — [ticket-731] APPROVED après 3 tour(s)
 - 2026-11-03 10:38:56 UTC — [ticket-731] documentation: 0 fichier(s) (64405ms)
+- 2026-11-03 10:50:21 UTC — [ide-core] ticket-731 PR #840 confiée au CIWatcher
+- 2026-11-03 10:50:25 UTC — [ticket-732] branche ticket-732-a-conflicting-pr-branch-is-merged-with-its-base-i
+- 2026-11-03 10:50:26 UTC — [ticket-732] tour 1 — codeur démarré
+- 2026-11-03 10:57:14 UTC — [ticket-732] tour 1 — codeur terminé (407750ms)
+- 2026-11-03 10:57:30 UTC — [ide-core] ticket-731 PR #840 mergée (CI verte)
+- 2026-11-03 11:11:00 UTC — [ticket-732] testeur: OK (exit 0)
+- 2026-11-03 11:14:45 UTC — [ticket-732] securite: PASS — Le module `mise_a_jour_branche.py` fusionne la base d'une PR dans sa branche en  (225187ms)
+- 2026-11-03 11:14:46 UTC — [ticket-732] tour 1 — reviewer démarré
+- 2026-11-03 11:15:16 UTC — [ticket-732] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : créneau occupé depuis plus de 30 s
+- 2026-11-03 11:15:38 UTC — [ticket-732] tour 1 — reviewer terminé (51625ms)
+- 2026-11-03 11:16:12 UTC — [ticket-732] validateur: fichiers cités joints : documentation.json, scripts/verifier.py (tronqué)
+- 2026-11-03 11:16:12 UTC — [ticket-732] validateur: APPROVED — All acceptance criteria are met. The implementation provides a robust merge-a-PR (86641ms)
+- 2026-11-03 11:16:12 UTC — [ticket-732] APPROVED après 1 tour(s)
+- 2026-11-03 11:20:19 UTC — [ticket-732] documentation: 0 fichier(s) (174110ms)
