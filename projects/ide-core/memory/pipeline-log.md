@@ -7119,3 +7119,19 @@ Le diff ajoute :
 - 2026-11-03 08:16:28 UTC — [ticket-700] validateur: APPROVED — Refactorisation complète. Toutes les étapes de livraison sont maintenant des fon (404281ms)
 - 2026-11-03 08:16:28 UTC — [ticket-700] APPROVED après 1 tour(s)
 - 2026-11-03 08:18:15 UTC — [ticket-700] documentation: 0 fichier(s) (101062ms)
+- 2026-11-03 08:18:35 UTC — [ide-core] ticket-700 PR #833 confiée au CIWatcher
+- 2026-11-03 08:18:39 UTC — [ticket-701] branche ticket-701-the-github-service-guard-leaves-the-tickets-route
+- 2026-11-03 08:18:40 UTC — [ticket-701] tour 1 — codeur démarré
+- 2026-11-03 08:20:32 UTC — [ticket-701] tour 1 — codeur terminé (111796ms)
+- 2026-11-03 08:25:29 UTC — [ide-core] ticket-700 PR #833 mergée (CI verte)
+- 2026-11-03 08:27:36 UTC — [ticket-701] testeur: 1 failed, 3425 passed, 64 warnings in 419.98s (0:06:59)
+- 2026-11-03 08:27:36 UTC — [ticket-701] tests rouges au tour 1
+- 2026-11-03 08:27:36 UTC — [ticket-701] tour 2 — codeur démarré
+- 2026-11-03 08:28:50 UTC — [ticket-701] tour 2 — codeur terminé (74062ms)
+- 2026-11-03 08:36:57 UTC — [ticket-701] testeur: OK (exit 0)
+- 2026-11-03 08:39:08 UTC — [ticket-701] securite: PASS — This diff safely refactors `_require_github_service()` from a private function i (131125ms)
+- 2026-11-03 08:39:08 UTC — [ticket-701] tour 2 — reviewer démarré
+- 2026-11-03 08:39:23 UTC — [ticket-701] tour 2 — reviewer terminé (15514ms)
+- 2026-11-03 08:41:01 UTC — [ticket-701] validateur: fichiers cités joints : routers/dependencies.py
+- 2026-11-03 08:41:01 UTC — [ticket-701] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code a été refactoré pour dé (113108ms)
+- 2026-11-03 08:41:01 UTC — [ticket-701] APPROVED après 2 tour(s)
