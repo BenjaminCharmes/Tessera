@@ -57,6 +57,19 @@ const JOUR_PAR_DEFAUT = {
 
 /** États : jamais thémés (ADR-026), mêmes teintes jour et nuit. */
 const ETATS = { actif: "#60a5fa", attente: "#71717a", question: "#fbbf24", blocage: "#f87171", fait: "#4ade80" };
+/**
+ * Les rampes des états, prises telles quelles dans leur famille Tailwind (ADR-026) :
+ * reflet 300, base 400, ombre 500, creux 600, contour 700 (zinc décalé d'un cran,
+ * l'attente part de zinc-500). Une rampe calculée glissait vers le magenta, le
+ * sarcelle ou le cyan, hors des familles d'état.
+ */
+const ETAT_RAMPES = {
+  actif: { hi: "#93c5fd", b: "#60a5fa", s: "#3b82f6", d: "#2563eb", bl: "#60a5fa", ol: "#1d4ed8" },
+  attente: { hi: "#a1a1aa", b: "#71717a", s: "#52525b", d: "#3f3f46", bl: "#71717a", ol: "#27272a" },
+  question: { hi: "#fcd34d", b: "#fbbf24", s: "#f59e0b", d: "#d97706", bl: "#fbbf24", ol: "#b45309" },
+  blocage: { hi: "#fca5a5", b: "#f87171", s: "#ef4444", d: "#dc2626", bl: "#f87171", ol: "#b91c1c" },
+  fait: { hi: "#86efac", b: "#4ade80", s: "#22c55e", d: "#16a34a", bl: "#4ade80", ol: "#15803d" },
+};
 
 const MODES = {
   jour: { rim: null, outline: "selout" },
@@ -79,7 +92,7 @@ function baseDe(fam, mode, choix) {
 function resolveur(mode, choix = {}) {
   const M = MODES[mode], cache = new Map(), rampes = new Map();
   const rampeDe = fam => {
-    if (!rampes.has(fam)) rampes.set(fam, fam.startsWith("etat-") ? ramp(ETATS[fam.slice(5)]) : ramp(baseDe(fam, mode, choix), (FAMILLES[fam] && FAMILLES[fam].doux) || 1));
+    if (!rampes.has(fam)) rampes.set(fam, fam.startsWith("etat-") ? ETAT_RAMPES[fam.slice(5)] : ramp(baseDe(fam, mode, choix), (FAMILLES[fam] && FAMILLES[fam].doux) || 1));
     return rampes.get(fam);
   };
   return tok => {
@@ -89,10 +102,10 @@ function resolveur(mode, choix = {}) {
     else {
       const [corps, etat, palier] = tok.split("^");
       const rim = corps.endsWith("~r"), [fam, ton] = corps.replace("~r", "").split(".");
-      if (ton === "ol") c = M.outline === "selout" ? selout(rampeDe(fam).b) : M.outline;
+      if (ton === "ol") c = fam.startsWith("etat-") ? rampeDe(fam).ol : M.outline === "selout" ? selout(rampeDe(fam).b) : M.outline;
       else c = rampeDe(fam)[ton] || "#ff00ff";
       if (rim && M.rim) c = mix(c, M.rim, .38);
-      if (etat && mode === "nuit") c = mix(c, ramp(ETATS[etat]).hi, +palier * .16);
+      if (etat && mode === "nuit") c = mix(c, ETAT_RAMPES[etat].hi, +palier * .16);
     }
     cache.set(tok, c);
     return c;
