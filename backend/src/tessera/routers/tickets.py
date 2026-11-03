@@ -21,7 +21,7 @@ _logger = get_logger(__name__)
 from tessera.services.git_workspace import GitWorkspaceError, GitWorkspaceService
 from tessera.services.github_workflow import GitHubWorkflowService, WorkflowError
 from tessera.services.politique_run import PolitiqueRun
-from tessera.routers.dependencies import require_valid_project_id
+from tessera.routers.dependencies import require_github_service, require_valid_project_id
 from tessera.services.project_loader import load_project
 from tessera.services.project_loader import ProjectLoader
 from tessera.services.sync_map import SyncMapService
@@ -183,20 +183,6 @@ def _resoudre_base_branch(project_path: Path) -> str:
     return politique.base_branch or settings.github_base_branch
 
 
-def _require_github_service(github_remote: str | None) -> GitHubService:
-    if not github_remote:
-        raise HTTPException(
-            status_code=422,
-            detail="Ce projet n'a pas de github_remote configuré dans agents.json.",
-        )
-    if not settings.github_token:
-        raise HTTPException(
-            status_code=422,
-            detail="GITHUB_TOKEN non configuré dans les settings.",
-        )
-    return GitHubService(token=settings.github_token, repo=github_remote)
-
-
 @router.post("/{project_id}/tickets/{ticket_id}/create-pr", response_model=CreatePrResponse, status_code=201)
 async def create_pull_request(
     project_id: str, ticket_id: str, body: CreatePrRequest
@@ -207,7 +193,7 @@ async def create_pull_request(
     except ValueError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
 
-    github_svc = _require_github_service(project.github_remote)
+    github_svc = require_github_service(project.github_remote)
     ticket_svc = _svc(project_id)
 
     ticket = await ticket_svc.get_ticket(ticket_id)
@@ -246,7 +232,7 @@ async def get_pr_status(project_id: str, ticket_id: str) -> PrStatusResponse:
     except ValueError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
 
-    github_svc = _require_github_service(project.github_remote)
+    github_svc = require_github_service(project.github_remote)
     ticket_svc = _svc(project_id)
 
     ticket = await ticket_svc.get_ticket(ticket_id)
@@ -261,7 +247,7 @@ async def get_pr_status(project_id: str, ticket_id: str) -> PrStatusResponse:
 
     # Capture narrowed non-None values for use inside the lambda and error
     # messages — mypy cannot narrow through closure captures or the
-    # _require_github_service guard.
+    # require_github_service guard.
     pr_number: int = ticket.pr_number
     repo: str = project.github_remote or ""
 
@@ -306,7 +292,7 @@ async def get_all_pr_statuses_endpoint(project_id: str) -> AllPrStatusesResponse
     except ValueError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
 
-    github_svc = _require_github_service(project.github_remote)
+    github_svc = require_github_service(project.github_remote)
     tickets, _ = await _svc(project_id).list_tickets_with_unreadable(None)
     repo: str = project.github_remote or ""
 

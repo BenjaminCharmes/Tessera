@@ -7,8 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
 from tessera.config import settings
-from tessera.routers.dependencies import require_valid_project_id
-from tessera.routers.tickets import _require_github_service
+from tessera.routers.dependencies import require_github_service, require_valid_project_id
 from tessera.services.git_workspace import GitWorkspaceError
 from tessera.services.github_workflow import WorkflowError
 from tessera.services.politique_run import PolitiqueRun
@@ -65,7 +64,7 @@ async def propose_tickets_to_project(
         validate_batch(files)
     except ProposalRefused as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
-    github = _require_github_service(project.github_remote)
+    github = require_github_service(project.github_remote)
     project_path = settings.ide_workspace_dir / project_id
     policy = PolitiqueRun.lire(project_path)
     request = ProposalRequest(

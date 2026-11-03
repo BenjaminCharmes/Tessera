@@ -10,7 +10,7 @@ PLAFOND_GENERAL = 300
 PLAFONDS: dict[str, int] = {
     "routers/chat.py": 377,
     "routers/orchestrator.py": 351,
-    "routers/tickets.py": 563,
+    "routers/tickets.py": 549,
     "services/ci_watcher.py": 607,
     "services/documentation.py": 412,
     "services/github_service.py": 592,
