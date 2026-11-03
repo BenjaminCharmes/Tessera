@@ -1,30 +1,19 @@
 import type { EtatBoite } from "../../lib/bureau/boiteAuxLettres";
-import { TON_BOITE } from "./tons";
+import { boite } from "../../lib/bureau/sprites/objets";
+import { memoise } from "../../lib/bureau/sprites/symboles";
+import SpriteSvg from "./SpriteSvg";
 
 interface BoiteProps {
   etat: EtatBoite;
 }
 
+const dessin = memoise(boite);
+
 /**
- * La boîte aux lettres : son drapeau n'est levé que s'il y a une PR, et sa
- * teinte dit où elle en est (ADR-058). Grille 12 × 12.
+ * La boîte aux lettres, grille 24 × 24 (36 × 36 px ; ticket-727). S'il y a une PR, une
+ * lettre dépasse de la fente et le drapeau se lève, dans le ton de son état : ambre
+ * ouverte, bleu en CI, vert mergée, rouge refusée (ADR-026). Sans PR, ni l'un ni l'autre.
  */
 export default function Boite({ etat }: BoiteProps) {
-  return (
-    <svg
-      width="36"
-      height="36"
-      viewBox="0 0 12 12"
-      shapeRendering="crispEdges"
-      aria-hidden="true"
-      data-sprite="boite"
-      data-boite={etat}
-    >
-      <rect x="5" y="8" width="2" height="4" className="fill-zinc-700" />
-      <rect x="1" y="3" width="9" height="5" className="fill-zinc-600" />
-      <rect x="2" y="4" width="5" height="1" className="fill-zinc-800" />
-      {etat !== "aucune" && <rect x="10" y="1" width="1" height="5" className={TON_BOITE[etat]} />}
-      {etat !== "aucune" && <rect x="8" y="1" width="2" height="2" className={TON_BOITE[etat]} />}
-    </svg>
-  );
+  return <SpriteSvg sprite={dessin(etat)} largeur={36} hauteur={36} data-sprite="boite" data-boite={etat} />;
 }

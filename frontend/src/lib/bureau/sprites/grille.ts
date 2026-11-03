@@ -41,12 +41,66 @@ export class Grille {
   clr(x: number, y: number): void {
     if (x >= 0 && y >= 0 && x < this.w && y < this.h) this.p[y * this.w + x] = null;
   }
+
+  /** Une ligne de pixels de (x0, y0) à (x1, y1), tracée à la Bresenham. */
+  line(x0: number, y0: number, x1: number, y1: number, c: Jeton): void {
+    const dx = Math.abs(x1 - x0);
+    const dy = -Math.abs(y1 - y0);
+    const sx = x0 < x1 ? 1 : -1;
+    const sy = y0 < y1 ? 1 : -1;
+    let e = dx + dy;
+    for (;;) {
+      this.set(x0, y0, c);
+      if (x0 === x1 && y0 === y1) break;
+      const e2 = 2 * e;
+      if (e2 >= dy) {
+        e += dy;
+        x0 += sx;
+      }
+      if (e2 <= dx) {
+        e += dx;
+        y0 += sy;
+      }
+    }
+  }
+
+  /** Un disque plein, ombré par sa position : reflet en haut à gauche, ombre en bas à droite. */
+  disc(cx: number, cy: number, r: number, fam: string, { ombre = true } = {}): void {
+    for (let y = Math.floor(cy - r); y <= cy + r; y++) {
+      for (let x = Math.floor(cx - r); x <= cx + r; x++) {
+        const dx = x - cx;
+        const dy = y - cy;
+        const d2 = dx * dx + dy * dy;
+        if (d2 > r * r + 0.6) continue;
+        if (!ombre) {
+          this.set(x, y, `${fam}.b`);
+          continue;
+        }
+        const t = (dx + dy) / r;
+        let ton = t < -0.75 ? "hi" : t < 0.35 ? "b" : "s";
+        if (d2 > (r - 1) * (r - 1) + 0.6 && t > 0.3) ton = "d";
+        this.set(x, y, `${fam}.${ton}`);
+      }
+    }
+  }
+
+  /** Un motif texte : chaque caractère renvoie à un jeton par `table`, « . » est vide. */
+  stamp(x: number, y: number, lignes: readonly string[], table: Readonly<Record<string, Jeton>>): void {
+    lignes.forEach((ligne, j) =>
+      [...ligne].forEach((ch, i) => {
+        const c = table[ch];
+        if (c !== undefined) this.set(x + i, y + j, c);
+      }),
+    );
+  }
 }
 
-/** Un calque : sa grille, et la classe d'animation que porte son groupe (« tape », « lueur »). */
+/** Un calque : sa grille, la classe d'animation que porte son `<use>`, et son décalage dans l'animation. */
 export interface Calque {
   g: Grille;
   classe: string;
+  /** Décalage de l'animation, en secondes (négatif : déjà en cours). */
+  delai?: number;
 }
 
 export interface Sprite {
@@ -56,18 +110,23 @@ export interface Sprite {
 }
 
 /** Un sprite vide ; `calque()` lui ajoute un calque au-dessus des autres. */
-export function sprite(w: number, h: number): Sprite & { calque: (classe?: string) => Grille } {
+export function sprite(w: number, h: number): Sprite & { calque: (classe?: string, delai?: number) => Grille } {
   const s: Sprite = { w, h, calques: [] };
   return {
     ...s,
     calques: s.calques,
-    calque(classe = "") {
+    calque(classe = "", delai?: number) {
       const g = new Grille(w, h);
-      s.calques.push({ g, classe });
+      s.calques.push(delai === undefined ? { g, classe } : { g, classe, delai });
       return g;
     },
   };
 }
+
+/** Les cinq tons d'une famille, sous la forme qu'attendent les fonctions de dessin. */
+export const R = (fam: string) => ({ hi: `${fam}.hi`, b: `${fam}.b`, s: `${fam}.s`, d: `${fam}.d`, bl: `${fam}.bl` });
+/** Les tons d'un état : voyants, écrans, cases. Jamais thémés, jamais contourés (ADR-026). */
+export const E = (etat: string) => R(`etat-${etat}`);
 
 const occupe = (s: Sprite, x: number, y: number): boolean => s.calques.some(({ g }) => g.get(x, y) !== null);
 const famille = (t: Jeton): string => t.split(".")[0] ?? t;

@@ -114,7 +114,7 @@ export function tete(g: Grille, x: number, y: number, ph: Physique, expr: Expres
 }
 
 /** Ce qui distingue une tenue : capuche à cordons, ou col et cravate. */
-function torseDetails(g: Grille, tenue: Tenue, x: number, y: number): void {
+export function torseDetails(g: Grille, tenue: Tenue, x: number, y: number): void {
   const T = R(`haut-${tenue.haut}`);
   if (tenue.capuche) {
     g.rect(x + 3, y, 8, 2, T.s);

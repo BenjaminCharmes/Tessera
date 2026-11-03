@@ -201,6 +201,12 @@
   50% { opacity: 0.2; }
   100% { opacity: 1; }
 }
+/* Deux étoiles de la fenêtre de nuit (ticket-727) : le décor du ciel, jamais un état. */
+@keyframes scintille {
+  0% { opacity: 1; }
+  50% { opacity: 0.3; }
+  100% { opacity: 1; }
+}
 /* Les scènes d'écran (ticket-629), sur une grille de 6 × 4 pixels : un pixel par palier. */
 @keyframes defile {
   0% { transform: translateY(0); }
@@ -220,6 +226,7 @@
 /* La barre grandit depuis son bord gauche, pas depuis l'origine de l'écran. */
 .anim-avance { transform-box: fill-box; transform-origin: 0 50%; }
 .anim-tape { animation: tape 0.5s steps(2) infinite; }
+.anim-scintille { animation: scintille 2.6s steps(1) infinite; }
 /* L'hélice de la VMC : sa durée vient du régime (BoucheVMC), quatre paliers par tour. */
 .anim-helice { animation: helice 1.2s steps(4) infinite; transform-box: fill-box; transform-origin: 50% 50%; }
 @keyframes helice { to { transform: rotate(90deg); } }
@@ -234,7 +241,7 @@
 .marche { transition: transform 1.8s steps(12), opacity 0.9s; }
 @media (prefers-reduced-motion: reduce) {
   .anim-tape, .anim-lueur, .anim-flotte, .anim-vapeur, .anim-chute, .anim-gyro,
-  .anim-defile, .anim-avance, .anim-balaie, .anim-helice { animation: none; }
+  .anim-defile, .anim-avance, .anim-balaie, .anim-helice, .anim-scintille { animation: none; }
   .marche { transition: none; }
 }
 

@@ -30,6 +30,7 @@ export interface ContenuDuSymbole {
 export interface Instance {
   symbole: ContenuDuSymbole;
   classe: string;
+  /** Les liaisons de couleur, et le décalage d'animation du calque. */
   style: Record<string, string>;
 }
 
@@ -48,7 +49,7 @@ export function empreinte(texte: string): string {
 }
 
 /** L'instance d'un calque, ou `null` s'il ne dessine rien. */
-export function instanceDuCalque({ g, classe }: Calque, w: number, h: number): Instance | null {
+export function instanceDuCalque({ g, classe, delai }: Calque, w: number, h: number): Instance | null {
   const { fond, lisere, lueurs } = tracer(g);
   if (fond.length === 0) return null;
   const chemins: CheminDuSymbole[] = fond.map(({ jeton, d }) => ({ d, fill: variableGenerique(jeton) }));
@@ -56,7 +57,9 @@ export function instanceDuCalque({ g, classe }: Calque, w: number, h: number): I
   for (const { palier, d } of lueurs) chemins.push({ d, ...lueurGenerique(palier) });
   const familles = new Set(fond.map(({ jeton }) => jeton.split(".")[0] ?? ""));
   const id = `sp-${empreinte(`${w}x${h}|${chemins.map((c) => `${c.fill}${c.opacity ?? ""}:${c.d}`).join("|")}`)}`;
-  return { symbole: { id, w, h, chemins }, classe, style: liaisons(familles, lueurs[0]?.etat ?? null) };
+  const style = liaisons(familles, lueurs[0]?.etat ?? null);
+  if (delai !== undefined) style.animationDelay = `${delai}s`;
+  return { symbole: { id, w, h, chemins }, classe, style };
 }
 
 const instancesParSprite = new WeakMap<Sprite, Instance[]>();
@@ -111,4 +114,21 @@ export function abonner(f: () => void): () => void {
 /** Les symboles inscrits : la même référence tant que rien ne change. */
 export function symbolesInscrits(): readonly ContenuDuSymbole[] {
   return instantane;
+}
+
+/**
+ * Un dessin mémoïsé par ses arguments : le même objet sprite d'un rendu à l'autre,
+ * donc les mêmes instances, sans recalcul toutes les dix secondes.
+ */
+export function memoise<A extends readonly (string | number | boolean)[]>(dessin: (...a: A) => Sprite): (...a: A) => Sprite {
+  const cache = new Map<string, Sprite>();
+  return (...a: A) => {
+    const cle = a.join("|");
+    let s = cache.get(cle);
+    if (!s) {
+      s = dessin(...a);
+      cache.set(cle, s);
+    }
+    return s;
+  };
 }

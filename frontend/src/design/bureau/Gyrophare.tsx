@@ -1,25 +1,13 @@
+import { gyrophare } from "../../lib/bureau/sprites/objets";
+import { memoise } from "../../lib/bureau/sprites/symboles";
+import SpriteSvg from "./SpriteSvg";
+
+const dessin = memoise(gyrophare);
+
 /**
- * Le gyrophare de la pièce, grille 10 × 8. Il ne se dessine que tant que la CI
- * est rouge (ADR-058) : le dôme clignote, le socle reste fixe. Sous
- * `prefers-reduced-motion` il reste allumé, sans clignoter.
+ * Le gyrophare d'une CI rouge, grille 20 × 16 (30 × 24 px ; ticket-727) : le dôme et ses
+ * éclats clignotent (`anim-gyro`, coupée sous `prefers-reduced-motion`), le socle reste.
  */
 export default function Gyrophare() {
-  return (
-    <svg
-      width="30"
-      height="24"
-      viewBox="0 0 10 8"
-      shapeRendering="crispEdges"
-      role="img"
-      aria-label="CI rouge"
-      data-sprite="gyrophare"
-    >
-      <g className="anim-gyro">
-        <rect x="2" y="1" width="6" height="4" className="fill-(--sprite-gyrophare)" />
-        <rect x="3" y="0" width="4" height="1" className="fill-(--sprite-gyrophare)" />
-        <rect x="4" y="2" width="2" height="2" className="fill-(--sprite-gyrophare-clair)" />
-      </g>
-      <rect x="1" y="5" width="8" height="3" className="fill-(--sprite-gyrophare-socle)" />
-    </svg>
-  );
+  return <SpriteSvg sprite={dessin()} largeur={30} hauteur={24} data-sprite="gyrophare" />;
 }

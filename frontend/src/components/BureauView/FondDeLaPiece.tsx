@@ -3,7 +3,7 @@ import Bibliotheque from "../../design/bureau/Bibliotheque";
 import Corbeille from "../../design/bureau/Corbeille";
 import Etagere from "../../design/bureau/Etagere";
 import Imprimante, { HAUTEUR_DU_MEUBLE } from "../../design/bureau/Imprimante";
-import MachineACafe from "../../design/bureau/MachineACafe";
+import MachineACafe, { HAUTEUR_DU_MEUBLE_BAS } from "../../design/bureau/MachineACafe";
 import Plante from "../../design/bureau/Plante";
 import Porte from "../../design/bureau/Porte";
 import Tuile from "../../design/bureau/Tuile";
@@ -167,8 +167,13 @@ export default function FondDeLaPiece({
         </Agrandi>
       </Pose>
       {machineEnService && (
-        <Pose x={MACHINE_X} bas="bottom-18">
-          <Vapeur />
+        <Pose x={MACHINE_X}>
+          {/* Au-dessus de la tasse : la machine (38,4 px) sur son meuble bas, à la même échelle. */}
+          <Agrandi>
+            <span className="block pl-[9.6px]" style={{ marginBottom: HAUTEUR_DU_MEUBLE_BAS + 32 }}>
+              <Vapeur />
+            </span>
+          </Agrandi>
         </Pose>
       )}
       <Pose x={BAIE_X}>
