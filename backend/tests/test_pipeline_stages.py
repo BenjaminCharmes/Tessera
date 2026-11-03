@@ -14,6 +14,7 @@ from tessera.services import pipeline_branche, pipeline_controles, pipeline_prod
 from tessera.services.git_workspace import GitCommandError, GitWorkspaceService, NotAGitRepository
 from tessera.services.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.pipeline_run import PipelineRun
+from tests.doubles_git import GitWorkspaceDouble
 
 
 async def _git(cwd: Path, *args: str) -> None:
@@ -115,12 +116,9 @@ async def test_ensure_clean_tree_laisse_passer_sans_git() -> None:
 async def test_ensure_clean_tree_bloque_le_ticket_sur_un_arbre_sale() -> None:
     # Le ticket ne doit surtout pas rester en `todo` : `pick_next_ticket` le
     # resservirait à chaque slot restant d'un run autonome.
-    class _DirtyGit:
+    class _DirtyGit(GitWorkspaceDouble):
         async def is_clean(self) -> bool:
             return False
-
-        async def dirty_files(self) -> list[str]:
-            return []
 
     class _TicketSvc:
         def __init__(self) -> None:
@@ -144,7 +142,7 @@ async def test_ensure_clean_tree_bloque_le_ticket_sur_un_arbre_sale() -> None:
 
 async def test_ensure_clean_tree_porte_la_liste_des_fichiers_dans_l_evenement_error() -> None:
     """The error event carries the list of blocking files (ticket-323)."""
-    class _DirtyGit:
+    class _DirtyGit(GitWorkspaceDouble):
         async def is_clean(self) -> bool:
             return False
 
@@ -172,7 +170,7 @@ async def test_ensure_clean_tree_porte_la_liste_des_fichiers_dans_l_evenement_er
 async def test_ensure_clean_tree_laisse_passer_si_le_controle_git_echoue() -> None:
     # Un dépôt cassé ne doit pas empêcher de travailler : le garde-fou est un
     # filet de sécurité, pas une condition de démarrage.
-    class _BrokenGit:
+    class _BrokenGit(GitWorkspaceDouble):
         async def is_clean(self) -> bool:
             raise GitCommandError(command=["git", "status"], returncode=128, stderr="boom")
 
@@ -221,15 +219,7 @@ async def test_ensure_clean_tree_laisse_passer_quand_seul_le_journal_est_modifie
 async def test_create_branch_degrade_sans_depot_git() -> None:
     # Un projet sans dépôt git reste utilisable : on continue sans branche.
     # NotAGitRepository est la seule erreur qui autorise ce repli (ticket-314).
-    class _NoRepoGit:
-        async def commit_bookkeeping(self) -> None:
-            pass
-
-        async def initialiser_base_ref(
-            self, base_branch: str | None = None, *, exiger_distant: bool = False
-        ) -> str | None:
-            return None
-
+    class _NoRepoGit(GitWorkspaceDouble):
         async def create_branch(self, ticket_id: str, slug: str) -> str:
             raise NotAGitRepository(
                 command=["git", "checkout"], returncode=128, stderr="not a git repository"
@@ -243,15 +233,7 @@ async def test_create_branch_degrade_sans_depot_git() -> None:
 
 
 async def test_create_branch_renseigne_la_branche_et_emet_l_evenement() -> None:
-    class _Git:
-        async def commit_bookkeeping(self) -> None:
-            pass
-
-        async def initialiser_base_ref(
-            self, base_branch: str | None = None, *, exiger_distant: bool = False
-        ) -> str | None:
-            return None
-
+    class _Git(GitWorkspaceDouble):
         async def create_branch(self, ticket_id: str, slug: str) -> str:
             return f"{ticket_id}-slug"
 
@@ -270,15 +252,7 @@ async def test_create_branch_git_command_error_bloque_le_run() -> None:
     git failure on a real repository must stop the pipeline so that the coder
     agent never runs on the wrong branch.
     """
-    class _GitAvecErreur:
-        async def commit_bookkeeping(self) -> None:
-            pass
-
-        async def initialiser_base_ref(
-            self, base_branch: str | None = None, *, exiger_distant: bool = False
-        ) -> str | None:
-            return None
-
+    class _GitAvecErreur(GitWorkspaceDouble):
         async def create_branch(self, ticket_id: str, slug: str) -> str:
             raise GitCommandError(
                 command=["git", "checkout", "-b"],

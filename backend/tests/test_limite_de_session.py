@@ -13,6 +13,7 @@ from tessera.services import pipeline_outcomes as outcomes
 from tessera.services.orchestrator import Orchestrator
 from tessera.services.pipeline_events import EventType, OrchestratorEvent, PipelineResult
 from tessera.services.pipeline_run import PipelineRun
+from tests.doubles_git import GitWorkspaceDouble
 from tessera.services.session_limit import (
     extract_reset_time,
     is_session_limit,
@@ -39,7 +40,7 @@ def _ticket(tid: str = "ticket-001") -> Ticket:
     )
 
 
-class _Git:
+class _Git(GitWorkspaceDouble):
     """Git minimal : commit réussit, pas d'avancement de ref de base."""
 
     def __init__(self) -> None:

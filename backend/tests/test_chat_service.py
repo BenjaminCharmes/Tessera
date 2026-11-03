@@ -10,6 +10,7 @@ from tessera.services.chat_service import (
 )
 from tessera.services.database_chat import ChatMessageRow
 from tessera.services.providers.base import ProviderResult
+from tests.doubles_git import GitWorkspaceDouble
 
 
 class _FakeProvider:
@@ -32,7 +33,7 @@ class _FakeProvider:
         )
 
 
-class _FakeGit:
+class _FakeGit(GitWorkspaceDouble):
     def __init__(self, dirty: bool = True) -> None:
         self.dirty = dirty
         self.branches: list[str] = []

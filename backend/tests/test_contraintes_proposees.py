@@ -9,6 +9,7 @@ from tessera.services.contraintes_touchees import lignes_hors_proposees
 from tessera.services.pipeline_contraintes import arret_contraintes_hors_proposees
 from tessera.services.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.pipeline_run import PipelineRun
+from tests.doubles_git import GitWorkspaceDouble
 
 _PROPOSEE = "- **Règle proposée par un run.** (ADR-099)"
 
@@ -198,7 +199,7 @@ def test_deleted_file_is_reported(tmp_path: Path) -> None:
 # ------------------------------------------------------------------
 
 
-class _Git:
+class _Git(GitWorkspaceDouble):
     def __init__(self) -> None:
         self.messages: list[str] = []
 

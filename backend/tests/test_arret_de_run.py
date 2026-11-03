@@ -3,6 +3,7 @@ from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketTy
 from tessera.services.dialogue import DialogueChannel
 from tessera.services.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.pipeline_run import PipelineRun
+from tests.doubles_git import GitWorkspaceDouble
 
 
 def _run() -> PipelineRun:
@@ -61,7 +62,7 @@ async def test_une_question_posee_apres_un_arret_ne_bloque_pas() -> None:
 # ------------------------------------------------------------------
 
 
-class _Git:
+class _Git(GitWorkspaceDouble):
     def __init__(self) -> None:
         self.messages: list[str] = []
 

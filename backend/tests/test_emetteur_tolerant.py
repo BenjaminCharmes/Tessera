@@ -13,6 +13,7 @@ from tests.revue_structuree import revue_depuis_texte
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 from tessera.services.orchestrator import Orchestrator
 from tessera.services.pipeline_events import OrchestratorEvent
+from tests.doubles_git import GitWorkspaceDouble
 
 
 def _ticket(tid: str = "ticket-001") -> Ticket:
@@ -23,25 +24,9 @@ def _ticket(tid: str = "ticket-001") -> Ticket:
     )
 
 
-class _GitQuiCommite:
+class _GitQuiCommite(GitWorkspaceDouble):
     def __init__(self) -> None:
         self.commits: list[str] = []
-
-    async def commit_bookkeeping(self) -> None:
-        pass
-
-    async def is_clean(self) -> bool:
-        return True
-
-    async def lire_ticket_sur_la_base(
-        self, ticket_id: str, *, fetch: bool = True
-    ) -> tuple[str, str] | None:
-        return None
-
-    async def initialiser_base_ref(
-        self, base_branch: str | None = None, *, exiger_distant: bool = False
-    ) -> str | None:
-        return None
 
     async def create_branch(self, ticket_id: str, slug: str) -> str:
         return f"{ticket_id}-slug"
@@ -55,9 +40,6 @@ class _GitQuiCommite:
     async def commit_all(self, message: str) -> str | None:
         self.commits.append(message)
         return "abc1234"
-
-    async def advance_base_ref(self) -> None:
-        return None
 
 
 class _Runner:

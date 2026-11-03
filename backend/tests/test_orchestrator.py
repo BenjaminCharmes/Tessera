@@ -12,6 +12,7 @@ from tessera.services.orchestrator import (
     PipelineResult,
 )
 
+from tests.doubles_git import GitWorkspaceDouble
 from tests.revue_structuree import revue_depuis_texte
 from tessera.services.git_workspace import GitWorkspaceError, NotAGitRepository
 from tessera.services.security_auditor import SecurityAuditResult, SecurityIssue
@@ -135,21 +136,13 @@ async def _noop(event: OrchestratorEvent) -> None:
 DIFF_REEL = "diff --git a/src/foo.py b/src/foo.py\n+SECRET = 'hunter2'\n"
 
 
-class _FakeGit:
+class _FakeGit(GitWorkspaceDouble):
     """GitWorkspaceService double returning a controlled diff."""
 
     def __init__(self, diff: str = DIFF_REEL) -> None:
         self._diff = diff
         self.commits: list[str] = []
         self.base_ref_advances = 0
-
-    async def commit_bookkeeping(self) -> None:
-        pass
-
-    async def initialiser_base_ref(
-        self, base_branch: str | None = None, *, exiger_distant: bool = False
-    ) -> str | None:
-        return None
 
     async def create_branch(self, ticket_id: str, slug: str) -> str:
         return f"{ticket_id}-slug"
@@ -159,14 +152,6 @@ class _FakeGit:
 
     async def diff_depuis_base(self) -> str:
         return self._diff
-
-    async def is_clean(self) -> bool:
-        return True
-
-    async def lire_ticket_sur_la_base(
-        self, ticket_id: str, *, fetch: bool = True
-    ) -> tuple[str, str] | None:
-        return None
 
     async def commit_all(self, message: str) -> str | None:
         self.commits.append(message)
@@ -331,33 +316,13 @@ async def test_run_pipeline_cree_une_branche_et_emet_l_event(tmp_path: Path) -> 
     """The branch is created before the first round, and announced."""
     events: list[OrchestratorEvent] = []
 
-    class FakeGit:
+    class FakeGit(GitWorkspaceDouble):
         def __init__(self) -> None:
             self.created: list[tuple[str, str]] = []
-
-        async def commit_bookkeeping(self) -> None:
-            pass
-
-        async def initialiser_base_ref(
-            self, base_branch: str | None = None, *, exiger_distant: bool = False
-        ) -> str | None:
-            return None
 
         async def create_branch(self, ticket_id: str, slug: str) -> str:
             self.created.append((ticket_id, slug))
             return f"{ticket_id}-{slug}"
-
-        async def current_diff(self) -> str:
-            return ""
-
-        async def diff_depuis_base(self) -> str:
-            return ""
-
-        async def is_clean(self) -> bool:
-            return True
-
-        async def commit_all(self, message: str) -> str | None:
-            return None
 
     git = FakeGit()
     ticket = _make_ticket()
@@ -396,29 +361,8 @@ async def test_pipeline_done_porte_la_branche_du_run(tmp_path: Path) -> None:
     # grisé — alors que la branche existait bel et bien (ticket-123).
     events: list[OrchestratorEvent] = []
 
-    class FakeGit:
-        async def commit_bookkeeping(self) -> None:
-            pass
-
-        async def initialiser_base_ref(
-            self, base_branch: str | None = None, *, exiger_distant: bool = False
-        ) -> str | None:
-            return None
-
-        async def create_branch(self, ticket_id: str, slug: str) -> str:
-            return f"{ticket_id}-{slug}"
-
-        async def current_diff(self) -> str:
-            return ""
-
-        async def diff_depuis_base(self) -> str:
-            return ""
-
-        async def is_clean(self) -> bool:
-            return True
-
-        async def commit_all(self, message: str) -> str | None:
-            return None
+    class FakeGit(GitWorkspaceDouble):
+        pass
 
     ticket = _make_ticket()
     svc = AsyncMock()
@@ -1167,7 +1111,7 @@ async def test_diff_en_echec_retombe_sur_la_prose_et_termine(tmp_path: Path) -> 
 # ------------------------------------------------------------------
 
 
-class _DirtyingGit:
+class _DirtyingGit(GitWorkspaceDouble):
     """Simulates a real repo: refuses (unapproved) work leaves the tree
     dirty; commits reset it clean. is_clean() reports the real state so
     the orchestrator's dirty-tree guard can be exercised end-to-end."""
@@ -1177,14 +1121,6 @@ class _DirtyingGit:
         self.commits: list[str] = []
         self.branches_created: list[str] = []
         self.base_ref_advances = 0
-
-    async def commit_bookkeeping(self) -> None:
-        pass
-
-    async def initialiser_base_ref(
-        self, base_branch: str | None = None, *, exiger_distant: bool = False
-    ) -> str | None:
-        return None
 
     async def create_branch(self, ticket_id: str, slug: str) -> str:
         self.branches_created.append(ticket_id)
