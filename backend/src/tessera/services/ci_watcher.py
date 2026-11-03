@@ -24,11 +24,14 @@ before the answer was lost.  When the caller provides `etat_pr`, the watcher
 re-reads the PR first; a merged PR is a success, logged as such.  Every failure
 message names the exception type, even when its text is empty.
 
+Retry (ticket-739): when the re-read PR is not merged, phase 2 is replayed once,
+under the bound each pass has, and the pipeline log says so. A second network
+error, or any other exception, is a failure as before.
+
 Shutdown: call arreter() to cancel all running tasks without raising exceptions.
 """
 import asyncio
 from collections.abc import Awaitable, Callable
-from datetime import datetime, timezone
 from pathlib import Path
 
 import httpx
@@ -40,6 +43,11 @@ from tessera.services.controle_tete import (
     TetePr as TetePr,
     decrire_exception as decrire_exception,
     verifier_tete,
+)
+from tessera.services.journal_ci_watcher import (
+    ecrire_ligne_log,
+    ecrire_log_blocage,
+    ecrire_log_merge,
 )
 from tessera.services.livraison import Livraison
 from tessera.services.mise_a_jour_pr import DELAI_MISE_A_JOUR_S, MiseAJourPr, mettre_a_jour_la_pr
@@ -216,42 +224,10 @@ class CIWatcher:
         sem = self._semaphore_du_projet(project_id)
         try:
             async with sem:
-                arret_erreur: str | None = None
-                try:
-                    # La borne s'applique à chaque passage de la phase 2, dans
-                    # `_passe` : une mise à jour a la sienne (ticket-733).
-                    await self._livrer_et_emettre(
-                        project_id, ticket_id, pr_number, livraison_phase_2,
-                        on_event, pipeline_log_path, controle_tete, mise_a_jour,
-                    )
-                except asyncio.TimeoutError:
-                    arret_erreur = f"délai dépassé ({self._timeout_phase2_s:.0f}s)"
-                    _logger.warning(
-                        "ci_watcher_timeout",
-                        extra={"project": project_id, "ticket": ticket_id},
-                    )
-                except httpx.TransportError as exc:
-                    # Une réponse perdue ne dit pas que l'action a échoué : on
-                    # relit la PR avant de conclure (ticket-405).
-                    if await self._pr_mergee(etat_pr, pr_number):
-                        await self._succes_malgre_erreur_reseau(
-                            project_id, ticket_id, pr_number, exc, on_event,
-                            pipeline_log_path,
-                        )
-                    else:
-                        arret_erreur = (
-                            f"erreur inattendue : {decrire_exception(exc)}"
-                        )
-                        _logger.exception(
-                            "ci_watcher_error",
-                            extra={"project": project_id, "ticket": ticket_id},
-                        )
-                except Exception as exc:  # noqa: BLE001
-                    arret_erreur = f"erreur inattendue : {decrire_exception(exc)}"
-                    _logger.exception(
-                        "ci_watcher_error",
-                        extra={"project": project_id, "ticket": ticket_id},
-                    )
+                arret_erreur = await self._phase_2_avec_reprise(
+                    project_id, ticket_id, pr_number, livraison_phase_2,
+                    on_event, pipeline_log_path, etat_pr, controle_tete, mise_a_jour,
+                )
                 if arret_erreur is not None:
                     await self._emettre_echec(
                         project_id, ticket_id, pr_number, arret_erreur, on_event,
@@ -277,6 +253,81 @@ class CIWatcher:
             if evt is not None:
                 evt.set()
 
+    async def _phase_2_avec_reprise(
+        self,
+        project_id: str,
+        ticket_id: str,
+        pr_number: int,
+        livraison_phase_2: Callable[[int], Awaitable[Livraison]],
+        on_event: EventCallback,
+        pipeline_log_path: Path | None,
+        etat_pr: EtatPr | None,
+        controle_tete: ControleTete | None,
+        mise_a_jour: MiseAJourPr | None,
+    ) -> str | None:
+        """Run phase 2; the failure line, or None when settled.
+
+        Chaque passage a sa borne, dans `_passe` : une mise à jour a la sienne
+        (ticket-733). Une erreur réseau sur une PR toujours ouverte rejoue la
+        phase 2 une fois (ticket-739) : c'est sûr, elle relit la CI, refuse une
+        tête qui n'est plus `pushed_sha`, et le merge est lié à `pushed_sha`
+        (ADR-039).
+        """
+        reprise_faite = False
+        while True:
+            try:
+                await self._livrer_et_emettre(
+                    project_id, ticket_id, pr_number, livraison_phase_2,
+                    on_event, pipeline_log_path, controle_tete, mise_a_jour,
+                )
+                return None
+            except asyncio.TimeoutError:
+                _logger.warning(
+                    "ci_watcher_timeout",
+                    extra={"project": project_id, "ticket": ticket_id},
+                )
+                return f"délai dépassé ({self._timeout_phase2_s:.0f}s)"
+            except httpx.TransportError as exc:
+                # Une réponse perdue ne dit pas que l'action a échoué : on
+                # relit la PR avant de conclure (ticket-405).
+                if await self._pr_mergee(etat_pr, pr_number):
+                    await self._succes_malgre_erreur_reseau(
+                        project_id, ticket_id, pr_number, exc, on_event,
+                        pipeline_log_path,
+                    )
+                    return None
+                if reprise_faite:
+                    return self._arret_erreur(project_id, ticket_id, exc)
+                reprise_faite = True
+                self._noter_reprise(pipeline_log_path, ticket_id, pr_number, exc)
+            except Exception as exc:  # noqa: BLE001
+                return self._arret_erreur(project_id, ticket_id, exc)
+
+    def _arret_erreur(
+        self, project_id: str, ticket_id: str, exc: BaseException
+    ) -> str:
+        """Log the exception being handled and return its stop line."""
+        _logger.exception(
+            "ci_watcher_error",
+            extra={"project": project_id, "ticket": ticket_id},
+        )
+        return f"erreur inattendue : {decrire_exception(exc)}"
+
+    def _noter_reprise(
+        self,
+        pipeline_log_path: Path | None,
+        ticket_id: str,
+        pr_number: int,
+        exc: BaseException,
+    ) -> None:
+        """Say in the pipeline log that phase 2 is replayed, and why."""
+        ecrire_ligne_log(
+            pipeline_log_path,
+            ticket_id,
+            f"livraison: nouvelle tentative de la PR #{pr_number} après une "
+            f"erreur réseau ({decrire_exception(exc)}), PR non mergée",
+        )
+
     async def _emettre_echec(
         self,
         project_id: str,
@@ -288,7 +339,7 @@ class CIWatcher:
     ) -> None:
         """Emit ticket_status_changed(blocked) then ci_merge_done(merged=False)."""
         self._resultats_merge[f"{project_id}:{ticket_id}"] = False
-        self._ecrire_log_blocage(pipeline_log_path, ticket_id, pr_number, arret)
+        ecrire_log_blocage(pipeline_log_path, ticket_id, pr_number, arret)
         await on_event(
             OrchestratorEvent(
                 type=EventType.TICKET_STATUS_CHANGED,
@@ -387,7 +438,7 @@ class CIWatcher:
         texte: str,
     ) -> None:
         """Journal line of an update; without a log path, the logger event carries it."""
-        self._ecrire_ligne_log(pipeline_log_path, ticket_id, texte)
+        ecrire_ligne_log(pipeline_log_path, ticket_id, texte)
         _logger.info(
             "ci_watcher_pr_mise_a_jour",
             extra={"project": project_id, "ticket": ticket_id, "detail": texte},
@@ -406,7 +457,7 @@ class CIWatcher:
         With a `pipeline_log_path`, the merge is also written to the log.
         """
         self._resultats_merge[f"{project_id}:{ticket_id}"] = True
-        self._ecrire_log_merge(pipeline_log_path, project_id, ticket_id, pr_number)
+        ecrire_log_merge(pipeline_log_path, project_id, ticket_id, pr_number)
         await on_event(
             OrchestratorEvent(
                 type=EventType.CI_MERGE_DONE,
@@ -467,64 +518,13 @@ class CIWatcher:
         pipeline_log_path: Path | None,
     ) -> None:
         """The PR is merged although the network call failed: a success."""
-        self._ecrire_ligne_log(
+        ecrire_ligne_log(
             pipeline_log_path,
             ticket_id,
             f"livraison: PR #{pr_number} mergée malgré une erreur réseau "
             f"({decrire_exception(exc)})",
         )
         await self._emettre_succes(project_id, ticket_id, pr_number, on_event)
-
-    def _ecrire_log_blocage(
-        self,
-        pipeline_log_path: Path | None,
-        ticket_id: str,
-        pr_number: int,
-        arret: str,
-    ) -> None:
-        """Write a blocking delivery entry to the pipeline log."""
-        self._ecrire_ligne_log(
-            pipeline_log_path,
-            ticket_id,
-            f"livraison: arrêt — PR #{pr_number} non mergée : {arret[:200]}",
-        )
-
-    def _ecrire_ligne_log(
-        self,
-        pipeline_log_path: Path | None,
-        ticket_id: str,
-        message: str,
-    ) -> None:
-        """Append one timestamped line for `ticket_id` to the pipeline log."""
-        if pipeline_log_path is None:
-            return
-        self._ajouter_au_log(pipeline_log_path, f"[{ticket_id}] {message}")
-
-    def _ecrire_log_merge(
-        self,
-        pipeline_log_path: Path | None,
-        project_id: str,
-        ticket_id: str,
-        pr_number: int,
-    ) -> None:
-        """Append `[project] ticket PR #N mergée (CI verte)` to the pipeline log."""
-        self._ajouter_au_log(
-            pipeline_log_path,
-            f"[{project_id}] {ticket_id} PR #{pr_number} mergée (CI verte)",
-        )
-
-    def _ajouter_au_log(self, pipeline_log_path: Path | None, texte: str) -> None:
-        """Append one timestamped line to the pipeline log; never raises."""
-        if pipeline_log_path is None:
-            return
-        ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
-        line = f"- {ts} — {texte}\n"
-        try:
-            pipeline_log_path.parent.mkdir(parents=True, exist_ok=True)
-            with pipeline_log_path.open("a", encoding="utf-8") as f:
-                f.write(line)
-        except Exception as exc:  # noqa: BLE001
-            _logger.warning("pipeline_log_write_failed", extra={"error": str(exc)})
 
 #: Instance partagée par tous les routeurs. Un singleton en mémoire suffit
 #: pour un backend local (ADR-038).
