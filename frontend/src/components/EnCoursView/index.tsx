@@ -11,6 +11,8 @@ import ProjetsArretes from "./ProjetsArretes";
 import SallesDesServeurs from "./SallesDesServeurs";
 import SalleTessera from "./SalleTessera";
 import { formaterMo, grouperParProjet, memoireTotale } from "./format";
+import { useZoomDuBureau } from "../../hooks/useZoomDuBureau";
+import { CommandesDeZoom } from "../SupervisionView/ZoomDuBureau";
 
 type VueEnCours = "salles" | "liste";
 
@@ -46,6 +48,15 @@ export default function EnCoursView({ appsEnCours, runs = AUCUN_RUN, vueInitiale
     appsEnCours;
   const { data: projets } = useResource(lireProjets, AUCUN);
   const [vue, setVue] = useState<VueEnCours>(vueInitiale);
+  // Les salles des serveurs ont leur zoom, comme le Bureau (ticket-727).
+  const {
+    mode: modeDeZoom,
+    defaut: zoomParDefaut,
+    zoom,
+    setMode: setModeDeZoom,
+    conteneur,
+    contenu,
+  } = useZoomDuBureau({ cle: "salles.zoom" });
 
   if (apps === null) {
     return erreur ? (
@@ -61,59 +72,76 @@ export default function EnCoursView({ appsEnCours, runs = AUCUN_RUN, vueInitiale
   const arretes = projets.filter((p) => p.services_declares && !enMarche.has(p.id));
 
   return (
-    <div className="h-full overflow-y-auto p-4 text-zinc-200">
-      <header className="mb-3 flex items-baseline justify-between">
+    <div className="flex h-full flex-col text-zinc-200">
+      <header className="flex items-baseline justify-between px-4 pt-4 pb-3">
         <RegionTitle>En cours</RegionTitle>
         <span className="flex items-center gap-3 text-sm text-zinc-300">
           Mémoire totale : {formaterMo(memoireTotale(apps))}
+          {vue === "salles" && (
+            <CommandesDeZoom
+              mode={modeDeZoom}
+              zoom={zoom}
+              setMode={setModeDeZoom}
+              defaut={zoomParDefaut}
+              vue="les salles"
+            />
+          )}
           <ViewSwitcher label="Vue des apps" options={VUES} valeur={vue} onChange={setVue} />
         </span>
       </header>
-      {erreur && (
-        <p role="alert" className="mb-3 text-sm text-red-300">
-          {erreur}
-        </p>
-      )}
-      {vue === "salles" && (
-        <SalleTessera nom={projets.find((p) => p.id === "ide-core")?.name ?? "Tessera"} lueA={lueA} />
-      )}
-      {apps.length === 0 ? (
-        <Message texte="Aucune app de projet ne tourne" />
-      ) : vue === "salles" ? (
-        <SallesDesServeurs
-          apps={apps}
-          lueA={lueA}
-          runs={runs}
-          enArret={enArret}
-          onArreterProjet={(id, groupe) => void arreterProjet(id, groupe)}
+      <div ref={conteneur} className="min-h-0 flex-1 overflow-y-auto px-4 pb-4">
+        {erreur && (
+          <p role="alert" className="mb-3 text-sm text-red-300">
+            {erreur}
+          </p>
+        )}
+        {vue === "salles" && (
+          // Le zoom ne touche que les salles : la liste des projets arrêtés garde sa taille.
+          <div ref={contenu} data-zoom={zoom} style={{ zoom }}>
+            <SalleTessera nom={projets.find((p) => p.id === "ide-core")?.name ?? "Tessera"} lueA={lueA} />
+            {apps.length === 0 ? (
+              <Message texte="Aucune app de projet ne tourne" />
+            ) : (
+              <SallesDesServeurs
+                apps={apps}
+                lueA={lueA}
+                runs={runs}
+                enArret={enArret}
+                onArreterProjet={(id, groupe) => void arreterProjet(id, groupe)}
+              />
+            )}
+          </div>
+        )}
+        {vue === "salles" ? null : apps.length === 0 ? (
+          <Message texte="Aucune app de projet ne tourne" />
+        ) : (
+          grouperParProjet(apps).map((groupe) => (
+            <section key={groupe.project_id} className="mb-4">
+              <EnTeteGroupe
+                groupe={groupe}
+                enArret={groupe.apps.every((app) => enArret(app.pid))}
+                onArreterProjet={() => void arreterProjet(groupe.project_id, groupe.apps)}
+              />
+              <ul className="rounded-sm bg-zinc-900 ring-1 ring-zinc-800">
+                {groupe.apps.map((app) => (
+                  <LigneApp
+                    key={app.pid}
+                    app={app}
+                    now={lueA}
+                    enArret={enArret(app.pid)}
+                    onArreter={(pid) => void arreter(pid)}
+                  />
+                ))}
+              </ul>
+            </section>
+          ))
+        )}
+        <ProjetsArretes
+          projets={arretes}
+          enLancement={enLancement}
+          onLancer={(id) => void lancer(id)}
         />
-      ) : (
-        grouperParProjet(apps).map((groupe) => (
-          <section key={groupe.project_id} className="mb-4">
-            <EnTeteGroupe
-              groupe={groupe}
-              enArret={groupe.apps.every((app) => enArret(app.pid))}
-              onArreterProjet={() => void arreterProjet(groupe.project_id, groupe.apps)}
-            />
-            <ul className="rounded-sm bg-zinc-900 ring-1 ring-zinc-800">
-              {groupe.apps.map((app) => (
-                <LigneApp
-                  key={app.pid}
-                  app={app}
-                  now={lueA}
-                  enArret={enArret(app.pid)}
-                  onArreter={(pid) => void arreter(pid)}
-                />
-              ))}
-            </ul>
-          </section>
-        ))
-      )}
-      <ProjetsArretes
-        projets={arretes}
-        enLancement={enLancement}
-        onLancer={(id) => void lancer(id)}
-      />
+      </div>
     </div>
   );
 }

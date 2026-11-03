@@ -45,13 +45,15 @@ export default function BureauConnecte({
     projects.map((p) => p.id),
   );
 
+  // Par défaut, trois lignes tiennent dans la hauteur : les salles du haut, ide-core et un projet (ticket-727).
   const {
     mode: modeDeZoom,
+    defaut: zoomParDefaut,
     zoom,
     setMode: setModeDeZoom,
     conteneur,
     contenu,
-  } = useZoomDuBureau();
+  } = useZoomDuBureau({ lignes: 3 });
 
   function ranger(ids: string[]) {
     fermerRuns(ids);
@@ -80,6 +82,7 @@ export default function BureauConnecte({
               mode={modeDeZoom}
               zoom={zoom}
               setMode={setModeDeZoom}
+              defaut={zoomParDefaut}
             />
             {selecteur}
           </>

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { estModeDeZoom, zoomPourAjuster, zoomVoisin } from "./zoomDuBureau";
+import { estModeDeZoom, zoomPourAjuster, zoomPourLignes, zoomVoisin } from "./zoomDuBureau";
 
 describe("zoomDuBureau", () => {
   it("steps by ten percent between 40 and 125 percent", () => {
@@ -17,8 +17,19 @@ describe("zoomDuBureau", () => {
 
   it("accepts only a known mode from storage", () => {
     expect(estModeDeZoom("ajuste")).toBe(true);
+    expect(estModeDeZoom("lignes")).toBe(true);
     expect(estModeDeZoom(0.8)).toBe(true);
     expect(estModeDeZoom(3)).toBe(false);
     expect(estModeDeZoom("grand")).toBe(false);
+  });
+});
+
+describe("zoomPourLignes", () => {
+  it("fits the first rows exactly, growing as well as shrinking, within the zoom bounds", () => {
+    expect(zoomPourLignes(900, 1000)).toBe(0.9);
+    expect(zoomPourLignes(900, 800)).toBe(1.12);
+    expect(zoomPourLignes(900, 300)).toBe(1.25);
+    expect(zoomPourLignes(900, 9000)).toBe(0.4);
+    expect(zoomPourLignes(0, 800)).toBe(1);
   });
 });

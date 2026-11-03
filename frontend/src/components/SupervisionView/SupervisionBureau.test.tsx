@@ -159,6 +159,22 @@ describe("Supervision — vue par défaut et sélecteur", () => {
     expect(screen.getByRole("group", { name: "Zoom du Bureau" })).toHaveTextContent("90 %");
   });
 
+  it("fits three rows by default, and comes back to it when Ajuster is released", async () => {
+    // Les salles du haut, ide-core et une pièce de projet : trois lignes dans la hauteur (ticket-727).
+    window.localStorage.clear();
+    const { container } = render(<SupervisionView supervision={supervision([])} projects={[]} />);
+
+    expect(container.querySelectorAll("[data-ligne-du-zoom]").length).toBeGreaterThan(0);
+    const ajuster = screen.getByRole("button", { name: "Ajuster" });
+    expect(ajuster).toHaveAttribute("aria-pressed", "false");
+    await userEvent.click(ajuster);
+    expect(ajuster).toHaveAttribute("aria-pressed", "true");
+    await userEvent.click(ajuster);
+    expect(ajuster).toHaveAttribute("aria-pressed", "false");
+    const memorise = Object.keys(window.localStorage).find((cle) => cle.endsWith("bureau.zoom.v2"));
+    expect(window.localStorage.getItem(memorise ?? "")).toBe(JSON.stringify("lignes"));
+  });
+
   it("keeps the office without a run, and says nothing is running where the rooms would be", () => {
     // Le 28/10, sans run, un message remplaçait tout le Bureau : salles du haut,
     // « À toi » et employé de la semaine disparaissaient (ticket-636).

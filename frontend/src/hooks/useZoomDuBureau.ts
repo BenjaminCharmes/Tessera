@@ -1,37 +1,56 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import { useEtatPersistant } from "./useEtatPersistant";
-import { estModeDeZoom, zoomPourAjuster } from "../lib/bureau/zoomDuBureau";
+import { estModeDeZoom, zoomPourAjuster, zoomPourLignes } from "../lib/bureau/zoomDuBureau";
 import type { ModeDeZoom } from "../lib/bureau/zoomDuBureau";
 
 /** Le padding vertical du conteneur qui défile (`p-3`) : il ne reçoit pas de pièce. */
 const PADDING_VERTICAL = 24;
 
+interface OptionsDuZoom {
+  /** La clé de mémorisation : chaque vue garde son zoom. */
+  cle?: string;
+  /**
+   * Le nombre de lignes (`[data-ligne-du-zoom]`) que le zoom par défaut fait tenir
+   * exactement dans la hauteur ; sans lui, le zoom par défaut est 100 %.
+   */
+  lignes?: number;
+}
+
+/** La hauteur, depuis le haut du contenu, jusqu'au bas de sa `n`-ième ligne (la dernière s'il en a moins). */
+function hauteurDesLignes(contenu: HTMLElement, n: number): number {
+  const lignes = [...contenu.querySelectorAll<HTMLElement>("[data-ligne-du-zoom]")];
+  const derniere = lignes[Math.min(n, lignes.length) - 1];
+  if (!derniere) return contenu.getBoundingClientRect().height;
+  return derniere.getBoundingClientRect().bottom - contenu.getBoundingClientRect().top;
+}
+
 /**
- * Le zoom du Bureau et ce qu'il faut pour le mesurer — ticket-657. Le mode est
- * mémorisé ; « ajusté » se recalcule quand la vue ou son contenu change de taille.
+ * Le zoom d'une vue de sprites et ce qu'il faut pour le mesurer — ticket-657,
+ * ticket-727. Le mode est mémorisé ; « ajusté » fait tenir tout le contenu, « lignes »
+ * ses premières lignes, et l'un comme l'autre se recalcule quand la vue ou son
+ * contenu change de taille.
  */
-export function useZoomDuBureau() {
-  const [mode, setMode] = useEtatPersistant<ModeDeZoom>(
-    "bureau.zoom",
-    1,
-    estModeDeZoom,
-  );
+export function useZoomDuBureau({ cle = "bureau.zoom.v2", lignes }: OptionsDuZoom = {}) {
+  const defaut: ModeDeZoom = lignes ? "lignes" : 1;
+  const [mode, setMode] = useEtatPersistant<ModeDeZoom>(cle, defaut, estModeDeZoom);
   const conteneur = useRef<HTMLDivElement>(null);
   const contenu = useRef<HTMLDivElement>(null);
-  const [ajuste, setAjuste] = useState(1);
+  const [mesure, setMesure] = useState(1);
 
   useLayoutEffect(() => {
-    if (mode !== "ajuste") return;
+    if (mode !== "ajuste" && mode !== "lignes") return;
     const boite = conteneur.current;
     const pieces = contenu.current;
     if (!boite || !pieces) return;
     const mesurer = () => {
       // La hauteur rendue tient compte du zoom courant : divisée par lui, c'est la hauteur naturelle.
       const zoomCourant = Number(pieces.dataset.zoom) || 1;
-      const naturelle = pieces.getBoundingClientRect().height / zoomCourant;
-      setAjuste(
-        zoomPourAjuster(boite.clientHeight - PADDING_VERTICAL, naturelle),
-      );
+      const dispo = boite.clientHeight - PADDING_VERTICAL;
+      if (mode === "lignes" && lignes) {
+        setMesure(zoomPourLignes(dispo, hauteurDesLignes(pieces, lignes) / zoomCourant));
+      } else {
+        setMesure(zoomPourAjuster(dispo, pieces.getBoundingClientRect().height / zoomCourant));
+      }
     };
     mesurer();
     if (typeof ResizeObserver === "undefined") return;
@@ -39,11 +58,12 @@ export function useZoomDuBureau() {
     observateur.observe(boite);
     observateur.observe(pieces);
     return () => observateur.disconnect();
-  }, [mode]);
+  }, [mode, lignes]);
 
   return {
     mode,
-    zoom: mode === "ajuste" ? ajuste : mode,
+    defaut,
+    zoom: typeof mode === "number" ? mode : mesure,
     setMode,
     conteneur,
     contenu,

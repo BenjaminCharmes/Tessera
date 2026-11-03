@@ -5,7 +5,7 @@
  * reste de l'app illisible. Le Bureau a donc son propre zoom : un pas fixe, ou
  * « ajusté » pour que toutes les pièces tiennent dans la hauteur disponible.
  */
-export type ModeDeZoom = number | "ajuste";
+export type ModeDeZoom = number | "ajuste" | "lignes";
 
 export const ZOOM_MIN = 0.4;
 export const ZOOM_MAX = 1.25;
@@ -36,8 +36,18 @@ export function zoomPourAjuster(
   );
 }
 
+/**
+ * Le zoom qui fait tenir exactement les premières lignes de la vue (de hauteur
+ * naturelle `hauteurDesLignes`) dans `hauteurDispo` : il peut grossir comme réduire,
+ * dans les bornes du zoom (ticket-727). Une mesure nulle laisse le zoom à 1.
+ */
+export function zoomPourLignes(hauteurDispo: number, hauteurDesLignes: number): number {
+  if (hauteurDispo <= 0 || hauteurDesLignes <= 0) return 1;
+  return borne(Math.floor((hauteurDispo / hauteurDesLignes) * 100) / 100);
+}
+
 export function estModeDeZoom(v: unknown): v is ModeDeZoom {
   return (
-    v === "ajuste" || (typeof v === "number" && v >= ZOOM_MIN && v <= ZOOM_MAX)
+    v === "ajuste" || v === "lignes" || (typeof v === "number" && v >= ZOOM_MIN && v <= ZOOM_MAX)
   );
 }

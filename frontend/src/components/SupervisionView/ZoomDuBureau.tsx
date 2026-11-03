@@ -7,21 +7,26 @@ interface CommandesDeZoomProps {
   mode: ModeDeZoom;
   zoom: number;
   setMode: (mode: ModeDeZoom) => void;
+  /** Le mode auquel « Ajuster » revient quand on le relâche (ticket-727). */
+  defaut?: ModeDeZoom;
+  /** Ce que le zoom agrandit : le Bureau, ou les salles des serveurs. */
+  vue?: string;
 }
 
-/** − / pourcentage / + / Ajuster, dans l'en-tête de la Supervision. */
-export function CommandesDeZoom({ mode, zoom, setMode }: CommandesDeZoomProps) {
+/** − / pourcentage / + / Ajuster, dans l'en-tête de la Supervision ou d'« En cours ». */
+export function CommandesDeZoom({ mode, zoom, setMode, defaut = 1, vue = "le Bureau" }: CommandesDeZoomProps) {
   const ajuste = mode === "ajuste";
+  const nom = vue.replace(/^(le|les) /, "");
   return (
     <div
       role="group"
-      aria-label="Zoom du Bureau"
+      aria-label={`Zoom ${vue === "le Bureau" ? "du Bureau" : `des ${nom}`}`}
       className="flex items-center gap-1"
     >
       <Button
         taille="compact"
         variante="discret"
-        aria-label="Dézoomer le Bureau"
+        aria-label={`Dézoomer ${vue}`}
         onClick={() => setMode(zoomVoisin(zoom, -1))}
       >
         <IconMinus size={12} />
@@ -32,7 +37,7 @@ export function CommandesDeZoom({ mode, zoom, setMode }: CommandesDeZoomProps) {
       <Button
         taille="compact"
         variante="discret"
-        aria-label="Zoomer le Bureau"
+        aria-label={`Zoomer ${vue}`}
         onClick={() => setMode(zoomVoisin(zoom, 1))}
       >
         <IconPlus size={12} />
@@ -42,7 +47,7 @@ export function CommandesDeZoom({ mode, zoom, setMode }: CommandesDeZoomProps) {
         variante={ajuste ? "plein" : "discret"}
         aria-pressed={ajuste}
         title="Faire tenir toutes les pièces dans la hauteur de l'écran"
-        onClick={() => setMode(ajuste ? 1 : "ajuste")}
+        onClick={() => setMode(ajuste ? defaut : "ajuste")}
       >
         Ajuster
       </Button>
