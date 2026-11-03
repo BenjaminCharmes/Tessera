@@ -4,7 +4,7 @@ created: 2026-11-03
 depends_on: []
 estimated_days: 1
 id: ticket-747
-pr_number: null
+pr_number: 862
 priority: high
 status: done
 title: Protected names are compared after Windows name normalization
