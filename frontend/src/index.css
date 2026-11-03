@@ -77,8 +77,6 @@
   --sprite-plante: #16a34a;
   --sprite-plante-ombre: #15803d;
   --sprite-pot: #92400e;
-  --sprite-sol: #2a2420;
-  --sprite-sol-joint: #211c18;
   --sprite-porte: #6b5038;
   --sprite-porte-ombre: #4a3626;
   --sprite-vapeur: #d4d4d8;
@@ -109,10 +107,8 @@
   --sprite-halo-coeur: rgb(253 224 71);
   --sprite-voile: rgb(9 9 20 / 0.28);
   --sprite-cadre-dore: #ca8a04;
-  /* Le mur du fond et sa plinthe, les nuages, le voile d'une nuit sans lumière
+  /* Les nuages, le voile d'une nuit sans lumière
      et l'interrupteur (ticket-609) : des fonds de sprite. */
-  --sprite-mur: #3a3430;
-  --sprite-plinthe: #1c1917;
   --sprite-nuage: #f4f4f5;
   --sprite-voile-sombre: rgb(9 9 20 / 0.55);
   --sprite-interrupteur: #d4d4d8;
@@ -169,15 +165,10 @@
   --sprite-console-touche: #a1a1aa;
 }
 
-/* Sol en lames des pièces et des salles : des lames horizontales séparées d'un
-   joint. Du mobilier au sens de l'ADR-058 : fixe, sans animation. */
+/* Sol en lames des pièces et des salles : le parquet est une tuile (`Tuile`,
+   ticket-727) ; la couleur de base ne sert qu'avant sa première peinture. */
 .sol-lames {
-  background-color: var(--sprite-sol);
-  background-image: repeating-linear-gradient(
-    0deg,
-    transparent 0 11px,
-    var(--sprite-sol-joint) 11px 12px
-  );
+  background-color: var(--sprite-sol-b);
 }
 
 /* Animations du Bureau : `transform` et `opacity` seulement, pour rester sur le

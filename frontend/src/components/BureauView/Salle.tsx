@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import Agrandi from "../../design/bureau/Agrandi";
 import NightVeil from "../../design/bureau/NightVeil";
 import Plante from "../../design/bureau/Plante";
+import Tuile from "../../design/bureau/Tuile";
 import type { EspeceDePlante } from "../../design/bureau/Plante";
 import { IconInfo } from "../../design/icons";
 import { useLumiere } from "../../hooks/useLumiere";
@@ -65,9 +66,10 @@ export default function Salle({
       data-occupee={occupee}
       data-moment={moment}
       data-contour={ambre ? "amber" : "neutre"}
-      className={`relative flex min-w-0 flex-1 flex-col overflow-hidden rounded-lg border bg-(--sprite-mur) ${contour}`}
+      className={`relative flex min-w-0 flex-1 flex-col overflow-hidden rounded-lg border ${contour}`}
     >
-      <div className="flex items-start justify-between gap-2 px-3 pt-[5px]">
+      <Tuile motif="mur" moment={moment} />
+      <div className="relative flex items-start justify-between gap-2 px-3 pt-[5px]">
         <h3
           title={entete}
           className="flex items-center gap-1 text-micro uppercase tracking-wide text-zinc-400"
@@ -86,7 +88,7 @@ export default function Salle({
       </div>
       <div
         data-mur="salle"
-        className="flex flex-nowrap items-start justify-center gap-1.5 overflow-hidden border-b-4 border-(--sprite-plinthe) px-1.5 pt-3 pb-4 min-[1700px]:gap-3 min-[1700px]:px-3"
+        className="relative flex flex-nowrap items-start justify-center gap-1.5 overflow-hidden px-1.5 pt-3 pb-4 min-[1700px]:gap-3 min-[1700px]:px-3"
       >
         <MurLumineux
           moment={moment}
@@ -99,14 +101,18 @@ export default function Salle({
           accroche={accroche}
         />
       </div>
+      <div className="relative h-[10.5px] shrink-0" data-plinthe="salle">
+        <Tuile motif="plinthe" moment={moment} />
+      </div>
       {/* Le fond du sol ne sert à rien dans une salle : le mobilier s'y centre au lieu de laisser un vide sous le mur (ticket-627). */}
       <div
         data-sol="lames"
-        className="sol-lames flex flex-1 flex-col justify-center px-3"
+        className="sol-lames relative flex flex-1 flex-col justify-center px-3"
       >
+        <Tuile motif="sol" moment={moment} />
         {/* Regroupés au centre : répartis d'un bord à l'autre, ils laissaient de grands vides
             sur un écran large ou dézoomé (ticket-657). */}
-        <div className="flex min-h-28 items-end justify-center gap-10 px-1 py-2">
+        <div className="relative flex min-h-28 items-end justify-center gap-10 px-1 py-2">
           <div className="flex min-w-0 items-center gap-4">
             <div className="shrink-0">
               <Agrandi>{mobilier}</Agrandi>

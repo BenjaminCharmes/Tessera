@@ -60,7 +60,7 @@ describe("sprites sources", () => {
     const plante = SPRITES.find((s) => s.nom === "Plante.tsx")?.contenu ?? "";
 
     expect(plante).not.toMatch(/anim-/);
-    for (const jeton of ["plante", "plante-ombre", "pot", "sol", "sol-joint"]) {
+    for (const jeton of ["plante", "plante-ombre", "pot"]) {
       expect(CSS).toMatch(new RegExp(`--sprite-${jeton}:`));
     }
     expect(plante).toContain("--sprite-plante");

@@ -4,6 +4,7 @@ import { useApercuDuProjet } from "../../hooks/useApercuDesProjets";
 import type { MotifDeVisite } from "../../lib/bureau/ronde";
 import Gyrophare from "../../design/bureau/Gyrophare";
 import NightVeil from "../../design/bureau/NightVeil";
+import Tuile from "../../design/bureau/Tuile";
 import Pastille from "../../design/bureau/Pastille";
 import type { StreamState } from "../../hooks/streamState";
 import { useActivites } from "../../hooks/useActivites";
@@ -225,6 +226,7 @@ export default function Piece({
         </div>
       </div>
       <div data-sol="lames" className="sol-lames relative">
+        <Tuile motif="sol" moment={moment} />
         {/* Le repère de 800 px de la maquette, étiré sur la largeur de la pièce ; les sprites gardent leur taille. */}
         <SolEtire>
           <FondDeLaPiece

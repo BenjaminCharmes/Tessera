@@ -6,6 +6,7 @@ import Imprimante, { HAUTEUR_DU_MEUBLE } from "../../design/bureau/Imprimante";
 import MachineACafe from "../../design/bureau/MachineACafe";
 import Plante from "../../design/bureau/Plante";
 import Porte from "../../design/bureau/Porte";
+import Tuile from "../../design/bureau/Tuile";
 import Vapeur from "../../design/bureau/Vapeur";
 import type { StreamState } from "../../hooks/streamState";
 import { useEchelleDesSprites } from "../../hooks/useEchelleDesSprites";
@@ -100,10 +101,15 @@ export default function FondDeLaPiece({
   const ciels = cielDesFenetres(projet, FENETRES_X.length, maintenant);
   return (
     <div
-      className="relative h-36 border-b-4 border-(--sprite-plinthe) bg-(--sprite-mur)"
+      className="relative h-[154.5px]"
       data-fond="piece"
       data-mur="piece"
     >
+      {/* L'enduit et la plinthe (ticket-727) : les meubles se posent devant elle, sur le sol. */}
+      <Tuile motif="mur" moment={moment} />
+      <span className="absolute inset-x-0 bottom-0 h-[10.5px]" data-plinthe="piece">
+        <Tuile motif="plinthe" moment={moment} />
+      </span>
       <MurLumineux
         moment={moment}
         ciels={ciels}

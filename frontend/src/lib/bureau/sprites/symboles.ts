@@ -22,6 +22,8 @@ export interface ContenuDuSymbole {
   w: number;
   h: number;
   chemins: CheminDuSymbole[];
+  /** Une tuile répétée (sol, mur) : un `<pattern>` à cette taille, déclaré sous son moment. */
+  tuile?: { largeur: number; hauteur: number; moment: "jour" | "nuit" };
 }
 
 /** Une instance : le symbole qu'elle pose, sa classe d'animation et ses liaisons de couleur. */
