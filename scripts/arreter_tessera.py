@@ -123,7 +123,9 @@ def main(argv: Sequence[str], entree: IO[bytes], sortie: IO[str]) -> int:
     if len(argv) != 1:
         sys.stderr.write("usage: arreter_tessera.py <racine du depot>\n")
         return 2
-    processus, ecoutes = lire_entree(entree.read().decode("utf-8"))
+    # `utf-8-sig` : Windows PowerShell 5.1 préfixe le tube d'un BOM malgré un
+    # $OutputEncoding sans BOM ; sans BOM, le décodage est celui d'utf-8.
+    processus, ecoutes = lire_entree(entree.read().decode("utf-8-sig"))
     sortie.write(formater_sortie(select_processus_tessera(processus, argv[0], ecoutes)))
     return 0
 
