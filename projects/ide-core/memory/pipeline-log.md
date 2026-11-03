@@ -7194,3 +7194,20 @@ Le diff ajoute :
 - 2026-11-03 11:16:12 UTC — [ticket-732] validateur: APPROVED — All acceptance criteria are met. The implementation provides a robust merge-a-PR (86641ms)
 - 2026-11-03 11:16:12 UTC — [ticket-732] APPROVED après 1 tour(s)
 - 2026-11-03 11:20:19 UTC — [ticket-732] documentation: 0 fichier(s) (174110ms)
+- 2026-11-03 11:36:04 UTC — [ticket-732] livraison: arrêt — PR #841 non mergée : erreur inattendue : ConnectTimeout
+- 2026-11-03 11:36:04 UTC — [ide-core] ticket-733 sauté : dépend de ticket-732, non mergé
+- 2026-11-03 11:36:04 UTC — [ide-core] ticket-732 PR #841 confiée au CIWatcher
+- 2026-11-03 11:36:13 UTC — [ticket-736] branche ticket-736-a-queue-skips-a-ticket-already-finished-on-the-ba
+- 2026-11-03 11:36:15 UTC — [ticket-736] tour 1 — codeur démarré
+- 2026-11-03 11:43:17 UTC — [ticket-736] tour 1 — codeur terminé (421858ms)
+- 2026-11-03 11:52:16 UTC — [ticket-736] testeur: 2 failed, 1644 passed, 64 warnings in 528.19s (0:08:48)
+- 2026-11-03 11:52:16 UTC — [ticket-736] tests rouges au tour 1
+- 2026-11-03 11:52:16 UTC — [ticket-736] tour 2 — codeur démarré
+- 2026-11-03 11:53:25 UTC — [ticket-736] tour 2 — codeur terminé (68672ms)
+- 2026-11-03 12:02:36 UTC — [ticket-736] testeur: 1 failed, 2134 passed, 64 warnings in 546.94s (0:09:06)
+- 2026-11-03 12:02:36 UTC — [ticket-736] tests rouges au tour 2
+- 2026-11-03 12:02:36 UTC — [ticket-736] tour 3 — codeur démarré
+- 2026-11-03 12:03:36 UTC — [ticket-736] tour 3 — codeur terminé (60483ms)
+- 2026-11-03 12:13:56 UTC — [ticket-736] testeur: 1 failed, 4516 passed, 64 warnings in 615.75s (0:10:15)
+- 2026-11-03 12:13:56 UTC — [ticket-736] tests rouges au tour 3
+- 2026-11-03 12:13:56 UTC — [ticket-736] BLOCKED après 3 tour(s) sans approbation
