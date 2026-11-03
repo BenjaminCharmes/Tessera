@@ -12,11 +12,6 @@ Cette section n'est injectée dans aucun appel d'agent. Une règle nouvelle
 s'écrit ici, avec son ADR ; un humain l'accepte en la déplaçant dans sa
 section. (ADR-055)
 
-- **Une PR devenue conflictuelle ne se met à jour que par un merge de la base
-  dans sa tête poussée, sans push forcé.** Sa tête doit encore être `pushed_sha` ;
-  seuls des conflits de journaux résolus en union sont admis, sans agent.
-  (ADR-069, ADR-022, ADR-039)
-
 ## Git et périmètre d'écriture
 
 - **Un projet qui déclare `worktree` exécute chaque run dans son worktree,
@@ -93,6 +88,10 @@ section. (ADR-055)
   pour le projet soient mergées ou bloquées, dans une limite de temps.**
   Le rebase se fait ainsi sur une base qui les porte ; passé le délai, la
   livraison part comme avant. (ADR-065, ADR-051)
+- **Une PR devenue conflictuelle ne se met à jour que par un merge de la base
+  dans sa tête poussée, sans push forcé.** Sa tête doit encore être `pushed_sha` ;
+  seuls des conflits de journaux résolus en union sont admis, sans agent.
+  (ADR-069, ADR-022, ADR-039)
 
 ## Portes qui échouent fermées
 
