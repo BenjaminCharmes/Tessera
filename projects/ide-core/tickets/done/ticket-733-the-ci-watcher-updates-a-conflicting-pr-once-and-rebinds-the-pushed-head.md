@@ -1,12 +1,13 @@
 ---
-id: ticket-733
-title: "The CI watcher updates a conflicting PR once and rebinds the pushed head"
-type: feat
-status: todo
-priority: low
 agent: codeur
-depends_on: [ticket-732]
 created: 2026-11-02
+depends_on:
+- ticket-732
+id: ticket-733
+priority: low
+status: done
+title: The CI watcher updates a conflicting PR once and rebinds the pushed head
+type: feat
 ---
 
 # ticket-733 — Le watcher met à jour une PR conflictuelle, une fois, et relie la nouvelle tête

@@ -35,6 +35,29 @@ async def sha_pousse_du_ticket(
     return str(ligne[0]) if ligne else None
 
 
+async def noter_poussee_du_ticket(
+    db_path: Path | str, project_id: str, ticket_id: str, sha: str
+) -> None:
+    """Make `sha` the `pushed_sha` of the latest run of the ticket that has one.
+
+    Used when the watcher updates a conflicting PR (ticket-733): the head it
+    pushed becomes the commit the merge is bound to. Raises `LookupError` when
+    no run of the ticket carries a `pushed_sha`: nothing was written.
+    """
+    async with aiosqlite.connect(str(db_path)) as db:
+        curseur = await db.execute(
+            "UPDATE pipeline_runs SET pushed_sha=? WHERE rowid = ("
+            " SELECT rowid FROM pipeline_runs"
+            " WHERE project_id=? AND ticket_id=? AND pushed_sha IS NOT NULL"
+            " ORDER BY started_at DESC, rowid DESC LIMIT 1)",
+            (sha, project_id, ticket_id),
+        )
+        ecrites = curseur.rowcount
+        await db.commit()
+    if ecrites != 1:
+        raise LookupError(f"aucun run de {ticket_id} ne porte de pushed_sha")
+
+
 async def _ecrire(
     db_path: Path | str, colonne: str, run_id: str, sha: str
 ) -> None:

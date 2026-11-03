@@ -1,13 +1,14 @@
-"""Check that a PR head is still the pushed commit before merging — ticket-492.
+"""Le contrôle de tête d'une PR avant son merge, sorti de `ci_watcher.py` (ticket-733).
 
-Split out of ci_watcher (ticket-739) so the watcher stays under its length
-ceiling. `CIWatcher` calls `tete_changee` before each phase 2 attempt.
+La tête de la PR doit être le commit que le pipeline a poussé (ticket-492) ;
+GitHub peut montrer l'ancien quelques secondes après un push, d'où la fenêtre
+de relecture (ticket-527). Ces fonctions ne décident de rien d'autre : elles
+rendent la ligne d'arrêt, ou `None` quand la tête est la bonne.
 """
 import asyncio
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 
-from tessera.utils.exceptions import decrire_exception
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -46,7 +47,14 @@ class ControleTete:
     intervalle_s: float = _INTERVALLE_RELECTURE_TETE_S
 
 
-async def tete_changee(controle: ControleTete | None, pr_number: int) -> str | None:
+def decrire_exception(exc: BaseException) -> str:
+    """Name the exception type, then its text when it has one."""
+    texte = str(exc)
+    nom = type(exc).__name__
+    return f"{nom}: {texte}" if texte else nom
+
+
+async def verifier_tete(controle: ControleTete | None, pr_number: int) -> str | None:
     """The stop line when the PR head is not the pushed commit, else None.
 
     Fails closed (ADR-039): an unknown pushed commit, an unreadable head or
@@ -94,9 +102,7 @@ async def _lire_tete(
     return tete, None
 
 
-async def _tete_en_retard(
-    controle: ControleTete, pushed_sha: str, tete: str
-) -> bool:
+async def _tete_en_retard(controle: ControleTete, pushed_sha: str, tete: str) -> bool:
     """True when `tete` may just be behind `pushed_sha` and is worth re-reading.
 
     Fails towards waiting, never towards merging: an ancestry that cannot be
