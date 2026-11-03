@@ -27,12 +27,14 @@ import TableauDesCriteres from "./TableauDesCriteres";
  * Les abscisses du mur, dans le repère de 800 px, de gauche à droite : le tableau
  * blanc, deux fenêtres, le ficus, le meuble de l'imprimante et sa pile de dossiers,
  * la machine, la baie, le cactus, la troisième fenêtre, la boîte aux lettres,
- * l'interrupteur et la porte. Les plafonniers pendent entre elles, hors du gyrophare.
+ * l'interrupteur et la porte. Les plafonniers pendent au sixième, à la moitié et aux
+ * cinq sixièmes du mur, comme dans l'atelier (ticket-727).
  * L'abscisse du tableau vient de `activites.ts` : l'agent du plan s'y tient (ticket-623).
  */
 // Fenêtre, bibliothèque, fenêtre, à intervalles égaux entre le tableau et le ficus (ticket-627).
 const FENETRES_X = [134, 274, 616] as const;
-const PLAFONNIERS_X = [250, 432, 590] as const;
+// Les plafonniers au sixième, à la moitié et aux cinq sixièmes du mur, centrés (ticket-727).
+const PLAFONNIERS_X = [800 / 6, 400, (800 * 5) / 6] as const;
 const FICUS_X = 348;
 const IMPRIMANTE_X = 392;
 const BAIE_X = 528;
@@ -41,7 +43,8 @@ const CACTUS_X = 572;
 const INTERRUPTEUR_X = 727;
 // Au-dessus de la machine, où le mur est libre ; le cadre, à droite de la dernière fenêtre (ticket-635).
 const HORLOGE_X = 488;
-const CADRE_X = 684;
+// Le cadre, centré entre la dernière fenêtre et la porte (ticket-727).
+const CADRE_X = (616 + 738) / 2;
 // Au-dessus de la baie, à hauteur des fenêtres : sous une fenêtre, elle se lisait comme
 // un rebord ; entre le ficus et l'horloge, elle chevauchait l'imprimante et ses dossiers.
 const ETAGERE_X = BAIE_X;
@@ -129,7 +132,7 @@ export default function FondDeLaPiece({
           <Corbeille boules={boulesDeLaCorbeille(etat)} />
         </Agrandi>
       </Pose>
-      <Pose x={TABLEAU_X} bas="top-5">
+      <Pose x={TABLEAU_X} bas="top-6">
         <TableauDesCriteres
           projet={projet}
           etat={etat}

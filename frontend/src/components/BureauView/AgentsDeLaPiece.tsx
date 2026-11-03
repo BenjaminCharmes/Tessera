@@ -1,3 +1,4 @@
+import { type TransitionEvent, useState } from "react";
 import Agrandi from "../../design/bureau/Agrandi";
 import type { MotifDeVisite } from "../../lib/bureau/ronde";
 import AgentDebout from "../../design/bureau/AgentDebout";
@@ -58,6 +59,12 @@ function AgentMarcheur({ projet, id, agent, role, bavarde }: AgentMarcheurProps)
   // Les abscisses sont celles du repère de 800 px : étirées comme la grille des postes.
   const etirement = useEtirementDuSol();
   const marche = useMarcheActive();
+  // Il marche tant que sa translation dure : ni minuteur ni supposition, la transition le dit.
+  // Sous mouvement réduit, il n'y a pas de transition : il change de place sans marcher.
+  const [enMarche, setEnMarche] = useState(false);
+  const surTransition = (enCours: boolean) => (e: TransitionEvent<HTMLSpanElement>) => {
+    if (e.target === e.currentTarget && e.propertyName === "transform") setEnMarche(enCours);
+  };
   // Les décalages sont comptés pour l'échelle large : ils suivent l'échelle courante.
   const decalage = (agent.decalage * useEchelleDesSprites()) / ECHELLE_LARGE;
   const style = {
@@ -81,6 +88,10 @@ function AgentMarcheur({ projet, id, agent, role, bavarde }: AgentMarcheurProps)
       data-objet={rendSaCopie ? "feuille" : undefined}
       className={`${marche ? "marche " : ""}${agent.parti ? "" : "pointer-events-auto "}absolute left-0 z-10`}
       style={style}
+      data-marche={enMarche}
+      onTransitionRun={surTransition(true)}
+      onTransitionEnd={surTransition(false)}
+      onTransitionCancel={surTransition(false)}
       {...acces}
     >
       {bavarde && <Bavardage />}
@@ -91,6 +102,7 @@ function AgentMarcheur({ projet, id, agent, role, bavarde }: AgentMarcheurProps)
           brasLeves={agent.activite === "fete"}
           sansTasse={agent.activite === "pause"}
           feuille={rendSaCopie}
+          enMarche={enMarche}
         />
       </Agrandi>
     </span>

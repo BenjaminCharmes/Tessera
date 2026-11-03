@@ -60,7 +60,7 @@ export const MACHINE_X = 470;
 /** La bibliothèque, entre les deux premières fenêtres (ticket-627). */
 export const BIBLIOTHEQUE_X = 208;
 /** Le bord gauche du tableau blanc, au mur : l'agent du plan s'y tient. */
-export const TABLEAU_X = 30;
+export const TABLEAU_X = 14;
 /**
  * Le tableau fait 88 px × 1,5 × 1,15 d'écran ; l'agent, 63 px : pour le centrer
  * devant, son bord gauche se décale de la moitié de la différence.
