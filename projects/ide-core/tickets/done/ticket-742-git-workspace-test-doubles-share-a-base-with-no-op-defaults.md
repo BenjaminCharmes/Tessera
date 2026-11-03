@@ -1,14 +1,14 @@
 ---
-id: ticket-742
-title: "Git workspace test doubles share a base with no-op defaults"
-type: test
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-11-03
 depends_on: []
 estimated_days: 1
-created: 2026-11-03
+id: ticket-742
+pr_number: 853
+priority: medium
+status: done
+title: Git workspace test doubles share a base with no-op defaults
+type: test
 ---
 
 # ticket-742 — Les doubles du workspace git partagent une base aux défauts neutres

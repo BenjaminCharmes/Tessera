@@ -7259,3 +7259,15 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-03 14:34:03 UTC — [ticket-733] livraison: conflit résolu : backend/src/tessera/services/ci_watcher.py, backend/src/tessera/services/controle_tete.py, backend/tests/test_longueur_des_fichiers.py (0ms)
 - 2026-11-03 14:34:03 UTC — [ticket-733] livraison: tests relancés après rebase : rouges (FAILED tests/test_ci_watcher_reprise.py::test_network_error_then_open_pr_replays_phase_2_and_succeeds !!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!! !!!!!!!!!!!! xdist.dsession.Interrupted: stopping after 1 failures !!!!!!!!!!!! 1 failed, 2302 passed, 64 warnings in ) (978953ms)
 - 2026-11-03 14:34:03 UTC — [ticket-733] livraison: arrêt — Tests rouges après rebase sur develop : rien n'est poussé. La base a avancé pendant le run et le tra
+- 2026-11-03 15:38:07 UTC — [ticket-742] branche ticket-742-git-workspace-test-doubles-share-a-base-with-no-o
+- 2026-11-03 15:38:09 UTC — [ticket-742] tour 1 — codeur démarré
+- 2026-11-03 15:42:12 UTC — [ticket-742] tour 1 — codeur terminé (243468ms)
+- 2026-11-03 15:50:55 UTC — [ticket-742] testeur: OK (exit 0)
+- 2026-11-03 15:51:25 UTC — [ticket-742] securite: PASS — Le diff introduit une classe de base pour les doubles de test du `GitWorkspaceSe (30234ms)
+- 2026-11-03 15:51:25 UTC — [ticket-742] tour 1 — reviewer démarré
+- 2026-11-03 15:51:55 UTC — [ticket-742] tour 1 — reviewer terminé (29891ms)
+- 2026-11-03 15:56:26 UTC — [ticket-742] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-03 15:56:50 UTC — [ticket-742] validateur: fichiers cités joints : backend/tests/doubles_git.py, services/orchestrator.py, backend/src/ (dossier, 0 fichiers)
+- 2026-11-03 15:56:50 UTC — [ticket-742] validateur: APPROVED — La classe de base `GitWorkspaceDouble` est créée avec toutes les méthodes asynch (325062ms)
+- 2026-11-03 15:56:50 UTC — [ticket-742] APPROVED après 1 tour(s)
+- 2026-11-03 15:58:16 UTC — [ticket-742] documentation: 0 fichier(s) (80092ms)

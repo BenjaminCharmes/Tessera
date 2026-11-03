@@ -15,6 +15,7 @@ from tessera.services import pipeline_outcomes as outcomes
 from tessera.services.git_workspace import GitCommandError, GitWorkspaceService
 from tessera.services.pipeline_events import OrchestratorEvent
 from tessera.services.pipeline_run import PipelineRun
+from tests.doubles_git import GitWorkspaceDouble
 
 
 async def _git(cwd: Path, *args: str) -> None:
@@ -62,7 +63,7 @@ class _Tickets:
         self._journal.append(f"statut:{status.value}")
 
 
-class _Git:
+class _Git(GitWorkspaceDouble):
     def __init__(self, journal: list[str]) -> None:
         self._journal = journal
 

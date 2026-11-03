@@ -6,6 +6,7 @@ from tessera.services import pipeline_outcomes as outcomes
 from tessera.services.git_workspace import GitCommandError
 from tessera.services.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.pipeline_run import PipelineRun
+from tests.doubles_git import GitWorkspaceDouble
 
 
 def _ticket() -> Ticket:
@@ -16,7 +17,7 @@ def _ticket() -> Ticket:
     )
 
 
-class _Git:
+class _Git(GitWorkspaceDouble):
     def __init__(self, sha: str | None = "abc1234", erreur: bool = False) -> None:
         self._sha, self._erreur = sha, erreur
         self.base_avancee = False

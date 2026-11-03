@@ -22,6 +22,7 @@ from tessera.services.agent_runner import AgentRunner
 from tessera.services.database import init_db
 from tessera.services.orchestrator import Orchestrator
 from tessera.services.run_recorder import RunRecorder
+from tests.doubles_git import GitWorkspaceDouble
 
 
 def _ticket(tid: str) -> Ticket:
@@ -48,18 +49,7 @@ class _Tickets:
         return [t for t in self._tickets.values() if status is None or t.status is status]
 
 
-class _Git:
-    async def commit_bookkeeping(self) -> None:
-        pass
-
-    async def is_clean(self) -> bool:
-        return True
-
-    async def initialiser_base_ref(
-        self, base_branch: str | None = None, *, exiger_distant: bool = False
-    ) -> str | None:
-        return None
-
+class _Git(GitWorkspaceDouble):
     async def create_branch(self, ticket_id: str, slug: str) -> str:
         return f"{ticket_id}-slug"
 
@@ -71,9 +61,6 @@ class _Git:
 
     async def commit_all(self, message: str) -> str | None:
         return "abc1234"
-
-    async def advance_base_ref(self) -> None:
-        return None
 
 
 def _orchestrateur(tmp_path: Path, db_path: Path, tickets: _Tickets) -> Orchestrator:

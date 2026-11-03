@@ -24,6 +24,7 @@ from tessera.services.run_dans_worktree import adopter_la_branche
 from tessera.services.run_worktree import RunWorktree
 from tessera.services.test_runner import EtapeTest, TestResult
 from tessera.services.worktree_politique import lire_worktree
+from tests.doubles_git import GitWorkspaceDouble
 
 _DEPOT = Path("/depot")
 _WT = RunWorktree(racine=Path("/wt/demo/ticket-1"), projet=Path("/wt/demo/ticket-1"), branche="b")
@@ -152,15 +153,16 @@ def _orchestrateur(
     lignes = [] if lignes is None else lignes
     commits = [] if commits is None else commits
 
-    async def adopter(branche: str, _base: str) -> str:
-        journal.append("branche")
-        return branche
+    class _Git(GitWorkspaceDouble):
+        async def adopter_worktree(self, branche: str, base_branch: str) -> str:
+            journal.append("branche")
+            return branche
 
-    async def commit_all(message: str) -> str:
-        if commit_en_echec:
-            raise GitWorkspaceError("index.lock")
-        commits.append(message)
-        return "abc1234"
+        async def commit_all(self, message: str) -> str:
+            if commit_en_echec:
+                raise GitWorkspaceError("index.lock")
+            commits.append(message)
+            return "abc1234"
 
     async def preparer() -> ResultatPreparation:
         journal.append("setup")
@@ -168,7 +170,7 @@ def _orchestrateur(
 
     orch = SimpleNamespace(
         _worktree=_WT,
-        _git_workspace=SimpleNamespace(adopter_worktree=adopter, commit_all=commit_all),
+        _git_workspace=_Git(),
         _base_branch="develop", _chemins_absents=(), _log=lignes.append,
         _preparation=preparer, _ticket_svc=tickets,
     )

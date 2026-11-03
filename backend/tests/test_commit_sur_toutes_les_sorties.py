@@ -11,6 +11,7 @@ from tessera.services import pipeline_outcomes as outcomes
 from tessera.services.git_workspace import GitCommandError
 from tessera.services.pipeline_events import EventType, OrchestratorEvent, PipelineResult
 from tessera.services.pipeline_run import PipelineRun
+from tests.doubles_git import GitWorkspaceDouble
 
 
 def _ticket(tid: str = "ticket-001") -> Ticket:
@@ -21,7 +22,7 @@ def _ticket(tid: str = "ticket-001") -> Ticket:
     )
 
 
-class _GitQuiEchoue:
+class _GitQuiEchoue(GitWorkspaceDouble):
     async def commit_all(self, message: str) -> str | None:
         raise GitCommandError(command=["git", "commit"], returncode=1, stderr="index.lock")
 
