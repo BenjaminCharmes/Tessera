@@ -4,7 +4,7 @@ created: 2026-11-03
 depends_on: []
 estimated_days: 1
 id: ticket-748
-pr_number: null
+pr_number: 863
 priority: high
 status: done
 title: The test configuration gate knows every configuration file and wants a full
