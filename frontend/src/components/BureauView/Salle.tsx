@@ -90,11 +90,11 @@ export default function Salle({
         </h3>
         {/* Ce que dit la salle vide, en face de son nom : le sol reste au mobilier. */}
         {occupee ? (
-          <ul className="flex min-w-0 flex-col items-end gap-0.5 text-micro">
+          <ul className="flex min-w-0 flex-1 flex-col gap-0.5 overflow-hidden text-right text-micro">
             {textes}
           </ul>
         ) : (
-          <p className="truncate text-micro text-zinc-500">{vide}</p>
+          <p className="min-w-0 flex-1 truncate text-right text-micro text-zinc-500">{vide}</p>
         )}
       </div>
       <div

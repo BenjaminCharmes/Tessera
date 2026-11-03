@@ -23,6 +23,15 @@ describe("echellePourLargeur", () => {
   });
 });
 
+describe("narrow screens", () => {
+  it("shrinks the sprites enough at 1280 px for the four top rooms to hold their wall and floor", () => {
+    // À 0,9, la fenêtre, l'interrupteur et le canapé sortaient des salles du haut (ticket-727).
+    expect(echellePourLargeur(1280)).toBeLessThanOrEqual(0.7);
+    expect(echellePourLargeur(1536)).toBe(0.95);
+    expect(echellePourLargeur(1920)).toBeGreaterThan(echellePourLargeur(1536));
+  });
+});
+
 describe("ECHELLE_DU_MOBILIER", () => {
   it("draws furniture a fifth larger than the characters", () => {
     expect(ECHELLE_DU_MOBILIER).toBeGreaterThanOrEqual(1.2);
