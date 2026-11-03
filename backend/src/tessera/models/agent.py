@@ -128,6 +128,10 @@ class AgentResult(BaseModel):
     # La sortie validée par le schéma posé à l'appel (ADR-061) ; None sans
     # schéma, ou quand le provider n'a rendu aucune sortie valide.
     structured: dict[str, Any] | None = None
+    # Les actions consommées et l'épuisement de la limite (ticket-702), remontés
+    # du provider pour que l'étape du codeur les journalise.
+    num_turns: int | None = None
+    max_turns_reached: bool = False
 
 
 class AgentRunRequest(BaseModel):

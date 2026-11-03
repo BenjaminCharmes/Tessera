@@ -34,6 +34,11 @@ class ProviderResult:
     # aucun schéma n'a été posé, ou que le provider n'a pas rendu de sortie
     # valide : `content` garde le texte dans tous les cas.
     structured: dict[str, Any] | None = None
+    # Le nombre d'actions que l'appel a consommées, et si la limite
+    # (`llm_max_turns`) l'a arrêté (ticket-702). Seul le SDK les rapporte ;
+    # les autres providers gardent les défauts.
+    num_turns: int | None = None
+    max_turns_reached: bool = False
 
 
 @runtime_checkable

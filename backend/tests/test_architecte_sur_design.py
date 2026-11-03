@@ -67,6 +67,8 @@ async def _lance(
             suggested_status = None
             session_id = None
             outils_refuses: list[str] = []
+            num_turns = None
+            max_turns_reached = False
 
         return _R()
 

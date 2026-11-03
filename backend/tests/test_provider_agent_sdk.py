@@ -20,8 +20,8 @@ from tessera.services.providers.agent_sdk import (
     ClaudeAgentSDKProvider,
     _build_options,
     _extract_stream_delta,
-    _usage_from,
 )
+from tessera.services.providers.messages_sdk import _usage_from
 from tessera.services.providers.noms import ProviderIndisponible
 
 
@@ -211,6 +211,53 @@ async def test_complete_retourne_un_provider_result_correct(
     assert outcome.cache_creation_tokens == 40
     assert outcome.cost_usd == 0.42
     assert outcome.provider_name == "agent_sdk"
+
+
+def _result_with_subtype(subtype: str, *, is_error: bool, num_turns: int) -> ResultMessage:
+    return ResultMessage(
+        subtype=subtype, duration_ms=1, duration_api_ms=1, is_error=is_error,
+        num_turns=num_turns, session_id="sess-1", total_cost_usd=None, usage=None,
+    )
+
+
+async def test_complete_reports_turns_exhausted_on_error_max_turns(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _patch_query(
+        monkeypatch,
+        [_result_with_subtype("error_max_turns", is_error=True, num_turns=30)],
+    )
+
+    outcome = await ClaudeAgentSDKProvider().complete(
+        system="sys", user="user", model="claude-sonnet-4-6", max_tokens=100
+    )
+
+    assert outcome.num_turns == 30
+    assert outcome.max_turns_reached is True
+
+
+async def test_complete_reports_no_exhaustion_on_success(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _patch_query(
+        monkeypatch,
+        [_result_with_subtype("success", is_error=False, num_turns=7)],
+    )
+
+    outcome = await ClaudeAgentSDKProvider().complete(
+        system="sys", user="user", model="claude-sonnet-4-6", max_tokens=100
+    )
+
+    assert outcome.num_turns == 7
+    assert outcome.max_turns_reached is False
+
+
+def test_provider_result_defaults_leave_turns_unreported() -> None:
+    from tessera.services.providers.base import ProviderResult
+
+    result = ProviderResult(content="x")
+    assert result.num_turns is None
+    assert result.max_turns_reached is False
 
 
 async def test_complete_ne_declenche_aucun_callback(

@@ -1,5 +1,7 @@
 from typing import Any
 
+from tessera.services.providers.base import ProviderResult
+
 
 def _extract_stream_delta(event: dict[str, Any]) -> str | None:
     """Extracts incremental text from a raw Anthropic ``stream_event`` payload.
@@ -35,6 +37,17 @@ def _usage_from(result: Any) -> tuple[int, int, int, int]:
     )
 
 
+def _num_turns_from(result: Any) -> int | None:
+    """Extracts the number of turns a ResultMessage reports, or ``None``."""
+    turns = getattr(result, "num_turns", None)
+    return turns if isinstance(turns, int) and not isinstance(turns, bool) else None
+
+
+def _max_turns_reached_from(result: Any) -> bool:
+    """True when the SDK stopped on the turn limit (``error_max_turns``)."""
+    return getattr(result, "subtype", None) == "error_max_turns"
+
+
 #: Le nom de l'outil interne par lequel le CLI rend la sortie structurée : il
 #: n'est pas un outil de l'agent et ne part pas dans `on_tool_use`.
 OUTIL_SORTIE_STRUCTUREE = "StructuredOutput"
@@ -51,6 +64,27 @@ def _structured_from(result: Any) -> dict[str, Any] | None:
         return None
     sortie = getattr(result, "structured_output", None)
     return sortie if isinstance(sortie, dict) else None
+
+
+def provider_result_du_sdk(
+    result: Any, content: str, provider_name: str, outils_refuses: list[str]
+) -> ProviderResult:
+    """Builds the ProviderResult of an Agent SDK call from its ResultMessage."""
+    inp, out, cache_read, cache_creation = _usage_from(result)
+    return ProviderResult(
+        content=content,
+        input_tokens=inp,
+        output_tokens=out,
+        cache_read_tokens=cache_read,
+        cache_creation_tokens=cache_creation,
+        cost_usd=result.total_cost_usd,
+        provider_name=provider_name,
+        session_id=getattr(result, "session_id", None) or None,
+        outils_refuses=outils_refuses,
+        structured=_structured_from(result),
+        num_turns=_num_turns_from(result),
+        max_turns_reached=_max_turns_reached_from(result),
+    )
 
 
 def _format_de_sortie(schema: dict[str, Any] | None) -> dict[str, Any] | None:

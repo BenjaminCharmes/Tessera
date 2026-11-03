@@ -68,8 +68,7 @@ from tessera.services.providers.messages_sdk import (
     OUTIL_SORTIE_STRUCTUREE,
     _extract_stream_delta,
     _format_de_sortie,
-    _structured_from,
-    _usage_from,
+    provider_result_du_sdk,
 )
 from tessera.services.providers.noms import ProviderIndisponible
 from tessera.services.providers.prompt_fichier import prompt_systeme_pour_sdk
@@ -448,16 +447,6 @@ class ClaudeAgentSDKProvider:
         if result is None:
             raise RuntimeError("Agent SDK: aucun ResultMessage reçu")
 
-        inp, out, cache_read, cache_creation = _usage_from(result)
-        return ProviderResult(
-            content="".join(chunks),
-            input_tokens=inp,
-            output_tokens=out,
-            cache_read_tokens=cache_read,
-            cache_creation_tokens=cache_creation,
-            cost_usd=result.total_cost_usd,
-            provider_name=self.name,
-            session_id=getattr(result, "session_id", None) or None,
-            outils_refuses=refus_cli.outils_refuses,
-            structured=_structured_from(result),
+        return provider_result_du_sdk(
+            result, "".join(chunks), self.name, refus_cli.outils_refuses
         )
