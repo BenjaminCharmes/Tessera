@@ -1,11 +1,12 @@
 ---
-id: ticket-702
-title: "The codeur's exhausted turns are recorded and journalised"
-type: feat
-status: todo
-priority: low
 agent: codeur
 created: 2026-10-30
+id: ticket-702
+pr_number: 838
+priority: low
+status: done
+title: The codeur's exhausted turns are recorded and journalised
+type: feat
 ---
 
 # ticket-702 — L'épuisement des actions du codeur se journalise

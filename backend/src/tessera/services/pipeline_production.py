@@ -7,7 +7,8 @@ Also holds what every stage reads to build its context.
 from collections.abc import Awaitable, Callable
 from typing import TYPE_CHECKING, Any, Optional
 
-from tessera.models.agent import AgentRole
+from tessera.config import settings
+from tessera.models.agent import AgentResult, AgentRole
 from tessera.models.ticket import TicketStatus, TicketType
 from tessera.services.artifact_snapshot import diff_artifacts, snapshot_artifacts
 from tessera.services.git_workspace import GitWorkspaceError
@@ -102,6 +103,23 @@ def journaliser_refus_cli(
         orch._log(f"[{ticket_id}] {role.value}: outil {nom} refusé par le CLI")
 
 
+def journaliser_actions_epuisees(
+    orch: "Orchestrator", run: PipelineRun, result: AgentResult
+) -> None:
+    """Writes one journal line when the turn ended on the action limit (ticket-702).
+
+    Le travail partiel part aux tests comme un travail fini : sans cette ligne,
+    rien ne disait combien d'appels s'arrêtent sur `llm_max_turns`. Aucun refus,
+    aucun repli : la ligne ne fait que compter.
+    """
+    if not result.max_turns_reached:
+        return
+    orch._log(
+        f"[{run.ticket_id}] tour {run.round_num} — codeur : actions épuisées "
+        f"({result.num_turns}/{settings.llm_max_turns})"
+    )
+
+
 async def run_coder(orch: "Orchestrator", run: PipelineRun, context: str) -> None:
     """Run the coder, then capture what it actually wrote to disk."""
     # Un ticket `design` ne demande pas du code mais une décision, et
@@ -183,6 +201,7 @@ async def run_coder(orch: "Orchestrator", run: PipelineRun, context: str) -> Non
     if codeur_result.session_id is not None:
         run.session_codeur = codeur_result.session_id
     journaliser_refus_cli(orch, ticket_id, role, codeur_result.outils_refuses)
+    journaliser_actions_epuisees(orch, run, codeur_result)
     orch.record_spend(codeur_result.cost_usd)
     await run.on_event(
         OrchestratorEvent(
@@ -195,6 +214,8 @@ async def run_coder(orch: "Orchestrator", run: PipelineRun, context: str) -> Non
                 "content": codeur_result.content,
                 "cost_usd": codeur_result.cost_usd,
                 "duration_ms": codeur_result.duration_ms,
+                "turns": codeur_result.num_turns,
+                "turns_exhausted": codeur_result.max_turns_reached,
             },
         )
     )

@@ -201,6 +201,8 @@ class AgentRunner:
             session_id=provider_result.session_id,
             outils_refuses=list(provider_result.outils_refuses),
             structured=provider_result.structured,
+            num_turns=provider_result.num_turns,
+            max_turns_reached=provider_result.max_turns_reached,
         )
 
     def _provider_pour(self, role: str) -> LLMProvider:
