@@ -7212,3 +7212,22 @@ Le diff ajoute :
 - 2026-11-03 12:13:56 UTC — [ticket-736] tests rouges au tour 3
 - 2026-11-03 12:13:56 UTC — [ticket-736] BLOCKED après 3 tour(s) sans approbation
 - 2026-11-03 12:14:01 UTC — [ide-core] file interrompue : ticket-736 non approuvé
+- 2026-11-03 12:31:44 UTC — [ticket-739] branche ticket-739-a-delivery-cut-by-a-network-error-is-retried-once
+- 2026-11-03 12:31:44 UTC — [ticket-739] base non réalignée — fetch origin develop échoué : From https://github.com/BenjaminCharmes/Tessera
+ * branch              develop    -> FETCH_HEAD
+   18d77ecf..be6b8bc5  develop    -> origin/develop
+error: fetching ref refs/remotes/origin/develop failed: incorrect old value provided
+- 2026-11-03 12:31:45 UTC — [ticket-739] tour 1 — codeur démarré
+- 2026-11-03 12:34:11 UTC — [ticket-739] tour 1 — codeur terminé (146000ms)
+- 2026-11-03 12:44:56 UTC — [ticket-739] testeur: 1 failed, 3485 passed, 64 warnings in 639.54s (0:10:39)
+- 2026-11-03 12:44:56 UTC — [ticket-739] tests rouges au tour 1
+- 2026-11-03 12:44:56 UTC — [ticket-739] tour 2 — codeur démarré
+- 2026-11-03 12:48:42 UTC — [ticket-739] tour 2 — codeur terminé (225562ms)
+- 2026-11-03 13:01:04 UTC — [ticket-739] testeur: OK (exit 0)
+- 2026-11-03 13:03:35 UTC — [ticket-739] securite: PASS — Refactorisation sécurisée du CIWatcher avec extraction de code et ajout de retry (151218ms)
+- 2026-11-03 13:03:35 UTC — [ticket-739] tour 2 — reviewer démarré
+- 2026-11-03 13:03:35 UTC — [ticket-739] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-11-03 13:03:51 UTC — [ticket-739] tour 2 — reviewer terminé (15968ms)
+- 2026-11-03 13:04:10 UTC — [ticket-739] validateur: APPROVED — Le ticket-739 implémente correctement la reprise unique de la phase 2 après une  (34546ms)
+- 2026-11-03 13:04:10 UTC — [ticket-739] APPROVED après 2 tour(s)
+- 2026-11-03 13:07:35 UTC — [ticket-739] documentation: 0 fichier(s) (200125ms) — après tour de correction

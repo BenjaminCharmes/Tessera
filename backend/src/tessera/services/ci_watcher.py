@@ -24,17 +24,26 @@ before the answer was lost.  When the caller provides `etat_pr`, the watcher
 re-reads the PR first; a merged PR is a success, logged as such.  Every failure
 message names the exception type, even when its text is empty.
 
+Retry (ticket-739): when the re-read PR is not merged, phase 2 is replayed once,
+inside the time left of `timeout_phase2_s`, and the pipeline log says so. A
+second network error, or any other exception, is a failure as before.
+
 Shutdown: call arreter() to cancel all running tasks without raising exceptions.
 """
 import asyncio
 from collections.abc import Awaitable, Callable
-from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
 import httpx
 
 from tessera.models.ticket import TicketStatus
+from tessera.services.controle_tete import (
+    ControleTete as ControleTete,
+    EstAncetre as EstAncetre,
+    TetePr as TetePr,
+    tete_changee,
+)
 from tessera.services.livraison import Livraison
 from tessera.services.pipeline_events import EventCallback, EventType, OrchestratorEvent
 from tessera.services.realignement_base import Realignement, realigner_base
@@ -49,40 +58,6 @@ _TIMEOUT_PHASE2_S = 1200.0
 
 #: Relit l'état d'une PR : « open », « closed », « merged » ou « unknown ».
 EtatPr = Callable[[int], Awaitable[str]]
-
-#: Relit le SHA de tête d'une PR ; `None` quand il ne peut pas être connu.
-TetePr = Callable[[int], Awaitable[str | None]]
-
-
-#: Dit si le premier SHA est un ancêtre du second : `True`, `False`, ou `None`
-#: quand l'ascendance ne peut pas se vérifier (commit inconnu localement…).
-EstAncetre = Callable[[str, str], Awaitable[bool | None]]
-
-#: Fenêtre de relecture par défaut : 4 relectures espacées de 15 s, soit
-#: 5 lectures sur 60 s en comptant la première (ticket-527).
-_RELECTURES_TETE = 4
-_INTERVALLE_RELECTURE_TETE_S = 15.0
-
-
-@dataclass(frozen=True)
-class ControleTete:
-    """What the watcher checks before merging: the PR head is the pushed commit.
-
-    `pushed_sha` is `None` when the delivery could not record it — the watcher
-    then refuses to merge (ticket-492).
-
-    GitHub may still show the previous commit a few seconds after a push. When
-    the head read is an ancestor of `pushed_sha` — or when that cannot be
-    checked — the head is read again up to `relectures` times, `intervalle_s`
-    apart, before the merge is refused (ticket-527). A head that is not an
-    ancestor refuses at once.
-    """
-
-    pushed_sha: str | None
-    lire_tete: TetePr
-    est_ancetre: EstAncetre | None = None
-    relectures: int = _RELECTURES_TETE
-    intervalle_s: float = _INTERVALLE_RELECTURE_TETE_S
 
 
 def decrire_exception(exc: BaseException) -> str:
@@ -236,43 +211,10 @@ class CIWatcher:
         sem = self._semaphore_du_projet(project_id)
         try:
             async with sem:
-                arret_erreur: str | None = None
-                try:
-                    await asyncio.wait_for(
-                        self._livrer_et_emettre(
-                            project_id, ticket_id, pr_number, livraison_phase_2,
-                            on_event, pipeline_log_path, controle_tete,
-                        ),
-                        timeout=self._timeout_phase2_s,
-                    )
-                except asyncio.TimeoutError:
-                    arret_erreur = f"délai dépassé ({self._timeout_phase2_s:.0f}s)"
-                    _logger.warning(
-                        "ci_watcher_timeout",
-                        extra={"project": project_id, "ticket": ticket_id},
-                    )
-                except httpx.TransportError as exc:
-                    # Une réponse perdue ne dit pas que l'action a échoué : on
-                    # relit la PR avant de conclure (ticket-405).
-                    if await self._pr_mergee(etat_pr, pr_number):
-                        await self._succes_malgre_erreur_reseau(
-                            project_id, ticket_id, pr_number, exc, on_event,
-                            pipeline_log_path,
-                        )
-                    else:
-                        arret_erreur = (
-                            f"erreur inattendue : {decrire_exception(exc)}"
-                        )
-                        _logger.exception(
-                            "ci_watcher_error",
-                            extra={"project": project_id, "ticket": ticket_id},
-                        )
-                except Exception as exc:  # noqa: BLE001
-                    arret_erreur = f"erreur inattendue : {decrire_exception(exc)}"
-                    _logger.exception(
-                        "ci_watcher_error",
-                        extra={"project": project_id, "ticket": ticket_id},
-                    )
+                arret_erreur = await self._phase_2_bornee(
+                    project_id, ticket_id, pr_number, livraison_phase_2,
+                    on_event, pipeline_log_path, etat_pr, controle_tete,
+                )
                 if arret_erreur is not None:
                     await self._emettre_echec(
                         project_id, ticket_id, pr_number, arret_erreur, on_event,
@@ -297,6 +239,84 @@ class CIWatcher:
             evt = self._events_merge.pop(cle, None)
             if evt is not None:
                 evt.set()
+
+    async def _phase_2_bornee(
+        self,
+        project_id: str,
+        ticket_id: str,
+        pr_number: int,
+        livraison_phase_2: Callable[[int], Awaitable[Livraison]],
+        on_event: EventCallback,
+        pipeline_log_path: Path | None,
+        etat_pr: EtatPr | None,
+        controle_tete: ControleTete | None,
+    ) -> str | None:
+        """Run phase 2 within its bound; the failure line, or None when settled.
+
+        A network error on a PR still not merged replays phase 2 once, inside
+        the time left of the same bound (ticket-739). Replaying is safe: phase 2
+        reads the CI again, refuses a head that is no longer `pushed_sha`, and
+        the merge is tied to `pushed_sha` (ADR-039).
+        """
+        loop = asyncio.get_running_loop()
+        fin = loop.time() + self._timeout_phase2_s
+        reprise_faite = False
+        while True:
+            try:
+                await asyncio.wait_for(
+                    self._livrer_et_emettre(
+                        project_id, ticket_id, pr_number, livraison_phase_2,
+                        on_event, pipeline_log_path, controle_tete,
+                    ),
+                    timeout=max(fin - loop.time(), 0.0),
+                )
+                return None
+            except asyncio.TimeoutError:
+                _logger.warning(
+                    "ci_watcher_timeout",
+                    extra={"project": project_id, "ticket": ticket_id},
+                )
+                return f"délai dépassé ({self._timeout_phase2_s:.0f}s)"
+            except httpx.TransportError as exc:
+                # Une réponse perdue ne dit pas que l'action a échoué : on
+                # relit la PR avant de conclure (ticket-405).
+                if await self._pr_mergee(etat_pr, pr_number):
+                    await self._succes_malgre_erreur_reseau(
+                        project_id, ticket_id, pr_number, exc, on_event,
+                        pipeline_log_path,
+                    )
+                    return None
+                if reprise_faite:
+                    return self._arret_erreur(project_id, ticket_id, exc)
+                reprise_faite = True
+                self._noter_reprise(pipeline_log_path, ticket_id, pr_number, exc)
+            except Exception as exc:  # noqa: BLE001
+                return self._arret_erreur(project_id, ticket_id, exc)
+
+    def _arret_erreur(
+        self, project_id: str, ticket_id: str, exc: BaseException
+    ) -> str:
+        """Log the exception being handled and return its stop line."""
+        _logger.exception(
+            "ci_watcher_error",
+            extra={"project": project_id, "ticket": ticket_id},
+        )
+        return f"erreur inattendue : {decrire_exception(exc)}"
+
+    def _noter_reprise(
+        self,
+        pipeline_log_path: Path | None,
+        ticket_id: str,
+        pr_number: int,
+        exc: BaseException,
+    ) -> None:
+        """Say in the pipeline log that phase 2 is replayed, and why."""
+        self._ecrire_ligne_log(
+            pipeline_log_path,
+            ticket_id,
+            f"livraison: nouvelle tentative de la PR #{pr_number} après une "
+            f"erreur réseau ({decrire_exception(exc)}), PR non mergée",
+        )
 
     async def _emettre_echec(
         self,
@@ -347,7 +367,7 @@ class CIWatcher:
         pipeline_log_path: Path | None,
         controle_tete: ControleTete | None = None,
     ) -> None:
-        arret_tete = await self._tete_changee(controle_tete, pr_number)
+        arret_tete = await tete_changee(controle_tete, pr_number)
         if arret_tete is not None:
             # La branche a bougé depuis le push : ce qui serait mergé n'est pas
             # ce que le reviewer a lu. La PR reste ouverte (ticket-492).
@@ -393,81 +413,6 @@ class CIWatcher:
             await self._emettre_succes(
                 project_id, ticket_id, pr_number, on_event, pipeline_log_path
             )
-
-    async def _tete_changee(
-        self, controle: ControleTete | None, pr_number: int
-    ) -> str | None:
-        """The stop line when the PR head is not the pushed commit, else None.
-
-        Fails closed (ADR-039): an unknown pushed commit, an unreadable head or
-        a missing one all refuse the merge.
-        """
-        if controle is None:
-            return None
-        if controle.pushed_sha is None:
-            return (
-                f"commit poussé inconnu : la PR #{pr_number} n'est pas mergée, "
-                "elle reste ouverte"
-            )
-        tete, arret = await self._lire_tete(controle, pr_number)
-        if tete is None:
-            return arret
-        if tete == controle.pushed_sha:
-            return None
-        if not await self._tete_en_retard(controle, controle.pushed_sha, tete):
-            return self._arret_tete_changee(pr_number, tete, controle.pushed_sha)
-        # Une tête en retard n'est pas une tête changée : GitHub rattrape le
-        # push. On relit sur la fenêtre, sans jamais merger une autre tête.
-        for _ in range(controle.relectures):
-            await asyncio.sleep(controle.intervalle_s)
-            tete, arret = await self._lire_tete(controle, pr_number)
-            if tete is None:
-                return arret
-            if tete == controle.pushed_sha:
-                return None
-        return self._arret_tete_changee(pr_number, tete, controle.pushed_sha)
-
-    async def _lire_tete(
-        self, controle: ControleTete, pr_number: int
-    ) -> tuple[str | None, str | None]:
-        """Read the PR head: `(sha, None)`, or `(None, stop line)` when unknown."""
-        try:
-            tete = await controle.lire_tete(pr_number)
-        except Exception as exc:  # noqa: BLE001 — une tête illisible refuse le merge
-            return None, (
-                f"tête de la PR #{pr_number} illisible "
-                f"({decrire_exception(exc)}) : elle reste ouverte"
-            )
-        if tete is None:
-            return None, f"tête de la PR #{pr_number} inconnue : elle reste ouverte"
-        return tete, None
-
-    async def _tete_en_retard(
-        self, controle: ControleTete, pushed_sha: str, tete: str
-    ) -> bool:
-        """True when `tete` may just be behind `pushed_sha` and is worth re-reading.
-
-        Fails towards waiting, never towards merging: an ancestry that cannot be
-        checked only delays the refusal (ADR-039).
-        """
-        if controle.est_ancetre is None:
-            return True
-        try:
-            ancetre = await controle.est_ancetre(tete, pushed_sha)
-        except Exception as exc:  # noqa: BLE001 — ascendance invérifiable : on relit
-            _logger.warning(
-                "ci_watcher_ascendance_illisible",
-                extra={"erreur": decrire_exception(exc)},
-            )
-            return True
-        return ancetre is None or ancetre
-
-    def _arret_tete_changee(self, pr_number: int, tete: str, pushed_sha: str) -> str:
-        return (
-            f"la tête de la PR #{pr_number} n'est plus le commit poussé : "
-            f"{tete[:7]} au lieu de {pushed_sha[:7]}. "
-            "La PR reste ouverte."
-        )
 
     async def _emettre_succes(
         self,

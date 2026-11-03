@@ -1,14 +1,14 @@
 ---
-id: ticket-739
-title: "A delivery cut by a network error is retried once"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-11-03
 depends_on: []
 estimated_days: 1
-created: 2026-11-03
+id: ticket-739
+pr_number: 844
+priority: medium
+status: done
+title: A delivery cut by a network error is retried once
+type: fix
 ---
 
 # ticket-739 — Une livraison coupée par une erreur réseau est retentée une fois
