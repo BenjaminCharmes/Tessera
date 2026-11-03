@@ -7270,3 +7270,4 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-03 15:56:50 UTC — [ticket-742] validateur: fichiers cités joints : backend/tests/doubles_git.py, services/orchestrator.py, backend/src/ (dossier, 0 fichiers)
 - 2026-11-03 15:56:50 UTC — [ticket-742] validateur: APPROVED — La classe de base `GitWorkspaceDouble` est créée avec toutes les méthodes asynch (325062ms)
 - 2026-11-03 15:56:50 UTC — [ticket-742] APPROVED après 1 tour(s)
+- 2026-11-03 15:58:16 UTC — [ticket-742] documentation: 0 fichier(s) (80092ms)
