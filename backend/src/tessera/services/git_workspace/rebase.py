@@ -138,6 +138,20 @@ class GitRebase(GitConflictsRegles):
         self.regles_appliquees = appliquees
         return ()
 
+    async def remettre_sur(self, sha: str) -> None:
+        """Put the branch back on *sha*, the head it had before a rebase (ticket-740).
+
+        Built on the recovery used for an aborted rebase, which only logs a
+        failed reset: the head is read back, and a branch that did not move
+        raises, so the caller can say so instead of claiming a restoration.
+        """
+        await self._restaurer_depuis_sha(sha)
+        courant = (await self._run("rev-parse", "HEAD")).strip()
+        if courant != sha:
+            raise GitCommandError(
+                ["reset", "--hard", sha], 1, f"la tête est restée sur {courant[:7]}"
+            )
+
     async def _ref_existe(self, ref: str) -> bool:
         """La ref est-elle résolvable ici ?
 
