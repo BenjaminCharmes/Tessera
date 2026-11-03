@@ -160,8 +160,11 @@ export function boite(etat: EtatBoite): Sprite {
   return cuire(s);
 }
 
-/** Le gyrophare, 20 × 16 : dôme strié et éclats en tons d'état (blocage), qui clignotent ; socle fixe. */
-export function gyrophare(): Sprite {
+/**
+ * Le gyrophare, 20 × 16 : dôme strié et éclats en tons d'état (blocage), qui clignotent ;
+ * socle fixe. Suspendu, il pend tête en bas sous le plafonnier, son socle vissé au-dessus.
+ */
+export function gyrophare(suspendu = false): Sprite {
   const s = sprite(20, 16);
   const L = E("blocage");
   const M = R("metal");
@@ -188,7 +191,14 @@ export function gyrophare(): Sprite {
   g.rect(4, 15, 13, 1, M.d);
   g.px(5, 13, M.d);
   g.px(14, 13, M.d);
+  if (suspendu) for (const { g: c } of s.calques) retourner(c);
   return cuire(s);
+}
+
+/** Retourne une grille de haut en bas, avant la cuisson : le liseré reste en haut à gauche. */
+function retourner(g: Grille): void {
+  const lignes = Array.from({ length: g.h }, (_, y) => g.p.slice(y * g.w, (y + 1) * g.w));
+  lignes.reverse().forEach((ligne, y) => ligne.forEach((c, x) => (g.p[y * g.w + x] = c)));
 }
 
 const VOLUTE = ["..h.", ".h..", ".b..", ".bb.", "..bb", "..bb", ".bb.", ".bs.", "bs.."];

@@ -39,6 +39,15 @@ describe("run room objects", () => {
     expect(etats(s).every((t) => t.startsWith("etat-blocage"))).toBe(true);
   });
 
+  it("hangs the beacon upside down under its lamp: base on top, dome below", () => {
+    const rangees = (s: ReturnType<typeof gyrophare>, prefixe: string) =>
+      s.calques.flatMap(({ g }) => g.p.flatMap((c, i) => (c?.startsWith(prefixe) ? [Math.floor(i / g.w)] : [])));
+    const debout = gyrophare();
+    const suspendu = gyrophare(true);
+    expect(Math.min(...rangees(debout, "etat-"))).toBeLessThan(Math.min(...rangees(debout, "metal")));
+    expect(Math.min(...rangees(suspendu, "metal"))).toBeLessThan(Math.min(...rangees(suspendu, "etat-")));
+  });
+
   it("lifts three plumes of steam, each at its own pace", () => {
     const s = vapeur();
     expect(classes(s)).toEqual(["anim-vapeur", "anim-vapeur", "anim-vapeur"]);
