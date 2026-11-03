@@ -46,14 +46,16 @@ tourne en parallèle.
 
 ## Critères d'acceptation
 
-- [ ] Un module `frontend/src/lib/bureau/sprites/` porte le moteur, testé : un sprite
+- [x] Un module `frontend/src/lib/bureau/sprites/` porte le moteur, testé : un sprite
       donne un chemin par jeton, et le contour sélectif ne touche pas un jeton `etat-*`
-- [ ] Les couleurs des sprites viennent de jetons `--sprite-*` définis dans
-      `frontend/src/index.css`, redéfinis pour la nuit
-- [ ] Les états (voyants, écrans) gardent les teintes d'ADR-026, jour comme nuit
-- [ ] `sources.test.ts` vérifie le nouveau jeu de sprites
-- [ ] Une ADR au prochain numéro libre de `memory/decisions.md` décrit le moteur et
-      l'assouplissement cosmétique d'ADR-058, avec sa règle sous `## Proposées` de
+- [x] Les couleurs des sprites viennent de jetons `--sprite-*` de
+      `frontend/src/design/bureau/sprites-theme.css`, importé par `index.css`,
+      redéfinis pour la nuit
+- [x] Les états (voyants, écrans) gardent les teintes d'ADR-026, jour comme nuit
+- [x] `sources.test.ts` vérifie le nouveau jeu de sprites
+- [x] Une ADR au prochain numéro libre de `memory/decisions.md` (ADR-070) décrit le
+      moteur et l'assouplissement cosmétique d'ADR-058 ; sa règle, acceptée par
+      Benjamin le 03/11, remplace celle d'ADR-058 dans `## Interface et design` de
       `contraintes.md`
 - [ ] Benjamin a validé le rendu sur 5175 (captures 1920 et 1536)
 
