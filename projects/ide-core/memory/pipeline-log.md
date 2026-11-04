@@ -7445,3 +7445,14 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-04 10:25:18 UTC — [ticket-752] validateur: APPROVED — Les trois critères d'acceptation ont été implémentés avec succès. Le code détect (137422ms)
 - 2026-11-04 10:25:18 UTC — [ticket-752] APPROVED après 1 tour(s)
 - 2026-11-04 10:26:28 UTC — [ticket-752] documentation: 0 fichier(s) (63546ms)
+- 2026-11-04 11:17:47 UTC — [ticket-754] branche ticket-754-the-observation-socket-trusts-only-declared-origi
+- 2026-11-04 11:17:48 UTC — [ticket-754] tour 1 — codeur démarré
+- 2026-11-04 11:19:11 UTC — [ticket-754] tour 1 — codeur terminé (83266ms)
+- 2026-11-04 11:32:20 UTC — [ticket-754] testeur: OK (exit 0)
+- 2026-11-04 11:34:13 UTC — [ticket-754] securite: PASS — Le diff introduit un contrôle d'origine strict pour les WebSockets, une améliora (113750ms)
+- 2026-11-04 11:34:13 UTC — [ticket-754] tour 1 — reviewer démarré
+- 2026-11-04 11:34:29 UTC — [ticket-754] tour 1 — reviewer terminé (15781ms)
+- 2026-11-04 11:37:23 UTC — [ticket-754] validateur: fichiers cités joints : docs/configuration.md
+- 2026-11-04 11:37:23 UTC — [ticket-754] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits : un test vérifie le refus des o (188921ms)
+- 2026-11-04 11:37:23 UTC — [ticket-754] APPROVED après 1 tour(s)
+- 2026-11-04 11:38:54 UTC — [ticket-754] documentation: 0 fichier(s) (84265ms)

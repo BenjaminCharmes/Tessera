@@ -1,14 +1,14 @@
 ---
-id: ticket-754
-title: "The observation socket trusts only declared origins, not every loopback port"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-11-03
 depends_on: []
 estimated_days: 1
-created: 2026-11-03
+id: ticket-754
+pr_number: 881
+priority: medium
+status: done
+title: The observation socket trusts only declared origins, not every loopback port
+type: fix
 ---
 
 # ticket-754 — La socket d'observation ne fait confiance qu'aux origines déclarées
