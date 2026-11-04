@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import { IconBell } from "../../design/icons";
+import ReglageNotifications, { type ReglageDesNotifications } from "./ReglageNotifications";
 import type { DonneesDeLaCloche } from "../../hooks/useNotificationsSysteme";
 import { PanneauAujourdhui, PanneauReglagesDesTypes } from "./ContenuDeLaCloche";
 import { useFermetureAuDehors } from "./useFermetureAuDehors";
@@ -19,7 +20,13 @@ const ONGLETS: { id: Onglet; label: string }[] = [
   { id: "reglages", label: "Réglages" },
 ];
 
-export default function Cloche({ cloche }: { cloche: DonneesDeLaCloche }) {
+interface ClocheProps {
+  cloche: DonneesDeLaCloche;
+  /** L'interrupteur global des notifications système, en tête des réglages (ticket-779). */
+  notifications?: ReglageDesNotifications;
+}
+
+export default function Cloche({ cloche, notifications }: ClocheProps) {
   const [ouvert, setOuvert] = useState(false);
   const [onglet, setOnglet] = useState<Onglet>("aujourdhui");
   const fermer = useCallback(() => setOuvert(false), []);
@@ -91,7 +98,16 @@ export default function Cloche({ cloche }: { cloche: DonneesDeLaCloche }) {
               }}
             />
           ) : (
-            <PanneauReglagesDesTypes reglages={cloche.reglages} setReglage={cloche.setReglage} />
+            <>
+              {notifications ? (
+                <ReglageNotifications
+                  active={notifications.active}
+                  etat={notifications.etat}
+                  onChange={notifications.onChange}
+                />
+              ) : null}
+              <PanneauReglagesDesTypes reglages={cloche.reglages} setReglage={cloche.setReglage} />
+            </>
           )}
         </div>
       ) : null}

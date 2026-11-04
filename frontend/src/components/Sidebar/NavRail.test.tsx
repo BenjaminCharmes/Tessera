@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { api } from "../../lib/api";
 import NavRail from "./NavRail";
 import type { ReglageDesNotifications } from "./ReglageNotifications";
 import type { SidebarPanel } from "./panels";
@@ -213,82 +212,55 @@ describe("NavRail", () => {
   });
 });
 
-describe("NavRail — le bouton Réglages (ticket-441)", () => {
+describe("NavRail — la cloche porte aussi le réglage global des notifications (ticket-779)", () => {
   const notifications: ReglageDesNotifications = {
     active: true,
     etat: "bloquees",
     onChange: () => {},
   };
+  const cloche: DonneesDeLaCloche = {
+    historique: [],
+    nonLus: 0,
+    toutMarquerLu: vi.fn(),
+    reglages: reglagesParDefaut(),
+    setReglage: vi.fn(),
+    ouvrir: vi.fn(),
+  };
 
   beforeEach(() => {
     vi.restoreAllMocks();
-    vi.spyOn(api.orchestrator, "limits").mockResolvedValue({
-      run_max_budget_usd: 1.5,
-      llm_max_budget_usd: 0,
-    });
   });
 
-  function rendre() {
-    render(
-      <NavRail
-        activePanel="projects"
-        onChangePanel={() => {}}
-        notifications={notifications}
-      />,
-    );
-  }
+  it("offers no separate Réglages button any more", () => {
+    render(<NavRail activePanel="projects" onChangePanel={() => {}} notifications={notifications} cloche={cloche} />);
 
-  it("offers a Réglages button, outside the tab list", () => {
-    rendre();
-
-    const bouton = screen.getByRole("button", { name: "Réglages" });
-    expect(bouton).toBeInTheDocument();
-    expect(bouton).toHaveAttribute("aria-expanded", "false");
+    expect(screen.queryByRole("button", { name: "Réglages" })).not.toBeInTheDocument();
     expect(screen.getAllByRole("tab")).toHaveLength(9);
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
-  it("opens the panel holding the notification setting and the spending caps", async () => {
-    rendre();
+  it("shows the global switch at the top of the bell's Réglages tab", async () => {
+    render(<NavRail activePanel="projects" onChangePanel={() => {}} notifications={notifications} cloche={cloche} />);
 
-    await userEvent.click(screen.getByRole("button", { name: "Réglages" }));
+    await userEvent.click(screen.getByRole("button", { name: "Notifications" }));
+    await userEvent.click(screen.getByRole("tab", { name: "Réglages" }));
 
-    const panneau = screen.getByRole("dialog", { name: "Réglages" });
-    expect(
-      within(panneau).getByLabelText("Notifications système"),
-    ).toBeInTheDocument();
+    const panneau = screen.getByRole("dialog", { name: "Notifications" });
+    expect(within(panneau).getByLabelText("Notifications système")).toBeInTheDocument();
     expect(within(panneau).getByText(/bloquées par le navigateur/)).toBeInTheDocument();
-    expect(await within(panneau).findByText("$1.50")).toBeInTheDocument();
   });
 
-  it("closes the panel on Escape", async () => {
-    rendre();
-    await userEvent.click(screen.getByRole("button", { name: "Réglages" }));
-
-    await userEvent.keyboard("{Escape}");
-
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-  });
-
-  it("closes the panel on a click outside", async () => {
-    rendre();
-    await userEvent.click(screen.getByRole("button", { name: "Réglages" }));
-
-    await userEvent.click(screen.getByRole("tab", { name: /Agents/ }));
-
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-  });
-
-  it("relays a change of the notification setting", async () => {
+  it("relays a change of the global switch from the bell", async () => {
     const onChange = vi.fn();
     render(
       <NavRail
         activePanel="projects"
         onChangePanel={() => {}}
         notifications={{ ...notifications, etat: "actives", onChange }}
+        cloche={cloche}
       />,
     );
-    await userEvent.click(screen.getByRole("button", { name: "Réglages" }));
+    await userEvent.click(screen.getByRole("button", { name: "Notifications" }));
+    await userEvent.click(screen.getByRole("tab", { name: "Réglages" }));
 
     await userEvent.click(screen.getByLabelText("Notifications système"));
 
