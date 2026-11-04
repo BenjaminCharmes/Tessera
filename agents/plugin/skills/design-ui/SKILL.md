@@ -105,8 +105,41 @@ séparer des groupes, pas à remplir l'écran. Règle de décision : si tu peux
 montrer deux fois plus d'éléments sans écraser le texte, l'espacement est
 trop généreux.
 
-## 7. Relecture avant de rendre
+## 7. Mouvement et micro-interactions
+
+Une animation a une raison qu'on peut nommer : retour d'une action, continuité
+d'un déplacement, changement d'état. Sans raison, pas d'animation.
+
+- **Selon la fréquence** : une action répétée cent fois par jour (raccourci
+  clavier, palette de commandes) ne s'anime jamais ; un survol ou une navigation
+  dans une liste, à peine ; une modale ou un tiroir, normalement. Une donnée
+  qu'on lit ne bouge pas pour le style.
+- **Ce qui s'anime** : `transform` et `opacity`, jamais `width`, `height`,
+  `margin` ni `padding` (sauf la hauteur d'un accordéon). Jamais
+  `transition: all` : nommer les propriétés. Jamais `scale(0)` : partir de
+  `scale(0.95)` avec `opacity: 0`.
+- **Courbes** : `ease-out` pour entrer ou sortir, `ease-in-out` pour un
+  déplacement à l'écran, jamais `ease-in` sur l'interface. Un menu, une bulle ou
+  une liste déroulante s'ouvre depuis son déclencheur (`transform-origin`) ; une
+  modale, depuis le centre.
+- **Durées** : appui 100–160 ms, bulle 125–200 ms, liste déroulante
+  150–250 ms, modale ou tiroir 200–300 ms. Au-delà de 300 ms, l'interface paraît
+  lente. Un décalage entre éléments d'une liste : 30–80 ms, sans jamais bloquer
+  l'interaction.
+- **Interruption** : ce qui se déclenche vite (notification, interrupteur)
+  passe par une `transition`, qui repart de l'état courant, pas par une
+  animation `@keyframes`, qui repart de zéro. Interrompue, une animation laisse
+  l'état final, le focus et le contenu justes.
+- **Retour d'appui** : `scale(0.97)` sur `:active`. Les effets de survol se
+  réservent aux pointeurs précis (`@media (hover: hover) and (pointer: fine)`) :
+  un écran tactile déclenche un faux survol au toucher.
+- **Mouvement réduit** : livré avec l'animation, dans le même changement.
+  `prefers-reduced-motion` veut dire moins et plus doux, pas rien : garder les
+  fondus d'opacité et de couleur, retirer les déplacements.
+
+## 8. Relecture avant de rendre
 
 Relis chaque écran touché comme un audit : pour chaque élément, nomme la
 donnée qu'il affiche ou l'action qu'il déclenche. Un élément sans réponse est
-décoratif : retire-le. Repasse ensuite la liste du §4, point par point.
+décoratif : retire-le. Repasse ensuite la liste du §4, point par point, puis
+celle du §7 pour chaque animation.
