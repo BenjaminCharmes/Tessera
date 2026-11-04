@@ -4,7 +4,7 @@ created: 2026-11-03
 depends_on: []
 estimated_days: 1
 id: ticket-759
-pr_number: null
+pr_number: 866
 priority: high
 status: done
 title: An unreadable agents.json is never rewritten, and a BOM is read
