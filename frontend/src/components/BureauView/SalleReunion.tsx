@@ -63,17 +63,34 @@ export default function SalleReunion({
         </li>
       ))}
     >
-      {/* Le résolveur ne se dessine que pendant la résolution : la PR à relire n'est plus son travail (ADR-033). */}
+      {/* Pendant la résolution, le reviewer rejoint le résolveur à la table ; ensuite le résolveur
+          attend, la PR en main, la relecture humaine qu'aucun merge seul ne remplace (ADR-033, ticket-784). */}
       {occupants.flatMap(({ projet, reunion }) =>
         reunion.temps === "conflit"
           ? [
-              <li key={projet} data-agent="resolveur" title={visiteur(projet, "resolveur", nomDuPoste("resolveur"))}>
+              <li key={`${projet}-resolveur`} data-agent="resolveur" title={visiteur(projet, "resolveur", nomDuPoste("resolveur"))}>
                 <Agrandi>
                   <AgentDebout projet={projet} role="resolveur" />
                 </Agrandi>
               </li>,
+              <li key={`${projet}-reviewer`} data-agent="reviewer" title={visiteur(projet, "reviewer", nomDuPoste("reviewer"))}>
+                <Agrandi>
+                  <AgentDebout projet={projet} role="reviewer" />
+                </Agrandi>
+              </li>,
             ]
-          : [],
+          : [
+              <li
+                key={`${projet}-resolveur`}
+                data-agent="resolveur"
+                data-objet="pr"
+                title={`${visiteur(projet, "resolveur", nomDuPoste("resolveur"))} — PR #${reunion.pr} à relire`}
+              >
+                <Agrandi>
+                  <AgentDebout projet={projet} role="resolveur" feuille sansTasse />
+                </Agrandi>
+              </li>,
+            ],
       )}
     </Salle>
   );
