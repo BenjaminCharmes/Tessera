@@ -4,7 +4,7 @@ created: 2026-11-03
 depends_on: []
 estimated_days: 1
 id: ticket-766
-pr_number: null
+pr_number: 892
 priority: medium
 status: done
 title: The Tessera server room shows only what it knows
