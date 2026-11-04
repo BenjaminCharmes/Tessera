@@ -13,6 +13,7 @@ from tessera.services.documentation_base import EditionRefusee
 from tessera.services.documentation_code import DiffDeTicket, MatiereCode
 from tessera.services.documentation_description import (
     LONGUEUR_MAX,
+    appliquer_description,
     ecrire_description,
     remplacer_description,
 )
@@ -133,6 +134,27 @@ def test_description_in_an_unreadable_manifest_is_refused(tmp_path: Path, conten
         ecrire_description(manifeste, _proposition(), _controle())
 
     assert manifeste.read_text(encoding="utf-8") == contenu
+
+
+def test_applying_a_description_to_a_latin_1_manifest_refuses_without_raising(
+    tmp_path: Path,
+) -> None:
+    manifeste = tmp_path / "agents.json"
+    avant = '{"description": "café"}'.encode("latin-1")
+    manifeste.write_bytes(avant)
+    matiere = MatiereCode(
+        diffs=[DiffDeTicket("ticket-001", "diff --git a/src/m.py b/src/m.py\n+def decrire(x):\n", ["src/m.py"])],
+        fichiers=[],
+        sans_diff=[],
+    )
+
+    ecrits, refus = appliquer_description(
+        manifeste, {"description": _proposition()}, matiere, "", "doc-technique"
+    )
+
+    assert ecrits == []
+    assert len(refus) == 1 and "description refusée" in refus[0]
+    assert manifeste.read_bytes() == avant
 
 
 def test_description_of_a_missing_manifest_is_refused(tmp_path: Path) -> None:

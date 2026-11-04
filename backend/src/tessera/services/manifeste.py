@@ -56,7 +56,7 @@ def lire_fichier(chemin: Path) -> dict[str, object]:
     if not chemin.is_file():
         return {}
     try:
-        data = json.loads(chemin.read_text(encoding="utf-8"))
+        data = json.loads(chemin.read_text(encoding="utf-8-sig"))
     except (json.JSONDecodeError, UnicodeDecodeError, OSError) as exc:
         _signaler(chemin, type(exc).__name__)
         return {}
@@ -116,11 +116,12 @@ def lire_pour_modifier(project_path: Path) -> dict[str, object]:
     """The whole manifest, for a caller that will rewrite it.
 
     Unlike the other readers it refuses to guess: a missing file raises
-    `FileNotFoundError`, invalid JSON or a non-object raises `ValueError`.
-    Rewriting from `{}` after a failed read would erase the manifest.
+    `FileNotFoundError`; invalid JSON, a non-UTF-8 file or a non-object raises
+    `ValueError`. Rewriting from `{}` after a failed read would erase the
+    manifest. A leading UTF-8 BOM is accepted, as by `lire_fichier`.
     """
     chemin = chemin_manifeste(project_path)
-    data = json.loads(chemin.read_text(encoding="utf-8"))
+    data = json.loads(chemin.read_text(encoding="utf-8-sig"))
     if not isinstance(data, dict):
         raise ValueError(f"{chemin.name} is not a JSON object")
     return data
@@ -148,12 +149,13 @@ def ecrire_clef(
 
     `retirer` names obsolete keys to drop in the same write. Read-modify-write
     under a process lock, replaced atomically so that a concurrent reader never
-    sees a half-written file. A manifest that cannot be read starts again from
-    an empty one (and is logged), as before.
+    sees a half-written file. A missing manifest is created with that key alone;
+    one that exists but cannot be read (invalid JSON, not UTF-8, not an object)
+    raises `ValueError` and is left untouched, byte for byte.
     """
     chemin = chemin_manifeste(project_path)
     with _verrou_ecriture:
-        data = lire_fichier(chemin)
+        data = lire_pour_modifier(project_path) if chemin.exists() else {}
         for ancienne in retirer:
             data.pop(ancienne, None)
         data[clef] = valeur
