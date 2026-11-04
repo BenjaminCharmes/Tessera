@@ -6,6 +6,7 @@ frontend de Tessera. Les images vont dans le dossier d'état de l'IDE, hors du
 dépôt du projet (ADR-021) : une capture n'a pas à finir dans un commit.
 """
 import asyncio
+import ipaddress
 import json
 import re
 from collections.abc import Awaitable, Callable
@@ -92,8 +93,24 @@ async def app_repond(url: str) -> bool:
     return True
 
 
+def url_locale(url: str) -> bool:
+    """Return True when the URL targets this machine (localhost or a loopback IP)."""
+    try:
+        hote = urlsplit(url).hostname
+    except ValueError:
+        return False
+    if not hote:
+        return False
+    if hote.lower() == "localhost":
+        return True
+    try:
+        return ipaddress.ip_address(hote).is_loopback
+    except ValueError:
+        return False
+
+
 def _charge(config: ConfigCaptures, jeton: str | None) -> bytes:
-    """Build the JSON sent on stdin ; the token travels only here."""
+    """Build the JSON sent on stdin ; the token travels only here, to a local URL."""
     charge: dict[str, object] = {
         "url": config.url,
         "largeurs": list(config.largeurs),
@@ -102,7 +119,7 @@ def _charge(config: ConfigCaptures, jeton: str | None) -> bytes:
             {"nom": e.nom, "chemin": e.chemin, "clic": e.clic} for e in config.ecrans
         ],
     }
-    if config.session is not None and jeton:
+    if config.session is not None and jeton and url_locale(config.url):
         charge["session"] = {"chemin": config.session.chemin, "jeton": jeton}
     return json.dumps(charge).encode("utf-8")
 
@@ -150,8 +167,13 @@ async def capturer(
     """Capture every declared screen and return the image names, in order.
 
     `jeton` is handed to the executor only ; it is never logged or returned.
+    It is withheld when the declared URL is not local (ticket-753).
     `ticket` sends the images to the run's own sub-folder.
     """
+    if jeton and not url_locale(config.url):
+        # Un agents.json importé ne doit pas faire sortir le jeton de la machine.
+        _logger.warning("jeton_retenu_url_etrangere", extra={"projet": project_id})
+        jeton = None
     sortie = dossier_des_captures(project_id, ticket)
     sortie.mkdir(parents=True, exist_ok=True)
     attendus = noms_attendus(config)
