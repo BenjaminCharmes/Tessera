@@ -1,14 +1,14 @@
 ---
-id: ticket-763
-title: "Project icons and run captures never carry the token in a URL"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-11-03
 depends_on: []
 estimated_days: 1
-created: 2026-11-03
+id: ticket-763
+pr_number: 886
+priority: medium
+status: done
+title: Project icons and run captures never carry the token in a URL
+type: fix
 ---
 
 # ticket-763 — Les icônes de projet et les captures ne portent jamais le jeton dans une URL

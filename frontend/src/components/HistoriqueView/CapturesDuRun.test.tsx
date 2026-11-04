@@ -89,6 +89,43 @@ describe("DetailDuRun — captures du run (ticket-620)", () => {
     );
   });
 
+  describe("with a session token", () => {
+    const creer = URL.createObjectURL;
+    const revoquer = URL.revokeObjectURL;
+
+    afterEach(() => {
+      vi.unstubAllEnvs();
+      URL.createObjectURL = creer;
+      URL.revokeObjectURL = revoquer;
+    });
+
+    it("loads each image with the Authorization header, shows an object URL, and revokes it on unmount", async () => {
+      vi.stubEnv("VITE_STATIC_TOKEN", "secret-de-test");
+      const revoque = vi.fn<(url: string) => void>();
+      URL.createObjectURL = vi.fn(() => "blob:http://localhost/capture");
+      URL.revokeObjectURL = revoque;
+      const fetchSimule = vi.fn<typeof fetch>(async (adresse) =>
+        String(adresse).includes("/captures/")
+          ? new Response(new Uint8Array([137, 80, 78, 71]))
+          : new Response(JSON.stringify({ captures: ["accueil-390-clair.png"] })),
+      );
+      vi.stubGlobal("fetch", fetchSimule);
+      const { container, unmount } = render(<DetailDuRun run={RUN} ticket={null} project={PROJET} />);
+
+      await waitFor(() => expect(container.querySelector("img")).not.toBeNull());
+      const image = fetchSimule.mock.calls.find(([a]) => String(a).includes("/captures/accueil"));
+      expect(String(image?.[0])).toBe("/api/v1/projects/p1/captures/accueil-390-clair.png?ticket=ticket-620");
+      expect(new Headers(image?.[1]?.headers).get("Authorization")).toBe("Bearer secret-de-test");
+      for (const img of container.querySelectorAll("img")) {
+        expect(img.getAttribute("src")).toBe("blob:http://localhost/capture");
+        expect(img.getAttribute("src")).not.toContain("token=");
+      }
+
+      unmount();
+      expect(revoque).toHaveBeenCalledWith("blob:http://localhost/capture");
+    });
+  });
+
   it("opens a thumbnail in large and closes it", async () => {
     repondre(["accueil-390-clair.png"]);
     afficher();
