@@ -4,7 +4,7 @@ created: 2026-11-03
 depends_on: []
 estimated_days: 1
 id: ticket-764
-pr_number: null
+pr_number: 888
 priority: medium
 status: done
 title: The shared modal traps focus and gives it back when it closes
