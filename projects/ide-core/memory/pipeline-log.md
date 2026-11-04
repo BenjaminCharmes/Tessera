@@ -7385,3 +7385,12 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-03 20:03:56 UTC — [ticket-748] validateur: APPROVED — Tous les critères d'acceptation ont été satisfaits. Les tests couvrent les cas d (215796ms)
 - 2026-11-03 20:03:56 UTC — [ticket-748] APPROVED après 1 tour(s)
 - 2026-11-03 20:06:45 UTC — [ticket-748] documentation: 0 fichier(s) (162171ms)
+- 2026-11-03 20:07:08 UTC — [ide-core] ticket-748 PR #863 confiée au CIWatcher
+- 2026-11-03 20:07:13 UTC — [ticket-759] branche ticket-759-an-unreadable-agents-json-is-never-rewritten-and
+- 2026-11-03 20:07:14 UTC — [ticket-759] tour 1 — codeur démarré
+- 2026-11-03 20:08:52 UTC — [ticket-759] tour 1 — codeur terminé (97906ms)
+- 2026-11-03 20:14:34 UTC — [ide-core] ticket-748 PR #863 mergée (CI verte)
+- 2026-11-04 02:23:29 UTC — [ticket-759] testeur: délai dépassé, suite relancée
+- 2026-11-04 02:23:29 UTC — [ticket-759] testeur: délai dépassé (1500 s, durée réelle 22475 s) — ../scripts/verifier.py coupé après 22475 s
+- 2026-11-04 08:16:18 UTC — [ticket-759] testeur: délai dépassé (1500 s, durée réelle 21168 s) — ../scripts/verifier.py coupé après 21169 s
+- 2026-11-04 08:16:20 UTC — [ticket-759] BLOCKED — testeur: délai dépassé deux fois
