@@ -7469,3 +7469,15 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-04 12:14:18 UTC — [ticket-755] validateur: APPROVED — Les deux critères d'acceptation sont satisfaits. Le code a été mis à jour pour g (104546ms)
 - 2026-11-04 12:14:18 UTC — [ticket-755] APPROVED après 1 tour(s)
 - 2026-11-04 12:15:35 UTC — [ticket-755] documentation: 0 fichier(s) (69828ms)
+- 2026-11-04 12:16:00 UTC — [ide-core] ticket-755 PR #882 confiée au CIWatcher
+- 2026-11-04 12:16:06 UTC — [ticket-751] branche ticket-751-the-interpreter-net-covers-node-e-and-python-name
+- 2026-11-04 12:16:07 UTC — [ticket-751] tour 1 — codeur démarré
+- 2026-11-04 12:18:43 UTC — [ticket-751] tour 1 — codeur terminé (156171ms)
+- 2026-11-04 12:23:05 UTC — [ide-core] ticket-755 PR #882 mergée (CI verte)
+- 2026-11-04 12:31:45 UTC — [ticket-751] testeur: OK (exit 0)
+- 2026-11-04 12:34:11 UTC — [ticket-751] securite: PASS — Ce diff améliore le système de détection des écritures non autorisées via shell  (146766ms)
+- 2026-11-04 12:34:11 UTC — [ticket-751] tour 1 — reviewer démarré
+- 2026-11-04 12:34:29 UTC — [ticket-751] tour 1 — reviewer terminé (17202ms)
+- 2026-11-04 12:36:07 UTC — [ticket-751] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code a été mis à jour pour dé (115828ms)
+- 2026-11-04 12:36:07 UTC — [ticket-751] APPROVED après 1 tour(s)
+- 2026-11-04 12:38:13 UTC — [ticket-751] documentation: 0 fichier(s) (119203ms)

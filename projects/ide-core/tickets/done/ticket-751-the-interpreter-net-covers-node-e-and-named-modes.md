@@ -1,14 +1,15 @@
 ---
-id: ticket-751
-title: "The interpreter net covers node -e and Python named write modes"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
-depends_on: ["ticket-750"]
-estimated_days: 1
 created: 2026-11-03
+depends_on:
+- ticket-750
+estimated_days: 1
+id: ticket-751
+pr_number: 883
+priority: medium
+status: done
+title: The interpreter net covers node -e and Python named write modes
+type: fix
 ---
 
 # ticket-751 — Le filet d'interpréteur couvre `node -e` et le mode d'écriture nommé

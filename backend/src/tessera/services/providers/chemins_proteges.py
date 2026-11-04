@@ -171,7 +171,7 @@ def refus_de_protection(motif: str) -> str:
 #: Ce que l'agent lit quand il tente de passer par un interpréteur pour écrire
 #: dans un fichier protégé (ticket-326).
 INTERPRETE_PROTEGE_REFUS = (
-    "Écriture refusée : passer par `python -c` ou `node -c` ne contourne pas "
+    "Écriture refusée : passer par `python -c` ou `node -e` ne contourne pas "
     "ce refus. Un refus de hook est définitif — aucune autre voie n'est permise "
     "pour obtenir le même effet. Décris dans ton rapport ce qui a été refusé et "
     "pourquoi le ticket le demandait."
