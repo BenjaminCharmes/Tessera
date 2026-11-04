@@ -5,7 +5,7 @@ depends_on:
 - ticket-750
 estimated_days: 1
 id: ticket-751
-pr_number: null
+pr_number: 883
 priority: medium
 status: done
 title: The interpreter net covers node -e and Python named write modes
