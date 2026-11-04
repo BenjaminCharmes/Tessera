@@ -4,7 +4,7 @@ created: 2026-11-03
 depends_on: []
 estimated_days: 1
 id: ticket-763
-pr_number: null
+pr_number: 886
 priority: medium
 status: done
 title: Project icons and run captures never carry the token in a URL
