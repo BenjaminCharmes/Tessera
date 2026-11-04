@@ -7428,3 +7428,14 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-04 09:23:34 UTC — [ticket-749] validateur: APPROVED — Les trois critères d'acceptation ont été satisfaits. Le code modifié implémente  (218671ms)
 - 2026-11-04 09:23:34 UTC — [ticket-749] APPROVED après 1 tour(s)
 - 2026-11-04 09:27:39 UTC — [ticket-749] documentation: 1 fichier(s) (237765ms) — après tour de correction
+- 2026-11-04 10:05:13 UTC — [ticket-752] branche ticket-752-the-token-guard-reads-globs-and-whole-folders-tha
+- 2026-11-04 10:05:14 UTC — [ticket-752] tour 1 — codeur démarré
+- 2026-11-04 10:06:45 UTC — [ticket-752] tour 1 — codeur terminé (91655ms)
+- 2026-11-04 10:19:10 UTC — [ticket-752] testeur: OK (exit 0)
+- 2026-11-04 10:23:01 UTC — [ticket-752] securite: PASS — Le diff renforce la protection du fichier `.env` de Tessera par trois vecteurs : (231000ms)
+- 2026-11-04 10:23:01 UTC — [ticket-752] tour 1 — reviewer démarré
+- 2026-11-04 10:23:25 UTC — [ticket-752] tour 1 — reviewer terminé (24108ms)
+- 2026-11-04 10:25:18 UTC — [ticket-752] validateur: fichiers cités joints : backend/src (dossier, 0 fichiers)
+- 2026-11-04 10:25:18 UTC — [ticket-752] validateur: APPROVED — Les trois critères d'acceptation ont été implémentés avec succès. Le code détect (137422ms)
+- 2026-11-04 10:25:18 UTC — [ticket-752] APPROVED après 1 tour(s)
+- 2026-11-04 10:26:28 UTC — [ticket-752] documentation: 0 fichier(s) (63546ms)

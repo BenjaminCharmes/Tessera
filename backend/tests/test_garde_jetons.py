@@ -181,6 +181,68 @@ async def test_bash_lets_an_unrelated_command_through(depot: _Depot, commande: s
     assert not _refuse(await _appeler(depot, "Bash", command=commande))
 
 
+@pytest.mark.parametrize("fin", [".e*", ".en?", ".env*", ".[e]nv"])
+async def test_bash_glob_reaching_the_env_is_refused(depot: _Depot, fin: str) -> None:
+    absolu = f"cat {depot.racine.as_posix()}/{fin}"
+
+    assert _refuse(await _appeler(depot, "Bash", command=absolu))
+    assert _refuse(await _appeler(depot, "Bash", command=f"cat ../../{fin}"))
+
+
+@pytest.mark.parametrize(
+    "commande",
+    [
+        "grep -r x {racine}",
+        "grep -rn x ../..",
+        "grep --recursive x {racine}",
+        "rg x {racine}",
+        "cd . && grep -R x ../.. | head",
+    ],
+)
+async def test_bash_recursive_search_on_a_folder_holding_the_env_is_refused(
+    depot: _Depot, commande: str
+) -> None:
+    sortie = await _appeler(
+        depot, "Bash", command=commande.format(racine=depot.racine.as_posix())
+    )
+
+    assert _refuse(sortie)
+
+
+async def test_grep_on_a_directory_holding_the_env_is_refused(depot: _Depot) -> None:
+    for dossier in (depot.racine, depot.projet / ".." / ".."):
+        assert _refuse(await _appeler(depot, "Grep", pattern="x", path=str(dossier)))
+    # Un glob qui ne vise pas le fichier ne le lit pas.
+    assert not _refuse(
+        await _appeler(depot, "Grep", pattern="x", path=str(depot.racine), glob="*.py")
+    )
+
+
+@pytest.mark.parametrize(
+    "commande",
+    [
+        "ls {racine}",
+        "ls -la ../..",
+        "grep -r x .",
+        "grep -r x {projet}",
+        "grep x {racine}/README.md",
+        "cat ../../*.md",
+        "ls .*",
+    ],
+)
+async def test_listing_a_folder_still_passes(depot: _Depot, commande: str) -> None:
+    ligne = commande.format(racine=depot.racine.as_posix(), projet=depot.projet.as_posix())
+
+    assert not _refuse(await _appeler(depot, "Bash", command=ligne))
+
+
+async def test_grep_tool_on_a_source_folder_still_passes(depot: _Depot) -> None:
+    source = depot.projet / "src"
+    source.mkdir()
+
+    assert not _refuse(await _appeler(depot, "Grep", pattern="x", path=str(source)))
+
+
 async def test_other_tools_are_ignored(depot: _Depot) -> None:
     sortie = await _appeler(depot, "Write", file_path=str(depot.env), content="x")
 

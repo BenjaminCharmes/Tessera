@@ -1,14 +1,14 @@
 ---
-id: ticket-752
-title: "The token guard reads globs and whole folders that reach Tessera's .env"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-11-03
 depends_on: []
 estimated_days: 1
-created: 2026-11-03
+id: ticket-752
+pr_number: 876
+priority: medium
+status: done
+title: The token guard reads globs and whole folders that reach Tessera's .env
+type: fix
 ---
 
 # ticket-752 — Le garde-jetons lit les globs et les dossiers entiers qui atteignent le `.env` de Tessera

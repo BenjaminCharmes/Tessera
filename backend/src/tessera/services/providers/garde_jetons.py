@@ -8,7 +8,9 @@ Same shape as ``perimetre.py``: a ``PreToolUse`` hook, because an
 ``allowed_tools`` entry auto-approves a tool *before* any permission callback.
 
 **Ceiling.** ``Bash`` is covered by a lexical scan of the paths written in the
-command: ``cat ../../.env``, ``type``, ``Get-Content``. It catches a mistake,
+command: ``cat ../../.env``, ``type``, ``Get-Content``, a glob that can name the
+file (``.e*``) and a recursive search given a folder that holds it
+(``grep -r x ../..``). It catches a mistake,
 not an evasion — ``python -c "open('../../' + '.env')"`` goes through. A token's
 real ceiling is its scope and its expiry, not this hook. The refusal message
 says so.
@@ -42,6 +44,10 @@ ENV_REFUS = (
 _GIT_BASH = re.compile(r"^/([a-zA-Z])/(.*)$")
 _SEPARATEURS = re.compile(r"[\s;|&<>()=,`]+")
 _JOKERS = "*?[{"
+_COMMANDES = re.compile(r"[;|&\n]+")
+_FAMILLE_GREP = frozenset({"grep", "egrep", "fgrep"})
+# rg, ag et ack descendent dans les sous-dossiers sans option.
+_TOUJOURS_RECURSIFS = frozenset({"rg", "ag", "ack"})
 
 
 def _resoudre(brut: str, base: Path) -> Path | None:
@@ -89,14 +95,57 @@ def motif_vise_le_env(motif: str, base: Path, env_file: Path) -> bool:
     return racine is not None and env_file.is_relative_to(racine)
 
 
+def dossier_contient_le_env(brut: str, base: Path, env_file: Path) -> bool:
+    """True if ``brut`` resolves to a folder (or the file itself) holding the file."""
+    chemin = _resoudre(brut, base)
+    return chemin is not None and env_file.is_relative_to(chemin)
+
+
+def _recherche_recursive(segment: list[str]) -> bool:
+    """True if a command segment is a search that walks into sub-folders."""
+    if not segment:
+        return False
+    nom = segment[0].replace("\\", "/").rsplit("/", 1)[-1].lower().removesuffix(".exe")
+    options = segment[1:]
+    if nom in _TOUJOURS_RECURSIFS:
+        return True
+    if nom in _FAMILLE_GREP:
+        return any(
+            o == "--recursive" or o == "--dereference-recursive"
+            or (re.fullmatch(r"-[A-Za-z0-9]*[rR][A-Za-z0-9]*", o) is not None)
+            for o in options
+        )
+    return nom == "findstr" and any(o.lower() == "/s" for o in options)
+
+
+def _recherche_vise_le_dossier_du_env(commande: str, base: Path, env_file: Path) -> bool:
+    """A recursive search given a folder that holds the file reads it too.
+
+    Without a path argument the search starts from the working folder, which is
+    not scanned here: it only covers a folder the command names.
+    """
+    for brut in _COMMANDES.split(commande):
+        segment = [t for t in re.split(r"\s+", brut.strip()) if t]
+        if not _recherche_recursive(segment):
+            continue
+        for jeton in segment[1:]:
+            nu = jeton.strip("'\"")
+            if not nu.startswith("-") and dossier_contient_le_env(nu, base, env_file):
+                return True
+    return False
+
+
 def _commande_vise_le_env(commande: str, base: Path, env_file: Path) -> bool:
     """Lexical scan of a ``Bash`` command for a path to the file."""
     for jeton in _SEPARATEURS.split(commande):
         nu = jeton.strip("'\"").replace("\\", "/")
-        if nu.rsplit("/", 1)[-1].lower() == env_file.name.lower():
-            if vise_le_env(nu, base, env_file):
+        dernier = nu.rsplit("/", 1)[-1].lower()
+        if any(joker in dernier for joker in _JOKERS):
+            if motif_vise_le_env(nu, base, env_file):
                 return True
-    return False
+        elif dernier == env_file.name.lower() and vise_le_env(nu, base, env_file):
+            return True
+    return _recherche_vise_le_dossier_du_env(commande, base, env_file)
 
 
 def _outil_vise_le_env(
@@ -109,10 +158,13 @@ def _outil_vise_le_env(
     if outil not in ("Glob", "Grep"):
         return False
     dossier = _resoudre(str(entrees.get("path") or "."), base) or base
-    if outil == "Grep" and entrees.get("path") and vise_le_env(
-        str(entrees["path"]), base, env_file
-    ):
-        return True
+    chemin = str(entrees.get("path") or "")
+    if outil == "Grep" and chemin:
+        if vise_le_env(chemin, base, env_file):
+            return True
+        # Sans `glob`, un dossier qui porte le fichier le lit avec le reste.
+        if not entrees.get("glob") and dossier_contient_le_env(chemin, base, env_file):
+            return True
     motif = entrees.get("pattern" if outil == "Glob" else "glob")
     return bool(motif) and motif_vise_le_env(str(motif), dossier, env_file)
 
