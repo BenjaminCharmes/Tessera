@@ -66,21 +66,21 @@ describe("Piece", () => {
     }
   });
 
-  it("makes only the busy post clickable when a choice is listened to", () => {
+  it("makes every post clickable when a choice is listened to, done and waiting ones too (ticket-778)", () => {
     const onChoisir = vi.fn();
     render(<Piece projet="ide-core" etat={etatEnSecurite()} maintenant={T0 + 5_000} onChoisir={onChoisir} />);
 
-    for (const nom of [nomme("Codeur, a fini", "codeur"), nomme("Testeur, a fini", "testeur"), nomme("Reviewer, attend son tour", "reviewer"), nomme("Validateur, attend son tour", "validateur")]) {
-      const bouton = screen.getByRole("button", { name: nom });
+    const postes: [string, string, string][] = [
+      ["Codeur, a fini", "codeur", "codeur"],
+      ["Reviewer, attend son tour", "reviewer", "reviewer"],
+      ["Sécurité, travaille", "securite", "securite"],
+    ];
+    for (const [libelle, role, poste] of postes) {
+      const bouton = screen.getByRole("button", { name: nomme(libelle, role) });
       fireEvent.click(bouton);
-      expect(bouton.className).not.toContain("cursor-pointer");
+      expect(bouton.className).toContain("cursor-pointer");
+      expect(onChoisir).toHaveBeenLastCalledWith("ide-core", poste);
     }
-    expect(onChoisir).not.toHaveBeenCalled();
-
-    const occupe = screen.getByRole("button", { name: nomme("Sécurité, travaille", "securite") });
-    fireEvent.click(occupe);
-    expect(occupe.className).toContain("cursor-pointer");
-    expect(onChoisir).toHaveBeenCalledWith("ide-core", "securite");
   });
 
   it("draws neither bubble nor pill when no post is busy", () => {

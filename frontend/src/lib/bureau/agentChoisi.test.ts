@@ -70,11 +70,40 @@ describe("lignesDeLAgent", () => {
     expect(Object.keys(lignes(etatComplet())).join(" ")).not.toMatch(/mod[eè]le/i);
   });
 
-  it("returns null for a done or a free post", () => {
+  it("tells what a done agent handed in, and how long ago (ticket-778)", () => {
     const etat = etatEnSecurite();
+    const rendu = lignesDeLAgent("ide-core", "codeur", etat, T0 + 120_000);
+    const parLibelle = Object.fromEntries((rendu ?? []).map((l) => [l.libelle, l.valeur]));
 
-    expect(lignesDeLAgent("ide-core", "codeur", etat, T0)).toBeNull();
-    expect(lignesDeLAgent("ide-core", "reviewer", etat, T0)).toBeNull();
-    expect(lignesDeLAgent("ide-core", "securite", etat, T0)).not.toBeNull();
+    expect(parLibelle["Rôle"]).toBe("Codeur");
+    expect(parLibelle["A rendu"]).toBe("son code");
+    expect(parLibelle["Fini"]).toMatch(/^il y a \d+ (s|min)$/);
+    expect(parLibelle).not.toHaveProperty("Il fait");
+  });
+
+  it("names the verdict a done reviewer gave", () => {
+    const etat = etatEnSecurite();
+    const fin = etat.ticketEvents.find((e) => e.type === "agent_done" && e.agent === "codeur");
+    const avecRevue: StreamState = {
+      ...etat,
+      ticketEvents: [
+        ...etat.ticketEvents,
+        { ...(fin as NonNullable<typeof fin>), agent: "reviewer", data: { verdict: "CHANGES_REQUESTED" } },
+      ],
+    };
+    const rendu = lignesDeLAgent("ide-core", "reviewer", avecRevue, T0);
+
+    expect(rendu?.find((l) => l.libelle === "A rendu")?.valeur).toBe("changements demandés");
+  });
+
+  it("tells a waiting agent who works before it (ticket-778)", () => {
+    const etat = etatEnSecurite();
+    const rendu = lignesDeLAgent("ide-core", "reviewer", etat, T0);
+
+    expect(rendu?.find((l) => l.libelle === "Il attend")?.valeur).toBe("la fin de Sécurité");
+  });
+
+  it("still describes the working agent as before", () => {
+    expect(lignesDeLAgent("ide-core", "securite", etatEnSecurite(), T0)?.map((l) => l.libelle)).toContain("Il fait");
   });
 });
