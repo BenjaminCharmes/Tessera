@@ -7416,6 +7416,12 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-04 08:57:40 UTC — [ticket-762] validateur: APPROVED — Les trois critères d'acceptation sont respectés. Les tests ont été ajoutés pour  (127016ms)
 - 2026-11-04 08:57:40 UTC — [ticket-762] APPROVED après 1 tour(s)
 - 2026-11-04 08:59:05 UTC — [ticket-762] documentation: 0 fichier(s) (78703ms)
+- 2026-11-04 09:42:58 UTC — [ticket-750] branche ticket-750-glued-redirections-every-tee-argument-and-cp-mv-r
+- 2026-11-04 09:43:00 UTC — [ticket-750] tour 1 — codeur démarré
+- 2026-11-04 09:45:18 UTC — [ticket-750] tour 1 — codeur terminé (137937ms)
+- 2026-11-04 09:58:49 UTC — [ticket-750] testeur: OK (exit 0)
+- 2026-11-04 10:01:44 UTC — [ticket-750] securite: BLOCK — Le diff introduit un bug CRITICAL ligne 122 : l'indexage `[0]` du tuple retourné (174750ms)
+- 2026-11-04 10:01:50 UTC — [ide-core] file interrompue : ticket-750 non approuvé
 - 2026-11-04 09:02:20 UTC — [ide-core] ticket-762 PR #867 confiée au CIWatcher
 - 2026-11-04 09:02:25 UTC — [ticket-749] branche ticket-749-common-windows-and-git-bash-wrappers-are-unwrappe
 - 2026-11-04 09:02:27 UTC — [ticket-749] tour 1 — codeur démarré
