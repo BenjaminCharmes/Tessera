@@ -7560,3 +7560,16 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-04 14:44:35 UTC — [ticket-766] validateur: APPROVED — Les trois critères d'acceptation ont été satisfaits. Le code a été modifié pour  (158391ms)
 - 2026-11-04 14:44:35 UTC — [ticket-766] APPROVED après 1 tour(s)
 - 2026-11-04 14:47:29 UTC — [ticket-766] documentation: 0 fichier(s) (165485ms) — après tour de correction
+- 2026-11-04 15:12:10 UTC — [ide-core] ticket-766 PR #892 mergée (CI verte)
+- 2026-11-04 15:12:12 UTC — [ide-core] ticket-766 : base réalignée sur develop
+- 2026-11-04 15:12:12 UTC — [ide-core] ticket-766 PR #892 confiée au CIWatcher
+- 2026-11-04 15:12:18 UTC — [ticket-767] branche ticket-767-a-shared-resource-sends-one-request-at-a-time-and
+- 2026-11-04 15:12:19 UTC — [ticket-767] tour 1 — codeur démarré
+- 2026-11-04 15:14:31 UTC — [ticket-767] tour 1 — codeur terminé (132375ms)
+- 2026-11-04 15:17:25 UTC — [ticket-767] testeur: OK (exit 0)
+- 2026-11-04 15:19:25 UTC — [ticket-767] securite: PASS — Le diff introduit une déduplication des requêtes en vol (ticket-767) et une réte (120187ms)
+- 2026-11-04 15:19:25 UTC — [ticket-767] tour 1 — reviewer démarré
+- 2026-11-04 15:19:56 UTC — [ticket-767] tour 1 — reviewer terminé (30592ms)
+- 2026-11-04 15:22:03 UTC — [ticket-767] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le code implémente un mécanism (157952ms)
+- 2026-11-04 15:22:03 UTC — [ticket-767] APPROVED après 1 tour(s)
+- 2026-11-04 15:23:24 UTC — [ticket-767] documentation: 0 fichier(s) (72375ms)

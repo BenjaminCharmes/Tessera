@@ -1,14 +1,14 @@
 ---
-id: ticket-767
-title: "A shared resource sends one request at a time and keeps its last data on error"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-11-03
 depends_on: []
 estimated_days: 1
-created: 2026-11-03
+id: ticket-767
+pr_number: 893
+priority: medium
+status: done
+title: A shared resource sends one request at a time and keeps its last data on error
+type: fix
 ---
 
 # ticket-767 — Une ressource partagée n'envoie qu'une requête à la fois et garde sa dernière donnée en erreur
