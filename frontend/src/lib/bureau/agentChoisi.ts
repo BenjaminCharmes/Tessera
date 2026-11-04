@@ -1,9 +1,10 @@
 import type { StreamState } from "../../hooks/streamState";
-import type { RunActif } from "../../types/api";
+import type { OrchestratorEvent, RunActif } from "../../types/api";
 import { LIBELLE_SANTE, santeAgent } from "../santeAgent";
 import { nomDuPoste } from "./libelleDuPoste";
+import { estTourDePlan } from "./plan";
 import type { PosteId } from "./postesDuRun";
-import { postesDuRun } from "./postesDuRun";
+import { postesDuRun, transitionDe } from "./postesDuRun";
 
 /** Une ligne du panneau « Agent choisi » : un libellé et ce que l'état en dit. */
 export interface LigneDeLAgent {
@@ -48,11 +49,58 @@ function ligneDeLAction(etat: StreamState, maintenant: number): LigneDeLAgent {
   return { libelle: "Il fait", valeur: `${LIBELLE_SANTE[sante]}${question}` };
 }
 
+/** La dernière fin d'étape de ce poste, hors plan rendu (le plan n'est pas le travail fini). */
+function derniereFin(etat: StreamState, poste: PosteId): OrchestratorEvent | null {
+  for (let i = etat.ticketEvents.length - 1; i >= 0; i--) {
+    const ev = etat.ticketEvents[i];
+    const t = transitionDe(ev);
+    if (t?.poste === poste && t.transition === "fin" && !estTourDePlan(ev)) return ev;
+  }
+  return null;
+}
+
+/** Ce que l'étape a rendu, d'après son événement de fin ; null quand il ne le dit pas. */
+function rendu(poste: PosteId, ev: OrchestratorEvent): string | null {
+  const data = ev.data;
+  switch (poste) {
+    case "codeur":
+      return "son code";
+    case "testeur":
+      return data["passed"] === true ? "tests verts" : data["passed"] === false ? "tests rouges" : null;
+    case "securite":
+      return typeof data["verdict"] === "string" ? `audit ${data["verdict"]}` : null;
+    case "reviewer":
+      if (data["verdict"] === "APPROVED") return "approuvé";
+      return data["verdict"] === "CHANGES_REQUESTED" ? "changements demandés" : null;
+    case "validateur":
+      return data["approved"] === true ? "critères validés" : data["approved"] === false ? "critères refusés" : null;
+  }
+}
+
+/** Un agent qui a fini : ce qu'il a rendu, et depuis quand (ticket-778). */
+function lignesDeLaFin(etat: StreamState, poste: PosteId, maintenant: number): (LigneDeLAgent | null)[] {
+  const fin = derniereFin(etat, poste);
+  if (!fin) return [];
+  const resultat = rendu(poste, fin);
+  const depuis = maintenant - Date.parse(fin.timestamp);
+  return [
+    resultat ? { libelle: "A rendu", valeur: resultat } : null,
+    Number.isNaN(depuis) ? null : { libelle: "Fini", valeur: `il y a ${ecoule(depuis)}` },
+  ];
+}
+
+/** Un agent qui attend son tour : qui travaille avant lui, s'il y a quelqu'un (ticket-778). */
+function ligneDeLAttente(etat: StreamState): LigneDeLAgent | null {
+  const auTravail = postesDuRun(etat).find((p) => p.etat === "occupe");
+  if (!auTravail) return null;
+  return { libelle: "Il attend", valeur: `la fin de ${nomDuPoste(auTravail.poste)}` };
+}
+
 /**
- * Ce que l'état du run dit d'un agent au travail, ligne par ligne. Une donnée
- * absente fait disparaître sa ligne (ADR-058) : le modèle, que ni `StreamState`
- * ni les événements ne portent, n'a donc pas de ligne. Un poste qui n'est pas
- * `occupe` n'a rien à dire : `null`.
+ * Ce que l'état du run dit d'un agent, ligne par ligne, selon que son poste
+ * travaille, a fini ou attend son tour. Une donnée absente fait disparaître sa
+ * ligne (ADR-058) : le modèle, que ni `StreamState` ni les événements ne portent,
+ * n'a donc pas de ligne. Un poste inconnu n'a rien à dire : `null`.
  */
 export function lignesDeLAgent(
   projet: string,
@@ -62,14 +110,18 @@ export function lignesDeLAgent(
   run?: RunActif,
 ): LigneDeLAgent[] | null {
   const courant = postesDuRun(etat).find((p) => p.poste === poste);
-  if (courant?.etat !== "occupe") return null;
+  if (!courant) return null;
+  const selonLEtat: (LigneDeLAgent | null)[] =
+    courant.etat === "occupe"
+      ? [ligneDuTour(etat), ligneDuSigne(etat, maintenant), ligneDeLAction(etat, maintenant)]
+      : courant.etat === "fait"
+        ? lignesDeLaFin(etat, poste, maintenant)
+        : [ligneDeLAttente(etat)];
   const lignes: (LigneDeLAgent | null)[] = [
     { libelle: "Rôle", valeur: nomDuPoste(poste) },
     { libelle: "Projet", valeur: projet },
     ligneDuTicket(etat, run),
-    ligneDuTour(etat),
-    ligneDuSigne(etat, maintenant),
-    ligneDeLAction(etat, maintenant),
+    ...selonLEtat,
   ];
   return lignes.filter((l): l is LigneDeLAgent => l !== null);
 }

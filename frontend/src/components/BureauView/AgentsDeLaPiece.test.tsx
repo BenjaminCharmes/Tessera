@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest";
-import { render } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
+import { fireEvent, render } from "@testing-library/react";
 import AgentsDeLaPiece from "./AgentsDeLaPiece";
 import type { AgentPlace } from "../../lib/bureau/activites";
 
@@ -36,5 +36,26 @@ describe("AgentsDeLaPiece — un agent du fond se tient sur le sol (ticket-777)"
     );
     const agent = container.querySelector<HTMLElement>('[data-agent="codeur"]');
     expect(hauteurDesPieds(agent as HTMLElement)).toBe(28);
+  });
+});
+
+describe("AgentsDeLaPiece — un agent qui a fini se choisit là où il est (ticket-778)", () => {
+  it("se choisit au clic et au clavier quand un choix est écouté", () => {
+    const onChoisir = vi.fn();
+    const { container } = render(<AgentsDeLaPiece projet="p" agents={[AU_FOND]} onChoisir={onChoisir} />);
+    const agent = container.querySelector<HTMLElement>('[data-agent="codeur"]') as HTMLElement;
+
+    expect(agent.getAttribute("role")).toBe("button");
+    fireEvent.click(agent);
+    fireEvent.keyDown(agent, { key: "Enter" });
+    expect(onChoisir).toHaveBeenCalledTimes(2);
+    expect(onChoisir).toHaveBeenLastCalledWith("codeur");
+  });
+
+  it("reste une image quand personne n'écoute le choix", () => {
+    const { container } = render(<AgentsDeLaPiece projet="p" agents={[AU_FOND]} />);
+    const agent = container.querySelector<HTMLElement>('[data-agent="codeur"]') as HTMLElement;
+
+    expect(agent.getAttribute("role")).toBe("img");
   });
 });

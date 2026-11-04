@@ -267,7 +267,7 @@ export default function Piece({
               />
             ))}
           </div>
-          <AgentsDeLaPiece projet={projet} agents={agents} roles={roles} redacteurs={redacteurs} directeur={directeur} motifDuDirecteur={motifDuDirecteur} />
+          <AgentsDeLaPiece projet={projet} agents={agents} roles={roles} redacteurs={redacteurs} directeur={directeur} motifDuDirecteur={motifDuDirecteur} onChoisir={onChoisir && ((poste) => onChoisir(projet, poste))} />
           {fete && <Confettis />}
           {gyrophare && (
             // Suspendu sous le plafonnier du milieu, son support : le socle sous le diffuseur.

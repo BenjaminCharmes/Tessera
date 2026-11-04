@@ -50,7 +50,7 @@ describe("PanneauAgentChoisi", () => {
   it("invites to click an agent when none is chosen", () => {
     rendre();
 
-    expect(within(panneau()).getByText("Clique un agent au travail")).toBeInTheDocument();
+    expect(within(panneau()).getByText("Clique un agent")).toBeInTheDocument();
     expect(within(panneau()).queryByRole("button")).toBeNull();
   });
 
@@ -63,18 +63,19 @@ describe("PanneauAgentChoisi", () => {
     expect(dans.getByText("Codeur")).toBeInTheDocument();
     expect(dans.getByText("ide-core")).toBeInTheDocument();
     expect(dans.getByText("ticket-001")).toBeInTheDocument();
-    expect(dans.queryByText("Clique un agent au travail")).toBeNull();
+    expect(dans.queryByText("Clique un agent")).toBeNull();
   });
 
-  it("does not act on a free post and gives it no pointer cursor", () => {
+  it("describes a waiting agent too, with who works before it (ticket-778)", () => {
     rendre();
-    const libre = screen.getByRole("button", { name: nomme("Reviewer, attend son tour", "reviewer") });
 
-    fireEvent.click(libre);
+    fireEvent.click(screen.getByRole("button", { name: nomme("Reviewer, attend son tour", "reviewer") }));
 
-    expect(libre.className).not.toContain("cursor-pointer");
-    expect(screen.getByRole("button", { name: nomme("Codeur, travaille", "codeur") }).className).toContain("cursor-pointer");
-    expect(within(panneau()).getByText("Clique un agent au travail")).toBeInTheDocument();
+    const dans = within(panneau());
+    expect(dans.getByText("Reviewer")).toBeInTheDocument();
+    expect(dans.getByText("Il attend")).toBeInTheDocument();
+    expect(dans.getByText("la fin de Codeur")).toBeInTheDocument();
+    expect(dans.queryByText("Clique un agent")).toBeNull();
   });
 
   it("opens the same thread as the room's Fil button", () => {

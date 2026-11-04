@@ -50,7 +50,8 @@ export default function PosteDeTravail({
   const occupe = poste.etat === "occupe";
   // Le prénom ouvre le nom accessible et l'infobulle native : c'est une identité, pas un état.
   const libelle = avecLeNom(projet, role, libelleDuPoste(role, poste.etat, sante, auRepos));
-  const choisir = occupe && onChoisir ? () => onChoisir(poste.poste) : undefined;
+  // Tout agent se choisit, qu'il travaille, ait fini ou attende son tour (ticket-778).
+  const choisir = onChoisir ? () => onChoisir(poste.poste) : undefined;
   // L'agent qui a fini se lève : la pièce le dessine hors du poste (AgentsDeLaPiece).
   return (
     <div
