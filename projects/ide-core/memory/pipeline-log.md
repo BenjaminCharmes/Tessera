@@ -7518,3 +7518,14 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-04 13:52:08 UTC — [ticket-764] validateur: APPROVED — Les critères d'acceptation sont tous satisfaits. Le code implémente correctement (142593ms)
 - 2026-11-04 13:52:08 UTC — [ticket-764] APPROVED après 1 tour(s)
 - 2026-11-04 13:53:37 UTC — [ticket-764] documentation: 0 fichier(s) (76265ms)
+- 2026-11-04 13:57:03 UTC — [ide-core] ticket-764 PR #888 confiée au CIWatcher
+- 2026-11-04 13:57:10 UTC — [ticket-765] branche ticket-765-the-route-contract-test-checks-field-types-and-ca
+- 2026-11-04 13:57:12 UTC — [ticket-765] tour 1 — codeur démarré
+- 2026-11-04 14:02:53 UTC — [ide-core] ticket-764 PR #888 mergée (CI verte)
+- 2026-11-04 14:05:46 UTC — [ticket-765] tour 1 — codeur terminé (514062ms)
+- 2026-11-04 14:08:51 UTC — [ticket-765] testeur: OK (exit 0)
+- 2026-11-04 14:10:24 UTC — [ticket-765] securite: PASS — This diff improves type safety and test infrastructure with no security vulnerab (93391ms)
+- 2026-11-04 14:10:24 UTC — [ticket-765] tour 1 — reviewer démarré
+- 2026-11-04 14:10:41 UTC — [ticket-765] tour 1 — reviewer terminé (16500ms)
+- 2026-11-04 14:15:03 UTC — [ticket-765] validateur: APPROVED — Les quatre critères d'acceptation sont respectés. Le code implémente un garde de (279327ms)
+- 2026-11-04 14:15:03 UTC — [ticket-765] APPROVED après 1 tour(s)
