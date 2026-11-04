@@ -12,16 +12,6 @@ Cette section n'est injectée dans aucun appel d'agent. Une règle nouvelle
 s'écrit ici, avec son ADR ; un humain l'accepte en la déplaçant dans sa
 section. (ADR-055)
 
-- **La configuration des tests qu'un diff ne peut toucher sans que le ticket
-  la demande** (complète la règle « Le script que `test_command` lance… ») :
-  `conftest.py`, `pytest.ini`, `tox.ini`, `setup.cfg`, `mypy.ini`,
-  `.mypy.ini`, `.coveragerc`, `[tool.pytest*]` et `[tool.mypy]` de
-  `pyproject.toml`, `vite.config.*`, `vitest.config.*`, `vitest.workspace.*`,
-  `eslint.config.*`, `tsconfig*.json`, `scripts` de `package.json`. Un
-  fichier n'est couvert que si son **chemin complet** depuis la racine du
-  dépôt figure dans le ticket ; son nom de base ne suffit pas. (ADR-072,
-  ADR-027)
-
 ## Git et périmètre d'écriture
 
 - **Un projet qui déclare `worktree` exécute chaque run dans son worktree,
@@ -52,9 +42,11 @@ section. (ADR-055)
 - **Le script que `test_command` lance se refuse en écriture**, comme
   `agents.json` : le premier argument qui désigne un fichier existant, résolu
   depuis `pipeline.test_cwd`. Un diff qui touche la configuration des tests
-  (`conftest.py`, `[tool.pytest*]`, `[tool.mypy]`, `vitest.config.*`,
-  `eslint.config.*`, `tsconfig*.json`, `scripts` de `package.json`) s'ouvre,
-  pour le reviewer, sur un avertissement qui les nomme. (ADR-027)
+  (`conftest.py`, `pytest.ini`, `tox.ini`, `setup.cfg`, `mypy.ini`, `.coveragerc`,
+  `[tool.pytest*]`, `[tool.mypy]`, `vite.config.*`, `vitest.*`, `eslint.config.*`,
+  `tsconfig*.json`, `scripts` de `package.json`) sans que le ticket la nomme par
+  son chemin complet s'ouvre, pour le reviewer, sur un avertissement. (ADR-027,
+  ADR-072)
 - **Une règle nouvelle s'écrit sous `## Proposées` dans `contraintes.md`,
   avec son ADR.** Un diff qui modifie ce fichier ailleurs met le run en
   `blocked` : un humain accepte la règle en la déplaçant dans sa section.
