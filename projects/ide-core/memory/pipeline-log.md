@@ -7494,3 +7494,14 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-04 13:10:33 UTC — [ticket-760] validateur: APPROVED — Les trois critères d'acceptation sont respectés. Le code modifié permet de s'ass (141765ms)
 - 2026-11-04 13:10:33 UTC — [ticket-760] APPROVED après 1 tour(s)
 - 2026-11-04 13:11:41 UTC — [ticket-760] documentation: 0 fichier(s) (60968ms)
+- 2026-11-04 13:26:21 UTC — [ide-core] ticket-760 PR #884 confiée au CIWatcher
+- 2026-11-04 13:26:26 UTC — [ticket-763] branche ticket-763-project-icons-and-run-captures-never-carry-the-to
+- 2026-11-04 13:26:27 UTC — [ticket-763] tour 1 — codeur démarré
+- 2026-11-04 13:30:17 UTC — [ticket-763] tour 1 — codeur terminé (229780ms)
+- 2026-11-04 13:32:56 UTC — [ticket-763] testeur: OK (exit 0)
+- 2026-11-04 13:33:28 UTC — [ide-core] ticket-760 PR #884 mergée (CI verte)
+- 2026-11-04 13:35:48 UTC — [ticket-763] securite: PASS — Le diff retire les tokens des URLs et les passe en Authorization header (annoncé (172360ms)
+- 2026-11-04 13:35:48 UTC — [ticket-763] tour 1 — reviewer démarré
+- 2026-11-04 13:36:07 UTC — [ticket-763] tour 1 — reviewer terminé (18733ms)
+- 2026-11-04 13:38:20 UTC — [ticket-763] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Des tests ont été ajoutés pour (152219ms)
+- 2026-11-04 13:38:20 UTC — [ticket-763] APPROVED après 1 tour(s)
