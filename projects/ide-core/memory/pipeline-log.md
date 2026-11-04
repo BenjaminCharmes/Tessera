@@ -7445,6 +7445,24 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-04 10:25:18 UTC — [ticket-752] validateur: APPROVED — Les trois critères d'acceptation ont été implémentés avec succès. Le code détect (137422ms)
 - 2026-11-04 10:25:18 UTC — [ticket-752] APPROVED après 1 tour(s)
 - 2026-11-04 10:26:28 UTC — [ticket-752] documentation: 0 fichier(s) (63546ms)
+- 2026-11-04 10:40:37 UTC — [ide-core] ticket-752 PR #876 confiée au CIWatcher
+- 2026-11-04 10:40:43 UTC — [ticket-753] branche ticket-753-captures-send-the-session-token-only-to-a-loopbac
+- 2026-11-04 10:40:44 UTC — [ticket-753] tour 1 — codeur démarré
+- 2026-11-04 10:41:54 UTC — [ticket-753] tour 1 — codeur terminé (69765ms)
+- 2026-11-04 10:46:25 UTC — [ticket-753] testeur: 1 failed, 1581 passed, 64 warnings in 265.09s (0:04:25)
+- 2026-11-04 10:46:25 UTC — [ticket-753] tests rouges au tour 1
+- 2026-11-04 10:46:25 UTC — [ticket-753] tour 2 — codeur démarré
+- 2026-11-04 10:46:54 UTC — [ticket-753] tour 2 — codeur terminé (29703ms)
+- 2026-11-04 10:46:57 UTC — [ticket-752] livraison: arrêt — PR #876 non mergée : Le merge de la PR #876 a échoué sur une erreur réseau (ReadTimeout, la PR est lue « open »). La PR reste ouverte.
+- 2026-11-04 11:00:15 UTC — [ticket-753] testeur: OK (exit 0)
+- 2026-11-04 11:02:04 UTC — [ticket-753] securite: PASS — This diff implements a critical security fix (ticket-753) preventing session tok (109000ms)
+- 2026-11-04 11:02:04 UTC — [ticket-753] tour 2 — reviewer démarré
+- 2026-11-04 11:02:43 UTC — [ticket-753] tour 2 — reviewer terminé (38452ms)
+- 2026-11-04 11:03:59 UTC — [ticket-753] validateur: fichiers cités joints : aucun ; absents : https://exemple.org
+- 2026-11-04 11:03:59 UTC — [ticket-753] validateur: APPROVED — Les deux critères d'acceptation sont satisfaits : le jeton de session n’est plus (114609ms)
+- 2026-11-04 11:03:59 UTC — [ticket-753] APPROVED après 2 tour(s)
+- 2026-11-04 11:06:09 UTC — [ticket-753] documentation: 0 fichier(s) (123469ms)
+- 2026-11-04 11:17:40 UTC — [ticket-753] livraison: arrêt — Livraison interrompue : GitCommandError: git command failed (code 1): git -c core.hooksPath=C:\Users
 - 2026-11-04 11:17:47 UTC — [ticket-754] branche ticket-754-the-observation-socket-trusts-only-declared-origi
 - 2026-11-04 11:17:48 UTC — [ticket-754] tour 1 — codeur démarré
 - 2026-11-04 11:19:11 UTC — [ticket-754] tour 1 — codeur terminé (83266ms)

@@ -1,14 +1,14 @@
 ---
-id: ticket-753
-title: "Captures send the session token only to a loopback address"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-11-03
 depends_on: []
 estimated_days: 1
-created: 2026-11-03
+id: ticket-753
+pr_number: null
+priority: medium
+status: done
+title: Captures send the session token only to a loopback address
+type: fix
 ---
 
 # ticket-753 — Les captures n'envoient le jeton de session qu'à une adresse locale
