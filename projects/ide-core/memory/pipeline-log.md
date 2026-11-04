@@ -7395,3 +7395,11 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-04 08:16:18 UTC — [ticket-759] testeur: délai dépassé (1500 s, durée réelle 21168 s) — ../scripts/verifier.py coupé après 21169 s
 - 2026-11-04 08:16:20 UTC — [ticket-759] BLOCKED — testeur: délai dépassé deux fois
 - 2026-11-04 08:16:56 UTC — [ide-core] file interrompue : ticket-759 non approuvé
+- 2026-11-04 08:18:00 UTC — [ticket-759] branche ticket-759-an-unreadable-agents-json-is-never-rewritten-and
+- 2026-11-04 08:29:15 UTC — [ticket-759] testeur: OK (exit 0)
+- 2026-11-04 08:29:15 UTC — [ticket-759] branche reprise (3 commit(s)) — tests green, codeur sauté
+- 2026-11-04 08:33:24 UTC — [ticket-759] securite: PASS — No security vulnerabilities introduced. The diff improves error handling and dat (247375ms)
+- 2026-11-04 08:33:24 UTC — [ticket-759] tour 1 — reviewer démarré
+- 2026-11-04 08:33:49 UTC — [ticket-759] tour 1 — reviewer terminé (24516ms)
+- 2026-11-04 08:35:51 UTC — [ticket-759] validateur: APPROVED — Tous les critères d'acceptation ont été satisfaits. Les tests couvrent les cas d (146280ms)
+- 2026-11-04 08:35:51 UTC — [ticket-759] APPROVED après 1 tour(s)
