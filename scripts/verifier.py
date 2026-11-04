@@ -10,6 +10,10 @@ pytest and mypy, one limited to `backend/` skips the frontend chain, and a diff
 that touches neither runs nothing. GitHub CI runs everything before any merge.
 When the diff cannot be read, every chain runs.
 
+`--impact <ref>` limits pytest to the test files the change since `<ref>` can
+affect; the retest after a rebase uses it (ticket-793). The last line gives the
+duration of every step that ran.
+
 Run from backend/ with: uv run python ../scripts/verifier.py
 
 Never calls a console-script launcher (`pytest.exe`, `mypy.exe`): Windows
@@ -20,8 +24,10 @@ from __future__ import annotations
 
 import importlib.util
 import os
+import re
 import subprocess
 import sys
+import time
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
@@ -39,7 +45,8 @@ _NPX = "npx.cmd" if os.name == "nt" else "npx"
 # 1 973 tests en série prenaient douze minutes, et la suite complète
 # dépassait les 900 s du testeur à elle seule (ticket-357). Huit processus la
 # ramènent à deux minutes et demie sans saturer une machine qui fait tourner
-# d'autres files.
+# d'autres files. Le 04/11/2026, avec 4 824 tests et deux files en parallèle,
+# la suite en prenait de nouveau quatorze et demie (ticket-793).
 _PYTEST_WORKERS = "8"
 
 # Ligne max renvoyée au codeur pour ne pas inonder sa fenêtre.
@@ -142,13 +149,15 @@ class _StepFailure:
     excerpt: str
 
 
-def _run_chain(steps: list[Step]) -> list[_StepFailure]:
+def _run_chain(steps: list[Step], durees: dict[str, float] | None = None) -> list[_StepFailure]:
     """Run steps sequentially; stop at first failure and return it.
 
     Returns a list with at most one entry: the failing step, with its
     return code and extracted output. Returns an empty list when all pass.
+    Each step's duration in seconds is recorded in `durees` when given.
     """
     for step in steps:
+        debut = time.monotonic()
         result = subprocess.run(
             step.cmd,
             cwd=step.cwd,
@@ -157,6 +166,8 @@ def _run_chain(steps: list[Step]) -> list[_StepFailure]:
             encoding="utf-8",
             errors="replace",
         )
+        if durees is not None:
+            durees[step.name] = time.monotonic() - debut
         if result.returncode != 0:
             combined = result.stdout + result.stderr
             return [_StepFailure(step.name, result.returncode, _extract_errors(combined))]
@@ -175,15 +186,25 @@ def run_parallel(
     typing, then frontend) is printed to stderr once every chain finishes.
     """
     chains = [backend_steps, type_steps or [], frontend_steps]
+    durees: dict[str, float] = {}
     with ThreadPoolExecutor(max_workers=len(chains)) as executor:
-        futures = [executor.submit(_run_chain, steps) for steps in chains]
+        futures = [executor.submit(_run_chain, steps, durees) for steps in chains]
         results = [future.result() for future in futures]
 
     all_failures = [failure for result in results for failure in result]
     for failure in all_failures:
         print(f"{failure.step_name} :\n{failure.excerpt}", file=sys.stderr)
+    if durees:
+        print(ligne_des_durees(durees), file=sys.stderr)
 
     return all_failures[0].returncode if all_failures else 0
+
+
+def ligne_des_durees(durees: dict[str, float]) -> str:
+    """One line with the duration of every step that ran, in run order of the chains."""
+    # On ne savait pas laquelle des étapes coûtait : le retest après rebase
+    # prenait 12 à 17 minutes sans dire pourquoi (ticket-793).
+    return "durées : " + ", ".join(f"{nom} {secondes:.0f} s" for nom, secondes in durees.items())
 
 
 def run_steps(steps: list[Step]) -> int:
@@ -260,8 +281,88 @@ def consignes_touchees(paths: list[str]) -> bool:
     return any(p.startswith(_CONSIGNES) or p.endswith("CLAUDE.md") for p in paths)
 
 
-def main() -> int:
+_SOURCES = "backend/src/"
+_TESTS = "backend/tests/"
+
+
+def _module_de(chemin: str) -> str:
+    """`backend/src/tessera/a/b.py` → `tessera.a.b` ; un `__init__.py` donne son paquet."""
+    module = chemin[len(_SOURCES):-len(".py")].replace("/", ".")
+    return module.removesuffix(".__init__")
+
+
+def _importe(texte: str, module: str) -> bool:
+    """Whether `texte` imports `module`, as `tessera.a.b` or as `from tessera.a import b`."""
+    if module in texte:
+        return True
+    parent, _, nom = module.rpartition(".")
+    if not parent:
+        return False
+    return re.search(rf"from {re.escape(parent)} import [^\n]*\b{re.escape(nom)}\b", texte) is not None
+
+
+def fichiers_de_test_impactes(chemins: list[str], racine: Path = REPO_ROOT) -> list[str] | None:
+    """Backend test files a change to `chemins` can affect, relative to `backend/`.
+
+    None means « toute la suite » : un fichier de configuration, un utilitaire de
+    test ou `scripts/` peuvent toucher n'importe quel test. Un module modifié
+    entraîne les tests qui l'importent, et ceux qui importent un module qui
+    l'importe (un niveau). La CI rejoue de toute façon la suite complète.
+    """
+    selection: set[str] = set()
+    modules: set[str] = set()
+    for chemin in chemins:
+        if chemin.startswith("scripts/"):
+            return None
+        if not chemin.startswith("backend/"):
+            continue
+        nom = chemin.rsplit("/", 1)[-1]
+        if chemin.startswith(_TESTS) and nom.startswith("test_") and nom.endswith(".py"):
+            if (racine / chemin).exists():
+                selection.add(chemin[len("backend/"):])
+        elif chemin.startswith(_SOURCES) and chemin.endswith(".py"):
+            modules.add(_module_de(chemin))
+        else:
+            return None
+    if modules:
+        modifies = frozenset(modules)
+        for source in (racine / _SOURCES).rglob("*.py"):
+            texte = source.read_text(encoding="utf-8", errors="replace")
+            if any(_importe(texte, m) for m in modifies):
+                modules.add(_module_de(source.relative_to(racine).as_posix()))
+        for test in (racine / _TESTS).rglob("test_*.py"):
+            texte = test.read_text(encoding="utf-8", errors="replace")
+            if any(_importe(texte, m) for m in modules):
+                selection.add(test.relative_to(racine / "backend").as_posix())
+    return sorted(selection)
+
+
+def _option_impact(argv: list[str]) -> str | None:
+    """The ref given with `--impact <ref>`, or None."""
+    if "--impact" in argv:
+        index = argv.index("--impact")
+        if index + 1 < len(argv):
+            return argv[index + 1]
+    return None
+
+
+def _pytest_impacte(ref: str) -> list[Step] | None:
+    """The pytest step limited to the tests the change since `ref` can affect; None for all."""
+    diff = _git("diff", "--name-only", ref, "HEAD")
+    if diff is None:
+        return None
+    fichiers = fichiers_de_test_impactes([p for p in diff.splitlines() if p.strip()])
+    if fichiers is None:
+        return None
+    if not fichiers:
+        print(f"Aucun test backend concerné depuis {ref} : pytest sauté.", file=sys.stderr)
+        return []
+    return [Step(name="pytest", cmd=pytest_command() + fichiers, cwd=BACKEND_DIR)]
+
+
+def main(argv: list[str] | None = None) -> int:
     """Entry point."""
+    ref = _option_impact(sys.argv[1:] if argv is None else argv)
     paths = changed_paths()
     backend, frontend = chains_for(paths)
     if not (backend or frontend) and paths is not None and consignes_touchees(paths):
@@ -269,8 +370,13 @@ def main() -> int:
     if not (backend or frontend):
         print("Aucun fichier de backend/ ni de frontend/ modifié : rien à tester.", file=sys.stderr)
         return 0
+    pytest_steps = BACKEND_STEPS
+    if backend and ref is not None:
+        # Le retest après rebase ne relance que ce que le rebase peut toucher (ticket-793).
+        impacte = _pytest_impacte(ref)
+        pytest_steps = BACKEND_STEPS if impacte is None else impacte
     return run_parallel(
-        BACKEND_STEPS if backend else [],
+        pytest_steps if backend else [],
         FRONTEND_STEPS if frontend else [],
         TYPE_STEPS if backend else [],
     )
