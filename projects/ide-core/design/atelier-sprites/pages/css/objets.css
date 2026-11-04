@@ -1,0 +1,12 @@
+/* Objets de la pièce de run : keyframes de index.css (Tessera), ramenées aux unités de la grille ×2. */
+.anim-obj-gyro { animation: obj-gyro .8s steps(2) infinite; }
+@keyframes obj-gyro { 0% { opacity: 1; } 50% { opacity: .2; } 100% { opacity: 1; } }
+/* Tessera monte de 6 px sur un svg de 24 px de haut : 4 unités d'une grille de 16. */
+.anim-obj-vapeur { animation: obj-vapeur 1.6s steps(4) infinite; }
+@keyframes obj-vapeur { 0% { transform: translateY(0); opacity: .8; } 100% { transform: translateY(-4px); opacity: 0; } }
+/* Dans Tessera la chute traverse la pièce ; ici, l'échantillon tombe dans sa propre case. */
+.anim-obj-chute { animation: obj-chute 1.6s linear infinite; }
+@keyframes obj-chute { 0% { transform: translateY(-2px); opacity: 1; } 100% { transform: translateY(14px); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .anim-obj-gyro, .anim-obj-vapeur, .anim-obj-chute { animation: none; }
+}
