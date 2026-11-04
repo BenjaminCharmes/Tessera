@@ -7573,3 +7573,36 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-04 15:22:03 UTC — [ticket-767] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le code implémente un mécanism (157952ms)
 - 2026-11-04 15:22:03 UTC — [ticket-767] APPROVED après 1 tour(s)
 - 2026-11-04 15:23:24 UTC — [ticket-767] documentation: 0 fichier(s) (72375ms)
+- 2026-11-04 16:01:43 UTC — [ide-core] ticket-756 PR #895 confiée au CIWatcher
+- 2026-11-04 16:01:48 UTC — [ticket-757] branche ticket-757-a-documentation-proof-excerpt-must-be-delivered-c
+- 2026-11-04 16:01:50 UTC — [ticket-757] tour 1 — codeur démarré
+- 2026-11-04 16:06:07 UTC — [ticket-757] tour 1 — codeur terminé (256812ms)
+- 2026-11-04 16:17:53 UTC — [ticket-756] livraison: arrêt — PR #895 non mergée : Fin de l'attente : la CI de la PR #895 n'a pas rendu de verdict. La PR reste ouverte.
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-758 retiré de la file
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-761 retiré de la file
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-768 retiré de la file
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-769 retiré de la file
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-770 retiré de la file
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-771 retiré de la file
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-773 retiré de la file
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-772 retiré de la file
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-774 retiré de la file
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-775 retiré de la file
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-776 retiré de la file
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-781 retiré de la file
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-782 retiré de la file
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-780 retiré de la file
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-783 retiré de la file
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-786 retiré de la file
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-787 retiré de la file
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-788 retiré de la file
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-789 retiré de la file
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-790 retiré de la file
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-791 retiré de la file
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-792 retiré de la file
+- 2026-11-04 16:20:41 UTC — [ticket-757] testeur: OK (exit 0)
+- 2026-11-04 16:23:08 UTC — [ticket-757] securite: PASS — Le refactoring implémente ADR-057 en corrigeant un bug où le code supprimé pouva (146812ms)
+- 2026-11-04 16:23:08 UTC — [ticket-757] tour 1 — reviewer démarré
+- 2026-11-04 16:23:30 UTC — [ticket-757] tour 1 — reviewer terminé (21266ms)
+- 2026-11-04 16:26:20 UTC — [ticket-757] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Les tests ont été ajoutés pour (191984ms)
+- 2026-11-04 16:26:20 UTC — [ticket-757] APPROVED après 1 tour(s)
