@@ -28,8 +28,15 @@ interface AgentsDeLaPieceProps {
 
 /** Hauteur du pied de l'agent au-dessus du bas du sol : sous les postes, au niveau de leur nom. */
 const BAS_DE_LA_RANGEE = 28;
+/** Hauteur du sol de la pièce, sous le mur du fond : la grille `h-40` de `Piece`. */
+const SOL_DE_LA_PIECE = 160;
+/** Les meubles du fond descendent sous le mur (`-bottom-1` de `Pose`). */
+const ENFONCEMENT_DES_MEUBLES = 4;
+/** Un agent du fond se tient devant le meuble, les pieds un peu sous sa base (ticket-777). */
+const DEVANT_LE_MEUBLE = 4;
 /** Écart entre le sol des postes et celui du fond (machine, porte), en pixels. */
-const DENIVELE_DU_FOND = 132;
+const DENIVELE_DU_FOND =
+  SOL_DE_LA_PIECE - ENFONCEMENT_DES_MEUBLES - DEVANT_LE_MEUBLE - BAS_DE_LA_RANGEE;
 
 /** Une petite bulle de conversation au-dessus de la tête : deux agents bavardent à la machine. */
 function Bavardage() {
