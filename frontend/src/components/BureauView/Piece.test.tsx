@@ -4,6 +4,7 @@ import { INITIAL } from "../../hooks/streamState";
 import { api } from "../../lib/api";
 import { serviceActif } from "../../test/contrat/exemples";
 import Piece from "./Piece";
+import type { PosteId } from "../../lib/bureau/postesDuRun";
 import { DERNIER, T0, etatApresPipeline, etatEnCodage, etatEnSecurite, nomme } from "./etatsDeTest";
 
 function bulle(): string | null {
@@ -70,13 +71,13 @@ describe("Piece", () => {
     const onChoisir = vi.fn();
     render(<Piece projet="ide-core" etat={etatEnSecurite()} maintenant={T0 + 5_000} onChoisir={onChoisir} />);
 
-    const postes: [string, string, string][] = [
-      ["Codeur, a fini", "codeur", "codeur"],
-      ["Reviewer, attend son tour", "reviewer", "reviewer"],
-      ["Sécurité, travaille", "securite", "securite"],
+    const postes: [string, PosteId][] = [
+      ["Codeur, a fini", "codeur"],
+      ["Reviewer, attend son tour", "reviewer"],
+      ["Sécurité, travaille", "securite"],
     ];
-    for (const [libelle, role, poste] of postes) {
-      const bouton = screen.getByRole("button", { name: nomme(libelle, role) });
+    for (const [libelle, poste] of postes) {
+      const bouton = screen.getByRole("button", { name: nomme(libelle, poste) });
       fireEvent.click(bouton);
       expect(bouton.className).toContain("cursor-pointer");
       expect(onChoisir).toHaveBeenLastCalledWith("ide-core", poste);
