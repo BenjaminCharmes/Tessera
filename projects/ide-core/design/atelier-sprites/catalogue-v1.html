@@ -1,0 +1,904 @@
+<title>Atelier des sprites</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Mise en page : une colonne de lecture, des cartes de comparaison avant / après posées sur le sol du Bureau. */
+:root {
+  --bg: #141217;
+  --panel: #1d1a21;
+  --panel-2: #26222b;
+  --line: #36313c;
+  --fg: #eeeae4;
+  --muted: #a49d97;
+  --accent: #8b5cf6;
+  --accent-soft: #2c2340;
+  --ok: #4ade80;
+  --warn: #fbbf24;
+  --font-display: "Pixelify Sans", "Courier New", monospace;
+  --font-body: "Atkinson Hyperlegible", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+  color-scheme: dark;
+}
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--font-body);
+  font-size: 15px; line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 32px 64px;
+}
+.wrap { max-width: 1120px; margin: 0 auto; display: flex; flex-direction: column; gap: 40px; }
+h1, h2 { font-family: var(--font-display); font-weight: 700; text-wrap: balance; margin: 0; letter-spacing: .01em; }
+h1 { font-size: clamp(30px, 5vw, 46px); line-height: 1.05; }
+h2 { font-size: 26px; }
+h3 { font-size: 16px; margin: 0; }
+p { margin: 0; max-width: 68ch; }
+.lead { color: var(--muted); font-size: 17px; }
+.eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+code, .mono { font-family: var(--font-mono); font-size: 12.5px; }
+.muted { color: var(--muted); }
+header.hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 24px; align-items: end; }
+@media (max-width: 760px) { header.hero { grid-template-columns: 1fr; } }
+.hero-sprites { display: flex; gap: 8px; align-items: flex-end; background: var(--panel); border: 1px solid var(--line); padding: 16px; }
+.levers { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
+.lever { background: var(--panel); border: 1px solid var(--line); padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; }
+.lever b { font-family: var(--font-display); font-size: 17px; font-weight: 500; }
+.lever p { color: var(--muted); font-size: 14px; }
+
+/* Barre de réglages collante */
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.controls { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: color-mix(in oklab, var(--bg) 92%, transparent); backdrop-filter: blur(6px); border-bottom: 1px solid var(--line); padding: 10px 0; display: flex; flex-wrap: wrap; gap: 14px 24px; align-items: center; }
+.ctl { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ctl > span { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.seg { display: inline-flex; border: 1px solid var(--line); background: var(--panel); flex-wrap: wrap; }
+.seg button { font: inherit; font-size: 13px; color: var(--muted); background: none; border: 0; padding: 6px 11px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--accent-soft); color: var(--fg); box-shadow: inset 0 -2px 0 var(--accent); }
+.seg button:focus-visible, .btn:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+label.chk { display: inline-flex; gap: 6px; align-items: center; font-size: 13px; color: var(--muted); cursor: pointer; }
+
+section { display: flex; flex-direction: column; gap: 18px; }
+.sec-head { display: flex; flex-direction: column; gap: 6px; }
+.cards { display: flex; flex-direction: column; gap: 16px; }
+.card { background: var(--panel); border: 1px solid var(--line); padding: 16px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.card-head { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline; justify-content: space-between; }
+.card-head .mono { color: var(--muted); }
+.compare { display: flex; flex-wrap: wrap; gap: 12px; }
+.tile { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.tile .stage { display: flex; align-items: flex-end; justify-content: center; gap: 10px; padding: 18px; min-height: 80px; border: 1px solid var(--line); overflow-x: auto; max-width: 100%; }
+.tile .lab { display: flex; justify-content: space-between; gap: 12px; font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); }
+.tile .lab b { color: var(--fg); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+.tile.after .lab b { color: #c4b5fd; }
+.note { font-size: 14px; color: var(--muted); max-width: 80ch; }
+.note b { color: var(--fg); }
+.strip { display: flex; flex-wrap: wrap; gap: 8px; }
+.strip .mini { display: flex; flex-direction: column; gap: 4px; align-items: center; }
+.strip .mini .stage { padding: 10px; min-height: 0; }
+.strip .mini span { font-family: var(--font-mono); font-size: 10.5px; color: var(--muted); }
+svg.px { display: block; flex: none; }
+.badge { font-family: var(--font-mono); font-size: 11px; padding: 2px 7px; border: 1px solid var(--line); color: var(--muted); }
+.badge.new { border-color: var(--accent); color: #c4b5fd; }
+.badge.warn { border-color: #7a5b12; color: var(--warn); }
+
+/* Animations des sprites : mêmes durées que index.css */
+.tape { animation: tape .5s steps(2) infinite; }
+@keyframes tape { 0% { transform: translateY(0); } 50% { transform: translateY(1px); } }
+.lueur { animation: lueur 1.6s ease-in-out infinite; }
+@keyframes lueur { 50% { opacity: .72; } }
+.clignote { animation: clignote 1.1s steps(1) infinite; }
+@keyframes clignote { 50% { opacity: .15; } }
+.frame { animation: frame .64s steps(1) infinite; opacity: 0; }
+@keyframes frame { 0% { opacity: 1; } 25% { opacity: 0; } 100% { opacity: 0; } }
+.walk-stack { display: grid; }
+.walk-stack > * { grid-area: 1 / 1; }
+.slide { display: grid; }
+.slide > * { grid-area: 1/1; }
+.slide-anim { animation: slide 1.8s steps(12) infinite alternate; }
+@keyframes slide { to { transform: translateX(110px); } }
+@media (prefers-reduced-motion: reduce) {
+  .tape, .lueur, .clignote, .slide-anim { animation: none; }
+  .frame { animation: none; opacity: 0; }
+  .frame:first-child { opacity: 1; }
+}
+
+/* Tableaux */
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 640px; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 400; background: var(--panel); }
+td.num { font-variant-numeric: tabular-nums; font-family: var(--font-mono); font-size: 13px; white-space: nowrap; }
+tr.reco td { background: color-mix(in oklab, var(--accent-soft) 60%, transparent); }
+.btn { font: inherit; font-size: 14px; background: var(--accent); color: #fff; border: 0; padding: 8px 14px; cursor: pointer; }
+.btn[disabled] { opacity: .6; cursor: wait; }
+.bench-out { font-family: var(--font-mono); font-size: 13px; color: var(--muted); }
+.bench-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.bench-cell { background: var(--panel-2); border: 1px solid var(--line); padding: 12px; display: flex; flex-direction: column; gap: 4px; }
+.bench-cell .v { font-family: var(--font-mono); font-size: 22px; font-variant-numeric: tabular-nums; }
+.bench-cell .k { font-size: 13px; color: var(--muted); }
+ol.steps { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 8px; max-width: 80ch; }
+ol.steps li::marker { font-family: var(--font-mono); color: var(--accent); }
+#benchArea { position: absolute; left: -99999px; top: 0; width: 1200px; }
+</style>
+
+<div class="wrap">
+  <header class="hero">
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <span class="eyebrow">Tessera · Bureau · exploration, rien n'est appliqué</span>
+      <h1>Atelier des sprites</h1>
+      <p class="lead">Les sprites actuels du Bureau redessinés à côté de leur version d'aujourd'hui. Même place à l'écran, mêmes jetons de couleur, mêmes états. Quatre palettes à essayer, quelques sprites nouveaux, et une comparaison des autres façons de dessiner le Bureau.</p>
+    </div>
+    <div class="hero-sprites" id="hero" aria-hidden="true"></div>
+  </header>
+
+  <div class="levers">
+    <div class="lever"><b>Grille ×2</b><p>Chaque sprite garde sa taille en pixels d'écran, mais sa grille double : 20 × 18 devient 40 × 36. Quatre fois plus de points pour des visages, des mains et des matières.</p></div>
+    <div class="lever"><b>Rampes de 4 tons</b><p>Aujourd'hui une matière a deux tons (base, ombre). Ici quatre : reflet, base, ombre, creux, avec un glissement de teinte (ombres vers le bleu, reflets vers le jaune).</p></div>
+    <div class="lever"><b>Contour sélectif</b><p>Un liseré plus sombre de la couleur voisine, calculé automatiquement. Les sprites se détachent du sol sans trait noir uniforme.</p></div>
+    <div class="lever"><b>Un path par couleur</b><p>Plus de pixels, moins de nœuds : chaque couleur d'un sprite devient un seul <code>&lt;path&gt;</code>. Le poste passe de 15 <code>rect</code> à environ 20 <code>path</code> pour 4× plus de détail.</p></div>
+  </div>
+
+  <div class="controls" role="toolbar" aria-label="Réglages d'affichage">
+    <div class="ctl"><span>Palette de l'après</span><div class="seg" id="themeSeg"></div></div>
+    <div class="ctl"><span>Zoom</span><div class="seg" id="zoomSeg"></div></div>
+    <label class="chk"><input type="checkbox" id="outlineChk" checked> Contour sélectif</label>
+  </div>
+
+  <section id="poste">
+    <div class="sec-head"><span class="eyebrow">Pièce de run</span><h2>Le poste et son agent</h2>
+      <p class="muted">Le sprite le plus vu. La troisième colonne garde la grille d'origine et n'ajoute que l'ombrage : on gagne déjà beaucoup sans doubler les pixels.</p></div>
+    <div class="cards" id="cards-poste"></div>
+  </section>
+
+  <section id="salle-serveurs">
+    <div class="sec-head"><span class="eyebrow">Salle des serveurs</span><h2>Baies et climatisation</h2>
+      <p class="muted">Le voyant reste le seul élément qui porte l'état du service (ADR-058) ; il gagne un halo. Les diodes d'activité de la variante ne s'allument que pour un service en cours.</p></div>
+    <div class="cards" id="cards-serveurs"></div>
+  </section>
+
+  <section id="mobilier">
+    <div class="sec-head"><span class="eyebrow">Mobilier fixe</span><h2>Plantes, café, livres</h2>
+      <p class="muted">Du mobilier : il se dessine toujours, sans animation ni voyant. C'est là que la grille ×2 se voit le plus, parce que les matières (terre cuite, feuilles, reliures) ont enfin la place d'exister.</p></div>
+    <div class="cards" id="cards-mobilier"></div>
+  </section>
+
+  <section id="nouveaux">
+    <div class="sec-head"><span class="eyebrow">Proposition</span><h2>Nouveaux sprites</h2>
+      <p class="muted">Chacun rend une donnée qui existe déjà dans le store de run ; aucun n'est décoratif.</p></div>
+    <div class="cards" id="cards-nouveaux"></div>
+  </section>
+
+  <section id="rendu">
+    <div class="sec-head"><span class="eyebrow">Au-delà des sprites</span><h2>Autres façons de dessiner le Bureau</h2>
+      <p class="muted">Le même poste, rendu de cinq manières. Le banc plus bas mesure le coût réel de chacune dans ce navigateur.</p></div>
+    <div class="cards" id="cards-rendu"></div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Technique</th><th>Beauté</th><th>Coût par poste</th><th>Ce qu'on garde</th><th>Ce qu'on perd</th></tr></thead>
+        <tbody>
+          <tr><td><b>SVG, un rect par bloc</b><br><span class="muted">aujourd'hui</span></td><td>Lisible, plat</td><td class="num" id="t-rect">…</td><td>Tout : jetons, tests DOM, tooltips</td><td>Le détail : chaque pixel de plus est un nœud de plus</td></tr>
+          <tr class="reco"><td><b>SVG, un path par couleur</b><br><span class="muted">recommandé</span></td><td>Pixel art soigné</td><td class="num" id="t-path">…</td><td>Tout ce qui précède, le format change seulement</td><td>Le test « rect seulement » de <code>sources.test.ts</code> est à adapter</td></tr>
+          <tr><td><b>Canvas 2D par salle</b></td><td>Identique au précédent</td><td class="num" id="t-canvas">…</td><td>L'image</td><td>Les classes Tailwind (jetons relus en JS), <code>data-sprite</code> pour les tests, survol et focus à refaire à la main</td></tr>
+          <tr><td><b>Hybride</b><br><span class="muted">décor cuit + vivant en SVG</span></td><td>Pixel art soigné</td><td class="num">≈ 1 image + les agents</td><td>Les agents et voyants restent des nœuds testables</td><td>Un cache à invalider quand le thème change</td></tr>
+          <tr><td><b>Vectoriel lisse</b></td><td>« Produit », zoom infini</td><td class="num" id="t-vector">…</td><td>Jetons, DOM</td><td>Le charme pixel ; dégradés et ombres coûtent au rendu, chaque objet est un dessin à part</td></tr>
+          <tr><td><b>Isométrique</b><br><span class="muted">non maquetté</span></td><td>Le plus « jeu »</td><td class="num">comparable au path</td><td>La technique SVG</td><td>Toute la disposition des salles, les trajets de marche, des semaines de dessin</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>Banc de mesure</h3><span class="mono">200 postes insérés dans la page, mise en page forcée, médiane de 5 passes</span></div>
+      <div><button class="btn" id="benchBtn" type="button">Lancer la mesure</button></div>
+      <div class="bench-grid" id="benchOut"></div>
+      <p class="note">La mesure tourne dans ce navigateur, avec la palette affichée. Les écarts comptent plus que les valeurs absolues : un Bureau réel porte au plus quelques dizaines de postes.</p>
+    </div>
+  </section>
+
+  <section id="conclusion">
+    <div class="sec-head"><span class="eyebrow">Si un jour on l'applique</span><h2>Recommandation</h2></div>
+    <p>Garder le SVG, passer à un <b>path par couleur</b> et à la <b>grille ×2</b> sur les personnages et le mobilier, avec des <b>rampes de 4 tons</b> écrites comme jetons <code>--sprite-*</code>. C'est la seule piste qui embellit sans rien retirer : les états restent des classes, les tests trouvent toujours leurs <code>data-sprite</code>, et changer de palette reste un échange de variables CSS, sans JavaScript. Le Canvas ne gagne du temps qu'au-delà de plusieurs centaines de sprites, ce que le Bureau n'atteint pas.</p>
+    <ol class="steps">
+      <li>Un convertisseur au build : une carte de pixels (texte ou PNG indexé) devient un composant avec un <code>&lt;path&gt;</code> par jeton. Le contour sélectif se calcule là, jamais à l'exécution.</li>
+      <li>Ajouter les tons <code>-reflet</code> et <code>-creux</code> aux jetons existants ; ADR à écrire pour la rampe et le glissement de teinte.</li>
+      <li>Commencer par la tête : <code>Tete.tsx</code> sert aux deux poses, et les expressions par santé y vivent.</li>
+      <li>Puis le poste et l'écran : les scènes d'<code>EcranScenes</code> passent de 6 × 4 à 12 × 8, à redessiner.</li>
+      <li>Le mobilier en dernier, une pièce par ticket ; adapter <code>sources.test.ts</code> pour accepter <code>path</code>.</li>
+    </ol>
+  </section>
+</div>
+<div id="benchArea" aria-hidden="true"></div>
+
+<script>
+"use strict";
+/* ---------- Couleurs ---------- */
+const h2r = h => { h = h.replace("#", ""); return [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16)); };
+const r2h = (r, g, b) => "#" + [r, g, b].map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, "0")).join("");
+function toHsl(hex) {
+  let [r, g, b] = h2r(hex).map(v => v / 255);
+  const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2;
+  if (mx === mn) return [0, 0, l];
+  const d = mx - mn, s = l > .5 ? d / (2 - mx - mn) : d / (mx + mn);
+  let h = mx === r ? (g - b) / d + (g < b ? 6 : 0) : mx === g ? (b - r) / d + 2 : (r - g) / d + 4;
+  return [h * 60, s, l];
+}
+function fromHsl(h, s, l) {
+  s = Math.max(0, Math.min(1, s)); l = Math.max(0, Math.min(1, l));
+  const k = n => (n + h / 30) % 12, a = s * Math.min(l, 1 - l);
+  const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+  return r2h(f(0) * 255, f(8) * 255, f(4) * 255);
+}
+const mix = (a, b, t) => { const x = h2r(a), y = h2r(b); return r2h(...x.map((v, i) => v + (y[i] - v) * t)); };
+const toward = (h, t, amt) => { const d = ((t - h + 540) % 360) - 180; return (h + d * amt + 360) % 360; };
+function ramp(hex) {
+  const [h, s, l] = toHsl(hex);
+  return {
+    hi: fromHsl(toward(h, 55, .14), s * .95, l + .13),
+    b: hex,
+    s: fromHsl(toward(h, 250, .12), s * 1.05 + .03, l - .11),
+    d: fromHsl(toward(h, 250, .2), s * 1.05 + .05, l - .21),
+    blush: mix(hex, "#e0605a", .32),
+  };
+}
+const lum = hex => { const [r, g, b] = h2r(hex); return .299 * r + .587 * g + .114 * b; };
+
+/* ---------- Tons actuels (index.css, familles Tailwind) ---------- */
+const C = {
+  z900: "#18181b", z800: "#27272a", z700: "#3f3f46", z600: "#52525b", z500: "#71717a", z200: "#e4e4e7",
+  peau: ["#f1c7a3", "#e8b98f", "#c68b59", "#8d5a3b", "#5c3a24"],
+  cheveux: ["#3f2a1d", "#111827", "#a16207", "#7c2d12", "#d4d4d8", "#1c1917"],
+  haut: { codeur: "#8e51ff", reviewer: "#0f766e", testeur: "#e4e4e7", securite: "#1e3a8a", validateur: "#b45309", architect: "#be185d" },
+  ombre: { codeur: "#7008e7", reviewer: "#115e59", testeur: "#a1a1aa", securite: "#172554", validateur: "#92400e", architect: "#9d174d" },
+  col: "#e4e4e7", cravate: "#1f2937", metal: "#52525b", metalO: "#3f3f46", metalC: "#71717a",
+  plante: "#16a34a", planteO: "#15803d", pot: "#92400e", cactus: "#4d7c0f", potClair: "#d6a77a",
+  machine: "#52525b", machineO: "#3f3f46", tasse: "#e4e4e7", table: "#8a6a4a", tableO: "#6b5038",
+  livres: ["#9f1239", "#1e40af", "#ca8a04"], sol: "#2a2420",
+};
+/* États : jamais thémés (ADR-026). */
+const ETAT = { actif: "#60a5fa", attente: "#71717a", question: "#fbbf24", blocage: "#f87171", fait: "#4ade80" };
+const ETAT_R = Object.fromEntries(Object.entries(ETAT).map(([k, v]) => [k, ramp(v)]));
+const PROTEGE = new Set(Object.values(ETAT_R).flatMap(r => [r.hi, r.b, r.s, r.d]));
+
+/* ---------- Palettes de l'après ---------- */
+const BASE = {
+  skin: C.peau, hair: C.cheveux, top: C.haut, pants: "#3f3f46", shoe: "#27272a", desk: "#52525b", chair: "#2f2f35",
+  metal: "#52525b", frame: "#2a2a30", plant: "#16a34a", pot: "#a14a17", cactus: "#4d7c0f", potClair: "#d6a77a",
+  machine: "#52525b", cup: "#e4e4e7", wood: "#8a6a4a", books: C.livres, col: "#e4e4e7", cravate: "#1f2937", ink: "#18181b",
+  floor: "#2a2420", coffee: "#5b3a1e", flower: "#f472b6", spine: "#ecfccb",
+};
+const THEMES = {
+  tessera: { label: "Tessera", note: "les teintes d'aujourd'hui, en rampes", base: BASE, outline: "selout" },
+  chaud: { label: "Chaud 16 bits", note: "bois, terre cuite, espresso", outline: "selout", base: { ...BASE,
+    pants: "#3d3a55", shoe: "#2b2230", desk: "#a0703f", chair: "#5a3b2a", metal: "#6b6f7a", frame: "#3b3440",
+    plant: "#3fa34d", pot: "#c0602f", machine: "#8c3b2f", cup: "#f2ead8", wood: "#9a6a3a", books: ["#b8323e", "#2f5fa8", "#d9a23a"],
+    floor: "#3a2c24", top: { ...C.haut, testeur: "#e9e2d0", securite: "#2a4a9a" } } },
+  neon: { label: "Néon nuit", note: "liseré sombre, lumière cyan venue de gauche", outline: "#07081a", rim: "#5ef2ff", base: { ...BASE,
+    pants: "#26284a", shoe: "#14152b", desk: "#2a2c4a", chair: "#1c1d36", metal: "#2d3150", frame: "#14152b",
+    plant: "#18b88a", pot: "#5a3d8a", machine: "#2a2c4a", cup: "#cfd3ff", wood: "#3a2f5a", books: ["#ff3d8b", "#3dd6ff", "#ffd23d"],
+    floor: "#0e0f1f", cactus: "#1fa37a", potClair: "#7a5ab8" } },
+  gb: { label: "Game Boy", note: "4 verts ; les voyants gardent leur couleur d'état", outline: "selout", quantize: ["#0f380f", "#306230", "#8bac0f", "#9bbc0f"], base: { ...BASE, floor: "#0f380f" } },
+};
+function palette(th) {
+  const b = th.base, R = ramp;
+  return {
+    skin: b.skin.map(R), hair: b.hair.map(R), top: Object.fromEntries(Object.entries(b.top).map(([k, v]) => [k, R(v)])),
+    pants: R(b.pants), shoe: R(b.shoe), desk: R(b.desk), chair: R(b.chair), metal: R(b.metal), frame: R(b.frame),
+    plant: R(b.plant), pot: R(b.pot), cactus: R(b.cactus), potClair: R(b.potClair), machine: R(b.machine), cup: R(b.cup),
+    wood: R(b.wood), books: b.books.map(R), col: R(b.col), cravate: R(b.cravate), ink: b.ink, coffee: b.coffee,
+    flower: R(b.flower), spine: b.spine, floor: b.floor,
+  };
+}
+
+/* ---------- Grille et rendu ---------- */
+class G {
+  constructor(w, h) { this.w = w; this.h = h; this.p = new Array(w * h).fill(null); this.n = 0; }
+  set(x, y, c) { if (x >= 0 && y >= 0 && x < this.w && y < this.h) this.p[y * this.w + x] = c; }
+  get(x, y) { return x < 0 || y < 0 || x >= this.w || y >= this.h ? null : this.p[y * this.w + x]; }
+  rect(x, y, w, h, c) { this.n++; for (let j = y; j < y + h; j++) for (let i = x; i < x + w; i++) this.set(i, j, c); }
+  px(x, y, c) { this.n++; this.set(x, y, c); }
+  clr(x, y) { this.set(x, y, null); }
+}
+function mk(w, h) {
+  const s = { w, h, layers: [] };
+  s.L = (cls = "", style = "") => { const g = new G(w, h); s.layers.push({ g, cls, style }); return g; };
+  return s;
+}
+const occupied = (s, x, y) => s.layers.some(l => l.g.get(x, y));
+function post(s, th, opts) {
+  if (th.rim) for (const { g } of s.layers) {
+    const src = g.p.slice();
+    for (let y = 0; y < s.h; y++) for (let x = 0; x < s.w; x++) {
+      const c = src[y * s.w + x];
+      if (c && !PROTEGE.has(c) && (!occupied(s, x - 1, y) || !occupied(s, x, y - 1))) g.set(x, y, mix(c, th.rim, .38));
+    }
+  }
+  if (opts.outline && th.outline) for (const { g } of s.layers) {
+    const src = g.p.slice(), at = (x, y) => x < 0 || y < 0 || x >= s.w || y >= s.h ? null : src[y * s.w + x];
+    for (let y = 0; y < s.h; y++) for (let x = 0; x < s.w; x++) {
+      if (occupied(s, x, y)) continue;
+      const n = at(x - 1, y) || at(x + 1, y) || at(x, y - 1) || at(x, y + 1);
+      if (!n) continue;
+      if (th.outline === "selout") { const [h, sa, l] = toHsl(n); g.set(x, y, fromHsl(toward(h, 250, .25), sa, l * .42)); }
+      else g.set(x, y, th.outline);
+    }
+  }
+  if (th.quantize) {
+    const q = th.quantize.map(c => [c, lum(c)]).sort((a, b) => a[1] - b[1]);
+    for (const { g } of s.layers) g.p = g.p.map(c => {
+      if (!c || PROTEGE.has(c)) return c;
+      const L = lum(c); let best = q[0];
+      for (const e of q) if (Math.abs(e[1] - L * .95 - 10) < Math.abs(best[1] - L * .95 - 10)) best = e;
+      return best[0];
+    });
+  }
+  return s;
+}
+function toSvg(s, dw, dh) {
+  let body = "", nodes = 0, pixels = 0;
+  for (const { g, cls, style } of s.layers) {
+    const byColor = new Map();
+    for (let y = 0; y < s.h; y++) {
+      let x = 0;
+      while (x < s.w) {
+        const c = g.p[y * s.w + x];
+        if (!c) { x++; continue; }
+        let e = x; while (e < s.w && g.p[y * s.w + e] === c) e++;
+        byColor.set(c, (byColor.get(c) || "") + `M${x} ${y}h${e - x}v1h${x - e}z`);
+        pixels += e - x; x = e;
+      }
+    }
+    let inner = "";
+    for (const [c, d] of byColor) { inner += `<path fill="${c}" d="${d}"/>`; nodes++; }
+    body += cls || style ? `<g class="${cls}" style="${style}">${inner}</g>` : inner;
+  }
+  return { html: `<svg class="px" viewBox="0 0 ${s.w} ${s.h}" width="${dw}" height="${dh}" shape-rendering="crispEdges" overflow="visible">${body}</svg>`, nodes, pixels };
+}
+const rectCount = s => s.layers.reduce((n, l) => n + l.g.n, 0);
+function flatten(s) { const g = new G(s.w, s.h); for (const l of s.layers) l.g.p.forEach((c, i) => { if (c) g.p[i] = c; }); const o = mk(s.w, s.h); o.layers.push({ g, cls: "", style: "" }); return o; }
+
+/* ---------- AVANT : copies fidèles des composants actuels ---------- */
+function avantTete(g, ph, x, y) {
+  const H = C.cheveux[ph.cheveux - 1], K = C.peau[ph.peau - 1];
+  if (ph.coiffure === "long") { g.rect(x - 1, y - 1, 1, 7, H); g.rect(x + 6, y - 1, 1, 7, H); }
+  if (ph.coiffure === "carre") { g.rect(x - 1, y - 1, 1, 4, H); g.rect(x + 6, y - 1, 1, 4, H); }
+  if (ph.coiffure === "chauve") { g.rect(x, y - 1, 1, 2, H); g.rect(x + 5, y - 1, 1, 2, H); } else g.rect(x, y - 2, 6, 2, H);
+  g.rect(x, y, 6, 4, K);
+  if (ph.coiffure === "court") { g.rect(x, y, 1, 1, H); g.rect(x + 5, y, 1, 1, H); }
+  if (ph.coiffure === "chauve") g.rect(x + 1, y - 1, 4, 1, K);
+  g.rect(x + 1, y + 1, 1, 1, C.z900); g.rect(x + 4, y + 1, 1, 1, C.z900);
+}
+function avantPoste(role = "codeur", ph = PH.codeur, etat = "actif") {
+  const s = mk(20, 18), g = s.L(), O = C.ombre[role];
+  avantTete(g, ph, 5, 3);
+  g.rect(4, 7, 8, 5, C.haut[role]);
+  if (role === "reviewer") { g.rect(7, 7, 2, 1, C.col); g.rect(7, 8, 2, 3, C.cravate); }
+  if (role === "codeur") g.rect(6, 7, 4, 1, O);
+  const a = s.L("tape"); a.rect(3, 9, 2, 3, O); a.rect(11, 9, 2, 3, O);
+  const d = s.L(); d.rect(1, 12, 18, 2, C.z600); d.rect(2, 14, 1, 4, C.z700); d.rect(17, 14, 1, 4, C.z700); d.rect(12, 5, 8, 6, C.z800);
+  const l = s.L("lueur"); l.rect(13, 6, 6, 4, ETAT[etat]);
+  s.L().rect(15, 11, 2, 1, C.z800);
+  return s;
+}
+function avantDebout(role = "reviewer", ph = PH.reviewer) {
+  const s = mk(12, 20), g = s.L(), O = C.ombre[role];
+  avantTete(g, ph, 2, 2);
+  g.rect(1, 6, 8, 7, C.haut[role]);
+  if (role === "reviewer") { g.rect(4, 6, 2, 1, C.col); g.rect(4, 7, 2, 4, C.cravate); }
+  g.rect(2, 13, 2, 7, C.z700); g.rect(6, 13, 2, 7, C.z700);
+  g.rect(0, 7, 1, 5, O); g.rect(9, 7, 1, 3, O); g.rect(10, 6, 2, 2, C.z200);
+  return s;
+}
+function avantBaie(etat = "actif") {
+  const s = mk(12, 30), g = s.L();
+  g.rect(0, 0, 12, 30, C.metalO); g.rect(1, 1, 10, 28, C.metal); g.rect(2, 2, 8, 3, C.metalO);
+  g.rect(8, 3, 1, 1, ETAT[etat]);
+  for (const y of [7, 10, 13, 16, 19, 22, 25]) g.rect(2, y, 8, 1, C.metalO);
+  g.rect(9, 27, 1, 1, C.metalC);
+  return s;
+}
+function avantClim() {
+  const s = mk(16, 22), g = s.L();
+  g.rect(0, 0, 16, 22, C.metalO); g.rect(1, 1, 14, 20, C.metal); g.rect(2, 2, 12, 13, C.metalO);
+  for (const y of [3, 5, 7, 9, 11, 13]) g.rect(3, y, 10, 1, C.metalC);
+  g.rect(2, 17, 12, 3, C.metalC); g.rect(3, 18, 10, 1, C.metalO);
+  return s;
+}
+function avantPlante(esp) {
+  const s = mk(8, esp === "ficus" ? 16 : 10), g = s.L();
+  if (esp === "pot") { g.rect(1, 2, 2, 2, C.plante); g.rect(5, 1, 2, 3, C.plante); g.rect(3, 0, 2, 5, C.planteO); g.rect(2, 4, 4, 1, C.planteO); g.rect(2, 5, 4, 1, C.pot); g.rect(2, 6, 4, 4, C.pot); }
+  if (esp === "cactus") { g.rect(3, 0, 2, 6, C.cactus); g.rect(1, 2, 1, 2, C.cactus); g.rect(1, 3, 2, 1, C.cactus); g.rect(6, 1, 1, 3, C.cactus); g.rect(5, 3, 2, 1, C.cactus); g.rect(2, 6, 4, 4, C.potClair); }
+  if (esp === "ficus") { g.rect(1, 1, 6, 5, C.plante); g.rect(2, 0, 4, 1, C.plante); g.rect(0, 3, 1, 2, C.planteO); g.rect(7, 2, 1, 3, C.planteO); g.rect(2, 4, 2, 2, C.planteO); g.rect(3, 6, 1, 5, C.pot); g.rect(2, 11, 4, 5, C.pot); }
+  return s;
+}
+function avantMachine() {
+  const s = mk(12, 16), g = s.L();
+  g.rect(1, 0, 10, 14, C.machine); g.rect(1, 12, 10, 2, C.machineO); g.rect(3, 2, 6, 3, C.machineO); g.rect(5, 6, 2, 2, C.machineO);
+  g.rect(4, 9, 4, 3, C.tasse); g.rect(0, 14, 12, 2, C.machineO);
+  return s;
+}
+const RANGEES = [
+  { y: 2, livres: [[2, 0, 2, 4, 1], [4, 1, 2, 3, 2], [6, 0, 1, 4, 3], [8, 1, 2, 3, 1], [11, 0, 2, 4, 3]] },
+  { y: 7, livres: [[2, 1, 1, 3, 3], [3, 0, 2, 4, 2], [5, 0, 1, 4, 1], [7, 2, 3, 2, 3], [11, 1, 1, 3, 2], [12, 0, 2, 4, 1]] },
+  { y: 12, livres: [[2, 0, 2, 4, 2], [5, 1, 1, 3, 1], [6, 0, 2, 4, 3], [9, 1, 2, 3, 2], [12, 0, 1, 4, 1]] },
+];
+function avantBiblio() {
+  const s = mk(16, 18), g = s.L();
+  g.rect(0, 0, 16, 18, C.tableO); g.rect(1, 1, 14, 16, C.table);
+  for (const { y, livres } of RANGEES) { for (const [x, dy, w, h, t] of livres) g.rect(x, y + dy, w, h, C.livres[t - 1]); g.rect(1, y + 4, 14, 1, C.tableO); }
+  return s;
+}
+
+/* ---------- APRÈS : grille ×2 ---------- */
+const PH = {
+  codeur: { peau: 2, cheveux: 1, coiffure: "court" },
+  reviewer: { peau: 4, cheveux: 2, coiffure: "long" },
+  testeur: { peau: 1, cheveux: 3, coiffure: "carre", jupe: true },
+  securite: { peau: 5, cheveux: 6, coiffure: "chauve" },
+  validateur: { peau: 3, cheveux: 4, coiffure: "court" },
+  architect: { peau: 2, cheveux: 5, coiffure: "carre" },
+};
+function tete(g, P, x, y, ph, expr = "neutre") {
+  const H = P.hair[ph.cheveux - 1], K = P.skin[ph.peau - 1], ink = P.ink, br = H.s;
+  g.rect(x - 1, y + 4, 1, 2, K.s); g.rect(x + 12, y + 4, 1, 2, K.s);
+  g.rect(x, y, 12, 9, K.b); g.rect(x + 11, y + 1, 1, 7, K.s); g.rect(x + 1, y + 8, 10, 1, K.s); g.clr(x, y + 8); g.clr(x + 11, y + 8);
+  g.rect(x + 1, y + 1, 1, 3, K.hi);
+  if (ph.coiffure === "long") { g.rect(x - 2, y - 1, 2, 13, H.b); g.rect(x + 12, y - 1, 2, 13, H.s); g.rect(x - 2, y + 11, 2, 1, H.s); g.rect(x + 12, y + 11, 2, 1, H.d); }
+  if (ph.coiffure === "carre") { g.rect(x - 2, y - 1, 2, 8, H.b); g.rect(x + 12, y - 1, 2, 8, H.s); g.rect(x - 2, y + 6, 2, 1, H.s); }
+  if (ph.coiffure === "chauve") {
+    g.rect(x + 1, y - 2, 10, 2, K.b); g.rect(x, y - 1, 12, 1, K.b); g.rect(x + 3, y - 2, 3, 1, K.hi); g.rect(x + 9, y - 1, 2, 1, K.s);
+    g.rect(x - 1, y + 1, 2, 4, H.b); g.rect(x + 11, y + 1, 2, 4, H.s);
+  } else {
+    g.rect(x + 1, y - 3, 10, 1, H.b); g.rect(x, y - 2, 12, 2, H.b); g.rect(x, y, 12, 1, H.b);
+    g.px(x + 2, y + 1, H.b); g.px(x + 3, y + 1, H.b); g.px(x + 7, y + 1, H.b); g.px(x + 10, y + 1, H.s);
+    g.rect(x + 9, y - 2, 3, 3, H.s); g.rect(x + 3, y - 2, 3, 1, H.hi); g.px(x + 2, y - 1, H.hi);
+    if (ph.coiffure === "court") { g.rect(x, y, 1, 3, H.b); g.rect(x + 11, y, 1, 3, H.s); }
+  }
+  const yeux = (dx = 0) => { g.rect(x + 3 + dx, y + 4, 1, 2, ink); g.rect(x + 8 + dx, y + 4, 1, 2, ink); };
+  const joues = () => { g.px(x + 2, y + 6, K.blush); g.px(x + 9, y + 6, K.blush); };
+  switch (expr) {
+    case "actif": g.rect(x + 2, y + 3, 2, 1, br); g.rect(x + 8, y + 3, 2, 1, br); yeux(1); g.rect(x + 5, y + 7, 2, 1, K.d); break;
+    case "attente": g.rect(x + 2, y + 5, 2, 1, ink); g.rect(x + 8, y + 5, 2, 1, ink); g.px(x + 6, y + 7, K.d); joues(); break;
+    case "question": g.rect(x + 2, y + 3, 2, 1, br); g.rect(x + 8, y + 2, 2, 1, br); yeux(); g.px(x + 6, y + 7, P.ink); joues(); break;
+    case "blocage": g.px(x + 2, y + 2, br); g.px(x + 3, y + 3, br); g.px(x + 9, y + 2, br); g.px(x + 8, y + 3, br); yeux();
+      g.rect(x + 4, y + 7, 4, 1, K.d); g.px(x + 13, y + 1, "#dbeafe"); g.rect(x + 12, y + 2, 2, 2, "#93c5fd"); break;
+    case "fait": [[2, 5], [3, 4], [4, 5], [7, 5], [8, 4], [9, 5]].forEach(([a, b]) => g.px(x + a, y + b, ink));
+      g.px(x + 4, y + 6, K.d); g.rect(x + 5, y + 7, 2, 1, K.d); g.px(x + 7, y + 6, K.d); g.px(x + 2, y + 6, K.blush); g.px(x + 9, y + 6, K.blush); break;
+    default: g.rect(x + 2, y + 3, 2, 1, br); g.rect(x + 8, y + 3, 2, 1, br); yeux(); g.rect(x + 5, y + 7, 2, 1, K.d); joues();
+  }
+}
+function torseDetails(g, P, role, x, y) {
+  const T = P.top[role];
+  if (role === "codeur") { g.rect(x + 3, y, 8, 2, T.s); g.rect(x + 4, y, 6, 1, T.d); g.rect(x + 5, y + 2, 1, 3, T.hi); g.rect(x + 8, y + 2, 1, 2, T.hi); g.rect(x + 3, y + 5, 8, 2, T.s); }
+  if (role === "reviewer") { g.rect(x + 4, y, 2, 1, P.col.b); g.rect(x + 8, y, 2, 1, P.col.s); g.rect(x + 6, y, 2, 2, P.cravate.hi); g.rect(x + 6, y + 2, 2, 5, P.cravate.b); g.px(x + 7, y + 7, P.cravate.b); }
+}
+function apresPoste(P, role = "codeur", ph = PH.codeur, etat = "actif", expr = "actif") {
+  const s = mk(40, 36), T = P.top[role], K = P.skin[ph.peau - 1];
+  const ch = s.L(); ch.rect(6, 13, 18, 11, P.chair.s); ch.rect(7, 12, 16, 1, P.chair.b); ch.rect(7, 13, 16, 1, P.chair.hi);
+  const g = s.L();
+  tete(g, P, 9, 6, ph, expr);
+  g.rect(13, 15, 4, 1, K.s);
+  g.rect(8, 16, 14, 8, T.b); g.rect(7, 17, 16, 7, T.b); g.rect(19, 17, 4, 7, T.s); g.rect(8, 17, 4, 1, T.hi); g.px(8, 18, T.hi);
+  torseDetails(g, P, role, 8, 16);
+  const d = s.L();
+  d.rect(10, 23, 10, 1, P.metal.hi);
+  d.rect(2, 24, 36, 1, P.desk.hi); d.rect(2, 25, 36, 2, P.desk.b); d.rect(2, 27, 36, 1, P.desk.s);
+  d.rect(4, 28, 2, 8, P.desk.s); d.rect(34, 28, 2, 8, P.desk.s); d.rect(4, 28, 2, 1, P.desk.d); d.rect(34, 28, 2, 1, P.desk.d);
+  const a = s.L(etat === "actif" ? "tape" : "");
+  a.rect(5, 18, 3, 5, T.s); a.rect(22, 18, 3, 5, T.s); a.rect(5, 18, 1, 4, T.d);
+  a.rect(5, 22, 3, 2, K.b); a.rect(22, 22, 3, 2, K.b); a.px(7, 23, K.s); a.px(24, 23, K.s);
+  const e = s.L();
+  e.rect(24, 10, 16, 12, P.frame.b); e.rect(24, 10, 16, 1, P.frame.hi); e.rect(24, 11, 1, 10, P.frame.hi);
+  e.rect(39, 11, 1, 11, P.frame.s); e.rect(25, 21, 15, 1, P.frame.s);
+  e.rect(31, 22, 2, 1, P.frame.s); e.rect(28, 23, 8, 1, P.frame.b);
+  const L = ETAT_R[etat], l = s.L(etat === "actif" ? "lueur" : "");
+  l.rect(26, 12, 12, 8, L.d);
+  if (etat === "attente") { l.rect(30, 15, 4, 2, L.s); }
+  else {
+    l.rect(27, 13, 5, 1, L.hi); l.rect(33, 13, 3, 1, L.b); l.rect(28, 15, 7, 1, L.b); l.rect(28, 17, 4, 1, L.b);
+    l.rect(33, 17, 2, 1, L.hi); l.rect(27, 19, 3, 1, L.s); l.px(37, 12, L.hi);
+  }
+  return s;
+}
+/* Même grille que l'actuel, ombrage seulement */
+function memeGrillePoste(P, role = "codeur", ph = PH.codeur, etat = "actif") {
+  const s = mk(20, 18), g = s.L(), T = P.top[role], K = P.skin[ph.peau - 1], H = P.hair[ph.cheveux - 1];
+  g.rect(5, 1, 6, 2, H.b); g.rect(9, 1, 2, 2, H.s); g.px(6, 1, H.hi);
+  g.rect(5, 3, 6, 4, K.b); g.rect(10, 4, 1, 3, K.s); g.clr(5, 6); g.clr(10, 6); g.rect(5, 3, 1, 1, H.b); g.rect(10, 3, 1, 1, H.s);
+  g.px(6, 4, P.ink); g.px(9, 4, P.ink);
+  g.rect(4, 7, 8, 5, T.b); g.rect(9, 8, 3, 4, T.s); g.px(4, 7, null); g.clr(4, 7); g.clr(11, 7); g.rect(6, 7, 4, 1, T.s); g.px(5, 8, T.hi);
+  const a = s.L(etat === "actif" ? "tape" : ""); a.rect(3, 9, 2, 2, T.s); a.rect(11, 9, 2, 2, T.s); a.rect(3, 11, 2, 1, K.b); a.rect(11, 11, 2, 1, K.b);
+  const d = s.L(); d.rect(1, 12, 18, 1, P.desk.hi); d.rect(1, 13, 18, 1, P.desk.s); d.rect(2, 14, 1, 4, P.desk.s); d.rect(17, 14, 1, 4, P.desk.s);
+  d.rect(12, 5, 8, 6, P.frame.b); d.rect(12, 5, 8, 1, P.frame.hi); d.rect(15, 11, 2, 1, P.frame.s);
+  const L = ETAT_R[etat], l = s.L(etat === "actif" ? "lueur" : ""); l.rect(13, 6, 6, 4, L.d); l.rect(14, 7, 3, 1, L.hi); l.rect(14, 8, 4, 1, L.b);
+  return s;
+}
+function apresDebout(P, role = "reviewer", ph = PH.reviewer, o = {}) {
+  const s = mk(24, 40), g = s.L(), T = P.top[role], K = P.skin[ph.peau - 1];
+  const bob = o.bob || 0, legs = o.legs || 0, swing = o.swing || 0;
+  const la = legs === 1 ? 2 : 0, lb = legs === -1 ? 2 : 0;
+  if (ph.jupe) {
+    g.rect(5, 32 + bob, 2, 6 - la - bob, K.b); g.rect(13, 32 + bob, 2, 6 - lb - bob, K.s);
+    g.rect(4, 38 - la, 4, 2, P.shoe.b); g.rect(12, 38 - lb, 4, 2, P.shoe.b);
+    g.rect(2, 25 + bob, 16, 7, T.s); g.rect(2, 31 + bob, 16, 1, T.d); g.rect(14, 26 + bob, 4, 5, T.d);
+  } else {
+    const Pn = P.pants;
+    g.rect(4, 26 + bob, 4, 12 - la - bob, Pn.b); g.rect(7, 26 + bob, 1, 12 - la - bob, Pn.s);
+    g.rect(12, 26 + bob, 4, 12 - lb - bob, Pn.b); g.rect(15, 26 + bob, 1, 12 - lb - bob, Pn.s);
+    g.rect(3, 38 - la, 5, 2, P.shoe.b); g.rect(3, 38 - la, 5, 1, P.shoe.hi); g.rect(12, 38 - lb, 5, 2, P.shoe.b); g.rect(12, 38 - lb, 5, 1, P.shoe.hi);
+    g.rect(2, 25 + bob, 16, 1, Pn.d);
+  }
+  tete(g, P, 4, 3 + bob, ph, o.expr || "fait");
+  g.rect(8, 12 + bob, 4, 1, K.s);
+  g.rect(3, 13 + bob, 14, 12, T.b); g.rect(2, 14 + bob, 16, 11, T.b); g.rect(14, 14 + bob, 4, 11, T.s); g.rect(3, 14 + bob, 3, 1, T.hi);
+  torseDetails(g, P, role, 5, 13 + bob);
+  g.rect(0, 14 + bob + swing, 2, 10, T.s); g.rect(0, 14 + bob + swing, 1, 9, T.d); g.rect(0, 24 + bob + swing, 2, 2, K.b);
+  if (o.tasse !== false) {
+    g.rect(18, 14 + bob, 2, 5, T.s); g.rect(19, 19 + bob, 3, 2, K.b);
+    g.rect(19, 15 + bob, 3, 4, P.cup.b); g.rect(19, 15 + bob, 3, 1, P.cup.hi); g.px(20, 15 + bob, P.coffee); g.rect(22, 16 + bob, 1, 2, P.cup.s); g.rect(21, 16 + bob, 1, 3, P.cup.s);
+  } else { g.rect(18, 14 + bob - swing, 2, 10, T.s); g.rect(18, 24 + bob - swing, 2, 2, K.b); }
+  return s;
+}
+function apresBaie(P, etat = "actif", activite = false) {
+  const s = mk(24, 60), g = s.L(), M = P.metal;
+  g.rect(0, 0, 24, 60, M.d); g.rect(1, 1, 22, 58, M.b); g.rect(1, 1, 22, 1, M.hi); g.rect(1, 1, 1, 58, M.hi); g.rect(22, 2, 1, 57, M.s);
+  g.rect(3, 3, 18, 6, M.d); g.rect(4, 4, 16, 4, P.frame.d); g.rect(5, 5, 7, 1, M.s); g.rect(5, 6, 4, 1, M.s);
+  const L = ETAT_R[etat];
+  const v = s.L(); v.rect(16, 4, 4, 4, mix(L.d, P.frame.d, .35)); v.rect(17, 5, 2, 2, L.b); v.px(17, 5, L.hi);
+  const leds = [];
+  for (let i = 0; i < 7; i++) {
+    const y = 12 + i * 6;
+    g.rect(3, y, 18, 5, M.s); g.rect(4, y + 1, 16, 3, M.b); g.rect(4, y + 1, 16, 1, M.hi);
+    for (let x = 7; x < 15; x += 2) g.px(x, y + 2, M.d);
+    g.rect(3, y + 1, 1, 3, M.hi); g.rect(20, y + 1, 1, 3, M.d);
+    if (activite && etat === "actif") leds.push(y);
+    else g.px(17, y + 2, M.d);
+  }
+  leds.forEach((y, i) => s.L("clignote", `animation-delay:-${(i * 0.37) % 1.1}s;animation-duration:${0.7 + (i % 3) * 0.35}s`).px(17, y + 2, L.hi));
+  g.rect(2, 55, 20, 3, M.d); g.rect(3, 58, 3, 2, M.d); g.rect(18, 58, 3, 2, M.d);
+  return s;
+}
+function apresClim(P) {
+  const s = mk(32, 44), g = s.L(), M = P.metal;
+  g.rect(0, 0, 32, 44, M.d); g.rect(1, 1, 30, 42, M.b); g.rect(1, 1, 30, 1, M.hi); g.rect(1, 1, 1, 42, M.hi); g.rect(30, 2, 1, 41, M.s); g.rect(2, 42, 29, 1, M.s);
+  g.rect(3, 3, 26, 26, M.d);
+  for (let y = 4; y < 28; y += 3) { g.rect(4, y, 24, 1, M.hi); g.rect(4, y + 1, 24, 1, M.s); }
+  g.rect(3, 31, 26, 9, M.s); g.rect(4, 32, 24, 1, M.d);
+  for (let x = 5; x < 27; x += 2) g.rect(x, 34, 1, 4, M.d);
+  g.rect(24, 3, 4, 2, M.s);
+  return s;
+}
+function feuillage(g, Pl, clusters) {
+  for (const [cx, cy, r] of clusters) for (let y = Math.floor(cy - r); y <= cy + r; y++) for (let x = Math.floor(cx - r); x <= cx + r; x++) {
+    const dx = x - cx, dy = y - cy, d2 = dx * dx + dy * dy;
+    if (d2 > r * r + .6) continue;
+    const t = (dx + dy) / r;
+    let c = t < -.75 ? Pl.hi : t < .35 ? Pl.b : Pl.s;
+    if (d2 > (r - 1) * (r - 1) + .6 && t > .3) c = Pl.d;
+    g.set(x, y, c);
+  }
+}
+function pot(g, Pt, x, y, w, h, soil) {
+  g.rect(x, y, w, 2, Pt.b); g.rect(x, y, w, 1, Pt.hi); if (soil) g.rect(x + 1, y, w - 2, 1, soil);
+  g.rect(x, y + 2, w, 1, Pt.d);
+  for (let j = 0; j < h; j++) { const inset = 1 + Math.floor(j / 3); g.rect(x + inset, y + 3 + j, w - 2 * inset, 1, Pt.b); g.px(x + w - inset - 1, y + 3 + j, Pt.s); g.px(x + w - inset - 2, y + 3 + j, Pt.s); g.px(x + inset + 1, y + 3 + j, Pt.hi); }
+}
+function apresPlante(P, esp) {
+  if (esp === "pot") {
+    const s = mk(16, 20), g = s.L();
+    g.rect(7, 5, 2, 7, P.plant.d);
+    feuillage(g, P.plant, [[4, 6, 3], [11, 5, 3], [8, 3, 2.6], [3.5, 10, 2.2], [12.5, 9.5, 2.2], [8, 8, 2.4]]);
+    pot(g, P.pot, 2, 12, 12, 6, P.pot.d);
+    return s;
+  }
+  if (esp === "cactus") {
+    const s = mk(16, 20), g = s.L(), K = P.cactus;
+    const tronc = (x, y, w, h) => { g.rect(x, y, w, h, K.b); g.rect(x, y, 1, h, K.hi); g.rect(x + w - 1, y, 1, h, K.s); if (w > 3) g.rect(x + 2, y + 1, 1, h - 1, K.s); g.rect(x, y, w, 1, K.hi); g.clr(x, y); g.clr(x + w - 1, y); };
+    tronc(6, 2, 4, 12); tronc(2, 5, 3, 5); g.rect(2, 9, 5, 2, K.b); g.rect(2, 10, 5, 1, K.s); tronc(11, 3, 3, 6); g.rect(9, 7, 5, 2, K.b); g.rect(9, 8, 5, 1, K.s);
+    [[7, 4], [9, 6], [7, 9], [9, 11], [3, 7], [12, 5], [6, 12]].forEach(([x, y]) => g.px(x, y, P.spine));
+    g.rect(7, 0, 2, 2, P.flower.b); g.px(6, 1, P.flower.s); g.px(9, 1, P.flower.s); g.px(7, 0, P.flower.hi);
+    pot(g, P.potClair, 3, 13, 10, 5, P.pot.d);
+    return s;
+  }
+  const s = mk(16, 32), g = s.L();
+  g.rect(7, 16, 2, 7, P.wood.s); g.px(7, 18, P.wood.b); g.rect(6, 19, 1, 1, P.wood.s);
+  feuillage(g, P.plant, [[8, 6, 6], [4, 10, 4], [12, 10, 4], [8, 13, 4.2], [6, 3, 3], [11, 4, 3]]);
+  pot(g, P.pot, 2, 22, 12, 8, P.pot.d);
+  return s;
+}
+function apresMachine(P) {
+  const s = mk(24, 32), g = s.L(), M = P.machine;
+  g.rect(2, 0, 20, 28, M.b); g.rect(2, 0, 20, 2, M.hi); g.rect(2, 0, 2, 28, M.hi); g.rect(19, 2, 3, 26, M.s);
+  g.rect(6, 3, 12, 6, M.d); g.rect(7, 4, 10, 4, P.frame.d); g.rect(8, 5, 4, 1, M.s);
+  [[7, 10], [11, 10], [15, 10]].forEach(([x, y]) => { g.rect(x, y, 2, 2, M.d); g.px(x, y, M.hi); });
+  g.rect(6, 14, 12, 11, M.d); g.rect(10, 14, 4, 3, P.metal.hi); g.rect(11, 17, 2, 1, P.metal.s);
+  g.rect(9, 19, 5, 5, P.cup.b); g.rect(9, 19, 5, 1, P.cup.hi); g.rect(10, 19, 3, 1, P.coffee); g.rect(13, 20, 1, 4, P.cup.s); g.rect(14, 20, 1, 2, P.cup.s);
+  g.rect(5, 24, 14, 2, M.s); for (let x = 6; x < 18; x += 2) g.px(x, 24, M.d);
+  g.rect(0, 28, 24, 4, M.s); g.rect(0, 28, 24, 1, M.b); g.rect(0, 31, 24, 1, M.d);
+  return s;
+}
+function apresBiblio(P) {
+  const s = mk(32, 36), g = s.L(), W = P.wood;
+  g.rect(0, 0, 32, 36, W.s); g.rect(0, 0, 32, 2, W.hi); g.rect(0, 0, 2, 36, W.b); g.rect(0, 0, 1, 36, W.hi); g.rect(30, 0, 2, 36, W.b); g.rect(31, 1, 1, 35, W.s); g.rect(30, 0, 2, 1, W.hi);
+  const rows = [
+    [[3, 3, 8, 1], [6, 2, 7, 2], [8, 3, 8, 3], [11, 2, 6, 1], [14, 3, 8, 2], [17, 3, 7, 3], ["L", 21, 7, 2, 1], [24, 3, 8, 3]],
+    [[3, 2, 6, 3], [5, 3, 8, 2], [8, 3, 8, 1], ["L", 12, 8, 2, 3], ["P", 22], [25, 3, 7, 2]],
+    [[3, 3, 8, 2], [6, 2, 6, 1], [8, 3, 8, 3], [11, 3, 7, 2], ["L", 15, 6, 2, 1], ["L", 15, 4, 2, 2], [22, 2, 8, 3], [24, 3, 7, 1]],
+  ];
+  rows.forEach((livres, i) => {
+    const top = 2 + i * 11, base = top + 9;
+    g.rect(2, top, 28, 9, W.d);
+    for (const b of livres) {
+      if (b[0] === "L") { const [, x, w, h, t] = b, B = P.books[t - 1]; g.rect(x, base - h, w, h, B.b); g.rect(x, base - h, w, 1, B.hi); g.rect(x + 1, base - 1, w - 2, 1, B.s); continue; }
+      if (b[0] === "P") { const x = b[1]; g.rect(x, base - 3, 3, 3, P.pot.b); g.px(x + 2, base - 2, P.pot.s); feuillage(g, P.plant, [[x + 1.5, base - 5, 1.8]]); continue; }
+      const [x, w, h, t] = b, B = P.books[t - 1];
+      g.rect(x, base - h, w, h, B.b); g.rect(x, base - h, 1, h, B.hi); if (w > 2) g.rect(x + w - 1, base - h, 1, h, B.s); g.rect(x, base - h + 2, w, 1, B.d);
+    }
+    g.rect(2, top, 28, 1, mix(W.d, "#000000", .25)); g.rect(2, base, 28, 1, W.hi); g.rect(2, base + 1, 28, 1, W.b);
+  });
+  return s;
+}
+
+/* ---------- Nuit : l'écran éclaire le visage ---------- */
+/* Seuls l'agent (calque 1) et ses mains (calque 3) reçoivent la lumière, en trois paliers : peu de couleurs, donc peu de paths. */
+function nuit(s, etat) {
+  const cx = 32, cy = 16, Lh = ETAT_R[etat].hi;
+  s.layers.forEach(({ g }, k) => {
+    if (k === 5) return; // l'écran garde sa propre lumière
+    g.p = g.p.map((c, i) => {
+      if (!c) return c;
+      const x = i % s.w, y = Math.floor(i / s.w);
+      let o = mix(c, "#0b0c24", .62);
+      if (k === 1 || k === 3) {
+        const d = Math.hypot(x - cx, (y - cy) * 1.3), palier = d < 12 ? 3 : d < 16 ? 2 : d < 20 ? 1 : 0;
+        if (palier) o = mix(o, Lh, palier * .16);
+      }
+      return o;
+    });
+  });
+  return s;
+}
+
+/* ---------- Vectoriel lisse (même poste, sans pixels) ---------- */
+function vectorPoste(dw, dh) {
+  const b = BASE, sk = ramp(b.skin[1]), top = ramp(b.top.codeur), hair = ramp(b.hair[0]), L = ETAT_R.actif;
+  return `<svg class="px" viewBox="0 0 80 72" width="${dw}" height="${dh}">
+  <defs><linearGradient id="vg-screen" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${L.hi}"/><stop offset="1" stop-color="${L.d}"/></linearGradient>
+  <linearGradient id="vg-desk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6b6b75"/><stop offset="1" stop-color="#43434b"/></linearGradient></defs>
+  <rect x="12" y="25" width="36" height="24" rx="6" fill="#2f2f35"/>
+  <path d="M15 50 Q15 34 30 33 Q45 34 45 50 Z" fill="${top.b}"/><path d="M38 36 Q45 40 45 50 L39 50 Z" fill="${top.s}"/>
+  <path d="M24 34 Q30 39 36 34" stroke="${top.d}" stroke-width="2" fill="none"/>
+  <circle cx="30" cy="22" r="10" fill="${sk.b}"/><path d="M20 21 Q20 10 30 10 Q41 10 40 21 Q36 15 30 16 Q23 15 20 21Z" fill="${hair.b}"/>
+  <ellipse cx="27" cy="23" rx="1.1" ry="1.6" fill="#18181b"/><ellipse cx="34" cy="23" rx="1.1" ry="1.6" fill="#18181b"/>
+  <path d="M29 28 h3" stroke="${sk.d}" stroke-width="1.2" stroke-linecap="round"/>
+  <rect x="2" y="48" width="76" height="6" rx="2" fill="url(#vg-desk)"/><rect x="7" y="54" width="4" height="18" fill="#3a3a42"/><rect x="69" y="54" width="4" height="18" fill="#3a3a42"/>
+  <g class="tape"><rect x="10" y="40" width="7" height="10" rx="3" fill="${top.s}"/><rect x="43" y="40" width="7" height="10" rx="3" fill="${top.s}"/></g>
+  <rect x="48" y="20" width="32" height="24" rx="3" fill="#232328"/><rect x="51" y="23" width="26" height="17" rx="1.5" fill="url(#vg-screen)" class="lueur"/>
+  <rect x="62" y="44" width="4" height="3" fill="#232328"/><rect x="57" y="46" width="14" height="2" rx="1" fill="#232328"/></svg>`;
+}
+function canvasPoste(s, dw, dh) {
+  const cv = document.createElement("canvas"), dpr = window.devicePixelRatio || 1;
+  cv.width = Math.round(dw * dpr); cv.height = Math.round(dh * dpr); cv.style.width = dw + "px"; cv.style.height = dh + "px";
+  const ctx = cv.getContext("2d"), k = cv.width / s.w, kh = cv.height / s.h;
+  for (const { g } of s.layers) g.p.forEach((c, i) => { if (c) { ctx.fillStyle = c; ctx.fillRect(Math.floor((i % s.w) * k), Math.floor(Math.floor(i / s.w) * kh), Math.ceil(k), Math.ceil(kh)); } });
+  return cv;
+}
+
+/* ---------- Page ---------- */
+const state = { theme: "tessera", zoom: 3, outline: true };
+try { const v = JSON.parse(localStorage.getItem("atelier-sprites") || "{}"); Object.assign(state, v); } catch (e) {}
+const save = () => { try { localStorage.setItem("atelier-sprites", JSON.stringify(state)); } catch (e) {} };
+
+function tile(kind, label, items, floor, info) {
+  const t = document.createElement("div"); t.className = "tile " + kind;
+  t.innerHTML = `<div class="stage" style="background:${floor}">${items.join("")}</div><div class="lab"><b>${label}</b><span>${info || ""}</span></div>`;
+  return t;
+}
+function renderOne(s, dw, dh, th) { return toSvg(post(s, th, { outline: state.outline }), dw * state.zoom, dh * state.zoom); }
+function metric(r) { return `${r.nodes} nœuds · ${r.pixels} px`; }
+
+/* Les sprites comparés : avant, après (fn de palette), dimensions d'affichage en px réels. */
+const SPRITES = {
+  poste: [
+    { id: "poste", nom: "Poste, agent qui tape", fichier: "Poste.tsx + PersonnageAssis.tsx + Tete.tsx + Ecran.tsx", grille: "20 × 18 → 40 × 36", dw: 70, dh: 63,
+      avant: () => avantPoste(), apres: P => apresPoste(P), meme: P => memeGrillePoste(P),
+      note: "Mains visibles sur le clavier, yeux tournés vers l'écran pendant qu'il travaille, dossier de chaise, code qui s'allume à l'écran. Le sweat à capuche du codeur a ses cordons." },
+    { id: "poste-rev", nom: "Poste, reviewer en attente", fichier: "même composant, autre rôle et autre santé", grille: "20 × 18 → 40 × 36", dw: 70, dh: 63,
+      avant: () => avantPoste("reviewer", PH.reviewer, "attente"), apres: P => apresPoste(P, "reviewer", PH.reviewer, "attente", "attente"), meme: P => memeGrillePoste(P, "reviewer", PH.reviewer, "attente"),
+      note: "Santé « attente » : les yeux se ferment, l'écran se met en veille. Cheveux longs, col et cravate." },
+    { id: "debout", nom: "Agent debout, tasse à la main", fichier: "PersonnageDebout.tsx", grille: "12 × 20 → 24 × 40", dw: 42, dh: 70,
+      avant: () => avantDebout(), apres: P => apresDebout(P),
+      note: "Il a fini : il sourit. La tasse a une anse et du café, les chaussures se distinguent du pantalon, la ceinture marque la taille." },
+  ],
+  serveurs: [
+    { id: "baie", nom: "Baie haute, service en cours", fichier: "BaieHaute.tsx", grille: "12 × 30 → 24 × 60", dw: 36, dh: 90,
+      avant: () => avantBaie(), apres: P => apresBaie(P, "actif"), variante: { label: "Variante : diodes d'activité", f: P => apresBaie(P, "actif", true) },
+      note: "Sept serveurs 1U avec poignées et grilles au lieu de sept traits. Le voyant a un halo ; la variante fait clignoter une diode par serveur tant que le service tourne." },
+    { id: "baie-echec", nom: "Baie haute, service en échec", fichier: "BaieHaute.tsx", grille: "12 × 30 → 24 × 60", dw: 36, dh: 90,
+      avant: () => avantBaie("blocage"), apres: P => apresBaie(P, "blocage"),
+      note: "Le rouge du voyant se lit de loin grâce au halo, sans gyrophare." },
+    { id: "clim", nom: "Climatiseur", fichier: "Climatiseur.tsx", grille: "16 × 22 → 32 × 44", dw: 48, dh: 66,
+      avant: () => avantClim(), apres: P => apresClim(P),
+      note: "Des lames en relief (reflet dessus, ombre dessous), un filtre à fentes, une trappe de service." },
+  ],
+  mobilier: [
+    { id: "plante", nom: "Plante en pot", fichier: "Plante.tsx (pot)", grille: "8 × 10 → 16 × 20", dw: 40, dh: 50, avant: () => avantPlante("pot"), apres: P => apresPlante(P, "pot"),
+      note: "Feuillage en touffes éclairées en haut à gauche, pot en terre cuite qui s'affine, terre visible." },
+    { id: "cactus", nom: "Cactus", fichier: "Plante.tsx (cactus)", grille: "8 × 10 → 16 × 20", dw: 40, dh: 50, avant: () => avantPlante("cactus"), apres: P => apresPlante(P, "cactus"),
+      note: "Côtes, épines, une fleur. Le pot clair reste clair." },
+    { id: "ficus", nom: "Ficus", fichier: "Plante.tsx (ficus)", grille: "8 × 16 → 16 × 32", dw: 40, dh: 80, avant: () => avantPlante("ficus"), apres: P => apresPlante(P, "ficus"),
+      note: "Une boule de feuillage devient un arbre : tronc en bois, masse feuillue en volume." },
+    { id: "cafe", nom: "Machine à café", fichier: "MachineACafe.tsx", grille: "12 × 16 → 24 × 32", dw: 36, dh: 48, avant: () => avantMachine(), apres: P => apresMachine(P),
+      note: "Afficheur, trois boutons, buse, grille d'égouttage, tasse pleine. Aucun voyant : rien ne dit qu'on s'en sert." },
+    { id: "biblio", nom: "Bibliothèque", fichier: "Bibliotheque.tsx", grille: "16 × 18 → 32 × 36", dw: 48, dh: 54, avant: () => avantBiblio(), apres: P => apresBiblio(P),
+      note: "Reliures avec dos et bandeau, livres couchés en pile, une petite plante sur une étagère." },
+  ],
+};
+
+function card(def, P, th, floor) {
+  const c = document.createElement("div"); c.className = "card";
+  c.innerHTML = `<div class="card-head"><h3>${def.nom}</h3><span class="mono">${def.fichier} · ${def.grille}</span></div>`;
+  const row = document.createElement("div"); row.className = "compare";
+  const av = avantRaw(def), z = state.zoom;
+  const avS = toSvg(av, def.dw * z, def.dh * z);
+  row.append(tile("before", "Avant", [avS.html], C.sol, `${rectCount(av)} rect`));
+  if (def.meme) { const r = renderOne(def.meme(P), def.dw, def.dh, th); row.append(tile("after", "Même grille", [r.html], floor, metric(r))); }
+  const r = renderOne(def.apres(P), def.dw, def.dh, th);
+  row.append(tile("after", "Grille ×2", [r.html], floor, metric(r)));
+  if (def.variante) { const v = renderOne(def.variante.f(P), def.dw, def.dh, th); row.append(tile("after", def.variante.label, [v.html], floor, metric(v))); }
+  c.append(row);
+  const strip = document.createElement("div"); strip.className = "strip";
+  for (const [k, t] of Object.entries(THEMES)) {
+    const rr = toSvg(post(def.apres(palette(t)), t, { outline: state.outline }), def.dw * 1.5, def.dh * 1.5);
+    const m = document.createElement("div"); m.className = "mini";
+    m.innerHTML = `<div class="stage" style="background:${t.base.floor}">${rr.html}</div><span>${t.label}</span>`;
+    strip.append(m);
+  }
+  const n = document.createElement("p"); n.className = "note"; n.textContent = def.note;
+  c.append(n, strip);
+  return c;
+}
+const avantRaw = def => def.avant();
+
+function cardsNouveaux(P, th, floor) {
+  const out = [], z = state.zoom;
+  // Expressions
+  {
+    const c = document.createElement("div"); c.className = "card";
+    c.innerHTML = `<div class="card-head"><h3>Visage selon la santé <span class="badge new">nouveau</span></h3><span class="mono">Tete.tsx · grille 16 × 16 · lit SanteAgent</span></div>`;
+    const row = document.createElement("div"); row.className = "compare";
+    const exprs = [["actif", "actif", "regarde l'écran"], ["attente", "attente", "yeux fermés"], ["question", "question", "sourcil levé"], ["blocage", "blocage_suspecte", "sueur, sourcils froncés"], ["fait", "fait", "sourire"]];
+    for (const [e, lib, desc] of exprs) {
+      const s = mk(18, 16); tete(s.L(), P, 3, 4, PH.codeur, e);
+      const r = renderOne(s, 30, 27, th);
+      row.append(tile("after", lib, [r.html], floor, desc));
+    }
+    c.append(row);
+    const n = document.createElement("p"); n.className = "note";
+    n.innerHTML = "Aujourd'hui la santé ne se lit que dans la bulle et la couleur de l'écran. Le visage la double, sans texte : à <b>×1</b>, on distingue encore le sourcil levé et la goutte de sueur. Aucune donnée nouvelle, <code>SanteAgent</code> suffit.";
+    c.append(n); out.push(c);
+  }
+  // Marche
+  {
+    const c = document.createElement("div"); c.className = "card";
+    c.innerHTML = `<div class="card-head"><h3>Cycle de marche <span class="badge new">nouveau</span></h3><span class="mono">AgentDebout.tsx · 4 images · même grille 24 × 40</span></div>`;
+    const frames = [{ legs: 0 }, { legs: 1, bob: 1, swing: 1 }, { legs: 0 }, { legs: -1, bob: 1, swing: -1 }];
+    const svgs = frames.map((f, i) => { const r = renderOne(apresDebout(P, "codeur", PH.codeur, { ...f, tasse: false, expr: "neutre" }), 42, 70, th); return `<div class="frame" style="animation-delay:${i * .16}s">${r.html}</div>`; });
+    const avR = toSvg(avantDebout("codeur", PH.codeur), 42 * z, 70 * z);
+    const row = document.createElement("div"); row.className = "compare";
+    row.append(tile("before", "Avant", [`<div class="slide"><div class="slide-anim">${avR.html}</div></div>`], C.sol, "glisse d'un bloc"));
+    row.append(tile("after", "Après", [`<div class="slide"><div class="slide-anim"><div class="walk-stack">${svgs.join("")}</div></div></div>`], floor, "4 images, 0,64 s"));
+    c.append(row);
+    const n = document.createElement("p"); n.className = "note";
+    n.innerHTML = "La classe <code>.marche</code> déplace déjà l'agent en 12 paliers ; ses jambes ne bougent pas. Quatre images empilées et une animation <code>steps(1)</code> sur l'opacité suffisent, sans JavaScript, et s'arrêtent avec <code>prefers-reduced-motion</code>.";
+    c.append(n); out.push(c);
+  }
+  // Nuit
+  {
+    const c = document.createElement("div"); c.className = "card";
+    c.innerHTML = `<div class="card-head"><h3>La nuit, l'écran éclaire l'agent <span class="badge new">nouveau</span></h3><span class="mono">NightVeil.tsx + Poste.tsx · lumière précalculée par état</span></div>`;
+    const row = document.createElement("div"); row.className = "compare";
+    for (const [e, lib] of [["actif", "actif"], ["question", "question"], ["blocage", "blocage_suspecte"]]) {
+      const s = nuit(post(apresPoste(P, "codeur", PH.codeur, e, e), th, { outline: state.outline }), e);
+      const r = toSvg(s, 70 * z, 63 * z);
+      row.append(tile("after", lib, [r.html], mix(floor, "#0b0c24", .62), metric(r)));
+    }
+    c.append(row);
+    const n = document.createElement("p"); n.className = "note";
+    n.innerHTML = "Aujourd'hui le voile de nuit assombrit toute la pièce de façon uniforme. Ici le visage et les mains prennent la couleur de l'état de l'écran : un agent bloqué se repère dans le noir. Les tons éclairés seraient des jetons de plus, calculés au build, pas un filtre CSS (les filtres coûtent cher au rendu).";
+    c.append(n); out.push(c);
+  }
+  return out;
+}
+
+function cardsRendu(P, th, floor) {
+  const z = state.zoom, c = document.createElement("div"); c.className = "card";
+  c.innerHTML = `<div class="card-head"><h3>Un poste, cinq rendus</h3><span class="mono">même taille à l'écran : 70 × 63 px × ${z}</span></div>`;
+  const row = document.createElement("div"); row.className = "compare";
+  const av = avantPoste(); const avS = toSvg(av, 70 * z, 63 * z);
+  row.append(tile("before", "SVG rect", [avS.html], C.sol, `${rectCount(av)} nœuds`));
+  const ps = post(apresPoste(P), th, { outline: state.outline }); const pr = toSvg(ps, 70 * z, 63 * z);
+  row.append(tile("after", "SVG path", [pr.html], floor, `${pr.nodes} nœuds`));
+  const tc = tile("after", "Canvas", [], floor, "1 nœud, sans animation"); tc.querySelector(".stage").append(canvasPoste(flatten(ps), 70 * z, 63 * z)); row.append(tc);
+  row.append(tile("after", "Vectoriel lisse", [vectorPoste(70 * z, 63 * z)], C.sol, "18 nœuds"));
+  // Hybride : chaise, bureau et cadre d'écran cuits dans un canvas ; agent, mains et écran restent du SVG vivant.
+  const decor = mk(ps.w, ps.h), vivant = mk(ps.w, ps.h);
+  ps.layers.forEach((l, i) => ([0, 2, 4].includes(i) ? decor : vivant).layers.push(l));
+  const th2 = tile("after", "Hybride", [], floor, `1 canvas + ${toSvg(vivant, 1, 1).nodes} nœuds`);
+  const st = th2.querySelector(".stage"), wrapH = document.createElement("div"); wrapH.className = "slide";
+  const cvs = canvasPoste(flatten(decor), 70 * z, 63 * z), tmp = document.createElement("div");
+  tmp.innerHTML = toSvg(vivant, 70 * z, 63 * z).html; wrapH.append(cvs, tmp.firstChild); st.append(wrapH); row.append(th2);
+  c.append(row);
+  const n = document.createElement("p"); n.className = "note";
+  n.innerHTML = "Le <b>Canvas</b> et l'<b>hybride</b> donnent la même image que le SVG path : la différence se joue dans ce qu'on peut encore tester, survoler, animer en CSS. Le <b>vectoriel lisse</b> change de style : plus proche d'une interface classique, il perd le côté « petit monde » du Bureau.";
+  c.append(n);
+  return [c];
+}
+
+function renderAll() {
+  const th = THEMES[state.theme], P = palette(th), floor = th.base.floor;
+  for (const [k, list] of Object.entries(SPRITES)) {
+    const host = document.getElementById("cards-" + k); host.replaceChildren(...list.map(d => card(d, P, th, floor)));
+  }
+  document.getElementById("cards-nouveaux").replaceChildren(...cardsNouveaux(P, th, floor));
+  document.getElementById("cards-rendu").replaceChildren(...cardsRendu(P, th, floor));
+  const hero = document.getElementById("hero"), PT = palette(THEMES.tessera);
+  hero.style.background = THEMES.tessera.base.floor;
+  hero.innerHTML = [apresPlante(PT, "ficus"), apresPoste(PT), apresDebout(PT), apresBaie(PT, "actif", true)]
+    .map((s, i) => toSvg(post(s, THEMES.tessera, { outline: true }), s.w * 1.75 * (i === 1 ? 1 : 1), s.h * 1.75).html).join("");
+  // Tableau : nœuds par poste
+  const av = avantPoste(), ps = post(apresPoste(P), th, { outline: state.outline });
+  document.getElementById("t-rect").textContent = `${rectCount(av)} nœuds`;
+  document.getElementById("t-path").textContent = `${toSvg(ps, 70, 63).nodes} nœuds`;
+  document.getElementById("t-canvas").textContent = "1 nœud par salle";
+  document.getElementById("t-vector").textContent = "18 nœuds + 2 dégradés";
+  // Réglages
+  document.querySelectorAll("#themeSeg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === state.theme)));
+  document.querySelectorAll("#zoomSeg button").forEach(b => b.setAttribute("aria-pressed", String(+b.dataset.v === state.zoom)));
+  document.getElementById("outlineChk").checked = state.outline;
+}
+
+function seg(id, items, key) {
+  const host = document.getElementById(id);
+  for (const [v, lab, title] of items) {
+    const b = document.createElement("button"); b.type = "button"; b.dataset.v = v; b.textContent = lab; if (title) b.title = title;
+    b.addEventListener("click", () => { state[key] = key === "zoom" ? +v : v; save(); renderAll(); });
+    host.append(b);
+  }
+}
+seg("themeSeg", Object.entries(THEMES).map(([k, t]) => [k, t.label, t.note]), "theme");
+seg("zoomSeg", [["1", "×1 réel"], ["2", "×2"], ["3", "×3"], ["4", "×4"]], "zoom");
+document.getElementById("outlineChk").addEventListener("change", e => { state.outline = e.target.checked; save(); renderAll(); });
+
+/* ---------- Banc de mesure ---------- */
+document.getElementById("benchBtn").addEventListener("click", async () => {
+  const btn = document.getElementById("benchBtn"), out = document.getElementById("benchOut"), area = document.getElementById("benchArea");
+  btn.disabled = true; btn.textContent = "Mesure en cours…"; out.innerHTML = "";
+  const th = THEMES[state.theme], P = palette(th), N = 200;
+  const avHtml = toSvg(avantPoste(), 70, 63).html;
+  const ps = post(apresPoste(P), th, { outline: state.outline }), pHtml = toSvg(ps, 70, 63).html, flat = flatten(ps);
+  const vHtml = vectorPoste(70, 63);
+  // version « un rect par pixel » : ce que coûterait la grille ×2 écrite comme aujourd'hui
+  const perPixel = (() => { let b = ""; for (const { g } of ps.layers) g.p.forEach((c, i) => { if (c) b += `<rect x="${i % ps.w}" y="${Math.floor(i / ps.w)}" width="1" height="1" fill="${c}"/>`; }); return `<svg viewBox="0 0 40 36" width="70" height="63" shape-rendering="crispEdges">${b}</svg>`; })();
+  const cases = [
+    ["SVG rect, aujourd'hui", () => { area.innerHTML = avHtml.repeat(N); }],
+    ["SVG ×2, un rect par pixel", () => { area.innerHTML = perPixel.repeat(N); }],
+    ["SVG ×2, un path par couleur", () => { area.innerHTML = pHtml.repeat(N); }],
+    ["Canvas ×2", () => { area.replaceChildren(...Array.from({ length: N }, () => canvasPoste(flat, 70, 63))); }],
+    ["Vectoriel lisse", () => { area.innerHTML = vHtml.repeat(N); }],
+  ];
+  const res = [];
+  for (const [name, fn] of cases) {
+    const t = [];
+    for (let k = 0; k < 5; k++) {
+      area.innerHTML = ""; void area.offsetHeight;
+      await new Promise(r => requestAnimationFrame(r));
+      const t0 = performance.now(); fn(); void area.offsetHeight; area.getBoundingClientRect();
+      await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+      t.push(performance.now() - t0);
+    }
+    t.sort((a, b) => a - b);
+    res.push([name, t[2], area.getElementsByTagName("*").length]);
+  }
+  area.innerHTML = "";
+  out.innerHTML = res.map(([n, ms, nodes]) => `<div class="bench-cell"><span class="k">${n}</span><span class="v">${ms.toFixed(0)} ms</span><span class="k">${nodes.toLocaleString("fr-FR")} nœuds pour ${N} postes</span></div>`).join("");
+  btn.disabled = false; btn.textContent = "Relancer la mesure";
+});
+
+renderAll();
+</script>
