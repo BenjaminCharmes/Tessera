@@ -142,10 +142,10 @@ def ecrire_description(
     controle.verifier({"nouveau": texte, "preuve": preuve}, "agents.json")
     if not manifeste.is_file():
         raise EditionRefusee("agents.json est introuvable.")
-    src = manifeste.read_bytes().decode("utf-8")
     try:
+        src = manifeste.read_bytes().decode("utf-8")
         valide = isinstance(json.loads(src.lstrip("﻿")), dict)
-    except json.JSONDecodeError:
+    except ValueError:  # JSONDecodeError et UnicodeDecodeError en descendent
         valide = False
     if not valide:
         raise EditionRefusee("agents.json n'est pas un objet JSON lisible.")
