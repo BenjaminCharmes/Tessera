@@ -123,6 +123,27 @@ async def test_runs_of_the_day_count_since_local_midnight(tmp_path: Path) -> Non
     assert await runs_du_jour(tmp_path / "absent" / "x.db") == 0
 
 
+async def test_runs_of_the_day_leave_out_queue_and_autonomous_envelopes(tmp_path: Path) -> None:
+    base = tmp_path / "tessera.db"
+    await init_db(base)
+    maintenant = datetime.now(timezone.utc).isoformat()
+    lignes = [
+        ("envelope", "queue", "queue"),
+        ("auto", "autonomous", "autonomous"),
+        ("child1", "ticket-1", "single"),
+        ("child2", "ticket-2", None),
+    ]
+    async with aiosqlite.connect(base) as db:
+        for id_, ticket, mode in lignes:
+            await db.execute(
+                "INSERT INTO pipeline_runs (id, ticket_id, project_id, started_at, mode) VALUES (?, ?, ?, ?, ?)",
+                (id_, ticket, "p", maintenant, mode),
+            )
+        await db.commit()
+
+    assert await runs_du_jour(base) == 2
+
+
 def test_database_size_is_in_megabytes(tmp_path: Path) -> None:
     base = tmp_path / "tessera.db"
     base.write_bytes(b"x" * 2_097_152)

@@ -95,6 +95,17 @@ describe("the Tessera server room (ticket-726)", () => {
     expect(screen.getByRole("group", { name: "Ollama : en refroidissement" })).toBeInTheDocument();
   });
 
+  it("does not claim Ollama is available when it has merely never been cut", async () => {
+    vi.mocked(lireLaSalleTessera).mockResolvedValue(salle());
+    rendre();
+
+    const baie = await screen.findByRole("group", { name: /^Ollama/ });
+    await userEvent.hover(baie);
+    const infobulle = await screen.findByRole("tooltip");
+    expect(infobulle.textContent).not.toMatch(/disponible/i);
+    expect(baie).not.toHaveAttribute("aria-label", expect.stringMatching(/disponible/i));
+  });
+
   it("reads the quota, the agents at work, today's runs and the database size", async () => {
     vi.mocked(lireLaSalleTessera).mockResolvedValue(salle());
     rendre();
@@ -168,6 +179,33 @@ describe("the Tessera server room (ticket-726)", () => {
     expect(screen.getByText("curio · ticket-070 · refusé · 1,50 $ · 40 min")).toHaveClass("text-red-300");
     expect(screen.getByText("1 / 2 approuvés")).toBeInTheDocument();
     expect(vi.mocked(api.usage.recentRuns)).toHaveBeenCalledWith(7, null, 20, "");
+  });
+
+  describe("the latest runs indicator light", () => {
+    const run = { id: "r1", project_id: "ide-core", ticket_id: "ticket-677", started_at: "2026-10-30T14:17:00Z", finished_at: null, final_status: null, cost_usd: 0, input_tokens: 0, output_tokens: 0, duration_ms: 0 };
+
+    async function voyant(approved: boolean | null): Promise<Element | null> {
+      vi.mocked(api.usage.recentRuns).mockResolvedValue([{ ...run, approved }]);
+      vi.mocked(lireLaSalleTessera).mockResolvedValue(salle());
+      rendre();
+      const ecran = await screen.findByRole("button", { name: /derniers runs/ });
+      await screen.findByText(`${approved === true ? 1 : 0} / 1 approuvés`);
+      return ecran.parentElement?.lastElementChild ?? null;
+    }
+
+    it("is green only for an approved run", async () => {
+      expect(await voyant(true)).toHaveClass("bg-green-500");
+    });
+
+    it("is zinc for a run without a verdict", async () => {
+      const lumiere = await voyant(null);
+      expect(lumiere).toHaveClass("bg-zinc-600");
+      expect(lumiere).not.toHaveClass("bg-green-500");
+    });
+
+    it("is red for a refused run", async () => {
+      expect(await voyant(false)).toHaveClass("bg-red-500");
+    });
   });
 });
 
