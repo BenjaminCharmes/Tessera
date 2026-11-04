@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -157,6 +158,79 @@ describe("Modale", () => {
     fireEvent.click(screen.getByRole("button", { name: "Dedans" }));
 
     expect(surClic).toHaveBeenCalledTimes(1);
+  });
+
+  it("wraps Tab from the last focusable element to the first, and Shift+Tab back", async () => {
+    render(
+      <Modale aria-label="m">
+        <button type="button">Un</button>
+        <input aria-label="Deux" />
+        <button type="button">Trois</button>
+      </Modale>,
+    );
+    const premier = screen.getByRole("button", { name: "Un" });
+    const dernier = screen.getByRole("button", { name: "Trois" });
+
+    dernier.focus();
+    await userEvent.tab();
+    expect(premier).toHaveFocus();
+
+    await userEvent.tab({ shift: true });
+    expect(dernier).toHaveFocus();
+  });
+
+  it("keeps Tab inside a modal without any focusable element", async () => {
+    render(
+      <Modale aria-label="m">
+        <p>Contenu</p>
+      </Modale>,
+    );
+
+    await userEvent.tab();
+
+    expect(screen.getByRole("dialog")).toHaveFocus();
+  });
+
+  it("gives the focus back to the opening button once closed", async () => {
+    function Parent() {
+      const [ouverte, setOuverte] = useState(false);
+      return (
+        <>
+          <button type="button" onClick={() => setOuverte(true)}>
+            Ouvrir
+          </button>
+          {ouverte && (
+            <Modale onFermer={() => setOuverte(false)} aria-label="m">
+              <input aria-label="Champ" autoFocus />
+            </Modale>
+          )}
+        </>
+      );
+    }
+    render(<Parent />);
+    const bouton = screen.getByRole("button", { name: "Ouvrir" });
+
+    await userEvent.click(bouton);
+    expect(screen.getByRole("textbox", { name: "Champ" })).toHaveFocus();
+    await userEvent.keyboard("{Escape}");
+
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(bouton).toHaveFocus();
+  });
+
+  it("closes on Escape while the focus is on a field of the modal", async () => {
+    const onFermer = vi.fn();
+    render(
+      <Modale onFermer={onFermer} aria-label="m">
+        <input aria-label="Champ" />
+      </Modale>,
+    );
+    const champ = screen.getByRole("textbox", { name: "Champ" });
+    champ.focus();
+
+    await userEvent.keyboard("{Escape}");
+
+    expect(onFermer).toHaveBeenCalledTimes(1);
   });
 
   it("takes the backdrop tint it is given", () => {
