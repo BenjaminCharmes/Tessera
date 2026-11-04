@@ -134,13 +134,18 @@ def ci_en_attente(projets: list[str], en_attente: Callable[[str], tuple[str, ...
 
 
 async def runs_du_jour(base: Path, maintenant: datetime | None = None) -> int:
-    """Pipeline runs started since local midnight ; 0 when the base cannot be read."""
+    """Ticket runs started since local midnight ; 0 when the base cannot be read.
+
+    Queue and autonomous envelopes are left out, as in the statistics.
+    """
     instant = (maintenant or datetime.now()).astimezone()
     minuit = instant.replace(hour=0, minute=0, second=0, microsecond=0).astimezone(timezone.utc)
     try:
         async with aiosqlite.connect(base) as db:
+            # mode IS NULL : lignes antérieures à la migration, traitées comme single.
             curseur = await db.execute(
-                "SELECT COUNT(*) FROM pipeline_runs WHERE started_at >= ?", (minuit.isoformat(),)
+                "SELECT COUNT(*) FROM pipeline_runs WHERE started_at >= ? AND (mode IS NULL OR mode = 'single')",
+                (minuit.isoformat(),),
             )
             ligne = await curseur.fetchone()
     except (aiosqlite.Error, OSError):

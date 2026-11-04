@@ -116,12 +116,12 @@ export default function SalleTessera({ nom, lueA }: SalleTesseraProps) {
               />
             ))}
             <AvecInfobulle
-              label={`Ollama : ${refroidi ? "en refroidissement" : "disponible"}`}
+              label={`Ollama : ${refroidi ? "en refroidissement" : "aucun refroidissement"}`}
               className="rounded-sm focus-visible:outline-2 focus-visible:outline-violet-500"
               infobulle={
                 <>
                   <p className="font-semibold text-zinc-100">Ollama · {salle.ollama.url}</p>
-                  <p>{refroidi ? `En refroidissement encore ${Math.ceil(salle.ollama.refroidissement_s ?? 0)} s : les rôles passent à leur repli.` : "Disponible."}</p>
+                  <p>{refroidi ? `En refroidissement encore ${Math.ceil(salle.ollama.refroidissement_s ?? 0)} s : les rôles passent à leur repli.` : "Aucun refroidissement en cours (la salle ne sonde pas Ollama)."}</p>
                 </>
               }
             >

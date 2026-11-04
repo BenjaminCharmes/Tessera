@@ -1,14 +1,14 @@
 ---
-id: ticket-766
-title: "The Tessera server room shows only what it knows"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-11-03
 depends_on: []
 estimated_days: 1
-created: 2026-11-03
+id: ticket-766
+pr_number: 892
+priority: medium
+status: done
+title: The Tessera server room shows only what it knows
+type: fix
 ---
 
 # ticket-766 — La salle Tessera ne montre que ce qu'elle sait

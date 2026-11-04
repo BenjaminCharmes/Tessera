@@ -18,6 +18,13 @@ interface EcransDeTesseraProps {
   onBasculer: (ecran: EcranDeTessera) => void;
 }
 
+/** Vert veut dire approuvé : un run sans verdict, ou aucun run, reste zinc. */
+function voyantDesDerniers(dernier: RecentRun | undefined): string {
+  if (dernier?.approved === true) return "bg-green-500";
+  if (dernier?.approved === false) return "bg-red-500";
+  return "bg-zinc-600";
+}
+
 export default function EcransDeTessera({ salle, derniers, deplie, onBasculer }: EcransDeTesseraProps) {
   const file = salle.runs.find((r) => r.file_total > 0);
   const enAttente = Object.values(salle.ci_en_attente).reduce((n, t) => n + t.length, 0);
@@ -61,7 +68,7 @@ export default function EcransDeTessera({ salle, derniers, deplie, onBasculer }:
         titre="derniers runs"
         statut={`${derniers.filter((r) => r.approved === true).length} / ${derniers.length} approuvés`}
         lignes={lignesDesDerniers(derniers.slice(0, LIGNES_AU_MUR))}
-        voyant={derniers[0]?.approved === false ? "bg-red-500" : derniers.length > 0 ? "bg-green-500" : "bg-zinc-600"}
+        voyant={voyantDesDerniers(derniers[0])}
         vide="(aucun run sur 7 jours)"
         data={{ "data-ecran-tessera": "derniers" }}
         onClick={() => onBasculer("derniers")}
