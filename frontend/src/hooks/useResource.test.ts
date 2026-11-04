@@ -142,7 +142,88 @@ describe("useResource — avec cle (cache ticket-356)", () => {
   });
 });
 
+describe("useResource — requêtes partagées et dernière donnée (ticket-767)", () => {
+  beforeEach(() => {
+    vi.resetAllMocks();
+    _viderCacheResource();
+  });
+
+  it("three instances mounted together with the same key make a single call", async () => {
+    const lente = differee<string[]>();
+    fetchListe.mockImplementation(() => lente.promise);
+
+    const { result } = renderHook(() => ({
+      a: useListeAvecCle("partagee"),
+      b: useListeAvecCle("partagee"),
+      c: useListeAvecCle("partagee"),
+    }));
+    expect(fetchListe).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      lente.resolve(["x"]);
+      await lente.promise;
+    });
+    await waitFor(() => expect(result.current.c.loading).toBe(false));
+    expect(result.current.a.data).toEqual(["x"]);
+    expect(result.current.b.data).toEqual(["x"]);
+    expect(result.current.c.data).toEqual(["x"]);
+    expect(fetchListe).toHaveBeenCalledTimes(1);
+  });
+
+  it("reads again once the shared request has settled", async () => {
+    fetchListe.mockResolvedValue(["x"]);
+    const { result } = renderHook(() => useListeAvecCle("partagee"));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    act(() => {
+      result.current.refresh();
+    });
+    await waitFor(() => expect(fetchListe).toHaveBeenCalledTimes(2));
+  });
+
+  it("returns the last data when a read fails after a successful one, and exposes the error apart", async () => {
+    fetchListe.mockResolvedValueOnce(["bonne"]);
+    const { result } = renderHook(() => useListe("p1"));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    fetchListe.mockRejectedValueOnce(new Error("Network error"));
+    act(() => {
+      result.current.refresh();
+    });
+    await waitFor(() => expect(result.current.error).toBe("Network error"));
+    expect(result.current.data).toEqual(["bonne"]);
+    expect(result.current.loading).toBe(false);
+  });
+
+  it("keeps the cached data for the key when a new fetcher then fails", async () => {
+    // Même clé de cache, autre identité de fetcher à chaque tick : comme la salle Tessera.
+    const useParTick = (n: number) =>
+      useResource(
+        useMemo(() => () => fetchListe(`tick-${n}`), [n]),
+        AUCUN,
+        { projet: "proj-a", ressource: "r" },
+      );
+    fetchListe.mockResolvedValueOnce(["bonne"]);
+    const { result, rerender } = renderHook(({ n }: { n: number }) => useParTick(n), {
+      initialProps: { n: 1 },
+    });
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    fetchListe.mockRejectedValueOnce(new Error("coupé"));
+    act(() => {
+      rerender({ n: 2 });
+    });
+    await waitFor(() => expect(result.current.error).toBe("coupé"));
+    expect(result.current.data).toEqual(["bonne"]);
+  });
+});
+
 describe("useResource", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    _viderCacheResource();
+  });
+
   it("charge au montage puis rend la donnée", async () => {
     fetchListe.mockResolvedValue(["a"]);
     const { result } = renderHook(() => useListe("p1"));

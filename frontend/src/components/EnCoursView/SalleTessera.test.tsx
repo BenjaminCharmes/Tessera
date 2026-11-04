@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import EnCoursView from "./index";
 import { api } from "../../lib/api";
@@ -126,6 +126,28 @@ describe("the Tessera server room (ticket-726)", () => {
     expect(await screen.findByText("(aucun run)")).toBeInTheDocument();
     expect(screen.getByText("(aucune PR en attente)")).toBeInTheDocument();
     expect(screen.getByText("(journal vide)")).toBeInTheDocument();
+  });
+
+  it("stays rendered when a later read of the room fails (ticket-767)", async () => {
+    vi.mocked(lireLaSalleTessera).mockResolvedValueOnce(salle());
+    const etat = (lueA: number): UseAppsEnCoursResult => ({
+      apps: [], lueA, erreur: null,
+      arreter: vi.fn(), rafraichir: vi.fn(), arreterProjet: vi.fn(), lancer: vi.fn(),
+      enArret: () => false, enLancement: () => false,
+    });
+    const { rerender } = render(<EnCoursView appsEnCours={etat(1)} vueInitiale="salles" />);
+    await screen.findByRole("article", { name: "Salle Tessera" });
+
+    vi.mocked(lireLaSalleTessera).mockRejectedValue(new Error("backend coupé"));
+    rerender(<EnCoursView appsEnCours={etat(2)} vueInitiale="salles" />);
+    await waitFor(() => expect(vi.mocked(lireLaSalleTessera)).toHaveBeenCalledTimes(2));
+    // Laisse la lecture rejetée se résoudre avant de regarder la salle.
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 0));
+    });
+
+    expect(screen.getByRole("article", { name: "Salle Tessera" })).toBeInTheDocument();
+    expect(screen.getByText("tessera.db 122,0 Mo")).toBeInTheDocument();
   });
 
   it("is left out of the list view", async () => {
