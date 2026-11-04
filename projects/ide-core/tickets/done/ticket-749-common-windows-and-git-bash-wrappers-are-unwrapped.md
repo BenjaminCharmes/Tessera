@@ -1,14 +1,15 @@
 ---
+agent: codeur
+created: 2026-11-03
+depends_on:
+- ticket-746
+estimated_days: 1
 id: ticket-749
-title: "Common Windows and Git Bash wrappers are unwrapped by the git guard"
-type: fix
-status: todo
 pr_number: null
 priority: medium
-agent: codeur
-depends_on: ["ticket-746"]
-estimated_days: 1
-created: 2026-11-03
+status: done
+title: Common Windows and Git Bash wrappers are unwrapped by the git guard
+type: fix
 ---
 
 # ticket-749 — Le garde git déballe les enveloppes courantes de Windows et Git Bash
