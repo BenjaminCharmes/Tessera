@@ -1,14 +1,14 @@
 ---
-id: ticket-765
-title: "The route contract test checks field types and cannot be bypassed by vi.mock"
-type: test
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-11-03
 depends_on: []
 estimated_days: 1
-created: 2026-11-03
+id: ticket-765
+pr_number: 889
+priority: medium
+status: done
+title: The route contract test checks field types and cannot be bypassed by vi.mock
+type: test
 ---
 
 # ticket-765 — Le test de contrat vérifie les types et ne se contourne plus par `vi.mock`
