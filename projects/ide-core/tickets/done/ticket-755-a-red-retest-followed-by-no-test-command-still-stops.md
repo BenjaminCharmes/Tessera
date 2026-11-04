@@ -5,7 +5,7 @@ depends_on:
 - ticket-740
 estimated_days: 1
 id: ticket-755
-pr_number: null
+pr_number: 882
 priority: medium
 status: done
 title: A red retest followed by no test command still stops the delivery
