@@ -4,7 +4,7 @@ created: 2026-11-03
 depends_on: []
 estimated_days: 1
 id: ticket-752
-pr_number: null
+pr_number: 876
 priority: medium
 status: done
 title: The token guard reads globs and whole folders that reach Tessera's .env
