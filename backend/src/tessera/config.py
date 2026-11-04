@@ -165,6 +165,9 @@ class Settings(BaseSettings):
     # Noms de `Host` admis en plus du loopback, séparés par des virgules
     # (ticket-704). Vide : 127.0.0.1, localhost et [::1] seuls.
     allowed_hosts: str = ""
+    # Origines admises en plus des défauts pour une WebSocket, séparées par des
+    # virgules (ticket-754). Vide : Vite 5173-5176 et l'app Tauri seuls.
+    allowed_origins: str = ""
     # Borne le nombre de suites de tests lancées simultanément sur la machine.
     # 0 ou moins : pas de borne. Voir ticket-348.
     max_parallel_test_runs: int = 2
