@@ -7456,3 +7456,16 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-04 11:37:23 UTC — [ticket-754] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits : un test vérifie le refus des o (188921ms)
 - 2026-11-04 11:37:23 UTC — [ticket-754] APPROVED après 1 tour(s)
 - 2026-11-04 11:38:54 UTC — [ticket-754] documentation: 0 fichier(s) (84265ms)
+- 2026-11-04 11:58:39 UTC — [ide-core] ticket-754 PR #881 mergée (CI verte)
+- 2026-11-04 11:58:41 UTC — [ide-core] ticket-754 : base réalignée sur develop
+- 2026-11-04 11:58:41 UTC — [ide-core] ticket-754 PR #881 confiée au CIWatcher
+- 2026-11-04 11:58:46 UTC — [ticket-755] branche ticket-755-a-red-retest-followed-by-no-test-command-still-st
+- 2026-11-04 11:58:47 UTC — [ticket-755] tour 1 — codeur démarré
+- 2026-11-04 11:59:50 UTC — [ticket-755] tour 1 — codeur terminé (62358ms)
+- 2026-11-04 12:11:25 UTC — [ticket-755] testeur: OK (exit 0)
+- 2026-11-04 12:12:34 UTC — [ticket-755] securite: PASS — Le diff corrige une logique d'arrêt de livraison en préservant le résultat du pr (68985ms)
+- 2026-11-04 12:12:34 UTC — [ticket-755] tour 1 — reviewer démarré
+- 2026-11-04 12:12:48 UTC — [ticket-755] tour 1 — reviewer terminé (14562ms)
+- 2026-11-04 12:14:18 UTC — [ticket-755] validateur: APPROVED — Les deux critères d'acceptation sont satisfaits. Le code a été mis à jour pour g (104546ms)
+- 2026-11-04 12:14:18 UTC — [ticket-755] APPROVED après 1 tour(s)
+- 2026-11-04 12:15:35 UTC — [ticket-755] documentation: 0 fichier(s) (69828ms)

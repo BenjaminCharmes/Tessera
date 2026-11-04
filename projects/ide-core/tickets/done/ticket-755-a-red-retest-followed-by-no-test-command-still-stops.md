@@ -1,14 +1,15 @@
 ---
-id: ticket-755
-title: "A red retest followed by no test command still stops the delivery"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
-depends_on: ["ticket-740"]
-estimated_days: 1
 created: 2026-11-03
+depends_on:
+- ticket-740
+estimated_days: 1
+id: ticket-755
+pr_number: 882
+priority: medium
+status: done
+title: A red retest followed by no test command still stops the delivery
+type: fix
 ---
 
 # ticket-755 — Un retest rouge suivi d'« aucune commande de test » arrête quand même la livraison
