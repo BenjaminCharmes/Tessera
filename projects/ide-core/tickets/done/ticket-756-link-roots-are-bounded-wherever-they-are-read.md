@@ -5,7 +5,7 @@ depends_on:
 - ticket-747
 estimated_days: 1
 id: ticket-756
-pr_number: null
+pr_number: 895
 priority: low
 status: done
 title: Link roots are bounded wherever the file API reads them
