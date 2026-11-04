@@ -138,7 +138,62 @@ def test_excerpt_from_removed_lines_is_refused() -> None:
 
 def test_single_line_excerpt_still_passes() -> None:
     _verifier(_controle_du_diff(), 'export type QuizMode =')
-    _verifier(_controle_du_diff(), "const ancien = 1")
+    _verifier(_controle_du_diff(), "+export type QuizMode =")
+
+
+def test_single_line_excerpt_found_only_on_a_removed_line_is_refused() -> None:
+    with pytest.raises(EditionRefusee, match=r"(?s)preuve.*n'est ni dans"):
+        _verifier(_controle_du_diff(), "const ancien = 1")
+    with pytest.raises(EditionRefusee, match=r"(?s)preuve.*n'est ni dans"):
+        _verifier(_controle_du_diff(), "-const ancien = 1")
+
+
+_DIFF_DEUX_SECTIONS = (
+    "diff --git a/src/a.py b/src/a.py\n"
+    "--- a/src/a.py\n"
+    "+++ b/src/a.py\n"
+    "@@ -1,2 +1,3 @@\n"
+    "+SEUIL = 3\n"
+    "+DELAI = 5\n"
+    " pass\n"
+    "@@ -90,2 +91,3 @@\n"
+    " def fin():\n"
+    "+    return SEUIL\n"
+    "+    # fin\n"
+)
+
+
+def _controle_de_deux_sections() -> ControleDePreuve:
+    diff = DiffDeTicket("ticket-9", _DIFF_DEUX_SECTIONS, ["src/a.py"])
+    return ControleDePreuve(MatiereCode(diffs=[diff]))
+
+
+def test_excerpt_of_two_lines_from_two_sections_is_refused() -> None:
+    # La dernière ligne de la section 1 et la première de la section 2 se touchent
+    # une fois les lignes recollées, mais ne se suivent pas dans le code livré.
+    with pytest.raises(EditionRefusee, match=r"(?s)preuve.*n'est ni dans"):
+        _verifier(_controle_de_deux_sections(), "pass\ndef fin():")
+
+
+def test_excerpt_of_two_consecutive_lines_of_one_section_is_accepted() -> None:
+    _verifier(_controle_de_deux_sections(), "SEUIL = 3\nDELAI = 5")
+    _verifier(_controle_de_deux_sections(), "def fin():\n    return SEUIL")
+
+
+def test_excerpt_cannot_straddle_two_files_of_the_material() -> None:
+    matiere = MatiereCode(
+        diffs=[DiffDeTicket("t", "diff --git a/a b/a\n+premier\n", ["a"])],
+        fichiers=[FichierLivre("b", "second\n")],
+    )
+    with pytest.raises(EditionRefusee, match=r"(?s)preuve.*n'est ni dans"):
+        _verifier(ControleDePreuve(matiere), "premier\nsecond")
+
+
+def test_an_added_line_starting_with_two_plus_signs_is_proof() -> None:
+    diff = "diff --git a/src/a.c b/src/a.c\n--- a/src/a.c\n+++ b/src/a.c\n@@ -1 +1,2 @@\n+++i\n x\n"
+    controle = ControleDePreuve(MatiereCode(diffs=[DiffDeTicket("t", diff, ["src/a.c"])]))
+
+    _verifier(controle, "++i")
 
 
 @pytest.mark.parametrize("entete", ["+++ b/src/types.ts", "@@ -1,3 +1,5 @@", "--- a/src/types.ts"])
