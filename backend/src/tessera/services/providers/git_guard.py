@@ -23,7 +23,12 @@ from typing import Any
 from claude_agent_sdk import HookContext, HookInput, HookJSONOutput
 
 from tessera.services.providers import git_guard_lexique as lexique
-from tessera.services.providers.git_guard_lectures import gh_interdit, git_interdit
+from tessera.services.providers.git_guard_lectures import (
+    gh_interdit,
+    gh_sans_sous_commande,
+    git_interdit,
+    git_sans_sous_commande,
+)
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -36,6 +41,26 @@ GIT_REFUS = (
     "run, avec un message dérivé du ticket. Contente-toi d'écrire les "
     "fichiers. Le git en lecture (status, diff, log, show) reste disponible."
 )
+
+def _xargs_sans_sous_commande(nom: str, reste: list[str]) -> bool:
+    """`xargs git` : la sous-commande arrive sur l'entrée standard (ticket-749)."""
+    if nom != "xargs" or not reste:
+        return False
+    cible = lexique.nom_de_commande(reste[0])
+    if cible == "git":
+        return git_sans_sous_commande(reste[1:])
+    return cible == "gh" and gh_sans_sous_commande(reste[1:])
+
+
+def _ligne_interdite(nom: str, jetons_: list[str], env_suspect: bool) -> bool:
+    """Un shell (`sh -c`, `cmd //c`, `powershell`…) ou `eval` : lit sa ligne."""
+    if nom == "eval":
+        return commande_git_interdite(" ".join(jetons_[1:]), env_suspect)
+    if lexique.commande_opaque(jetons_):
+        return True
+    ligne = lexique.ligne_derriere_c(jetons_)
+    return ligne is not None and commande_git_interdite(ligne, env_suspect)
+
 
 def _segment_interdit(jetons_: list[str], env_suspect: bool = False) -> bool:
     """True si ce segment, une fois déballé, est un git ou un gh qui écrit.
@@ -51,14 +76,13 @@ def _segment_interdit(jetons_: list[str], env_suspect: bool = False) -> bool:
         if not jetons_:
             return False
         nom = lexique.nom_de_commande(jetons_[0])
-        if nom in lexique.SHELLS:
-            ligne = lexique.ligne_derriere_c(jetons_)
-            return ligne is not None and commande_git_interdite(ligne, env_suspect)
-        if nom == "eval":
-            return commande_git_interdite(" ".join(jetons_[1:]), env_suspect)
+        if nom in lexique.SHELLS or nom == "eval":
+            return _ligne_interdite(nom, jetons_, env_suspect)
         if nom in lexique.ENVELOPPES:
             avant = jetons_
             jetons_ = lexique.sans_enveloppe(jetons_)
+            if _xargs_sans_sous_commande(nom, jetons_):
+                return True
             env_suspect = env_suspect or lexique.affecte_environnement(avant, jetons_)
             continue
         if nom == "git":
