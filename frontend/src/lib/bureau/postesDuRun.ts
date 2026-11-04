@@ -47,7 +47,7 @@ interface Releve {
  * Le testeur est `occupe` de `test_started` à `test_result` (ticket-587) : avant
  * cet événement, il n'avait pas de départ et le dire aurait été décoratif.
  */
-function transitionDe(ev: OrchestratorEvent): { poste: PosteId; transition: Transition } | null {
+export function transitionDe(ev: OrchestratorEvent): { poste: PosteId; transition: Transition } | null {
   switch (ev.type) {
     case "agent_started":
     case "agent_done": {

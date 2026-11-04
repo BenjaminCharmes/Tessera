@@ -25,7 +25,8 @@ interface PanneauAgentChoisiProps {
 
 /**
  * Le panneau sous « À toi » : ce que l'état du run dit de l'agent choisi. Lignes
- * dérivées à chaque rendu : un agent qui ne travaille plus retombe sur l'invite.
+ * dérivées à chaque rendu, selon que l'agent travaille, a fini ou attend son tour
+ * (ticket-778).
  * Pas de « Lui écrire » : le canal d'écriture n'est pas câblé dans le Bureau.
  */
 export default function PanneauAgentChoisi({ choix, etat, run, maintenant, onOuvrir }: PanneauAgentChoisiProps) {
@@ -33,7 +34,7 @@ export default function PanneauAgentChoisi({ choix, etat, run, maintenant, onOuv
   // Le prénom titre le panneau dès qu'un agent est choisi ; le rôle montré suit celui du poste (architecte ou codeur).
   const role = choix && etat && lignes ? roleDuPoste(etat, choix.poste) : null;
   const titre = choix && role ? nomDeLAgent(choix.projet, role) : "Agent choisi";
-  // Le bilan ne se lit que pour un agent au travail : rien à demander à l'API sinon.
+  // Le bilan ne se lit que pour un agent choisi : rien à demander à l'API sinon.
   const bilan = useBilanDeLAgent(role ? (choix?.projet ?? null) : null, role, maintenant);
 
   return (
@@ -43,7 +44,7 @@ export default function PanneauAgentChoisi({ choix, etat, run, maintenant, onOuv
     >
       <h3 className="text-corps font-semibold text-zinc-200">{titre}</h3>
       {lignes === null ? (
-        <p className="text-micro text-zinc-500">Clique un agent au travail</p>
+        <p className="text-micro text-zinc-500">Clique un agent</p>
       ) : (
         <dl className="flex flex-col gap-1">
           {lignes.map(({ libelle, valeur }) => (

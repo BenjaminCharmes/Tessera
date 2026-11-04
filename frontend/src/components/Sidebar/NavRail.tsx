@@ -1,7 +1,6 @@
 import type { ReactElement } from "react";
 import type { AlerteDeSupervision, SidebarPanel } from "./panels";
 import Pastille from "./Pastille";
-import BoutonReglages from "./BoutonReglages";
 import Cloche from "./Cloche";
 import type { DonneesDeLaCloche } from "../../hooks/useNotificationsSysteme";
 import type { ReglageDesNotifications } from "./ReglageNotifications";
@@ -44,7 +43,7 @@ interface NavRailProps {
   appsEnCours?: number;
   /** Ce qui mérite d'être vu avant le reste, quand c'est le cas. */
   alerte?: AlerteDeSupervision;
-  /** Le réglage des notifications système, ouvert par « Réglages » (ticket-441). */
+  /** Le réglage global des notifications système, en tête des réglages de la cloche (ticket-779). */
   notifications?: ReglageDesNotifications;
   /** L'historique du jour et les réglages par type, derrière la cloche (ticket-554). */
   cloche?: DonneesDeLaCloche;
@@ -186,9 +185,8 @@ export default function NavRail({
           </div>
         ))}
       </nav>
-      {/* Hors du `tablist` : ce ne sont pas des destinations, mais la cloche et un réglage. */}
-      {cloche ? <Cloche cloche={cloche} /> : null}
-      <BoutonReglages notifications={notifications} />
+      {/* Hors du `tablist` : la cloche n'est pas une destination ; elle porte aussi le réglage global (ticket-779). */}
+      {cloche ? <Cloche cloche={cloche} notifications={notifications} /> : null}
     </div>
   );
 }

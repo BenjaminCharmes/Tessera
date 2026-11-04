@@ -1,4 +1,4 @@
-import { type TransitionEvent, useState } from "react";
+import { type KeyboardEvent, type TransitionEvent, useState } from "react";
 import Agrandi from "../../design/bureau/Agrandi";
 import type { MotifDeVisite } from "../../lib/bureau/ronde";
 import AgentDebout from "../../design/bureau/AgentDebout";
@@ -22,6 +22,8 @@ interface AgentsDeLaPieceProps {
   redacteurs?: readonly RedacteurPlace[];
   /** Le poste derrière lequel se tient le directeur en visite dans cette pièce (ticket-661). */
   directeur?: PosteId | null;
+  /** Choisit l'agent d'un poste là où il se trouve, comme un clic sur son poste (ticket-778). */
+  onChoisir?: (poste: PosteId) => void;
   /** Pourquoi il est venu, pour son infobulle (ticket-723). */
   motifDuDirecteur?: MotifDeVisite;
 }
@@ -58,9 +60,11 @@ interface AgentMarcheurProps {
   agent: Placement;
   role: RoleAffiche;
   bavarde: boolean;
+  /** Absent : l'agent n'est qu'une image (rédacteur, ou personne n'écoute le choix). */
+  choisir?: () => void;
 }
 
-function AgentMarcheur({ projet, id, agent, role, bavarde }: AgentMarcheurProps) {
+function AgentMarcheur({ projet, id, agent, role, bavarde, choisir }: AgentMarcheurProps) {
   const rendSaCopie = agent.activite === "copie";
   const monte = agent.niveau === "fond" ? -DENIVELE_DU_FOND : 0;
   // Les abscisses sont celles du repère de 800 px : étirées comme la grille des postes.
@@ -86,14 +90,21 @@ function AgentMarcheur({ projet, id, agent, role, bavarde }: AgentMarcheurProps)
     : (() => {
         const libelle = avecLeNom(projet, role, `${nomDuPoste(role)}, ${libelleActivite(agent.activite ?? "tasse")}`);
         // Le même texte au survol qu'à son poste : la couche ignore le pointeur, l'agent le reprend.
-        return { role: "img", "aria-label": libelle, title: libelle };
+        if (!choisir) return { role: "img", "aria-label": libelle, title: libelle };
+        // Un agent qui a fini se choisit là où il est, au clic comme au clavier (ticket-778).
+        const auClavier = (e: KeyboardEvent<HTMLSpanElement>) => {
+          if (e.key !== "Enter" && e.key !== " ") return;
+          e.preventDefault();
+          choisir();
+        };
+        return { role: "button", tabIndex: 0, "aria-label": libelle, title: libelle, onClick: choisir, onKeyDown: auClavier };
       })();
   return (
     <span
       data-agent={id}
       data-activite={agent.activite ?? "parti"}
       data-objet={rendSaCopie ? "feuille" : undefined}
-      className={`${marche ? "marche " : ""}${agent.parti ? "" : "pointer-events-auto "}absolute left-0 z-10`}
+      className={`${marche ? "marche " : ""}${agent.parti ? "" : "pointer-events-auto "}${choisir && !agent.parti ? "cursor-pointer " : ""}absolute left-0 z-10`}
       style={style}
       data-marche={enMarche}
       onTransitionRun={surTransition(true)}
@@ -119,9 +130,9 @@ function AgentMarcheur({ projet, id, agent, role, bavarde }: AgentMarcheurProps)
 /**
  * Les agents qui ont fini, posés en absolu sur le sol de la pièce : ils quittent
  * leur poste pour une activité, et partent tous par la porte quand le run se clôt.
- * La couche ne reçoit aucun clic : les postes dessous restent des boutons.
+ * La couche ne reçoit aucun clic hors des agents : les postes dessous restent des boutons.
  */
-export default function AgentsDeLaPiece({ projet, agents, roles = {}, redacteurs = [], directeur = null, motifDuDirecteur }: AgentsDeLaPieceProps) {
+export default function AgentsDeLaPiece({ projet, agents, roles = {}, redacteurs = [], directeur = null, motifDuDirecteur, onChoisir }: AgentsDeLaPieceProps) {
   const bavard = quiBavarde(agents);
   return (
     <div className="pointer-events-none absolute inset-0">
@@ -133,6 +144,7 @@ export default function AgentsDeLaPiece({ projet, agents, roles = {}, redacteurs
           agent={agent}
           role={roles[agent.poste] ?? agent.poste}
           bavarde={agent.poste === bavard}
+          choisir={onChoisir && (() => onChoisir(agent.poste))}
         />
       ))}
       {redacteurs.map((redacteur) => (

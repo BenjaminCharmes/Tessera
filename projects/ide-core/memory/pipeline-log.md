@@ -7422,3 +7422,15 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-04 09:58:49 UTC — [ticket-750] testeur: OK (exit 0)
 - 2026-11-04 10:01:44 UTC — [ticket-750] securite: BLOCK — Le diff introduit un bug CRITICAL ligne 122 : l'indexage `[0]` du tuple retourné (174750ms)
 - 2026-11-04 10:01:50 UTC — [ide-core] file interrompue : ticket-750 non approuvé
+- 2026-11-04 09:02:20 UTC — [ide-core] ticket-762 PR #867 confiée au CIWatcher
+- 2026-11-04 09:02:25 UTC — [ticket-749] branche ticket-749-common-windows-and-git-bash-wrappers-are-unwrappe
+- 2026-11-04 09:02:27 UTC — [ticket-749] tour 1 — codeur démarré
+- 2026-11-04 09:04:35 UTC — [ticket-749] tour 1 — codeur terminé (128328ms)
+- 2026-11-04 09:09:42 UTC — [ide-core] ticket-762 PR #867 mergée (CI verte)
+- 2026-11-04 09:17:05 UTC — [ticket-749] testeur: OK (exit 0)
+- 2026-11-04 09:19:56 UTC — [ticket-749] securite: PASS — Ticket-749 améliore la sécurité du gardien git sans introduire de vulnérabilités (170921ms)
+- 2026-11-04 09:19:56 UTC — [ticket-749] tour 1 — reviewer démarré
+- 2026-11-04 09:20:31 UTC — [ticket-749] tour 1 — reviewer terminé (34842ms)
+- 2026-11-04 09:23:34 UTC — [ticket-749] validateur: APPROVED — Les trois critères d'acceptation ont été satisfaits. Le code modifié implémente  (218671ms)
+- 2026-11-04 09:23:34 UTC — [ticket-749] APPROVED après 1 tour(s)
+- 2026-11-04 09:27:39 UTC — [ticket-749] documentation: 1 fichier(s) (237765ms) — après tour de correction

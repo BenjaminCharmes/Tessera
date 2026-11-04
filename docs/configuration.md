@@ -1,6 +1,6 @@
 # Configuration
 
-Le backend Tessera écoute sur le port **8100**.
+Le backend Tessera écoute sur le port **8100**, jamais sur 8000 : ce dernier est le port par défaut d'uvicorn, et d'autres applications locales l'occupent souvent.
 
 Toutes les variables sont dans `.env` (copie de `.env.example`) :
 

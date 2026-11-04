@@ -98,6 +98,25 @@ def git_interdit(arguments: list[str]) -> bool:
     return False
 
 
+def git_sans_sous_commande(arguments: list[str]) -> bool:
+    """True si ces arguments de `git` ne nomment aucune sous-commande.
+
+    `xargs git` la reçoit sur son entrée standard : le garde ne peut pas la lire.
+    """
+    i = 0
+    while i < len(arguments):
+        pas = _avance_option_git(arguments, i)
+        if pas is None or pas == 0:
+            return False
+        i += pas
+    return True
+
+
+def gh_sans_sous_commande(arguments: list[str]) -> bool:
+    """True si ces arguments de `gh` ne nomment aucune sous-commande."""
+    return not _positionnels_gh(arguments)
+
+
 def _positionnels_gh(arguments: list[str]) -> list[str]:
     """Les arguments de `gh` à partir de la sous-commande, options globales
     (`--repo o/r`, `-R o/r`, `--hostname h`) sautées avec leur valeur."""
