@@ -1,10 +1,12 @@
 """Liaison d'un projet à un dépôt GitHub — ticket-061."""
 import json
 import asyncio
+import inspect
 from pathlib import Path
 
 import pytest
 
+from tessera.services import git_link
 from tessera.services.git_link import (
     GitLinkError,
     RemoteNotEmpty,
@@ -94,6 +96,33 @@ async def test_init_without_branch_keeps_the_machine_default(
     await init_repository(project)
 
     assert (await _git(project, "symbolic-ref", "--short", "HEAD")).strip() == "trunk"
+
+
+async def test_init_runs_no_user_template_hook(
+    project: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    temoin = tmp_path / "temoin.txt"
+    modele = tmp_path / "modele"
+    (modele / "hooks").mkdir(parents=True)
+    hook = modele / "hooks" / "pre-commit"
+    hook.write_text(f'#!/bin/sh\necho pre-commit >> "{temoin.as_posix()}"\n', encoding="utf-8")
+    hook.chmod(0o755)
+    config = tmp_path / "gitconfig"
+    config.write_text(f"[init]\n\ttemplateDir = {modele.as_posix()}\n", encoding="utf-8")
+    monkeypatch.setenv("GIT_CONFIG_GLOBAL", str(config))
+
+    await init_repository(project)
+
+    assert (project / ".git" / "hooks" / "pre-commit").is_file()
+    assert (await git_status(project)).has_commits is True
+    assert not temoin.exists()
+
+
+def test_git_link_does_not_spawn_git_itself() -> None:
+    source = inspect.getsource(git_link)
+
+    assert "create_subprocess_exec" not in source
+    assert "tessera.services.git_runner" in source
 
 
 async def test_init_sur_un_depot_existant_ne_le_touche_pas(project: Path) -> None:

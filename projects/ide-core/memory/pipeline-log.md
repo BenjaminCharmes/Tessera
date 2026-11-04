@@ -7481,3 +7481,16 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-04 12:36:07 UTC — [ticket-751] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code a été mis à jour pour dé (115828ms)
 - 2026-11-04 12:36:07 UTC — [ticket-751] APPROVED après 1 tour(s)
 - 2026-11-04 12:38:13 UTC — [ticket-751] documentation: 0 fichier(s) (119203ms)
+- 2026-11-04 12:50:42 UTC — [ide-core] ticket-751 PR #883 confiée au CIWatcher
+- 2026-11-04 12:50:47 UTC — [ticket-760] branche ticket-760-every-git-write-goes-through-the-shared-runner-sy
+- 2026-11-04 12:50:49 UTC — [ticket-760] tour 1 — codeur démarré
+- 2026-11-04 12:52:24 UTC — [ticket-760] tour 1 — codeur terminé (95671ms)
+- 2026-11-04 12:58:04 UTC — [ide-core] ticket-751 PR #883 mergée (CI verte)
+- 2026-11-04 13:06:10 UTC — [ticket-760] testeur: OK (exit 0)
+- 2026-11-04 13:08:11 UTC — [ticket-760] securite: PASS — Le diff centralise l'exécution git via un runner unique et durcit le contrôle de (121046ms)
+- 2026-11-04 13:08:11 UTC — [ticket-760] tour 1 — reviewer démarré
+- 2026-11-04 13:08:28 UTC — [ticket-760] tour 1 — reviewer terminé (17202ms)
+- 2026-11-04 13:10:33 UTC — [ticket-760] validateur: fichiers cités joints : git_link.py
+- 2026-11-04 13:10:33 UTC — [ticket-760] validateur: APPROVED — Les trois critères d'acceptation sont respectés. Le code modifié permet de s'ass (141765ms)
+- 2026-11-04 13:10:33 UTC — [ticket-760] APPROVED après 1 tour(s)
+- 2026-11-04 13:11:41 UTC — [ticket-760] documentation: 0 fichier(s) (60968ms)

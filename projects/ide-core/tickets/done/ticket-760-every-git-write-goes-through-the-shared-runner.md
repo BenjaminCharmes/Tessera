@@ -1,14 +1,14 @@
 ---
-id: ticket-760
-title: "Every git write goes through the shared runner, symbolic-ref included"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-11-03
 depends_on: []
 estimated_days: 1
-created: 2026-11-03
+id: ticket-760
+pr_number: 884
+priority: medium
+status: done
+title: Every git write goes through the shared runner, symbolic-ref included
+type: fix
 ---
 
 # ticket-760 — Toute écriture git passe par l'exécuteur commun, `symbolic-ref` compris
