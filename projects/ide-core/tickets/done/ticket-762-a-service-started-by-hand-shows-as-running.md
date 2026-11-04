@@ -1,14 +1,14 @@
 ---
-id: ticket-762
-title: "A declared service started by hand shows as running in its server room"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-11-03
 depends_on: []
 estimated_days: 1
-created: 2026-11-03
+id: ticket-762
+pr_number: 867
+priority: high
+status: done
+title: A declared service started by hand shows as running in its server room
+type: fix
 ---
 
 # ticket-762 — Un service déclaré lancé à la main s'affiche en marche dans sa salle serveur

@@ -7404,3 +7404,15 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-04 08:35:51 UTC — [ticket-759] validateur: APPROVED — Tous les critères d'acceptation ont été satisfaits. Les tests couvrent les cas d (146280ms)
 - 2026-11-04 08:35:51 UTC — [ticket-759] APPROVED après 1 tour(s)
 - 2026-11-04 08:37:01 UTC — [ticket-759] documentation: 0 fichier(s) (64280ms)
+- 2026-11-04 08:48:51 UTC — [ide-core] ticket-759 PR #866 confiée au CIWatcher
+- 2026-11-04 08:48:57 UTC — [ticket-762] branche ticket-762-a-declared-service-started-by-hand-shows-as-runni
+- 2026-11-04 08:48:58 UTC — [ticket-762] tour 1 — codeur démarré
+- 2026-11-04 08:50:51 UTC — [ticket-762] tour 1 — codeur terminé (113375ms)
+- 2026-11-04 08:53:49 UTC — [ticket-762] testeur: OK (exit 0)
+- 2026-11-04 08:55:09 UTC — [ide-core] ticket-759 PR #866 mergée (CI verte)
+- 2026-11-04 08:55:33 UTC — [ticket-762] securite: PASS — The diff refactors the baies service display logic and adds test coverage. All c (103827ms)
+- 2026-11-04 08:55:33 UTC — [ticket-762] tour 1 — reviewer démarré
+- 2026-11-04 08:55:49 UTC — [ticket-762] tour 1 — reviewer terminé (16703ms)
+- 2026-11-04 08:57:40 UTC — [ticket-762] validateur: APPROVED — Les trois critères d'acceptation sont respectés. Les tests ont été ajoutés pour  (127016ms)
+- 2026-11-04 08:57:40 UTC — [ticket-762] APPROVED après 1 tour(s)
+- 2026-11-04 08:59:05 UTC — [ticket-762] documentation: 0 fichier(s) (78703ms)
