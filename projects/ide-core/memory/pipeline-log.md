@@ -7506,3 +7506,14 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-04 13:38:20 UTC — [ticket-763] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Des tests ont été ajoutés pour (152219ms)
 - 2026-11-04 13:38:20 UTC — [ticket-763] APPROVED après 1 tour(s)
 - 2026-11-04 13:40:01 UTC — [ticket-763] documentation: 0 fichier(s) (92342ms)
+- 2026-11-04 13:43:46 UTC — [ide-core] ticket-763 PR #886 confiée au CIWatcher
+- 2026-11-04 13:43:52 UTC — [ticket-764] branche ticket-764-the-shared-modal-traps-focus-and-gives-it-back-wh
+- 2026-11-04 13:43:54 UTC — [ticket-764] tour 1 — codeur démarré
+- 2026-11-04 13:46:03 UTC — [ticket-764] tour 1 — codeur terminé (129282ms)
+- 2026-11-04 13:49:09 UTC — [ticket-764] testeur: OK (exit 0)
+- 2026-11-04 13:49:45 UTC — [ticket-764] securite: PASS — Le diff ajoute une gestion sécurisée du focus pour la navigation Tab dans les mo (36094ms)
+- 2026-11-04 13:49:45 UTC — [ticket-764] tour 1 — reviewer démarré
+- 2026-11-04 13:50:11 UTC — [ticket-764] tour 1 — reviewer terminé (25780ms)
+- 2026-11-04 13:50:53 UTC — [ide-core] ticket-763 PR #886 mergée (CI verte)
+- 2026-11-04 13:52:08 UTC — [ticket-764] validateur: APPROVED — Les critères d'acceptation sont tous satisfaits. Le code implémente correctement (142593ms)
+- 2026-11-04 13:52:08 UTC — [ticket-764] APPROVED après 1 tour(s)
