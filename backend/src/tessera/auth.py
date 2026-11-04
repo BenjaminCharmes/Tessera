@@ -94,19 +94,44 @@ def _is_allowed_origin(origin: str) -> bool:
     return parts.scheme == "http" and bare and parts.hostname in _LOOPBACK_ORIGIN_NAMES
 
 
+#: Ports du Vite de dev et de ses variantes (ticket-754).
+_DEFAULT_ORIGIN_PORTS = range(5173, 5177)
+
+
+def _declared_origins() -> frozenset[str]:
+    """Origins a WebSocket may come from: the defaults plus `ALLOWED_ORIGINS`."""
+    defaults = {
+        f"http://{name}:{port}"
+        for name in ("localhost", "127.0.0.1")
+        for port in _DEFAULT_ORIGIN_PORTS
+    }
+    added = {o.strip().lower().rstrip("/") for o in settings.allowed_origins.split(",")}
+    return frozenset(defaults | _TAURI_ORIGINS | {o for o in added if o})
+
+
+def _is_declared_origin(origin: str) -> bool:
+    return origin.strip().lower() in _declared_origins()
+
+
 def _is_trusted_origin_and_host(scope: Scope) -> bool:
     """False for a `Host` outside the allowed names or a foreign `Origin`.
 
     Un `Origin` absent passe : les outils, curl et les tests n'en envoient pas,
     et un navigateur en joint toujours un aux requêtes qu'une page tierce émet
-    vers l'API (WebSocket comprise).
+    vers l'API. Une WebSocket n'est admise que depuis une origine déclarée : le
+    loopback sert aussi les apps que les agents écrivent, sur des ports quelconques
+    (ticket-754). En HTTP, le préflight CORS tient déjà ces pages à l'écart.
     """
     if scope["path"] in _OPEN_PATHS:
         return True
     if _host_without_port(_header(scope, b"host")) not in _allowed_host_names():
         return False
     origin = _header(scope, b"origin")
-    return not origin or _is_allowed_origin(origin)
+    if not origin:
+        return True
+    if scope["type"] == "websocket":
+        return _is_declared_origin(origin)
+    return _is_allowed_origin(origin)
 
 
 class HostOriginMiddleware:

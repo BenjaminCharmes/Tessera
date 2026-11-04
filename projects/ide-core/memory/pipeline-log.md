@@ -7463,3 +7463,88 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-04 11:03:59 UTC — [ticket-753] APPROVED après 2 tour(s)
 - 2026-11-04 11:06:09 UTC — [ticket-753] documentation: 0 fichier(s) (123469ms)
 - 2026-11-04 11:17:40 UTC — [ticket-753] livraison: arrêt — Livraison interrompue : GitCommandError: git command failed (code 1): git -c core.hooksPath=C:\Users
+- 2026-11-04 11:17:47 UTC — [ticket-754] branche ticket-754-the-observation-socket-trusts-only-declared-origi
+- 2026-11-04 11:17:48 UTC — [ticket-754] tour 1 — codeur démarré
+- 2026-11-04 11:19:11 UTC — [ticket-754] tour 1 — codeur terminé (83266ms)
+- 2026-11-04 11:32:20 UTC — [ticket-754] testeur: OK (exit 0)
+- 2026-11-04 11:34:13 UTC — [ticket-754] securite: PASS — Le diff introduit un contrôle d'origine strict pour les WebSockets, une améliora (113750ms)
+- 2026-11-04 11:34:13 UTC — [ticket-754] tour 1 — reviewer démarré
+- 2026-11-04 11:34:29 UTC — [ticket-754] tour 1 — reviewer terminé (15781ms)
+- 2026-11-04 11:37:23 UTC — [ticket-754] validateur: fichiers cités joints : docs/configuration.md
+- 2026-11-04 11:37:23 UTC — [ticket-754] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits : un test vérifie le refus des o (188921ms)
+- 2026-11-04 11:37:23 UTC — [ticket-754] APPROVED après 1 tour(s)
+- 2026-11-04 11:38:54 UTC — [ticket-754] documentation: 0 fichier(s) (84265ms)
+- 2026-11-04 11:58:39 UTC — [ide-core] ticket-754 PR #881 mergée (CI verte)
+- 2026-11-04 11:58:41 UTC — [ide-core] ticket-754 : base réalignée sur develop
+- 2026-11-04 11:58:41 UTC — [ide-core] ticket-754 PR #881 confiée au CIWatcher
+- 2026-11-04 11:58:46 UTC — [ticket-755] branche ticket-755-a-red-retest-followed-by-no-test-command-still-st
+- 2026-11-04 11:58:47 UTC — [ticket-755] tour 1 — codeur démarré
+- 2026-11-04 11:59:50 UTC — [ticket-755] tour 1 — codeur terminé (62358ms)
+- 2026-11-04 12:11:25 UTC — [ticket-755] testeur: OK (exit 0)
+- 2026-11-04 12:12:34 UTC — [ticket-755] securite: PASS — Le diff corrige une logique d'arrêt de livraison en préservant le résultat du pr (68985ms)
+- 2026-11-04 12:12:34 UTC — [ticket-755] tour 1 — reviewer démarré
+- 2026-11-04 12:12:48 UTC — [ticket-755] tour 1 — reviewer terminé (14562ms)
+- 2026-11-04 12:14:18 UTC — [ticket-755] validateur: APPROVED — Les deux critères d'acceptation sont satisfaits. Le code a été mis à jour pour g (104546ms)
+- 2026-11-04 12:14:18 UTC — [ticket-755] APPROVED après 1 tour(s)
+- 2026-11-04 12:15:35 UTC — [ticket-755] documentation: 0 fichier(s) (69828ms)
+- 2026-11-04 12:16:00 UTC — [ide-core] ticket-755 PR #882 confiée au CIWatcher
+- 2026-11-04 12:16:06 UTC — [ticket-751] branche ticket-751-the-interpreter-net-covers-node-e-and-python-name
+- 2026-11-04 12:16:07 UTC — [ticket-751] tour 1 — codeur démarré
+- 2026-11-04 12:18:43 UTC — [ticket-751] tour 1 — codeur terminé (156171ms)
+- 2026-11-04 12:23:05 UTC — [ide-core] ticket-755 PR #882 mergée (CI verte)
+- 2026-11-04 12:31:45 UTC — [ticket-751] testeur: OK (exit 0)
+- 2026-11-04 12:34:11 UTC — [ticket-751] securite: PASS — Ce diff améliore le système de détection des écritures non autorisées via shell  (146766ms)
+- 2026-11-04 12:34:11 UTC — [ticket-751] tour 1 — reviewer démarré
+- 2026-11-04 12:34:29 UTC — [ticket-751] tour 1 — reviewer terminé (17202ms)
+- 2026-11-04 12:36:07 UTC — [ticket-751] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code a été mis à jour pour dé (115828ms)
+- 2026-11-04 12:36:07 UTC — [ticket-751] APPROVED après 1 tour(s)
+- 2026-11-04 12:38:13 UTC — [ticket-751] documentation: 0 fichier(s) (119203ms)
+- 2026-11-04 12:50:42 UTC — [ide-core] ticket-751 PR #883 confiée au CIWatcher
+- 2026-11-04 12:50:47 UTC — [ticket-760] branche ticket-760-every-git-write-goes-through-the-shared-runner-sy
+- 2026-11-04 12:50:49 UTC — [ticket-760] tour 1 — codeur démarré
+- 2026-11-04 12:52:24 UTC — [ticket-760] tour 1 — codeur terminé (95671ms)
+- 2026-11-04 12:58:04 UTC — [ide-core] ticket-751 PR #883 mergée (CI verte)
+- 2026-11-04 13:06:10 UTC — [ticket-760] testeur: OK (exit 0)
+- 2026-11-04 13:08:11 UTC — [ticket-760] securite: PASS — Le diff centralise l'exécution git via un runner unique et durcit le contrôle de (121046ms)
+- 2026-11-04 13:08:11 UTC — [ticket-760] tour 1 — reviewer démarré
+- 2026-11-04 13:08:28 UTC — [ticket-760] tour 1 — reviewer terminé (17202ms)
+- 2026-11-04 13:10:33 UTC — [ticket-760] validateur: fichiers cités joints : git_link.py
+- 2026-11-04 13:10:33 UTC — [ticket-760] validateur: APPROVED — Les trois critères d'acceptation sont respectés. Le code modifié permet de s'ass (141765ms)
+- 2026-11-04 13:10:33 UTC — [ticket-760] APPROVED après 1 tour(s)
+- 2026-11-04 13:11:41 UTC — [ticket-760] documentation: 0 fichier(s) (60968ms)
+- 2026-11-04 13:26:21 UTC — [ide-core] ticket-760 PR #884 confiée au CIWatcher
+- 2026-11-04 13:26:26 UTC — [ticket-763] branche ticket-763-project-icons-and-run-captures-never-carry-the-to
+- 2026-11-04 13:26:27 UTC — [ticket-763] tour 1 — codeur démarré
+- 2026-11-04 13:30:17 UTC — [ticket-763] tour 1 — codeur terminé (229780ms)
+- 2026-11-04 13:32:56 UTC — [ticket-763] testeur: OK (exit 0)
+- 2026-11-04 13:33:28 UTC — [ide-core] ticket-760 PR #884 mergée (CI verte)
+- 2026-11-04 13:35:48 UTC — [ticket-763] securite: PASS — Le diff retire les tokens des URLs et les passe en Authorization header (annoncé (172360ms)
+- 2026-11-04 13:35:48 UTC — [ticket-763] tour 1 — reviewer démarré
+- 2026-11-04 13:36:07 UTC — [ticket-763] tour 1 — reviewer terminé (18733ms)
+- 2026-11-04 13:38:20 UTC — [ticket-763] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Des tests ont été ajoutés pour (152219ms)
+- 2026-11-04 13:38:20 UTC — [ticket-763] APPROVED après 1 tour(s)
+- 2026-11-04 13:40:01 UTC — [ticket-763] documentation: 0 fichier(s) (92342ms)
+- 2026-11-04 13:43:46 UTC — [ide-core] ticket-763 PR #886 confiée au CIWatcher
+- 2026-11-04 13:43:52 UTC — [ticket-764] branche ticket-764-the-shared-modal-traps-focus-and-gives-it-back-wh
+- 2026-11-04 13:43:54 UTC — [ticket-764] tour 1 — codeur démarré
+- 2026-11-04 13:46:03 UTC — [ticket-764] tour 1 — codeur terminé (129282ms)
+- 2026-11-04 13:49:09 UTC — [ticket-764] testeur: OK (exit 0)
+- 2026-11-04 13:49:45 UTC — [ticket-764] securite: PASS — Le diff ajoute une gestion sécurisée du focus pour la navigation Tab dans les mo (36094ms)
+- 2026-11-04 13:49:45 UTC — [ticket-764] tour 1 — reviewer démarré
+- 2026-11-04 13:50:11 UTC — [ticket-764] tour 1 — reviewer terminé (25780ms)
+- 2026-11-04 13:50:53 UTC — [ide-core] ticket-763 PR #886 mergée (CI verte)
+- 2026-11-04 13:52:08 UTC — [ticket-764] validateur: APPROVED — Les critères d'acceptation sont tous satisfaits. Le code implémente correctement (142593ms)
+- 2026-11-04 13:52:08 UTC — [ticket-764] APPROVED après 1 tour(s)
+- 2026-11-04 13:53:37 UTC — [ticket-764] documentation: 0 fichier(s) (76265ms)
+- 2026-11-04 13:57:03 UTC — [ide-core] ticket-764 PR #888 confiée au CIWatcher
+- 2026-11-04 13:57:10 UTC — [ticket-765] branche ticket-765-the-route-contract-test-checks-field-types-and-ca
+- 2026-11-04 13:57:12 UTC — [ticket-765] tour 1 — codeur démarré
+- 2026-11-04 14:02:53 UTC — [ide-core] ticket-764 PR #888 mergée (CI verte)
+- 2026-11-04 14:05:46 UTC — [ticket-765] tour 1 — codeur terminé (514062ms)
+- 2026-11-04 14:08:51 UTC — [ticket-765] testeur: OK (exit 0)
+- 2026-11-04 14:10:24 UTC — [ticket-765] securite: PASS — This diff improves type safety and test infrastructure with no security vulnerab (93391ms)
+- 2026-11-04 14:10:24 UTC — [ticket-765] tour 1 — reviewer démarré
+- 2026-11-04 14:10:41 UTC — [ticket-765] tour 1 — reviewer terminé (16500ms)
+- 2026-11-04 14:15:03 UTC — [ticket-765] validateur: APPROVED — Les quatre critères d'acceptation sont respectés. Le code implémente un garde de (279327ms)
+- 2026-11-04 14:15:03 UTC — [ticket-765] APPROVED après 1 tour(s)
+- 2026-11-04 14:16:32 UTC — [ticket-765] documentation: 0 fichier(s) (80703ms)

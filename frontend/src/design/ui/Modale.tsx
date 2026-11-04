@@ -1,5 +1,36 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { KeyboardEvent, MouseEvent, ReactNode } from "react";
+
+const FOCALISABLES =
+  'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), ' +
+  'select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+/** Tab et Maj+Tab bouclent sur les éléments focalisables de la modale. */
+function retenirLeFocus(e: KeyboardEvent<HTMLElement>, racine: HTMLElement) {
+  if (e.defaultPrevented) return;
+  const liste = Array.from(racine.querySelectorAll<HTMLElement>(FOCALISABLES));
+  if (liste.length === 0) {
+    e.preventDefault();
+    return;
+  }
+  const premier = liste[0];
+  const dernier = liste[liste.length - 1];
+  const actif = document.activeElement;
+  if (e.shiftKey && (actif === premier || actif === racine)) {
+    e.preventDefault();
+    dernier.focus();
+  } else if (!e.shiftKey && actif === dernier) {
+    e.preventDefault();
+    premier.focus();
+  }
+}
+
+/** À la fermeture, le focus retourne à l'élément qui a ouvert la modale, s'il existe encore. */
+function rendreLeFocus(ouvrant: Element | null) {
+  const actif = document.activeElement;
+  const perdu = actif === null || actif === document.body;
+  if (perdu && ouvrant instanceof HTMLElement && ouvrant.isConnected) ouvrant.focus();
+}
 
 interface ModaleProps {
   children: ReactNode;
@@ -27,7 +58,8 @@ interface ModaleProps {
  *
  * Le fond porte le rôle `dialog` : c'est lui qui reçoit Escape et le clic.
  * Il prend le focus à l'ouverture si rien dedans ne l'a pris, pour qu'Escape
- * agisse même sur une modale sans champ à remplir.
+ * agisse même sur une modale sans champ à remplir. Tab reste dans la modale, et
+ * le focus retourne à ce qui l'a ouverte quand elle se ferme.
  */
 export default function Modale({
   children,
@@ -41,11 +73,14 @@ export default function Modale({
 }: ModaleProps) {
   const ref = useRef<HTMLDivElement>(null);
   const peutFermer = onFermer !== undefined && !fermetureSuspendue;
+  // Ce qui avait le focus avant l'ouverture : lu au rendu, avant qu'un enfant en autoFocus ne le prenne.
+  const [ouvrant] = useState<Element | null>(() => document.activeElement);
 
   useEffect(() => {
     const racine = ref.current;
     if (racine && !racine.contains(document.activeElement)) racine.focus();
-  }, []);
+    return () => rendreLeFocus(ouvrant);
+  }, [ouvrant]);
 
   function surClic(e: MouseEvent<HTMLDivElement>) {
     if (isoler) e.stopPropagation();
@@ -55,6 +90,7 @@ export default function Modale({
   function surTouche(e: KeyboardEvent<HTMLDivElement>) {
     if (isoler) e.stopPropagation();
     if (e.key === "Escape" && peutFermer) onFermer?.();
+    if (e.key === "Tab" && ref.current) retenirLeFocus(e, ref.current);
   }
 
   return (

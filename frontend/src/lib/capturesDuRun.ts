@@ -5,7 +5,7 @@
  * d'une image sont les seuls moyens de les voir. Le nom d'un fichier porte
  * l'écran, la largeur et le thème : `<écran>-<largeur>-<thème>.png`.
  */
-import { BASE, request } from "./http";
+import { request } from "./http";
 const MOTIF = /^([a-z0-9-]+)-([0-9]{1,4})-(clair|sombre)\.png$/;
 
 export type ThemeDeCapture = "clair" | "sombre";
@@ -45,10 +45,10 @@ export function grouperParEcran(fichiers: readonly string[]): EcranCapture[] {
   }));
 }
 
-/** L'adresse d'une image du run, pour un `<img src>`. */
-export function urlDeCapture(projectId: string, ticketId: string, fichier: string): string {
+/** Le chemin d'une image du run, relatif à `/api/v1` : celui que prend le client HTTP. */
+export function cheminDeCapture(projectId: string, ticketId: string, fichier: string): string {
   const projet = encodeURIComponent(projectId);
-  return `${BASE}/projects/${projet}/captures/${encodeURIComponent(fichier)}?ticket=${encodeURIComponent(ticketId)}`;
+  return `/projects/${projet}/captures/${encodeURIComponent(fichier)}?ticket=${encodeURIComponent(ticketId)}`;
 }
 
 /** Les noms des images prises pour ce ticket ; liste vide si le run n'a rien capturé. */

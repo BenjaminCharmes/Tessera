@@ -20,9 +20,11 @@ from pathlib import Path
 #: passe hooks neutralisés.
 _READS = frozenset({
     "diff", "status", "rev-parse", "log", "show", "ls-files", "ls-tree",
-    "cat-file", "check-ignore", "rev-list", "merge-base", "symbolic-ref",
+    "cat-file", "check-ignore", "rev-list", "merge-base",
     "for-each-ref", "describe",
 })
+# `symbolic-ref` n'y figure pas : lecture à un nom, écriture dès le second
+# (voir `writes`).
 
 #: Options placées avant la sous-commande, dont la valeur est l'argument suivant.
 _OPTIONS_WITH_VALUE = frozenset({"-c", "-C", "--git-dir", "--work-tree", "--namespace"})
@@ -66,9 +68,20 @@ def _subcommand(args: tuple[str, ...]) -> str | None:
     return None
 
 
+def _symbolic_ref_writes(args: tuple[str, ...]) -> bool:
+    """`symbolic-ref` reads with one name; a second name, -d or -m writes a ref."""
+    apres = args[args.index("symbolic-ref") + 1:]
+    if any(arg in ("-d", "--delete", "-m") for arg in apres):
+        return True
+    return sum(1 for arg in apres if not arg.startswith("-")) > 1
+
+
 def writes(args: tuple[str, ...]) -> bool:
     """True unless the command is a known read (fail closed)."""
-    return _subcommand(args) not in _READS
+    sous_commande = _subcommand(args)
+    if sous_commande == "symbolic-ref":
+        return _symbolic_ref_writes(args)
+    return sous_commande not in _READS
 
 
 def build_command(args: tuple[str, ...]) -> list[str]:

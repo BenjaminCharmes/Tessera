@@ -1,14 +1,14 @@
 ---
-id: ticket-764
-title: "The shared modal traps focus and gives it back when it closes"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-11-03
 depends_on: []
 estimated_days: 1
-created: 2026-11-03
+id: ticket-764
+pr_number: 888
+priority: medium
+status: done
+title: The shared modal traps focus and gives it back when it closes
+type: fix
 ---
 
 # ticket-764 — La modale partagée retient le focus et le rend à la fermeture

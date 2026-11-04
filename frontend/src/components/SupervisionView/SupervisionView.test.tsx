@@ -246,6 +246,8 @@ describe("SupervisionView", () => {
             demarre_a: new Date().toISOString(),
             en_cours: true,
             code_de_sortie: null,
+            sortie: [],
+            arrete_a_la_main: false,
           },
         ]}
       />,
@@ -269,6 +271,8 @@ describe("SupervisionView", () => {
             demarre_a: new Date().toISOString(),
             en_cours: false,
             code_de_sortie: 1,
+            sortie: [],
+            arrete_a_la_main: false,
           },
         ]}
       />,
@@ -294,6 +298,8 @@ describe("SupervisionView", () => {
             demarre_a: new Date().toISOString(),
             en_cours: true,
             code_de_sortie: null,
+            sortie: [],
+            arrete_a_la_main: false,
           },
         ]}
       />,

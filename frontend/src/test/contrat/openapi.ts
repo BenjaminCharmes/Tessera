@@ -66,3 +66,8 @@ export function reponseDecrite(verbe: string, route: string): boolean {
 export function proprietes(schema: Schema): string[] {
   return Object.keys(resoudre(schema).properties ?? {});
 }
+
+/** Les champs que le schéma exige : le backend les envoie toujours. */
+export function requis(schema: Schema): string[] {
+  return resoudre(schema).required ?? [];
+}

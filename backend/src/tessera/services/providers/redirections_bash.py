@@ -161,48 +161,54 @@ _NOMS_PROTEGES_INLINE: tuple[str, ...] = (
     ".git/",
 )
 
-#: Un appel open() avec mode écriture : open('x','w'), open('x',"a+"), etc.
-_RE_OPEN_ECRITURE = re.compile(r"""open\s*\([^)]*['"]\s*,\s*['"][wa]""")
+#: Les motifs d'écriture d'un code inline : `open` en mode positionnel ou nommé
+#: (`mode='w'`), `.write(`, `shutil`/`os` qui copient ou déplacent, et les
+#: écritures de `fs` côté Node (`writeFileSync`, `createWriteStream`…).
+_MOTIFS_ECRITURE: tuple[re.Pattern[str], ...] = (
+    re.compile(r"""open\s*\([^)]*['"]\s*,\s*['"][wax]"""),
+    re.compile(r"""open\s*\([^)]*\bmode\s*=\s*['"][wax]"""),
+    re.compile(r"""\.write(?:_text|_bytes)?\s*\("""),
+    re.compile(r"""\b(?:shutil|os)\s*\.\s*(?:copy2?|copyfile|copytree|move|rename|replace)\s*\("""),
+    re.compile(r"""\b(?:write|append)File(?:Sync)?\s*\(|\bcreateWriteStream\s*\("""),
+    re.compile(r"""\.\s*(?:copyFile|cp|rename|truncate)(?:Sync)?\s*\("""),
+)
 
-#: Méthode d'écriture directe : .write( ou .write_text(
-_RE_WRITE_METHOD = re.compile(r"""\.write(?:_text)?\s*\(""")
-
-#: Interpréteurs Python et Node reconnus comme premier jeton.
-_RE_INTERPRETE = re.compile(
-    r"^(python3?(\.\d+)?(\.exe)?|node(\.exe)?)$", re.IGNORECASE
+#: Interpréteurs reconnus comme premier jeton, et l'option qui porte leur code :
+#: `python -c`, `node -e` (`node -c` ne fait que vérifier la syntaxe).
+_OPTIONS_CODE: tuple[tuple[re.Pattern[str], frozenset[str]], ...] = (
+    (re.compile(r"^python3?(\.\d+)?(\.exe)?$", re.IGNORECASE), frozenset({"-c"})),
+    (
+        re.compile(r"^node(\.exe)?$", re.IGNORECASE),
+        frozenset({"-e", "--eval", "-p", "--print", "-pe"}),
+    ),
 )
 
 
-def cibles_interpreteur_ecriture(commande: str) -> list[str]:
-    """Noms protégés qu'un `python -c` ou `node -c` tente d'écrire.
+def _code_inline(jetons: list[str]) -> str | None:
+    """Le code que l'interpréteur du premier jeton reçoit en ligne, s'il y en a un."""
+    nom = Path(jetons[0].replace("\\", "/")).name
+    for motif, options in _OPTIONS_CODE:
+        if motif.match(nom):
+            for i, jeton in enumerate(jetons[1:-1], start=1):
+                if jeton in options:
+                    return jetons[i + 1]
+    return None
 
-    Attrape le cas `python -c "open('CLAUDE.md','w').write(…)"`.
+
+def cibles_interpreteur_ecriture(commande: str) -> list[str]:
+    """Noms protégés qu'un `python -c` ou `node -e` tente d'écrire.
+
+    Attrape le cas `python -c "open('CLAUDE.md','w').write(…)"`, le mode nommé,
+    `shutil.copy` et `writeFileSync`.
     ADR-031 : filet, pas une garantie — ce qui ne se lit pas avec certitude passe.
     """
     try:
         jetons = shlex.split(commande, posix=True)
     except ValueError:
         return []
-
-    if not jetons or not _RE_INTERPRETE.match(Path(jetons[0]).name):
+    code = _code_inline(jetons) if jetons else None
+    if code is None or not any(m.search(code) for m in _MOTIFS_ECRITURE):
         return []
-
-    # Extraire le code inline après -c
-    code: str | None = None
-    for i, jeton in enumerate(jetons):
-        if jeton == "-c" and i + 1 < len(jetons):
-            code = jetons[i + 1]
-            break
-
-    if code is None:
-        return []
-
-    has_write = bool(_RE_OPEN_ECRITURE.search(code)) or bool(
-        _RE_WRITE_METHOD.search(code)
-    )
-    if not has_write:
-        return []
-
     return [nom for nom in _NOMS_PROTEGES_INLINE if nom in code]
 
 

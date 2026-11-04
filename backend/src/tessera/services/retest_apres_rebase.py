@@ -117,10 +117,11 @@ class RetestApresRebase:
     async def juger(self, base: str) -> "Jugement | None":
         """Rerun the tests and say what the delivery must record and whether it stops.
 
-        `None` quand le projet n'a pas de test à lancer : aucune trace. Un premier
-        essai rouge (échec, délai dépassé, démarrage raté) est relancé une fois : un
-        test instable n'arrête pas, à lui seul, la livraison — mais l'instabilité
-        reste écrite dans le journal.
+        `None` quand le projet n'a pas de test à lancer dès le premier essai : aucune
+        trace. Un premier essai rouge (échec, délai dépassé, démarrage raté) est
+        relancé une fois ; si le second ne trouve plus de commande, le rouge du
+        premier tient et la livraison s'arrête. Un test instable n'arrête pas, à
+        lui seul, la livraison — mais l'instabilité reste écrite dans le journal.
         """
         t0 = time.monotonic()
         premier = await self.relancer()
@@ -128,7 +129,10 @@ class RetestApresRebase:
             return None
         resultat = premier if premier.vert else await self.relancer()
         if resultat is None:
-            return None
+            # Un premier essai rouge n'est jamais effacé par un second qui ne
+            # trouve plus de commande (le premier a pu supprimer le fichier
+            # de config des tests) : le rouge tient.
+            resultat = premier
         etape = etape_de(resultat)
         if resultat.vert and premier is not resultat:
             etape = etape_au_second_essai(resultat, premier)

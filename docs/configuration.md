@@ -49,6 +49,7 @@ Toutes les variables sont dans `.env` (copie de `.env.example`) :
 | `OLLAMA_COOLDOWN_S` | | `600` | Durée du repos du serveur Ollama après un dépassement de délai, avant nouvelle tentative (en secondes) |
 | `STATIC_TOKEN` | | `""` | Si renseignée, **toutes** les requêtes — HTTP et WebSocket — exigent le token (voir ci-dessous). Vide, l'API est ouverte : `make dev` et `make run` ne la servent que sur `127.0.0.1` |
 | `ALLOWED_HOSTS` | | `""` | Noms de `Host` admis en plus du loopback, séparés par des virgules (voir ci-dessous). Vide : `127.0.0.1`, `localhost` et `[::1]` seuls |
+| `ALLOWED_ORIGINS` | | `""` | Origines admises en plus des défauts pour ouvrir une WebSocket, séparées par des virgules. Défauts : `localhost` et `127.0.0.1` sur les ports `5173` à `5176`, et les origines Tauri (voir ci-dessous) |
 | `KEEP_AWAKE_DURING_RUNS` | | `true` | Maintient le système éveillé tant qu'un run est ouvert (Windows uniquement — no-op ailleurs). L'écran peut s'éteindre ; seule la mise en veille du système est empêchée. Désactiver si un outil externe gère déjà la veille (ticket-394) |
 
 ## Budget et limites
@@ -93,11 +94,20 @@ sur l'API locale :
   `127.0.0.1`, `localhost`, `[::1]` ou l'un des noms de `ALLOWED_HOSTS`
   (`ALLOWED_HOSTS=tessera.lan,poste.local`). Sinon : `403` en HTTP, fermeture
   de la WebSocket ;
-- **un `Origin` étranger** : s'il est présent, il doit être une origine
-  loopback (`http://localhost:<port>`, `http://127.0.0.1:<port>`, tout port —
-  le Vite de dev et ceux des worktrees) ou une origine de l'app Tauri
-  (`tauri://localhost`, `http://tauri.localhost`, `https://tauri.localhost`).
-  Sinon : `403` en HTTP, fermeture de la WebSocket en code `4403`.
+- **un `Origin` étranger** : s'il est présent, il doit être admis.
+  - *WebSocket* : seules les origines déclarées passent — `http://localhost:<port>`
+    et `http://127.0.0.1:<port>` pour les ports `5173` à `5176`, les origines de
+    l'app Tauri (`tauri://localhost`, `http://tauri.localhost`,
+    `https://tauri.localhost`), et celles de `ALLOWED_ORIGINS`. Une page servie
+    sur un autre port loopback — une app qu'un agent a écrite — est fermée en
+    code `4403` : elle ne peut ni observer les runs ni répondre à un agent.
+  - *HTTP* : toute origine loopback (tout port) ou Tauri ; sinon `403`. Le
+    préflight CORS, qui n'admet que `http://localhost:5173`, garde les autres
+    pages hors des requêtes JSON.
+
+`ALLOWED_ORIGINS` s'ajoute à ces défauts, origines complètes séparées par des
+virgules (`ALLOWED_ORIGINS=http://tessera.lan:5173,http://localhost:5199`) ;
+vide par défaut.
 
 Sans `Origin` (curl, outils, tests), la requête passe. `/health` reste ouvert.
 Le contrôle ne protège pas contre un processus local : le loopback reste de

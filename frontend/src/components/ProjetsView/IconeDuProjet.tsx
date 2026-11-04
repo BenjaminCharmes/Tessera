@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { API_ORIGIN } from "../../lib/config";
-import { withTokenQuery } from "../../lib/auth";
+import { useImageAuthentifiee } from "../../hooks/useImageAuthentifiee";
 import type { ProjectOverview } from "../../types/api";
 
 interface IconeDuProjetProps {
@@ -15,11 +14,11 @@ const DIMENSION = { carte: "size-10 text-base", tuile: "size-7 text-sm", titre: 
 export default function IconeDuProjet({ projet, taille = "carte" }: IconeDuProjetProps) {
   const [cassee, setCassee] = useState(false);
   const dimension = DIMENSION[taille];
-  if (projet.icon && !cassee) {
-    const url = `${API_ORIGIN}/api/v1/projects/${projet.id}/icon`;
+  const image = useImageAuthentifiee(projet.icon ? `/projects/${encodeURIComponent(projet.id)}/icon` : null);
+  if (image.src !== null && !cassee && !image.echec) {
     return (
       <img
-        src={withTokenQuery(url)}
+        src={image.src}
         alt=""
         onError={() => setCassee(true)}
         className={`${dimension} shrink-0 rounded-sm object-contain`}

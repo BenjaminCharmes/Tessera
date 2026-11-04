@@ -329,6 +329,20 @@ async def test_no_test_command_still_records_nothing() -> None:
     assert lanceur.lancements == 1
 
 
+async def test_red_then_no_command_still_stops() -> None:
+    lanceur = _LanceurEnSerie(_rouges(), TestCommandNotFound("pyproject.toml supprimé"))
+    retest = RetestApresRebase(_FauxGit([]), lanceur, worktree=False)
+
+    jugement = await retest.juger("main")
+
+    assert jugement is not None
+    assert jugement.arret is not None
+    assert jugement.arret.startswith("Tests rouges après rebase sur main")
+    assert "FAILED test_longueur_des_fichiers.py" in jugement.arret
+    assert "rouges" in jugement.etape
+    assert lanceur.lancements == 2
+
+
 async def test_base_a_avance_reads_the_ancestry() -> None:
     git = _FauxGit([], ancetre=True)
     retest = RetestApresRebase(git, _Lanceur([], _verts()), worktree=False)
