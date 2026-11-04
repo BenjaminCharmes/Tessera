@@ -7421,3 +7421,4 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-04 09:45:18 UTC — [ticket-750] tour 1 — codeur terminé (137937ms)
 - 2026-11-04 09:58:49 UTC — [ticket-750] testeur: OK (exit 0)
 - 2026-11-04 10:01:44 UTC — [ticket-750] securite: BLOCK — Le diff introduit un bug CRITICAL ligne 122 : l'indexage `[0]` du tuple retourné (174750ms)
+- 2026-11-04 10:01:50 UTC — [ide-core] file interrompue : ticket-750 non approuvé
