@@ -4,7 +4,7 @@ created: 2026-11-03
 depends_on: []
 estimated_days: 1
 id: ticket-760
-pr_number: null
+pr_number: 884
 priority: medium
 status: done
 title: Every git write goes through the shared runner, symbolic-ref included
