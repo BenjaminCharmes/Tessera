@@ -92,13 +92,13 @@ export interface ServiceActif {
    * (ticket-148). Le canal ne rejoue pas l'historique : sans elles, qui ouvre
    * l'IDE apres le demarrage ne verrait jamais l'adresse annoncee.
    */
-  sortie?: string[];
+  sortie: string[];
   /**
    * Vrai quand c'est l'utilisateur qui a demande l'arret (ticket-151).
    * `terminate()` laisse un code non nul sur certaines plateformes : sans ce
    * drapeau, un service qu'on vient d'arreter s'afficherait en echec.
    */
-  arrete_a_la_main?: boolean;
+  arrete_a_la_main: boolean;
 }
 
 // ---------------------------------------------------------- liaison git ----

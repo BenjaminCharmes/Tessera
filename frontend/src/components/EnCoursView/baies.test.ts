@@ -23,6 +23,8 @@ function service(nom: string, surcharge: Partial<ServiceActif> = {}): ServiceAct
     demarre_a: "",
     en_cours: false,
     code_de_sortie: null,
+    sortie: [],
+    arrete_a_la_main: false,
     ...surcharge,
   };
 }
