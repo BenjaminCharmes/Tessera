@@ -11,12 +11,12 @@ trace — tout l'apport d'ADR-018 disparaît, silencieusement.
 Ce module ne fait rien de destructif : il n'initialise que si `.git` est
 absent, et ne remplace jamais un remote existant sans confirmation.
 """
-import asyncio
 import re
 from dataclasses import dataclass
 from pathlib import Path
 
 from tessera.services.artifacts import apply_artifact_mode, read_artifact_mode
+from tessera.services.git_runner import git
 from tessera.services.manifeste import ecrire_clef
 from tessera.utils.logger import get_logger
 
@@ -73,18 +73,9 @@ class GitStatus:
 
 
 async def _run(cwd: Path, *args: str) -> tuple[int, str, str]:
-    proc = await asyncio.create_subprocess_exec(
-        "git", *args,
-        cwd=str(cwd),
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-    )
-    out, err = await proc.communicate()
-    return (
-        proc.returncode or 0,
-        out.decode("utf-8", errors="replace"),
-        err.decode("utf-8", errors="replace"),
-    )
+    # Exécuteur commun : toute écriture passe hooks neutralisés (ticket-760).
+    resultat = await git(cwd, *args)
+    return resultat.code, resultat.out, resultat.err
 
 
 async def git_status(project_path: Path) -> GitStatus:
