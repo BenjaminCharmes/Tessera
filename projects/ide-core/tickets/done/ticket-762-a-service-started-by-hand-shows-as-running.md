@@ -4,7 +4,7 @@ created: 2026-11-03
 depends_on: []
 estimated_days: 1
 id: ticket-762
-pr_number: null
+pr_number: 867
 priority: high
 status: done
 title: A declared service started by hand shows as running in its server room
