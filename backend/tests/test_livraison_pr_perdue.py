@@ -34,15 +34,25 @@ class _WorkflowAReponsePerdue:
         self._trouvee = trouvee
         self._echec = recherche_en_echec
         self.recherches: list[str] = []
+        self.ouvertures = 0
+        # Numéro de la recherche à partir duquel la PR devient visible.
+        self.apres: int | None = None
 
     async def open_pull_request(self, **kwargs: object) -> object:
+        self.ouvertures += 1
         raise httpx.ReadTimeout("réponse perdue")
 
     async def pr_ouverte_de(self, branch: str) -> int | None:
         self.recherches.append(branch)
         if self._echec:
             raise httpx.ConnectError("recherche impossible")
+        if self.apres is not None and len(self.recherches) < self.apres:
+            return None
         return self._trouvee
+
+
+async def _sans_dormir(_s: float) -> None:
+    return None
 
 
 def _service(tmp_path: Path, workflow: _WorkflowAReponsePerdue) -> LivraisonService:
@@ -54,6 +64,7 @@ def _service(tmp_path: Path, workflow: _WorkflowAReponsePerdue) -> LivraisonServ
         workflow=workflow,  # type: ignore[arg-type]
         project_path=tmp_path,
         base_branch="develop",
+        dormir=_sans_dormir,
     )
 
 
@@ -78,6 +89,20 @@ async def test_read_timeout_with_an_open_pr_carries_its_number(tmp_path: Path) -
     assert livraison.pr_number == 20
     assert livraison.pr_orpheline is True
     assert "ReadTimeout" in (livraison.arret or "")
+
+
+async def test_read_timeout_then_a_pr_found_at_the_second_search_carries_it(
+    tmp_path: Path,
+) -> None:
+    workflow = _WorkflowAReponsePerdue(trouvee=24)
+    workflow.apres = 2
+
+    with pytest.raises(LivraisonInterrompue) as info:
+        await _phase_1(_service(tmp_path, workflow))
+
+    assert info.value.pr_number == 24
+    assert len(workflow.recherches) == 2
+    assert workflow.ouvertures == 1
 
 
 async def test_read_timeout_without_an_open_pr_stays_a_plain_stop(
