@@ -560,7 +560,7 @@ Une ADR qu'aucune règle de `contraintes.md` ni aucun `CLAUDE.md` ne cite part d
 ## ADR-076 — Ranger `services/` par domaine, sans import vers un rang plus haut
 
 **Date** : 2026-11-05
-**Décision** : `services/` se range en dix-huit domaines, du plus bas au plus haut : noyau, projets, usage, provisioning, gardes, git_workspace, worktrees, github, providers, verification, verdicts, agents, documentation, creation_projet, livraison, pipeline, file, supervision. Un module n'importe que son domaine ou un plus bas ; `test_sens_des_imports.py` le mesure, avec cliquet. `tessera/agents/` disparaît : `github_sync` rejoint `github`. Classement : `memory/services-domaines.md`. Les déplacements gardent le comportement, un domaine par ticket, chacun attendant le merge du précédent.
+**Décision** : `services/` se range en dix-huit domaines, du plus bas au plus haut : noyau, projets, usage, provisioning, gardes, git_workspace, worktrees, github, providers, verification, verdicts, agents, documentation, creation_projet, livraison, pipeline, file, supervision. Un module n'importe que son domaine ou un plus bas ; `test_sens_des_imports.py` le mesure, avec cliquet. `tessera/agents/` disparaît : `github_sync` rejoint `github`. Ordre : `ORDRE` de `test_domaines_services.py`. Les déplacements gardent le comportement, un domaine par ticket, chacun attendant le merge du précédent.
 **Raison** : deux cents modules à plat ne disent ni où chercher ni qui importe qui ; `agents/` échappait au contrôle.
 **Alternative rejetée** : tout déplacer d'un coup — conflit avec chaque PR ouverte ; une façade à l'ancien chemin — les `monkeypatch` par chaîne cessent de s'appliquer, sans erreur.
 
