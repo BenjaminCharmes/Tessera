@@ -2,7 +2,7 @@
 id: ticket-791
 title: "An agent in the break or meeting room is not also drawn at its desk"
 type: fix
-status: todo
+status: done
 pr_number: null
 priority: medium
 agent: codeur
@@ -44,12 +44,12 @@ Une mascotte par projet a été écartée : elle ne rendrait aucune donnée (ADR
 
 ## Critères d'acceptation
 
-- [ ] Un test de `salles.test.ts` vérifie que, pendant la CI d'une PR, le validateur est en pause
+- [x] Un test de `salles.test.ts` vérifie que, pendant la CI d'une PR, le validateur est en pause
       quand il n'est pas occupé par le run courant, et ne l'est pas quand il est occupé
-- [ ] Un test de `sallesCommunes.test.ts` vérifie que `postesAbsents` contient le validateur
+- [x] Un test de `sallesCommunes.test.ts` vérifie que `postesAbsents` contient le validateur
       pendant la CI, et le reviewer pendant un conflit en salle de réunion
-- [ ] Un test de `Piece` vérifie que, pendant la CI d'une PR, le poste du validateur porte
+- [x] Un test de `Piece` vérifie que, pendant la CI d'une PR, le poste du validateur porte
       `data-absent="true"` (comme un agent parti chez le directeur, `PosteDeTravail.tsx`) quand
       le validateur n'est pas occupé par le run courant
-- [ ] Un test de `SallePause` vérifie qu'un validateur occupé par le run courant n'est pas dessiné
+- [x] Un test de `SallePause` vérifie qu'un validateur occupé par le run courant n'est pas dessiné
       en salle de pause, et que la ligne « CI en cours » reste visible
