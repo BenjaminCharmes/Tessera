@@ -8021,3 +8021,6 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-05 23:35:40 UTC — [ticket-852] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (170405ms)
 - 2026-11-05 23:35:40 UTC — [ticket-852] APPROVED après 2 tour(s)
 - 2026-11-05 23:36:55 UTC — [ticket-852] leçons: rien à retenir
+- 2026-11-05 23:44:27 UTC — [ticket-852] documentation: 0 fichier(s) (444358ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « jeton vérifiable » — nombre « 80 % » n'est ni dans le texte remplacé, ni dans les tickets, le diff ou les fichier — refusé : doc-fonctionnelle : docs/guide-utilisateur.md : règle « preuve » — l'extrait « # ANOMALIE_OUTIL_REPETE=4
+# ANOMALIE_SILENCE_S=900
+# ANOMALI » (.env.example) n'e
