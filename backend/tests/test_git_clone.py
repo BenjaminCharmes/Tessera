@@ -8,8 +8,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 
 from tessera.models.project import AnalysisResult
-from tessera.services import git_clone, git_link
-from tessera.services.git_clone import (
+from tessera.services.creation_projet import git_clone, git_link
+from tessera.services.creation_projet.git_clone import (
     CloneError,
     GitCloneService,
     _repo_name,

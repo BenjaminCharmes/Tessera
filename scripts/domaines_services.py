@@ -134,15 +134,6 @@ A_DEPLACER: dict[str, str] = {
     "sortie_de_test": "verification",
     "limiteur_de_suites": "verification",
     "test_runner": "verification",
-    # creation_projet
-    "git_clone": "creation_projet",
-    "git_link": "creation_projet",
-    "project_analyzer": "creation_projet",
-    "project_creator": "creation_projet",
-    "project_from_template": "creation_projet",
-    "project_importer": "creation_projet",
-    "project_removal": "creation_projet",
-    "template_claude_md": "creation_projet",
     # livraison
     "attente_dependance": "livraison",
     "attente_des_merges": "livraison",

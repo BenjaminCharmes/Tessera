@@ -13,7 +13,7 @@ from tessera.services.agents.agent_creator import AgentCreatorService
 from tessera.services.agents.agent_registry import AgentRegistryService
 from tessera.services.agents.agent_runner import AgentRunner
 from tessera.services.github_service import GitHubService
-from tessera.services.project_creator import ProjectCreatorService
+from tessera.services.creation_projet.project_creator import ProjectCreatorService
 from tessera.services.agents.agent_runner import OUTILS_DE_RELECTURE
 from tessera.services.providers.base import LLMProvider
 from tessera.services.providers.par_role import provider_pour_role

@@ -6,8 +6,8 @@ from pathlib import Path
 
 from tessera.models.project import CloneProjectResponse, Project
 from tessera.services.manifeste import ecrire_clef
-from tessera.services.project_analyzer import ProjectAnalyzerService
-from tessera.services.project_importer import _scaffold_artifact_dirs
+from tessera.services.creation_projet.project_analyzer import ProjectAnalyzerService
+from tessera.services.creation_projet.project_importer import _scaffold_artifact_dirs
 from tessera.services.artifacts import (
     apply_artifact_mode,
     default_mode_for,

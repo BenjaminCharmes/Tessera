@@ -25,7 +25,7 @@ from tessera.services.documentation.documentation import DocumentationService
 from tessera.services.event_hub import EVENT_HUB
 from tessera.services.pipeline_events import EventType
 from tessera.services.file.planner import PlannerService
-from tessera.services.project_analyzer import ProjectAnalyzerService
+from tessera.services.creation_projet.project_analyzer import ProjectAnalyzerService
 from tessera.services.project_loader import (
     ModeleInconnu,
     load_agents_config,

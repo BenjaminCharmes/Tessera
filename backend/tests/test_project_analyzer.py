@@ -7,7 +7,7 @@ import pytest
 from tessera.services.prompt_loader import MissingPromptError
 
 from tests.test_providers_base import FakeProvider
-from tessera.services.project_analyzer import ProjectAnalyzerService
+from tessera.services.creation_projet.project_analyzer import ProjectAnalyzerService
 
 
 # ------------------------------------------------------------------

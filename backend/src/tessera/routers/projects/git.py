@@ -7,7 +7,7 @@ from pydantic import BaseModel
 
 from tessera.config import settings
 from tessera.routers.projects.shared import new_router, require_project_path
-from tessera.services.git_link import (
+from tessera.services.creation_projet.git_link import (
     GitLinkError,
     RemoteNotEmpty,
     git_status,

@@ -6,7 +6,7 @@ import pytest
 
 from tests.conftest import requires_symlinks
 
-from tessera.services.project_importer import ImportError, ProjectImporter, _sanitize_id
+from tessera.services.creation_projet.project_importer import ImportError, ProjectImporter, _sanitize_id
 
 
 # ------------------------------------------------------------------

@@ -239,12 +239,12 @@ def test_creation_d_un_projet_deja_existant_renvoie_409() -> None:
 
 
 def test_clone_d_une_url_invalide_est_refuse(monkeypatch: pytest.MonkeyPatch) -> None:
-    from tessera.services.git_clone import CloneError
+    from tessera.services.creation_projet.git_clone import CloneError
 
     async def _refuse(self: object, **kwargs: object) -> None:
         raise CloneError("URL de dépôt invalide : pas-une-url")
 
-    monkeypatch.setattr("tessera.services.git_clone.GitCloneService.clone", _refuse)
+    monkeypatch.setattr("tessera.services.creation_projet.git_clone.GitCloneService.clone", _refuse)
 
     resp = _client().post("/api/v1/projects/clone", json={"repo_url": "pas-une-url"})
 

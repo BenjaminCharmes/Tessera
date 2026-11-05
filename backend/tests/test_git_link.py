@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services import git_link
-from tessera.services.git_link import (
+from tessera.services.creation_projet import git_link
+from tessera.services.creation_projet.git_link import (
     GitLinkError,
     RemoteNotEmpty,
     git_status,

@@ -15,12 +15,12 @@ from tessera.services import (
     branch_cleanup,
     git_runner,
     journal_en_attente,
-    project_removal,
     realignement_base,
     reprise_orphelin,
     temporary_worktree,
     ticket_diff,
 )
+from tessera.services.creation_projet import project_removal
 from tessera.services.git_runner import GitResult, git, writes
 from tessera.services.git_workspace import GitCommandError
 
