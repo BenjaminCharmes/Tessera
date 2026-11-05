@@ -1,9 +1,10 @@
-"""Manage Tessera's secrets in the system vault (ADR-073, design §5).
+"""Manage Tessera's secrets in the system vault (ADR-073, design §5 and §6).
 
 ``python -m tessera.coffre_cli migrer|set NOM|supprimer NOM|lister``, run by
 ``scripts/tessera.ps1 secrets``. No value is ever printed, passed as an
 argument or written to a temporary file holding it: ``set`` reads the value
-on standard input. This module does not import ``tessera.config``: building the
+on standard input. ``termes`` is the one exception: it prints FORBIDDEN_TERMS
+for the ``pre-push`` hook, never for a terminal. This module does not import ``tessera.config``: building the
 settings would read the vault, and refuse to start in the cases this command
 exists to repair.
 """
@@ -18,7 +19,7 @@ from typing import TextIO
 from dotenv import dotenv_values
 
 from tessera.coffre import NOMS_SECRETS, Coffre, CoffreAbsent, CoffreEnErreur, coffre_du_systeme
-from tessera.config_coffre import est_placeholder
+from tessera.config_coffre import est_placeholder, lire_secrets_source, noms_migres
 
 # Le `.env` de Tessera, à la racine du dépôt (même ancrage que `config.py`).
 _ENV_FILE = Path(__file__).resolve().parents[3] / ".env"
@@ -174,6 +175,30 @@ def lister(fichier: Path) -> int:
     return 0
 
 
+def termes(fichier: Path) -> int:
+    """Print FORBIDDEN_TERMS: environment, vault, then .env (design §6).
+
+    Exit 0 with an empty output when no list is declared; non-zero when the
+    list cannot be read, so that the hook refuses the push.
+    """
+    valeur = os.environ.get("FORBIDDEN_TERMS") or ""
+    mode = lire_secrets_source(fichier)
+    if not valeur and mode in ("auto", "coffre"):
+        indisponible = False
+        try:
+            valeur = coffre_du_systeme().lire("FORBIDDEN_TERMS") or ""
+        except (CoffreAbsent, CoffreEnErreur):
+            indisponible = True
+        migre = "FORBIDDEN_TERMS" in noms_migres(fichier)
+        if indisponible and (mode == "coffre" or migre):
+            print("termes : coffre indisponible, la liste ne peut pas être lue", file=sys.stderr)
+            return 2
+    if not valeur and fichier.is_file():
+        valeur = dotenv_values(fichier).get("FORBIDDEN_TERMS") or ""
+    sys.stdout.write(valeur.strip())
+    return 0
+
+
 def _analyseur() -> argparse.ArgumentParser:
     commun = argparse.ArgumentParser(add_help=False)
     commun.add_argument("--env-file", type=Path, default=_ENV_FILE)
@@ -181,6 +206,7 @@ def _analyseur() -> argparse.ArgumentParser:
     sous = analyseur.add_subparsers(dest="commande", required=True)
     sous.add_parser("migrer", parents=[commun])
     sous.add_parser("lister", parents=[commun])
+    sous.add_parser("termes", parents=[commun])
     for commande in ("set", "supprimer"):
         sous.add_parser(commande, parents=[commun]).add_argument("nom")
     return analyseur
@@ -196,6 +222,8 @@ def main(argv: list[str] | None = None, entree: TextIO | None = None) -> int:
         return definir(arguments.nom, entree or sys.stdin)
     if arguments.commande == "supprimer":
         return supprimer(arguments.nom)
+    if arguments.commande == "termes":
+        return termes(fichier)
     return lister(fichier)
 
 

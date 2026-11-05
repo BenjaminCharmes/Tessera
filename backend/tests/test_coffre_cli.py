@@ -207,3 +207,79 @@ def test_tessera_ps1_lists_the_secrets_verb() -> None:
         assert f"'{sous_verbe}'" in script
     assert "Read-Host -AsSecureString" in script
     assert "tessera.coffre_cli" in script
+
+
+# ------------------------------------------------------------------
+# termes (ticket-798) : la seule sous-commande qui écrit une valeur
+# ------------------------------------------------------------------
+
+
+def _termes(
+    fichier: Path, capsys: pytest.CaptureFixture[str], mode: str = "auto"
+) -> tuple[int, str]:
+    import os
+
+    os.environ["SECRETS_SOURCE"] = mode
+    code = _lancer(fichier, "termes")
+    return code, capsys.readouterr().out
+
+
+@pytest.fixture
+def sans_termes_dans_l_environnement(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.delenv("FORBIDDEN_TERMS", raising=False)
+    monkeypatch.setenv("SECRETS_SOURCE", "env")
+
+
+def test_termes_prints_the_vault_list(
+    double: CoffreDouble,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    sans_termes_dans_l_environnement: None,
+) -> None:
+    double.entrees["FORBIDDEN_TERMS"] = "zorglub,bidule"
+    fichier = _dotenv(tmp_path, "FORBIDDEN_TERMS=autre\n")
+
+    assert _termes(fichier, capsys) == (0, "zorglub,bidule")
+
+
+def test_termes_env_variable_wins_over_the_vault(
+    double: CoffreDouble,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+    sans_termes_dans_l_environnement: None,
+) -> None:
+    double.entrees["FORBIDDEN_TERMS"] = "zorglub"
+    monkeypatch.setenv("FORBIDDEN_TERMS", "depuis-l-environnement")
+
+    assert _termes(_dotenv(tmp_path, ""), capsys) == (0, "depuis-l-environnement")
+
+
+def test_termes_exits_non_zero_without_a_vault_in_coffre_mode(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    sans_termes_dans_l_environnement: None,
+) -> None:
+    monkeypatch.setattr(coffre_cli, "coffre_du_systeme", ouvrant(erreur=CoffreAbsent("x")))
+    fichier = _dotenv(tmp_path, "FORBIDDEN_TERMS=zorglub\n")
+
+    code, sortie = _termes(fichier, capsys, mode="coffre")
+
+    assert code != 0
+    assert sortie == ""
+    # En `auto`, un secret migré qui manque refuse aussi.
+    migre = _dotenv(tmp_path, "# FORBIDDEN_TERMS : dans le coffre (tessera.ps1 secrets)\n")
+    assert _termes(migre, capsys)[0] != 0
+
+
+def test_termes_falls_back_to_dotenv_when_the_vault_has_no_entry(
+    double: CoffreDouble,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    sans_termes_dans_l_environnement: None,
+) -> None:
+    fichier = _dotenv(tmp_path, "FORBIDDEN_TERMS=zorglub\n")
+
+    assert _termes(fichier, capsys) == (0, "zorglub")
+    assert _termes(_dotenv(tmp_path, ""), capsys) == (0, "")

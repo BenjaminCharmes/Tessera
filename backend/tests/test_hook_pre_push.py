@@ -64,39 +64,89 @@ def _commit(sha7: str, message: str, auteur: str = "dev <d@example.com>") -> Com
 
 
 # ---------------------------------------------------------------------------
-# load_forbidden_terms
+# load_forbidden_terms — lu par le backend (ticket-798, ADR-073)
 # ---------------------------------------------------------------------------
 
-
-def test_load_terms_file_absent(tmp_path: Path) -> None:
-    result = HOOK.load_forbidden_terms(tmp_path / "absent.env")
-    assert result == []
+_RACINE_FACTICE = Path("C:/depot-factice")
 
 
-def test_load_terms_key_absent(tmp_path: Path) -> None:
-    env = tmp_path / ".env"
-    env.write_text("ANTHROPIC_API_KEY=sk-xxx\n", encoding="utf-8")
-    assert HOOK.load_forbidden_terms(env) == []
+def _lanceur(code: int = 0, sortie: str = "", erreur: BaseException | None = None):  # type: ignore[no-untyped-def]
+    """Stand-in for subprocess.run: records the command, never runs `uv`."""
+    appels: list[list[str]] = []
+
+    def lancer(cmd: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
+        appels.append(cmd)
+        if erreur is not None:
+            raise erreur
+        return subprocess.CompletedProcess(cmd, code, stdout=sortie, stderr="")
+
+    lancer.appels = appels  # type: ignore[attr-defined]
+    return lancer
 
 
-def test_load_terms_key_present(tmp_path: Path) -> None:
-    env = tmp_path / ".env"
-    env.write_text("FORBIDDEN_TERMS=acme,zorglub\n", encoding="utf-8")
-    result = HOOK.load_forbidden_terms(env)
-    assert result == ["acme", "zorglub"]
+def test_hook_uses_the_terms_printed_by_the_backend() -> None:
+    lancer = _lanceur(sortie="ACME,zorglub\n")
+
+    assert HOOK.load_forbidden_terms(_RACINE_FACTICE, lancer=lancer) == ["acme", "zorglub"]
+    commande = lancer.appels[0]
+    assert commande[:3] == ["uv", "run", "--project"]
+    assert Path(commande[3]) == _RACINE_FACTICE / "backend"
+    assert commande[-3:] == ["-m", "tessera.coffre_cli", "termes"]
 
 
-def test_load_terms_empty_value(tmp_path: Path) -> None:
-    env = tmp_path / ".env"
-    env.write_text("FORBIDDEN_TERMS=\n", encoding="utf-8")
-    assert HOOK.load_forbidden_terms(env) == []
+def test_hook_without_a_list_does_not_control_locally() -> None:
+    assert HOOK.load_forbidden_terms(_RACINE_FACTICE, lancer=_lanceur(sortie="")) == []
 
 
-def test_load_terms_normalises_case(tmp_path: Path) -> None:
-    env = tmp_path / ".env"
-    env.write_text("FORBIDDEN_TERMS=ACME\n", encoding="utf-8")
-    result = HOOK.load_forbidden_terms(env)
-    assert result == ["acme"]
+def test_hook_refuses_when_the_backend_cannot_judge() -> None:
+    with pytest.raises(HOOK.LectureImpossible):
+        HOOK.load_forbidden_terms(_RACINE_FACTICE, lancer=_lanceur(code=2))
+
+
+def test_hook_refuses_when_uv_is_missing() -> None:
+    with pytest.raises(HOOK.LectureImpossible):
+        HOOK.load_forbidden_terms(_RACINE_FACTICE, lancer=_lanceur(erreur=FileNotFoundError("uv")))
+    with pytest.raises(HOOK.LectureImpossible):
+        HOOK.load_forbidden_terms(
+            _RACINE_FACTICE, lancer=_lanceur(erreur=subprocess.TimeoutExpired("uv", 1))
+        )
+
+
+def test_hook_message_never_holds_a_term(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    def illisible(racine: Path, **kwargs: object) -> list[str]:
+        raise HOOK.LectureImpossible
+
+    monkeypatch.setattr(HOOK, "load_forbidden_terms", illisible)
+    monkeypatch.setattr(sys, "stdin", io.StringIO(""))
+
+    assert HOOK.main() == 1
+    message = capsys.readouterr().err
+    assert "uv sync" in message
+    assert "SECRETS_SOURCE=env" in message
+
+    monkeypatch.setattr(HOOK, "load_forbidden_terms", lambda racine, **k: ["zorglub"])
+    monkeypatch.setattr(
+        HOOK, "_get_commits", lambda l, r: [CommitInfo(sha7="abc1234", message="zorglub", auteur="x")]
+    )
+    monkeypatch.setattr(HOOK, "_get_diff_lines", lambda l, r: _diff_lines("a.py", "zorglub"))
+    monkeypatch.setattr(sys, "stdin", io.StringIO(f"refs/heads/x {'b' * 40} refs/heads/x {'c' * 40}\n"))
+    assert HOOK.main() == 1
+    assert "zorglub" not in capsys.readouterr().err
+
+
+def test_hook_root_is_deduced_from_its_own_path() -> None:
+    racine = Path(__file__).resolve().parents[2]
+    assert HOOK.racine_du_depot() == racine
+
+
+def test_hook_imports_only_the_standard_library() -> None:
+    source = (Path(__file__).resolve().parents[2] / "scripts" / "hooks" / "pre-push").read_text(
+        encoding="utf-8"
+    )
+    modules = set(re.findall(r"^(?:from|import) ([a-z_]+)", source, re.MULTILINE))
+    assert modules <= set(sys.stdlib_module_names) | {"__future__"}
 
 
 # ---------------------------------------------------------------------------
@@ -339,8 +389,7 @@ def test_commits_carry_their_body_and_committer() -> None:
 
 def test_a_git_failure_blocks_the_push(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     # Un contrôle qui n'a pas pu lire ce qui part ne laisse rien passer.
-    (tmp_path / ".env").write_text("FORBIDDEN_TERMS=zorglub\n", encoding="utf-8")
-    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(HOOK, "load_forbidden_terms", lambda racine, **k: ["zorglub"])
     monkeypatch.setattr(sys, "stdin", io.StringIO(f"refs/heads/x {'b' * 40} refs/heads/x {'c' * 40}\n"))
 
     def fake_run(cmd: list[str], **kwargs: object) -> MagicMock:
