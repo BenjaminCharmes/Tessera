@@ -8,14 +8,14 @@ description: Use when recording a non-trivial architecture decision in memory/de
 ## Le coût caché — lire ceci en premier
 
 Chaque appel d'agent reçoit `memory/contraintes.md`, réduit au rôle appelé
-(`services/adr.py`, ticket-311) ; `memory/decisions.md` ne part qu'en repli,
+(`services/projets/adr.py`, ticket-311) ; `memory/decisions.md` ne part qu'en repli,
 sur un projet sans `contraintes.md`. Sur un ticket qui va au bout, c'est
 jusqu'à 18 appels. Une règle de `contraintes.md` coûte donc à chaque appel,
 et un ADR long coûte à chaque lecteur, et à chaque appel d'un projet en repli.
 
 Un ADR long n'est pas un défaut de style. C'est une taxe permanente.
 
-Depuis ticket-087, `services/adr.py` réduit la section aux ADR qui concernent
+Depuis ticket-087, `services/projets/adr.py` réduit la section aux ADR qui concernent
 le rôle appelé. Ça n'annule pas le budget : un ADR **sans portée** — donc
 toute contrainte de comportement — continue de partir dans les 18 appels.
 

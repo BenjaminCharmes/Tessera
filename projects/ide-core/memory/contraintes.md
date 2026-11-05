@@ -156,7 +156,7 @@ section. (ADR-055)
   une sortie structurée validée par un schéma, jamais dans le texte.** Une
   sortie absente, hors schéma ou contradictoire refuse. (ADR-061, ADR-009)
 - **Un module de `services/` vit dans son domaine et n'importe que son
-  domaine ou un plus bas** (ordre dans `memory/services-domaines.md`). Aucun
+  domaine ou un plus bas** (`ORDRE` de `test_domaines_services.py`). Aucun
   paquet de premier niveau hors `models`, `services`, `routers`, `utils`.
   (ADR-076)
 - **Seuls les cinq réglages de `reglages.py` se changent depuis l'interface**,
