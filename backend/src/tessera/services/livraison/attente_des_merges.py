@@ -26,9 +26,9 @@ from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
 
-#: Un peu plus que la phase 2 d'un ticket (attente CI 900 s + merge), pour
+#: Un peu plus que la phase 2 d'un ticket (attente CI 2 100 s + merge), pour
 #: laisser finir une PR sans bloquer la file au-delà.
-_ATTENTE_MAX_S = 1500.0
+_ATTENTE_MAX_S = 2700.0
 
 
 class _Surveillance(Protocol):

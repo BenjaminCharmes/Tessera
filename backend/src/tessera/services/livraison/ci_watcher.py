@@ -53,8 +53,8 @@ from tessera.utils.logger import get_logger
 _logger = get_logger(__name__)
 
 #: Borne globale de la phase 2 (attente CI + merge). Supérieure à
-#: _ATTENTE_CI_MAX_S (900 s) pour couvrir également les appels réseau du merge.
-_TIMEOUT_PHASE2_S = 1200.0
+#: _ATTENTE_CI_MAX_S (2 100 s) pour couvrir également les appels réseau du merge.
+_TIMEOUT_PHASE2_S = 2400.0
 
 #: Relit l'état d'une PR : « open », « closed », « merged » ou « unknown ».
 EtatPr = Callable[[int], Awaitable[str]]

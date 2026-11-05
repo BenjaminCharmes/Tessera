@@ -33,9 +33,9 @@ _logger = get_logger(__name__)
 #: Intervalle entre deux interrogations de la CI. Assez court pour ne pas
 #: laisser traîner un ticket, assez long pour ne pas marteler l'API.
 _INTERVALLE_CI_S = 15.0
-#: Au-delà, on rend la main. Une attente sans borne bloquerait la file de
-#: tickets, et ADR-018 fait reposer le ticket suivant sur un arbre propre.
-_ATTENTE_CI_MAX_S = 900.0
+#: Au-delà, on rend la main : avec le job E2E, la CI prend une vingtaine de
+#: minutes ; une attente sans borne bloquerait la file de tickets (ADR-018).
+_ATTENTE_CI_MAX_S = 2100.0
 
 
 class LivraisonInterrompue(Exception):
