@@ -685,9 +685,9 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 
 ---
 
-## ADR-074 — Les leçons d'un projet vivent dans `memory/lecons.md`
+## ADR-074 — Ranger `services/` par domaine, sans import vers un rang plus haut
 
 **Date** : 2026-11-05
-**Décision** : après un run approuvé dont `review_feedback` n'est pas vide, le service, sans outils, écrit au plus une leçon « Quand <situation>, <action>. » sous `## Proposées` de `memory/lecons.md`, artefact d'ADR-021 et ADR-023. Un humain la déplace sous `## En vigueur`, seule section injectée, au codeur et au reviewer, sous les contraintes : 25 leçons, 4 Ko. Refus : hors forme, 200 caractères, preuve absente du retour, doublon, vérification affaiblie. Un diff de run qui touche ce fichier met le run en `blocked` (ADR-055). Une leçon dit un piège observé ; `decisions.md` dit un choix.
-**Raison** : ticket-736 a perdu trois tours sur des doubles de test ; un texte de modèle injecté sans relecture change la consigne de tous (ADR-055).
-**Alternative rejetée** : écriture directe par l'agent, ou activation automatique — la confiance accordée à un texte non relu est une décision humaine.
+**Décision** : `services/` se range en dix-huit domaines, du plus bas au plus haut : noyau, projets, usage, provisioning, gardes, git_workspace, worktrees, github, providers, verification, verdicts, agents, documentation, creation_projet, livraison, pipeline, file, supervision. Un module n'importe que son domaine ou un plus bas ; `test_sens_des_imports.py` le mesure, avec cliquet. `tessera/agents/` disparaît : `github_sync` rejoint `github`. Classement : `memory/services-domaines.md`. Les déplacements gardent le comportement, un domaine par ticket, chacun attendant le merge du précédent.
+**Raison** : deux cents modules à plat ne disent ni où chercher ni qui importe qui ; `agents/` échappait au contrôle.
+**Alternative rejetée** : tout déplacer d'un coup — conflit avec chaque PR ouverte ; une façade à l'ancien chemin — les `monkeypatch` par chaîne cessent de s'appliquer, sans erreur.

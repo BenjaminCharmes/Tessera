@@ -21,12 +21,12 @@ section. (ADR-055)
 - **Aucun agent n'exécute le coffre.** Le garde d'ADR-053 refuse les commandes
   Bash qui lancent `keyring`, `cmdkey` ou `coffre_cli`, plafond lexical compris :
   il attrape une erreur, pas une évasion. (ADR-073, ADR-053)
-- **Une leçon de projet s'écrit sous `## Proposées` de `memory/lecons.md`, par
-  le service seul.** Un humain la déplace sous `## En vigueur`, la seule section
-  injectée (codeur, reviewer, après les contraintes qui priment ; 25 leçons,
-  4 Ko). Le service refuse une leçon hors forme, de plus de 200 caractères, sans
-  preuve citée du retour, en doublon ou qui affaiblit une vérification. Un diff
-  de run qui touche ce fichier met le run en `blocked`. (ADR-074, ADR-055)
+- **Un module de `services/` vit dans son domaine et n'importe que son domaine
+  ou un plus bas.** Ordre : noyau, projets, usage, provisioning, gardes,
+  git_workspace, worktrees, github, providers, verification, verdicts, agents,
+  documentation, creation_projet, livraison, pipeline, file, supervision. Un
+  module nouveau s'inscrit dans son domaine ; aucun paquet de premier niveau
+  hors `models`, `services`, `routers`, `utils`. (ADR-074)
 
 ## Git et périmètre d'écriture
 
