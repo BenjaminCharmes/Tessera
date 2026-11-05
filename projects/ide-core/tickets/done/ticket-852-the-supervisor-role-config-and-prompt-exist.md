@@ -1,14 +1,15 @@
 ---
-id: ticket-852
-title: "The supervisor role config and prompt exist"
-type: feat
-status: todo
-priority: high
 agent: codeur
-depends_on: [ticket-851]
-estimated_days: 1
 created: 2026-11-05
-pr_number: null
+depends_on:
+- ticket-851
+estimated_days: 1
+id: ticket-852
+pr_number: 945
+priority: high
+status: done
+title: The supervisor role config and prompt exist
+type: feat
 ---
 
 # ticket-852 — Le rôle `superviseur` : configuration et prompt

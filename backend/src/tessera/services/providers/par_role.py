@@ -27,7 +27,10 @@ OUTILS_WEB = ["WebFetch", "WebSearch"]
 #: totale maximale (ticket-518). Le codeur et le reviewer en sont exclus : un
 #: tour légitime de codeur dure longtemps, et c'est le silence qui le borne.
 ROLES_TEXTE = frozenset(
-    {"validateur", "securite", "doc-technique", "doc-fonctionnelle", "lecons"}
+    {
+        "validateur", "securite", "doc-technique", "doc-fonctionnelle", "lecons",
+        "superviseur",
+    }
 )
 
 

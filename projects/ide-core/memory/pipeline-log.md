@@ -8007,3 +8007,20 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-05 23:21:04 UTC — [ticket-865] documentation: 0 fichier(s) (558750ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « jeton vérifiable » — ticket « ticket-833 » n'est ni dans le texte remplacé, ni dans les tickets, le diff ou les f — refusé : doc-fonctionnelle : docs/guide-utilisateur.md : règle « preuve » — l'extrait « RUN_ANOMALY = "run_anomaly"
     #: Le détecteur d'anomalies  » (backend/src/tesse
 - 2026-11-05 23:21:30 UTC — [ticket-865] livraison: arrêt — Livraison interrompue : GitCommandError: git command failed (code 1): git -c core.hooksPath=C:\Users
+- 2026-11-05 23:21:44 UTC — [ticket-852] branche ticket-852-the-supervisor-role-config-and-prompt-exist
+- 2026-11-05 23:21:46 UTC — [ticket-852] tour 1 — codeur démarré
+- 2026-11-05 23:25:13 UTC — [ticket-852] tour 1 — codeur terminé (207000ms)
+- 2026-11-05 23:27:07 UTC — [ticket-852] testeur: 1 failed, 595 passed in 108.44s (0:01:48)
+- 2026-11-05 23:27:07 UTC — [ticket-852] tests rouges au tour 1
+- 2026-11-05 23:27:07 UTC — [ticket-852] tour 2 — codeur démarré
+- 2026-11-05 23:28:29 UTC — [ticket-852] tour 2 — codeur terminé (81657ms)
+- 2026-11-05 23:30:14 UTC — [ticket-852] testeur: dur�es : ruff 0 s, mypy 7 s, mypy-linux 11 s, pytest 102 s
+- 2026-11-05 23:32:50 UTC — [ticket-852] securite: PASS — Ticket-852 introduces secure supervisor agent infrastructure with proper configu (155531ms)
+- 2026-11-05 23:32:50 UTC — [ticket-852] tour 2 — reviewer démarré
+- 2026-11-05 23:33:16 UTC — [ticket-852] tour 2 — reviewer terminé (26375ms)
+- 2026-11-05 23:35:40 UTC — [ticket-852] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (170405ms)
+- 2026-11-05 23:35:40 UTC — [ticket-852] APPROVED après 2 tour(s)
+- 2026-11-05 23:36:55 UTC — [ticket-852] leçons: rien à retenir
+- 2026-11-05 23:44:27 UTC — [ticket-852] documentation: 0 fichier(s) (444358ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « jeton vérifiable » — nombre « 80 % » n'est ni dans le texte remplacé, ni dans les tickets, le diff ou les fichier — refusé : doc-fonctionnelle : docs/guide-utilisateur.md : règle « preuve » — l'extrait « # ANOMALIE_OUTIL_REPETE=4
+# ANOMALIE_SILENCE_S=900
+# ANOMALI » (.env.example) n'e
