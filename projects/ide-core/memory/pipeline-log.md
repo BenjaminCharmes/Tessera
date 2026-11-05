@@ -7824,3 +7824,7 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-05 15:24:15 UTC — [ticket-806] validateur: APPROVED — Les deux critères d'acceptation sont satisfaits. Les tests existants passent, y  (217436ms)
 - 2026-11-05 15:24:15 UTC — [ticket-806] APPROVED après 2 tour(s)
 - 2026-11-05 15:30:14 UTC — [ticket-806] documentation: 3 fichier(s) (348938ms) — après tour de correction
+- 2026-11-05 15:35:13 UTC — [ticket-806] livraison: rebase sur develop (1203ms)
+- 2026-11-05 15:35:13 UTC — [ticket-806] livraison: tests relancés après rebase : rouges (FAILED tests/test_longueur_des_fichiers.py::test_backend_files_respect_their_ceilings !!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!! !!!!!!!!!!!! xdist.dsession.Interrupted: stopping after 1 failures !!!!!!!!!!!! 1 failed, 752 passed in 140.09s (0:02:20) dur�es : myp) (282578ms)
+- 2026-11-05 15:35:13 UTC — [ticket-806] livraison: branche remise sur 5d0654f (0ms)
+- 2026-11-05 15:35:13 UTC — [ticket-806] livraison: arrêt — Tests rouges après rebase sur develop : rien n'est poussé. La base a avancé pendant le run et le tra
