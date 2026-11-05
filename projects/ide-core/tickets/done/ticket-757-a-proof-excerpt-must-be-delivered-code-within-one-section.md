@@ -1,14 +1,14 @@
 ---
-id: ticket-757
-title: "A documentation proof excerpt must be delivered code, within one section"
-type: fix
-status: todo
-pr_number: null
-priority: low
 agent: codeur
+created: 2026-11-03
 depends_on: []
 estimated_days: 1
-created: 2026-11-03
+id: ticket-757
+pr_number: 896
+priority: low
+status: done
+title: A documentation proof excerpt must be delivered code, within one section
+type: fix
 ---
 
 # ticket-757 — Un extrait de preuve doit être du code livré, dans une seule section

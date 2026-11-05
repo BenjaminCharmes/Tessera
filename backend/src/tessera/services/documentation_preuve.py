@@ -16,6 +16,7 @@ from re import Match, Pattern
 
 from tessera.services.documentation_base import EditionRefusee, normaliser_typo
 from tessera.services.documentation_code import MatiereCode
+from tessera.services.documentation_diff import sections_du_diff
 
 #: Ce qu'une édition `ancien`/`nouveau` a le droit de remplacer, en caractères,
 #: et ce qu'un rôle remplace sur un lot. À ajuster après les premiers lots.
@@ -73,28 +74,31 @@ def jetons_de(texte: str) -> set[Jeton]:
     }
 
 
-_ENTETES_DE_DIFF = ("+++", "---", "@@")
-
-
-def _texte_du_diff(diff: str) -> str:
-    """One diff, raw then as delivered code: where an extract may be found.
-
-    Le diff brut garde ses marqueurs, pour qu'un extrait d'une ligne continue de
-    passer. S'y ajoute le code livré, sans marqueur : lignes `+` et de contexte
-    privées de leur premier caractère, pour qu'un extrait de plusieurs lignes
-    se retrouve. Les en-têtes ne sont pas du code, et les lignes `-` ne sont
-    plus livrées.
-    """
-    lignes = [ligne for ligne in diff.splitlines() if not ligne.startswith(_ENTETES_DE_DIFF)]
-    livrees = [ligne[1:] for ligne in lignes if ligne[:1] in ("+", " ")]
-    return "\n".join([*lignes, *livrees])
-
-
 def _texte_du_code(matiere: MatiereCode) -> str:
-    """The diffs and the file contents: where an extract may be found."""
-    diffs = (_texte_du_diff(diff.diff) for diff in matiere.diffs)
-    fichiers = (fichier.contenu for fichier in matiere.fichiers)
-    return "\n".join([*diffs, *fichiers])
+    """Everything the agent read, removed lines included: the source of the tokens."""
+    morceaux: list[str] = []
+    for diff in matiere.diffs:
+        for section in sections_du_diff(diff.diff):
+            morceaux.extend([*section.lignes, *section.livrees])
+    morceaux.extend(fichier.contenu for fichier in matiere.fichiers)
+    return "\n".join(morceaux)
+
+
+def _blocs_de_preuve(matiere: MatiereCode) -> list[str]:
+    """The places an extract may be found, each flattened and read on its own.
+
+    Un bloc est le code livré d'une seule section de diff (avec ou sans marqueurs,
+    pour qu'un extrait copié depuis le diff passe) ou un fichier entier. Un
+    extrait ne se lit jamais à cheval sur deux blocs, et les lignes `-` n'en font
+    pas partie : elles ne sont plus du code livré.
+    """
+    blocs: list[str] = []
+    for diff in matiere.diffs:
+        for section in sections_du_diff(diff.diff):
+            blocs.append("\n".join(section.livrees))
+            blocs.append("\n".join(section.avec_marqueurs))
+    blocs.extend(fichier.contenu for fichier in matiere.fichiers)
+    return [aplatir(bloc) for bloc in blocs]
 
 
 def fichiers_de_la_matiere(matiere: MatiereCode) -> list[str]:
@@ -122,7 +126,7 @@ class ControleDePreuve:
 
     def __init__(self, matiere: MatiereCode, tickets: str = "") -> None:
         code = _texte_du_code(matiere)
-        self._code = aplatir(code)
+        self._blocs = _blocs_de_preuve(matiere)
         tout = aplatir(tickets + "\n" + code).lower()
         self._tout = tout
         self._jetons = jetons_de(tickets + "\n" + code)
@@ -174,7 +178,8 @@ class ControleDePreuve:
                     f"{chemin} : règle « preuve » — chaque entrée porte `fichier` et "
                     "`extrait`, tous deux non vides."
                 )
-            if aplatir(extrait) not in self._code:
+            plat = aplatir(extrait)
+            if not any(plat in bloc for bloc in self._blocs):
                 raise EditionRefusee(
                     f"{chemin} : règle « preuve » — l'extrait « {extrait.strip()[:60]} » "
                     f"({fichier}) n'est ni dans le diff ni dans les fichiers fournis."
