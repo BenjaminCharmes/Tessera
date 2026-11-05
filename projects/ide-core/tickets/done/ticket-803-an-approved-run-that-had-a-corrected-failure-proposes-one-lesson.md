@@ -6,7 +6,7 @@ estimated_days: 1
 id: ticket-803
 pr_number: null
 priority: medium
-status: todo
+status: done
 title: An approved run that had a corrected failure proposes one lesson
 type: feat
 ---
@@ -55,17 +55,17 @@ dossier du run.
 
 ## Critères d'acceptation
 
-- [ ] `backend/tests/test_lecons_run.py`, provider factice : run approuvé avec
+- [x] `backend/tests/test_lecons_run.py`, provider factice : run approuvé avec
       `review_feedback` non vide → une ligne sous `## Proposées`, source `ticket-NNN` et date
       posées par le service
-- [ ] Même test : `review_feedback` vide → provider non appelé, fichier non créé
-- [ ] `pipeline.lecons` absent ou `false` → provider non appelé
-- [ ] Réponse `{"lecon": null}`, JSON invalide, preuve absente du retour, doublon,
+- [x] Même test : `review_feedback` vide → provider non appelé, fichier non créé
+- [x] `pipeline.lecons` absent ou `false` → provider non appelé
+- [x] Réponse `{"lecon": null}`, JSON invalide, preuve absente du retour, doublon,
       leçon qui nomme `conftest.py` : rien n'est écrit, une ligne de journal dit pourquoi,
       le run reste approuvé
-- [ ] Un run non approuvé n'appelle jamais le provider
-- [ ] Le fichier est écrit dans le worktree, jamais dans le checkout (test sur les chemins)
-- [ ] Test de `load_pipeline_config` pour `pipeline.lecons`
+- [x] Un run non approuvé n'appelle jamais le provider
+- [x] Le fichier est écrit dans le worktree, jamais dans le checkout (test sur les chemins)
+- [x] Test de `load_pipeline_config` pour `pipeline.lecons`
 
 ## Ce que ça ne fait pas
 

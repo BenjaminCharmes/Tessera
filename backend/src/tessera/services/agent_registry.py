@@ -69,6 +69,7 @@ class AgentRegistryService:
             "codeur",
             "doc-fonctionnelle",
             "doc-technique",
+            "lecons",
             "plan",
             "planificateur",
             "project-analyzer",
@@ -92,6 +93,7 @@ class AgentRegistryService:
             "resolveur-conflit",
             "doc-technique",
             "doc-fonctionnelle",
+            "lecons",
         }
     )
 

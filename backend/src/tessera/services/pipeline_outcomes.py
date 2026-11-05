@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING
 
 from tessera.models.ticket import TicketStatus
 from tessera.services.git_workspace import GitWorkspaceError
+from tessera.services.lecons_run import proposer_lecon
 from tessera.services.pipeline_approbation import noter_tete_approuvee
 from tessera.services.pipeline_events import EventType, PipelineResult
 from tessera.services.pipeline_run import PipelineRun, emit, set_status
@@ -90,8 +91,6 @@ async def finish_security_block(
     )
 
 
-
-
 async def commit_work(
     orch: "Orchestrator", run: PipelineRun, message: str
 ) -> str | None:
@@ -155,6 +154,7 @@ async def finish_approved(orch: "Orchestrator", run: PipelineRun) -> PipelineRes
     # livraison du ticket courant, immédiate : `git rebase` refuse de démarrer
     # sur des modifications non commitées (ticket-159).
     await set_status(orch, run, TicketStatus.done)
+    await proposer_lecon(orch, run)
 
     # Ce message est écrit dans le dépôt *de l'utilisateur* : il suit donc la
     # convention de ce dépôt — Conventional Commits — avec le type du ticket
