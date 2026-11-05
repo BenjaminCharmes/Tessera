@@ -2,7 +2,7 @@
 id: ticket-843
 title: "The replay input and the reading of a review result are pure functions"
 type: chore
-status: todo
+status: done
 priority: low
 agent: codeur
 created: 2026-11-05
@@ -55,15 +55,15 @@ def lire_resultats(chemin: Path) -> list[Resultat]: ...   # fichier absent -> []
 
 ## Critères d'acceptation
 
-- [ ] `scripts/seconde_revue_lecture.py` porte les fonctions et le type ci-dessus
-- [ ] `backend/tests/test_seconde_revue_lecture.py` couvre : `corps_du_ticket` trouvé dans
+- [x] `scripts/seconde_revue_lecture.py` porte les fonctions et le type ci-dessus
+- [x] `backend/tests/test_seconde_revue_lecture.py` couvre : `corps_du_ticket` trouvé dans
       `done` puis absent (`ValueError`) ; `composer_entree` contient le ticket et le diff et
       aucune section de test ni d'audit ; `leve` faux pour un `APPROVED`, vrai pour un
       `CHANGES_REQUESTED` avec une remarque au seuil, faux pour un `CHANGES_REQUESTED` dont
       toutes les remarques sont sous le seuil, vrai pour `None` et pour une sortie hors schéma ;
       `designe_le_defaut` avec un chemin Windows (`\`) et un chemin POSIX ; un aller-retour
       `vers_ligne` / `lire_resultats` ; fichier absent
-- [ ] `leve` et `remarques_au_seuil` délèguent à `lire_verdict` : un test change le seuil et
+- [x] `leve` et `remarques_au_seuil` délèguent à `lire_verdict` : un test change le seuil et
       vérifie que les deux suivent
 
 ## Ce que ça ne fait pas
