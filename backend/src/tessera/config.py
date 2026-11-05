@@ -6,6 +6,7 @@ from typing import ClassVar, Literal
 from pydantic import SecretStr, ValidationError
 from pydantic_settings import BaseSettings, PydanticBaseSettingsSource, SettingsConfigDict
 
+from tessera.coffre import NOMS_SECRETS
 from tessera.config_coffre import sources_des_secrets
 from tessera.config_errors import ConfigurationError, describe_validation_error
 
@@ -230,10 +231,21 @@ class Settings(BaseSettings):
     # Désactivable si un outil externe gère déjà la veille.
     keep_awake_during_runs: bool = True
 
-    def valeurs_des_jetons(self) -> list[str]:
-        """Return the non-empty values of the online-service tokens (ADR-053)."""
-        valeurs = (getattr(self, champ).get_secret_value() for champ in CHAMPS_JETONS)
-        return [valeur for valeur in valeurs if valeur]
+    def valeurs_des_secrets(self) -> list[str]:
+        """Return the non-empty values of the eight secrets (ADR-073).
+
+        Every name of ``NOMS_SECRETS`` but ``FORBIDDEN_TERMS``: that one is the
+        list the push gate already applies, not a value to mask.
+        """
+        valeurs: list[str] = []
+        for nom in NOMS_SECRETS:
+            if nom == "FORBIDDEN_TERMS":
+                continue
+            valeur = getattr(self, nom.lower())
+            texte = valeur.get_secret_value() if isinstance(valeur, SecretStr) else valeur
+            if texte:
+                valeurs.append(texte)
+        return valeurs
 
 
 def load_settings(env_file: Path | None = None) -> Settings:

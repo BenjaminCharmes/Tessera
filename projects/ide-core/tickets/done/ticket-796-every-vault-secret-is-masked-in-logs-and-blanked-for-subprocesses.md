@@ -2,7 +2,7 @@
 id: ticket-796
 title: "Every vault secret is masked in logs and blanked for subprocesses"
 type: fix
-status: todo
+status: done
 pr_number: null
 priority: medium
 agent: codeur
@@ -45,9 +45,9 @@ aujourd'hui. Design §4.
 
 ## Critères d'acceptation
 
-- [ ] Aucun appelant de `valeurs_des_jetons` ne subsiste (`Grep` dans `backend/`)
-- [ ] Les quatre familles de tests passent
-- [ ] La liste des variables vidées vient de `NOMS_SECRETS`, pas d'une seconde liste
+- [x] Aucun appelant de `valeurs_des_jetons` ne subsiste (`Grep` dans `backend/`)
+- [x] Les quatre familles de tests passent
+- [x] La liste des variables vidées vient de `NOMS_SECRETS`, pas d'une seconde liste
 
 ## Ce que ça ne fait pas
 

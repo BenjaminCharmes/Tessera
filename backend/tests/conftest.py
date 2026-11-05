@@ -149,13 +149,18 @@ def _aucun_jeton_de_mise_en_ligne_de_la_machine(
     """
     from pydantic import SecretStr
 
-    from tessera.config import CHAMPS_JETONS, VARIABLES_JETONS, settings
+    from tessera.coffre import NOMS_SECRETS
+    from tessera.config import CHAMPS_JETONS, settings
     from tessera.utils.secrets import SECRETS
 
     for champ in CHAMPS_JETONS:
         monkeypatch.setattr(settings, champ, SecretStr(""))
-    for variable in VARIABLES_JETONS:
-        monkeypatch.delenv(variable, raising=False)
+    # Les trois autres secrets masqués (ticket-796) : champs `str`.
+    for champ in ("github_token", "static_token", "anthropic_api_key"):
+        monkeypatch.setattr(settings, champ, "")
+    for variable in NOMS_SECRETS:
+        if variable != "FORBIDDEN_TERMS":
+            monkeypatch.delenv(variable, raising=False)
     avant = SECRETS.valeurs()
     SECRETS.clear()
     yield

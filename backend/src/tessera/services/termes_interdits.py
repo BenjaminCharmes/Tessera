@@ -98,10 +98,10 @@ class TermesInterditsService:
             re.compile(r"\b" + re.escape(terme) + r"\b")
             for terme in self._termes
         ]
-        # Les jetons de mise en ligne configurés, et tout secret reçu d'une API
+        # Les huit secrets configurés (ADR-073), et tout secret reçu d'une API
         # pendant l'exécution, sont des termes interdits (ADR-053). Sans bornes
         # de mot : un secret collé à d'autres caractères reste un secret.
-        secrets = {*settings.valeurs_des_jetons(), *SECRETS.valeurs()}
+        secrets = {*settings.valeurs_des_secrets(), *SECRETS.valeurs()}
         self._patterns += [
             re.compile(re.escape(_normaliser(secret)))
             for secret in sorted(secrets)
