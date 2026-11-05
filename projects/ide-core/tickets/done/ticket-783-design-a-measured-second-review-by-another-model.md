@@ -1,14 +1,14 @@
 ---
-id: ticket-783
-title: "Design a measured trial of a second review by a different model"
-type: design
-status: todo
-pr_number: null
-priority: low
 agent: architect
+created: 2026-11-04
 depends_on: []
 estimated_days: 1
-created: 2026-11-04
+id: ticket-783
+pr_number: null
+priority: low
+status: done
+title: Design a measured trial of a second review by a different model
+type: design
 ---
 
 # ticket-783 — Concevoir l'essai mesuré d'une seconde revue par un autre modèle
