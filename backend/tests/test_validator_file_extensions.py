@@ -1,7 +1,7 @@
 """A dotted identifier in a criterion is not a cited file (ticket-475)."""
 
-from tessera.services.validator_cited_files import extract_file_refs
-from tessera.services.validator_file_extensions import looks_like_file
+from tessera.services.verdicts.validator_cited_files import extract_file_refs
+from tessera.services.verdicts.validator_file_extensions import looks_like_file
 
 
 def test_dotted_identifiers_are_not_extracted() -> None:

@@ -6,7 +6,7 @@ from typing import Any
 import pytest
 
 from tests.test_providers_base import FakeProvider
-from tessera.services.security_auditor import SecurityAuditorService
+from tessera.services.verdicts.security_auditor import SecurityAuditorService
 
 _PROMPTS = Path(__file__).resolve().parents[2] / "agents" / "prompts"
 

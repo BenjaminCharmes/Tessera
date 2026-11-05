@@ -11,14 +11,14 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from tessera.services.politique_run import PolitiqueRun
-from tessera.services.validator_cited_dirs import (
+from tessera.services.verdicts.validator_cited_dirs import (
     list_folder_files,
     looks_like_folder,
     render_folder_entry,
     resolve_folder,
 )
-from tessera.services.validator_binary import is_binary_file
-from tessera.services.validator_file_extensions import looks_like_file
+from tessera.services.verdicts.validator_binary import is_binary_file
+from tessera.services.verdicts.validator_file_extensions import looks_like_file
 
 # Max size of the cited-files section -- all entries combined.
 # Beyond this the current file is truncated (ticket-316).

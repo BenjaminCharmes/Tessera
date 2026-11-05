@@ -20,7 +20,7 @@ from tessera.services import pipeline_controles
 from tessera.services.artifact_snapshot import diff_artifacts, snapshot_artifacts
 from tessera.services.pipeline_events import OrchestratorEvent
 from tessera.services.pipeline_run import PipelineRun
-from tessera.services.validator import CriterionResult, ValidationResult
+from tessera.services.verdicts.validator import CriterionResult, ValidationResult
 
 
 # ---------------------------------------------------------------------------

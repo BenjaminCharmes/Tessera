@@ -4,7 +4,7 @@ from unittest.mock import AsyncMock
 
 from tessera.models.agent import AgentResult
 from tessera.models.ticket import TicketStatus
-from tessera.services.critere_protege import (
+from tessera.services.verdicts.critere_protege import (
     critere_demande_ecriture,
     criteres_sur_chemins_proteges,
 )

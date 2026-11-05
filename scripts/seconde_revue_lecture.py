@@ -11,7 +11,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any, Literal, cast
 
-from tessera.services.verdict_reviewer import lire_verdict
+from tessera.services.verdicts.verdict_reviewer import lire_verdict
 
 Etat = Literal["ok", "indisponible", "hors_fenetre", "hors_schema"]
 

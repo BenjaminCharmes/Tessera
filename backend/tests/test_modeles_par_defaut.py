@@ -3,7 +3,7 @@ import json
 import re
 from pathlib import Path
 
-from tessera.services import security_auditor, validator
+from tessera.services.verdicts import security_auditor, validator
 from tessera.services.documentation import documentation
 from tessera.services.modeles_par_defaut import (
     MODELE_JUGEMENT,

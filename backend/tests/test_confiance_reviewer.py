@@ -2,7 +2,7 @@
 from typing import Any
 
 from tessera.config import settings
-from tessera.services.verdict_reviewer import lire_verdict
+from tessera.services.verdicts.verdict_reviewer import lire_verdict
 from tests.revue_structuree import revue
 
 

@@ -521,7 +521,7 @@ class _AuditeurEnRepli:
     async def audit(
         self, code_diff: str, project_path: Path, contexte: object = None
     ) -> object:
-        from tessera.services.security_auditor import SecurityAuditResult
+        from tessera.services.verdicts.security_auditor import SecurityAuditResult
 
         return SecurityAuditResult(
             issues=[], verdict="PASS", summary="ok", fallback_reason="tours épuisés"
@@ -553,7 +553,7 @@ class _AuditeurEspion:
     async def audit(
         self, code_diff: str, project_path: Path, contexte: object = None
     ) -> object:
-        from tessera.services.security_auditor import SecurityAuditResult
+        from tessera.services.verdicts.security_auditor import SecurityAuditResult
 
         self.contexte = contexte
         return SecurityAuditResult(issues=[], verdict="PASS", summary="ok")

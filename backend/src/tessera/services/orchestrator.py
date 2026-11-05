@@ -62,9 +62,9 @@ if TYPE_CHECKING:
     from tessera.services.run_recorder import RunRecorder
     from tessera.services.run_worktree import RunWorktree
     from tessera.services.git_workspace import GitWorkspaceService
-    from tessera.services.security_auditor import SecurityAuditorService
+    from tessera.services.verdicts.security_auditor import SecurityAuditorService
     from tessera.services.test_runner import TestRunnerService
-    from tessera.services.validator import ValidatorService
+    from tessera.services.verdicts.validator import ValidatorService
 
 _logger = get_logger(__name__)
 

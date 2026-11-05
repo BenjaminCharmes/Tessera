@@ -23,7 +23,7 @@ from tessera.services.pipeline_events import EventType, OrchestratorEvent, Pipel
 from tessera.services.pipeline_run import PipelineRun
 from tessera.services.run_executor import _suivre
 from tessera.services.run_registry import RunActif
-from tessera.services.validator import CriterionResult, ValidationResult
+from tessera.services.verdicts.validator import CriterionResult, ValidationResult
 
 
 # ------------------------------------------------------------------
@@ -345,7 +345,7 @@ class _OrchJournal(_Orch):
 
 class _ValidateurFichiers:
     async def validate(self, **kwargs: object) -> ValidationResult:
-        from tessera.services.validator_cited_files import CitedFilesReport
+        from tessera.services.verdicts.validator_cited_files import CitedFilesReport
 
         return ValidationResult(
             verdict="APPROVED",

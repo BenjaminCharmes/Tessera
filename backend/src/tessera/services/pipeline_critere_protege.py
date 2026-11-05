@@ -8,7 +8,7 @@ en `blocked` avec son commit comme tout run non approuvé (ADR-018, ADR-037).
 from typing import TYPE_CHECKING
 
 from tessera.models.ticket import TicketStatus
-from tessera.services.critere_protege import criteres_sur_chemins_proteges
+from tessera.services.verdicts.critere_protege import criteres_sur_chemins_proteges
 from tessera.services.pipeline_events import EventType, PipelineResult
 from tessera.services.pipeline_outcomes import commit_ou_bloquer
 from tessera.services.pipeline_run import PipelineRun, emit, set_status

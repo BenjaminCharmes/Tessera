@@ -8,7 +8,7 @@ from typing import Any
 
 from tessera.config import settings
 from tessera.models.agent import AgentResult
-from tessera.services.reviewer_schema import VERDICTS
+from tessera.services.verdicts.reviewer_schema import VERDICTS
 
 _REQUIRED: tuple[str, ...] = ("verdict", "summary", "blocking")
 _ABSENT = "Sortie structurée du reviewer absente : verdict non lu."

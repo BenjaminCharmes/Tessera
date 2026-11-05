@@ -23,12 +23,12 @@ from tessera.services.pipeline_outcomes import finish_security_block
 from tessera.services.pipeline_run import PipelineRun, emit
 from tessera.services.pipeline_text import _extract_criteria
 from tessera.services.quota_exhaustion import is_quota_exhausted
-from tessera.services.reviewer_schema import REVIEWER_SCHEMA
-from tessera.services.security_auditor import SecurityAuditResult
-from tessera.services.security_contexte import build_audit_context
-from tessera.services.validator_cited_files import format_cited_files_log
-from tessera.services.validator_decisions import validator_extras
-from tessera.services.verdict_reviewer import donnees_fin_de_revue, juger_revue
+from tessera.services.verdicts.reviewer_schema import REVIEWER_SCHEMA
+from tessera.services.verdicts.security_auditor import SecurityAuditResult
+from tessera.services.verdicts.security_contexte import build_audit_context
+from tessera.services.verdicts.validator_cited_files import format_cited_files_log
+from tessera.services.verdicts.validator_decisions import validator_extras
+from tessera.services.verdicts.verdict_reviewer import donnees_fin_de_revue, juger_revue
 from tessera.utils.logger import get_logger
 
 if TYPE_CHECKING:

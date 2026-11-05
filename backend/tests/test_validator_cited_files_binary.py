@@ -2,8 +2,8 @@
 
 from pathlib import Path
 
-from tessera.services.validator_binary import is_binary_file
-from tessera.services.validator_cited_files import build_cited_files_section
+from tessera.services.verdicts.validator_binary import is_binary_file
+from tessera.services.verdicts.validator_cited_files import build_cited_files_section
 
 _PNG_BYTES = b"\x89PNG\r\n\x1a\n" + b"\x00\x00\x00\rIHDR" + bytes(range(256)) * 4
 

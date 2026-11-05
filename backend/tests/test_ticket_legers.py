@@ -15,9 +15,9 @@ import pytest
 from tessera.models.agent import AgentResult, AgentRole
 from tessera.services.documentation.documentation import ResultatDocumentation
 from tessera.services.pipeline_events import EventType, OrchestratorEvent
-from tessera.services.security_auditor import SecurityAuditResult
+from tessera.services.verdicts.security_auditor import SecurityAuditResult
 from tessera.services.ticket_service import TicketService
-from tessera.services.validator import ValidationResult
+from tessera.services.verdicts.validator import ValidationResult
 from tests.test_orchestrator import (
     _FakeGit,
     _make_agent_result,

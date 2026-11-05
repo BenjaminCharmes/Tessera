@@ -42,8 +42,8 @@ from tessera.services.providers.noms import (
 )
 from tessera.services.providers.par_role import modele_du_role, provider_pour_role
 from tessera.services.providers.repli import ProviderAvecRepli
-from tessera.services.security_auditor import SecurityAuditorService
-from tessera.services.validator import ValidatorService
+from tessera.services.verdicts.security_auditor import SecurityAuditorService
+from tessera.services.verdicts.validator import ValidatorService
 from tests.matiere_factice import matiere_factice
 from tests.test_agent_runner import _make_ticket, _runner
 from tests.test_providers_base import FakeProvider

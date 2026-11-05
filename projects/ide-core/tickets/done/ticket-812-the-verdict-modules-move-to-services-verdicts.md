@@ -2,7 +2,7 @@
 id: ticket-812
 title: "The verdict modules move to services/verdicts"
 type: refactor
-status: todo
+status: done
 pr_number: null
 priority: low
 agent: codeur
@@ -29,12 +29,12 @@ ADR-076 ; section `verdicts` de `memory/services-domaines.md`. Ces modules porte
 
 ## Critères d'acceptation
 
-- [ ] Les douze modules de la section `verdicts` sont sous `services/verdicts/`, aucun n'est resté
+- [x] Les douze modules de la section `verdicts` sont sous `services/verdicts/`, aucun n'est resté
       à plat
-- [ ] `A_DEPLACER` n'a plus d'entrée `verdicts`, `ECARTS_DOMAINES` n'a grandi d'aucune ligne
-- [ ] Aucune occurrence des anciens chemins pointés ne reste dans `backend/src`, `backend/tests`,
+- [x] `A_DEPLACER` n'a plus d'entrée `verdicts`, `ECARTS_DOMAINES` n'a grandi d'aucune ligne
+- [x] Aucune occurrence des anciens chemins pointés ne reste dans `backend/src`, `backend/tests`,
       `scripts/`, `Makefile`
-- [ ] Le diff n'est que des renommages et des lignes d'import ou de chaîne ; la suite passe
+- [x] Le diff n'est que des renommages et des lignes d'import ou de chaîne ; la suite passe
 
 ## Ce que ça ne fait pas
 
@@ -44,3 +44,7 @@ Aucun changement de comportement, aucun schéma de verdict touché.
 
 Les tests de ces modules patchent beaucoup par chaîne : un patch non réécrit désarme un test de
 porte sans le faire échouer. Relire chaque `tessera.services.<module>` restant avec `grep`.
+
+## Notes de réalisation
+
+Le domaine compte treize modules, pas douze : `scripts/domaines_services.py` fait foi. Le diff ne touche que des lignes d'import : aucune porte qui échoue fermée ne change. Seuls des documents historiques citent les anciens chemins : ils restent tels quels.

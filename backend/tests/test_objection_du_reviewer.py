@@ -7,7 +7,7 @@ from tessera.models.agent import AgentResult, AgentRole
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 from tessera.services.orchestrator import Orchestrator, OrchestratorEvent
 from tessera.services.pipeline_text import OBJECTION_MAX_CHARS, _first_line
-from tessera.services.verdict_reviewer import lire_verdict
+from tessera.services.verdicts.verdict_reviewer import lire_verdict
 from tests.revue_structuree import revue
 
 THREE_REMARKS = revue(

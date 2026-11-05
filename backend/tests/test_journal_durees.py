@@ -18,8 +18,8 @@ from tessera.services.orchestrator import Orchestrator
 from tessera.services.pipeline_documentation import documenter_le_run
 from tessera.services.pipeline_events import EventType, OrchestratorEvent, PipelineResult
 from tessera.services.pipeline_run import PipelineRun
-from tessera.services.security_auditor import SecurityAuditResult
-from tessera.services.validator import ValidationResult
+from tessera.services.verdicts.security_auditor import SecurityAuditResult
+from tessera.services.verdicts.validator import ValidationResult
 
 
 # ------------------------------------------------------------------

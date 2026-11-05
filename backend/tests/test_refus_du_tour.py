@@ -13,7 +13,7 @@ from tessera.services.providers.refus_garde import (
     refus_du_tour,
     section_refus,
 )
-from tessera.services.validator import ValidatorService
+from tessera.services.verdicts.validator import ValidatorService
 from tests.test_orchestrator import _FakeGit, _make_agent_result, _make_ticket, _noop
 from tests.test_providers_base import FakeProvider
 

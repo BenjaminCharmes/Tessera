@@ -38,7 +38,7 @@ from tessera.services.providers.refus_garde import JournalDesRefus
 from tessera.services.retest_apres_rebase import retest_du_run
 from tessera.services.run_recorder import RunRecorder
 from tessera.services.run_worktree import RunWorktree
-from tessera.services.security_auditor import SecurityAuditorService
+from tessera.services.verdicts.security_auditor import SecurityAuditorService
 from tessera.services.surveillance_run import (
     chercheur_pr_mergee,
     lecteur_etat_pr,
@@ -46,7 +46,7 @@ from tessera.services.surveillance_run import (
 )
 from tessera.services.test_runner import TestRunnerService
 from tessera.services.ticket_service import TicketService
-from tessera.services.validator import ValidatorService
+from tessera.services.verdicts.validator import ValidatorService
 
 _OPEN_STATUSES = {
     TicketStatus.todo,
