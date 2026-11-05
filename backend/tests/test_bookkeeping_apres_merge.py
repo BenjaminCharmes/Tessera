@@ -16,7 +16,7 @@ from pathlib import Path
 import pytest
 
 from tessera.services.git_workspace import GitWorkspaceService
-from tessera.services.ticket_service import TicketService
+from tessera.services.projets.ticket_service import TicketService
 
 
 # ---------------------------------------------------------------------------

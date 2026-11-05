@@ -17,7 +17,7 @@ from tessera.services.pipeline.pipeline_fin_de_file import (
     attendre_merge_et_syncer,
     realigner_base,
 )
-from tessera.services.ticket_service import TicketService
+from tessera.services.projets.ticket_service import TicketService
 
 if TYPE_CHECKING:
     from tessera.services.pipeline.orchestrator import Orchestrator

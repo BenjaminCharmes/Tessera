@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 from tessera.services.git_workspace.git_runner import _dossier_sans_hooks
 from tessera.services.git_workspace.erreurs import GitCommandError, NotAGitRepository
-from tessera.services.racine_depot import declare_ancestor
+from tessera.services.projets.racine_depot import declare_ancestor
 
 if TYPE_CHECKING:
     from tessera.services.gardes.politique_run import PolitiqueRun

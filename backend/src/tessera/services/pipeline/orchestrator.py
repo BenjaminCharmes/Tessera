@@ -26,7 +26,7 @@ from tessera.services.pipeline_events import (
     PipelineResult,
 )
 from tessera.services.verification.build_warning import build_warnings
-from tessera.services.ticket_service import TicketService
+from tessera.services.projets.ticket_service import TicketService
 from tessera.utils.logger import get_logger
 
 from tessera.services.pipeline import pipeline_outcomes as outcomes

@@ -33,15 +33,15 @@ import frontmatter as fm
 
 from tessera.models.ticket import TicketStatus
 from tessera.services.git_workspace.git_runner import git
-from tessera.services.manifeste import lire_chaine
+from tessera.services.projets.manifeste import lire_chaine
 from tessera.services.pipeline.pipeline_text import _unapproved_commit_message
-from tessera.services.racine_depot import depot_le_plus_proche
+from tessera.services.projets.racine_depot import depot_le_plus_proche
 from tessera.services.livraison.reprise_marqueur import (
     lire_runs,
     marquer_depots_repris,
     runs_interrompus_a_reprendre,
 )
-from tessera.services.ticket_service import TicketService
+from tessera.services.projets.ticket_service import TicketService
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

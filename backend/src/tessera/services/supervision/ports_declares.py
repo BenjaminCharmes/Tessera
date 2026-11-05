@@ -8,7 +8,7 @@ import re
 from pathlib import Path
 
 from tessera.services.verification.process_registry import CommandeInvalide, resoudre_le_cwd
-from tessera.services.project_loader import load_services_config
+from tessera.services.projets.project_loader import load_services_config
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

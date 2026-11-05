@@ -3,21 +3,21 @@ from pathlib import Path
 
 from tessera.models.agent import AgentConfig, AgentPipelineConfig
 from tessera.models.project import Project, ProjectCreate
-from tessera.services.artifacts import default_mode_for
-from tessera.services.extraction_claude_md import (
+from tessera.services.projets.artifacts import default_mode_for
+from tessera.services.projets.extraction_claude_md import (
     lire_readme,
     parse_active_agents,
     parse_description,
     parse_name,
     parse_stack,
 )
-from tessera.services.forge import parse_remote
-from tessera.services.gabarits_projet import default_agents_json, default_claude_md
-from tessera.services.manifeste import lire_chaine, lire_liste, lire_valeur
+from tessera.services.projets.forge import parse_remote
+from tessera.services.projets.gabarits_projet import default_agents_json, default_claude_md
+from tessera.services.projets.manifeste import lire_chaine, lire_liste, lire_valeur
 
 # Ré-exports : ces noms vivaient ici avant le ticket-691 et des appelants (les
 # tests, notamment) les importent encore depuis ce module.
-from tessera.services.manifeste_ecriture import (
+from tessera.services.projets.manifeste_ecriture import (
     AgentAbsentDuProjet as AgentAbsentDuProjet,
     ModeleInconnu as ModeleInconnu,
     set_agent_model as set_agent_model,

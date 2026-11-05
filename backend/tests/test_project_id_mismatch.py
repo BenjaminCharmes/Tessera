@@ -2,7 +2,7 @@
 import json
 from pathlib import Path
 
-from tessera.services.project_loader import load_project
+from tessera.services.projets.project_loader import load_project
 from tessera.services.supervision.project_overview import build_overview, clear_overview_cache
 
 

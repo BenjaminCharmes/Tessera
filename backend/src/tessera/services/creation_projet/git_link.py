@@ -15,9 +15,9 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
-from tessera.services.artifacts import apply_artifact_mode, read_artifact_mode
+from tessera.services.projets.artifacts import apply_artifact_mode, read_artifact_mode
 from tessera.services.git_workspace.git_runner import git
-from tessera.services.manifeste import ecrire_clef
+from tessera.services.projets.manifeste import ecrire_clef
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

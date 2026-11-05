@@ -16,7 +16,7 @@ from tessera.services.gardes.lecons import lire_lecons
 from tessera.services.pipeline.lecons_run import produire_lecon, proposer_lecon
 from tessera.services.pipeline_events import OrchestratorEvent
 from tessera.services.pipeline.pipeline_run import PipelineRun
-from tessera.services.project_loader import load_pipeline_config
+from tessera.services.projets.project_loader import load_pipeline_config
 from tessera.services.providers.base import ProviderResult
 from tests.doubles_git import GitWorkspaceDouble
 

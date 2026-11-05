@@ -9,8 +9,8 @@ from fastapi.testclient import TestClient
 from tessera.config import settings
 from tessera.main import app
 from tessera.services.pipeline.file_vivante import FileVivante, trier_ajouts
-from tessera.services.ticket_archive import hundred_folder, ticket_number
-from tessera.services.ticket_service import TicketService
+from tessera.services.projets.ticket_archive import hundred_folder, ticket_number
+from tessera.services.projets.ticket_service import TicketService
 from tests.test_orchestrator import _make_orchestrator
 
 _PROJET = "mon-projet"

@@ -99,8 +99,8 @@ def _singletons_propres() -> Iterator[None]:
     """
     from tessera.services.event_hub import EVENT_HUB
     from tessera.services.pipeline.run_registry import RUN_REGISTRY
-    from tessera.services import ticket_service as _ts_module
-    from tessera.services import project_loader as _pl_module
+    from tessera.services.projets import ticket_service as _ts_module
+    from tessera.services.projets import project_loader as _pl_module
     from tessera.services.livraison import pr_status_cache as _prc_module
 
     yield

@@ -11,7 +11,7 @@ from tessera.services.github.github_workflow import GitHubWorkflowService
 from tessera.services.livraison.livraison import Livraison, LivraisonService
 from tessera.services.pipeline_events import EventCallback
 from tessera.services.gardes.politique_run import PolitiqueRun
-from tessera.services.project_loader import load_project
+from tessera.services.projets.project_loader import load_project
 from tessera.services.livraison.mise_a_jour_pr import TeteAttendue, mise_a_jour_de
 from tessera.services.livraison.realignement_base import Realignement
 from tessera.services.livraison.reprise_surveillance import SurveillanceProjet

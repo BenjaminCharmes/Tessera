@@ -24,7 +24,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from tessera.services.git_workspace.git_runner import git
-from tessera.services.racine_depot import est_un_depot
+from tessera.services.projets.racine_depot import est_un_depot
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

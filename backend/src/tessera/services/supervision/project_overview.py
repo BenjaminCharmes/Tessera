@@ -16,14 +16,14 @@ from pydantic import BaseModel
 
 from tessera.models.project import Project
 from tessera.models.ticket import TicketStatus
-from tessera.services.racine_depot import (
+from tessera.services.projets.racine_depot import (
     declare_ancestor,
     depot_au_dessus,
     depot_le_plus_proche,
 )
-from tessera.services.online_declaration import StripeMode, read_online_declaration
+from tessera.services.projets.online_declaration import StripeMode, read_online_declaration
 from tessera.services.gardes.politique_run import PolitiqueRun
-from tessera.services.ticket_service import _STATUS_DIRS
+from tessera.services.projets.ticket_service import _STATUS_DIRS
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

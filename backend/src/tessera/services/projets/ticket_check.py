@@ -4,7 +4,7 @@ One broken frontmatter value makes `TicketService` drop the file from the
 project; this module names the file and the field before the tickets are
 committed (ticket-433).
 
-Command line: ``python -m tessera.services.ticket_check <project_id>`` exits
+Command line: ``python -m tessera.services.projets.ticket_check <project_id>`` exits
 with 1 when at least one problem is reported.
 """
 import sys
@@ -17,7 +17,7 @@ import frontmatter
 from pydantic import BaseModel
 
 from tessera.models.ticket import TicketPriority, TicketStatus, TicketType
-from tessera.services.ticket_service import _STATUS_DIRS, TicketService
+from tessera.services.projets.ticket_service import _STATUS_DIRS, TicketService
 
 _REQUIRED_FIELDS = ("id", "title", "type", "priority", "agent")
 _ENUM_FIELDS: dict[str, type[Enum]] = {
@@ -140,7 +140,7 @@ def main(argv: list[str]) -> int:
     from tessera.utils.project_id import validate_project_id
 
     if len(argv) != 1 or not validate_project_id(argv[0]):
-        sys.stderr.write("usage : python -m tessera.services.ticket_check <project_id>\n")
+        sys.stderr.write("usage : python -m tessera.services.projets.ticket_check <project_id>\n")
         return 2
     racine = settings.ide_workspace_dir / argv[0]
     if not racine.is_dir():

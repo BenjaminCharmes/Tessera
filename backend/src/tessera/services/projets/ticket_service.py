@@ -14,7 +14,7 @@ from tessera.models.ticket import (
     TicketType,
     TicketUnreadable,
 )
-from tessera.services.ticket_archive import (
+from tessera.services.projets.ticket_archive import (
     archive_done_tickets,
     highest_number,
     is_archived,

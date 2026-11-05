@@ -14,7 +14,7 @@ from tessera.models.project import (
     ProjectImportResponse,
 )
 from tessera.routers.projects.shared import loader, new_router
-from tessera.services.artifacts import apply_artifact_mode, default_mode_for
+from tessera.services.projets.artifacts import apply_artifact_mode, default_mode_for
 from tessera.services.creation_projet.git_clone import CloneError, GitCloneService
 from tessera.services.creation_projet.git_link import init_repository
 from tessera.services.creation_projet.project_analyzer import ProjectAnalyzerService

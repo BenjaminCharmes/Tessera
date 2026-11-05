@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Any, Awaitable, Callable, Protocol
 
 from tessera.config import settings
-from tessera.services.autonomie import NiveauAutonomie, lire_niveau
+from tessera.services.projets.autonomie import NiveauAutonomie, lire_niveau
 from tessera.services.git_workspace import GitCommandError
 from tessera.services.livraison.livraison_apres import (
     branche_modifiee,

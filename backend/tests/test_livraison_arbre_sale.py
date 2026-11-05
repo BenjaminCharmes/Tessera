@@ -165,7 +165,7 @@ async def test_un_run_approuve_laisse_l_arbre_propre(repo: Path) -> None:
     du projet demineur, ou l'arbre portait `D tickets/in-review/...` et un
     `tickets/done/` non suivi au moment ou la livraison demarrait.
     """
-    from tessera.services.ticket_service import TicketService
+    from tessera.services.projets.ticket_service import TicketService
 
     tickets = repo / "tickets" / "in-review"
     tickets.mkdir(parents=True)

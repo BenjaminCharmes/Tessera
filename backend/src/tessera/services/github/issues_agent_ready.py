@@ -2,9 +2,9 @@
 from tessera.services.github.github_sync import GithubSyncAgent
 from tessera.config import settings
 from tessera.services.github.github_service import GitHubService
-from tessera.services.project_loader import load_project
+from tessera.services.projets.project_loader import load_project
 from tessera.services.github.sync_map import SyncMapService
-from tessera.services.ticket_service import TicketService
+from tessera.services.projets.ticket_service import TicketService
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

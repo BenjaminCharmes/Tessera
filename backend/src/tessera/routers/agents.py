@@ -8,7 +8,7 @@ from tessera.config import settings
 from tessera.models.agent import AgentResult, AgentRole, AgentRunRequest, CreateAgentConversationResponse
 from tessera.models.project import ConversationMessage, CreateProjectRequest, CreateProjectResponse, ProjectContext
 from tessera.models.ticket import TicketStatus
-from tessera.services.adr import lire_contraintes
+from tessera.services.projets.adr import lire_contraintes
 from tessera.services.agents.agent_creator import AgentCreatorService
 from tessera.services.agents.agent_registry import AgentRegistryService
 from tessera.services.agents.agent_runner import AgentRunner
@@ -17,9 +17,9 @@ from tessera.services.creation_projet.project_creator import ProjectCreatorServi
 from tessera.services.agents.agent_runner import OUTILS_DE_RELECTURE
 from tessera.services.providers.base import LLMProvider
 from tessera.services.providers.par_role import provider_pour_role
-from tessera.services.project_loader import ProjectLoader, load_agents_config
+from tessera.services.projets.project_loader import ProjectLoader, load_agents_config
 from tessera.services.github.sync_map import SyncMapService
-from tessera.services.ticket_service import TicketService
+from tessera.services.projets.ticket_service import TicketService
 
 router = APIRouter(prefix="/agents", tags=["agents"])
 

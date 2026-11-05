@@ -6,20 +6,20 @@ from dataclasses import replace
 from tessera.config import settings
 from tessera.services.agents.agent_runner import AgentRunner
 from tessera.services.livraison.attente_des_merges import apres_les_merges
-from tessera.services.autonomie import NiveauAutonomie
+from tessera.services.projets.autonomie import NiveauAutonomie
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.github.github_service import GitHubService
 from tessera.services.github.github_workflow import GitHubWorkflowService
 from tessera.services.livraison.livraison import Livraison, LivraisonInterrompue, LivraisonService
 from tessera.services.pipeline.orchestrator import PipelineResult
 from tessera.services.gardes.politique_run import PolitiqueRun
-from tessera.services.project_loader import load_project
+from tessera.services.projets.project_loader import load_project
 from tessera.services.livraison.renumeroter import Renumeroteur
 from tessera.services.livraison.resolveur_conflit import ResolveurConflitService
 from tessera.services.livraison.retest_apres_rebase import RetestApresRebase
 from tessera.services.worktrees.run_worktree import RunWorktree
 from tessera.services.livraison.sha_approbation import noter_poussee
-from tessera.services.ticket_service import TicketService
+from tessera.services.projets.ticket_service import TicketService
 from tessera.utils.exceptions import decrire_exception
 from tessera.utils.logger import get_logger
 

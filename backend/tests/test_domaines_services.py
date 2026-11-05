@@ -34,8 +34,8 @@ ECARTS_DOMAINES: frozenset[str] = frozenset({
     "services/agents/chat_suggestion.py -> pipeline",
     "services/livraison/ci_watcher.py -> pipeline",
     # Les noms et la déclaration des providers vivent dans providers/.
-    "services/manifeste_ecriture.py -> providers",
-    "services/project_loader.py -> providers",
+    "services/projets/manifeste_ecriture.py -> providers",
+    "services/projets/project_loader.py -> providers",
     # L'orchestrateur aiguille vers le mode file, qui l'importe en retour.
     "services/pipeline/orchestrator.py -> file",
     # Le type `Livraison` porté par l'événement de fin de run.

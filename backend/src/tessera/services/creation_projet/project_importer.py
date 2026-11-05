@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Literal
 
 from tessera.models.project import Project
-from tessera.services.project_loader import load_project
+from tessera.services.projets.project_loader import load_project
 
 _COPY_EXCLUSIONS = {
     ".git",

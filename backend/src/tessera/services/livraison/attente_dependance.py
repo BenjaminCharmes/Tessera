@@ -6,7 +6,7 @@ from tessera.models.ticket import Ticket, TicketStatus
 from tessera.services.livraison.livraison import Livraison
 from tessera.services.livraison.livraison_evenements import attente_annoncee
 from tessera.services.pipeline_events import EventCallback
-from tessera.services.ticket_service import TicketService
+from tessera.services.projets.ticket_service import TicketService
 
 
 async def attendre_si_dependant(

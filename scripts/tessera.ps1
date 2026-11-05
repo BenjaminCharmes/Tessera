@@ -246,7 +246,7 @@ switch ($Task) {
             exit 2
         }
         Push-Location (Join-Path $Root 'backend')
-        try { & uv run python -m tessera.services.ticket_check $Projet }
+        try { & uv run python -m tessera.services.projets.ticket_check $Projet }
         finally { Pop-Location }
         exit $LASTEXITCODE
     }

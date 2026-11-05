@@ -11,7 +11,7 @@ from typing import Literal, Optional
 
 from pydantic import BaseModel
 
-from tessera.services.manifeste import lire_objet
+from tessera.services.projets.manifeste import lire_objet
 
 StripeMode = Literal["test", "live"]
 

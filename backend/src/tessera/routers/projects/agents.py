@@ -7,13 +7,13 @@ from tessera.config import settings
 from tessera.models.agent import FallbackConfig
 from tessera.routers.projects.shared import new_router
 from tessera.services.cost_calculator import modeles_connus
-from tessera.services.manifeste_ecriture import (
+from tessera.services.projets.manifeste_ecriture import (
     AgentAbsentDuProjet,
     ModeleInconnu,
     set_agent_model,
     set_agent_provider,
 )
-from tessera.services.project_loader import load_agents_config
+from tessera.services.projets.project_loader import load_agents_config
 from tessera.services.providers.noms import PROVIDERS_ANTHROPIC, PROVIDERS_CONNUS, ProviderInconnu
 
 router = new_router()

@@ -7,7 +7,7 @@ from fastapi.testclient import TestClient
 
 from tessera.config import settings
 from tessera.main import app
-from tessera.services.online_declaration import OnlineDeclaration, read_online_declaration
+from tessera.services.projets.online_declaration import OnlineDeclaration, read_online_declaration
 from tessera.services.supervision.project_overview import clear_overview_cache
 
 _BASE = "/api/v1/projects"

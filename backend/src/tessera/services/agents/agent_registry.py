@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 
-from tessera.services.manifeste import lire_fichier
+from tessera.services.projets.manifeste import lire_fichier
 
 _ROLE_PATTERN = re.compile(r"^[a-z][a-z0-9-]*$")
 

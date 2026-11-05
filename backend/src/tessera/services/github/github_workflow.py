@@ -21,7 +21,7 @@ import httpx
 from pathlib import Path
 
 from tessera.config import settings
-from tessera.services.autonomie import (
+from tessera.services.projets.autonomie import (
     NiveauAutonomie,
     lire_niveau,
     niveau_peut_merger,

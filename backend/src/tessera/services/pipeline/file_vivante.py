@@ -12,7 +12,7 @@ from collections.abc import Awaitable, Callable
 from typing import Protocol
 
 from tessera.models.ticket import Ticket, TicketStatus
-from tessera.services.ticket_service import TicketService, ticket_depuis_contenu
+from tessera.services.projets.ticket_service import TicketService, ticket_depuis_contenu
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

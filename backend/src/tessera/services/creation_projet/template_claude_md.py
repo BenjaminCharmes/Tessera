@@ -6,7 +6,7 @@ réécrit une fois `agents.json` posé, pour que chaque agent lise un projet vra
 """
 from pathlib import Path
 
-from tessera.services.manifeste import lire_fichier
+from tessera.services.projets.manifeste import lire_fichier
 
 
 def active_roles(agents_json: Path) -> list[str]:

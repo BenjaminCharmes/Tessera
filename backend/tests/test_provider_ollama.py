@@ -24,7 +24,7 @@ from tessera.services.providers.ollama import OllamaProvider, _reset_slots, _res
 from tessera.services.providers import par_role
 from tessera.services.providers.par_role import provider_pour_role
 from tessera.services.verdicts.security_auditor import SecurityAuditorService
-from tessera.services.project_loader import load_agents_config
+from tessera.services.projets.project_loader import load_agents_config
 from tests.test_providers_base import FakeProvider
 
 _BASE = "http://ollama.test:11434"

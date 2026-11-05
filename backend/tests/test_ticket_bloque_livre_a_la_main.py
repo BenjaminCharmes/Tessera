@@ -17,7 +17,7 @@ from tessera.services.github.github_service import GitHubService
 from tessera.services.github.github_workflow import GitHubWorkflowService
 from tessera.services.pipeline_events import OrchestratorEvent
 from tessera.services.pipeline.pipeline_run import PipelineRun
-from tessera.services.ticket_service import TicketService
+from tessera.services.projets.ticket_service import TicketService
 
 _JOURNAL = "memory/pipeline-log.md"
 

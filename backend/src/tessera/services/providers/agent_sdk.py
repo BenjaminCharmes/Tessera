@@ -50,7 +50,7 @@ from tessera.services.providers.perimetre import (
     hook_refus_hors_perimetre,
     racine_autorisee,
 )
-from tessera.services.racine_depot import depot_au_dessus
+from tessera.services.projets.racine_depot import depot_au_dessus
 from tessera.services.providers.refus_cli import ReleveDesRefusCli
 from tessera.services.providers.refus_garde import JournalDesRefus
 from tessera.services.providers.ask_user import (

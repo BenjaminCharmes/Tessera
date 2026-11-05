@@ -15,7 +15,7 @@ from tessera.services.livraison.reprise_surveillance import (
     reprendre_surveillances,
 )
 from tessera.services.livraison.sha_approbation import noter_poussee
-from tessera.services.ticket_service import TicketService
+from tessera.services.projets.ticket_service import TicketService
 
 PROJET = "demo"
 

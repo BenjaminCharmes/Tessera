@@ -12,7 +12,7 @@ from typing import TypedDict
 from tessera.config import _REPO_ROOT, settings
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 from tessera.services.pipeline.run_registry import RUN_REGISTRY
-from tessera.services.ticket_service import TicketService
+from tessera.services.projets.ticket_service import TicketService
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

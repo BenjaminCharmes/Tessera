@@ -17,7 +17,7 @@ from tessera.services.modeles_par_defaut import MODELE_JUGEMENT
 from tessera.config import settings
 from tessera.main import app
 from tessera.models.agent import AgentConfig, AgentRole
-from tessera.services import project_loader
+from tessera.services.projets import project_loader
 from tessera.services.usage.agent_calls import save_agent_call
 from tessera.services.database import init_db
 from tessera.services.database_runs import create_run
@@ -26,7 +26,7 @@ from tessera.services.event_hub import EVENT_HUB
 from tessera.services.pipeline_events import EventType
 from tessera.services.file.planner import PlannerService
 from tessera.services.creation_projet.project_analyzer import ProjectAnalyzerService
-from tessera.services.project_loader import (
+from tessera.services.projets.project_loader import (
     ModeleInconnu,
     load_agents_config,
     set_agent_model,

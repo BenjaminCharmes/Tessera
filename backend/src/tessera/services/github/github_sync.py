@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 from tessera.services.github.github_service import GitHubIssue, GitHubService
 from tessera.services.github.sync_map import SyncEntry, SyncMapService
-from tessera.services.ticket_service import TicketService
+from tessera.services.projets.ticket_service import TicketService
 
 _TYPE_MAP: dict[str, TicketType] = {
     "feat": TicketType.feat,

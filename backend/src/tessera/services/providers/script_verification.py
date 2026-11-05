@@ -17,7 +17,7 @@ cycle.
 import shlex
 from pathlib import Path
 
-from tessera.services.manifeste import lire_objet
+from tessera.services.projets.manifeste import lire_objet
 
 #: Ce que l'agent lit pour comprendre pourquoi ce fichier-là est refusé.
 MOTIF_SCRIPT = (

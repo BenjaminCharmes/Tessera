@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services.artifacts import (
+from tessera.services.projets.artifacts import (
     ArtifactMode,
     ARTIFACT_PATHS,
     apply_artifact_mode,

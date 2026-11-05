@@ -617,7 +617,7 @@ def test_noter_la_pr_qui_echoue_ne_change_pas_la_livraison(
         "tessera.services.livraison.livraison.LivraisonService.livrer_phase_1", _livrer_la_pr(7)
     )
     monkeypatch.setattr(
-        "tessera.services.ticket_service.TicketService.set_pr_number", _leve
+        "tessera.services.projets.ticket_service.TicketService.set_pr_number", _leve
     )
 
     livraison = asyncio.run(livreur("mon-projet")(_approved()))

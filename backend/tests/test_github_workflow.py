@@ -253,7 +253,7 @@ def test_le_merge_passe_toujours_par_la_porte(tmp_path: Path) -> None:
 
 
 def test_un_projet_sans_declaration_ne_merge_jamais(tmp_path: Path) -> None:
-    from tessera.services.autonomie import peut_merger
+    from tessera.services.projets.autonomie import peut_merger
 
     projet = tmp_path / "sans-declaration"
     projet.mkdir()

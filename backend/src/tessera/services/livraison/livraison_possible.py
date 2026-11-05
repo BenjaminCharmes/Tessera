@@ -7,8 +7,8 @@ la lit ici, avant de réserver le projet.
 """
 from pathlib import Path
 
-from tessera.services.autonomie import peut_pousser
-from tessera.services.project_loader import load_project
+from tessera.services.projets.autonomie import peut_pousser
+from tessera.services.projets.project_loader import load_project
 
 
 def raison_de_refus_livraison(project_path: Path, github_token: str) -> str | None:

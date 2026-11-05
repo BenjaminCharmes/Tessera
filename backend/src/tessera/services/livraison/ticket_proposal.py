@@ -15,7 +15,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from tessera.models.ticket import Ticket
-from tessera.services.autonomie import NiveauAutonomie
+from tessera.services.projets.autonomie import NiveauAutonomie
 from tessera.services.livraison.ci_watcher import CI_WATCHER
 from tessera.services.event_hub import EVENT_HUB
 from tessera.services.git_workspace import GitWorkspaceService
@@ -24,9 +24,9 @@ from tessera.services.github.github_workflow import GitHubWorkflowService, PullR
 from tessera.services.livraison.livraison import LivraisonService
 from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.github.proposal_workspace import ProposalWorkspace
-from tessera.services.racine_depot import GIT_ROOT_ANCESTOR
+from tessera.services.projets.racine_depot import GIT_ROOT_ANCESTOR
 from tessera.services.worktrees.temporary_worktree import detached_worktree, run_git
-from tessera.services.ticket_service import validate_ticket
+from tessera.services.projets.ticket_service import validate_ticket
 
 
 class ProposalRefused(Exception):

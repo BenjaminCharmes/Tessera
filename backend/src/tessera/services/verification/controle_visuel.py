@@ -10,7 +10,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from tessera.services.verification.captures_config import ConfigCaptures, parse_captures_config
-from tessera.services.manifeste import lire_objet, lire_valeur
+from tessera.services.projets.manifeste import lire_objet, lire_valeur
 
 MODES: tuple[str, ...] = ("joindre", "relire")
 #: Délai de démarrage de l'app, en secondes : défaut et plafond.

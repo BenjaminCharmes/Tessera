@@ -1,7 +1,7 @@
 """Chaque agent ne reçoit que les contraintes qui le concernent — tickets 087 et 311."""
 from pathlib import Path
 
-from tessera.services.adr import (
+from tessera.services.projets.adr import (
     adr_pertinents,
     adr_pour,
     contraintes_pour,

@@ -13,7 +13,7 @@ import asyncio
 from typing import TYPE_CHECKING
 
 from tessera.services.pipeline.pipeline_run import PipelineRun
-from tessera.services.ticket_check import Probleme, verifier_tickets
+from tessera.services.projets.ticket_check import Probleme, verifier_tickets
 from tessera.utils.logger import get_logger
 
 if TYPE_CHECKING:

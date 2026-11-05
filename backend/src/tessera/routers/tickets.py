@@ -10,7 +10,7 @@ from tessera.config import settings
 from tessera.services.git_workspace.ticket_diff import TicketDiff, diff_du_ticket
 from tessera.models.ticket import Ticket, TicketBatchCreate, TicketBatchResponse, TicketCreate, TicketListResponse, TicketStatus, TicketStatusUpdate
 from tessera.services.github.github_service import CiStatus, GitHubService, PRStatus
-from tessera.services.autonomie import lire_niveau
+from tessera.services.projets.autonomie import lire_niveau
 from tessera.services.database_runs import list_runs, list_runs_for_ticket
 from tessera.services.livraison.pr_status_cache import get_cached_status
 from tessera.services.event_hub import EVENT_HUB
@@ -22,11 +22,11 @@ from tessera.services.git_workspace import GitWorkspaceError, GitWorkspaceServic
 from tessera.services.github.github_workflow import GitHubWorkflowService, WorkflowError
 from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.routers.dependencies import require_github_service, require_valid_project_id
-from tessera.services.project_loader import load_project
-from tessera.services.project_loader import ProjectLoader
+from tessera.services.projets.project_loader import load_project
+from tessera.services.projets.project_loader import ProjectLoader
 from tessera.services.github.sync_map import SyncMapService
-from tessera.services.ticket_check import Probleme, verifier_tickets
-from tessera.services.ticket_service import TicketService
+from tessera.services.projets.ticket_check import Probleme, verifier_tickets
+from tessera.services.projets.ticket_service import TicketService
 
 router = APIRouter(
     tags=["tickets"],

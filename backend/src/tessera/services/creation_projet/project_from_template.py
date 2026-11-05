@@ -7,8 +7,8 @@ from pathlib import Path
 from tessera.config import _REPO_ROOT
 from tessera.models.project import ProjectCreate, ProjectFromTemplateResult
 from tessera.services.creation_projet.git_link import init_repository
-from tessera.services.manifeste import lire_liste
-from tessera.services.project_loader import ProjectLoader
+from tessera.services.projets.manifeste import lire_liste
+from tessera.services.projets.project_loader import ProjectLoader
 from tessera.services.modeles_par_defaut import MODELE_JUGEMENT, MODELE_PRODUCTION
 from tessera.services.creation_projet.template_claude_md import write_claude_md
 from tessera.utils.logger import get_logger

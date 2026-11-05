@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 from tessera.config import settings
 from tessera.routers.dependencies import require_valid_project_id
-from tessera.services.ticket_service import TicketService
+from tessera.services.projets.ticket_service import TicketService
 
 router = APIRouter(
     tags=["tickets"],

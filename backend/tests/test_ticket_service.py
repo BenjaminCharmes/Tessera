@@ -9,7 +9,7 @@ import frontmatter  # type: ignore[import-untyped]
 import pytest
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services.ticket_service import (
+from tessera.services.projets.ticket_service import (
     TicketService,
     _normalize_depends_on,
     validate_ticket,
@@ -125,7 +125,7 @@ async def test_list_tickets_with_unreadable_surfaces_missing_type(
     )
     _write_ticket(tmp_path / "tickets/todo/ticket-001-a.md", "ticket-001")
 
-    with caplog.at_level(logging.WARNING, logger="tessera.services.ticket_service"):
+    with caplog.at_level(logging.WARNING, logger="tessera.services.projets.ticket_service"):
         tickets, unreadable = await _svc(tmp_path).list_tickets_with_unreadable()
 
     # The valid ticket is listed; the broken file is not
@@ -523,7 +523,7 @@ def test_normalize_depends_on_invalid_id_is_discarded(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """An item that does not match ticket-NNN is dropped and logged."""
-    with caplog.at_level(logging.WARNING, logger="tessera.services.ticket_service"):
+    with caplog.at_level(logging.WARNING, logger="tessera.services.projets.ticket_service"):
         result = _normalize_depends_on("ticket-001, not-a-ticket, ticket-002")
 
     assert result == ["ticket-001", "ticket-002"]
@@ -644,7 +644,7 @@ async def test_cache_reflects_ticket_moved_to_done(tmp_path: Path) -> None:
 
 async def test_cache_purges_deleted_file(tmp_path: Path) -> None:
     """A deleted file no longer appears in the listing and its cache entry is removed."""
-    from tessera.services import ticket_service as ts_module
+    from tessera.services.projets import ticket_service as ts_module
 
     path = tmp_path / "tickets/todo/ticket-001-a.md"
     _write_ticket(path, "ticket-001")

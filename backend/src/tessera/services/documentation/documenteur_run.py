@@ -6,7 +6,7 @@ from tessera.config import settings
 from tessera.services.documentation.documentation import DocumentationService, ResultatDocumentation
 from tessera.services.journal_pipeline import journal_vers
 from tessera.services.gardes.politique_run import PolitiqueRun
-from tessera.services.project_loader import load_pipeline_config
+from tessera.services.projets.project_loader import load_pipeline_config
 from tessera.services.providers.base import LLMProvider
 from tessera.services.providers.enregistrant import ProviderEnregistrant
 from tessera.services.providers.par_role import modele_du_role, provider_pour_role

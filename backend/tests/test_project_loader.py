@@ -9,7 +9,7 @@ import pytest
 
 from tessera.services.modeles_par_defaut import MODELE_PRODUCTION
 from tessera.models.project import ProjectCreate
-from tessera.services.project_loader import (
+from tessera.services.projets.project_loader import (
     ProjectLoader,
     _default_agents_json,
     _load_category,
@@ -478,7 +478,7 @@ async def test_project_cache_skips_reload_without_change(tmp_path: Path) -> None
 
     loader = ProjectLoader(tmp_path)
     with mock_patch(
-        "tessera.services.project_loader._load_category",
+        "tessera.services.projets.project_loader._load_category",
         wraps=_load_category,
     ) as mock_cat:
         await loader.list_projects()

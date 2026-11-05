@@ -12,7 +12,7 @@ import pytest
 from pydantic import ValidationError
 
 from tessera.models.agent import AgentConfig
-from tessera.services.project_loader import load_agents_config
+from tessera.services.projets.project_loader import load_agents_config
 from tessera.services.providers import par_role
 from tessera.services.providers.agent_sdk import ClaudeAgentSDKProvider, _build_options
 from tessera.services.providers.par_role import provider_pour_role

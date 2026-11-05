@@ -13,7 +13,7 @@ from pydantic import ValidationError
 
 from tessera.config import Settings, settings
 from tessera.models.worktree_config import ConfigWorktree, EntreePopulate
-from tessera.services.autonomie import NiveauAutonomie
+from tessera.services.projets.autonomie import NiveauAutonomie
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.github.github_workflow import GitHubWorkflowService, WorkflowError
 from tessera.services.livraison.livraison import LivraisonService

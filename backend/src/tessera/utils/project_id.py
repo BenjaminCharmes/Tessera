@@ -1,6 +1,6 @@
 """Project-id validation shared by models and routes — ticket-370.
 
-Kept in its own module: `models/project.py` and `services/project_loader.py`
+Kept in its own module: `models/project.py` and `services/projets/project_loader.py`
 both need it, and the loader already imports the models.
 """
 import re

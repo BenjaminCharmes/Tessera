@@ -11,7 +11,7 @@ from fastapi import HTTPException
 from tessera import reglages
 from tessera.config import settings
 from tessera.models.ticket import TicketStatus
-from tessera.services.adr import lire_contraintes
+from tessera.services.projets.adr import lire_contraintes
 from tessera.services.agents.agent_registry import AgentRegistryService
 from tessera.services.agents.agent_runner import OUTILS_DE_RELECTURE, AgentRunner
 from tessera.services.agents.carte_du_depot import CarteDuDepot
@@ -25,7 +25,7 @@ from tessera.services.pipeline.orchestrator import Orchestrator
 from tessera.services.pipeline.pipeline_plan import ROLE_PLAN
 from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.pipeline.preparation_run import preparation_du_run_declaree, tests_du_run
-from tessera.services.project_loader import (
+from tessera.services.projets.project_loader import (
     ProjectLoader,
     load_agents_config,
     load_pipeline_config,
@@ -45,7 +45,7 @@ from tessera.services.livraison.surveillance_run import (
     surveillance_pour,
 )
 from tessera.services.verification.test_runner import TestRunnerService
-from tessera.services.ticket_service import TicketService
+from tessera.services.projets.ticket_service import TicketService
 from tessera.services.verdicts.validator import ValidatorService
 
 _OPEN_STATUSES = {

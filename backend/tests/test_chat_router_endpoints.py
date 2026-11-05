@@ -219,7 +219,7 @@ async def test_le_contexte_du_chat_ne_garde_que_les_adr_qui_le_concernent(
     workspace: Path,
 ) -> None:
     # Le chat titrait sa section « Décisions d'architecture », que
-    # `services/adr.py` ne reconnaît pas : il recevait le fichier entier,
+    # `services/projets/adr.py` ne reconnaît pas : il recevait le fichier entier,
     # choix de stack compris, quand chaque agent du pipeline est filtré.
     from tessera.routers.chat import _build_context
 

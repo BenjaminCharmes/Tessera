@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services.autonomie import (
+from tessera.services.projets.autonomie import (
     NiveauAutonomie,
     lire_niveau,
     peut_merger,

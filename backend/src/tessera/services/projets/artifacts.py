@@ -25,7 +25,7 @@ import asyncio
 from pathlib import Path
 from typing import Literal
 
-from tessera.services.manifeste import ecrire_clef, lire_manifeste
+from tessera.services.projets.manifeste import ecrire_clef, lire_manifeste
 
 ArtifactMode = Literal["tracked", "local"]
 

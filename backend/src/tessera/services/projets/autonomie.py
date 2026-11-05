@@ -19,7 +19,7 @@ valeur inconnue ne désarme rien.
 from enum import Enum
 from pathlib import Path
 
-from tessera.services.manifeste import lire_valeur
+from tessera.services.projets.manifeste import lire_valeur
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

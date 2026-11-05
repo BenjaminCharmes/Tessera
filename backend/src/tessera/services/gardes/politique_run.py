@@ -17,12 +17,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal
 
-from tessera.services.artifacts import ArtifactMode, read_artifact_mode
-from tessera.services.autonomie import NiveauAutonomie, lire_niveau
-from tessera.services.manifeste import lire_booleen, lire_chaine
+from tessera.services.projets.artifacts import ArtifactMode, read_artifact_mode
+from tessera.services.projets.autonomie import NiveauAutonomie, lire_niveau
+from tessera.services.projets.manifeste import lire_booleen, lire_chaine
 from tessera.models.worktree_config import ConfigWorktree
-from tessera.services.project_loader import load_pipeline_config
-from tessera.services.racine_depot import est_ancestor, racine_ecriture_projet
+from tessera.services.projets.project_loader import load_pipeline_config
+from tessera.services.projets.racine_depot import est_ancestor, racine_ecriture_projet
 from tessera.services.gardes.worktree_dossiers import DossiersWorktree
 from tessera.services.gardes.worktree_politique import lire_worktree
 

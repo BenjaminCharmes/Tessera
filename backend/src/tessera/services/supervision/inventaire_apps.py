@@ -22,7 +22,7 @@ from tessera.services.supervision.arbre_de_processus import memoire_mo as _memoi
 from tessera.services.supervision.attribution_processus import appartient_au_projet
 from tessera.services.supervision.ports_declares import ports_du_projet
 from tessera.services.verification.process_registry import PROCESS_REGISTRY, Service
-from tessera.services.project_loader import fait_tourner_l_ide, list_projects
+from tessera.services.projets.project_loader import fait_tourner_l_ide, list_projects
 from tessera.services.supervision.services_sans_port import processus_sans_port
 from tessera.services.supervision.sonde_systeme import InfoProcessus, SondeSysteme
 

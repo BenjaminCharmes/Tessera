@@ -9,7 +9,7 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
-from tessera.services.manifeste import lire_valeur
+from tessera.services.projets.manifeste import lire_valeur
 
 #: Largeurs en pixels : téléphone puis ordinateur.
 LARGEURS: tuple[int, ...] = (390, 1440)

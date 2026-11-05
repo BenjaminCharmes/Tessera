@@ -10,7 +10,7 @@ from tessera.models.project import (
 from tessera.models.ticket import TicketDraft, TicketPriority, TicketType
 from tessera.services.agents.agent_registry import AgentRegistryService
 from tessera.services.cost_calculator import DEFAULT_MODEL
-from tessera.services.project_loader import ProjectLoader
+from tessera.services.projets.project_loader import ProjectLoader
 from tessera.services.providers.base import LLMProvider
 from tessera.utils.conversation import format_conversation
 from tessera.utils.json_extract import extract_json

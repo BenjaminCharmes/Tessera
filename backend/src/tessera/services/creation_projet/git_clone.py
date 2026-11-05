@@ -5,14 +5,14 @@ import shutil
 from pathlib import Path
 
 from tessera.models.project import CloneProjectResponse, Project
-from tessera.services.manifeste import ecrire_clef
+from tessera.services.projets.manifeste import ecrire_clef
 from tessera.services.creation_projet.project_analyzer import ProjectAnalyzerService
 from tessera.services.creation_projet.project_importer import _scaffold_artifact_dirs
-from tessera.services.artifacts import (
+from tessera.services.projets.artifacts import (
     apply_artifact_mode,
     default_mode_for,
 )
-from tessera.services.project_loader import load_project
+from tessera.services.projets.project_loader import load_project
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

@@ -7,7 +7,7 @@ from tessera.config import settings
 from tessera.models.agent import AgentConfig, AgentResult, AgentRole
 from tessera.services.agents.agent_runner import OUTILS_DE_RELECTURE
 from tessera.services.pipeline_events import EventType, OrchestratorEvent
-from tessera.services.ticket_service import TicketService
+from tessera.services.projets.ticket_service import TicketService
 from tests.test_orchestrator import (
     _FakeGit,
     _make_agent_result,

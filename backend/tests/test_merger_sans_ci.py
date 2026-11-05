@@ -8,7 +8,7 @@ verification et coute un aller-retour par ticket.
 import json
 from pathlib import Path
 
-from tessera.services.autonomie import NiveauAutonomie, niveau_peut_merger
+from tessera.services.projets.autonomie import NiveauAutonomie, niveau_peut_merger
 from tessera.services.gardes.politique_run import PolitiqueRun
 
 

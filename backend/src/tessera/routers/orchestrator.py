@@ -29,7 +29,7 @@ from tessera.services.pipeline.run_dans_worktree import (
 from tessera.services.pipeline.run_executor import executer
 from tessera.services.pipeline.run_registry import RUN_REGISTRY, RunActif, RunAlreadyInProgress
 from tessera.services.worktrees.run_worktree import RunWorktree
-from tessera.services.ticket_service import TicketService
+from tessera.services.projets.ticket_service import TicketService
 from tessera.utils.logger import get_logger
 from tessera.utils.project_id import validate_project_id
 

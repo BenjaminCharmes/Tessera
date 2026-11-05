@@ -2,7 +2,7 @@
 # sont maintenant dans test_ticket_service.py (via TicketService).
 # On garde ici un smoke test minimal pour vérifier l'import.
 
-from tessera.services.ticket_service import TicketService
+from tessera.services.projets.ticket_service import TicketService
 
 
 def test_ticket_service_importable() -> None:

@@ -13,7 +13,7 @@ or not.
 """
 from pathlib import Path
 
-from tessera.services.manifeste import lire_valeur
+from tessera.services.projets.manifeste import lire_valeur
 
 #: The only `git_root` value that opens the repository above the project
 #: (ADR-028). Any other value disarms nothing.

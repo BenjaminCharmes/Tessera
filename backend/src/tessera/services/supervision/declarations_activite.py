@@ -8,7 +8,7 @@ from pathlib import Path
 from pydantic import ValidationError
 
 from tessera.models.agent import ServiceDeclare
-from tessera.services.manifeste import lire_liste
+from tessera.services.projets.manifeste import lire_liste
 
 
 def services_avec_activite(racine: Path) -> list[ServiceDeclare]:

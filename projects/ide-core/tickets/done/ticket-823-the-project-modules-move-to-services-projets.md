@@ -2,7 +2,7 @@
 id: ticket-823
 title: "The project modules move to services/projets"
 type: refactor
-status: todo
+status: done
 pr_number: null
 priority: low
 agent: codeur
@@ -34,12 +34,12 @@ confondent pas (`projets` / `manifeste`).
 
 ## Critères d'acceptation
 
-- [ ] Les onze modules de la section `projets` sont sous `services/projets/`, aucun n'est resté à plat
-- [ ] `make` (cible de vérification des tickets) et `scripts/tessera.ps1` appellent le nouveau chemin
-- [ ] `A_DEPLACER` n'a plus d'entrée `projets`, `ECARTS_DOMAINES` n'a grandi d'aucune ligne
-- [ ] Aucune occurrence des anciens chemins pointés ne reste dans `backend/src`, `backend/tests`,
+- [x] Les onze modules de la section `projets` sont sous `services/projets/`, aucun n'est resté à plat
+- [x] `make` (cible de vérification des tickets) et `scripts/tessera.ps1` appellent le nouveau chemin
+- [x] `A_DEPLACER` n'a plus d'entrée `projets`, `ECARTS_DOMAINES` n'a grandi d'aucune ligne
+- [x] Aucune occurrence des anciens chemins pointés ne reste dans `backend/src`, `backend/tests`,
       `scripts/`, `Makefile`
-- [ ] Le diff n'est que des renommages et des lignes d'import ou de chaîne ; la suite passe
+- [x] Le diff n'est que des renommages et des lignes d'import ou de chaîne ; la suite passe
 
 ## Ce que ça ne fait pas
 
@@ -48,3 +48,7 @@ Aucun changement de comportement, aucune lecture de manifeste modifiée.
 ## Risques
 
 `project_loader` est patché par chaîne dans les tests de routeurs : relire les restes de chemins.
+
+## Notes de réalisation
+
+Le domaine compte quinze modules, pas onze : `scripts/domaines_services.py` fait foi. `Makefile` et `scripts/tessera.ps1` sont réécrits par le script ; `python -m tessera.services.projets.ticket_check ide-core` répond « 0 problème(s) », code 0. Retouche à la main : `test_racine_depot.py:159` attend `services/projets/racine_depot.py`. `scripts/prochain_numero.py` importe `numerotation`, qui bouge au ticket-824. `docs/architecture.md` suit `adr` et `project_loader` ; `decisions-archive.md` et les documents historiques restent tels quels.

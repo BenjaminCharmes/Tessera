@@ -11,7 +11,7 @@ from pydantic import ValidationError
 
 from tessera.config import Settings
 from tessera.models.worktree_config import ConfigWorktree, EntreePopulate
-from tessera.services.manifeste import lire_valeur
+from tessera.services.projets.manifeste import lire_valeur
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

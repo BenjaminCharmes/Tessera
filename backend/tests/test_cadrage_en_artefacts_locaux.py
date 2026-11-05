@@ -17,7 +17,7 @@ import pytest
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 from tessera.services.pipeline import pipeline_controles
-from tessera.services.artifact_snapshot import diff_artifacts, snapshot_artifacts
+from tessera.services.projets.artifact_snapshot import diff_artifacts, snapshot_artifacts
 from tessera.services.pipeline_events import OrchestratorEvent
 from tessera.services.pipeline.pipeline_run import PipelineRun
 from tessera.services.verdicts.validator import CriterionResult, ValidationResult

@@ -21,7 +21,7 @@ from tessera.services.verification.process_registry import (
     ServiceDejaEnCours,
 )
 from tessera.routers.dependencies import require_valid_project_id
-from tessera.services.project_loader import load_services_config
+from tessera.services.projets.project_loader import load_services_config
 from tessera.services.verification.service_etat import (
     ServiceEtat,
     ServicesArretes,

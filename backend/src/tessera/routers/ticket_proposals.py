@@ -11,7 +11,7 @@ from tessera.routers.dependencies import require_github_service, require_valid_p
 from tessera.services.git_workspace import GitWorkspaceError
 from tessera.services.github.github_workflow import WorkflowError
 from tessera.services.gardes.politique_run import PolitiqueRun
-from tessera.services.project_loader import ProjectLoader
+from tessera.services.projets.project_loader import ProjectLoader
 from tessera.services.livraison.ticket_proposal import (
     ProposalRefused,
     ProposalRequest,

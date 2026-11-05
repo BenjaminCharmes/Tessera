@@ -554,7 +554,7 @@ Chaque agent reçoit un contexte filtré selon sa portée définie dans les ADR 
 
 **Invariant** : le contexte d'un agent inclut toujours le diff git, les résultats des étapes précédentes et l'audit, indépendamment de la portée des ADR du projet. Seule la section des décisions elle-même est filtrée par rôle.
 
-`adr_pertinents` (`backend/src/tessera/services/adr.py`) découpe à cette limite. Les ADRs au format `contraintes.md` (`contraintes_pour`) n'en ont pas besoin : leurs blocs s'arrêtent déjà au titre de niveau 2 suivant.
+`adr_pertinents` (`backend/src/tessera/services/projets/adr.py`) découpe à cette limite. Les ADRs au format `contraintes.md` (`contraintes_pour`) n'en ont pas besoin : leurs blocs s'arrêtent déjà au titre de niveau 2 suivant.
 
 ### Composition du contexte : priorité aux contraintes
 
@@ -563,7 +563,7 @@ Chaque agent reçoit deux fichiers de mémoire du projet, dans l'ordre de priori
 1. `memory/contraintes.md` — Les règles en vigueur pour le projet, spécifiques au rôle de l'agent
 2. `memory/decisions.md` — ADRs et décisions architecturales, en repli si le premier n'existe pas
 
-Le filtrage par rôle est implémenté dans les routers (`orchestrator.py`, `agents.py`, `chat.py`), qui passent par `services/adr.py`. Une contrainte est une ligne portant un label entre crochets — ex. `[codeur]` — indiquant son champ d'application. Les agents n'appliquent que les contraintes qui les concernent.
+Le filtrage par rôle est implémenté dans les routers (`orchestrator.py`, `agents.py`, `chat.py`), qui passent par `services/projets/adr.py`. Une contrainte est une ligne portant un label entre crochets — ex. `[codeur]` — indiquant son champ d'application. Les agents n'appliquent que les contraintes qui les concernent.
 
 ### Contraintes proposées (ticket-493)
 
@@ -1753,7 +1753,7 @@ L'ordre est garanti : deux signalements reçoivent des `position` croissantes et
 
 Toutes les routes contenant un paramètre `project_id` valident cet identifiant pour assurer que le chemin du projet reste conforme au dossier des projets configuré. Un `project_id` invalide — contenant `.`, `..`, `/`, `\` ou tout caractère ne correspondant pas au pattern `^[A-Za-z0-9][A-Za-z0-9._-]*$` — retourne une `404` sans jamais accéder au disque.
 
-La validation est centralisée dans `backend/src/tessera/services/project_loader.py` :
+La validation est centralisée dans `backend/src/tessera/services/projets/project_loader.py` :
 
 1. **Paramètres de chemin** — FastAPI refuse un identifiant invalide avant l'appel du routeur (→ `404`)
 2. **Corps de requête** — les objets `RunRequest` et `RunAutonomousRequest` rejettent un `project_id` invalide (→ `422`)
