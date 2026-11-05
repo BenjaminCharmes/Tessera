@@ -9,7 +9,7 @@ déplacement ; ce fichier se supprime au ticket-825.
 Les domaines sont ordonnés (1 = le plus bas). Un module importe son domaine
 ou un domaine de rang plus bas, jamais un rang plus haut. `routers/` importe
 tout ; `models/` n'importe aucun domaine. Un import à contresens se mesure
-par `test_sens_des_imports.py` (cliquet : les écarts connus ne font que
+par `test_domaines_services.py` (cliquet : les écarts connus ne font que
 diminuer, un écart corrigé se retire de la liste).
 
 | Rang | Domaine | Rôle |
@@ -63,47 +63,47 @@ diminuer, un écart corrigé se retire de la liste).
 
 ## Les modules, par domaine
 
-`noyau` (25) : arret_de_service, database, database_chat, database_events,
-database_runs, database_usage, diff_changements, diff_sections, event_hub,
-groupe_de_processus, journal_attente, journal_du_texte, journal_en_attente,
-journal_pipeline, lancement, minuteur_d_etape, modeles_par_defaut,
-numerotation, pipeline_events, prompt_loader, racine_depot,
+`noyau` (22) : arret_de_service, cost_calculator, database, database_chat,
+database_events, database_runs, dialogue, diff_changements, eveil, event_hub,
+groupe_de_processus, journal_du_texte, journal_pipeline, lancement,
+modeles_par_defaut, numerotation, pipeline_events, prompt_loader,
 reecriture_des_numeros, releve_du_diff, shell_detection, statut_suggere.
 
-`projets` (11) : adr, artifact_snapshot, artifacts, autonomie, manifeste,
-manifeste_ecriture, online_declaration, project_loader, ticket_archive,
+`projets` (15) : adr, artifact_snapshot, artifacts, autonomie,
+extraction_claude_md, forge, gabarits_projet, manifeste, manifeste_ecriture,
+online_declaration, project_loader, racine_depot, ticket_archive,
 ticket_check, ticket_service.
 
-`usage` (8) : agent_calls, cost_aggregate, cost_calculator, quota_exhaustion,
+`usage` (8) : agent_calls, cost_aggregate, database_usage, quota_exhaustion,
 quota_registry, quota_tracker, session_limit, usage_stats.
 
 `provisioning` : inchangé.
 
-`gardes` (6) : config_tests_touchee, contraintes_touchees, critere_protege,
-politique_run, secrets_diff, termes_interdits.
+`gardes` (9) : config_tests_touchee, contraintes_touchees, lecons,
+lecons_touchees, politique_run, secrets_diff, termes_interdits,
+worktree_dossiers, worktree_politique.
 
-`git_workspace` : son contenu, plus 5 modules : git_attributes, git_runner,
-prisma_conflits, regles_conflit, worktree_dossiers.
+`git_workspace` : son contenu, plus 8 modules : diff_sections, git_attributes,
+git_runner, journal_attente, journal_en_attente, prisma_conflits,
+regles_conflit, ticket_diff.
 
-`worktrees` (8) : preparation_worktree, reprise_orphelin, reprise_worktrees,
-run_dans_worktree, run_worktree, run_worktree_populate, temporary_worktree,
-worktree_politique.
+`worktrees` (3) : run_worktree, run_worktree_populate, temporary_worktree.
 
-`github` (8, plus `agents/github_sync.py`) : forge, github_retry,
-github_service, github_workflow, issues_agent_ready, proposal_workspace,
-sync_map, ticket_proposal.
+`github` (6, plus `agents/github_sync.py`) : github_retry, github_service,
+github_workflow, issues_agent_ready, proposal_workspace, sync_map.
 
 `providers` : inchangé.
 
-`verification` (15) : app_du_run, build_warning, captures, captures_config,
+`verification` (18) : app_du_run, build_warning, captures, captures_config,
 captures_session, chaines_de_test, commande_chainee, commande_effective,
 controle_visuel, detail_du_delai, erreur_de_sortie, groupe_d_etape,
-outil_introuvable, sortie_de_test, test_runner.
+minuteur_d_etape, outil_introuvable, process_registry, service_etat,
+sortie_de_test, test_runner.
 
-`verdicts` (12) : reviewer_schema, security_auditor, security_contexte,
-security_schema, validator, validator_binary, validator_cited_dirs,
-validator_cited_files, validator_decisions, validator_file_extensions,
-validator_schema, verdict_reviewer.
+`verdicts` (13) : critere_protege, reviewer_schema, security_auditor,
+security_contexte, security_schema, validator, validator_binary,
+validator_cited_dirs, validator_cited_files, validator_decisions,
+validator_file_extensions, validator_schema, verdict_reviewer.
 
 `agents` (6) : agent_creator, agent_registry, agent_runner, carte_du_depot,
 chat_service, chat_suggestion.
@@ -114,39 +114,43 @@ documentation_diff, documentation_editions, documentation_preuve,
 documentation_reponse, documentation_selection, documenteur_run,
 roles_documentation.
 
-`creation_projet` (10) : extraction_claude_md, gabarits_projet, git_clone,
-git_link, project_analyzer, project_creator, project_from_template,
-project_importer, project_removal, template_claude_md.
+`creation_projet` (8) : git_clone, git_link, project_analyzer,
+project_creator, project_from_template, project_importer, project_removal,
+template_claude_md.
 
 `livraison` (29) : attente_dependance, attente_des_merges, branch_cleanup,
 ci_watcher, controle_tete, journal_ci_watcher, livraison, livraison_apres,
 livraison_arrets, livraison_conflit, livraison_evenements, livraison_merge,
-livraison_possible, livraison_rebase, livraison_resultat, livreur_run,
-mise_a_jour_branche, mise_a_jour_pr, pr_status_cache, pr_statuses,
-realignement_base, renumeroter, reprise_marqueur, reprise_outils,
-reprise_surveillance, resolveur_conflit, retest_apres_rebase, sha_approbation,
-surveillance_run.
+livraison_possible, livraison_rebase, livraison_resultat, mise_a_jour_branche,
+mise_a_jour_pr, pr_status_cache, pr_statuses, realignement_base, renumeroter,
+reprise_marqueur, reprise_outils, reprise_surveillance, resolveur_conflit,
+retest_apres_rebase, sha_approbation, surveillance_run, ticket_proposal.
 
-`pipeline` (31) : assemblage_run, controles_depart, dialogue, etape_de_capture,
-orchestrator, pipeline_approbation, pipeline_branche, pipeline_capture,
-pipeline_contraintes, pipeline_controles, pipeline_critere_protege,
-pipeline_documentation, pipeline_livraison, pipeline_outcomes, pipeline_plan,
-pipeline_production, pipeline_rangement, pipeline_reprise, pipeline_run,
-pipeline_testeur, pipeline_text, pipeline_tickets, preparation_run,
-refus_precedent, run_executor, run_lock, run_recorder, run_registry,
-run_status, signalements_en_attente, ticket_diff.
+`pipeline` (37) : assemblage_run, controles_depart, etape_de_capture,
+file_vivante, lecons_run, livreur_run, orchestrator, pipeline_approbation,
+pipeline_branche, pipeline_capture, pipeline_contraintes, pipeline_controles,
+pipeline_critere_protege, pipeline_documentation, pipeline_fin_de_file,
+pipeline_livraison, pipeline_outcomes, pipeline_plan, pipeline_production,
+pipeline_rangement, pipeline_reprise, pipeline_run, pipeline_testeur,
+pipeline_text, pipeline_tickets, preparation_run, preparation_worktree,
+refus_precedent, reprise_orphelin, reprise_worktrees, run_dans_worktree,
+run_executor, run_lock, run_recorder, run_registry, run_status,
+signalements_en_attente.
 
-`file` (7) : file_vivante, pipeline_file, pipeline_file_livraison,
-pipeline_file_reprise, pipeline_file_tour, pipeline_fin_de_file, planner.
+`file` (5) : pipeline_file, pipeline_file_livraison, pipeline_file_reprise,
+pipeline_file_tour, planner.
 
-`supervision` (14) : activite_produit, arbre_de_processus,
-attribution_processus, declarations_activite, eveil, inventaire_apps,
-ports_declares, process_registry, project_overview, salle_tessera,
-service_etat, services_sans_port, signature_commande, sonde_systeme.
+`supervision` (11) : activite_produit, arbre_de_processus,
+attribution_processus, declarations_activite, inventaire_apps, ports_declares,
+project_overview, salle_tessera, services_sans_port, signature_commande,
+sonde_systeme.
 
-Total : 207 modules à plat, contre 203 dans le ticket-776 (trois tickets ont
-ajouté des modules depuis). Le test de couverture du ticket-826 est l'arbitre :
-un module absent de ce fichier s'y ajoute, un module inexistant s'en retire.
+Total : 210 modules à plat. La table de départ en comptait 207 ; les trois
+modules des leçons (tickets 801 à 804) s'y sont ajoutés, et le ticket-826 a
+reclassé vingt-six modules là où un seul déplacement supprimait un import
+montant (détail dans son message de commit). `scripts/domaines_services.py`
+est l'arbitre : le test de couverture refuse un module à plat sans ligne et
+une ligne sans fichier.
 
 ## Ordre des déplacements
 
