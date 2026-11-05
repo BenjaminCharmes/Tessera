@@ -15,7 +15,7 @@ from tessera.models.project import (
 from tessera.routers.projects.shared import loader, new_router, ticket_svc
 from tessera.services.github_service import GitHubService
 from tessera.services.manifeste import lire_label_map
-from tessera.services.planner import PlannerService
+from tessera.services.file.planner import PlannerService
 from tessera.services.project_analyzer import ProjectAnalyzerService
 from tessera.services.providers.par_role import modele_du_role, provider_pour_role
 from tessera.services.sync_map import SyncMapService

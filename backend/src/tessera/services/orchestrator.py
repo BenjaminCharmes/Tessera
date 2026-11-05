@@ -30,7 +30,7 @@ from tessera.services.ticket_service import TicketService
 from tessera.utils.logger import get_logger
 
 from tessera.services import pipeline_outcomes as outcomes
-from tessera.services import pipeline_file as file
+from tessera.services.file import pipeline_file as file
 from tessera.services import pipeline_fin_de_file as fin_de_file
 from tessera.services import pipeline_branche, pipeline_controles, pipeline_production, pipeline_testeur
 from tessera.services.pipeline_run import PipelineRun, set_status, tolerant

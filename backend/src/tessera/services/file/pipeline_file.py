@@ -17,9 +17,9 @@ from tessera.services.pipeline_events import (
     OrchestratorEvent,
     PipelineResult,
 )
-from tessera.services.pipeline_file_livraison import livraison_arrete_la_file
-from tessera.services.pipeline_file_reprise import est_non_livre, relivrer_les_non_livres
-from tessera.services.pipeline_file_tour import Tour, progres
+from tessera.services.file.pipeline_file_livraison import livraison_arrete_la_file
+from tessera.services.file.pipeline_file_reprise import est_non_livre, relivrer_les_non_livres
+from tessera.services.file.pipeline_file_tour import Tour, progres
 from tessera.services.pipeline_fin_de_file import nettoyer_apres_file
 from tessera.services.pipeline_run import tolerant
 from tessera.services.session_limit import extract_reset_time_from_arret

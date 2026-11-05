@@ -4,8 +4,8 @@ from typing import cast
 
 from tessera.services.orchestrator import Orchestrator
 from tessera.services.pipeline_events import EventType, OrchestratorEvent
-from tessera.services.pipeline_file import plafond_effectif
-from tessera.services.pipeline_file_tour import Tour, progres
+from tessera.services.file.pipeline_file import plafond_effectif
+from tessera.services.file.pipeline_file_tour import Tour, progres
 
 
 def _orch(plafond_par_ticket: float) -> Orchestrator:

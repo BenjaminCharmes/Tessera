@@ -234,10 +234,4 @@ A_DEPLACER: dict[str, str] = {
     "run_suivi": "pipeline",
     "run_status": "pipeline",
     "signalements_en_attente": "pipeline",
-    # file
-    "pipeline_file": "file",
-    "pipeline_file_livraison": "file",
-    "pipeline_file_reprise": "file",
-    "pipeline_file_tour": "file",
-    "planner": "file",
 }
