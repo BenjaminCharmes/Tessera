@@ -1,5 +1,6 @@
 import time
 from collections.abc import Awaitable, Callable
+from dataclasses import replace
 from pathlib import Path
 from typing import Any
 
@@ -11,6 +12,7 @@ from tessera.services.noyau.prompt_loader import MissingPromptError
 from tessera.services.noyau.statut_suggere import _parse_suggested_status
 from tessera.services.projets.adr import adr_pertinents
 from tessera.services.providers.base import LLMProvider, ProviderResult, ToolEventCallback
+from tessera.services.providers.signaler import ContexteSignal, role_recoit_signaler
 from tessera.services.usage.agent_calls import save_agent_call
 from tessera.utils.logger import get_logger
 
@@ -86,6 +88,7 @@ class AgentRunner:
         ask_user: Callable[[str], Awaitable[str]] | None = None,
         session: str | None = None,
         schema: dict[str, Any] | None = None,
+        signaler: ContexteSignal | None = None,
     ) -> AgentResult:
         role_str = role.value if isinstance(role, AgentRole) else role
         t0 = time.monotonic()
@@ -114,8 +117,13 @@ class AgentRunner:
         # Comme `session` : transmis seulement s'il est posé (ADR-061).
         if schema is not None:
             extra["schema"] = schema
+        # Comme `ask_user` : seulement s'il y a un contexte, et jamais pour un
+        # rôle qui ne signale pas (ticket-863). Le rôle est celui de l'appel,
+        # le reste du contexte vient du run.
+        if signaler is not None and role_recoit_signaler(role_str):
+            extra["signaler"] = replace(signaler, role=role_str)
 
-        provider = self._provider_pour(role_str)
+        provider =self._provider_pour(role_str)
         provider_result: ProviderResult
         if stream_callback is not None:
             provider_result = await provider.stream(

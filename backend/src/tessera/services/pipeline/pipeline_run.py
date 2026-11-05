@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING, Any
 from tessera.models.ticket import Ticket, TicketStatus
 from tessera.services.noyau.dialogue import DialogueChannel
 from tessera.services.noyau.pipeline_events import EventCallback, EventType, OrchestratorEvent
+from tessera.services.providers.signaler import CompteurRun
 from tessera.utils.logger import get_logger
 
 if TYPE_CHECKING:
@@ -48,6 +49,10 @@ class PipelineRun:
     # nouveau run repart à vide. Un provider qui n'en rend pas la laisse à
     # None, et chaque tour reste l'appel complet.
     session_codeur: str | None = None
+
+    # Les signalements émis par les agents de ce run, tous rôles confondus : la
+    # borne de trois par run se compte ici (ticket-863).
+    compteur_signaux: CompteurRun = field(default_factory=CompteurRun)
 
     # La liste des fichiers suivis, calculée une fois avant le premier agent
     # (ticket-190) : le codeur ne doit pas y voir ses propres fichiers du

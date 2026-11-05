@@ -6,6 +6,7 @@ from anthropic import AsyncAnthropic
 from anthropic.types import TextBlockParam
 
 from tessera.services.providers.base import ProviderResult, StreamCallback, ToolEventCallback
+from tessera.services.providers.signaler import ContexteSignal
 
 #: Le nom de l'outil unique par lequel la Messages API rend une sortie
 #: structurée : son `input_schema` est le schéma, et `tool_choice` le force.
@@ -70,6 +71,7 @@ class AnthropicApiProvider:
         max_tokens: int,
         cwd: Path | None = None,
         ask_user: Callable[[str], Awaitable[str]] | None = None,
+        signaler: ContexteSignal | None = None,
         session: str | None = None,
         schema: dict[str, Any] | None = None,
     ) -> ProviderResult:
@@ -99,6 +101,7 @@ class AnthropicApiProvider:
         on_token: StreamCallback | None = None,
         on_tool_use: ToolEventCallback | None = None,
         ask_user: Callable[[str], Awaitable[str]] | None = None,
+        signaler: ContexteSignal | None = None,
         session: str | None = None,
         schema: dict[str, Any] | None = None,
     ) -> ProviderResult:

@@ -3,6 +3,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Protocol, runtime_checkable
 
+from tessera.services.providers.signaler import ContexteSignal
+
 StreamCallback = Callable[[str], Awaitable[None]]
 ToolEventCallback = Callable[[str, dict[str, Any]], Awaitable[None]]
 
@@ -56,6 +58,7 @@ class LLMProvider(Protocol):
         max_tokens: int,
         cwd: Path | None = None,
         ask_user: Callable[[str], Awaitable[str]] | None = None,
+        signaler: ContexteSignal | None = None,
         session: str | None = None,
         schema: dict[str, Any] | None = None,
     ) -> ProviderResult:
@@ -102,6 +105,7 @@ class LLMProvider(Protocol):
         on_token: StreamCallback | None = None,
         on_tool_use: ToolEventCallback | None = None,
         ask_user: Callable[[str], Awaitable[str]] | None = None,
+        signaler: ContexteSignal | None = None,
         session: str | None = None,
         schema: dict[str, Any] | None = None,
     ) -> ProviderResult:

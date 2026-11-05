@@ -24,7 +24,6 @@ from claude_agent_sdk.types import SystemPromptFile
 
 from tessera.models.agent import EffortLevel
 from tessera.services.projets.racine_depot import depot_au_dessus
-from tessera.services.providers.ask_user import ASK_USER_SERVER_NAME, ASK_USER_TOOL_NAME, build_ask_user_server
 from tessera.services.providers.base import ProviderResult, StreamCallback, ToolEventCallback
 from tessera.services.providers.consignes_ancetres import claude_md_ancetres_a_exclure
 from tessera.services.providers.duree_max import borner
@@ -37,6 +36,7 @@ from tessera.services.providers.perimetre import hook_refus_hors_perimetre, raci
 from tessera.services.providers.prompt_fichier import prompt_systeme_pour_sdk
 from tessera.services.providers.refus_cli import ReleveDesRefusCli
 from tessera.services.providers.refus_garde import JournalDesRefus
+from tessera.services.providers.signaler import ContexteSignal, serveur_tessera
 from tessera.services.usage.quota_tracker import QuotaTracker
 from tessera.utils.logger import get_logger
 
@@ -120,6 +120,7 @@ def _build_options(
     cwd: Path | None,
     allowed_tools: list[str] | None = None,
     ask_user: Callable[[str], Awaitable[str]] | None = None,
+    signaler: ContexteSignal | None = None,
     racine_ecriture: Path | None = None,
     resume: str | None = None,
     skills: list[str] | None = None,
@@ -142,15 +143,15 @@ def _build_options(
     ``resume`` names a session of a previous call to pick up from (ticket-187).
     The CLI finds it on disk by ``cwd``, so both must match between the calls.
     """
-    # ``allowed_tools`` only controls auto-approval — the SDK CLI's
-    # subprocess transport reads ``if effective_allowed_tools:`` and omits
-    # ``--allowedTools`` entirely when the list is empty, leaving the CLI's
-    # full default toolset available. Only ``tools`` controls which built-in
-    # tools exist at all (``[]`` disables all of them). Both fields are
-    # always set to the same resolved list here, so a "no tools" request
-    # (`allowed_tools=[]`) actually disables tool availability instead of
-    # merely withholding auto-approval, and no configuration path can end up
-    # with an implicit toolset (ticket-044 merge-gate review, finding 1).
+    # ``allowed_tools`` only controls auto-approval — the SDK CLI's subprocess
+    # transport reads ``if effective_allowed_tools:`` and omits ``--allowedTools``
+    # entirely when the list is empty, leaving the CLI's full default toolset
+    # available. Only ``tools`` controls which built-in tools exist at all
+    # (``[]`` disables all of them). Both fields are always set to the same
+    # resolved list here, so a "no tools" request (`allowed_tools=[]`) really
+    # disables tool availability instead of merely withholding auto-approval,
+    # and no configuration path can end up with an implicit toolset
+    # (ticket-044 merge-gate review, finding 1).
     effective_tools = allowed_tools if allowed_tools is not None else _ALLOWED_TOOLS
 
     # `tools` étant explicite, l'option `skills` du SDK ne suffit pas à rendre
@@ -167,13 +168,9 @@ def _build_options(
     if skills and any(s.startswith("tessera:") for s in skills):
         plugins = [{"type": "local", "path": str(_TESSERA_PLUGIN_PATH)}]
 
-    # L'outil `ask_user` n'existe que si un canal de dialogue est branché sur
-    # ce run (ticket-066). Le donner sans canal reviendrait à promettre à
-    # l'agent une réponse que personne ne pourrait lui apporter.
-    mcp_servers: dict[str, Any] = {}
-    if ask_user is not None:
-        mcp_servers[ASK_USER_SERVER_NAME] = build_ask_user_server(ask_user)
-        effective_tools = [*effective_tools, ASK_USER_TOOL_NAME]
+    # `ask_user` : canal de dialogue branché (066) ; `signaler` : rôle outillé, `[]` non (863).
+    mcp_servers, noms_mcp = serveur_tessera(ask_user, signaler, outille=allowed_tools != [])
+    effective_tools = [*effective_tools, *noms_mcp]
 
     env = env_du_sous_processus(git_bash_path)
 
@@ -286,6 +283,7 @@ class ClaudeAgentSDKProvider:
         max_tokens: int,
         cwd: Path | None = None,
         ask_user: Callable[[str], Awaitable[str]] | None = None,
+        signaler: ContexteSignal | None = None,
         session: str | None = None,
         schema: dict[str, Any] | None = None,
     ) -> ProviderResult:
@@ -294,7 +292,7 @@ class ClaudeAgentSDKProvider:
         # Voir LLMProvider.complete pour la portée exacte de cette limitation.
         return await self._run_ou_reprendre(
             system=system, user=user, model=model, cwd=cwd, ask_user=ask_user,
-            session=session, schema=schema,
+            signaler=signaler, session=session, schema=schema,
         )
 
     async def stream(
@@ -308,6 +306,7 @@ class ClaudeAgentSDKProvider:
         on_token: StreamCallback | None = None,
         on_tool_use: ToolEventCallback | None = None,
         ask_user: Callable[[str], Awaitable[str]] | None = None,
+        signaler: ContexteSignal | None = None,
         session: str | None = None,
         schema: dict[str, Any] | None = None,
     ) -> ProviderResult:
@@ -315,7 +314,7 @@ class ClaudeAgentSDKProvider:
         return await self._run_ou_reprendre(
             system=system, user=user, model=model, cwd=cwd,
             on_token=on_token, on_tool_use=on_tool_use, ask_user=ask_user,
-            session=session, schema=schema,
+            signaler=signaler, session=session, schema=schema,
         )
 
     async def _run_ou_reprendre(
@@ -363,13 +362,14 @@ class ClaudeAgentSDKProvider:
         on_token: StreamCallback | None = None,
         on_tool_use: ToolEventCallback | None = None,
         ask_user: Callable[[str], Awaitable[str]] | None = None,
+        signaler: ContexteSignal | None = None,
         resume: str | None = None,
         schema: dict[str, Any] | None = None,
     ) -> ProviderResult:
         options = _build_options(
             system=system, model=model, max_turns=self._max_turns,
             max_budget_usd=self._max_budget_usd, cwd=cwd,
-            allowed_tools=self._allowed_tools, ask_user=ask_user,
+            allowed_tools=self._allowed_tools, ask_user=ask_user, signaler=signaler,
             racine_ecriture=self.racine_ecriture, resume=resume,
             skills=self._skills, git_bash_path=self._git_bash_path,
             journal_refus=self._journal_refus, effort=self._effort,

@@ -13,6 +13,7 @@ from tessera.models.ticket import TicketStatus, TicketType
 from tessera.services.git_workspace import GitWorkspaceError
 from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.pipeline.pipeline_run import PipelineRun, set_status
+from tessera.services.pipeline.signaler_du_run import signaler_for
 from tessera.services.projets.artifact_snapshot import diff_artifacts, snapshot_artifacts
 from tessera.services.providers.refus_garde import refus_du_tour
 from tessera.utils.logger import get_logger
@@ -167,6 +168,8 @@ async def run_coder(orch: "Orchestrator", run: PipelineRun, context: str) -> Non
     # runner exactement comme avant ce ticket.
     asker = asker_for(run)
     extra: dict[str, Any] = {"ask_user": asker} if asker is not None else {}
+    if (signaler := signaler_for(orch, run)) is not None:
+        extra["signaler"] = signaler
 
     # Au tour suivant, le codeur reprend sa conversation et ne reçoit que ce
     # que le tour ajoute : le ticket, les ADR et le dépôt, il les a déjà lus
