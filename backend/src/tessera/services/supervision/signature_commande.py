@@ -12,7 +12,7 @@ La signature ne prouve pas l'appartenance au projet ; elle ne sert que combinée
 import os
 import re
 
-from tessera.services.sonde_systeme import InfoProcessus
+from tessera.services.supervision.sonde_systeme import InfoProcessus
 
 _MODULE = re.compile(r"""(?:^|\s)-m\s+([A-Za-z_][\w.]*(?:\s+[^\s\-][^\s]*)*)""")
 _SCRIPT = re.compile(r"""(?:^|[\s"'])([^\s"']+\.py)(?=$|[\s"'])""")

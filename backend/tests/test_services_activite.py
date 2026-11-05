@@ -17,7 +17,7 @@ from tessera.config import settings
 from tessera.main import app
 from tessera.routers.services_running import get_sonde
 from tessera.services.database import init_db
-from tessera.services.sonde_systeme import InfoProcessus
+from tessera.services.supervision.sonde_systeme import InfoProcessus
 
 
 @dataclass

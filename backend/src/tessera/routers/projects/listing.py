@@ -17,7 +17,7 @@ from tessera.services.project_loader import (
     load_agents_config,
     load_services_config,
 )
-from tessera.services.project_overview import ProjectOverview, build_overview, find_icon
+from tessera.services.supervision.project_overview import ProjectOverview, build_overview, find_icon
 from tessera.services.run_registry import RUN_REGISTRY
 
 router = new_router()

@@ -10,7 +10,7 @@ import os
 import re
 from pathlib import Path
 
-from tessera.services.sonde_systeme import InfoProcessus
+from tessera.services.supervision.sonde_systeme import InfoProcessus
 
 #: Un chemin ne se prolonge pas par ces caractères : `projets/ide` ne doit pas
 #: reconnaître `projets/ide-core`.

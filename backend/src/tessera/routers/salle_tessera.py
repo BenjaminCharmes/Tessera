@@ -7,8 +7,8 @@ from tessera.routers.services_running import get_sonde
 from tessera.services.ci_watcher import CI_WATCHER
 from tessera.services.providers.ollama import secondes_de_refroidissement
 from tessera.services.run_registry import RUN_REGISTRY
-from tessera.services.salle_tessera import ci_en_attente, salle_tessera
-from tessera.services.sonde_systeme import SondeSysteme
+from tessera.services.supervision.salle_tessera import ci_en_attente, salle_tessera
+from tessera.services.supervision.sonde_systeme import SondeSysteme
 
 router = APIRouter(prefix="/tessera", tags=["tessera"])
 

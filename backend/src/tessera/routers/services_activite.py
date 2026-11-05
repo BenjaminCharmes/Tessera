@@ -12,10 +12,10 @@ from fastapi import APIRouter, Depends
 from tessera.config import settings
 from tessera.models.activite import ActiviteDeService
 from tessera.routers.services_running import get_sonde
-from tessera.services.activite_produit import lire_activite
-from tessera.services.declarations_activite import services_avec_activite
-from tessera.services.inventaire_apps import inventaire
-from tessera.services.sonde_systeme import SondeSysteme
+from tessera.services.supervision.activite_produit import lire_activite
+from tessera.services.supervision.declarations_activite import services_avec_activite
+from tessera.services.supervision.inventaire_apps import inventaire
+from tessera.services.supervision.sonde_systeme import SondeSysteme
 
 router = APIRouter(prefix="/services", tags=["services"])
 

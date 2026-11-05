@@ -16,7 +16,7 @@ from tessera.main import app
 from tessera.services.database import init_db
 from tessera.routers.services_running import get_sonde
 from tessera.services.providers import ollama
-from tessera.services.salle_tessera import (
+from tessera.services.supervision.salle_tessera import (
     PORT_DU_FRONTEND,
     ci_en_attente,
     fin_du_journal,
@@ -27,7 +27,7 @@ from tessera.services.salle_tessera import (
     salle_tessera,
     taille_mo,
 )
-from tessera.services.sonde_systeme import InfoProcessus
+from tessera.services.supervision.sonde_systeme import InfoProcessus
 
 
 @dataclass

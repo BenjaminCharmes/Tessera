@@ -4,7 +4,7 @@ Un service lance souvent des enfants (rechargeur, `npm` puis `node`) : sa
 mémoire est celle de tout l'arbre, et un processus déjà compté dans un arbre
 ne l'est pas une seconde fois.
 """
-from tessera.services.sonde_systeme import InfoProcessus
+from tessera.services.supervision.sonde_systeme import InfoProcessus
 
 Enfants = dict[int, list[int]]
 

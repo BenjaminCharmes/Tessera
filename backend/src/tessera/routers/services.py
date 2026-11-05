@@ -11,8 +11,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from tessera.config import settings
 from tessera.routers.services_running import get_sonde
 from tessera.services.event_hub import EVENT_HUB
-from tessera.services.inventaire_apps import inventaire
-from tessera.services.sonde_systeme import SondeSysteme
+from tessera.services.supervision.inventaire_apps import inventaire
+from tessera.services.supervision.sonde_systeme import SondeSysteme
 from tessera.services.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.process_registry import (
     PROCESS_REGISTRY,

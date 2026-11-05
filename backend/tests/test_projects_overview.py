@@ -12,7 +12,7 @@ from fastapi.testclient import TestClient
 
 from tessera.config import settings
 from tessera.main import app
-from tessera.services.project_overview import clear_overview_cache
+from tessera.services.supervision.project_overview import clear_overview_cache
 from tessera.services.run_registry import RUN_REGISTRY
 
 _BASE = "/api/v1/projects"
@@ -228,7 +228,7 @@ def test_tessera_icon_wins_and_next_and_root_favicons_are_found(plain_workspace:
     """Ticket-404: `.tessera/icon.svg` (projects without a web app) comes first;
     a Next.js `src/app/icon.svg`, a root `favicon.svg` (static games) and a
     `frontend/public/logo.svg` are found too."""
-    from tessera.services.project_overview import find_icon
+    from tessera.services.supervision.project_overview import find_icon
 
     svg = "<svg xmlns='http://www.w3.org/2000/svg'/>"
     profil = _project(plain_workspace, "profil")
@@ -255,7 +255,7 @@ def test_tessera_icon_wins_and_next_and_root_favicons_are_found(plain_workspace:
 def test_ancestor_project_uses_the_repository_icon(repo_workspace: Path) -> None:
     """Ticket-404: a `git_root: ancestor` project (ide-core) shows the icon of
     the repository that contains it — the IDE's own; a plain project does not."""
-    from tessera.services.project_overview import find_icon
+    from tessera.services.supervision.project_overview import find_icon
 
     public = repo_workspace / "frontend" / "public"
     public.mkdir(parents=True)

@@ -2,7 +2,7 @@
 id: ticket-828
 title: "The supervision modules move to services/supervision"
 type: refactor
-status: todo
+status: done
 pr_number: null
 priority: low
 agent: codeur
@@ -30,12 +30,12 @@ déplacement : c'est le domaine que le moins de fichiers importent, il éprouve 
 
 ## Critères d'acceptation
 
-- [ ] Les quatorze modules de la section `supervision` sont sous `services/supervision/`, aucun
+- [x] Les quatorze modules de la section `supervision` sont sous `services/supervision/`, aucun
       n'est resté à plat
-- [ ] `A_DEPLACER` n'a plus d'entrée `supervision`, `ECARTS_DOMAINES` n'a grandi d'aucune ligne
-- [ ] Aucune occurrence des anciens chemins pointés (`tessera.services.<module>`) ne reste dans
+- [x] `A_DEPLACER` n'a plus d'entrée `supervision`, `ECARTS_DOMAINES` n'a grandi d'aucune ligne
+- [x] Aucune occurrence des anciens chemins pointés (`tessera.services.<module>`) ne reste dans
       `backend/src`, `backend/tests`, `scripts/`, `Makefile`
-- [ ] Le diff n'est que des renommages et des lignes d'import ou de chaîne ; la suite passe
+- [x] Le diff n'est que des renommages et des lignes d'import ou de chaîne ; la suite passe
 
 ## Ce que ça ne fait pas
 
@@ -45,3 +45,7 @@ Aucun changement de comportement. Les autres domaines ne bougent pas.
 
 Une chaîne de `monkeypatch` non réécrite ne casse pas à l'import : la rechercher par
 `grep "tessera.services.<module>"` après le script, pour chaque module déplacé.
+
+## Notes de réalisation
+
+Le domaine compte onze modules, pas quatorze : `scripts/domaines_services.py` fait foi (trois modules reclassés au ticket-826). Les anciens chemins cités dans `docs/audit/`, `docs/superpowers/specs/` et les tickets terminés restent tels quels : ils datent l'état décrit.

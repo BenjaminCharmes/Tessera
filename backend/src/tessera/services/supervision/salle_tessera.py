@@ -25,8 +25,8 @@ from tessera.models.salle_tessera import (
     RunVivant,
     SalleTessera,
 )
-from tessera.services.arbre_de_processus import arbre, enfants_par_parent, memoire_mo
-from tessera.services.sonde_systeme import InfoProcessus, SondeSysteme
+from tessera.services.supervision.arbre_de_processus import arbre, enfants_par_parent, memoire_mo
+from tessera.services.supervision.sonde_systeme import InfoProcessus, SondeSysteme
 
 #: Le port du Vite qui sert le frontend (`frontend/vite.config.ts`, `devUrl` de Tauri).
 PORT_DU_FRONTEND = 5173

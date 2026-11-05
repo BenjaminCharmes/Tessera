@@ -8,10 +8,10 @@ signature seule prendrait celui de l'un pour celui de l'autre.
 """
 from pathlib import Path
 
-from tessera.services.attribution_processus import appartient_au_projet
+from tessera.services.supervision.attribution_processus import appartient_au_projet
 from tessera.services.project_loader import load_services_config
-from tessera.services.signature_commande import commande_porte, signature
-from tessera.services.sonde_systeme import InfoProcessus
+from tessera.services.supervision.signature_commande import commande_porte, signature
+from tessera.services.supervision.sonde_systeme import InfoProcessus
 
 
 def _signatures(racine: Path) -> list[tuple[str, str]]:

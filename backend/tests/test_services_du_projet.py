@@ -25,7 +25,7 @@ from tessera.main import app
 from tessera.routers.services_running import get_sonde
 from tessera.services.database import init_db
 from tessera.services.process_registry import PROCESS_REGISTRY
-from tessera.services.sonde_systeme import InfoProcessus
+from tessera.services.supervision.sonde_systeme import InfoProcessus
 
 #: Un « service » qui vit assez longtemps pour être observé puis arrêté, sans
 #: dépendre de rien d'installé sur la machine de test.

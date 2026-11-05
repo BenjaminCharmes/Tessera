@@ -253,16 +253,4 @@ A_DEPLACER: dict[str, str] = {
     "pipeline_file_reprise": "file",
     "pipeline_file_tour": "file",
     "planner": "file",
-    # supervision
-    "activite_produit": "supervision",
-    "arbre_de_processus": "supervision",
-    "attribution_processus": "supervision",
-    "declarations_activite": "supervision",
-    "inventaire_apps": "supervision",
-    "ports_declares": "supervision",
-    "project_overview": "supervision",
-    "salle_tessera": "supervision",
-    "services_sans_port": "supervision",
-    "signature_commande": "supervision",
-    "sonde_systeme": "supervision",
 }
