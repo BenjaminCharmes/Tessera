@@ -94,6 +94,9 @@ section. (ADR-055)
 - **Un worktree qui porte du travail non commité ne se supprime pas.** Au
   démarrage, un worktree orphelin se commite comme un run non approuvé, puis
   se supprime. (ADR-056, ADR-037)
+- **Le détecteur d'anomalies observe sans gouverner** : sans LLM, `git` ni
+  `gh`, il n'arrête, ne relance ni ne modifie aucun run et n'écrit dans aucun
+  dépôt ; son échec n'atteint jamais un run. (ADR-078, ADR-037)
 - **Un projet ne porte qu'un run à la fois.** `RunLock` refuse le second
   et renvoie 409. Deux projets distincts tournent en parallèle. (ADR-038)
 - **L'audit sécurité et le validateur échouent fermés.** Provider
@@ -103,17 +106,15 @@ section. (ADR-055)
 - **En mode autonome, vérifier dépense estimée et quota réel entre deux
   tickets.** Un quota inconnu ne bloque jamais. Ne jamais interrompre au
   milieu d'un ticket. (ADR-020)
-- **Une question sans réponse reprend sur une hypothèse énoncée.** Passé
-  `dialogue_timeout_s`, l'agent choisit et énonce son hypothèse. En mode
-  autonome, le délai ne démarre pas. (ADR-025)
+- **Une question sans réponse reprend, passé `dialogue_timeout_s`, sur une
+  hypothèse énoncée** ; en mode autonome, le délai ne démarre pas. (ADR-025)
 
 ## Artefacts et projets
 
 - **Les artefacts Tessera s'excluent via `.git/info/exclude`, jamais via
   `.gitignore`.** (ADR-021)
-- **Les artefacts d'un projet cloné ou importé restent `local` par
-  défaut ; ceux d'un projet créé par l'IDE sont versionnés.** Le mode suit
-  la façon dont le projet est arrivé ; un autre se déclare explicitement.
+- **Les artefacts d'un projet cloné ou importé restent `local` par défaut,
+  ceux d'un projet créé par l'IDE sont versionnés** ; un autre mode se déclare.
   (ADR-023)
 - **Les services d'un projet se déclarent dans `agents.json`
   (`services: [{nom, commande}]`).** Rien de déclaré : pas de bouton de

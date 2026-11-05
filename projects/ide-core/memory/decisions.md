@@ -717,7 +717,27 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 
 **Date** : 2026-11-05
 **Portée** : architect, codeur
-**Décision** : aucun outil externe n'est suivi en direct : rien ne s'installe pour se mettre à jour seul. Par défaut on réécrit les idées (`idées réécrites`). Une `copie épinglée` (texte repris tel quel, commit précis, attribution) exige un outil de pur texte, sous licence libre compatible, sans binaire, réseau, télémétrie ni hook, qui tient dans le budget de contexte du rôle qui le charge. Toute reprise s'inscrit dans `docs/inspirations.md`. Une nouvelle version d'un outil inscrit ouvre un ticket « relire l'écart et reporter ce qui vaut », jamais une mise à jour automatique.
+**Décision** : aucun outil externe n'est suivi en direct : rien ne s'installe pour se mettre à jour seul. Par défaut on réécrit les idées (`idées réécrites`). Une `copie épinglée` (texte repris tel quel, commit précis, attribution) exige un outil de pur texte, sous licence libre compatible, sans binaire, réseau, télémétrie ni hook, qui tient dans le budget de contexte du rôle. Toute reprise s'inscrit dans `docs/inspirations.md`. Une nouvelle version d'un outil inscrit ouvre un ticket « relire l'écart et reporter ce qui vaut », jamais une mise à jour automatique.
 **Raison** : un skill est un texte que le modèle exécute ; un changement en amont modifierait les agents sans revue (ADR-055).
 **Alternative rejetée** : laisser les outils se mettre à jour, ou ne rien noter (ticket-715).
 **Détail** : ticket-790.
+
+---
+
+## ADR-078 — Un détecteur d'anomalies observe les runs sans les arrêter
+
+**Date** : 2026-11-05
+**Décision** : une tâche de fond du backend relit toutes les 5 min, en lecture seule, chaque run vivant. Six règles : outil répété 4 fois, étape ou coût au-delà de 3 × la médiane du projet, 15 min sans événement, dernier tour de revue, deux blocages de même cause. Chaque anomalie se signale une fois, en `run_anomaly` : cloche, Bureau, salle Tessera, historique, log. Elle n'arrête, ne relance ni ne modifie aucun run.
+**Raison** : le 03/11, testeur figé de 19 h à 7 h 48, trois tours perdus sur des doubles de test, deux livraisons coupées par le réseau : seul un humain l'a vu ; « figé ? » ignore les étapes silencieuses.
+**Alternative rejetée** : couper au seuil — un faux positif perd un travail payé (ADR-037).
+**Détail** : spec 2026-11-05-detecteur-d-anomalies-design.md, tickets 794 à 833.
+
+---
+
+## ADR-079 — Une seconde revue par un autre modèle se mesure hors du produit
+
+**Date** : 2026-11-05
+**Décision** : un script de `scripts/` rejoue le reviewer actuel et un candidat (Ollama) sur un corpus figé d'avance : diffs corrigés après approbation, diffs sains. Même entrée, sans outils. Règle : ≥ 3 défauts et ≤ 2 faux positifs en plus, adopter ; sinon ≥ 2 défauts en plus sur les diffs de garde, les y réserver ; sinon abandonner. Rejeu qui retrouve moins de 80 % des verdicts d'origine : non concluant. Rien n'entre dans `backend/src`, `agents.json` ni le pipeline avant la conclusion ; l'adoption est une autre ADR.
+**Raison** : sur une vingtaine de diffs, un défaut de plus n'est qu'un bruit, sauf corpus et règle figés d'avance.
+**Alternative rejetée** : brancher un second reviewer au pipeline — il bloquerait de vrais tickets.
+**Détail** : spec `2026-11-05-seconde-revue-design.md`.

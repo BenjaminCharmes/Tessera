@@ -1,14 +1,14 @@
 ---
-id: ticket-774
-title: "Design an anomaly detector that watches runs without stopping them"
-type: design
-status: todo
-pr_number: null
-priority: medium
 agent: architect
+created: 2026-11-03
 depends_on: []
 estimated_days: 1
-created: 2026-11-03
+id: ticket-774
+pr_number: null
+priority: medium
+status: done
+title: Design an anomaly detector that watches runs without stopping them
+type: design
 ---
 
 # ticket-774 — Concevoir un détecteur d'anomalies qui observe les runs sans les arrêter
