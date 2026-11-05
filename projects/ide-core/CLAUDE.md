@@ -49,6 +49,7 @@ Identique à la stack globale. Dossier cible : `../../backend/` et `../../fronte
 - `architect` — tient l'étape de production sur les tickets de type `design`
 - `securite` — audite le diff de chaque run avant la revue
 - `validateur` — juge chaque critère d'acceptation du ticket
+- `lecons` — propose une leçon après un run approuvé qui a corrigé un échec (ADR-074)
 - `doc-technique` — documentation technique, par lot (ADR-035)
 - `doc-fonctionnelle` — guide utilisateur, par lot (ADR-035)
 - `project-analyzer` — génère le CLAUDE.md d'un projet importé

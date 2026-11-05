@@ -90,6 +90,14 @@
         "provider": "agent_sdk",
         "model": "claude-sonnet-5-5"
       }
+    },
+    {
+      "role": "lecons",
+      "model": "claude-haiku-4-5",
+      "max_tokens": 2048,
+      "prompt_file": "agents/prompts/lecons.md",
+      "active": true,
+      "provider": "agent_sdk"
     }
   ],
   "pipeline": {
@@ -104,7 +112,8 @@
     "test_timeout_s": 1500,
     "securite_enabled": true,
     "validateur_enabled": true,
-    "doc_claude_md": true
+    "doc_claude_md": true,
+    "lecons": true
   },
   "autonomy": "merge",
   "github_remote": "BenjaminCharmes/Tessera"
