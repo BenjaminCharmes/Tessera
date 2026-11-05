@@ -111,6 +111,18 @@ async def test_cache_creation_tokens_column_is_added_with_zero(tmp_path: Path) -
     assert lignes == [("r", 10, 0)]
 
 
+async def test_migration_11_creates_the_reglages_table(tmp_path: Path) -> None:
+    db = tmp_path / "tessera.db"
+
+    await init_db(db)
+
+    colonnes = [
+        r[1] for r in sqlite3.connect(str(db)).execute("PRAGMA table_info(reglages)")
+    ]
+    assert colonnes == ["nom", "valeur", "modifie_le"]
+    assert version_du_schema() == 11
+
+
 async def test_le_schema_de_base_ne_bouge_plus(tmp_path: Path) -> None:
     # `_CREATE_TABLES` décrit le schéma **d'origine**. Toute évolution passe
     # par une migration : le modifier ferait diverger une base neuve d'une

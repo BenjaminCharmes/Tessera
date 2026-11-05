@@ -1,14 +1,14 @@
 ---
-id: ticket-805
-title: "A reglages module stores five overridable settings in SQLite"
-type: feat
-status: todo
-pr_number: null
-priority: low
 agent: codeur
+created: 2026-11-05
 depends_on: []
 estimated_days: 1
-created: 2026-11-05
+id: ticket-805
+pr_number: 924
+priority: low
+status: done
+title: A reglages module stores five overridable settings in SQLite
+type: feat
 ---
 
 # ticket-805 — Un module `reglages` range cinq réglages modifiables dans SQLite
