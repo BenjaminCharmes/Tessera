@@ -7708,3 +7708,5 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-05 10:58:45 UTC — [ticket-775] validateur: fichiers cités joints : projects/ide-core/memory/decisions.md (tronqué) ; non joints (budget épuisé) : projects/ide-core/tickets/todo/
 - 2026-11-05 10:58:45 UTC — [ticket-775] validateur: APPROVED — Le design ADR-074 est complet et couvre rigoureusement l'architecture d'une mémo (27608ms)
 - 2026-11-05 10:58:45 UTC — [ticket-775] APPROVED après 1 tour(s)
+- 2026-11-05 10:58:53 UTC — [ticket-775] fichiers non suivis laissés par le run : tickets/todo/ticket-801-a-lessons-module-parses-and-checks-the-project-lessons-file.md, tickets/todo/ticket-802-the-in-force-lessons-reach-the-coder-and-the-reviewer-only.md, tickets/todo/ticket-803-an-approved-run-that-had-a-corrected-failure-proposes-one-lesson.md, tickets/todo/ticket-804-a-run-diff-that-touches-the-lessons-file-blocks-the-run.md (à ignorer dans .gitignore ?)
+- 2026-11-05 11:02:18 UTC — [ticket-775] documentation: 1 fichier(s) (204875ms)
