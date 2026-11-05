@@ -294,7 +294,10 @@ _SOURCES = "backend/src/"
 _TESTS = "backend/tests/"
 
 #: Tests qui jugent tout le dépôt : toujours lancés en mode impact (ticket-793).
+#: Le scan des traces professionnelles en est : le ticket-849 l'a passé chez le
+#: testeur et l'a raté en CI, sur une adresse d'exemple.
 TESTS_GLOBAUX = (
+    "tests/test_aucune_trace_professionnelle.py",
     "tests/test_longueur_des_fichiers.py",
     "tests/test_consignes_coherentes.py",
     "tests/test_contrat_des_routes.py",

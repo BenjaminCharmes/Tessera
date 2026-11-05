@@ -111,3 +111,8 @@ def test_the_last_impact_option_wins() -> None:
          patch("verifier.run_parallel", return_value=0):
         assert main(["--impact", "base", "--impact", "abc123"]) == 0
     assert "backend/src/tessera/y.py" in choix.call_args.args[0]
+
+
+def test_professional_trace_scan_is_a_global_test() -> None:
+    """The scan of every tracked file runs in impact mode too: ticket-849 passed its tester and failed the CI on it."""
+    assert "tests/test_aucune_trace_professionnelle.py" in TESTS_GLOBAUX
