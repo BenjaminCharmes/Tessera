@@ -2,7 +2,7 @@
 id: ticket-838
 title: "Two consecutive blocks with the same cause are reported"
 type: feat
-status: todo
+status: done
 pr_number: null
 priority: medium
 agent: codeur
@@ -41,18 +41,18 @@ chemin ou un identifiant : c'est ce que la signature efface.
 
 ## Critères d'acceptation
 
-- [ ] `test_signature_d_arret_ignores_numbers_hashes_paths_and_quoted_strings`
-- [ ] `test_signature_d_arret_keeps_different_words_apart`
-- [ ] `test_signature_d_arret_empty_or_blank_is_none`
-- [ ] `test_signature_d_arret_cuts_at_120_chars` : deux causes identiques sur 120 caractères et
+- [x] `test_signature_d_arret_ignores_numbers_hashes_paths_and_quoted_strings`
+- [x] `test_signature_d_arret_keeps_different_words_apart`
+- [x] `test_signature_d_arret_empty_or_blank_is_none`
+- [x] `test_signature_d_arret_cuts_at_120_chars` : deux causes identiques sur 120 caractères et
       différentes au 121e ont la même signature ; différentes au 120e, des signatures différentes
-- [ ] `test_blocages_identiques_two_blocked_with_the_same_cause_reports`
-- [ ] `test_blocages_identiques_one_run_only_is_none`
-- [ ] `test_blocages_identiques_a_different_cause_is_none`
-- [ ] `test_blocages_identiques_an_approved_run_in_between_is_none`
-- [ ] `test_blocages_identiques_only_the_two_latest_runs_count` (trois runs, le plus ancien
+- [x] `test_blocages_identiques_two_blocked_with_the_same_cause_reports`
+- [x] `test_blocages_identiques_one_run_only_is_none`
+- [x] `test_blocages_identiques_a_different_cause_is_none`
+- [x] `test_blocages_identiques_an_approved_run_in_between_is_none`
+- [x] `test_blocages_identiques_only_the_two_latest_runs_count` (trois runs, le plus ancien
       d'une autre cause : signalé)
-- [ ] `test_derniers_runs_finis_excludes_envelopes_and_the_open_row`
+- [x] `test_derniers_runs_finis_excludes_envelopes_and_the_open_row`
 
 ## Ce que ça ne fait pas
 

@@ -9,7 +9,7 @@ from typing import Any
 
 from tessera.services.anomalies.etapes import etapes_depuis, types_de_l_etape
 from tessera.services.anomalies.lecture_base import ouvrir_en_lecture
-from tessera.services.anomalies.modeles import EvenementLu, LigneOuverte
+from tessera.services.anomalies.modeles import EvenementLu, LigneOuverte, RunFini
 
 #: Lignes lues par type d'événement : de quoi couvrir 20 étapes, sans la table entière.
 BORNE_PAR_TYPE = 200
@@ -97,3 +97,20 @@ async def cout_du_ticket(db_path: Path | str, run_row_id: str) -> float:
         ) as curseur:
             ligne = await curseur.fetchone()
     return float(ligne[0]) if ligne else 0.0
+
+
+async def derniers_runs_finis(
+    db_path: Path | str, project_id: str, ticket_id: str, n: int = 2
+) -> list[RunFini]:
+    """The `n` latest finished `single` runs of the ticket, newest first.
+
+    Les enveloppes de file et la ligne encore ouverte n'en font pas partie.
+    """
+    requete = f"""
+        SELECT r.id, r.ticket_id, r.final_status, r.arret FROM pipeline_runs r
+        WHERE r.project_id = ? AND r.ticket_id = ? AND {_SINGLE} AND r.finished_at IS NOT NULL
+        ORDER BY r.started_at DESC, r.rowid DESC LIMIT ?
+    """  # noqa: S608
+    async with ouvrir_en_lecture(db_path) as db:
+        async with db.execute(requete, (project_id, ticket_id, n)) as curseur:
+            return [RunFini(*ligne) for ligne in await curseur.fetchall()]

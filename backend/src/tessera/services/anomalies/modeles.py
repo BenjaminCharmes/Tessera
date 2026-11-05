@@ -83,3 +83,13 @@ class LigneOuverte:
     id: str
     ticket_id: str
     started_at: str
+
+
+@dataclass(frozen=True)
+class RunFini:
+    """A finished `single` row of `pipeline_runs`, reduced to what the blocks rule compares."""
+
+    id: str
+    ticket_id: str
+    final_status: str | None
+    arret: str | None

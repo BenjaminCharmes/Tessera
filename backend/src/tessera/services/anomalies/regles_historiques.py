@@ -2,11 +2,12 @@
 
 Pures : l'historique (médianes, derniers runs) est lu par l'appelant.
 """
+import re
 from collections.abc import Sequence
 from datetime import datetime
 from statistics import median
 
-from tessera.services.anomalies.modeles import Anomalie, Etape
+from tessera.services.anomalies.modeles import Anomalie, Etape, RunFini
 
 
 def mediane_si_assez(echantillon: Sequence[float], minimum: int = 10) -> float | None:
@@ -137,3 +138,55 @@ def cout_anormal(
     if constat is not None or cumul_usd is None or budget_usd is None:
         return constat
     return cout_budget(cumul_usd, budget_usd, ticket_id=ticket_id, run_id=run_id, part=part)
+
+
+# Une cause se dit toujours pareil ; seuls varient un nombre, un chemin, un
+# identifiant ou un nom entre guillemets. La signature efface ce qui varie.
+# L'apostrophe n'ouvre une citation qu'en début de mot : « d'un » reste un mot.
+_CITATION = re.compile(r"(?<!\w)'[^']*'(?!\w)|\"[^\"]*\"|«[^»]*»|‘[^’]*’|“[^”]*”")
+_URL = re.compile(r"https?://\S+")
+_CHEMIN = re.compile(r"(?<!\w)[a-z]:[\\/]\S*|(?<!\w)(?:/[\w.\-]+){2,}")
+_HEXA = re.compile(r"\b(?=[0-9a-f]*\d)[0-9a-f]{7,40}\b")
+_NOMBRE = re.compile(r"\d+(?:[.,]\d+)?")
+SIGNATURE_MAX = 120
+
+
+def signature_d_arret(arret: str | None) -> str | None:
+    """The comparable form of a block cause: its first line with the variable parts erased.
+
+    Minuscules ; chaînes entre guillemets, URL, chemins, hexadécimaux et nombres
+    remplacés par un marqueur ; coupée à 120 caractères. `None` si `arret` est vide.
+    """
+    if arret is None or not arret.strip():
+        return None
+    ligne = arret.strip().splitlines()[0].lower()
+    for motif, marqueur in (
+        (_CITATION, "<texte>"), (_URL, "<url>"), (_CHEMIN, "<chemin>"),
+        (_HEXA, "<hexa>"), (_NOMBRE, "<n>"),
+    ):
+        ligne = motif.sub(marqueur, ligne)
+    return " ".join(ligne.split())[:SIGNATURE_MAX]
+
+
+def blocages_identiques(derniers: Sequence[RunFini]) -> Anomalie | None:
+    """The two latest finished runs of the ticket are blocked for the same cause.
+
+    `derniers` va du plus récent au plus ancien ; seuls les deux premiers comptent.
+    """
+    if len(derniers) < 2:
+        return None
+    recent, precedent = derniers[0], derniers[1]
+    if recent.final_status != "blocked" or precedent.final_status != "blocked":
+        return None
+    signature = signature_d_arret(recent.arret)
+    if signature is None or signature != signature_d_arret(precedent.arret):
+        return None
+    return Anomalie(
+        regle="blocages_identiques",
+        cle=f"blocages:{recent.id}",
+        ticket_id=recent.ticket_id,
+        message="Les deux derniers runs de ce ticket se sont bloqués pour la même cause.",
+        mesure=2.0,
+        seuil=2.0,
+        unite="runs",
+    )
