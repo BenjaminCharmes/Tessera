@@ -6,7 +6,7 @@ estimated_days: 1
 id: ticket-804
 pr_number: null
 priority: medium
-status: todo
+status: done
 title: A run diff that touches the lessons file blocks the run
 type: feat
 ---
@@ -42,14 +42,14 @@ proposition appartient au service (ticket-803), qui écrit après ce contrôle.
 
 ## Critères d'acceptation
 
-- [ ] `backend/tests/test_lecons_gardees.py` : un diff qui ajoute une ligne sous
+- [x] `backend/tests/test_lecons_gardees.py` : un diff qui ajoute une ligne sous
       `## En vigueur` → `blocked`, raison `lessons_file_modified`, commit « unapproved »
-- [ ] Même test pour une ligne ajoutée sous `## Proposées` au tour du codeur, et pour une
+- [x] Même test pour une ligne ajoutée sous `## Proposées` au tour du codeur, et pour une
       suppression de ligne
-- [ ] Un diff qui ne touche pas `lecons.md` → `None`, le run continue
-- [ ] Une leçon ajoutée par le service après la fin du tour du codeur (ticket-803) ne
+- [x] Un diff qui ne touche pas `lecons.md` → `None`, le run continue
+- [x] Une leçon ajoutée par le service après la fin du tour du codeur (ticket-803) ne
       déclenche pas l'arrêt : un test fixe l'ordre des deux étapes
-- [ ] Le contrôle de `contraintes.md` garde ses tests inchangés
+- [x] Le contrôle de `contraintes.md` garde ses tests inchangés
 
 ## Ce que ça ne fait pas
 
