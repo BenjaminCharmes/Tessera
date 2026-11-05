@@ -42,9 +42,14 @@ from tessera.services.reprise_surveillance import reprendre_surveillances
 from tessera.services.surveillance_run import surveillance_de_reprise
 from tessera.services.signalements_en_attente import migrer_ancien_fichier
 from tessera.services.prompt_loader import MissingPromptError
+from tessera.utils.access_log_redaction import install_token_redaction
 from tessera.utils.logger import configure_file_logging, get_logger, install_asyncio_exception_handler
 
 _logger = get_logger(__name__)
+
+# Le jeton d'une WebSocket voyage en query string : il ne doit pas finir dans
+# le journal d'accès d'uvicorn (ticket-758).
+install_token_redaction()
 
 # Résolution unique au démarrage : la variable d'environnement ne change pas
 # en cours d'exécution. Sous Windows, un bash.exe introuvable loge un

@@ -1,5 +1,6 @@
 """Tests pour GitCloneService (ticket-030)."""
 import asyncio
+import inspect
 import json
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
@@ -7,10 +8,10 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 
 from tessera.models.project import AnalysisResult
+from tessera.services import git_clone, git_link
 from tessera.services.git_clone import (
     CloneError,
     GitCloneService,
-    _build_clone_url,
     _repo_name,
     _sanitize_id,
 )
@@ -69,16 +70,29 @@ def test_repo_name_extracts_last_segment() -> None:
     assert _repo_name("https://github.com/owner/my-repo/") == "my-repo"
 
 
-def test_build_clone_url_without_token() -> None:
-    url = "https://github.com/owner/repo"
-    assert _build_clone_url(url, None) == url
+def test_clone_never_writes_a_token_into_the_remote_url(tmp_path: Path) -> None:
+    assert "github_token" not in inspect.signature(GitCloneService.clone).parameters
+    assert not hasattr(git_clone, "_build_clone_url")
+
+    urls: list[str] = []
+
+    async def _spy(url: str, dest: Path) -> None:
+        urls.append(url)
+        dest.mkdir(parents=True)
+
+    svc = GitCloneService(_make_workspace(tmp_path), _make_analyzer_mock())
+    with patch.object(svc, "_run_clone", new=AsyncMock(side_effect=_spy)):
+        asyncio.run(svc.clone("https://github.com/owner/my-repo"))
+
+    assert urls == ["https://github.com/owner/my-repo"]
 
 
-def test_build_clone_url_with_token() -> None:
-    url = "https://github.com/owner/repo"
-    result = _build_clone_url(url, "mytoken123")
-    assert result == "https://mytoken123@github.com/owner/repo"
-    assert "github.com/owner/repo" in result
+def test_clone_url_with_a_trailing_newline_is_refused() -> None:
+    assert git_clone._GITHUB_URL_RE.match("https://github.com/owner/repo")
+    assert not git_clone._GITHUB_URL_RE.match("https://github.com/owner/repo\n")
+    assert git_link._REPO_URL.match("https://github.com/owner/repo.git")
+    assert not git_link._REPO_URL.match("https://github.com/owner/repo.git\n")
+    assert not git_link._REPO_URL.match("git@github.com:owner/repo.git\n")
 
 
 # ------------------------------------------------------------------

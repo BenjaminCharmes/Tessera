@@ -27,7 +27,8 @@ _logger = get_logger(__name__)
 _REPO_URL = re.compile(
     r"^(https?://[\w.\-]+/[\w.\-]+/[\w.\-]+(\.git)?/?"
     r"|git@[\w.\-]+:[\w.\-]+/[\w.\-]+(\.git)?"
-    r"|ssh://git@[\w.\-]+/[\w.\-]+/[\w.\-]+(\.git)?)$"
+    # `\Z` et non `$` : `$` accepte aussi un saut de ligne final (ticket-758).
+    r"|ssh://git@[\w.\-]+/[\w.\-]+/[\w.\-]+(\.git)?)\Z"
 )
 
 _INITIAL_COMMIT_MESSAGE = "chore: initial commit"
