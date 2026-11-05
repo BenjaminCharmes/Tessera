@@ -72,9 +72,6 @@ class _Orch:
             raise trouve
         return trouve
 
-    async def _sur_la_base(self) -> bool:
-        return await self._git_workspace.branche_courante() == self._base_branch
-
     def _log(self, message: str) -> None:
         self.logs.append(message)
 

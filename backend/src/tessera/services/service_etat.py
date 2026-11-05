@@ -1,6 +1,6 @@
 """Response models for the project services routes — ticket-679.
 
-`ServiceEtat` is the one description of a service's state: `Service.en_dict()`
+`ServiceEtat` is the one description of a service's state: `Service.etat()`
 derives from it and the routes declare it as their `response_model`. The front
 mirrors it as `ServiceActif` in `types/api.ts`; a test compares both key sets.
 """

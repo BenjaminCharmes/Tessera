@@ -26,7 +26,6 @@ from tessera.services.run_dans_worktree import (
     retirer_apres_echec,
 )
 from tessera.services.run_executor import executer
-from tessera.services.run_lock import RUN_LOCK
 from tessera.services.run_registry import RUN_REGISTRY, RunActif, RunAlreadyInProgress
 from tessera.services.run_worktree import RunWorktree
 from tessera.services.ticket_service import TicketService
@@ -36,11 +35,6 @@ from tessera.utils.project_id import validate_project_id
 _logger = get_logger(__name__)
 
 router = APIRouter(prefix="/orchestrator", tags=["orchestrator"])
-
-# Un run à la fois par projet, sur tous les points d'entrée — le même
-# verrou que `/chat/run` (ticket-121).
-_RUN_LOCK = RUN_LOCK
-
 
 class RunRequest(BaseModel):
     project_id: str
