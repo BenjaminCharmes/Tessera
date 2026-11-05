@@ -7682,3 +7682,16 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-05 09:38:01 UTC — [ticket-758] validateur: APPROVED — Tous les critères d'acceptation sont respectés : le jeton WebSocket n'apparaît p (191219ms)
 - 2026-11-05 09:38:01 UTC — [ticket-758] APPROVED après 2 tour(s)
 - 2026-11-05 09:42:02 UTC — [ticket-758] documentation: 1 fichier(s) (232953ms)
+- 2026-11-05 10:18:26 UTC — [ide-core] ticket-761 PR #909 confiée au CIWatcher
+- 2026-11-05 10:18:33 UTC — [ticket-772] branche ticket-772-design-how-tessera-keeps-its-secrets-in-the-opera
+- 2026-11-05 10:18:35 UTC — [ticket-772] tour 1 — codeur démarré
+- 2026-11-05 10:24:21 UTC — [ticket-772] tour 1 — architect terminé (346093ms)
+- 2026-11-05 10:24:38 UTC — [ticket-772] testeur: OK (exit 0)
+- 2026-11-05 10:25:30 UTC — [ticket-761] livraison: arrêt — PR #909 non mergée : CI failing : la PR #909 reste ouverte.
+- 2026-11-05 10:26:01 UTC — [ticket-772] securite: PASS — Ce diff ajoute un document de conception et des règles pour un système de gestio (82750ms)
+- 2026-11-05 10:26:01 UTC — [ticket-772] tour 1 — reviewer démarré
+- 2026-11-05 10:26:23 UTC — [ticket-772] tour 1 — reviewer terminé (22750ms)
+- 2026-11-05 10:31:01 UTC — [ticket-772] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-05 10:31:47 UTC — [ticket-772] validateur: fichiers cités joints : projects/ide-core/memory/decisions.md (tronqué) ; non joints (budget épuisé) : contraintes.md, projects/ide-core/tickets/todo/
+- 2026-11-05 10:31:47 UTC — [ticket-772] validateur: APPROVED — Le ticket 772 satisfait intégralement son cahier des charges : une ADR-073 compl (346156ms)
+- 2026-11-05 10:31:47 UTC — [ticket-772] APPROVED après 1 tour(s)
