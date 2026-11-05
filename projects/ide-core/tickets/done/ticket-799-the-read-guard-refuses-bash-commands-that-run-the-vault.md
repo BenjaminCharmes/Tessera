@@ -2,7 +2,7 @@
 id: ticket-799
 title: "The read guard refuses Bash commands that run the vault"
 type: feat
-status: todo
+status: done
 pr_number: null
 priority: medium
 agent: codeur
@@ -53,8 +53,8 @@ refuserait au codeur de lancer `python -m tessera.coffre_cli` pour tester les ti
 
 ## Critères d'acceptation
 
-- [ ] Les tests ci-dessus passent ; `test_garde_jetons.py` n'est pas modifié
-- [ ] Le hook reste branché sur les mêmes rôles que le garde de `.env`
+- [x] Les tests ci-dessus passent ; `test_garde_jetons.py` n'est pas modifié
+- [x] Le hook reste branché sur les mêmes rôles que le garde de `.env`
 
 ## Ce que ça ne fait pas
 
