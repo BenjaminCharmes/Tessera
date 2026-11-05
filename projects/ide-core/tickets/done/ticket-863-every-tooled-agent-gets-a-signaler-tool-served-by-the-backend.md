@@ -5,7 +5,7 @@ depends_on:
 - ticket-862
 estimated_days: 1
 id: ticket-863
-pr_number: null
+pr_number: 942
 priority: medium
 status: done
 title: Every tooled agent gets a signaler tool served by the backend
