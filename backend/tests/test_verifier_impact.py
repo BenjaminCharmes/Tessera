@@ -12,6 +12,7 @@ if str(_SCRIPTS_DIR) not in sys.path:
 from verifier import (  # noqa: E402
     BACKEND_STEPS,
     FRONTEND_STEPS,
+    TESTS_GLOBAUX,
     fichiers_de_test_impactes,
     ligne_des_durees,
     main,
@@ -78,13 +79,25 @@ def test_main_with_impact_runs_the_whole_suite_when_the_diff_is_unreadable() -> 
     assert run.call_args.args[0] == BACKEND_STEPS
 
 
-def test_main_with_impact_skips_pytest_when_no_test_is_concerned() -> None:
+def test_main_with_impact_still_runs_the_global_tests_when_no_test_is_concerned() -> None:
     with patch("verifier.changed_paths", return_value=["backend/src/tessera/x.py", "frontend/a.ts"]), \
          patch("verifier._git", return_value="frontend/a.ts\n"), \
          patch("verifier.run_parallel", return_value=0) as run:
         assert main(["--impact", "abc123"]) == 0
     pytest_steps, frontend, _types = run.call_args.args
-    assert pytest_steps == [] and frontend == FRONTEND_STEPS
+    assert frontend == FRONTEND_STEPS
+    assert pytest_steps[0].cmd[-len(TESTS_GLOBAUX):] == sorted(TESTS_GLOBAUX)
+
+
+def test_a_shrunk_module_runs_the_length_ratchet_with_its_own_tests() -> None:
+    # Ticket-761 : du code mort retiré d'un routeur, le cliquet des longueurs
+    # devait voir le fichier rétrécir, alors qu'il n'importe pas ce routeur.
+    with patch("verifier.changed_paths", return_value=["backend/src/tessera/routers/orchestrator.py"]), \
+         patch("verifier.fichiers_de_test_impactes", return_value=["tests/test_orchestrator_router.py"]), \
+         patch("verifier.run_parallel", return_value=0) as run:
+        assert main(["--impact", "base"]) == 0
+    cmd = run.call_args.args[0][0].cmd
+    assert "tests/test_longueur_des_fichiers.py" in cmd and "tests/test_orchestrator_router.py" in cmd
 
 
 def test_impact_base_selects_from_the_ticket_diff_without_asking_git() -> None:
