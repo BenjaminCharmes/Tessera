@@ -21,6 +21,7 @@ from tessera.services.providers.base import ProviderResult, StreamCallback, Tool
 from tessera.services.providers.duree_max import borner
 from tessera.services.providers.noms import ProviderIndisponible
 from tessera.services.providers.ollama_corps import _corps, _resultat, _verifier_statut
+from tessera.services.providers.signaler import ContexteSignal
 
 #: Un modèle qui se charge en mémoire prend bien plus que les 5 s par défaut.
 DELAI_LECTURE_S = 300.0
@@ -169,6 +170,7 @@ class OllamaProvider:
         max_tokens: int,
         cwd: Path | None = None,
         ask_user: Callable[[str], Awaitable[str]] | None = None,
+        signaler: ContexteSignal | None = None,
         session: str | None = None,
         schema: dict[str, Any] | None = None,
     ) -> ProviderResult:
@@ -207,6 +209,7 @@ class OllamaProvider:
         on_token: StreamCallback | None = None,
         on_tool_use: ToolEventCallback | None = None,
         ask_user: Callable[[str], Awaitable[str]] | None = None,
+        signaler: ContexteSignal | None = None,
         session: str | None = None,
         schema: dict[str, Any] | None = None,
     ) -> ProviderResult:

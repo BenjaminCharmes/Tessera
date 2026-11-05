@@ -358,6 +358,9 @@ Après qu'un run approuvé a corrigé quelque chose, l'agent propose une leçon 
 
 Un run qui essaierait de modifier ce fichier est bloqué : seul le service écrit dedans.
 
+
+Le nombre de leçons qui attendent ta validation apparaît dans la colonne « À toi » du Bureau, sous chaque projet — tu vois tout de suite s'il y a quelque chose à relire sans aller ouvrir `memory/lecons.md`.
+
 ### États de la vue
 
 - **Chargement** : tu vois des cartes-squelettes gris clair
@@ -1309,6 +1312,9 @@ La boîte aux lettres devient cliquable quand la pull request existe : un clic l
 La baie de serveurs s'ouvre sur l'adresse que le service lancé a annoncée, si elle existe : un clic dans un nouvel onglet. Sinon, elle reste un meuble et le lancement se fait depuis l'en-tête du projet.
 
 Chaque bouton d'accès au service nomme le service qu'il ouvre — par exemple « Ouvrir backend :8026 » ou « Ouvrir frontend :5196 ». Cela évite toute ambiguïté quand plusieurs services tournent sur des ports différents.
+
+
+Quand un run détecte une anomalie, le Bureau marque l'agent d'un symbole en ambre. Le nombre d'anomalies figure dans le nom du marqueur pour les lecteurs d'écran. La salle Tessera affiche aussi, pour chaque run vivant, le nombre d'anomalies détectées — en texte ambre quand ce nombre est > 0.
 
 ## 5 quart. L'onglet Historique
 

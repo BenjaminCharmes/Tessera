@@ -19,6 +19,7 @@ from tessera.services.providers import openai_corps
 from tessera.services.providers.base import ProviderResult, StreamCallback, ToolEventCallback
 from tessera.services.providers.duree_max import borner
 from tessera.services.providers.noms import ProviderIndisponible
+from tessera.services.providers.signaler import ContexteSignal
 
 #: Un modèle distant peut réfléchir longtemps avant le premier octet.
 DELAI_LECTURE_S = 300.0
@@ -74,6 +75,7 @@ class OpenAICompatibleProvider:
         max_tokens: int,
         cwd: Path | None = None,
         ask_user: Callable[[str], Awaitable[str]] | None = None,
+        signaler: ContexteSignal | None = None,
         session: str | None = None,
         schema: dict[str, Any] | None = None,
     ) -> ProviderResult:
@@ -108,6 +110,7 @@ class OpenAICompatibleProvider:
         on_token: StreamCallback | None = None,
         on_tool_use: ToolEventCallback | None = None,
         ask_user: Callable[[str], Awaitable[str]] | None = None,
+        signaler: ContexteSignal | None = None,
         session: str | None = None,
         schema: dict[str, Any] | None = None,
     ) -> ProviderResult:

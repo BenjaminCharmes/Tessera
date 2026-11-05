@@ -1,14 +1,15 @@
 ---
-id: ticket-863
-title: "Every tooled agent gets a signaler tool served by the backend"
-type: feat
-status: todo
-priority: medium
 agent: codeur
-depends_on: [ticket-862]
-estimated_days: 1
 created: 2026-11-05
-pr_number: null
+depends_on:
+- ticket-862
+estimated_days: 1
+id: ticket-863
+pr_number: 942
+priority: medium
+status: done
+title: Every tooled agent gets a signaler tool served by the backend
+type: feat
 ---
 
 # ticket-863 — Tout agent outillé reçoit `signaler`, servi par le backend

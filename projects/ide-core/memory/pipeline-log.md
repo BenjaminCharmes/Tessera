@@ -7954,3 +7954,16 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-05 21:02:12 UTC — [ticket-862] APPROVED après 2 tour(s)
 - 2026-11-05 21:04:34 UTC — [ticket-862] leçons: une leçon proposée
 - 2026-11-05 21:06:53 UTC — [ticket-862] documentation: 0 fichier(s) (132563ms) — après tour de correction
+- 2026-11-05 21:15:02 UTC — [ide-core] ticket-862 : base réalignée sur develop
+- 2026-11-05 21:15:02 UTC — [ide-core] ticket-862 PR #941 confiée au CIWatcher
+- 2026-11-05 21:14:59 UTC — [ide-core] ticket-862 PR #941 mergée (CI verte)
+- 2026-11-05 21:15:09 UTC — [ticket-863] branche ticket-863-every-tooled-agent-gets-a-signaler-tool-served-by
+- 2026-11-05 21:15:11 UTC — [ticket-863] tour 1 — codeur démarré
+- 2026-11-05 21:23:24 UTC — [ticket-863] tour 1 — codeur terminé (493250ms)
+- 2026-11-05 21:30:47 UTC — [ticket-863] testeur: dur�es : ruff 0 s, mypy 7 s, mypy-linux 9 s, pytest 439 s
+- 2026-11-05 21:33:12 UTC — [ticket-863] securite: PASS — Le ticket-863 implémente l'outil `signaler` avec des protections robustes : vali (145282ms)
+- 2026-11-05 21:33:12 UTC — [ticket-863] tour 1 — reviewer démarré
+- 2026-11-05 21:33:46 UTC — [ticket-863] tour 1 — reviewer terminé (33468ms)
+- 2026-11-05 21:37:44 UTC — [ticket-863] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les tests passent et le code imp (271843ms)
+- 2026-11-05 21:37:44 UTC — [ticket-863] APPROVED après 1 tour(s)
+- 2026-11-05 21:44:26 UTC — [ticket-863] documentation: 1 fichier(s) (393483ms) — après tour de correction — refusé : doc-technique : docs/configuration.md : règle « preuve » — l'extrait « # [OPTIONNEL] Détecteur d'anomalies des runs (ticket-834, AD » (.env.example) n'est ni da
