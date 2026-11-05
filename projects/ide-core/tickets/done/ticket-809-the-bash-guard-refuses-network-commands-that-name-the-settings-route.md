@@ -2,7 +2,7 @@
 id: ticket-809
 title: "The Bash guard refuses network commands that name the settings route"
 type: feat
-status: todo
+status: done
 pr_number: null
 priority: low
 agent: codeur
@@ -49,8 +49,8 @@ arrête l'erreur de l'agent qui essaie. Même module que ticket-799 : il passe a
 
 ## Critères d'acceptation
 
-- [ ] Les tests ci-dessus passent
-- [ ] Le hook reste branché sur les mêmes rôles que le garde de `.env`
+- [x] Les tests ci-dessus passent
+- [x] Le hook reste branché sur les mêmes rôles que le garde de `.env`
 
 ## Ce que ça ne fait pas
 
