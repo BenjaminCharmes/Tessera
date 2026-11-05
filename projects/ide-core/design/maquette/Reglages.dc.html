@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Tessera — Réglages</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+.ligne{padding:10px 12px;border-bottom:1px solid #27272a}
+.champ{background:#18181b;border:1px solid #3f3f46;border-radius:6px;color:#e4e4e7;padding:4px 6px;width:84px;font-size:12px}
+.btn{border:1px solid #3f3f46;border-radius:6px;background:transparent;color:#d4d4d8;padding:4px 8px;font-size:11px}
+.btn-pri{background:rgba(139,92,246,.15);border-color:rgba(139,92,246,.4);color:#f4f4f5}
+.note{color:#71717a;font-size:11px;margin-top:4px}
+</style>
+</helmet>
+<!-- Réglages globaux (ADR-075, ticket-810) : popover au pied du rail, sous la cloche.
+     États en zinc / red / amber / green / blue ; le violet reste en fond (ADR-026). -->
+<div style="width: 1536px; height: 900px; display: flex; background: #0f0f11; color: #e4e4e7; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 13px; overflow: hidden; position: relative">
+
+  <nav aria-label="Navigation principale" style="width: 96px; flex-shrink: 0; background: #121214; border-right: 1px solid #27272a; display: flex; flex-direction: column; justify-content: flex-end; padding: 10px 8px; gap: 4px">
+    <div style="display:flex;justify-content:center;padding:8px 0;color:#71717a" aria-label="Notifications">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15L6 16Z"/><path d="M10 21h4"/></svg>
+    </div>
+    <div style="display:flex;justify-content:center;padding:8px 0;border-radius:6px;background:rgba(139,92,246,.15);color:#f4f4f5;box-shadow:inset 0 0 0 1px rgba(139,92,246,.4)" aria-label="Réglages">
+      <!-- Roue dentée : huit dents, moyeu percé -->
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.5 3h3l.5 2.4 1.7.7 2.1-1.3 2.1 2.1-1.3 2.1.7 1.7L21 11v3l-2.4.5-.7 1.7 1.3 2.1-2.1 2.1-2.1-1.3-1.7.7L13.5 21h-3l-.5-2.4-1.7-.7-2.1 1.3-2.1-2.1 1.3-2.1-.7-1.7L3 14v-3l2.4-.5.7-1.7-1.3-2.1 2.1-2.1 2.1 1.3 1.7-.7z"/><circle cx="12" cy="12.5" r="2.5"/></svg>
+    </div>
+  </nav>
+
+  <div role="dialog" aria-label="Réglages" style="position:absolute;left:100px;bottom:12px;width:380px;background:#18181b;border:1px solid #3f3f46;border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,.5)">
+    <div style="padding:10px 12px;border-bottom:1px solid #27272a;font-size:12px;color:#a1a1aa">Réglages globaux · valeur du prochain run</div>
+
+    <div class="ligne">
+      <div style="display:flex;justify-content:space-between;align-items:center"><label>Plafond de dépense d'un run (USD)</label><input class="champ" value="5" aria-label="Plafond de dépense d'un run (USD)"></div>
+      <div class="note">Défaut de .env : 5 · entre 0,5 et 50 · au prochain run</div>
+      <div style="margin-top:6px;display:flex;gap:6px"><button class="btn btn-pri">Appliquer</button><button class="btn">Revenir au défaut</button></div>
+      <div class="note" style="color:#fbbf24">2 runs gardent l'ancienne valeur</div>
+    </div>
+
+    <div class="ligne">
+      <div style="display:flex;justify-content:space-between;align-items:center"><label>Plafond de dépense d'un appel (USD)</label><input class="champ" value="1" aria-label="Plafond de dépense d'un appel (USD)"></div>
+      <div class="note">Défaut de .env : 1 · entre 0,25 et 10 · au prochain run</div>
+      <div style="margin-top:6px"><button class="btn btn-pri">Appliquer</button></div>
+    </div>
+
+    <div class="ligne">
+      <div style="display:flex;justify-content:space-between;align-items:center"><label>Délai avant de reprendre sans réponse (s)</label><input class="champ" value="300" aria-label="Délai avant de reprendre sans réponse (s)"></div>
+      <div class="note">Défaut de .env : 300 · entre 30 et 3600 · au prochain run</div>
+      <div style="margin-top:6px"><button class="btn btn-pri">Appliquer</button></div>
+    </div>
+
+    <div class="ligne">
+      <div style="display:flex;justify-content:space-between;align-items:center"><label>Suites de tests simultanées</label><input class="champ" value="2" aria-label="Suites de tests simultanées"></div>
+      <div class="note">Défaut de .env : 2 · entre 1 et 8 · dès la prochaine suite de tests</div>
+      <div style="margin-top:6px"><button class="btn btn-pri">Appliquer</button></div>
+    </div>
+
+    <div class="ligne" style="border-bottom:0">
+      <div style="display:flex;justify-content:space-between;align-items:center"><label>Garder la machine éveillée pendant un run</label><input type="checkbox" checked aria-label="Garder la machine éveillée pendant un run"></div>
+      <div class="note">Défaut de .env : oui · à l'ouverture du premier run</div>
+      <div style="margin-top:6px"><button class="btn btn-pri">Appliquer</button></div>
+    </div>
+
+    <div style="padding:8px 12px;border-top:1px solid #27272a;color:#f87171;font-size:11px">Erreur type : « 403 — origine non déclarée » ou « 422 — doit être entre 0,5 et 50 ».</div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

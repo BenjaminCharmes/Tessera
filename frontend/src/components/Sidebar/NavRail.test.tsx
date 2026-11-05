@@ -231,10 +231,14 @@ describe("NavRail — la cloche porte aussi le réglage global des notifications
     vi.restoreAllMocks();
   });
 
-  it("offers no separate Réglages button any more", () => {
+  it("renders_the_settings_button_below_the_bell_outside_the_tablist", () => {
+    // Ticket-810 : le bouton retiré par le ticket-779 revient, pour les réglages globaux.
     render(<NavRail activePanel="projects" onChangePanel={() => {}} notifications={notifications} cloche={cloche} />);
 
-    expect(screen.queryByRole("button", { name: "Réglages" })).not.toBeInTheDocument();
+    const reglages = screen.getByRole("button", { name: "Réglages" });
+    const cloc = screen.getByRole("button", { name: "Notifications" });
+    expect(cloc.compareDocumentPosition(reglages) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.getByRole("tablist", { name: "Navigation principale" })).not.toContainElement(reglages);
     expect(screen.getAllByRole("tab")).toHaveLength(9);
   });
 
