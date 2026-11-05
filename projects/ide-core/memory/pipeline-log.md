@@ -7767,3 +7767,24 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-05 11:53:08 UTC — [ticket-790] validateur: APPROVED — Tous les critères d'acceptation ont été respectés. Le registre des inspirations  (240625ms)
 - 2026-11-05 11:53:08 UTC — [ticket-790] APPROVED après 1 tour(s)
 - 2026-11-05 11:57:07 UTC — [ticket-790] documentation: 0 fichier(s) (230969ms) — après tour de correction
+- 2026-11-05 13:59:05 UTC — [ticket-830] branche ticket-830-decisions-md-keeps-only-the-adrs-that-still-groun
+- 2026-11-05 13:59:06 UTC — [ticket-830] tour 1 — codeur démarré
+- 2026-11-05 14:12:43 UTC — [ticket-830] tour 1 — codeur terminé (816266ms)
+- 2026-11-05 14:14:10 UTC — [ticket-830] testeur: dur�es : pytest 32 s, mypy 44 s, mypy-linux 33 s
+- 2026-11-05 14:15:24 UTC — [ticket-830] securite: PASS — Ticket-830 archives uncited ADRs from decisions.md to decisions-archive.md and a (73655ms)
+- 2026-11-05 14:15:24 UTC — [ticket-830] tour 1 — reviewer démarré
+- 2026-11-05 14:16:10 UTC — [ticket-830] tour 1 — reviewer terminé (46187ms)
+- 2026-11-05 14:20:26 UTC — [ticket-830] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-05 14:22:06 UTC — [ticket-830] validateur: fichiers cités joints : backend/tests/test_consignes_coherentes.py (tronqué) ; non joints (budget épuisé) : projects/ide-core/memory/decisions.md, contraintes.md, CLAUDE.md, projects/ide-core/CLAUDE.md, projects/ide-core/memory/decisions-archive.md
+- 2026-11-05 14:22:06 UTC — [ticket-830] validateur: CHANGES_REQUESTED — Trois critères sur quatre sont satisfaits. Les ADR non-citées ont bien été archi (401217ms)
+- 2026-11-05 14:22:06 UTC — [ticket-830] CHANGES_REQUESTED tour 1: Validateur : Trois critères sur quatre sont satisfaits. Les ADR non-citées ont bien été archivées dans `decisions-archive.md`, les tests de vérification passent, et les nouveaux tests de cohérence ont
+- 2026-11-05 14:22:06 UTC — [ticket-830] tour 2 — codeur démarré
+- 2026-11-05 14:24:18 UTC — [ticket-830] tour 2 — codeur terminé (131811ms)
+- 2026-11-05 14:24:45 UTC — [ticket-830] testeur: dur�es : mypy 7 s, mypy-linux 8 s, pytest 23 s
+- 2026-11-05 14:25:30 UTC — [ticket-830] securite: PASS — Ticket-830 ajoute des tests de validation pour l'archivage des ADR et réorganise (45157ms)
+- 2026-11-05 14:25:30 UTC — [ticket-830] tour 2 — reviewer démarré
+- 2026-11-05 14:25:30 UTC — [ticket-830] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-11-05 14:25:56 UTC — [ticket-830] tour 2 — reviewer terminé (25563ms)
+- 2026-11-05 14:26:25 UTC — [ticket-830] validateur: fichiers cités joints : backend/tests/test_consignes_coherentes.py (tronqué) ; non joints (budget épuisé) : projects/ide-core/memory/decisions.md, contraintes.md, CLAUDE.md, projects/ide-core/CLAUDE.md, projects/ide-core/memory/decisions-archive.md
+- 2026-11-05 14:26:25 UTC — [ticket-830] validateur: APPROVED — Tous les critères sont satisfaits. Les 13 ADR non citées ont bien été archivées  (54827ms)
+- 2026-11-05 14:26:25 UTC — [ticket-830] APPROVED après 2 tour(s)
