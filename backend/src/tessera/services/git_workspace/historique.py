@@ -138,6 +138,18 @@ class GitHistory(GitPoussee):
             return False if exc.returncode == 1 else None
         return True
 
+    async def merge_base(self, gauche: str, droite: str) -> str | None:
+        """The full SHA of the merge base of two refs (ticket-793).
+
+        `None` when git cannot say — unknown ref, unrelated histories — so the
+        caller falls back on the whole suite instead of a guess.
+        """
+        try:
+            sortie = await self._run("merge-base", gauche, droite)
+        except GitCommandError:
+            return None
+        return sortie.strip() or None
+
     async def chemins_modifies(self, gauche: str, droite: str) -> list[str] | None:
         """Paths changed on `droite` since its merge base with `gauche` (ticket-584).
 

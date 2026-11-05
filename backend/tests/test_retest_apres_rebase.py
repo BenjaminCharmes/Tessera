@@ -382,6 +382,62 @@ async def test_retest_du_run_uses_the_run_test_runner_and_command(tmp_path: Path
     assert resultat is not None and resultat.vert is True
 
 
+class _GitAvecFork(_FauxGit):
+    """A git double that knows the merge base of the branch, or fails to read it."""
+
+    def __init__(self, fork: str | None | Exception) -> None:
+        super().__init__([], ancetre=False)
+        self.fork = fork
+
+    async def merge_base(self, gauche: str, droite: str) -> str | None:
+        if isinstance(self.fork, Exception):
+            raise self.fork
+        return self.fork
+
+    async def chemins_modifies(self, gauche: str, droite: str) -> list[str] | None:
+        return ["backend/src/a.py"]
+
+
+def _projet_avec_verifier(racine: Path) -> Path:
+    (racine / "scripts").mkdir()
+    (racine / "scripts" / "verifier.py").write_text("", encoding="utf-8")
+    return racine
+
+
+async def _commande_du_retest(racine: Path, git: _FauxGit) -> str | None:
+    runner = MagicMock()
+    runner.run_tests = AsyncMock(return_value=_verts())
+    retest = retest_du_run(git, False, runner, racine, "python scripts/verifier.py")
+    assert retest is not None
+    assert await retest.base_a_avance("main") is True
+
+    await retest.relancer()
+
+    return runner.run_tests.await_args.kwargs["test_command"]  # type: ignore[no-any-return]
+
+
+async def test_retest_with_a_verifier_adds_the_pre_rebase_fork_as_impact(tmp_path: Path) -> None:
+    fork = "c3" * 20
+
+    commande = await _commande_du_retest(_projet_avec_verifier(tmp_path), _GitAvecFork(fork))
+
+    assert commande == f"python scripts/verifier.py --impact {fork}"
+
+
+async def test_retest_without_a_verifier_keeps_the_command_unchanged(tmp_path: Path) -> None:
+    commande = await _commande_du_retest(tmp_path, _GitAvecFork("c3" * 20))
+
+    assert commande == "python scripts/verifier.py"
+
+
+async def test_retest_runs_the_whole_suite_when_the_fork_is_unreadable(tmp_path: Path) -> None:
+    racine = _projet_avec_verifier(tmp_path)
+    for fork in (None, OSError("git absent"), "pas un sha; rm -rf"):
+        commande = await _commande_du_retest(racine, _GitAvecFork(fork))
+
+        assert commande == "python scripts/verifier.py"
+
+
 def test_retest_du_run_is_absent_without_tester_or_git(tmp_path: Path) -> None:
     assert retest_du_run(_FauxGit([]), False, None, tmp_path, "cmd") is None
     assert retest_du_run(None, False, MagicMock(), tmp_path, "cmd") is None

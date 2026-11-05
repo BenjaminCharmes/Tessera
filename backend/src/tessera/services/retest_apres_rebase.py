@@ -54,8 +54,13 @@ class _GitAncetre(Protocol):
 
     async def chemins_modifies(self, gauche: str, droite: str) -> list[str] | None: ...
 
+    async def merge_base(self, gauche: str, droite: str) -> str | None: ...
+
 
 Lanceur = Callable[[], Awaitable[TestResult]]
+#: Lance les tests limités à l'impact du diff `<sha>..HEAD` (ticket-793).
+LanceurImpact = Callable[[str], Awaitable[TestResult]]
+_SHA = re.compile(r"[0-9a-f]{7,64}")
 
 
 def _resultat_de(resultat: TestResult) -> ResultatRetest:
@@ -71,10 +76,19 @@ class RetestApresRebase:
     """Decides whether the base moved, and reruns the project's tests when it did."""
 
     def __init__(
-        self, git: _GitAncetre, lancer: Lanceur, worktree: bool, verifier: bool = False
+        self,
+        git: _GitAncetre,
+        lancer: Lanceur,
+        worktree: bool,
+        verifier: bool = False,
+        lancer_impact: LanceurImpact | None = None,
     ) -> None:
         self._git = git
         self._lancer = lancer
+        # Avec `scripts/verifier.py`, le retest ne lance que les tests que le
+        # diff depuis le fork d'avant rebase peut toucher (ticket-793).
+        self._lancer_impact = lancer_impact
+        self._depart: str | None = None
         # Dans un worktree de run, la base locale est celle du checkout : le
         # rebase rejoue sur le distant, et c'est lui qu'on compare
         # (même règle que `GitWorkspaceService.rejouer_sur`).
@@ -93,6 +107,7 @@ class RetestApresRebase:
         branche touche aussi n'oblige pas à retester ; la CI rejoue tout.
         """
         cible = f"origin/{base}" if self._worktree else base
+        self._depart = None
         try:
             dessous = await self._git.est_ancetre(cible, "HEAD")
         except Exception as exc:  # noqa: BLE001 — l'inconnu compte comme une avancée
@@ -100,7 +115,19 @@ class RetestApresRebase:
             return True
         if dessous is True:
             return False
-        return await self._chaine_partagee(cible) if self._verifier else True
+        if not self._verifier:
+            return True
+        self._depart = await self._fork_avant_rebase(cible)
+        return await self._chaine_partagee(cible)
+
+    async def _fork_avant_rebase(self, cible: str) -> str | None:
+        """The SHA the branch forks from `cible`; None when unreadable (full suite)."""
+        try:
+            sha = await self._git.merge_base(cible, "HEAD")
+        except Exception as exc:  # noqa: BLE001 — sans fork lisible, la suite complète tourne
+            _logger.warning("fork_illisible", extra={"erreur": str(exc)})
+            return None
+        return sha if sha is not None and _SHA.fullmatch(sha) else None
 
     async def _chaine_partagee(self, cible: str) -> bool:
         """True when base and branch touch a common chain; True too when unreadable."""
@@ -149,6 +176,8 @@ class RetestApresRebase:
         rendent un résultat rouge : rien ne prouve que le travail passe.
         """
         try:
+            if self._depart is not None and self._lancer_impact is not None:
+                return _resultat_de(await self._lancer_impact(self._depart))
             return _resultat_de(await self._lancer())
         except TestCommandNotFound:
             return None
@@ -179,7 +208,14 @@ def retest_du_run(
     async def lancer() -> TestResult:
         return await test_runner.run_tests(project_path, test_command=commande)
 
-    return RetestApresRebase(git, lancer, worktree, _porte_un_verifier(project_path, test_cwd))
+    verifier = _porte_un_verifier(project_path, test_cwd)
+    if not verifier or not commande:
+        return RetestApresRebase(git, lancer, worktree, verifier)
+
+    async def lancer_impact(depuis: str) -> TestResult:
+        return await test_runner.run_tests(project_path, test_command=f"{commande} --impact {depuis}")
+
+    return RetestApresRebase(git, lancer, worktree, verifier, lancer_impact)
 
 
 def _porte_un_verifier(project_path: Path, test_cwd: str | None) -> bool:
