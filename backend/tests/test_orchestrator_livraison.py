@@ -11,8 +11,8 @@ import pytest
 
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.livraison.livraison import Livraison
-from tessera.services.orchestrator import Orchestrator
-from tessera.services.pipeline_fin_de_file import nettoyer_apres_file
+from tessera.services.pipeline.orchestrator import Orchestrator
+from tessera.services.pipeline.pipeline_fin_de_file import nettoyer_apres_file
 from tessera.services.pipeline_events import (
     EventType,
     OrchestratorEvent,
@@ -1599,7 +1599,7 @@ def _espace_git_double(ordre: list[str], branche_courante: str = "develop") -> A
 
 
 def _run_de_depart() -> Any:
-    from tessera.services.pipeline_run import PipelineRun
+    from tessera.services.pipeline.pipeline_run import PipelineRun
 
     async def _on_event(event: OrchestratorEvent) -> None:
         pass
@@ -1615,7 +1615,7 @@ def _run_de_depart() -> Any:
 async def test_la_base_est_realignee_avant_la_creation_de_la_branche(
     tmp_path: Path,
 ) -> None:
-    from tessera.services import pipeline_branche
+    from tessera.services.pipeline import pipeline_branche
 
     ordre: list[str] = []
     git_ws = _espace_git_double(ordre)
@@ -1630,7 +1630,7 @@ async def test_la_base_est_realignee_avant_la_creation_de_la_branche(
 async def test_un_realignement_refuse_n_empeche_pas_le_run_et_est_journalise(
     tmp_path: Path,
 ) -> None:
-    from tessera.services import pipeline_branche
+    from tessera.services.pipeline import pipeline_branche
 
     ordre: list[str] = []
     git_ws = _espace_git_double(ordre)
@@ -1650,7 +1650,7 @@ async def test_un_realignement_refuse_n_empeche_pas_le_run_et_est_journalise(
 async def test_aucun_realignement_sans_espace_git_ni_branche_de_base(
     tmp_path: Path,
 ) -> None:
-    from tessera.services import pipeline_branche
+    from tessera.services.pipeline import pipeline_branche
 
     ordre: list[str] = []
     git_ws = _espace_git_double(ordre)
@@ -1666,7 +1666,7 @@ async def test_aucun_realignement_sans_espace_git_ni_branche_de_base(
 async def test_l_arbre_reste_sur_une_branche_de_ticket_revient_sur_la_base_avant_le_realignement(
     tmp_path: Path,
 ) -> None:
-    from tessera.services import pipeline_branche
+    from tessera.services.pipeline import pipeline_branche
 
     ordre: list[str] = []
     git_ws = _espace_git_double(ordre, branche_courante="ticket-000-ancien")
@@ -1680,7 +1680,7 @@ async def test_l_arbre_reste_sur_une_branche_de_ticket_revient_sur_la_base_avant
 async def test_un_retour_sur_la_base_refuse_est_journalise_et_le_run_demarre(
     tmp_path: Path,
 ) -> None:
-    from tessera.services import pipeline_branche
+    from tessera.services.pipeline import pipeline_branche
     from tessera.services.git_workspace import GitCommandError
 
     ordre: list[str] = []
@@ -1702,7 +1702,7 @@ async def test_un_retour_sur_la_base_refuse_est_journalise_et_le_run_demarre(
 async def test_le_depart_sur_la_base_ne_commite_pas_la_tenue_de_livres(
     tmp_path: Path,
 ) -> None:
-    from tessera.services import pipeline_branche
+    from tessera.services.pipeline import pipeline_branche
 
     git_ws = _espace_git_double([], branche_courante="develop")
     orch = _orchestrateur_de_depart(tmp_path, git_ws, "develop")

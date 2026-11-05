@@ -3,7 +3,7 @@
 Focuses on `_extract_criteria`, which must reassemble multi-line criteria
 before handing them to the validator.
 """
-from tessera.services.pipeline_text import _extract_criteria
+from tessera.services.pipeline.pipeline_text import _extract_criteria
 
 
 class TestExtractCriteria:

@@ -13,7 +13,7 @@ import pytest
 from tessera.config import Settings, settings
 from tessera.models.agent import AgentResult, AgentRole
 from tessera.models.ticket import TicketStatus
-from tessera.services.orchestrator import EventType, OrchestratorEvent
+from tessera.services.pipeline.orchestrator import EventType, OrchestratorEvent
 from tessera.services.verdicts.reviewer_schema import REVIEWER_SCHEMA
 from tessera.services.verdicts.verdict_reviewer import lire_verdict, rendre_revue
 from tests.revue_structuree import revue

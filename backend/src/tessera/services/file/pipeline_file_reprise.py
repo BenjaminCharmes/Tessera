@@ -14,11 +14,11 @@ from tessera.services.pipeline_events import (
     OrchestratorEvent,
     PipelineResult,
 )
-from tessera.services.pipeline_livraison import livrer_le_resultat
+from tessera.services.pipeline.pipeline_livraison import livrer_le_resultat
 from tessera.utils.logger import get_logger
 
 if TYPE_CHECKING:
-    from tessera.services.orchestrator import Orchestrator
+    from tessera.services.pipeline.orchestrator import Orchestrator
 
 _logger = get_logger(__name__)
 

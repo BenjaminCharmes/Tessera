@@ -53,7 +53,7 @@ from tessera.services.livraison.livraison import Livraison
 from tessera.services.livraison.mise_a_jour_pr import DELAI_MISE_A_JOUR_S, MiseAJourPr, mettre_a_jour_la_pr
 from tessera.services.pipeline_events import EventCallback, EventType, OrchestratorEvent
 from tessera.services.livraison.realignement_base import Realignement, realigner_base
-from tessera.services.run_registry import RUN_REGISTRY
+from tessera.services.pipeline.run_registry import RUN_REGISTRY
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

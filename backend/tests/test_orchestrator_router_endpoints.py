@@ -396,7 +396,7 @@ def test_le_livreur_passe_le_titre_et_le_corps_du_ticket(
 ) -> None:
     # Le corps de la PR se rédige depuis le ticket : passer son identifiant en
     # guise de titre donnait une PR nommée « ticket-001 — ticket-001 ».
-    from tessera.services.livreur_run import livreur
+    from tessera.services.pipeline.livreur_run import livreur
     from tessera.services.livraison.livraison import Livraison
 
     recu: dict[str, object] = {}
@@ -420,7 +420,7 @@ def test_une_livraison_qui_leve_ne_fait_pas_echouer_le_run(
 ) -> None:
     # Le travail est commité : perdre la réponse du run parce que GitHub est
     # injoignable ferait croire que le pipeline lui-même a échoué.
-    from tessera.services.livreur_run import livreur
+    from tessera.services.pipeline.livreur_run import livreur
 
     async def _livrer(self: object, **kwargs: object) -> object:
         raise RuntimeError("GitHub injoignable")
@@ -440,7 +440,7 @@ def test_une_exception_sans_message_nomme_son_type_dans_l_arret(
 ) -> None:
     # Le 2026-10-13, « Livraison interrompue : » s'est écrit sans motif : un
     # `TimeoutError()` n'a pas de message. (ticket-415)
-    from tessera.services.livreur_run import livreur
+    from tessera.services.pipeline.livreur_run import livreur
 
     async def _livrer(self: object, **kwargs: object) -> object:
         raise TimeoutError()
@@ -464,7 +464,7 @@ def test_une_exception_apres_la_pr_garde_son_numero(
 ) -> None:
     # La PR #13 de curio était ouverte, mais la livraison ne le savait plus :
     # la phase 2 n'est jamais partie. (ticket-415)
-    from tessera.services.livreur_run import livreur
+    from tessera.services.pipeline.livreur_run import livreur
     from tessera.services.livraison.livraison import LivraisonInterrompue
 
     async def _livrer(self: object, **kwargs: object) -> object:
@@ -485,7 +485,7 @@ def test_une_exception_apres_la_pr_garde_son_numero(
 def test_la_sync_en_echec_n_efface_pas_la_cause_d_une_pr_orpheline(
     workspace: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    from tessera.services.livreur_run import livreur
+    from tessera.services.pipeline.livreur_run import livreur
     from tessera.services.livraison.livraison import LivraisonInterrompue
 
     async def _livrer(self: object, **kwargs: object) -> object:
@@ -531,7 +531,7 @@ def test_le_livreur_note_la_pr_dans_le_ticket(
 ) -> None:
     # La livraison ouvrait et mergeait la PR sans jamais l'écrire : la carte
     # du ticket, qui lit `pr_number`, proposait d'en ouvrir une (ticket-205).
-    from tessera.services.livreur_run import livreur
+    from tessera.services.pipeline.livreur_run import livreur
 
     monkeypatch.setattr(
         "tessera.services.livraison.livraison.LivraisonService.livrer_phase_1", _livrer_la_pr(7)
@@ -550,7 +550,7 @@ def test_noter_la_pr_laisse_l_arbre_propre(
     # coup enverrait le run suivant en `blocked` (ADR-018).
     import subprocess
 
-    from tessera.services.livreur_run import livreur
+    from tessera.services.pipeline.livreur_run import livreur
 
     projet = workspace / "mon-projet"
 
@@ -579,7 +579,7 @@ def test_noter_la_pr_synchronise_la_base_distante(
 ) -> None:
     # Après la phase 1 (PR ouverte), la base distante est synchronisée pour
     # que le ticket suivant forke depuis origin/<base> (ADR-051).
-    from tessera.services.livreur_run import livreur
+    from tessera.services.pipeline.livreur_run import livreur
 
     appels: list[str] = []
 
@@ -608,7 +608,7 @@ def test_noter_la_pr_qui_echoue_ne_change_pas_la_livraison(
 ) -> None:
     # La PR est mergée : un ticket qu'on n'a pas pu réécrire ne fait pas
     # croire que la livraison a échoué (ADR-030).
-    from tessera.services.livreur_run import livreur
+    from tessera.services.pipeline.livreur_run import livreur
 
     async def _leve(self: object, ticket_id: str, pr_number: int) -> object:
         raise OSError("disque plein")

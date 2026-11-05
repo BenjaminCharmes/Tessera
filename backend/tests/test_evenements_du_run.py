@@ -22,8 +22,8 @@ from tessera.services.database_events import get_run_events, save_event
 from tessera.services.database_runs import create_run, list_runs
 from tessera.services.event_hub import EventHub
 from tessera.services.pipeline_events import EventType, PipelineResult
-from tessera.services.run_executor import _clore, emetteur
-from tessera.services.run_registry import RunActif
+from tessera.services.pipeline.run_executor import _clore, emetteur
+from tessera.services.pipeline.run_registry import RunActif
 
 
 # ------------------------------------------------------------------

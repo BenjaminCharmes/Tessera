@@ -24,7 +24,7 @@ from websockets.exceptions import ConnectionClosed
 from tessera.services.event_hub import EVENT_HUB, JETABLES
 from tessera.services.journal_du_texte import JOURNAL_DU_TEXTE
 from tessera.services.pipeline_events import EventType, OrchestratorEvent
-from tessera.services.run_registry import RUN_REGISTRY
+from tessera.services.pipeline.run_registry import RUN_REGISTRY
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

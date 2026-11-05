@@ -1,6 +1,6 @@
 """A ticket finished on the base branch is skipped by the queue — ticket-736."""
 from tessera.models.ticket import TicketStatus
-from tessera.services.orchestrator import Orchestrator
+from tessera.services.pipeline.orchestrator import Orchestrator
 
 from tests.test_file_de_tickets import _OrchestrateurFile, _ServiceTickets, _events
 

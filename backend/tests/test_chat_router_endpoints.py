@@ -339,7 +339,7 @@ def test_un_lancement_concurrent_est_refuse_avec_409(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     # Deux pipelines sur le même dépôt violeraient l'isolation par branche.
-    from tessera.services.run_registry import RUN_REGISTRY, RunActif
+    from tessera.services.pipeline.run_registry import RUN_REGISTRY, RunActif
 
     async def _build(project_id: str) -> object:
         raise AssertionError("ne doit pas être atteint")

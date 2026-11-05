@@ -3,7 +3,7 @@ import pytest
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 from tessera.services.dialogue import DialogueChannel
-from tessera.services.file_vivante import FileFermee, FileVivante, fermer_si_vivante
+from tessera.services.pipeline.file_vivante import FileFermee, FileVivante, fermer_si_vivante
 from tessera.services.pipeline_events import EventType, OrchestratorEvent, PipelineResult
 
 
@@ -18,7 +18,7 @@ class _OrchestrateurFile:
     """Le vrai `run_queue`, avec `run_pipeline` double."""
 
     def __init__(self, echecs: set[str] | None = None) -> None:
-        from tessera.services.orchestrator import Orchestrator
+        from tessera.services.pipeline.orchestrator import Orchestrator
 
         self.lances: list[str] = []
         self._echecs = echecs or set()

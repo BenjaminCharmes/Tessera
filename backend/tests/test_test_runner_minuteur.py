@@ -11,7 +11,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from tessera.services import pipeline_testeur
+from tessera.services.pipeline import pipeline_testeur
 from tessera.services.verification.detail_du_delai import ligne_de_delai
 from tessera.services.verification.groupe_d_etape import GroupeDEtape
 from tessera.services.verification.minuteur_d_etape import MARGE_S

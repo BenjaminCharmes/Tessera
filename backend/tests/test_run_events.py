@@ -227,8 +227,8 @@ async def test_run_closed_carries_db_run_id(db_path: Path) -> None:
 
     from tessera.services.event_hub import EventHub
     from tessera.services.pipeline_events import EventType, OrchestratorEvent
-    from tessera.services.run_executor import emetteur, _clore
-    from tessera.services.run_registry import RunActif
+    from tessera.services.pipeline.run_executor import emetteur, _clore
+    from tessera.services.pipeline.run_registry import RunActif
 
     await init_db(db_path)
 

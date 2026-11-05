@@ -10,10 +10,10 @@ from pathlib import Path
 from claude_agent_sdk import ProcessError
 
 from tessera.models.ticket import TicketStatus
-from tessera.services import pipeline_outcomes as outcomes
+from tessera.services.pipeline import pipeline_outcomes as outcomes
 from tessera.services.pipeline_events import EventType, PipelineResult
 from tessera.services.usage.quota_exhaustion import is_quota_exhausted, resume_label
-from tessera.services.orchestrator import Orchestrator
+from tessera.services.pipeline.orchestrator import Orchestrator
 from tessera.services.usage.quota_tracker import QuotaSnapshot, QuotaStatus, QuotaTracker
 from tests.test_orchestrator import _FakeGit, _make_orchestrator, _make_ticket, _noop
 from tests.test_limite_de_session import _Orch, _OrchFile, _collect_events, _run

@@ -19,8 +19,8 @@ from tessera.models.ticket import TicketStatus
 from tessera.services.git_workspace import journal_en_attente
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.livraison.livraison import Livraison
-from tessera.services.orchestrator import Orchestrator
-from tessera.services.pipeline_fin_de_file import signaler_fichiers_non_suivis
+from tessera.services.pipeline.orchestrator import Orchestrator
+from tessera.services.pipeline.pipeline_fin_de_file import signaler_fichiers_non_suivis
 from tessera.services.pipeline_events import OrchestratorEvent, PipelineResult
 from tessera.services.livraison.realignement_base import realigner_base
 

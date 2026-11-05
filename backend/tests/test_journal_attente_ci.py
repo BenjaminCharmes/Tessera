@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from tessera.services import pipeline_branche
+from tessera.services.pipeline import pipeline_branche
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.livraison.journal_ci_watcher import ajouter_au_log, ecrire_log_merge
 from tests.test_journal_attente import _LOG, _Orch, _Tickets, _attente, _depot, _git, _run

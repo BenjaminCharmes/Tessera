@@ -2198,9 +2198,9 @@ async def test_la_branche_du_ticket_part_du_commit_distant_et_garde_le_journal(
     the run realigns it first, so the ticket branch forks from the remote
     commit and the log line survives (the state the CIWatcher leaves behind)."""
     from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-    from tessera.services import pipeline_branche
+    from tessera.services.pipeline import pipeline_branche
     from tessera.services.pipeline_events import OrchestratorEvent
-    from tessera.services.pipeline_run import PipelineRun
+    from tessera.services.pipeline.pipeline_run import PipelineRun
 
     local, bare = repo_avec_distant
     journal = local / "memory" / "pipeline-log.md"

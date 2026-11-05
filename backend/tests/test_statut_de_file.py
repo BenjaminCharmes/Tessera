@@ -11,9 +11,9 @@ from tessera.models.ticket import TicketStatus
 from tessera.services.database_events import save_event
 from tessera.services.database_runs import create_run, finish_run
 from tessera.services.pipeline_events import EventType, OrchestratorEvent, PipelineResult
-from tessera.services.run_executor import _suivre
-from tessera.services.run_registry import RUN_REGISTRY
-from tessera.services.run_status import statut_d_un_run_termine
+from tessera.services.pipeline.run_executor import _suivre
+from tessera.services.pipeline.run_registry import RUN_REGISTRY
+from tessera.services.pipeline.run_status import statut_d_un_run_termine
 
 _TS = "2026-10-14T10:00:00+00:00"
 

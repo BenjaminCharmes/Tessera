@@ -3,8 +3,8 @@ from datetime import datetime, timedelta, timezone
 
 from tessera.config import settings
 from tessera.services.database_runs import create_run, finish_run
-from tessera.services.run_registry import RunActif
-from tessera.services.run_status import (
+from tessera.services.pipeline.run_registry import RunActif
+from tessera.services.pipeline.run_status import (
     en_utc,
     statut_d_un_run_vivant,
     statut_en_base,

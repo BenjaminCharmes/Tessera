@@ -21,7 +21,7 @@ from tessera.services.anomalies import lecture_evenements
 from tessera.services.anomalies.detecteur import DetecteurDAnomalies
 from tessera.services.event_hub import EventHub
 from tessera.services.pipeline_events import EventType, OrchestratorEvent
-from tessera.services.run_registry import RunActif, RunRegistry
+from tessera.services.pipeline.run_registry import RunActif, RunRegistry
 from tests.anomalies_base import appel_d_agent, evenement, ligne_de_run
 
 NOW = datetime(2026, 11, 5, 12, 0, tzinfo=timezone.utc)

@@ -144,7 +144,7 @@ async def test_le_frontmatter_declare_le_plan(
 async def test_le_plan_n_a_que_les_outils_de_lecture(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    from tessera.services.assemblage_run import build_orchestrator
+    from tessera.services.pipeline.assemblage_run import build_orchestrator
 
     monkeypatch.setattr(settings, "ide_workspace_dir", tmp_path)
     monkeypatch.setattr(settings, "llm_provider", "agent_sdk")

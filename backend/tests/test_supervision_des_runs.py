@@ -11,8 +11,8 @@ import pytest
 
 from tessera.services.event_hub import EventHub
 from tessera.services.pipeline_events import EventType, OrchestratorEvent
-from tessera.services.run_lock import RunAlreadyInProgress, RunLock
-from tessera.services.run_registry import RunRegistry
+from tessera.services.pipeline.run_lock import RunAlreadyInProgress, RunLock
+from tessera.services.pipeline.run_registry import RunRegistry
 
 
 def _token(texte: str = "x") -> OrchestratorEvent:

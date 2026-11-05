@@ -23,7 +23,7 @@ from tessera.services.agents.chat_service import ChatReply
 from tessera.services.database import init_db
 from tessera.services.event_hub import EVENT_HUB
 from tessera.services.pipeline_events import EventType
-from tessera.services.run_registry import RUN_REGISTRY
+from tessera.services.pipeline.run_registry import RUN_REGISTRY
 
 
 @pytest.fixture(autouse=True)

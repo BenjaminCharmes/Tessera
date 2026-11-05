@@ -8,8 +8,8 @@ import pytest
 
 from tessera.services.event_hub import EventHub
 from tessera.services.pipeline_events import EventType, OrchestratorEvent
-from tessera.services.run_executor import emetteur
-from tessera.services.run_registry import RunActif
+from tessera.services.pipeline.run_executor import emetteur
+from tessera.services.pipeline.run_registry import RunActif
 
 
 def _run(

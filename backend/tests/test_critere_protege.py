@@ -8,7 +8,7 @@ from tessera.services.verdicts.critere_protege import (
     critere_demande_ecriture,
     criteres_sur_chemins_proteges,
 )
-from tessera.services.orchestrator import Orchestrator
+from tessera.services.pipeline.orchestrator import Orchestrator
 from tests.test_orchestrator import (
     _FakeGit,
     _RecordingRunner,

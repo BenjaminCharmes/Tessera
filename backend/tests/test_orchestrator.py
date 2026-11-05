@@ -5,7 +5,7 @@ import pytest
 
 from tessera.models.agent import AgentConfig, AgentResult, AgentRole
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services.orchestrator import (
+from tessera.services.pipeline.orchestrator import (
     EventType,
     Orchestrator,
     OrchestratorEvent,
@@ -182,7 +182,7 @@ class _RecordingRunner:
 
 
 def test_agent_tool_use_event_existe() -> None:
-    from tessera.services.orchestrator import EventType
+    from tessera.services.pipeline.orchestrator import EventType
 
     assert EventType.AGENT_TOOL_USE.value == "agent_tool_use"
 
@@ -1356,8 +1356,8 @@ async def test_reviewer_et_validateur_tournent_en_parallele(tmp_path: Path) -> N
     orchestrator = _make_orchestrator(tmp_path, runner=_RecordingRunner(), git_workspace=_FakeGit())
 
     with (
-        patch("tessera.services.pipeline_controles.run_review", fake_review),
-        patch("tessera.services.pipeline_controles.run_validation", fake_validation),
+        patch("tessera.services.pipeline.pipeline_controles.run_review", fake_review),
+        patch("tessera.services.pipeline.pipeline_controles.run_validation", fake_validation),
     ):
         result = await orchestrator.run_pipeline("projet", "ticket-001", _noop)
 
@@ -1396,8 +1396,8 @@ async def test_audit_block_ne_demarre_ni_reviewer_ni_validateur(tmp_path: Path) 
     )
 
     with (
-        patch("tessera.services.pipeline_controles.run_review", spy_review),
-        patch("tessera.services.pipeline_controles.run_validation", spy_validation),
+        patch("tessera.services.pipeline.pipeline_controles.run_review", spy_review),
+        patch("tessera.services.pipeline.pipeline_controles.run_validation", spy_validation),
     ):
         result = await orchestrator.run_pipeline("projet", "ticket-001", _noop)
 

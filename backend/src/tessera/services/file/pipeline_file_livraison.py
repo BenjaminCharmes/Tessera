@@ -13,14 +13,14 @@ from tessera.services.livraison.attente_dependance import (
 from tessera.services.livraison.livraison import Livraison
 from tessera.services.pipeline_events import EventCallback, PipelineResult
 from tessera.services.file.pipeline_file_tour import Tour
-from tessera.services.pipeline_fin_de_file import (
+from tessera.services.pipeline.pipeline_fin_de_file import (
     attendre_merge_et_syncer,
     realigner_base,
 )
 from tessera.services.ticket_service import TicketService
 
 if TYPE_CHECKING:
-    from tessera.services.orchestrator import Orchestrator
+    from tessera.services.pipeline.orchestrator import Orchestrator
 
 
 async def _trouver_bloquant(

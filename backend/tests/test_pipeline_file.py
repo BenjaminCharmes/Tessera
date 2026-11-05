@@ -2,7 +2,7 @@
 from types import SimpleNamespace
 from typing import cast
 
-from tessera.services.orchestrator import Orchestrator
+from tessera.services.pipeline.orchestrator import Orchestrator
 from tessera.services.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.file.pipeline_file import plafond_effectif
 from tessera.services.file.pipeline_file_tour import Tour, progres

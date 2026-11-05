@@ -20,8 +20,8 @@ from tessera.services.database import init_db
 from tessera.services.event_hub import EventHub
 from tessera.services.livraison.livraison import Livraison
 from tessera.services.pipeline_events import PipelineResult
-from tessera.services.run_executor import executer
-from tessera.services.run_registry import RunRegistry
+from tessera.services.pipeline.run_executor import executer
+from tessera.services.pipeline.run_registry import RunRegistry
 
 from .test_orchestrator_livraison import (
     _construire,

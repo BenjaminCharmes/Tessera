@@ -27,8 +27,8 @@ from tessera.services.anomalies.regles_historiques import (
 )
 from tessera.services.event_hub import EventHub
 from tessera.services.pipeline_events import EventType, OrchestratorEvent
-from tessera.services.run_executor import emetteur
-from tessera.services.run_registry import RunActif, RunRegistry
+from tessera.services.pipeline.run_executor import emetteur
+from tessera.services.pipeline.run_registry import RunActif, RunRegistry
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

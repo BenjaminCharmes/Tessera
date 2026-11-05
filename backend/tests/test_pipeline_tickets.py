@@ -2,8 +2,8 @@
 from pathlib import Path
 
 from tessera.models.agent import AgentResult, AgentRole
-from tessera.services.pipeline_run import PipelineRun
-from tessera.services.pipeline_tickets import (
+from tessera.services.pipeline.pipeline_run import PipelineRun
+from tessera.services.pipeline.pipeline_tickets import (
     problemes_nouveaux,
     relever_etat_initial,
     renvoyer_si_problemes,

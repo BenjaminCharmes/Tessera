@@ -10,10 +10,15 @@ from pathlib import Path
 import pytest
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services import pipeline_branche, pipeline_controles, pipeline_production, pipeline_testeur
+from tessera.services.pipeline import (
+    pipeline_branche,
+    pipeline_controles,
+    pipeline_production,
+    pipeline_testeur,
+)
 from tessera.services.git_workspace import GitCommandError, GitWorkspaceService, NotAGitRepository
 from tessera.services.pipeline_events import EventType, OrchestratorEvent
-from tessera.services.pipeline_run import PipelineRun
+from tessera.services.pipeline.pipeline_run import PipelineRun
 from tests.doubles_git import GitWorkspaceDouble
 
 
@@ -612,7 +617,7 @@ async def test_run_validation_sans_validateur_approuve_avec_raison_vide() -> Non
 
 
 def test_en_dict_contient_etapes_en_cours_vide_par_defaut() -> None:
-    from tessera.services.run_registry import RunActif
+    from tessera.services.pipeline.run_registry import RunActif
 
     run = RunActif(run_id="r1", project_id="p1")
     d = run.en_dict()
@@ -622,7 +627,7 @@ def test_en_dict_contient_etapes_en_cours_vide_par_defaut() -> None:
 
 
 def test_en_dict_expose_les_etapes_en_cours() -> None:
-    from tessera.services.run_registry import RunActif
+    from tessera.services.pipeline.run_registry import RunActif
 
     run = RunActif(run_id="r1", project_id="p1")
     run.etapes_en_cours = ["revue", "validation"]
@@ -635,8 +640,8 @@ def test_suivre_ajoute_revue_et_validation_dans_etapes_en_cours() -> None:
     """_suivre tracks both stages when reviewer and validator run concurrently."""
     from tessera.models.agent import AgentRole
     from tessera.services.pipeline_events import EventType, OrchestratorEvent
-    from tessera.services.run_executor import _suivre
-    from tessera.services.run_registry import RunActif
+    from tessera.services.pipeline.run_executor import _suivre
+    from tessera.services.pipeline.run_registry import RunActif
 
     run_actif = RunActif(run_id="r1", project_id="p1")
 

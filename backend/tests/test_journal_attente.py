@@ -9,12 +9,12 @@ from pathlib import Path
 from typing import Any
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services import pipeline_branche
+from tessera.services.pipeline import pipeline_branche
 from tessera.services.git_workspace import journal_attente
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.pipeline_events import OrchestratorEvent
-from tessera.services.pipeline_fin_de_file import nettoyer_apres_file
-from tessera.services.pipeline_run import PipelineRun
+from tessera.services.pipeline.pipeline_fin_de_file import nettoyer_apres_file
+from tessera.services.pipeline.pipeline_run import PipelineRun
 
 _LOG = Path("memory") / "pipeline-log.md"
 _LIGNE = "- 2026-11-04 10:00:00 UTC — [portfolio] file interrompue : ticket-021 n'a pas été livré"
@@ -158,7 +158,7 @@ def test_a_path_that_is_not_a_pipeline_log_is_not_queued(tmp_path: Path) -> None
 
 
 async def test_a_worktree_run_rewrites_the_queued_lines_in_its_own_log(tmp_path: Path) -> None:
-    from tessera.services.run_dans_worktree import _reprendre_les_lignes_en_attente
+    from tessera.services.pipeline.run_dans_worktree import _reprendre_les_lignes_en_attente
 
     root = tmp_path / "repo"
     await _depot(root)

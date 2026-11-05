@@ -17,7 +17,7 @@ import re
 from dataclasses import dataclass
 
 from tessera.services.database_chat import ChatMessageRow
-from tessera.services.run_lock import RunAlreadyInProgress, RunLock
+from tessera.services.pipeline.run_lock import RunAlreadyInProgress, RunLock
 
 # Le marqueur que le prompt du chat demande à l'agent d'émettre. C'est un
 # protocole entre l'agent et l'UI, jamais du contenu destiné à l'utilisateur.

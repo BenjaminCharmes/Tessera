@@ -11,7 +11,7 @@ from tessera import reglages
 from tessera.config import settings
 from tessera.main import app
 from tessera.services.database import init_db
-from tessera.services.run_registry import RUN_REGISTRY
+from tessera.services.pipeline.run_registry import RUN_REGISTRY
 
 _URL = "/api/v1/reglages"
 _VITE = {"Origin": "http://localhost:5173"}

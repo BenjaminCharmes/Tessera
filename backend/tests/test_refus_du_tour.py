@@ -5,7 +5,7 @@ from unittest.mock import AsyncMock
 
 from tessera.models.agent import AgentResult, AgentRole
 from tessera.models.ticket import TicketStatus
-from tessera.services.orchestrator import Orchestrator
+from tessera.services.pipeline.orchestrator import Orchestrator
 from tessera.services.providers.perimetre import hook_refus_hors_perimetre
 from tessera.services.providers.refus_garde import (
     TITRE_REFUS,

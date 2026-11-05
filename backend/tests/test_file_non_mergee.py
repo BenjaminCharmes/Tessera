@@ -8,10 +8,10 @@ import pytest
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 from tessera.services.autonomie import NiveauAutonomie
 from tessera.services.livraison.livraison import Livraison
-from tessera.services.orchestrator import Orchestrator
+from tessera.services.pipeline.orchestrator import Orchestrator
 from tessera.services.pipeline_events import PipelineResult
 from tessera.services.gardes.politique_run import PolitiqueRun
-from tessera.services.livreur_run import sync_apres_livraison
+from tessera.services.pipeline.livreur_run import sync_apres_livraison
 
 
 # ------------------------------------------------------------------

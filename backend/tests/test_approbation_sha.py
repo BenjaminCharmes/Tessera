@@ -21,8 +21,8 @@ from tessera.services.database import init_db
 from tessera.services.database_runs import create_run
 from tessera.services.github.github_workflow import GitHubWorkflowService
 from tessera.services.livraison.livraison import Livraison
-from tessera.services.orchestrator import Orchestrator
-from tessera.services.pipeline_approbation import suivre_documentation
+from tessera.services.pipeline.orchestrator import Orchestrator
+from tessera.services.pipeline.pipeline_approbation import suivre_documentation
 from tessera.services.pipeline_events import (
     EventType,
     OrchestratorEvent,
@@ -206,7 +206,7 @@ async def test_watcher_check_reads_the_sha_noted_by_the_delivery(
 ) -> None:
     """The real chain: pushed SHA noted after phase 1, read back for the watcher."""
     from tessera.config import settings
-    from tessera.services.livreur_run import noter_sha_pousse
+    from tessera.services.pipeline.livreur_run import noter_sha_pousse
     from tessera.services.livraison.surveillance_run import controle_tete_de
 
     db = tmp_path / "ide.db"

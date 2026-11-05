@@ -12,8 +12,8 @@ from datetime import datetime, timedelta, timezone
 from tessera.config import settings
 from tessera.models.agent import AgentRole
 from tessera.services.pipeline_events import EventType, OrchestratorEvent
-from tessera.services.run_executor import _suivre, dialogue_du_run
-from tessera.services.run_registry import RunActif
+from tessera.services.pipeline.run_executor import _suivre, dialogue_du_run
+from tessera.services.pipeline.run_registry import RunActif
 
 
 def _run() -> RunActif:

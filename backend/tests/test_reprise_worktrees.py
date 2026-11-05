@@ -10,10 +10,10 @@ from pathlib import Path
 import pytest
 
 from tessera.config import settings
-from tessera.services import reprise_worktrees
+from tessera.services.pipeline import reprise_worktrees
 from tessera.services.git_workspace import GitCommandError
 from tessera.services.worktrees.run_worktree import RunWorktree, creer
-from tessera.services.reprise_worktrees import reprendre_worktrees_orphelins
+from tessera.services.pipeline.reprise_worktrees import reprendre_worktrees_orphelins
 from tests.depot_worktree import BRANCHE, construire, git, lier
 
 
@@ -93,7 +93,7 @@ async def test_a_failed_commit_keeps_the_folder_and_the_startup_goes_on(
         return await vrai_run_git(cwd, *args)
 
     monkeypatch.setattr(reprise_worktrees, "run_git", _commit_refuse)
-    with caplog.at_level(logging.WARNING, logger="tessera.services.reprise_worktrees"):
+    with caplog.at_level(logging.WARNING, logger="tessera.services.pipeline.reprise_worktrees"):
         await _reprendre(checkout)
 
     assert (sale.racine / "travail.txt").read_text(encoding="utf-8") == "a sauver"
@@ -132,7 +132,7 @@ async def test_a_folder_no_repository_registers_is_left_and_logged(
     inconnu.mkdir(parents=True)
     (inconnu / "a.txt").write_text("a", encoding="utf-8")
 
-    with caplog.at_level(logging.WARNING, logger="tessera.services.reprise_worktrees"):
+    with caplog.at_level(logging.WARNING, logger="tessera.services.pipeline.reprise_worktrees"):
         await _reprendre(checkout)
 
     assert (inconnu / "a.txt").read_text(encoding="utf-8") == "a"

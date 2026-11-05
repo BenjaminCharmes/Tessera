@@ -4,11 +4,11 @@ from typing import Any
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 from tessera.services.livraison.livraison import Livraison
-from tessera.services.orchestrator import Orchestrator
+from tessera.services.pipeline.orchestrator import Orchestrator
 from tessera.services.pipeline_events import EventType, OrchestratorEvent, PipelineResult
 from tessera.services.file.pipeline_file_reprise import est_non_livre
 from tessera.services.file.pipeline_file_tour import Tour
-from tessera.services.run_status import classer_les_tickets
+from tessera.services.pipeline.run_status import classer_les_tickets
 
 _REFUS = "Livraison interrompue : GitCommandError push Internal Server Error"
 
@@ -103,7 +103,7 @@ class _Orch:
         self.run_queue = Orchestrator.run_queue.__get__(self)  # type: ignore[attr-defined]
 
     async def run_pipeline(self, project_id: str, ticket_id: str, on_event: Any, **_: Any) -> PipelineResult:
-        from tessera.services.pipeline_livraison import livrer_le_resultat
+        from tessera.services.pipeline.pipeline_livraison import livrer_le_resultat
 
         resultat = PipelineResult(
             ticket_id=ticket_id, final_status=TicketStatus.done, rounds=1,

@@ -19,7 +19,7 @@ from tessera.services.livraison.ci_watcher import CIWatcher
 from tessera.services.livraison.livraison import Livraison
 from tessera.services.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.livraison.realignement_base import Realignement, realigner_base
-from tessera.services.run_registry import RUN_REGISTRY
+from tessera.services.pipeline.run_registry import RUN_REGISTRY
 
 _JOURNAL = Path("memory") / "pipeline-log.md"
 _LIGNE = "- 2026-10-13 13:27:20 UTC — [ticket-051] PR #71 confiée au CIWatcher"

@@ -8,8 +8,8 @@ from fastapi.testclient import TestClient
 from tessera.config import settings
 from tessera.main import app
 from tessera.routers import orchestrator
-from tessera.services.file_vivante import FileVivante, lecteur_sur_la_base, trier_ajouts
-from tessera.services.run_registry import RUN_REGISTRY
+from tessera.services.pipeline.file_vivante import FileVivante, lecteur_sur_la_base, trier_ajouts
+from tessera.services.pipeline.run_registry import RUN_REGISTRY
 from tessera.services.ticket_service import TicketService
 
 _PROJET = "mon-projet"

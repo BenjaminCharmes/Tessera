@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING
 
 from tessera.models.ticket import TicketStatus
 from tessera.services.dialogue import DialogueChannel
-from tessera.services.file_vivante import fermer_si_vivante, marquer_position_si_vivante
+from tessera.services.pipeline.file_vivante import fermer_si_vivante, marquer_position_si_vivante
 from tessera.services.pipeline_events import (
     EventCallback,
     EventType,
@@ -20,13 +20,13 @@ from tessera.services.pipeline_events import (
 from tessera.services.file.pipeline_file_livraison import livraison_arrete_la_file
 from tessera.services.file.pipeline_file_reprise import est_non_livre, relivrer_les_non_livres
 from tessera.services.file.pipeline_file_tour import Tour, progres
-from tessera.services.pipeline_fin_de_file import nettoyer_apres_file
-from tessera.services.pipeline_run import tolerant
+from tessera.services.pipeline.pipeline_fin_de_file import nettoyer_apres_file
+from tessera.services.pipeline.pipeline_run import tolerant
 from tessera.services.usage.session_limit import extract_reset_time_from_arret
 from tessera.utils.logger import get_logger
 
 if TYPE_CHECKING:
-    from tessera.services.orchestrator import Orchestrator
+    from tessera.services.pipeline.orchestrator import Orchestrator
 
 _logger = get_logger(__name__)
 
