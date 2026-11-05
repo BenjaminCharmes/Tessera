@@ -7631,3 +7631,4 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-04 22:47:27 UTC — [ticket-793] testeur: délai dépassé (1500 s, durée réelle 21751 s) — ../scripts/verifier.py coupé après 21751 s
 - 2026-11-05 07:35:57 UTC — [ticket-793] testeur: délai dépassé (1500 s, durée réelle 31709 s) — ../scripts/verifier.py coupé après 31710 s
 - 2026-11-05 07:36:08 UTC — [ticket-793] BLOCKED — testeur: délai dépassé deux fois
+- 2026-11-05 07:36:34 UTC — [ide-core] file interrompue : ticket-793 non approuvé
