@@ -4,7 +4,7 @@ created: 2026-11-05
 depends_on: []
 estimated_days: 1
 id: ticket-849
-pr_number: null
+pr_number: 936
 priority: high
 status: done
 title: A queue refuses tickets absent from origin base before it opens
