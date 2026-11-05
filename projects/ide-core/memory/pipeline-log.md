@@ -7800,3 +7800,4 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-05 14:46:54 UTC — [ticket-805] validateur: fichiers cités joints : reglages.py ; absents : services/
 - 2026-11-05 14:46:54 UTC — [ticket-805] validateur: APPROVED — Tous les critères d'acceptation sont respectés : les tests passent, le fichier r (237156ms)
 - 2026-11-05 14:46:54 UTC — [ticket-805] APPROVED après 1 tour(s)
+- 2026-11-05 14:54:31 UTC — [ticket-805] documentation: 0 fichier(s) (445687ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « jeton vérifiable » — guillemets « quand ... , ... » n'est ni dans le texte remplacé, ni dans les tickets, le diff
