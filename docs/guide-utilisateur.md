@@ -428,6 +428,10 @@ Elle s'arrête si tu navigues ailleurs.
 - **Chargement** : la liste est en cours de lecture.
 - **Erreur** : quelque chose a échoué ; l'écran affiche le message.
 
+### Faux positifs d'erreur dans le journal
+
+Une ligne du journal qui dit « ✓ built, 0 error » ou « 0 errors » s'affiche en blanc (info), non en rouge. Seules les lignes qui affirment un vrai problème (« Error: boom ») rougissent. Les services très bavards — en particulier les compilateurs affichant le décompte des erreurs — ne produisent pas d'alerte visuelle sur un bilan sain.
+
 ## 2 ter. Vue « En cours »
 
 La destination « En cours » vous permet de superviser toutes les apps de projet
@@ -1224,6 +1228,10 @@ Chaque reprise est notée dans le journal du pipeline (`memory/pipeline-log.md`)
 Après un redémarrage du backend, Tessera cherche aussi les pull requests ouvertes dans le dépôt GitHub (pour les projets en `autonomy: merge` avec un dépôt configuré). Si une PR attend sa CI, elle sera de nouveau surveillée et mergée une fois que la CI passe — même si sa fiche est restée en `todo` localement. Rien n'est perdu.
 
 Si ton projet n'a pas de dépôt GitHub ou si son autonomie est `pull`, Tessera reprend uniquement les tickets marqués `in-review` localement.
+
+### Erreur GitHub 500 — Retry automatique
+
+Une erreur serveur 500 de GitHub lors de l'ouverture de la PR n'arrête plus la livraison : le pipeline cherche d'abord si la PR a malgré tout été créée malgré l'erreur, puis retente l'ouverture une fois après une courte attente. L'étape du journal affiche « nouvelle tentative d'ouverture de la PR après l'erreur 500 » ou « PR #N reprise malgré l'erreur 500 » si la PR existait déjà.
 
 ## Le Bureau — vue de supervision
 
