@@ -20,6 +20,7 @@ if str(_SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(_SCRIPTS_DIR))
 
 from verifier import (  # noqa: E402
+    BACKEND_DIR,
     BACKEND_STEPS,
     CONSIGNES_STEPS,
     FRONTEND_STEPS,
@@ -221,9 +222,9 @@ def test_xdist_is_a_dev_dependency() -> None:
 
 
 def test_backend_type_and_frontend_steps_are_defined() -> None:
-    """pytest, the two mypy runs and the frontend steps each sit in their own chain."""
+    """pytest, ruff with the two mypy runs, and the frontend steps each sit in their own chain."""
     assert [s.name for s in BACKEND_STEPS] == ["pytest"]
-    assert [s.name for s in TYPE_STEPS] == ["mypy", "mypy-linux"]
+    assert [s.name for s in TYPE_STEPS] == ["ruff", "mypy", "mypy-linux"]
     assert {s.name for s in FRONTEND_STEPS} == {"tsc", "eslint", "vitest"}
 
 
@@ -232,9 +233,16 @@ def test_steps_equals_backend_plus_types_plus_frontend() -> None:
     assert STEPS == BACKEND_STEPS + TYPE_STEPS + FRONTEND_STEPS
 
 
+def test_ruff_step_lints_src_and_tests_through_the_interpreter() -> None:
+    """Ruff runs as `<python> -m ruff`, never through a launcher (ticket-773)."""
+    ruff = TYPE_STEPS[0]
+    assert ruff.cmd[1:] == ["-m", "ruff", "check", "src", "tests"]
+    assert ruff.cwd == BACKEND_DIR
+
+
 def test_each_mypy_platform_has_its_own_cache() -> None:
     """A shared cache was invalidated by every run of the other platform."""
-    caches = [s.cmd[s.cmd.index("--cache-dir") + 1] for s in TYPE_STEPS]
+    caches = [s.cmd[s.cmd.index("--cache-dir") + 1] for s in TYPE_STEPS if s.name.startswith("mypy")]
     assert len(caches) == 2
     assert caches[0] != caches[1]
 
