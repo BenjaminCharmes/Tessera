@@ -16,7 +16,7 @@ from tessera.services.pipeline_events import EventType, PipelineResult
 from tessera.services.pipeline_rangement import ranger_les_bloques_livres
 from tessera.services.pipeline_run import PipelineRun, emit, set_status
 from tessera.services.run_dans_worktree import adopter_la_branche
-from tessera.services.run_worktree import RunWorktree
+from tessera.services.worktrees.run_worktree import RunWorktree
 from tessera.utils.logger import get_logger
 
 if TYPE_CHECKING:

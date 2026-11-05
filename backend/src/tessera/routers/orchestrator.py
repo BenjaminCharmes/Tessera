@@ -28,7 +28,7 @@ from tessera.services.run_dans_worktree import (
 )
 from tessera.services.run_executor import executer
 from tessera.services.run_registry import RUN_REGISTRY, RunActif, RunAlreadyInProgress
-from tessera.services.run_worktree import RunWorktree
+from tessera.services.worktrees.run_worktree import RunWorktree
 from tessera.services.ticket_service import TicketService
 from tessera.utils.logger import get_logger
 from tessera.utils.project_id import validate_project_id

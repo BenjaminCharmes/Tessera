@@ -16,7 +16,7 @@ from tessera.services.mise_a_jour_pr import TeteAttendue, mise_a_jour_de
 from tessera.services.realignement_base import Realignement
 from tessera.services.reprise_surveillance import SurveillanceProjet
 from tessera.services.resolveur_conflit import ResolveurConflitService
-from tessera.services.run_worktree import RunWorktree
+from tessera.services.worktrees.run_worktree import RunWorktree
 from tessera.services.sha_approbation import sha_pousse_du_ticket
 from tessera.utils.logger import get_logger
 

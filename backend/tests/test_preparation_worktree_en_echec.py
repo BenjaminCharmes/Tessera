@@ -18,7 +18,7 @@ from tessera.services.pipeline_events import OrchestratorEvent, PipelineResult
 from tessera.services.politique_run import PolitiqueRun
 from tessera.services.preparation_worktree import ResultatPreparation
 from tessera.services.run_dans_worktree import ouvrir_worktree
-from tessera.services.run_worktree import RunWorktree
+from tessera.services.worktrees.run_worktree import RunWorktree
 from tests.depot_worktree import construire, git
 
 PROJET = "checkout"

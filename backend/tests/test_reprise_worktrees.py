@@ -12,7 +12,7 @@ import pytest
 from tessera.config import settings
 from tessera.services import reprise_worktrees
 from tessera.services.git_workspace import GitCommandError
-from tessera.services.run_worktree import RunWorktree, creer
+from tessera.services.worktrees.run_worktree import RunWorktree, creer
 from tessera.services.reprise_worktrees import reprendre_worktrees_orphelins
 from tests.depot_worktree import BRANCHE, construire, git, lier
 

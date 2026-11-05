@@ -28,7 +28,7 @@ from tessera.services.run_dans_worktree import (
     ouvrir_worktree,
     retirer_en_fin_de_run,
 )
-from tessera.services.run_worktree import RunWorktree
+from tessera.services.worktrees.run_worktree import RunWorktree
 from tests.depot_worktree import construire, git
 from tests.revue_structuree import revue_depuis_texte
 

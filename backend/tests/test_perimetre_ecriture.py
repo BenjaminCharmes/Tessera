@@ -9,7 +9,7 @@ from tessera.services.providers.perimetre import (
     racine_autorisee,
 )
 from tessera.services.politique_run import PolitiqueRun
-from tessera.services.run_worktree import RunWorktree
+from tessera.services.worktrees.run_worktree import RunWorktree
 from tests.depot_worktree import lier
 
 

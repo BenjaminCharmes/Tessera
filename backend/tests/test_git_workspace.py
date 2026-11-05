@@ -5,7 +5,7 @@ import pytest
 
 import json
 
-from tessera.services.run_worktree import RunWorktree
+from tessera.services.worktrees.run_worktree import RunWorktree
 from tessera.services.git_workspace import (
     GitCommandError,
     GitWorkspaceService,

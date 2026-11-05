@@ -13,8 +13,8 @@ from pathlib import Path
 
 from tessera.config import settings
 from tessera.services.git_workspace import GitCommandError, GitWorkspaceError
-from tessera.services.run_worktree_populate import chemin_etendu, retirer_les_liens
-from tessera.services.temporary_worktree import run_git
+from tessera.services.worktrees.run_worktree_populate import chemin_etendu, retirer_les_liens
+from tessera.services.worktrees.temporary_worktree import run_git
 from tessera.utils.logger import get_logger
 from tessera.utils.project_id import validate_project_id
 

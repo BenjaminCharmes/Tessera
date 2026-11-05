@@ -6,9 +6,9 @@ from pathlib import Path
 import pytest
 
 from tessera.config import settings
-from tessera.services import run_worktree
+from tessera.services.worktrees import run_worktree
 from tessera.services.git_workspace import GitCommandError
-from tessera.services.run_worktree import RunWorktree, supprimer
+from tessera.services.worktrees.run_worktree import RunWorktree, supprimer
 from tests.depot_worktree import BRANCHE
 
 

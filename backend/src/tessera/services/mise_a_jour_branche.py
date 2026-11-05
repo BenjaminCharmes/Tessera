@@ -21,7 +21,7 @@ from tessera.services.git_workspace.chemins import (
 )
 from tessera.services.git_workspace.textes import _union_json_lists, _union_lines
 from tessera.services.retest_apres_rebase import RetestApresRebase
-from tessera.services.temporary_worktree import detached_worktree, run_git
+from tessera.services.worktrees.temporary_worktree import detached_worktree, run_git
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

@@ -103,10 +103,6 @@ A_DEPLACER: dict[str, str] = {
     "prisma_conflits": "git_workspace",
     "regles_conflit": "git_workspace",
     "ticket_diff": "git_workspace",
-    # worktrees
-    "run_worktree": "worktrees",
-    "run_worktree_populate": "worktrees",
-    "temporary_worktree": "worktrees",
     # livraison
     "attente_dependance": "livraison",
     "attente_des_merges": "livraison",

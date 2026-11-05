@@ -20,14 +20,14 @@ from tessera.services.pipeline_events import (
 from tessera.services.pipeline_run import PipelineRun, emit, set_status
 from tessera.services.politique_run import PolitiqueRun
 from tessera.services.preparation_worktree import preparer_le_worktree
-from tessera.services.run_worktree import (
+from tessera.services.worktrees.run_worktree import (
     LienPersistant,
     RunWorktree,
     TravailNonSauve,
     creer,
     supprimer,
 )
-from tessera.services.run_worktree_populate import peupler
+from tessera.services.worktrees.run_worktree_populate import peupler
 from tessera.models.ticket import TicketStatus
 from tessera.utils.logger import get_logger
 

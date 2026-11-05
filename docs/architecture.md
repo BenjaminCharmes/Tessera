@@ -325,7 +325,7 @@ Un worktree neuf est peuplé avant tout lancement : ses entrées déclarées (fi
 
 **Protection contre la suppression de liens traversés** : avant tout `worktree remove` ou `rmtree`, une étape retire chaque jonction et lien sans jamais en traverser l'intérieur — cela évite le bug du 14/10 où une jonction vidait le `node_modules` du dépôt principal. Sous Windows, la détection s'appuie sur l'attribut de point d'analyse (`st_file_attributes`). Si un lien subsiste après, la suppression du worktree s'arrête sans effacer le reste.
 
-Implémentation : `services/run_worktree_populate.py` (ticket-523, ADR-056).
+Implémentation : `services/worktrees/run_worktree_populate.py` (ticket-523, ADR-056).
 
 Sous Windows, les chemins de plus de 260 caractères (courant avec pnpm et les arbres imbriqués de `node_modules`) levaient `WinError 3` lors de la suppression du worktree, interrompant le run même après la livraison de la PR (ticket-531). La correction applique le préfixe étendu `\?\` pour les appels système du nettoyage et rattrape les erreurs `OSError` et `GitWorkspaceError` : le résultat du run reste inchangé (livré reste livré), un avertissement `run_worktree_non_supprime` est journalisé, et le dossier peut être nettoyé au prochain démarrage (ticket-520).
 

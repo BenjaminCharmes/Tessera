@@ -17,9 +17,9 @@ from pathlib import Path
 from tessera.services.git_workspace import GitWorkspaceError
 from tessera.services.pipeline_text import _unapproved_commit_message
 from tessera.services.reprise_orphelin import _RAISON_ARRET
-from tessera.services.run_worktree import RunWorktree, supprimer
-from tessera.services.run_worktree_populate import retirer_les_liens
-from tessera.services.temporary_worktree import run_git
+from tessera.services.worktrees.run_worktree import RunWorktree, supprimer
+from tessera.services.worktrees.run_worktree_populate import retirer_les_liens
+from tessera.services.worktrees.temporary_worktree import run_git
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

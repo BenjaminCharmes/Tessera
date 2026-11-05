@@ -11,7 +11,7 @@ from tessera.services.providers.base import LLMProvider
 from tessera.services.providers.enregistrant import ProviderEnregistrant
 from tessera.services.providers.par_role import modele_du_role, provider_pour_role
 from tessera.services.documentation.roles_documentation import roles_de_documentation
-from tessera.services.run_worktree import RunWorktree
+from tessera.services.worktrees.run_worktree import RunWorktree
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

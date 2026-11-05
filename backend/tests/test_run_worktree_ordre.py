@@ -9,9 +9,9 @@ import pytest
 
 from tessera.config import Settings, settings
 from tessera.models.worktree_config import ConfigWorktree
-from tessera.services import run_worktree
-from tessera.services.run_worktree import RunWorktree, creer, supprimer
-from tessera.services.run_worktree_populate import peupler
+from tessera.services.worktrees import run_worktree
+from tessera.services.worktrees.run_worktree import RunWorktree, creer, supprimer
+from tessera.services.worktrees.run_worktree_populate import peupler
 from tessera.services.worktree_politique import lire_worktree
 from tests.depot_worktree import BRANCHE, construire
 

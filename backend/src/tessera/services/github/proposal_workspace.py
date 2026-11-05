@@ -9,7 +9,7 @@ from pathlib import Path
 
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.politique_run import PolitiqueRun
-from tessera.services.temporary_worktree import run_git
+from tessera.services.worktrees.temporary_worktree import run_git
 from tessera.services.termes_interdits import CommitInfo
 
 

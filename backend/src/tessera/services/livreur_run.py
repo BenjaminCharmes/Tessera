@@ -17,7 +17,7 @@ from tessera.services.project_loader import load_project
 from tessera.services.renumeroter import Renumeroteur
 from tessera.services.resolveur_conflit import ResolveurConflitService
 from tessera.services.retest_apres_rebase import RetestApresRebase
-from tessera.services.run_worktree import RunWorktree
+from tessera.services.worktrees.run_worktree import RunWorktree
 from tessera.services.sha_approbation import noter_poussee
 from tessera.services.ticket_service import TicketService
 from tessera.utils.exceptions import decrire_exception

@@ -18,11 +18,11 @@ from typing import TYPE_CHECKING
 
 from tessera.models.worktree_config import ConfigWorktree, EntreePopulate
 from tessera.services.git_workspace import GitCommandError
-from tessera.services.temporary_worktree import run_git
+from tessera.services.worktrees.temporary_worktree import run_git
 from tessera.utils.logger import get_logger
 
 if TYPE_CHECKING:
-    from tessera.services.run_worktree import RunWorktree
+    from tessera.services.worktrees.run_worktree import RunWorktree
 
 if sys.platform == "win32":
     import _winapi

@@ -17,7 +17,7 @@ from tessera.services.documentation.documenteur_run import documenteur
 from tessera.services.documentation import documentation
 from tessera.services.politique_run import PolitiqueRun
 from tessera.services.run_dans_worktree import ouvrir_worktree
-from tessera.services.run_worktree import RunWorktree
+from tessera.services.worktrees.run_worktree import RunWorktree
 from tests.depot_worktree import construire, git
 from tests.matiere_factice import matiere_factice
 from tests.test_providers_base import FakeProvider

@@ -19,7 +19,7 @@ from tessera.services.github.github_workflow import GitHubWorkflowService, Workf
 from tessera.services.livraison import LivraisonService
 from tessera.services.politique_run import PolitiqueRun
 from tessera.services.providers.perimetre import hook_refus_hors_perimetre
-from tessera.services.run_worktree import RunWorktree
+from tessera.services.worktrees.run_worktree import RunWorktree
 
 
 def _projet(tmp_path: Path, manifeste: dict[str, object] | None) -> Path:

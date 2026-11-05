@@ -60,7 +60,7 @@ if TYPE_CHECKING:
     from tessera.services.verification.controle_visuel import ControleVisuel
     from tessera.services.quota_tracker import QuotaTracker
     from tessera.services.run_recorder import RunRecorder
-    from tessera.services.run_worktree import RunWorktree
+    from tessera.services.worktrees.run_worktree import RunWorktree
     from tessera.services.git_workspace import GitWorkspaceService
     from tessera.services.verdicts.security_auditor import SecurityAuditorService
     from tessera.services.verification.test_runner import TestRunnerService

@@ -17,9 +17,9 @@ from tessera.services import (
     journal_en_attente,
     realignement_base,
     reprise_orphelin,
-    temporary_worktree,
     ticket_diff,
 )
+from tessera.services.worktrees import temporary_worktree
 from tessera.services.creation_projet import project_removal
 from tessera.services.git_runner import GitResult, git, writes
 from tessera.services.git_workspace import GitCommandError

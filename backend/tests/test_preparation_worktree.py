@@ -21,7 +21,7 @@ from tessera.services.preparation_worktree import (
     preparer_le_worktree,
 )
 from tessera.services.run_dans_worktree import adopter_la_branche
-from tessera.services.run_worktree import RunWorktree
+from tessera.services.worktrees.run_worktree import RunWorktree
 from tessera.services.verification.test_runner import EtapeTest, TestResult
 from tessera.services.worktree_politique import lire_worktree
 from tests.doubles_git import GitWorkspaceDouble

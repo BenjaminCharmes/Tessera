@@ -25,7 +25,7 @@ from tessera.services.livraison import LivraisonService
 from tessera.services.politique_run import PolitiqueRun
 from tessera.services.github.proposal_workspace import ProposalWorkspace
 from tessera.services.racine_depot import GIT_ROOT_ANCESTOR
-from tessera.services.temporary_worktree import detached_worktree, run_git
+from tessera.services.worktrees.temporary_worktree import detached_worktree, run_git
 from tessera.services.ticket_service import validate_ticket
 
 
