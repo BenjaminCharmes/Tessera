@@ -2,7 +2,7 @@
 id: ticket-845
 title: "The decision rule and the report of the second-review trial are functions"
 type: chore
-status: todo
+status: done
 priority: low
 agent: codeur
 created: 2026-11-05
@@ -64,17 +64,17 @@ conclusion entre `<!-- seconde-revue-conclusion:debut -->` et `<!-- seconde-revu
 
 ## Critères d'acceptation
 
-- [ ] `scripts/seconde_revue_decision.py` porte les types et les fonctions ci-dessus
-- [ ] `backend/tests/test_seconde_revue_decision.py` couvre `decision` : une branche par test
+- [x] `scripts/seconde_revue_decision.py` porte les types et les fonctions ci-dessus
+- [x] `backend/tests/test_seconde_revue_decision.py` couvre `decision` : une branche par test
       (`non concluant`, `adopter`, `reserver`, `abandonner`) et les bornes : 3 défauts en plus
       adopte, 2 ne le fait pas ; 2 faux positifs en plus adopte, 3 non ; durée à 300 000 ms
       adopte, 300 001 non ; coût de C supérieur à celui de B refuse `adopter` et retombe sur
       `reserver` quand les comptes sensibles le permettent
-- [ ] Le même fichier couvre `mesures_depuis` : un `infonde` ne compte pas comme défaut ;
+- [x] Le même fichier couvre `mesures_depuis` : un `infonde` ne compte pas comme défaut ;
       un défaut que B lève aussi ne compte pas ; une entrée `hors_fenetre` est exclue ; 79 %
       d'approbations de B rendent `valide` faux, 80 % vrai ; 25 % d'exclues de C rendent
       `valide` faux
-- [ ] Un test de `rapport` vérifie la présence du bloc balisé et que sa décision est celle de
+- [x] Un test de `rapport` vérifie la présence du bloc balisé et que sa décision est celle de
       `decision(mesures_depuis(...))`
 
 ## Ce que ça ne fait pas
