@@ -1,6 +1,7 @@
 import Agrandi from "../../design/bureau/Agrandi";
 import Bulle from "../../design/bureau/Bulle";
 import BulleDOutil from "../../design/bureau/BulleDOutil";
+import MarqueurAnomalie from "../../design/bureau/MarqueurAnomalie";
 import Poste from "../../design/bureau/Poste";
 import type { EcranId } from "../../lib/bureau/ecranDuPoste";
 import { libelleDuPoste, nomDuPoste } from "../../lib/bureau/libelleDuPoste";
@@ -27,6 +28,8 @@ interface PosteDeTravailProps {
   outil?: string | null;
   /** Ce que l'écran du poste montre : la scène de son étape ou son verdict (ticket-629). */
   ecran?: EcranId;
+  /** Les anomalies du run, si ce poste porte son marqueur : un seul poste par run (ADR-078). */
+  anomalies?: number;
 }
 
 /**
@@ -46,6 +49,7 @@ export default function PosteDeTravail({
   onChoisir,
   outil = null,
   ecran,
+  anomalies = 0,
 }: PosteDeTravailProps) {
   const occupe = poste.etat === "occupe";
   // Le prénom ouvre le nom accessible et l'infobulle native : c'est une identité, pas un état.
@@ -60,6 +64,7 @@ export default function PosteDeTravail({
     >
       {/* La bulle suit l'agent : absent, c'est la salle où il est qui la porte. */}
       <div className="flex h-5 max-w-full items-end">
+        {occupe && !absent && anomalies > 0 && <MarqueurAnomalie nombre={anomalies} />}
         {occupe && !absent && <Bulle sante={sante} />}
         {occupe && !absent && sante === "actif" && outil && <BulleDOutil phrase={outil} />}
       </div>

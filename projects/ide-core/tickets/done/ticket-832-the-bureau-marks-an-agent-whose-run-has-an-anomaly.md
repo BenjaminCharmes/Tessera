@@ -2,7 +2,7 @@
 id: ticket-832
 title: "The Bureau marks an agent whose run has an anomaly"
 type: feat
-status: todo
+status: done
 pr_number: null
 priority: low
 agent: codeur
@@ -37,15 +37,15 @@ ADR-026 : l'attente à vérifier est ambre. Un marqueur d'état existe déjà po
 
 ## Critères d'acceptation
 
-- [ ] `test_bureau_shows_the_anomaly_marker_when_the_run_has_one_anomaly`
-- [ ] `test_bureau_shows_no_anomaly_marker_when_the_run_has_none`
-- [ ] `test_bureau_shows_one_marker_for_a_run_with_three_anomalies` et son nom accessible dit
+- [x] `test_bureau_shows_the_anomaly_marker_when_the_run_has_one_anomaly`
+- [x] `test_bureau_shows_no_anomaly_marker_when_the_run_has_none`
+- [x] `test_bureau_shows_one_marker_for_a_run_with_three_anomalies` et son nom accessible dit
       « 3 anomalies »
-- [ ] `test_bureau_removes_the_marker_when_the_run_closes`
-- [ ] `test_anomaly_marker_is_a_use_of_the_shared_defs_and_adds_no_inline_path` : le plafond de
+- [x] `test_bureau_removes_the_marker_when_the_run_closes`
+- [x] `test_anomaly_marker_is_a_use_of_the_shared_defs_and_adds_no_inline_path` : le plafond de
       nœuds SVG du Bureau (ADR-070) reste respecté
-- [ ] `test_etat_anomalie_token_is_amber_and_identical_by_day_and_by_night`
-- [ ] `test_the_marker_does_not_draw_an_agent_for_a_run_without_activity` : ADR-058 et ADR-064
+- [x] `test_etat_anomalie_token_is_amber_and_identical_by_day_and_by_night`
+- [x] `test_the_marker_does_not_draw_an_agent_for_a_run_without_activity` : ADR-058 et ADR-064
       tiennent
 
 ## Ce que ça ne fait pas

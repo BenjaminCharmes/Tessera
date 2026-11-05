@@ -32,6 +32,8 @@ class RunVivant(BaseModel):
     file_total: int
     #: The tickets left in the queue, in order.
     suivants: list[str]
+    #: How many anomalies the detector reported on this run (ADR-078), from the registry.
+    anomalies: int = 0
 
 
 class LigneDeJournal(BaseModel):

@@ -2,7 +2,7 @@
 id: ticket-833
 title: "The Tessera room counts the anomalies of each live run"
 type: feat
-status: todo
+status: done
 pr_number: null
 priority: low
 agent: codeur
@@ -35,12 +35,12 @@ inventé.
 
 ## Critères d'acceptation
 
-- [ ] `test_salle_tessera_counts_the_anomalies_of_a_live_run` (backend) : 2 anomalies, `anomalies == 2`
-- [ ] `test_salle_tessera_run_without_anomaly_has_a_zero_count`
-- [ ] `test_salle_tessera_run_row_shows_nothing_for_zero_anomalies`
-- [ ] `test_salle_tessera_run_row_says_1_anomaly_in_the_singular`
-- [ ] `test_salle_tessera_run_row_says_2_anomalies_in_the_plural`
-- [ ] `test_salle_tessera_anomaly_count_uses_amber_never_violet_text`
+- [x] `test_salle_tessera_counts_the_anomalies_of_a_live_run` (backend) : 2 anomalies, `anomalies == 2`
+- [x] `test_salle_tessera_run_without_anomaly_has_a_zero_count`
+- [x] `test_salle_tessera_run_row_shows_nothing_for_zero_anomalies`
+- [x] `test_salle_tessera_run_row_says_1_anomaly_in_the_singular`
+- [x] `test_salle_tessera_run_row_says_2_anomalies_in_the_plural`
+- [x] `test_salle_tessera_anomaly_count_uses_amber_never_violet_text`
 
 ## Ce que ça ne fait pas
 

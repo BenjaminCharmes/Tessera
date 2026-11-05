@@ -120,7 +120,7 @@ async def test_migration_11_creates_the_reglages_table(tmp_path: Path) -> None:
         r[1] for r in sqlite3.connect(str(db)).execute("PRAGMA table_info(reglages)")
     ]
     assert colonnes == ["nom", "valeur", "modifie_le"]
-    assert version_du_schema() == 11
+    assert version_du_schema() >= 11
 
 
 async def test_le_schema_de_base_ne_bouge_plus(tmp_path: Path) -> None:

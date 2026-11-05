@@ -249,3 +249,19 @@ def test_a_shell_whose_line_mentions_claude_is_not_an_agent() -> None:
     }
 
     assert agents_en_cours(moi, procs) == 1
+
+
+def test_salle_tessera_counts_the_anomalies_of_a_live_run() -> None:
+    runs = runs_vivants(
+        [{"project_id": "p", "ticket_id": "ticket-001", "agent": "codeur", "etape": "codeur",
+          "anomalies": [{"regle": "silence"}, {"regle": "tours_de_revue"}]}]
+    )
+
+    assert runs[0].anomalies == 2
+
+
+def test_salle_tessera_run_without_anomaly_has_a_zero_count() -> None:
+    sans_champ = runs_vivants([{"project_id": "p", "ticket_id": "ticket-001"}])
+    liste_vide = runs_vivants([{"project_id": "p", "ticket_id": "ticket-001", "anomalies": []}])
+
+    assert sans_champ[0].anomalies == 0 and liste_vide[0].anomalies == 0

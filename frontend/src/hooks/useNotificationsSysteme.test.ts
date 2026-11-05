@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, renderHook } from "@testing-library/react";
 import { useNotificationsSysteme } from "./useNotificationsSysteme";
 import { INITIAL, type StreamState } from "./streamState";
+import { reglagesParDefaut } from "../lib/reglagesNotifications";
 import type { RunActif } from "../types/api";
 
 const run: RunActif = {
@@ -45,6 +46,36 @@ describe("useNotificationsSysteme", () => {
 
     expect(creees).toHaveLength(1);
     expect(creees[0].titre).toMatch(/question/);
+  });
+
+  it("keeps the boxes of a setting stored before the anomalie type and gives it the defaults (ticket-840)", () => {
+    const ancien: Partial<ReturnType<typeof reglagesParDefaut>> = { ...reglagesParDefaut() };
+    delete ancien.anomalie;
+    ancien.merge = { systeme: false, son: true };
+    window.localStorage.setItem("tessera.ui.notifications.types", JSON.stringify(ancien));
+
+    const { result } = renderHook(() => useNotificationsSysteme(supervision({ ...INITIAL }), "ide-core", vi.fn()));
+
+    expect(result.current.cloche.reglages.merge).toEqual({ systeme: false, son: true });
+    expect(result.current.cloche.reglages.anomalie).toEqual({ systeme: true, son: false });
+    act(() => result.current.cloche.setReglage("anomalie", "son", true));
+    expect(result.current.cloche.reglages.anomalie).toEqual({ systeme: true, son: true });
+  });
+
+  it("notifies a new run anomaly through the system, once (ticket-840)", () => {
+    const etat: StreamState = { ...INITIAL, status: "running" };
+    const avecAnomalie: RunActif = {
+      ...run,
+      anomalies: [{ regle: "tours_de_revue", cle: "tours:ticket-004", ticket_id: "ticket-004", message: "Le tour de revue 3 est atteint.", mesure: 3, seuil: 3, unite: "tours" }],
+    };
+    const { rerender } = renderHook(
+      ({ runs }: { runs: RunActif[] }) => useNotificationsSysteme(supervision(etat, runs), "ide-core", vi.fn()),
+      { initialProps: { runs: [run] } },
+    );
+    rerender({ runs: [avecAnomalie] });
+    rerender({ runs: [{ ...avecAnomalie }] });
+
+    expect(creees.map((c) => c.titre)).toEqual(["demineur · ticket-004 : dernier tour de revue"]);
   });
 
   it("previent une fois quand un agent muet depasse trois minutes", () => {

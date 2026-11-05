@@ -22,6 +22,9 @@ from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
 
+#: Combien d'anomalies un run garde en mémoire (la plus ancienne sort).
+ANOMALIES_GARDEES = 20
+
 
 class RunAlreadyInProgress(Exception):
     """A pipeline is already running on this project."""
@@ -106,6 +109,17 @@ class RunActif:
     demarre_a: datetime = field(
         default_factory=lambda: datetime.now(timezone.utc)
     )
+    #: Quand le run a émis son dernier événement, tokens et appels d'outils
+    #: compris (ticket-834). Le détecteur d'anomalies y lit le silence.
+    dernier_evenement_a: datetime | None = None
+    #: Vrai pendant une attente extérieure (`external_wait`) : le silence y est voulu.
+    attente_exterieure: bool = False
+    #: Les anomalies signalées sur ce run, les plus récentes (ADR-078). Dans
+    #: `en_dict()`, comme `question` : un client arrivé après coup les voit.
+    anomalies: list[dict[str, Any]] = field(default_factory=list)
+    #: Les clés déjà signalées. Hors de `en_dict()` : c'est de la comptabilité
+    #: interne du détecteur, qui meurt avec le run.
+    anomalies_vues: set[str] = field(default_factory=set)
 
     def __post_init__(self) -> None:
         # Un run créé avec son titre le tient pour celui de son ticket courant.
@@ -122,6 +136,11 @@ class RunActif:
         if self.file is not None:
             return self.file.restants()
         return list(self.file_restants)
+
+    def ajouter_anomalie(self, anomalie: dict[str, Any]) -> None:
+        """Keep a reported anomaly, the 20 most recent only."""
+        self.anomalies.append(anomalie)
+        del self.anomalies[:-ANOMALIES_GARDEES]
 
     def en_dict(self) -> dict[str, Any]:
         """Serialisable view — the dialogue channel is deliberately left out."""
@@ -149,6 +168,7 @@ class RunActif:
             "file_faits": list(self.file_faits),
             "etapes_en_cours": list(self.etapes_en_cours),
             "demarre_a": self.demarre_a.isoformat(),
+            "anomalies": list(self.anomalies),
         }
 
 
@@ -178,6 +198,10 @@ class RunRegistry:
 
     def get(self, run_id: str) -> RunActif | None:
         return self._runs.get(run_id)
+
+    def vivants(self) -> list[RunActif]:
+        """The runs open right now, a copy the caller may walk freely."""
+        return list(self._runs.values())
 
     def instantane(self) -> list[dict[str, Any]]:
         """Every live run, as the supervision view receives it on connect."""

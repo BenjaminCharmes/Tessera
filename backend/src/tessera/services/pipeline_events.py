@@ -105,6 +105,10 @@ class EventType(str, Enum):
     #: ou « failed », avec `images`, `startup_ms`, `capture_ms` et, en cas d'échec,
     #: `reason`. Jamais le jeton de session. Absent sans `controle_visuel`.
     VISUAL_CHECK = "visual_check"
+    #: Le détecteur d'anomalies a relevé quelque chose sur ce run (ticket-834,
+    #: ADR-078). `data` est l'`Anomalie` sérialisée. Une transition, pas du
+    #: texte : jamais jetable.
+    RUN_ANOMALY = "run_anomaly"
 
 
 class OrchestratorEvent(BaseModel):

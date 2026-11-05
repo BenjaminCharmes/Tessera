@@ -2,7 +2,7 @@
 id: ticket-834
 title: "The run registry, the event stream and the settings carry run anomalies"
 type: feat
-status: todo
+status: done
 pr_number: null
 priority: medium
 agent: codeur
@@ -45,19 +45,19 @@ un client qui se connecte après coup la voit, et elle meurt avec le run.
 
 ## Critères d'acceptation
 
-- [ ] `test_en_dict_exposes_anomalies_and_hides_the_seen_keys` : `anomalies` est dans `en_dict()`,
+- [x] `test_en_dict_exposes_anomalies_and_hides_the_seen_keys` : `anomalies` est dans `en_dict()`,
       `anomalies_vues` n'y est pas
-- [ ] `test_suivre_sets_last_event_time_on_every_event_type` : un token, un appel d'outil et un
+- [x] `test_suivre_sets_last_event_time_on_every_event_type` : un token, un appel d'outil et un
       `ticket_status_changed` posent tous `dernier_evenement_a`
-- [ ] `test_suivre_tracks_external_wait` : `waiting: true` pose `attente_exterieure`, `waiting:
+- [x] `test_suivre_tracks_external_wait` : `waiting: true` pose `attente_exterieure`, `waiting:
       false` la retire
-- [ ] `test_registry_vivants_lists_open_runs_only` : un run fermé en est absent
-- [ ] `test_run_anomaly_is_not_droppable` : `RUN_ANOMALY` n'est pas dans `JETABLES`, et une file
+- [x] `test_registry_vivants_lists_open_runs_only` : un run fermé en est absent
+- [x] `test_run_anomaly_is_not_droppable` : `RUN_ANOMALY` n'est pas dans `JETABLES`, et une file
       saturée de tokens l'accepte
-- [ ] `test_anomalie_message_at_200_chars_is_kept` et `test_anomalie_message_at_201_chars_is_refused`
-- [ ] `test_anomalies_list_keeps_the_20_most_recent` : 20 anomalies sont gardées, la 21e fait
+- [x] `test_anomalie_message_at_200_chars_is_kept` et `test_anomalie_message_at_201_chars_is_refused`
+- [x] `test_anomalies_list_keeps_the_20_most_recent` : 20 anomalies sont gardées, la 21e fait
       sortir la plus ancienne
-- [ ] `test_anomaly_settings_defaults` : les valeurs par défaut sont celles de la spec
+- [x] `test_anomaly_settings_defaults` : les valeurs par défaut sont celles de la spec
 
 ## Ce que ça ne fait pas
 
