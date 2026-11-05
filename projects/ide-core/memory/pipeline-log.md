@@ -7882,3 +7882,18 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-05 19:23:01 UTC — [ticket-848] livraison: tests relancés après rebase : rouges (FAILED tests/test_ruff_propre.py::test_ruff_check_passes_on_src_and_tests - A... !!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!! !!!!!!!!!!!! xdist.dsession.Interrupted: stopping after 1 failures !!!!!!!!!!!! 1 failed, 4306 passed, 64 warnings in 776.66s (0:12:56) ruf) (1520703ms)
 - 2026-11-05 19:23:01 UTC — [ticket-848] livraison: branche remise sur 17dacf1 ; résolution de conflit abandonnée (0ms)
 - 2026-11-05 19:23:01 UTC — [ticket-848] livraison: arrêt — Tests rouges après rebase sur develop : rien n'est poussé. La base a avancé pendant le run et le tra
+- 2026-11-05 19:23:03 UTC — [ide-core] file interrompue : ticket-848 n'a pas été livré
+- 2026-11-05 19:27:02 UTC — [ticket-849] branche ticket-849-a-queue-refuses-tickets-absent-from-origin-base-b
+- 2026-11-05 19:27:03 UTC — [ticket-849] tour 1 — codeur démarré
+- 2026-11-05 19:33:23 UTC — [ticket-849] tour 1 — codeur terminé (380467ms)
+- 2026-11-05 19:33:48 UTC — [ticket-849] testeur: dur�es : ruff 0 s, pytest 21 s
+- 2026-11-05 19:33:48 UTC — [ticket-849] tests rouges au tour 1
+- 2026-11-05 19:33:48 UTC — [ticket-849] tour 2 — codeur démarré
+- 2026-11-05 19:34:31 UTC — [ticket-849] tour 2 — codeur terminé (42688ms)
+- 2026-11-05 19:35:19 UTC — [ticket-849] testeur: dur�es : ruff 0 s, pytest 20 s, mypy 23 s, mypy-linux 21 s
+- 2026-11-05 19:37:43 UTC — [ticket-849] securite: PASS — Audit ticket-849 : aucune vulnérabilité introduite. Le contrôle refus_avant_ouve (144547ms)
+- 2026-11-05 19:37:43 UTC — [ticket-849] tour 2 — reviewer démarré
+- 2026-11-05 19:38:09 UTC — [ticket-849] tour 2 — reviewer terminé (25452ms)
+- 2026-11-05 19:40:13 UTC — [ticket-849] validateur: APPROVED — Tous les critères d'acceptation ont été satisfaits. Le code implémente le contrô (149188ms)
+- 2026-11-05 19:40:13 UTC — [ticket-849] APPROVED après 2 tour(s)
+- 2026-11-05 19:40:41 UTC — [ticket-849] leçons: rien à retenir
