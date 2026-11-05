@@ -2,7 +2,7 @@
 id: ticket-808
 title: "A route reads and writes the settings from a declared origin only"
 type: feat
-status: todo
+status: done
 pr_number: null
 priority: low
 agent: codeur
@@ -53,8 +53,8 @@ WebSocket) : insuffisant pour relever un plafond de dépense.
 
 ## Critères d'acceptation
 
-- [ ] Les tests ci-dessus passent, `backend/tests/test_auth*.py` existants inchangés et verts
-- [ ] `routers/reglages.py` reste sous 150 lignes ; `auth.py` sous 300
+- [x] Les tests ci-dessus passent, `backend/tests/test_auth*.py` existants inchangés et verts
+- [x] `routers/reglages.py` reste sous 150 lignes ; `auth.py` sous 300
 
 ## Ce que ça ne fait pas
 

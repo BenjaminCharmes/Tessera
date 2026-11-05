@@ -113,6 +113,18 @@ def _is_declared_origin(origin: str) -> bool:
     return origin.strip().lower() in _declared_origins()
 
 
+#: Préfixe des réglages : une écriture y exige un `Origin` déclaré (ticket-808).
+_REGLAGES_PREFIX = "/api/v1/reglages"
+
+
+def _is_settings_write(scope: Scope) -> bool:
+    """A PUT or DELETE on the settings route (ADR-075)."""
+    if scope["type"] != "http" or str(scope["method"]) not in ("PUT", "DELETE"):
+        return False
+    path = str(scope["path"]).lower().rstrip("/")
+    return path == _REGLAGES_PREFIX or path.startswith(_REGLAGES_PREFIX + "/")
+
+
 def _is_trusted_origin_and_host(scope: Scope) -> bool:
     """False for a `Host` outside the allowed names or a foreign `Origin`.
 
@@ -127,6 +139,10 @@ def _is_trusted_origin_and_host(scope: Scope) -> bool:
     if _host_without_port(_header(scope, b"host")) not in _allowed_host_names():
         return False
     origin = _header(scope, b"origin")
+    if _is_settings_write(scope):
+        # Un navigateur en envoie toujours un sur un PUT, curl non : ici l'absence
+        # refuse, et seule une origine déclarée passe, pas tout port loopback.
+        return bool(origin) and _is_declared_origin(origin)
     if not origin:
         return True
     if scope["type"] == "websocket":
