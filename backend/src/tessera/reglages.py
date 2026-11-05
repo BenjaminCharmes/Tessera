@@ -118,6 +118,11 @@ def du_moment() -> ReglagesEffectifs:
     return _effectifs(valeurs)
 
 
+def noms_modifies() -> frozenset[str]:
+    """Names whose value currently differs from `.env` by an override."""
+    return frozenset(_SURCHARGES)
+
+
 def figer(valeurs: ReglagesEffectifs | None = None) -> ReglagesEffectifs:
     """Pin the settings for the current context (a run) and return them."""
     figees = valeurs if valeurs is not None else du_moment()

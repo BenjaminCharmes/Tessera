@@ -19,7 +19,9 @@ Only the ``.env`` of Tessera is refused: a project's own ``.env`` and
 ``.env.example`` are different files and pass.
 
 The same hook refuses a ``Bash`` command that runs the system vault
-(``garde_coffre.py``, ADR-073): the vault holds the same secrets.
+(``garde_coffre.py``, ADR-073): the vault holds the same secrets. It also
+refuses a network command that names the settings route (``garde_reglages.py``,
+ADR-075).
 """
 import fnmatch
 import os
@@ -31,6 +33,7 @@ from claude_agent_sdk import HookContext, HookInput, HookJSONOutput
 
 from tessera.config import Settings
 from tessera.services.providers.garde_coffre import COFFRE_REFUS, commande_execute_le_coffre
+from tessera.services.providers.garde_reglages import REGLAGES_REFUS, commande_vise_les_reglages
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -195,6 +198,9 @@ def hook_refus_env_tessera(
         if outil == "Bash" and commande_execute_le_coffre(str(entrees.get("command", ""))):
             _logger.warning("execution_coffre_refusee", extra={"outil": str(outil)})
             return _refus(COFFRE_REFUS)
+        if outil == "Bash" and commande_vise_les_reglages(str(entrees.get("command", ""))):
+            _logger.warning("route_reglages_refusee", extra={"outil": str(outil)})
+            return _refus(REGLAGES_REFUS)
         if not _outil_vise_le_env(outil, entrees, base, cible):
             return {}
         _logger.warning("lecture_env_tessera_refusee", extra={"outil": str(outil)})

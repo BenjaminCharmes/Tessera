@@ -2,6 +2,7 @@ import type { ReactElement } from "react";
 import type { AlerteDeSupervision, SidebarPanel } from "./panels";
 import Pastille from "./Pastille";
 import Cloche from "./Cloche";
+import BoutonReglages from "./BoutonReglages";
 import type { DonneesDeLaCloche } from "../../hooks/useNotificationsSysteme";
 import type { ReglageDesNotifications } from "./ReglageNotifications";
 import { BAND } from "../../design/layout";
@@ -187,6 +188,8 @@ export default function NavRail({
       </nav>
       {/* Hors du `tablist` : la cloche n'est pas une destination ; elle porte aussi le réglage global (ticket-779). */}
       {cloche ? <Cloche cloche={cloche} notifications={notifications} /> : null}
+      {/* Sous la cloche, hors du `tablist` aussi : un popover pour les réglages globaux (ticket-810). */}
+      <BoutonReglages />
     </div>
   );
 }

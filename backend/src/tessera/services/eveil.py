@@ -9,7 +9,7 @@ fois, pour ne pas polluer les logs à chaque run.
 """
 import platform
 
-from tessera.config import settings
+from tessera import reglages
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -40,7 +40,7 @@ def retenir() -> None:
     Un échec de l'appel système est journalisé et jamais propagé.
     """
     global _non_windows_logged
-    if not settings.keep_awake_during_runs:
+    if not reglages.du_moment().keep_awake_during_runs:
         return
     if platform.system() != "Windows":
         if not _non_windows_logged:
@@ -57,11 +57,11 @@ def retenir() -> None:
 def relacher() -> None:
     """Release the stay-awake request — no-op (logged once) on non-Windows.
 
+    Ne consulte aucun réglage : coupé entre `retenir` et `relacher`, le réglage
+    ne doit pas laisser la machine éveillée pour toujours (ticket-807).
     Un échec de l'appel système est journalisé et jamais propagé.
     """
     global _non_windows_logged
-    if not settings.keep_awake_during_runs:
-        return
     if platform.system() != "Windows":
         if not _non_windows_logged:
             _logger.info("eveil_non_windows", extra={"action": "relacher"})

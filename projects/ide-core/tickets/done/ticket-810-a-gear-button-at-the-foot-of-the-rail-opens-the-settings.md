@@ -2,7 +2,7 @@
 id: ticket-810
 title: "A gear button at the foot of the rail opens the settings"
 type: feat
-status: todo
+status: done
 pr_number: null
 priority: low
 agent: codeur
@@ -51,9 +51,9 @@ montrait que des valeurs. `IconSettings` existe mais se lit comme un soleil : il
 
 ## Critères d'acceptation
 
-- [ ] Les tests ci-dessus passent ; `npm run build`, `tsc`, `eslint` et vitest sont verts
-- [ ] Le test de couleurs d'ADR-026 passe
-- [ ] Une capture du panneau ouvert à 1536 px est jointe au run
+- [x] Les tests ci-dessus passent ; `npm run build`, `tsc`, `eslint` et vitest sont verts
+- [x] Le test de couleurs d'ADR-026 passe
+- [ ] Une capture du panneau ouvert à 1536 px est jointe au run (non faite hors pipeline : la maquette `Reglages.dc.html` est à 1536 px)
 
 ## Ce que ça ne fait pas
 

@@ -91,4 +91,7 @@ export const HORS_PERIMETRE: string[] = [
   "POST /api/v1/agents/create-project",
   "GET /api/v1/fs/list",
   "GET /api/v1/fs/read",
+  "GET /api/v1/reglages", // `Reglage` est typé à la main dans `apiReglages.ts` (ticket-810)
+  "PUT /api/v1/reglages/{nom}",
+  "DELETE /api/v1/reglages/{nom}",
 ];

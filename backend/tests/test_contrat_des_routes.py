@@ -10,6 +10,7 @@ from tessera.main import app
 COUPLES: list[tuple[str, str]] = [
     ("DELETE", "/api/v1/agents/registry/{role}"),
     ("DELETE", "/api/v1/projects/{project_id}"),
+    ("DELETE", "/api/v1/reglages/{nom}"),
     ("GET", "/api/v1/agents/registry"),
     ("GET", "/api/v1/agents/registry/{role}"),
     ("GET", "/api/v1/fs/list"),
@@ -45,6 +46,7 @@ COUPLES: list[tuple[str, str]] = [
     ("GET", "/api/v1/projects/{project_id}/tickets/{ticket_id}/runs"),
     ("GET", "/api/v1/projects/{project_id}/usage"),
     ("GET", "/api/v1/projects/{project_id}/usage/breakdown"),
+    ("GET", "/api/v1/reglages"),
     ("GET", "/api/v1/runs/{run_id}"),
     ("GET", "/api/v1/runs/{run_id}/events"),
     ("GET", "/api/v1/services/running"),
@@ -93,6 +95,7 @@ COUPLES: list[tuple[str, str]] = [
     ("PUT", "/api/v1/fs/write"),
     ("PUT", "/api/v1/projects/{project_id}/agents/{role}"),
     ("PUT", "/api/v1/projects/{project_id}/artifacts"),
+    ("PUT", "/api/v1/reglages/{nom}"),
 ]
 
 
