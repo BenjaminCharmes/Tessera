@@ -1,14 +1,15 @@
 ---
-id: ticket-865
-title: "A review button launches a project review and shows its cost"
-type: feat
-status: todo
-priority: low
 agent: codeur
-depends_on: [ticket-864]
-estimated_days: 1
 created: 2026-11-05
+depends_on:
+- ticket-864
+estimated_days: 1
+id: ticket-865
 pr_number: null
+priority: low
+status: done
+title: A review button launches a project review and shows its cost
+type: feat
 ---
 
 # ticket-865 — Un bouton « Revue » lance une revue de projet et en montre le coût

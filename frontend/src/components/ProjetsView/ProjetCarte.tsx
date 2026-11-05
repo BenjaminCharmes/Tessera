@@ -8,6 +8,7 @@ import BoutonServices from "./BoutonServices";
 import IconeDuProjet from "./IconeDuProjet";
 import LancerFile from "./LancerFile";
 import MenuCategorie from "./MenuCategorie";
+import RevueProjetBouton from "./RevueProjetBouton";
 
 interface ProjetCarteProps {
   projet: ProjectOverview;
@@ -200,6 +201,7 @@ export default function ProjetCarte({
               dejaEnFile={dejaEnFile}
               onLancee={onFileLancee}
             />
+            <RevueProjetBouton projet={projet} onLancee={onFileLancee} />
             <BoutonMiseEnLigne projet={projet} compact />
             <BoutonServices projet={projet} onChange={onServicesChange} />
           </div>

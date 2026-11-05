@@ -7991,3 +7991,19 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-05 22:45:53 UTC — [ticket-864] APPROVED après 3 tour(s)
 - 2026-11-05 22:46:15 UTC — [ticket-864] leçons: une leçon proposée
 - 2026-11-05 22:52:28 UTC — [ticket-864] documentation: 1 fichier(s) (363108ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « preuve » — l'extrait « anomalies: list[dict] » (backend/src/tessera/services/run_registry.py) n'est ni dans le di
+- 2026-11-05 22:59:48 UTC — [ide-core] ticket-864 : base réalignée sur develop
+- 2026-11-05 22:59:48 UTC — [ide-core] ticket-864 PR #943 confiée au CIWatcher
+- 2026-11-05 22:59:45 UTC — [ide-core] ticket-864 PR #943 mergée (CI verte)
+- 2026-11-05 22:59:54 UTC — [ticket-865] branche ticket-865-a-review-button-launches-a-project-review-and-sho
+- 2026-11-05 22:59:56 UTC — [ticket-865] tour 1 — codeur démarré
+- 2026-11-05 23:03:51 UTC — [ticket-865] tour 1 — codeur terminé (235125ms)
+- 2026-11-05 23:06:31 UTC — [ticket-865] testeur: dur�es : tsc 13 s, eslint 24 s, vitest 119 s
+- 2026-11-05 23:09:13 UTC — [ticket-865] securite: PASS — Le diff ajoute un bouton de revue de projet (ticket-865) avec composant React, u (162063ms)
+- 2026-11-05 23:09:13 UTC — [ticket-865] tour 1 — reviewer démarré
+- 2026-11-05 23:09:35 UTC — [ticket-865] tour 1 — reviewer terminé (22125ms)
+- 2026-11-05 23:11:33 UTC — [ticket-865] validateur: fichiers cités joints : RevueProjetBouton.test.tsx
+- 2026-11-05 23:11:33 UTC — [ticket-865] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le composant `RevueProjetBouto (139688ms)
+- 2026-11-05 23:11:33 UTC — [ticket-865] APPROVED après 1 tour(s)
+- 2026-11-05 23:21:04 UTC — [ticket-865] documentation: 0 fichier(s) (558750ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « jeton vérifiable » — ticket « ticket-833 » n'est ni dans le texte remplacé, ni dans les tickets, le diff ou les f — refusé : doc-fonctionnelle : docs/guide-utilisateur.md : règle « preuve » — l'extrait « RUN_ANOMALY = "run_anomaly"
+    #: Le détecteur d'anomalies  » (backend/src/tesse
+- 2026-11-05 23:21:30 UTC — [ticket-865] livraison: arrêt — Livraison interrompue : GitCommandError: git command failed (code 1): git -c core.hooksPath=C:\Users

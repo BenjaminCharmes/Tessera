@@ -73,9 +73,17 @@ export interface RunRequest {
   project_id: string;
   ticket_id?: string | null;
   ticket_ids?: string[];
-  mode?: "single" | "queue" | "autonomous";
+  mode?: "single" | "queue" | "autonomous" | "revue";
   max_tickets?: number;
   depuis_github?: boolean;
+}
+
+/** La réponse de `POST /orchestrator/run` ; une revue y ajoute sa fiche et son coût (ticket-864). */
+export interface RunDemarre {
+  run_id: string;
+  ticket_id?: string | null;
+  plafond_usd?: number | null;
+  cout_estime_usd?: number | null;
 }
 
 /** L'instantane des runs vivants, envoye a la connexion sur `/observe`. */
