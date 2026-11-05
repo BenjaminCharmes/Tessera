@@ -710,3 +710,14 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 **Décision** : `services/` se range en dix-huit domaines, du plus bas au plus haut : noyau, projets, usage, provisioning, gardes, git_workspace, worktrees, github, providers, verification, verdicts, agents, documentation, creation_projet, livraison, pipeline, file, supervision. Un module n'importe que son domaine ou un plus bas ; `test_sens_des_imports.py` le mesure, avec cliquet. `tessera/agents/` disparaît : `github_sync` rejoint `github`. Classement : `memory/services-domaines.md`. Les déplacements gardent le comportement, un domaine par ticket, chacun attendant le merge du précédent.
 **Raison** : deux cents modules à plat ne disent ni où chercher ni qui importe qui ; `agents/` échappait au contrôle.
 **Alternative rejetée** : tout déplacer d'un coup — conflit avec chaque PR ouverte ; une façade à l'ancien chemin — les `monkeypatch` par chaîne cessent de s'appliquer, sans erreur.
+
+---
+
+## ADR-077 — Un outil externe dont on s'inspire s'inscrit au registre et ne se suit jamais en direct
+
+**Date** : 2026-11-05
+**Portée** : architect, codeur
+**Décision** : aucun outil externe n'est suivi en direct : rien ne s'installe pour se mettre à jour seul. Par défaut on réécrit les idées (`idées réécrites`). Une `copie épinglée` (texte repris tel quel, commit précis, attribution) exige un outil de pur texte, sous licence libre compatible, sans binaire, réseau, télémétrie ni hook, qui tient dans le budget de contexte du rôle qui le charge. Toute reprise s'inscrit dans `docs/inspirations.md`. Une nouvelle version d'un outil inscrit ouvre un ticket « relire l'écart et reporter ce qui vaut », jamais une mise à jour automatique.
+**Raison** : un skill est un texte que le modèle exécute ; un changement en amont modifierait les agents sans revue (ADR-055).
+**Alternative rejetée** : laisser les outils se mettre à jour, ou ne rien noter (ticket-715).
+**Détail** : ticket-790.

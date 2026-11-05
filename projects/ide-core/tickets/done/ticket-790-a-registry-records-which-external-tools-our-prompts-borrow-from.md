@@ -1,14 +1,14 @@
 ---
-id: ticket-790
-title: "A registry records which external tools our prompts borrow from, at which commit"
-type: docs
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-11-04
 depends_on: []
 estimated_days: 1
-created: 2026-11-04
+id: ticket-790
+pr_number: 916
+priority: medium
+status: done
+title: A registry records which external tools our prompts borrow from, at which commit
+type: docs
 ---
 
 # ticket-790 — Un registre note les outils externes dont nos consignes s'inspirent, et à quel commit
