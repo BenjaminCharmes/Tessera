@@ -86,6 +86,13 @@ class SourceCoffre(PydanticBaseSettingsSource): ...
 | `coffre` | disponible | présente | valeur du coffre |
 | `coffre` | disponible | absente | repli sur `.env`, puis défaut vide ; chaque secret lu dans `.env` journalise `secret_en_clair_dans_env` (nom seul) |
 | `env` | jamais lu | — | variables d'environnement, `.env`, défaut, sans avertissement |
+| `auto` (défaut) | absent ou en erreur | — | `.env` et avertissement `coffre_indisponible_repli_env` ; **refus** si `.env` porte une ligne `# NOM : dans le coffre` |
+| `auto` | disponible | présente / absente | comme `coffre` |
+
+**Décision de Benjamin, 05/11 :** Tessera reste utilisable sur tous ses PC sans
+rien configurer, d'où le défaut `auto`. Un PC migré (§4, étape 5) passe en
+`coffre` ; un PC jamais migré démarre sur son `.env`. Le refus ci-dessous reste
+entier pour tout secret migré.
 
 Pourquoi refuser plutôt que se replier : un `STATIC_TOKEN` migré, sur une machine
 sans coffre, rouvrirait l'API en silence ; une `FORBIDDEN_TERMS` introuvable
