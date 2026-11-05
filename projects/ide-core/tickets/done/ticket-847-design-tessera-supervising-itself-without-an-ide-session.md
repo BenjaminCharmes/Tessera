@@ -4,7 +4,7 @@ created: 2026-11-05
 depends_on: []
 estimated_days: 1
 id: ticket-847
-pr_number: null
+pr_number: 932
 priority: high
 status: done
 title: Design Tessera supervising itself, without an IDE session next to it
