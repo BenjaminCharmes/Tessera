@@ -24,6 +24,10 @@ from tessera.config_errors import ConfigurationError
 # Pas le logger structuré : il importe `tessera.config`.
 _journal = logging.getLogger("tessera.config")
 
+# D'où viennent les secrets du dernier `Settings` construit : `coffre`, `env`
+# ou `env-repli` (mode `auto` sans coffre). Lu par `/health` et `doctor`.
+_source_effective = "env"
+
 # La ligne que la migration (ticket-797) laisse à la place d'un secret rangé.
 _MARQUE_MIGRE = re.compile(r"^\s*#\s*([A-Z0-9_]+)\s*:\s*dans le coffre", re.MULTILINE)
 
@@ -47,6 +51,19 @@ def noms_migres(env_file: Path | None) -> list[str]:
 def est_placeholder(valeur: str) -> bool:
     """True for an example value such as ``sk-ant-...``: never a real secret."""
     return valeur.strip().endswith("...")
+
+
+def source_effective() -> str:
+    """Return where the secrets came from: ``coffre``, ``env`` or ``env-repli``."""
+    return _source_effective
+
+
+def noms_en_clair(env_file: Path | None) -> list[str]:
+    """Return the secrets that .env still holds in clear, by name only."""
+    if env_file is None or not env_file.is_file():
+        return []
+    lus = dotenv_values(env_file)
+    return [nom for nom in NOMS_SECRETS if (v := lus.get(nom)) and not est_placeholder(v)]
 
 
 class SourceCoffre(PydanticBaseSettingsSource):
@@ -108,12 +125,8 @@ def _signaler_les_secrets_en_clair(
     env_file: Path | None, coffre: dict[str, str] | None
 ) -> None:
     """Log, by name only, every secret still read from .env."""
-    if env_file is None or not env_file.is_file():
-        return
-    lus = dotenv_values(env_file)
-    for nom in NOMS_SECRETS:
-        valeur = lus.get(nom)
-        if not valeur or est_placeholder(valeur) or nom in os.environ:
+    for nom in noms_en_clair(env_file):
+        if nom in os.environ:
             continue
         evenement = (
             "secret_en_double_coffre_et_env"
@@ -131,13 +144,17 @@ def sources_des_secrets(
     file_secret: PydanticBaseSettingsSource,
 ) -> tuple[PydanticBaseSettingsSource, ...]:
     """Order the sources: init, environment, vault, .env, then defaults."""
+    global _source_effective
     env_file = _chemin_dotenv(dotenv)
     mode = lire_secrets_source(env_file)
     if mode not in ("auto", "coffre"):
         # `env`, ou une valeur invalide que la validation du champ refusera.
+        _source_effective = "env"
         return init, env, dotenv, file_secret
     valeurs = _lire_le_coffre(mode, env_file)
     _signaler_les_secrets_en_clair(env_file, valeurs)
     if valeurs is None:
+        _source_effective = "env-repli"
         return init, env, dotenv, file_secret
+    _source_effective = "coffre"
     return init, env, SourceCoffre(settings_cls, valeurs), dotenv, file_secret

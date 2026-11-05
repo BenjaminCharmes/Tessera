@@ -61,6 +61,8 @@ function Invoke-Setup {
     if (-not (Test-Path $envFile)) {
         Copy-Item (Join-Path $Root '.env.example') $envFile
         Write-Host "-> .env cree depuis .env.example"
+        Write-Host "-> Secrets : range-les dans le coffre du systeme, pas dans .env :"
+        Write-Host "   .\scripts\tessera.ps1 secrets set <NOM>, ou secrets migrer apres les avoir mis dans .env"
     }
     Push-Location (Join-Path $Root 'backend')
     try { & uv sync --extra dev } finally { Pop-Location }

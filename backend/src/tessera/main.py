@@ -9,6 +9,7 @@ from starlette.requests import Request
 
 from tessera.auth import HostOriginMiddleware, StaticTokenMiddleware
 from tessera.config import settings
+from tessera.config_coffre import source_effective
 from tessera.services.process_registry import PROCESS_REGISTRY
 from tessera.services.shell_detection import agent_shell_ok, resolve_git_bash, warn_if_shell_missing
 from tessera.routers import (
@@ -169,4 +170,10 @@ app.include_router(salle_tessera.router, prefix="/api/v1")
 
 @app.get("/health")
 async def health() -> dict[str, str | bool]:
-    return {"status": "ok", "version": "0.1.0", "agent_shell": _AGENT_SHELL_OK}
+    # `secrets` : d'où viennent les secrets (ADR-073), jamais un nom ni une valeur.
+    return {
+        "status": "ok",
+        "version": "0.1.0",
+        "agent_shell": _AGENT_SHELL_OK,
+        "secrets": source_effective(),
+    }
