@@ -5,7 +5,7 @@ depends_on:
 - ticket-851
 estimated_days: 1
 id: ticket-852
-pr_number: null
+pr_number: 945
 priority: high
 status: done
 title: The supervisor role config and prompt exist
