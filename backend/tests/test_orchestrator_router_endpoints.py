@@ -10,8 +10,8 @@ from fastapi.testclient import TestClient
 from tessera.config import settings
 from tessera.main import app
 from tessera.models.ticket import TicketStatus
-from tessera.services.database import init_db
-from tessera.services.pipeline_events import EventType, OrchestratorEvent, PipelineResult
+from tessera.services.noyau.database import init_db
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent, PipelineResult
 
 
 @pytest.fixture(autouse=True)
@@ -753,6 +753,6 @@ def test_run_interrompu_clot_le_run_et_ne_renvoie_pas_500(
 
 
 async def _lister_runs() -> list[dict[str, object]]:
-    from tessera.services.database_runs import list_runs
+    from tessera.services.noyau.database_runs import list_runs
 
     return await list_runs(settings.ide_db_path, "mon-projet")

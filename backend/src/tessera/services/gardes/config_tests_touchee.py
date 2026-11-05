@@ -20,7 +20,7 @@ from collections.abc import Callable
 from fnmatch import fnmatch
 from pathlib import Path
 
-from tessera.services.diff_changements import Changement, FichierModifie, lire_diff
+from tessera.services.noyau.diff_changements import Changement, FichierModifie, lire_diff
 
 #: Le titre sous lequel le reviewer lit l'avertissement.
 TITRE_CONFIG_TESTS = "Attention : ce diff modifie la configuration des tests"

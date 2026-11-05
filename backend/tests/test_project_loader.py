@@ -7,7 +7,7 @@ from unittest.mock import patch as mock_patch
 
 import pytest
 
-from tessera.services.modeles_par_defaut import MODELE_PRODUCTION
+from tessera.services.noyau.modeles_par_defaut import MODELE_PRODUCTION
 from tessera.models.project import ProjectCreate
 from tessera.services.projets.project_loader import (
     ProjectLoader,

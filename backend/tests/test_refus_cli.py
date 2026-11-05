@@ -26,7 +26,7 @@ from tessera.models.agent import AgentResult, AgentRole
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 from tessera.services.pipeline import pipeline_production
 from tessera.services.pipeline.orchestrator import Orchestrator
-from tessera.services.pipeline_events import OrchestratorEvent
+from tessera.services.noyau.pipeline_events import OrchestratorEvent
 from tessera.services.pipeline.pipeline_run import PipelineRun
 from tessera.services.providers.agent_sdk import ClaudeAgentSDKProvider
 from tessera.services.providers.refus_cli import MESSAGE_REFUS_CLI

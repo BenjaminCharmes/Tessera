@@ -15,8 +15,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Protocol
 
-from tessera.services.journal_pipeline import ajouter_ligne
-from tessera.services.numerotation import (
+from tessera.services.noyau.journal_pipeline import ajouter_ligne
+from tessera.services.noyau.numerotation import (
     FICHIERS_ADR,
     Genre,
     nombre_de_titres_au_merge_base,
@@ -27,13 +27,13 @@ from tessera.services.numerotation import (
     titres_d_adr,
     titres_d_adr_sur_la_base,
 )
-from tessera.services.reecriture_des_numeros import (
+from tessera.services.noyau.reecriture_des_numeros import (
     JOURNAL,
     nommer,
     reecrire_les_mentions,
     renommer_les_fiches,
 )
-from tessera.services.releve_du_diff import Releve, lire_lignes, releve_du_diff
+from tessera.services.noyau.releve_du_diff import Releve, lire_lignes, releve_du_diff
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

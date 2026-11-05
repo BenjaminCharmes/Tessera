@@ -5,7 +5,7 @@ Split out of `project_loader`: the `CLAUDE.md` and `agents.json` templates.
 
 import json
 
-from tessera.services.modeles_par_defaut import modele_par_defaut
+from tessera.services.noyau.modeles_par_defaut import modele_par_defaut
 
 #: Les rôles posés quand la création n'en demande aucun. La modale n'envoie que
 #: l'identifiant, le nom et la description : sans ce défaut, le projet naissait

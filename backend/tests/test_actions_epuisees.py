@@ -15,7 +15,7 @@ from tessera.models.agent import AgentResult
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 from tessera.services.pipeline import pipeline_production
 from tessera.services.pipeline.orchestrator import Orchestrator
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.pipeline.pipeline_run import PipelineRun
 
 

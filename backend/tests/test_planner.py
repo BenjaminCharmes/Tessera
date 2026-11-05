@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services.prompt_loader import MissingPromptError
+from tessera.services.noyau.prompt_loader import MissingPromptError
 
 from tests.test_providers_base import FakeProvider
 from tessera.models.project import PlanResult

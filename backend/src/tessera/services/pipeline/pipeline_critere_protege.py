@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING
 
 from tessera.models.ticket import TicketStatus
 from tessera.services.verdicts.critere_protege import criteres_sur_chemins_proteges
-from tessera.services.pipeline_events import EventType, PipelineResult
+from tessera.services.noyau.pipeline_events import EventType, PipelineResult
 from tessera.services.pipeline.pipeline_outcomes import commit_ou_bloquer
 from tessera.services.pipeline.pipeline_run import PipelineRun, emit, set_status
 from tessera.services.pipeline.pipeline_text import _extract_criteria, _unapproved_commit_message

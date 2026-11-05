@@ -8,7 +8,7 @@ from fastapi.testclient import TestClient
 from tessera.config import settings
 from tessera.main import app
 from tessera.services.pipeline.file_vivante import FileFermee, FileVivante
-from tessera.services.pipeline_events import PipelineResult
+from tessera.services.noyau.pipeline_events import PipelineResult
 from tessera.services.pipeline.run_registry import RUN_REGISTRY
 from tests.test_file_de_tickets import _events, _OrchestrateurFile
 

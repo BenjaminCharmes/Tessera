@@ -17,7 +17,7 @@ from datetime import datetime, timezone
 from typing import Any, Optional
 
 from tessera.reglages import ReglagesEffectifs, du_moment
-from tessera.services import eveil
+from tessera.services.noyau import eveil
 from tessera.services.pipeline.file_vivante import FileVivante
 from tessera.services.pipeline.run_occupe import RunAlreadyInProgress as RunAlreadyInProgress
 from tessera.utils.logger import get_logger

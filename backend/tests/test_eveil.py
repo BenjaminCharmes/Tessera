@@ -10,8 +10,8 @@ from unittest.mock import MagicMock
 import pytest
 
 from tessera.config import settings
-from tessera.services import eveil
-from tessera.services.eveil import _ES_CONTINUOUS, _ES_SYSTEM_REQUIRED
+from tessera.services.noyau import eveil
+from tessera.services.noyau.eveil import _ES_CONTINUOUS, _ES_SYSTEM_REQUIRED
 from tessera.services.pipeline.run_registry import RunRegistry
 
 

@@ -10,7 +10,7 @@ import pytest
 from websockets.exceptions import ConnectionClosed
 
 from tessera.routers import observation
-from tessera.services.event_hub import Abonnement
+from tessera.services.noyau.event_hub import Abonnement
 
 
 class _SocketQuiEchoue:

@@ -39,7 +39,7 @@ ECARTS_DOMAINES: frozenset[str] = frozenset({
     # L'orchestrateur aiguille vers le mode file, qui l'importe en retour.
     "services/pipeline/orchestrator.py -> file",
     # Le type `Livraison` porté par l'événement de fin de run.
-    "services/pipeline_events.py -> livraison",
+    "services/noyau/pipeline_events.py -> livraison",
 })
 
 

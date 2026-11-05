@@ -15,7 +15,7 @@ _BACKEND_SRC = Path(__file__).resolve().parent.parent / "backend" / "src"
 if str(_BACKEND_SRC) not in sys.path:
     sys.path.insert(0, str(_BACKEND_SRC))
 
-from tessera.services.cost_calculator import calculate_cost  # noqa: E402
+from tessera.services.noyau.cost_calculator import calculate_cost  # noqa: E402
 from tessera.services.verification.sortie_de_test import (  # noqa: E402
     extract_errors,
     extract_failure_details,

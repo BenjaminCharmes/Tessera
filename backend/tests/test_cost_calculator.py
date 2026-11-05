@@ -6,7 +6,7 @@ import tessera.services.agents.chat_service as chat_service
 import tessera.services.file.planner as planner
 import tessera.services.creation_projet.project_analyzer as project_analyzer
 import tessera.services.creation_projet.project_creator as project_creator
-from tessera.services.cost_calculator import DEFAULT_MODEL, calculate_cost, modeles_connus
+from tessera.services.noyau.cost_calculator import DEFAULT_MODEL, calculate_cost, modeles_connus
 
 
 def test_sonnet_cost() -> None:

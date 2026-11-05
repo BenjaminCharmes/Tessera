@@ -8,7 +8,7 @@ from tessera.services.agents.chat_suggestion import (
     parse_pipeline_suggestion,
     summarize_conversation,
 )
-from tessera.services.database_chat import ChatMessageRow
+from tessera.services.noyau.database_chat import ChatMessageRow
 
 
 # ------------------------------------------------------------------

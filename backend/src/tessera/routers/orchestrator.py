@@ -8,7 +8,7 @@ from tessera import reglages
 from tessera.config import settings
 from tessera.services.pipeline.assemblage_run import build_orchestrator
 from tessera.services.pipeline.controles_depart import manques_avant_depart
-from tessera.services.event_hub import EVENT_HUB
+from tessera.services.noyau.event_hub import EVENT_HUB
 from tessera.services.pipeline.file_vivante import (
     FileFermee,
     FileVivante,

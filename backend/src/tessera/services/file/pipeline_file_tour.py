@@ -1,7 +1,7 @@
 """Position of the queue loop and its progress event — ticket-685."""
 from dataclasses import dataclass
 
-from tessera.services.pipeline_events import EventCallback, EventType, OrchestratorEvent
+from tessera.services.noyau.pipeline_events import EventCallback, EventType, OrchestratorEvent
 
 
 @dataclass(frozen=True)

@@ -8,7 +8,7 @@ push (ADR-022). A second failure leaves the ticket where it is.
 from typing import TYPE_CHECKING
 
 from tessera.models.ticket import TicketStatus
-from tessera.services.pipeline_events import (
+from tessera.services.noyau.pipeline_events import (
     EventCallback,
     EventType,
     OrchestratorEvent,

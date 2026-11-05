@@ -12,7 +12,7 @@ from tessera.models.agent import AgentResult, AgentRole
 from tessera.models.ticket import TicketStatus, TicketType
 from tessera.services.projets.artifact_snapshot import diff_artifacts, snapshot_artifacts
 from tessera.services.git_workspace import GitWorkspaceError
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.pipeline.pipeline_run import PipelineRun, set_status
 from tessera.services.providers.refus_garde import refus_du_tour
 from tessera.utils.logger import get_logger

@@ -11,10 +11,10 @@ from tessera.services.git_workspace.ticket_diff import TicketDiff, diff_du_ticke
 from tessera.models.ticket import Ticket, TicketBatchCreate, TicketBatchResponse, TicketCreate, TicketListResponse, TicketStatus, TicketStatusUpdate
 from tessera.services.github.github_service import CiStatus, GitHubService, PRStatus
 from tessera.services.projets.autonomie import lire_niveau
-from tessera.services.database_runs import list_runs, list_runs_for_ticket
+from tessera.services.noyau.database_runs import list_runs, list_runs_for_ticket
 from tessera.services.livraison.pr_status_cache import get_cached_status
-from tessera.services.event_hub import EVENT_HUB
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.noyau.event_hub import EVENT_HUB
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

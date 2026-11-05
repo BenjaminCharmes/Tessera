@@ -3,8 +3,8 @@ import os
 import re
 from pathlib import Path
 
-from tessera.services.numerotation import Genre, numeros_de_noms
-from tessera.services.releve_du_diff import Releve
+from tessera.services.noyau.numerotation import Genre, numeros_de_noms
+from tessera.services.noyau.releve_du_diff import Releve
 
 JOURNAL = "memory/pipeline-log.md"
 PREFIXES: dict[Genre, str] = {"ticket": "ticket-", "adr": "ADR-"}

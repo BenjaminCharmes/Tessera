@@ -16,7 +16,7 @@ import httpx
 
 from tessera.services.livraison.ci_watcher import CIWatcher
 from tessera.services.livraison.livraison import Livraison
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 
 _PLAFOND_S = 5.0
 

@@ -12,7 +12,7 @@ from unittest.mock import AsyncMock, MagicMock
 from tessera.models.agent import AgentResult, AgentRole
 from tessera.models.ticket import TicketStatus
 from tessera.services.documentation.documentation import DocumentationService, ResultatDocumentation
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 from tests.matiere_factice import matiere_factice
 from tests.test_orchestrator import (
     _FakeGit,

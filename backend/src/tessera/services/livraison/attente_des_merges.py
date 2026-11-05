@@ -21,7 +21,7 @@ from typing import Protocol
 
 from tessera.services.livraison.ci_watcher import CI_WATCHER
 from tessera.services.livraison.livraison import Livraison
-from tessera.services.pipeline_events import PipelineResult
+from tessera.services.noyau.pipeline_events import PipelineResult
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

@@ -8,7 +8,7 @@ import time
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from tessera.services.pipeline_events import (
+from tessera.services.noyau.pipeline_events import (
     EventCallback,
     EventType,
     OrchestratorEvent,

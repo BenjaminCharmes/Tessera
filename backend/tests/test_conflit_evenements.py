@@ -13,7 +13,7 @@ from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.livraison.livraison import LivraisonService
 from tessera.services.livraison.livraison_conflit import signal_courant
 from tessera.services.livraison.livraison_evenements import evenements_de_livraison
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 
 _SCHEMA = Path("prisma") / "schema.prisma"
 

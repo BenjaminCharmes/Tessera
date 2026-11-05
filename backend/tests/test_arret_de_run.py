@@ -1,7 +1,7 @@
 """Arreter un run en cours — ticket-069."""
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services.dialogue import DialogueChannel
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.noyau.dialogue import DialogueChannel
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.pipeline.pipeline_run import PipelineRun
 from tests.doubles_git import GitWorkspaceDouble
 

@@ -11,7 +11,7 @@ from tessera.models.ticket import (
     TicketType,
 )
 from tessera.services.pipeline.orchestrator import Orchestrator
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 
 
 def _ticket(type_: TicketType) -> Ticket:

@@ -13,17 +13,17 @@ import aiosqlite
 import pytest
 from fastapi.testclient import TestClient
 
-from tessera.services.modeles_par_defaut import MODELE_JUGEMENT
+from tessera.services.noyau.modeles_par_defaut import MODELE_JUGEMENT
 from tessera.config import settings
 from tessera.main import app
 from tessera.models.agent import AgentConfig, AgentRole
 from tessera.services.projets import project_loader
 from tessera.services.usage.agent_calls import save_agent_call
-from tessera.services.database import init_db
-from tessera.services.database_runs import create_run
+from tessera.services.noyau.database import init_db
+from tessera.services.noyau.database_runs import create_run
 from tessera.services.documentation.documentation import DocumentationService
-from tessera.services.event_hub import EVENT_HUB
-from tessera.services.pipeline_events import EventType
+from tessera.services.noyau.event_hub import EVENT_HUB
+from tessera.services.noyau.pipeline_events import EventType
 from tessera.services.file.planner import PlannerService
 from tessera.services.creation_projet.project_analyzer import ProjectAnalyzerService
 from tessera.services.projets.project_loader import (

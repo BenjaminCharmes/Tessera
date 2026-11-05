@@ -19,8 +19,8 @@ from fastapi.testclient import TestClient
 from tessera.config import settings
 from tessera.main import app
 from tessera.models.ticket import TicketStatus
-from tessera.services.database import init_db
-from tessera.services.pipeline_events import EventType, OrchestratorEvent, PipelineResult
+from tessera.services.noyau.database import init_db
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent, PipelineResult
 from tessera.services.pipeline.run_lock import RUN_LOCK, RunAlreadyInProgress, RunLock
 
 

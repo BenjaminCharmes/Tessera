@@ -7,15 +7,15 @@ from tessera.models.agent import AgentConfig, AgentResult, AgentRole
 from tessera.models.ticket import Ticket
 from tessera.services.projets.adr import adr_pertinents
 from tessera.services.agents.agent_registry import AgentNotFoundError, AgentRegistryService
-from tessera.services.cost_calculator import DEFAULT_MODEL, calculate_cost
+from tessera.services.noyau.cost_calculator import DEFAULT_MODEL, calculate_cost
 from tessera.services.usage.agent_calls import save_agent_call
 from tessera.services.providers.base import (
     LLMProvider,
     ProviderResult,
     ToolEventCallback,
 )
-from tessera.services.prompt_loader import MissingPromptError
-from tessera.services.statut_suggere import _parse_suggested_status
+from tessera.services.noyau.prompt_loader import MissingPromptError
+from tessera.services.noyau.statut_suggere import _parse_suggested_status
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

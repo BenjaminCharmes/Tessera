@@ -9,9 +9,9 @@ work uncommitted (ADR-018, ADR-020).
 from typing import TYPE_CHECKING
 
 from tessera.models.ticket import TicketStatus
-from tessera.services.dialogue import DialogueChannel
+from tessera.services.noyau.dialogue import DialogueChannel
 from tessera.services.pipeline.file_vivante import fermer_si_vivante, marquer_position_si_vivante
-from tessera.services.pipeline_events import (
+from tessera.services.noyau.pipeline_events import (
     EventCallback,
     EventType,
     OrchestratorEvent,

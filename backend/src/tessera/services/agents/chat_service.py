@@ -24,10 +24,10 @@ from tessera.services.agents.chat_suggestion import (
     parse_pipeline_suggestion,
     strip_suggestion_marker,
 )
-from tessera.services.database_chat import ChatMessageRow
+from tessera.services.noyau.database_chat import ChatMessageRow
 from tessera.services.git_workspace import GitWorkspaceError, GitWorkspaceService
-from tessera.services.cost_calculator import DEFAULT_MODEL
-from tessera.services.prompt_loader import load_system_prompt
+from tessera.services.noyau.cost_calculator import DEFAULT_MODEL
+from tessera.services.noyau.prompt_loader import load_system_prompt
 from tessera.services.providers.base import LLMProvider
 from tessera.utils.logger import get_logger
 

@@ -13,12 +13,12 @@ from tessera.services.projets.adr import adr_pertinents, lire_contraintes
 from tessera.services.pipeline.assemblage_run import build_orchestrator
 from tessera.services.agents.chat_service import ChatBudgetExceeded, ChatService
 from tessera.services.agents.chat_suggestion import summarize_conversation
-from tessera.services.event_hub import EVENT_HUB
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.noyau.event_hub import EVENT_HUB
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.pipeline.run_executor import emetteur
 from tessera.services.pipeline.run_lock import RUN_LOCK
 from tessera.services.pipeline.run_registry import RUN_REGISTRY, RunActif, RunAlreadyInProgress
-from tessera.services.database_chat import (
+from tessera.services.noyau.database_chat import (
     ChatMessageRow,
     ConversationSummary,
     conversation_cost_usd,

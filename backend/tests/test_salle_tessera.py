@@ -13,7 +13,7 @@ import aiosqlite
 from fastapi.testclient import TestClient
 
 from tessera.main import app
-from tessera.services.database import init_db
+from tessera.services.noyau.database import init_db
 from tessera.routers.services_running import get_sonde
 from tessera.services.providers import ollama
 from tessera.services.supervision.salle_tessera import (

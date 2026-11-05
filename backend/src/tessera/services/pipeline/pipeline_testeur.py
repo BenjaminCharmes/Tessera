@@ -2,7 +2,7 @@
 from typing import TYPE_CHECKING
 
 from tessera.services.verification.detail_du_delai import detail_du_delai, ligne_de_delai
-from tessera.services.pipeline_events import EventType, PipelineResult
+from tessera.services.noyau.pipeline_events import EventType, PipelineResult
 from tessera.services.pipeline.pipeline_outcomes import finish_timeout_expired
 from tessera.services.pipeline.pipeline_run import PipelineRun, emit
 from tessera.utils.logger import get_logger

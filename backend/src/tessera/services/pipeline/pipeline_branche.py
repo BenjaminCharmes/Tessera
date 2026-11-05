@@ -13,7 +13,7 @@ from tessera.models.ticket import TicketStatus
 from tessera.services.pipeline import pipeline_fin_de_file as fin_de_file
 from tessera.services.git_workspace import journal_attente, journal_en_attente
 from tessera.services.git_workspace import GitWorkspaceError, NotAGitRepository
-from tessera.services.pipeline_events import EventType, PipelineResult
+from tessera.services.noyau.pipeline_events import EventType, PipelineResult
 from tessera.services.pipeline.pipeline_rangement import ranger_les_bloques_livres
 from tessera.services.pipeline.pipeline_run import PipelineRun, emit, set_status
 from tessera.services.pipeline.run_dans_worktree import adopter_la_branche

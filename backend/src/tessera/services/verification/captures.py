@@ -15,7 +15,7 @@ from urllib.parse import urlsplit
 
 from tessera.config import settings
 from tessera.services.verification.captures_config import ConfigCaptures
-from tessera.services.lancement import essais_de_commande
+from tessera.services.noyau.lancement import essais_de_commande
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

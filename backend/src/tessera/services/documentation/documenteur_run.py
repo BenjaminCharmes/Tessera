@@ -4,7 +4,7 @@ from collections.abc import Awaitable, Callable
 
 from tessera.config import settings
 from tessera.services.documentation.documentation import DocumentationService, ResultatDocumentation
-from tessera.services.journal_pipeline import journal_vers
+from tessera.services.noyau.journal_pipeline import journal_vers
 from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.projets.project_loader import load_pipeline_config
 from tessera.services.providers.base import LLMProvider

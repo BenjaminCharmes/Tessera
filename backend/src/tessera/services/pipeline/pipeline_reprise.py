@@ -8,7 +8,7 @@ droit à l'audit.
 from typing import TYPE_CHECKING
 
 from tessera.models.ticket import TicketStatus
-from tessera.services.pipeline_events import EventType
+from tessera.services.noyau.pipeline_events import EventType
 from tessera.services.pipeline.pipeline_run import PipelineRun, emit, set_status
 from tessera.services.pipeline.pipeline_production import (
     _capture_artifact_diff,

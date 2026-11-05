@@ -9,8 +9,8 @@ import asyncio
 
 import pytest
 
-from tessera.services.event_hub import EventHub
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.noyau.event_hub import EventHub
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.pipeline.run_lock import RunAlreadyInProgress, RunLock
 from tessera.services.pipeline.run_registry import RunRegistry
 

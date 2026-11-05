@@ -5,7 +5,7 @@ from pathlib import Path
 
 from tessera.services.verdicts import security_auditor, validator
 from tessera.services.documentation import documentation
-from tessera.services.modeles_par_defaut import (
+from tessera.services.noyau.modeles_par_defaut import (
     MODELE_JUGEMENT,
     MODELE_PRODUCTION,
     modele_par_defaut,

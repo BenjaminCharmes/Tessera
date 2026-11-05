@@ -13,7 +13,7 @@ from tessera.services.providers.base import (
     ToolEventCallback,
 )
 from tessera.services.providers.refus_garde import JournalDesRefus
-from tessera.services.shell_detection import resolve_git_bash
+from tessera.services.noyau.shell_detection import resolve_git_bash
 
 __all__ = [
     "AnthropicApiProvider",

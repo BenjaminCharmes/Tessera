@@ -19,7 +19,7 @@ from contextvars import ContextVar
 from pathlib import Path
 from typing import Any
 
-from tessera.services.cost_calculator import calculate_cost
+from tessera.services.noyau.cost_calculator import calculate_cost
 from tessera.services.usage.agent_calls import save_agent_call
 from tessera.services.providers.base import (
     LLMProvider,

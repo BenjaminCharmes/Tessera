@@ -15,7 +15,7 @@ from tessera.services.pipeline import pipeline_branche
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.github.github_service import GitHubService
 from tessera.services.github.github_workflow import GitHubWorkflowService
-from tessera.services.pipeline_events import OrchestratorEvent
+from tessera.services.noyau.pipeline_events import OrchestratorEvent
 from tessera.services.pipeline.pipeline_run import PipelineRun
 from tessera.services.projets.ticket_service import TicketService
 

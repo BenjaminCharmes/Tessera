@@ -23,7 +23,7 @@ from fastapi.testclient import TestClient
 from tessera.config import settings
 from tessera.main import app
 from tessera.routers.services_running import get_sonde
-from tessera.services.database import init_db
+from tessera.services.noyau.database import init_db
 from tessera.services.verification.process_registry import PROCESS_REGISTRY
 from tessera.services.supervision.sonde_systeme import InfoProcessus
 
@@ -238,8 +238,8 @@ def test_la_sortie_du_service_part_sur_le_canal(
 ) -> None:
     # Le canal d'ADR-041 porte « ce que l'IDE est en train de faire » : un
     # serveur qui tourne en fait partie.
-    from tessera.services.event_hub import EVENT_HUB
-    from tessera.services.pipeline_events import EventType
+    from tessera.services.noyau.event_hub import EVENT_HUB
+    from tessera.services.noyau.pipeline_events import EventType
 
     _manifeste(workspace / "mon-projet", [{"nom": "api", "commande": _BAVARD}])
     abonne = EVENT_HUB.subscribe()
@@ -468,8 +468,8 @@ def test_la_fin_d_un_service_est_annoncee(
     # Sans annonce, l'écran ne peut apprendre la mort d'un service qu'en
     # sondant en boucle : il afficherait « en cours » pour un processus qui
     # n'existe plus (ticket-145).
-    from tessera.services.event_hub import EVENT_HUB
-    from tessera.services.pipeline_events import EventType
+    from tessera.services.noyau.event_hub import EVENT_HUB
+    from tessera.services.noyau.pipeline_events import EventType
 
     _manifeste(workspace / "mon-projet", [{"nom": "api", "commande": _QUI_MEURT}])
     abonne = EVENT_HUB.subscribe()

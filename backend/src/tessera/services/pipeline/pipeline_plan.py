@@ -12,7 +12,7 @@ sans lui.
 from typing import TYPE_CHECKING
 
 from tessera.models.agent import AgentConfig, AgentRole
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.pipeline.pipeline_run import PipelineRun
 from tessera.utils.logger import get_logger
 

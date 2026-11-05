@@ -15,8 +15,8 @@ from pathlib import Path
 
 import aiosqlite
 
-from tessera.services.database import init_db
-from tessera.services.database_runs import create_run, solder_les_runs_orphelins
+from tessera.services.noyau.database import init_db
+from tessera.services.noyau.database_runs import create_run, solder_les_runs_orphelins
 from tessera.services.pipeline.reprise_orphelin import reprendre_depots_orphelins
 
 

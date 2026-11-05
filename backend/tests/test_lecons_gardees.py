@@ -12,7 +12,7 @@ from tessera.services.pipeline.pipeline_contraintes import (
     arret_contraintes_hors_proposees,
     arret_lecons_modifiees,
 )
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.pipeline.pipeline_run import PipelineRun
 from tests.doubles_git import GitWorkspaceDouble
 from tests.test_lecons_run import LECON, PREUVE, RETOUR, _Fournisseur, _projet, _reponse

@@ -4,9 +4,9 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services import database
-from tessera.services.database import init_db, version_du_schema
-from tessera.services.database_runs import create_run
+from tessera.services.noyau import database
+from tessera.services.noyau.database import init_db, version_du_schema
+from tessera.services.noyau.database_runs import create_run
 
 
 def _version(db_path: Path) -> int:

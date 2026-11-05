@@ -15,7 +15,7 @@ from tessera.services.livraison.livraison import Livraison
 from tessera.services.pipeline.orchestrator import Orchestrator
 from tessera.services.pipeline.pipeline_approbation import retenir_pour_relecture
 from tessera.services.pipeline.pipeline_capture import capturer_le_run
-from tessera.services.pipeline_events import OrchestratorEvent, PipelineResult
+from tessera.services.noyau.pipeline_events import OrchestratorEvent, PipelineResult
 
 
 def _declarer(projet: Path, mode: str = "relire", **extra: object) -> ControleVisuel:

@@ -5,7 +5,7 @@ Supervision ne pouvait pas dire s'il en restait deux derriere.
 """
 
 from tessera.models.agent import AgentRole
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.pipeline.run_executor import _suivre
 from tessera.services.pipeline.run_registry import RunActif
 

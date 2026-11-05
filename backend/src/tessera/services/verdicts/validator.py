@@ -14,7 +14,7 @@ from tessera.services.verdicts.validator_cited_files import (
 )
 from tessera.services.verdicts.validator_decisions import Exchanges, build_decisions_section
 from tessera.services.verdicts.validator_schema import VALIDATOR_SCHEMA
-from tessera.services.modeles_par_defaut import MODELE_JUGEMENT
+from tessera.services.noyau.modeles_par_defaut import MODELE_JUGEMENT
 from tessera.utils.logger import get_logger
 
 if TYPE_CHECKING:

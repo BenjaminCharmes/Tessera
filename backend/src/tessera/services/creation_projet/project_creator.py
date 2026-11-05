@@ -9,13 +9,13 @@ from tessera.models.project import (
 )
 from tessera.models.ticket import TicketDraft, TicketPriority, TicketType
 from tessera.services.agents.agent_registry import AgentRegistryService
-from tessera.services.cost_calculator import DEFAULT_MODEL
+from tessera.services.noyau.cost_calculator import DEFAULT_MODEL
 from tessera.services.projets.project_loader import ProjectLoader
 from tessera.services.providers.base import LLMProvider
 from tessera.utils.conversation import format_conversation
 from tessera.utils.json_extract import extract_json
-from tessera.services.prompt_loader import load_system_prompt
-from tessera.services.modeles_par_defaut import MODELE_JUGEMENT
+from tessera.services.noyau.prompt_loader import load_system_prompt
+from tessera.services.noyau.modeles_par_defaut import MODELE_JUGEMENT
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

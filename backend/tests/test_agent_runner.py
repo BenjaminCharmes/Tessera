@@ -9,16 +9,16 @@ from tests.test_providers_base import FakeProvider
 from tessera.models.agent import AgentConfig, AgentResult, AgentRole
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 from tessera.services.agents.agent_registry import AgentRegistryService
-from tessera.services.prompt_loader import MissingPromptError
+from tessera.services.noyau.prompt_loader import MissingPromptError
 from tessera.services.agents.agent_runner import (
     _DEFAULT_MAX_TOKENS,
     _DEFAULT_MODEL,
     AgentRunner,
     _parse_suggested_status,
 )
-from tessera.services.cost_calculator import calculate_cost
-from tessera.services.database import init_db
-from tessera.services.database_runs import create_run
+from tessera.services.noyau.cost_calculator import calculate_cost
+from tessera.services.noyau.database import init_db
+from tessera.services.noyau.database_runs import create_run
 
 
 # ------------------------------------------------------------------

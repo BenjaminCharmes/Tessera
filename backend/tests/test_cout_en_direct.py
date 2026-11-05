@@ -13,7 +13,7 @@ from fastapi.testclient import TestClient
 from tessera.config import settings
 from tessera.main import app
 from tessera.models.agent import AgentResult, AgentRole
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.pipeline.run_executor import _suivre
 from tessera.services.pipeline.run_registry import RunActif
 from tests.test_orchestrator import _make_agent_result, _make_orchestrator

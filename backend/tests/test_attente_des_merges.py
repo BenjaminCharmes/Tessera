@@ -9,7 +9,7 @@ from tessera.services.livraison.attente_des_merges import (
 )
 from tessera.services.livraison.ci_watcher import CIWatcher
 from tessera.services.livraison.livraison import Livraison
-from tessera.services.pipeline_events import PipelineResult
+from tessera.services.noyau.pipeline_events import PipelineResult
 
 
 class _FausseSurveillance:

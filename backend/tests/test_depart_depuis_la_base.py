@@ -11,7 +11,7 @@ import pytest
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 from tessera.services.pipeline import pipeline_branche
 from tessera.services.git_workspace import GitWorkspaceService
-from tessera.services.pipeline_events import OrchestratorEvent
+from tessera.services.noyau.pipeline_events import OrchestratorEvent
 from tessera.services.pipeline.pipeline_run import PipelineRun
 
 _JOURNAL = "memory/pipeline-log.md"

@@ -4,7 +4,7 @@ Sorti de `run_executor.py` au ticket-834, qui plafonnait ce fichier : le suivi
 d'un événement est une fonction pure du registre, sans I/O.
 """
 from tessera.models.agent import AgentRole
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.pipeline.run_registry import RunActif
 
 

@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 from tessera.services.pipeline import pipeline_fin_de_file as fin_de_file
 from tessera.services.livraison.livraison_evenements import evenements_de_livraison
 from tessera.services.pipeline.pipeline_approbation import retenir_pour_relecture
-from tessera.services.pipeline_events import (
+from tessera.services.noyau.pipeline_events import (
     EventCallback,
     EventType,
     OrchestratorEvent,

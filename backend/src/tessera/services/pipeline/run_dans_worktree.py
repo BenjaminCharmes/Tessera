@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING
 from tessera.config import settings
 from tessera.services.git_workspace import journal_attente, journal_en_attente
 from tessera.services.git_workspace import GitWorkspaceError, _branch_name
-from tessera.services.pipeline_events import (
+from tessera.services.noyau.pipeline_events import (
     EventCallback,
     EventType,
     OrchestratorEvent,

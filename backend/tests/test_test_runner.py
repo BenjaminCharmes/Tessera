@@ -323,7 +323,7 @@ class TestCommandeNonDemarree:
         # testeur lance sans shell, et `npm` n'existe pas sous Windows — c'est
         # `npm.cmd`. La reprise existait dans `ProcessRegistry` depuis le
         # ticket-149 et n'avait pas été portée ici (ticket-157).
-        from tessera.services.lancement import essais_de_commande
+        from tessera.services.noyau.lancement import essais_de_commande
 
         essais = essais_de_commande(["npm", "run", "test"])
 
@@ -334,7 +334,7 @@ class TestCommandeNonDemarree:
             assert essais == [["npm", "run", "test"]]
 
     async def test_une_commande_deja_suffixee_n_est_pas_redoublee(self) -> None:
-        from tessera.services.lancement import essais_de_commande
+        from tessera.services.noyau.lancement import essais_de_commande
 
         assert essais_de_commande(["npm.cmd", "test"]) == [["npm.cmd", "test"]]
 

@@ -18,11 +18,11 @@ from typing import Any, Optional, Protocol
 
 from tessera import reglages
 from tessera.config import settings
-from tessera.services.database_events import save_event
-from tessera.services.database_runs import create_run, finish_run
-from tessera.services.dialogue import DialogueChannel
-from tessera.services.event_hub import EventHub
-from tessera.services.pipeline_events import (
+from tessera.services.noyau.database_events import save_event
+from tessera.services.noyau.database_runs import create_run, finish_run
+from tessera.services.noyau.dialogue import DialogueChannel
+from tessera.services.noyau.event_hub import EventHub
+from tessera.services.noyau.pipeline_events import (
     EventCallback,
     EventType,
     OrchestratorEvent,

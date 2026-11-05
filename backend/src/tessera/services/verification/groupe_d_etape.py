@@ -14,7 +14,7 @@ import os
 import subprocess
 import threading
 
-from tessera.services import groupe_de_processus
+from tessera.services.noyau import groupe_de_processus
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

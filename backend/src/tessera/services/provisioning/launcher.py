@@ -10,8 +10,8 @@ from dataclasses import dataclass
 from typing import Optional
 
 from tessera.config import settings
-from tessera.services.event_hub import EVENT_HUB
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.noyau.event_hub import EVENT_HUB
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.provisioning.cloudflare import CloudflareClient
 from tessera.services.provisioning.cloudflare_steps import DnsStep
 from tessera.services.provisioning.health_step import HealthCheckStep

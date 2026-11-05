@@ -13,7 +13,7 @@ from tessera.services.gardes.config_tests_touchee import (
     imposer_config_nommee,
     porte_config_nommee,
 )
-from tessera.services.diff_changements import lire_diff
+from tessera.services.noyau.diff_changements import lire_diff
 from tessera.services.pipeline.orchestrator import Orchestrator
 from tessera.services.verdicts.validator import ValidatorService
 from tests.test_orchestrator import _FakeGit, _make_agent_result, _make_ticket, _noop

@@ -5,7 +5,7 @@ from pathlib import Path
 from unittest.mock import AsyncMock
 
 from tessera.models.agent import AgentResult, AgentRole
-from tessera.services.dialogue import DialogueChannel, DialogueExchange
+from tessera.services.noyau.dialogue import DialogueChannel, DialogueExchange
 from tessera.services.pipeline.orchestrator import Orchestrator
 from tessera.services.verdicts.validator import ValidatorService
 from tessera.services.verdicts.validator_decisions import DECISIONS_SECTION_TITLE, validator_extras

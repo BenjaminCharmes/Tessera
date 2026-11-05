@@ -20,9 +20,9 @@ from fastapi.testclient import TestClient
 from tessera.config import settings
 from tessera.main import app
 from tessera.services.agents.chat_service import ChatReply
-from tessera.services.database import init_db
-from tessera.services.event_hub import EVENT_HUB
-from tessera.services.pipeline_events import EventType
+from tessera.services.noyau.database import init_db
+from tessera.services.noyau.event_hub import EVENT_HUB
+from tessera.services.noyau.pipeline_events import EventType
 from tessera.services.pipeline.run_registry import RUN_REGISTRY
 
 

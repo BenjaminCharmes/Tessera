@@ -16,7 +16,7 @@ Trois pièces, chacune répondant à une contrainte posée par le ticket :
 import re
 from dataclasses import dataclass
 
-from tessera.services.database_chat import ChatMessageRow
+from tessera.services.noyau.database_chat import ChatMessageRow
 from tessera.services.pipeline.run_lock import RunAlreadyInProgress, RunLock
 
 # Le marqueur que le prompt du chat demande à l'agent d'émettre. C'est un

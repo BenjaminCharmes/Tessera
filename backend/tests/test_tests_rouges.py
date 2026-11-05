@@ -10,7 +10,7 @@ from tessera.models.ticket import (
     TicketType,
 )
 from tessera.services.pipeline.orchestrator import Orchestrator
-from tessera.services.pipeline_events import OrchestratorEvent
+from tessera.services.noyau.pipeline_events import OrchestratorEvent
 from tessera.services.verification.test_runner import TestResult
 
 

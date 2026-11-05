@@ -13,13 +13,13 @@ from typing import TYPE_CHECKING, Any, Optional
 from tessera.models.agent import AgentConfig, AgentRole
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus
 from tessera.services.agents.agent_runner import AgentRunner
-from tessera.services.dialogue import DialogueChannel
+from tessera.services.noyau.dialogue import DialogueChannel
 from tessera.services.pipeline.file_vivante import est_termine
 from tessera.services.providers.enregistrant import activer_enregistrement
-from tessera.services.journal_pipeline import ajouter_ligne
+from tessera.services.noyau.journal_pipeline import ajouter_ligne
 from tessera.services.livraison.livraison import Livraison
 from tessera.services.livraison.attente_dependance import ids_termines
-from tessera.services.pipeline_events import (
+from tessera.services.noyau.pipeline_events import (
     EventCallback,
     EventType,
     OrchestratorEvent,

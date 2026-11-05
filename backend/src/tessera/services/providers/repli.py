@@ -8,8 +8,8 @@ from collections.abc import Awaitable, Callable
 from pathlib import Path
 from typing import Any
 
-from tessera.services.event_hub import EVENT_HUB
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.noyau.event_hub import EVENT_HUB
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.providers.base import (
     LLMProvider,
     ProviderResult,

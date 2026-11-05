@@ -13,7 +13,7 @@ from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.livraison.livraison import Livraison
 from tessera.services.pipeline.orchestrator import Orchestrator
 from tessera.services.pipeline.pipeline_fin_de_file import nettoyer_apres_file
-from tessera.services.pipeline_events import (
+from tessera.services.noyau.pipeline_events import (
     EventType,
     OrchestratorEvent,
     PipelineResult,
@@ -327,7 +327,7 @@ async def test_surveiller_non_appele_sans_pr(tmp_path: Path) -> None:
 async def test_run_closed_emis_avant_ci_merge_done(tmp_path: Path) -> None:
     """Critère 2 : run_closed précède ci_merge_done (arrière-plan)."""
     from tessera.services.livraison.ci_watcher import CIWatcher
-    from tessera.services.pipeline_events import EventType
+    from tessera.services.noyau.pipeline_events import EventType
 
     watcher = CIWatcher()
     gate = asyncio.Event()

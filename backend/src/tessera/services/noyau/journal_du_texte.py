@@ -11,7 +11,7 @@ d'un travail vit dans ses commits et sa pull request.
 """
 from collections import deque
 
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 
 #: Ce qui se garde : exactement ce que le hub s'autorise à jeter, donc ce
 #: qu'un client risque de ne jamais voir.

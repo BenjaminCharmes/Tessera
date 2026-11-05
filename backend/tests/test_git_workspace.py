@@ -2199,7 +2199,7 @@ async def test_la_branche_du_ticket_part_du_commit_distant_et_garde_le_journal(
     commit and the log line survives (the state the CIWatcher leaves behind)."""
     from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
     from tessera.services.pipeline import pipeline_branche
-    from tessera.services.pipeline_events import OrchestratorEvent
+    from tessera.services.noyau.pipeline_events import OrchestratorEvent
     from tessera.services.pipeline.pipeline_run import PipelineRun
 
     local, bare = repo_avec_distant

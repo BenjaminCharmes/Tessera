@@ -12,7 +12,7 @@ from tessera.services.verification.commande_chainee import decouper
 from tessera.services.verification.detail_du_delai import detail_du_delai
 from tessera.services.verification.erreur_de_sortie import detail_avec_erreur
 from tessera.services.verification.groupe_d_etape import GroupeDEtape
-from tessera.services.lancement import essais_de_commande
+from tessera.services.noyau.lancement import essais_de_commande
 from tessera.services.verification.limiteur_de_suites import LimiteurDeSuites
 from tessera.services.verification.minuteur_d_etape import MinuteurDEtape
 from tessera.services.verification.outil_introuvable import outil_introuvable
@@ -182,7 +182,7 @@ class TestRunnerService:
     async def _lancer(self, args: list[str], dossier: Path) -> Any:
         """Launch the command, trying its Windows form when needed.
 
-        La règle de résolution est dans `services/lancement.py`, partagée avec
+        La règle de résolution est dans `services/noyau/lancement.py`, partagée avec
         `ProcessRegistry` : deux copies de cette logique ont divergé une fois,
         et c'est ce qui a rendu `blocked` un ticket dont le code était juste
         (ticket-157).

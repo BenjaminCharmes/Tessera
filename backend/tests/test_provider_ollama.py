@@ -14,8 +14,8 @@ import pytest
 import respx
 
 from tessera.config import settings
-from tessera.services.event_hub import EVENT_HUB
-from tessera.services.pipeline_events import EventType
+from tessera.services.noyau.event_hub import EVENT_HUB
+from tessera.services.noyau.pipeline_events import EventType
 from tessera.services.providers import get_provider
 from tessera.services.providers.base import LLMProvider
 from tessera.services.providers.noms import PROVIDERS_CONNUS, ProviderIndisponible

@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING
 from tessera.models.ticket import TicketStatus
 from tessera.services.gardes.contraintes_touchees import lignes_hors_proposees
 from tessera.services.gardes.lecons_touchees import lignes_de_lecons
-from tessera.services.pipeline_events import EventType, PipelineResult
+from tessera.services.noyau.pipeline_events import EventType, PipelineResult
 from tessera.services.pipeline.pipeline_outcomes import commit_ou_bloquer
 from tessera.services.pipeline.pipeline_run import PipelineRun, emit, set_status
 from tessera.services.pipeline.pipeline_text import _unapproved_commit_message

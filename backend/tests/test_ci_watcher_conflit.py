@@ -17,7 +17,7 @@ from tessera.models.ticket import TicketStatus
 from tessera.services.livraison.ci_watcher import CIWatcher
 from tessera.services.github.github_workflow import GitHubWorkflowService
 from tessera.services.livraison.livraison import LivraisonService
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 from tests.test_github_workflow import _FakeGit, _FakeGitHub
 
 

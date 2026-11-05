@@ -16,7 +16,7 @@ from tessera.services.pipeline import pipeline_controles, pipeline_production, p
 from tessera.services.livraison.livraison import Livraison
 from tessera.services.pipeline.orchestrator import Orchestrator
 from tessera.services.pipeline.pipeline_documentation import documenter_le_run
-from tessera.services.pipeline_events import EventType, OrchestratorEvent, PipelineResult
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent, PipelineResult
 from tessera.services.pipeline.pipeline_run import PipelineRun
 from tessera.services.verdicts.security_auditor import SecurityAuditResult
 from tessera.services.verdicts.validator import ValidationResult

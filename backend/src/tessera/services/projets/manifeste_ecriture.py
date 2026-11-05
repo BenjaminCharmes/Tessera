@@ -35,7 +35,7 @@ def set_agent_model(project_path: Path, role: str, model: str) -> None:
     porte aussi le mode des artefacts, la racine git et la configuration du
     pipeline.
     """
-    from tessera.services.cost_calculator import modeles_connus
+    from tessera.services.noyau.cost_calculator import modeles_connus
 
     data, agent = _entree_du_role(project_path, role)
     # La grille tarifaire ne borne que les providers Anthropic : ailleurs le

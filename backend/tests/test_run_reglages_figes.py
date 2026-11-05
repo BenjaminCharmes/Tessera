@@ -16,8 +16,8 @@ from tessera.config import settings
 from tessera.routers import orchestrator as routeur
 from tessera.routers.orchestrator import RunRequest, get_limits, run_pipeline
 from tessera.services.pipeline import run_executor
-from tessera.services.database import init_db
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.noyau.database import init_db
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.providers import par_role
 from tessera.services.providers.par_role import provider_pour_role
 from tessera.services.pipeline.run_registry import RUN_REGISTRY, RunActif, RunRegistry

@@ -647,7 +647,7 @@ limite de silence (ticket-381) qui coupe après 1200 s sans message.
 
 ### Lancement isolé des services (ticket-664)
 
-Les services lancés par Tessera (backends, workers déclarés par les projets) ne doivent pas arrêter le backend orchestrateur. Sous Windows, un processus enfant qui reçoit `CTRL_C_EVENT` (ex: `uvicorn --reload`) le propage à toute sa console ; partagée, elle arrête le backend et tous ses enfants. Tessera isole chaque service dans sa propre console, son groupe de processus (`CREATE_NO_WINDOW | CREATE_NEW_PROCESS_GROUP` sur Windows, `start_new_session` ailleurs). La fonction `options_de_lancement(systeme)` dans `services/lancement.py` est appelée par `ProcessRegistry._lancer()`.
+Les services lancés par Tessera (backends, workers déclarés par les projets) ne doivent pas arrêter le backend orchestrateur. Sous Windows, un processus enfant qui reçoit `CTRL_C_EVENT` (ex: `uvicorn --reload`) le propage à toute sa console ; partagée, elle arrête le backend et tous ses enfants. Tessera isole chaque service dans sa propre console, son groupe de processus (`CREATE_NO_WINDOW | CREATE_NEW_PROCESS_GROUP` sur Windows, `start_new_session` ailleurs). La fonction `options_de_lancement(systeme)` dans `services/noyau/lancement.py` est appelée par `ProcessRegistry._lancer()`.
 
 ### Coffre du système et gestion des secrets (ADR-073, tickets 794-798)
 
@@ -1794,7 +1794,7 @@ CREATE TABLE agent_events (
     ts        TEXT NOT NULL
 );
 
--- Un appel LLM d'un run — tous les rôles (backend/src/tessera/services/database.py)
+-- Un appel LLM d'un run — tous les rôles (backend/src/tessera/services/noyau/database.py)
 CREATE TABLE agent_calls (
     id                INTEGER PRIMARY KEY AUTOINCREMENT,
     run_id            TEXT NOT NULL REFERENCES pipeline_runs(id),

@@ -8,7 +8,7 @@ from collections.abc import AsyncIterator, Iterator
 from contextlib import asynccontextmanager, contextmanager
 
 from tessera.services.livraison.livraison_conflit import poser_signal
-from tessera.services.pipeline_events import EventCallback, EventType, OrchestratorEvent
+from tessera.services.noyau.pipeline_events import EventCallback, EventType, OrchestratorEvent
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

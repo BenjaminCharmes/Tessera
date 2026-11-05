@@ -3,8 +3,8 @@ from fastapi.testclient import TestClient
 
 from tessera.config import settings
 from tessera.main import app
-from tessera.services.database_events import save_event
-from tessera.services.database_runs import (
+from tessera.services.noyau.database_events import save_event
+from tessera.services.noyau.database_runs import (
     CAUSE_RUN_ORPHELIN,
     create_run,
     finish_run,

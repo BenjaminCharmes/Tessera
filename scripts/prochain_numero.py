@@ -15,7 +15,7 @@ _BACKEND_SRC = Path(__file__).resolve().parent.parent / "backend" / "src"
 if str(_BACKEND_SRC) not in sys.path:
     sys.path.insert(0, str(_BACKEND_SRC))
 
-from tessera.services.numerotation import BASE_PAR_DEFAUT, prochain_numero  # noqa: E402
+from tessera.services.noyau.numerotation import BASE_PAR_DEFAUT, prochain_numero  # noqa: E402
 
 
 def main(argv: list[str] | None = None) -> int:

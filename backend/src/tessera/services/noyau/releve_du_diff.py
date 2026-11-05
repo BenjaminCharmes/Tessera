@@ -3,7 +3,7 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
-from tessera.services.numerotation import lire_git, ref_de_base
+from tessera.services.noyau.numerotation import lire_git, ref_de_base
 
 _EN_TETE_BLOC = re.compile(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@")
 

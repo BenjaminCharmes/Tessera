@@ -17,13 +17,13 @@ from unittest.mock import AsyncMock, MagicMock
 import aiosqlite
 
 from tessera.models.ticket import TicketStatus
-from tessera.services.database import init_db
-from tessera.services.database_runs import create_run
+from tessera.services.noyau.database import init_db
+from tessera.services.noyau.database_runs import create_run
 from tessera.services.github.github_workflow import GitHubWorkflowService
 from tessera.services.livraison.livraison import Livraison
 from tessera.services.pipeline.orchestrator import Orchestrator
 from tessera.services.pipeline.pipeline_approbation import suivre_documentation
-from tessera.services.pipeline_events import (
+from tessera.services.noyau.pipeline_events import (
     EventType,
     OrchestratorEvent,
     PipelineResult,

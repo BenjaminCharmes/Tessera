@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from tessera.config import settings
 from tessera.models.agent import FallbackConfig
 from tessera.routers.projects.shared import new_router
-from tessera.services.cost_calculator import modeles_connus
+from tessera.services.noyau.cost_calculator import modeles_connus
 from tessera.services.projets.manifeste_ecriture import (
     AgentAbsentDuProjet,
     ModeleInconnu,

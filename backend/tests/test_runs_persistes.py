@@ -19,7 +19,7 @@ from tessera.main import app
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 from tessera.services.agents.agent_registry import AgentRegistryService
 from tessera.services.agents.agent_runner import AgentRunner
-from tessera.services.database import init_db
+from tessera.services.noyau.database import init_db
 from tessera.services.pipeline.orchestrator import Orchestrator
 from tessera.services.pipeline.run_recorder import RunRecorder
 from tests.doubles_git import GitWorkspaceDouble

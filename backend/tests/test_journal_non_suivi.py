@@ -21,7 +21,7 @@ from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.livraison.livraison import Livraison
 from tessera.services.pipeline.orchestrator import Orchestrator
 from tessera.services.pipeline.pipeline_fin_de_file import signaler_fichiers_non_suivis
-from tessera.services.pipeline_events import OrchestratorEvent, PipelineResult
+from tessera.services.noyau.pipeline_events import OrchestratorEvent, PipelineResult
 from tessera.services.livraison.realignement_base import realigner_base
 
 _JOURNAL = Path("memory") / "pipeline-log.md"

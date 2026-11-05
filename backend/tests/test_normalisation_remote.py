@@ -10,7 +10,7 @@ from fastapi.testclient import TestClient
 
 from tessera.config import settings
 from tessera.main import app
-from tessera.services.database import init_db
+from tessera.services.noyau.database import init_db
 from tessera.services.projets.forge import forge_supportee, parse_remote
 from tessera.services.projets.project_loader import load_project
 

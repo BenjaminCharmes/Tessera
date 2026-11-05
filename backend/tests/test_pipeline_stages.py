@@ -17,7 +17,7 @@ from tessera.services.pipeline import (
     pipeline_testeur,
 )
 from tessera.services.git_workspace import GitCommandError, GitWorkspaceService, NotAGitRepository
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.pipeline.pipeline_run import PipelineRun
 from tests.doubles_git import GitWorkspaceDouble
 
@@ -466,7 +466,7 @@ def test_l_outil_ask_user_n_est_offert_qu_en_mode_interactif() -> None:
     # Offrir `ask_user` a un run non interactif promettrait a l'agent une
     # réponse que personne ne peut donner : il attendrait le delai complet a
     # chaque question, pour rien (ADR-025).
-    from tessera.services.dialogue import DialogueChannel
+    from tessera.services.noyau.dialogue import DialogueChannel
 
     run = _run()
     assert pipeline_production.asker_for(run) is None
@@ -639,7 +639,7 @@ def test_en_dict_expose_les_etapes_en_cours() -> None:
 def test_suivre_ajoute_revue_et_validation_dans_etapes_en_cours() -> None:
     """_suivre tracks both stages when reviewer and validator run concurrently."""
     from tessera.models.agent import AgentRole
-    from tessera.services.pipeline_events import EventType, OrchestratorEvent
+    from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
     from tessera.services.pipeline.run_executor import _suivre
     from tessera.services.pipeline.run_registry import RunActif
 
@@ -729,7 +729,7 @@ async def test_run_tests_sans_runner_rend_true() -> None:
 
 async def test_run_tests_premier_expire_second_vert_passe_a_la_securite() -> None:
     """First timeout + second green: continues without invoking the coder again (ticket-349)."""
-    from tessera.services.pipeline_events import PipelineResult
+    from tessera.services.noyau.pipeline_events import PipelineResult
 
     runner = _TestRunnerResult([_expired_result(), _green_result()])
     orch = _Orch(
@@ -745,7 +745,7 @@ async def test_run_tests_premier_expire_second_vert_passe_a_la_securite() -> Non
 
 async def test_run_tests_deux_expirements_bloquent_le_run() -> None:
     """Two consecutive timeouts terminate the run as blocked (ticket-349)."""
-    from tessera.services.pipeline_events import PipelineResult
+    from tessera.services.noyau.pipeline_events import PipelineResult
     from tessera.models.ticket import TicketStatus
 
     class _TicketSvcMock:

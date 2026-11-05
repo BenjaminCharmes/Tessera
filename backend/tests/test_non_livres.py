@@ -5,7 +5,7 @@ from typing import Any
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 from tessera.services.livraison.livraison import Livraison
 from tessera.services.pipeline.orchestrator import Orchestrator
-from tessera.services.pipeline_events import EventType, OrchestratorEvent, PipelineResult
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent, PipelineResult
 from tessera.services.file.pipeline_file_reprise import est_non_livre
 from tessera.services.file.pipeline_file_tour import Tour
 from tessera.services.pipeline.run_status import classer_les_tickets

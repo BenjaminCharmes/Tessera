@@ -2,7 +2,7 @@
 from collections.abc import Sequence
 from typing import Any
 
-from tessera.services.dialogue import DialogueChannel, DialogueExchange
+from tessera.services.noyau.dialogue import DialogueChannel, DialogueExchange
 
 Exchanges = Sequence[DialogueExchange]
 

@@ -11,7 +11,7 @@ from tessera.services.livraison.attente_dependance import (
     sauter_dependants,
 )
 from tessera.services.livraison.livraison import Livraison
-from tessera.services.pipeline_events import EventCallback, PipelineResult
+from tessera.services.noyau.pipeline_events import EventCallback, PipelineResult
 from tessera.services.file.pipeline_file_tour import Tour
 from tessera.services.pipeline.pipeline_fin_de_file import (
     attendre_merge_et_syncer,

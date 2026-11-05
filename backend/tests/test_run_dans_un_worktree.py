@@ -17,10 +17,10 @@ from tessera.services.git_workspace import GitWorkspaceError
 from tessera.models.agent import AgentResult, AgentRole
 from tessera.models.ticket import TicketStatus
 from tessera.services.pipeline.assemblage_run import build_orchestrator
-from tessera.services.database import init_db
+from tessera.services.noyau.database import init_db
 from tessera.services.livraison.livraison import Livraison
 from tessera.services.pipeline.orchestrator import Orchestrator
-from tessera.services.pipeline_events import OrchestratorEvent, PipelineResult
+from tessera.services.noyau.pipeline_events import OrchestratorEvent, PipelineResult
 from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.pipeline.run_dans_worktree import (
     OrchestrateurRefuse,

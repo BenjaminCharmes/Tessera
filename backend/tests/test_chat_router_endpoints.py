@@ -13,8 +13,8 @@ from fastapi.testclient import TestClient
 from tessera.config import settings
 from tessera.main import app
 from tessera.services.agents.chat_service import ChatBudgetExceeded, ChatReply
-from tessera.services.database import init_db
-from tessera.services.database_chat import list_chat_messages
+from tessera.services.noyau.database import init_db
+from tessera.services.noyau.database_chat import list_chat_messages
 
 
 @pytest.fixture(autouse=True)
@@ -292,7 +292,7 @@ def test_le_lancement_transmet_la_discussion_au_codeur(
     # de la conversation est perdu.
     import asyncio
 
-    from tessera.services.database_chat import save_chat_message
+    from tessera.services.noyau.database_chat import save_chat_message
 
     asyncio.run(
         save_chat_message(
@@ -310,7 +310,7 @@ def test_le_lancement_transmet_la_discussion_au_codeur(
             captured["context"] = self._project_context
             captured["ticket_id"] = ticket_id
             from tessera.models.ticket import TicketStatus
-            from tessera.services.pipeline_events import PipelineResult
+            from tessera.services.noyau.pipeline_events import PipelineResult
 
             return PipelineResult(
                 ticket_id=ticket_id,

@@ -8,8 +8,8 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
 from tessera.models.ticket import Ticket, TicketStatus
-from tessera.services.dialogue import DialogueChannel
-from tessera.services.pipeline_events import (
+from tessera.services.noyau.dialogue import DialogueChannel
+from tessera.services.noyau.pipeline_events import (
     EventCallback,
     EventType,
     OrchestratorEvent,

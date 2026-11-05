@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING
 
 from tessera.services.git_workspace import journal_attente
 from tessera.services.livraison.livraison_evenements import attente_annoncee
-from tessera.services.pipeline_events import EventCallback
+from tessera.services.noyau.pipeline_events import EventCallback
 from tessera.utils.logger import get_logger
 
 if TYPE_CHECKING:

@@ -18,7 +18,7 @@ from tessera.services.agents.carte_du_depot import CarteDuDepot
 from tessera.services.verification.controle_visuel import lire_le_controle
 from tessera.services.documentation.documenteur_run import documenteur
 from tessera.services.git_workspace import GitWorkspaceService
-from tessera.services.journal_pipeline import journal_vers, journaliser_mode_rapide
+from tessera.services.noyau.journal_pipeline import journal_vers, journaliser_mode_rapide
 from tessera.services.gardes.lecons import section_lecons
 from tessera.services.pipeline.livreur_run import livreur
 from tessera.services.pipeline.orchestrator import Orchestrator

@@ -19,8 +19,8 @@ from tessera.main import app
 from tessera.services.anomalies import detecteur as module_detecteur
 from tessera.services.anomalies import lecture_evenements
 from tessera.services.anomalies.detecteur import DetecteurDAnomalies
-from tessera.services.event_hub import EventHub
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.noyau.event_hub import EventHub
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.pipeline.run_registry import RunActif, RunRegistry
 from tests.anomalies_base import appel_d_agent, evenement, ligne_de_run
 

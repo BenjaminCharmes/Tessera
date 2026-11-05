@@ -12,7 +12,7 @@ from tessera.services.pipeline import preparation_worktree
 from tessera.services.git_workspace import GitWorkspaceError
 from tessera.services.verification.commande_effective import PlaceholderInconnu, setup_effectif
 from tessera.services.pipeline.orchestrator import Orchestrator
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.pipeline.pipeline_run import PipelineRun
 from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.pipeline.preparation_worktree import (

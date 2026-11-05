@@ -146,7 +146,7 @@ class TestTerminerSync:
         )
         try:
             with patch(
-                "tessera.services.groupe_de_processus.creer_groupe", return_value=None
+                "tessera.services.noyau.groupe_de_processus.creer_groupe", return_value=None
             ):
                 GroupeDEtape().terminer_sync(proc.pid)
 
@@ -157,5 +157,5 @@ class TestTerminerSync:
                 proc.wait(timeout=10)
 
     def test_a_pid_that_is_not_an_int_is_ignored(self) -> None:
-        with patch("tessera.services.groupe_de_processus.creer_groupe", return_value=None):
+        with patch("tessera.services.noyau.groupe_de_processus.creer_groupe", return_value=None):
             GroupeDEtape().terminer_sync(MagicMock())

@@ -5,7 +5,7 @@ from fastapi import Query
 from tessera.config import settings
 from tessera.models.usage import UsageBreakdown
 from tessera.routers.projects.shared import new_router
-from tessera.services.database_runs import PipelineRunSummary, list_runs
+from tessera.services.noyau.database_runs import PipelineRunSummary, list_runs
 from tessera.services.usage.database_usage import (
     ProjectUsage,
     get_project_usage,

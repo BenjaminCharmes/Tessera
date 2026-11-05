@@ -10,7 +10,7 @@ from tessera.config import settings
 from tessera.main import app
 from tessera.models.ticket import TicketStatus
 from tessera.services.livraison.livraison_possible import raison_de_refus_livraison
-from tessera.services.pipeline_events import PipelineResult
+from tessera.services.noyau.pipeline_events import PipelineResult
 from tessera.services.pipeline.run_registry import RUN_REGISTRY
 
 

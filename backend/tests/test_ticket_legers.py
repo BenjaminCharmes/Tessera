@@ -14,7 +14,7 @@ import pytest
 
 from tessera.models.agent import AgentResult, AgentRole
 from tessera.services.documentation.documentation import ResultatDocumentation
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.verdicts.security_auditor import SecurityAuditResult
 from tessera.services.projets.ticket_service import TicketService
 from tessera.services.verdicts.validator import ValidationResult

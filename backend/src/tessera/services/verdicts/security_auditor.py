@@ -6,7 +6,7 @@ from tessera.services.providers.base import LLMProvider
 from tessera.services.usage.quota_exhaustion import is_quota_exhausted
 from tessera.services.verdicts.security_contexte import AuditContext
 from tessera.services.verdicts.security_schema import SECURITY_SCHEMA
-from tessera.services.modeles_par_defaut import MODELE_JUGEMENT
+from tessera.services.noyau.modeles_par_defaut import MODELE_JUGEMENT
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

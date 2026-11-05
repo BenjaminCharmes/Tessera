@@ -50,7 +50,7 @@ from tessera.services.documentation.documentation_selection import (
     tickets_a_documenter,
 )
 from tessera.services.providers.base import LLMProvider
-from tessera.services.modeles_par_defaut import MODELE_PRODUCTION
+from tessera.services.noyau.modeles_par_defaut import MODELE_PRODUCTION
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

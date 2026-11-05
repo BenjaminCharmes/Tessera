@@ -14,7 +14,7 @@ from tessera.services.gardes.config_tests_touchee import (
     config_tests_du_diff,
     porte_config_nommee,
 )
-from tessera.services.pipeline_events import (
+from tessera.services.noyau.pipeline_events import (
     EventType,
     OrchestratorEvent,
     PipelineResult,

@@ -14,8 +14,8 @@ from typing import Any
 import aiosqlite
 import pytest
 
-from tessera.services.database import init_db
-from tessera.services.database_runs import create_run
+from tessera.services.noyau.database import init_db
+from tessera.services.noyau.database_runs import create_run
 from tessera.services.providers.base import ProviderResult
 from tessera.services.providers.enregistrant import (
     ProviderEnregistrant,

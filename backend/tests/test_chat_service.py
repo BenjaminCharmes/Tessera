@@ -8,7 +8,7 @@ from tessera.services.agents.chat_service import (
     ChatReply,
     ChatService,
 )
-from tessera.services.database_chat import ChatMessageRow
+from tessera.services.noyau.database_chat import ChatMessageRow
 from tessera.services.providers.base import ProviderResult
 from tests.doubles_git import GitWorkspaceDouble
 

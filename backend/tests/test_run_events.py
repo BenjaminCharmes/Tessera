@@ -15,9 +15,9 @@ from fastapi.testclient import TestClient
 
 from tessera.config import settings
 from tessera.main import app
-from tessera.services.database import init_db
-from tessera.services.database_events import get_run_events, save_event
-from tessera.services.database_runs import create_run, finish_run, list_runs
+from tessera.services.noyau.database import init_db
+from tessera.services.noyau.database_events import get_run_events, save_event
+from tessera.services.noyau.database_runs import create_run, finish_run, list_runs
 
 
 @pytest.fixture
@@ -225,8 +225,8 @@ async def test_run_closed_carries_db_run_id(db_path: Path) -> None:
     """run_closed event's data includes db_run_id for the events endpoint."""
     from unittest.mock import AsyncMock, MagicMock
 
-    from tessera.services.event_hub import EventHub
-    from tessera.services.pipeline_events import EventType, OrchestratorEvent
+    from tessera.services.noyau.event_hub import EventHub
+    from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
     from tessera.services.pipeline.run_executor import emetteur, _clore
     from tessera.services.pipeline.run_registry import RunActif
 

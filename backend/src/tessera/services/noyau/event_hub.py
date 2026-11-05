@@ -19,8 +19,8 @@ from typing import Optional
 
 import asyncio
 
-from tessera.services.journal_du_texte import JOURNAL_DU_TEXTE
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.noyau.journal_du_texte import JOURNAL_DU_TEXTE
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 
 #: Les seuls types qu'une file saturée a le droit de jeter. Tout le reste
 #: décrit un changement d'état, et se perdrait silencieusement.

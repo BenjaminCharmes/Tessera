@@ -36,27 +36,4 @@ ORDRE: tuple[str, ...] = (
 # par module : le script de déplacement retire les lignes d'un domaine en le
 # déplaçant.
 A_DEPLACER: dict[str, str] = {
-    # noyau
-    "arret_de_service": "noyau",
-    "cost_calculator": "noyau",
-    "database": "noyau",
-    "database_chat": "noyau",
-    "database_events": "noyau",
-    "database_runs": "noyau",
-    "dialogue": "noyau",
-    "diff_changements": "noyau",
-    "eveil": "noyau",
-    "event_hub": "noyau",
-    "groupe_de_processus": "noyau",
-    "journal_du_texte": "noyau",
-    "journal_pipeline": "noyau",
-    "lancement": "noyau",
-    "modeles_par_defaut": "noyau",
-    "numerotation": "noyau",
-    "pipeline_events": "noyau",
-    "prompt_loader": "noyau",
-    "reecriture_des_numeros": "noyau",
-    "releve_du_diff": "noyau",
-    "shell_detection": "noyau",
-    "statut_suggere": "noyau",
 }

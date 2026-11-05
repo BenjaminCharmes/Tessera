@@ -7,7 +7,7 @@ from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketTy
 from tessera.services.projets.adr import adr_pertinents, contraintes_pour, lire_contraintes
 from tessera.services.gardes.contraintes_touchees import lignes_hors_proposees
 from tessera.services.pipeline.pipeline_contraintes import arret_contraintes_hors_proposees
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.pipeline.pipeline_run import PipelineRun
 from tests.doubles_git import GitWorkspaceDouble
 

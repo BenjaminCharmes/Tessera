@@ -8,7 +8,7 @@ consigne de tous les agents suivants sans relecture : contrairement à
 par le même lecteur ; le fichier n'a pas besoin d'être relu sur le disque,
 puisque toute modification compte.
 """
-from tessera.services.diff_changements import lire_diff
+from tessera.services.noyau.diff_changements import lire_diff
 
 _FIN_DE_CHEMIN = "memory/lecons.md"
 

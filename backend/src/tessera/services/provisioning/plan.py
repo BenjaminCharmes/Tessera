@@ -3,7 +3,7 @@ from collections.abc import Awaitable, Callable, Sequence
 from dataclasses import dataclass
 from typing import Optional
 
-from tessera.services.pipeline_events import EventCallback, EventType, OrchestratorEvent
+from tessera.services.noyau.pipeline_events import EventCallback, EventType, OrchestratorEvent
 from tessera.services.provisioning.errors import ServiceError
 from tessera.services.provisioning.steps import (
     ProvisioningContext,

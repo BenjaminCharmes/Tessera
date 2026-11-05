@@ -18,8 +18,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional
 
-from tessera.services.arret_de_service import describe_error, terminate_if_alive
-from tessera.services.groupe_de_processus import (
+from tessera.services.noyau.arret_de_service import describe_error, terminate_if_alive
+from tessera.services.noyau.groupe_de_processus import (
     creer_groupe,
     fermer_le_groupe,
     rattacher,
@@ -28,7 +28,7 @@ from tessera.services.groupe_de_processus import (
 )
 from tessera.services.providers.perimetre import racine_autorisee
 from tessera.services.verification.service_etat import ServiceEtat
-from tessera.services.lancement import essais_de_commande, options_de_lancement
+from tessera.services.noyau.lancement import essais_de_commande, options_de_lancement
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -297,7 +297,7 @@ class ProcessRegistry:
     async def _lancer(self, args: list[str], dossier: Path) -> Any:
         """Lance les arguments, en essayant l'équivalent Windows au besoin.
 
-        La règle de résolution vit dans `services/lancement.py`, appelée
+        La règle de résolution vit dans `services/noyau/lancement.py`, appelée
         aussi par `TestRunnerService` : elle n'existait ici que sous forme
         d'une copie, et le testeur, qui ne l'avait pas, rendait `blocked` des
         tickets dont le code était juste (ticket-143, ticket-157).
