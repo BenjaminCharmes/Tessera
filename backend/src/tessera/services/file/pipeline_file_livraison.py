@@ -5,12 +5,12 @@ or stops, depending on what the delivery produced (ADR-051, ADR-060).
 """
 from typing import TYPE_CHECKING
 
-from tessera.services.attente_dependance import (
+from tessera.services.livraison.attente_dependance import (
     attendre_si_dependant,
     journal_confiee,
     sauter_dependants,
 )
-from tessera.services.livraison import Livraison
+from tessera.services.livraison.livraison import Livraison
 from tessera.services.pipeline_events import EventCallback, PipelineResult
 from tessera.services.file.pipeline_file_tour import Tour
 from tessera.services.pipeline_fin_de_file import (

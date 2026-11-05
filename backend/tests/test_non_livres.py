@@ -3,7 +3,7 @@ import sqlite3
 from typing import Any
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services.livraison import Livraison
+from tessera.services.livraison.livraison import Livraison
 from tessera.services.orchestrator import Orchestrator
 from tessera.services.pipeline_events import EventType, OrchestratorEvent, PipelineResult
 from tessera.services.file.pipeline_file_reprise import est_non_livre

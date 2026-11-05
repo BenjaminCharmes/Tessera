@@ -17,7 +17,7 @@ from unittest.mock import AsyncMock, MagicMock
 from tessera.models.agent import AgentResult, AgentRole
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 from tessera.services import pipeline_controles
-from tessera.services.livraison import Livraison
+from tessera.services.livraison.livraison import Livraison
 from tessera.services.orchestrator import Orchestrator
 from tessera.services.pipeline_events import EventType, OrchestratorEvent, PipelineResult
 from tessera.services.pipeline_run import PipelineRun

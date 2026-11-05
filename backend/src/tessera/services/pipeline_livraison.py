@@ -6,7 +6,7 @@ path a second time for a ticket whose first delivery stopped without a PR.
 from typing import TYPE_CHECKING
 
 from tessera.services import pipeline_fin_de_file as fin_de_file
-from tessera.services.livraison_evenements import evenements_de_livraison
+from tessera.services.livraison.livraison_evenements import evenements_de_livraison
 from tessera.services.pipeline_approbation import retenir_pour_relecture
 from tessera.services.pipeline_events import (
     EventCallback,

@@ -4,20 +4,20 @@ from collections.abc import Awaitable, Callable
 
 from tessera.config import settings
 from tessera.services.agents.agent_runner import AgentRunner
-from tessera.services.ci_watcher import ControleTete, EstAncetre, TetePr
+from tessera.services.livraison.ci_watcher import ControleTete, EstAncetre, TetePr
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.github.github_service import GitHubService
 from tessera.services.github.github_workflow import GitHubWorkflowService
-from tessera.services.livraison import Livraison, LivraisonService
+from tessera.services.livraison.livraison import Livraison, LivraisonService
 from tessera.services.pipeline_events import EventCallback
 from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.project_loader import load_project
-from tessera.services.mise_a_jour_pr import TeteAttendue, mise_a_jour_de
-from tessera.services.realignement_base import Realignement
-from tessera.services.reprise_surveillance import SurveillanceProjet
-from tessera.services.resolveur_conflit import ResolveurConflitService
+from tessera.services.livraison.mise_a_jour_pr import TeteAttendue, mise_a_jour_de
+from tessera.services.livraison.realignement_base import Realignement
+from tessera.services.livraison.reprise_surveillance import SurveillanceProjet
+from tessera.services.livraison.resolveur_conflit import ResolveurConflitService
 from tessera.services.worktrees.run_worktree import RunWorktree
-from tessera.services.sha_approbation import sha_pousse_du_ticket
+from tessera.services.livraison.sha_approbation import sha_pousse_du_ticket
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -60,7 +60,7 @@ def surveillance_pour(
     lance les tests dans le checkout ou le worktree du run, pas sur la fusion
     poussée, et le worktree a disparu à ce stade. La CI verte garde le merge.
     """
-    from tessera.services.ci_watcher import CI_WATCHER
+    from tessera.services.livraison.ci_watcher import CI_WATCHER
 
     project_path = settings.ide_workspace_dir / project_id
     project = load_project(project_path)

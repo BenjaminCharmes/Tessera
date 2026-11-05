@@ -11,9 +11,9 @@ from typing import Any
 from unittest.mock import AsyncMock, MagicMock
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services.attente_dependance import dependants_a_sauter
-from tessera.services.ci_watcher import CIWatcher
-from tessera.services.livraison import Livraison
+from tessera.services.livraison.attente_dependance import dependants_a_sauter
+from tessera.services.livraison.ci_watcher import CIWatcher
+from tessera.services.livraison.livraison import Livraison
 from tessera.services.orchestrator import Orchestrator
 from tessera.services.pipeline_events import PipelineResult
 

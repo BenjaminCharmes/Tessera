@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, Query
 from tessera.config import settings
 from tessera.models.salle_tessera import SalleTessera
 from tessera.routers.services_running import get_sonde
-from tessera.services.ci_watcher import CI_WATCHER
+from tessera.services.livraison.ci_watcher import CI_WATCHER
 from tessera.services.providers.ollama import secondes_de_refroidissement
 from tessera.services.run_registry import RUN_REGISTRY
 from tessera.services.supervision.salle_tessera import ci_en_attente, salle_tessera

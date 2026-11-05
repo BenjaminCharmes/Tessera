@@ -12,7 +12,7 @@ from pathlib import Path
 import pytest
 
 from tessera.services.git_workspace import GitWorkspaceService
-from tessera.services.livraison import Livraison, LivraisonService
+from tessera.services.livraison.livraison import Livraison, LivraisonService
 
 _SCHEMA = Path("prisma") / "schema.prisma"
 

@@ -37,22 +37,22 @@ from pathlib import Path
 import httpx
 
 from tessera.models.ticket import TicketStatus
-from tessera.services.controle_tete import (
+from tessera.services.livraison.controle_tete import (
     ControleTete as ControleTete,
     EstAncetre as EstAncetre,
     TetePr as TetePr,
     decrire_exception as decrire_exception,
     verifier_tete,
 )
-from tessera.services.journal_ci_watcher import (
+from tessera.services.livraison.journal_ci_watcher import (
     ecrire_ligne_log,
     ecrire_log_blocage,
     ecrire_log_merge,
 )
-from tessera.services.livraison import Livraison
-from tessera.services.mise_a_jour_pr import DELAI_MISE_A_JOUR_S, MiseAJourPr, mettre_a_jour_la_pr
+from tessera.services.livraison.livraison import Livraison
+from tessera.services.livraison.mise_a_jour_pr import DELAI_MISE_A_JOUR_S, MiseAJourPr, mettre_a_jour_la_pr
 from tessera.services.pipeline_events import EventCallback, EventType, OrchestratorEvent
-from tessera.services.realignement_base import Realignement, realigner_base
+from tessera.services.livraison.realignement_base import Realignement, realigner_base
 from tessera.services.run_registry import RUN_REGISTRY
 from tessera.utils.logger import get_logger
 

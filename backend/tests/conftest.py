@@ -101,7 +101,7 @@ def _singletons_propres() -> Iterator[None]:
     from tessera.services.run_registry import RUN_REGISTRY
     from tessera.services import ticket_service as _ts_module
     from tessera.services import project_loader as _pl_module
-    from tessera.services import pr_status_cache as _prc_module
+    from tessera.services.livraison import pr_status_cache as _prc_module
 
     yield
     RUN_REGISTRY._runs.clear()

@@ -15,10 +15,10 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services.ci_watcher import CIWatcher
-from tessera.services.livraison import Livraison
+from tessera.services.livraison.ci_watcher import CIWatcher
+from tessera.services.livraison.livraison import Livraison
 from tessera.services.pipeline_events import EventType, OrchestratorEvent
-from tessera.services.realignement_base import Realignement, realigner_base
+from tessera.services.livraison.realignement_base import Realignement, realigner_base
 from tessera.services.run_registry import RUN_REGISTRY
 
 _JOURNAL = Path("memory") / "pipeline-log.md"

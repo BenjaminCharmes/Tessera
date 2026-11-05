@@ -32,7 +32,7 @@ PAQUETS_TOLERES: frozenset[str] = frozenset()
 ECARTS_DOMAINES: frozenset[str] = frozenset({
     # Le verrou et le registre des runs tirent file_vivante (pipeline).
     "services/agents/chat_suggestion.py -> pipeline",
-    "services/ci_watcher.py -> pipeline",
+    "services/livraison/ci_watcher.py -> pipeline",
     # Les noms et la déclaration des providers vivent dans providers/.
     "services/manifeste_ecriture.py -> providers",
     "services/project_loader.py -> providers",

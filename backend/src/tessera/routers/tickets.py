@@ -12,7 +12,7 @@ from tessera.models.ticket import Ticket, TicketBatchCreate, TicketBatchResponse
 from tessera.services.github.github_service import CiStatus, GitHubService, PRStatus
 from tessera.services.autonomie import lire_niveau
 from tessera.services.database_runs import list_runs, list_runs_for_ticket
-from tessera.services.pr_status_cache import get_cached_status
+from tessera.services.livraison.pr_status_cache import get_cached_status
 from tessera.services.event_hub import EVENT_HUB
 from tessera.services.pipeline_events import EventType, OrchestratorEvent
 from tessera.utils.logger import get_logger
@@ -284,7 +284,7 @@ async def get_all_pr_statuses_endpoint(project_id: str) -> AllPrStatusesResponse
     Tickets without a pr_number and PR numbers absent from the repository are
     both silently omitted (status 200 with a shorter list).
     """
-    from tessera.services.pr_statuses import get_all_pr_statuses
+    from tessera.services.livraison.pr_statuses import get_all_pr_statuses
 
     loader = ProjectLoader(settings.ide_workspace_dir)
     try:

@@ -12,7 +12,7 @@ import json
 from pathlib import Path
 
 from tessera.services.git_workspace import GitCommandError
-from tessera.services.livraison import Livraison, LivraisonService
+from tessera.services.livraison.livraison import Livraison, LivraisonService
 
 _APPROUVE = "a1" * 20
 _INTRUS = "bad0" * 10

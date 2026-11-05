@@ -22,8 +22,8 @@ from pathlib import Path
 import httpx
 
 from tessera.models.ticket import TicketStatus
-from tessera.services.ci_watcher import CIWatcher, decrire_exception
-from tessera.services.livraison import Livraison
+from tessera.services.livraison.ci_watcher import CIWatcher, decrire_exception
+from tessera.services.livraison.livraison import Livraison
 from tessera.services.pipeline_events import EventType, OrchestratorEvent
 
 

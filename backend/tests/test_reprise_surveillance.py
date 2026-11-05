@@ -10,11 +10,11 @@ from tessera.services.database import init_db
 from tessera.services.database_runs import create_run
 from tessera.services.pipeline_events import OrchestratorEvent
 from tessera.services.gardes.politique_run import PolitiqueRun
-from tessera.services.reprise_surveillance import (
+from tessera.services.livraison.reprise_surveillance import (
     SurveillanceProjet,
     reprendre_surveillances,
 )
-from tessera.services.sha_approbation import noter_poussee
+from tessera.services.livraison.sha_approbation import noter_poussee
 from tessera.services.ticket_service import TicketService
 
 PROJET = "demo"

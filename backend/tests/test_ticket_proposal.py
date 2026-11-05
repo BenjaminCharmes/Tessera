@@ -15,11 +15,11 @@ from fastapi.testclient import TestClient
 
 from tessera.config import settings
 from tessera.main import app
-from tessera.services.ci_watcher import CI_WATCHER
+from tessera.services.livraison.ci_watcher import CI_WATCHER
 from tessera.services.git_workspace import GitCommandError
 from tessera.services.github.github_service import GitHubService
 from tessera.services.gardes.politique_run import PolitiqueRun
-from tessera.services.ticket_proposal import (
+from tessera.services.livraison.ticket_proposal import (
     ProposalRefused,
     ProposalRequest,
     propose_tickets,

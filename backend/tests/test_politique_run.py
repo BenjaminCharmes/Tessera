@@ -16,7 +16,7 @@ from tessera.models.worktree_config import ConfigWorktree, EntreePopulate
 from tessera.services.autonomie import NiveauAutonomie
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.github.github_workflow import GitHubWorkflowService, WorkflowError
-from tessera.services.livraison import LivraisonService
+from tessera.services.livraison.livraison import LivraisonService
 from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.providers.perimetre import hook_refus_hors_perimetre
 from tessera.services.worktrees.run_worktree import RunWorktree

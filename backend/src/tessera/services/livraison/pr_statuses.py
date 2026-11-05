@@ -17,7 +17,7 @@ from typing import Literal
 
 from tessera.models.ticket import Ticket
 from tessera.services.github.github_service import CiStatus, GitHubService, PRStatus
-from tessera.services import pr_status_cache
+from tessera.services.livraison import pr_status_cache
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

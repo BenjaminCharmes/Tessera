@@ -7,7 +7,7 @@ only announces, and an announcement that fails never breaks the run.
 from collections.abc import AsyncIterator, Iterator
 from contextlib import asynccontextmanager, contextmanager
 
-from tessera.services.livraison_conflit import poser_signal
+from tessera.services.livraison.livraison_conflit import poser_signal
 from tessera.services.pipeline_events import EventCallback, EventType, OrchestratorEvent
 from tessera.utils.logger import get_logger
 

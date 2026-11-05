@@ -1,7 +1,7 @@
 """What a delivery rebase did on its own, as steps of the delivery journal."""
 from typing import Protocol
 
-from tessera.services.retest_apres_rebase import RetestApresRebase
+from tessera.services.livraison.retest_apres_rebase import RetestApresRebase
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

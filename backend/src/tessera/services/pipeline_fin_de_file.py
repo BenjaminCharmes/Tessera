@@ -8,12 +8,12 @@ import asyncio
 from typing import TYPE_CHECKING
 
 from tessera.services.git_workspace import journal_attente
-from tessera.services.livraison_evenements import attente_annoncee
+from tessera.services.livraison.livraison_evenements import attente_annoncee
 from tessera.services.pipeline_events import EventCallback
 from tessera.utils.logger import get_logger
 
 if TYPE_CHECKING:
-    from tessera.services.livraison import Livraison
+    from tessera.services.livraison.livraison import Livraison
     from tessera.services.orchestrator import Orchestrator
 
 _logger = get_logger(__name__)

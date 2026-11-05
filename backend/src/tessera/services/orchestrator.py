@@ -17,8 +17,8 @@ from tessera.services.dialogue import DialogueChannel
 from tessera.services.file_vivante import est_termine
 from tessera.services.providers.enregistrant import activer_enregistrement
 from tessera.services.journal_pipeline import ajouter_ligne
-from tessera.services.livraison import Livraison
-from tessera.services.attente_dependance import ids_termines
+from tessera.services.livraison.livraison import Livraison
+from tessera.services.livraison.attente_dependance import ids_termines
 from tessera.services.pipeline_events import (
     EventCallback,
     EventType,

@@ -12,7 +12,7 @@ from pydantic import BaseModel, Field
 
 from tessera.models.agent import AgentRole
 from tessera.models.ticket import TicketStatus
-from tessera.services.livraison import Livraison
+from tessera.services.livraison.livraison import Livraison
 
 
 class EventType(str, Enum):

@@ -10,7 +10,7 @@ from dataclasses import replace
 from typing import TYPE_CHECKING
 
 from tessera.services.git_workspace import GitWorkspaceError
-from tessera.services.livraison import Livraison
+from tessera.services.livraison.livraison import Livraison
 from tessera.services.pipeline_capture import capturer_le_run
 from tessera.services.pipeline_documentation import documenter_le_run
 from tessera.services.pipeline_events import EventCallback, PipelineResult

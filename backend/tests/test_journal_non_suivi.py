@@ -18,11 +18,11 @@ from unittest.mock import AsyncMock, MagicMock
 from tessera.models.ticket import TicketStatus
 from tessera.services.git_workspace import journal_en_attente
 from tessera.services.git_workspace import GitWorkspaceService
-from tessera.services.livraison import Livraison
+from tessera.services.livraison.livraison import Livraison
 from tessera.services.orchestrator import Orchestrator
 from tessera.services.pipeline_fin_de_file import signaler_fichiers_non_suivis
 from tessera.services.pipeline_events import OrchestratorEvent, PipelineResult
-from tessera.services.realignement_base import realigner_base
+from tessera.services.livraison.realignement_base import realigner_base
 
 _JOURNAL = Path("memory") / "pipeline-log.md"
 _LIGNE = "- 2026-10-16 10:00:00 UTC — [ticket-001] PR #1 confiée au CIWatcher"

@@ -44,8 +44,8 @@ from tessera.services.event_hub import EVENT_HUB
 from tessera.services.run_registry import RUN_REGISTRY
 from tessera.services.reprise_orphelin import reprendre_depots_orphelins
 from tessera.services.reprise_worktrees import reprendre_worktrees_orphelins
-from tessera.services.reprise_surveillance import reprendre_surveillances
-from tessera.services.surveillance_run import surveillance_de_reprise
+from tessera.services.livraison.reprise_surveillance import reprendre_surveillances
+from tessera.services.livraison.surveillance_run import surveillance_de_reprise
 from tessera.services.signalements_en_attente import migrer_ancien_fichier
 from tessera.services.prompt_loader import MissingPromptError
 from tessera.utils.access_log_redaction import install_token_redaction

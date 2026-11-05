@@ -12,7 +12,7 @@ from tessera.services.git_workspace import GitWorkspaceError
 from tessera.services.github.github_workflow import WorkflowError
 from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.project_loader import ProjectLoader
-from tessera.services.ticket_proposal import (
+from tessera.services.livraison.ticket_proposal import (
     ProposalRefused,
     ProposalRequest,
     propose_tickets,

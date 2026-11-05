@@ -13,7 +13,7 @@ from unittest.mock import AsyncMock, patch
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 from tessera.services import pipeline_controles, pipeline_production, pipeline_testeur
-from tessera.services.livraison import Livraison
+from tessera.services.livraison.livraison import Livraison
 from tessera.services.orchestrator import Orchestrator
 from tessera.services.pipeline_documentation import documenter_le_run
 from tessera.services.pipeline_events import EventType, OrchestratorEvent, PipelineResult

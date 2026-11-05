@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 from tessera.config import settings
 from tessera.routers.projects.shared import new_router
-from tessera.services.branch_cleanup import PlanDeNettoyage, plan_de_nettoyage, supprimer_branches
+from tessera.services.livraison.branch_cleanup import PlanDeNettoyage, plan_de_nettoyage, supprimer_branches
 
 router = new_router()
 

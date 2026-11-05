@@ -20,7 +20,7 @@ from tessera.models.ticket import TicketStatus
 from tessera.services.database import init_db
 from tessera.services.database_runs import create_run
 from tessera.services.github.github_workflow import GitHubWorkflowService
-from tessera.services.livraison import Livraison
+from tessera.services.livraison.livraison import Livraison
 from tessera.services.orchestrator import Orchestrator
 from tessera.services.pipeline_approbation import suivre_documentation
 from tessera.services.pipeline_events import (
@@ -28,7 +28,7 @@ from tessera.services.pipeline_events import (
     OrchestratorEvent,
     PipelineResult,
 )
-from tessera.services.sha_approbation import (
+from tessera.services.livraison.sha_approbation import (
     noter_approbation,
     noter_poussee,
     noter_poussee_du_ticket,
@@ -207,7 +207,7 @@ async def test_watcher_check_reads_the_sha_noted_by_the_delivery(
     """The real chain: pushed SHA noted after phase 1, read back for the watcher."""
     from tessera.config import settings
     from tessera.services.livreur_run import noter_sha_pousse
-    from tessera.services.surveillance_run import controle_tete_de
+    from tessera.services.livraison.surveillance_run import controle_tete_de
 
     db = tmp_path / "ide.db"
     monkeypatch.setattr(settings, "ide_db_path", db)

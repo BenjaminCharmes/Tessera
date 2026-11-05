@@ -3,8 +3,8 @@ from collections.abc import Awaitable, Callable
 from typing import Any
 
 from tessera.models.ticket import Ticket, TicketStatus
-from tessera.services.livraison import Livraison
-from tessera.services.livraison_evenements import attente_annoncee
+from tessera.services.livraison.livraison import Livraison
+from tessera.services.livraison.livraison_evenements import attente_annoncee
 from tessera.services.pipeline_events import EventCallback
 from tessera.services.ticket_service import TicketService
 

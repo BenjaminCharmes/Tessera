@@ -18,7 +18,7 @@ from tessera.config import settings
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 from tessera.services.database import init_db
 from tessera.services.event_hub import EventHub
-from tessera.services.livraison import Livraison
+from tessera.services.livraison.livraison import Livraison
 from tessera.services.pipeline_events import PipelineResult
 from tessera.services.run_executor import executer
 from tessera.services.run_registry import RunRegistry

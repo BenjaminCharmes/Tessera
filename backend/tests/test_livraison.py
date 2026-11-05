@@ -6,7 +6,7 @@ import httpx
 import pytest
 
 from tessera.config import settings
-from tessera.services.livraison import LivraisonService, Livraison
+from tessera.services.livraison.livraison import LivraisonService, Livraison
 
 
 class _FauxGit:
@@ -599,7 +599,7 @@ async def test_phase_1_exception_apres_la_pr_porte_son_numero(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Une exception levée une fois la PR ouverte garde son numéro (ticket-415)."""
-    from tessera.services.livraison import LivraisonInterrompue
+    from tessera.services.livraison.livraison import LivraisonInterrompue
 
     svc, _git, _workflow = _service(tmp_path, "pr")
 
@@ -611,7 +611,7 @@ async def test_phase_1_exception_apres_la_pr_porte_son_numero(
             raise OSError("journal indisponible")
 
     svc._post_pr_callback = _callback_en_echec  # type: ignore[assignment]
-    monkeypatch.setattr("tessera.services.livraison._logger", _JournalCasse())
+    monkeypatch.setattr("tessera.services.livraison.livraison._logger", _JournalCasse())
 
     with pytest.raises(LivraisonInterrompue) as info:
         await _phase_1(svc)

@@ -2,7 +2,7 @@
 id: ticket-821
 title: "The delivery modules move to services/livraison"
 type: refactor
-status: todo
+status: done
 pr_number: null
 priority: low
 agent: codeur
@@ -32,13 +32,13 @@ renommages. Les portes de livraison (ADR-029, 030, 033, 039, 051, 065, 069) ne b
 
 ## Critères d'acceptation
 
-- [ ] Les vingt-neuf modules de la section `livraison` sont sous `services/livraison/`, aucun
+- [x] Les vingt-neuf modules de la section `livraison` sont sous `services/livraison/`, aucun
       n'est resté à plat
-- [ ] `livraison.py` est devenu `services/livraison/livraison.py`, ses importeurs aussi
-- [ ] `A_DEPLACER` n'a plus d'entrée `livraison`, `ECARTS_DOMAINES` n'a grandi d'aucune ligne
-- [ ] Aucune occurrence des anciens chemins pointés ne reste dans `backend/src`, `backend/tests`,
+- [x] `livraison.py` est devenu `services/livraison/livraison.py`, ses importeurs aussi
+- [x] `A_DEPLACER` n'a plus d'entrée `livraison`, `ECARTS_DOMAINES` n'a grandi d'aucune ligne
+- [x] Aucune occurrence des anciens chemins pointés ne reste dans `backend/src`, `backend/tests`,
       `scripts/`, `Makefile`
-- [ ] Le diff n'est que des renommages et des lignes d'import ou de chaîne ; la suite passe
+- [x] Le diff n'est que des renommages et des lignes d'import ou de chaîne ; la suite passe
 
 ## Ce que ça ne fait pas
 
@@ -48,3 +48,7 @@ Aucun changement de comportement, aucune porte de livraison modifiée.
 
 Le test de livraison réelle (PR, CI) ne se rejoue pas dans le run : après le merge, regarder la
 première livraison suivante avant de lancer le ticket-822.
+
+## Notes de réalisation
+
+Vingt-neuf modules, comme annoncé. Retouches à la main : la liste triée attendue par `test_only_the_run_wiring_imports_run_worktree` (`test_run_worktree.py`) est retriée ; dans `test_anomalies_detecteur.py`, le préfixe interdit `"tessera.services.livraison"` est gardé tel quel (le script l'avait changé en `livraison.livraison`, ce qui aurait laissé passer les autres modules du domaine). Les chaînes de `monkeypatch` des tests de livraison sont réécrites, et le script prouve qu'aucun ancien chemin ne reste. `docs/architecture.md` suit `ci_watcher` et `pr_status_cache`.

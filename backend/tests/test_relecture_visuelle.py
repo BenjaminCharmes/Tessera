@@ -11,7 +11,7 @@ from tessera.models.ticket import TicketStatus
 from tessera.services import pipeline_approbation, pipeline_capture
 from tessera.services.verification.controle_visuel import ControleVisuel, lire_le_controle
 from tessera.services.etape_de_capture import ResultatCapture
-from tessera.services.livraison import Livraison
+from tessera.services.livraison.livraison import Livraison
 from tessera.services.orchestrator import Orchestrator
 from tessera.services.pipeline_approbation import retenir_pour_relecture
 from tessera.services.pipeline_capture import capturer_le_run

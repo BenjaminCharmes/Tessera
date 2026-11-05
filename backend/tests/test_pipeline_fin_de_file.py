@@ -6,7 +6,7 @@ from typing import cast
 from unittest.mock import AsyncMock, MagicMock
 
 from tessera.services import orchestrator as orchestrator_module
-from tessera.services.livraison import Livraison
+from tessera.services.livraison.livraison import Livraison
 from tessera.services.orchestrator import Orchestrator
 from tessera.services.pipeline_documentation import documenter_le_run
 from tessera.services.pipeline_events import EventType, OrchestratorEvent, PipelineResult

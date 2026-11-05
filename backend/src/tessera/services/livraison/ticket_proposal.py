@@ -16,12 +16,12 @@ from pathlib import Path
 
 from tessera.models.ticket import Ticket
 from tessera.services.autonomie import NiveauAutonomie
-from tessera.services.ci_watcher import CI_WATCHER
+from tessera.services.livraison.ci_watcher import CI_WATCHER
 from tessera.services.event_hub import EVENT_HUB
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.github.github_service import GitHubService
 from tessera.services.github.github_workflow import GitHubWorkflowService, PullRequestResult
-from tessera.services.livraison import LivraisonService
+from tessera.services.livraison.livraison import LivraisonService
 from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.github.proposal_workspace import ProposalWorkspace
 from tessera.services.racine_depot import GIT_ROOT_ANCESTOR

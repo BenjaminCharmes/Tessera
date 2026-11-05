@@ -35,11 +35,11 @@ from tessera.services.providers.enregistrant import ProviderEnregistrant
 from tessera.services.providers.noms import ProviderInconnu
 from tessera.services.providers.par_role import modele_du_role, provider_pour_role
 from tessera.services.providers.refus_garde import JournalDesRefus
-from tessera.services.retest_apres_rebase import retest_du_run
+from tessera.services.livraison.retest_apres_rebase import retest_du_run
 from tessera.services.run_recorder import RunRecorder
 from tessera.services.worktrees.run_worktree import RunWorktree
 from tessera.services.verdicts.security_auditor import SecurityAuditorService
-from tessera.services.surveillance_run import (
+from tessera.services.livraison.surveillance_run import (
     chercheur_pr_mergee,
     lecteur_etat_pr,
     surveillance_pour,
@@ -238,7 +238,7 @@ async def build_orchestrator(
 
     git_workspace = GitWorkspaceService(racine_run, politique=politique, worktree=wt)
 
-    from tessera.services.ci_watcher import CI_WATCHER
+    from tessera.services.livraison.ci_watcher import CI_WATCHER
 
     return Orchestrator(
         journal_refus=journal_refus,

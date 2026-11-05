@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services.branch_cleanup import plan_de_nettoyage, supprimer_branches
+from tessera.services.livraison.branch_cleanup import plan_de_nettoyage, supprimer_branches
 
 
 async def _git(cwd: Path, *args: str) -> str:

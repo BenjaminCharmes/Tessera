@@ -1460,7 +1460,7 @@ rapide, la branche n'est pas réécrite ; la raison s'ajoute à `Livraison.arret
 
 ### Réalignement de la base locale après merge du CIWatcher (ticket-420)
 
-Après qu'un run autonome soit mergé par le `CIWatcher` (`services/ci_watcher.py`), la base locale doit être réalignée sur la base distante pour que les services du projet servent le code à jour.
+Après qu'un run autonome soit mergé par le `CIWatcher` (`services/livraison/ci_watcher.py`), la base locale doit être réalignée sur la base distante pour que les services du projet servent le code à jour.
 
 **Condition** : le réalignement ne s'effectue que si :
 - Aucun run n'occupe actuellement le projet (`RUN_REGISTRY.projet_occupe()` retourne faux)
@@ -1553,7 +1553,7 @@ une fiche pour garantir que le numéro n'est pris ni sur l'arbre, ni sur `origin
 
 L'endpoint `/projects/{id}/tickets/{id}/pr-status` affichait le statut de chaque PR en interrogeant GitHub, sans cache. Chaque appel lancait deux requêtes GitHub (la PR, puis ses check-runs). Avec 139 tickets portant un `pr_number` dans ide-core, ouvrir le projet provoquait 139 appels à l'endpoint, soit ~280 requêtes GitHub — consommant 5,6 % du quota horaire (5 000 requêtes).
 
-Le module `backend/src/tessera/services/pr_status_cache.py` implémente deux niveaux de cache :
+Le module `backend/src/tessera/services/livraison/pr_status_cache.py` implémente deux niveaux de cache :
 
 - **Statuts définitifs** (`merged`, `closed`) : persistés dans une table SQLite `pr_status_cache`, relus sans appel GitHub — y compris après redémarrage.
 - **Statuts ouverts** : gardés en mémoire 30 secondes, puis redemandés.

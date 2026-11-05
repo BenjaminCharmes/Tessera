@@ -9,7 +9,7 @@ from typing import Any, Awaitable, Callable, Protocol
 import httpx
 
 from tessera.services.git_workspace import GitWorkspaceError
-from tessera.services.livraison_resultat import Livraison
+from tessera.services.livraison.livraison_resultat import Livraison
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

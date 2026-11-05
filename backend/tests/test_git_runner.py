@@ -11,7 +11,8 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services import branch_cleanup, realignement_base, reprise_orphelin
+from tessera.services import reprise_orphelin
+from tessera.services.livraison import branch_cleanup, realignement_base
 from tessera.services.git_workspace import git_runner, journal_en_attente, ticket_diff
 from tessera.services.worktrees import temporary_worktree
 from tessera.services.creation_projet import project_removal

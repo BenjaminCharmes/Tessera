@@ -221,12 +221,12 @@ def test_only_the_run_wiring_imports_run_worktree() -> None:
         "routers/orchestrator.py",
         "services/assemblage_run.py",
         "services/documentation/documenteur_run.py",
+        "services/livraison/surveillance_run.py",
         "services/livreur_run.py",
         "services/orchestrator.py",
         "services/pipeline_branche.py",
         "services/preparation_run.py",
         "services/run_dans_worktree.py",
-        "services/surveillance_run.py",
     ]
 
 

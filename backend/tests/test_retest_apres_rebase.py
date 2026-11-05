@@ -15,10 +15,10 @@ from typing import Any
 from unittest.mock import AsyncMock, MagicMock
 
 from tessera.models.ticket import TicketStatus
-from tessera.services.livraison import Livraison, LivraisonService
+from tessera.services.livraison.livraison import Livraison, LivraisonService
 from tessera.services.orchestrator import Orchestrator
 from tessera.services.pipeline_events import OrchestratorEvent, PipelineResult
-from tessera.services.retest_apres_rebase import (
+from tessera.services.livraison.retest_apres_rebase import (
     RetestApresRebase,
     ResultatRetest,
     etape_de,
