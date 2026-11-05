@@ -12,6 +12,39 @@ Cette section n'est injectée dans aucun appel d'agent. Une règle nouvelle
 s'écrit ici, avec son ADR ; un humain l'accepte en la déplaçant dans sa
 section. (ADR-055)
 
+- **Le superviseur n'agit que par les actions d'un registre fermé**, choisies
+  dans une sortie validée par un schéma ; son modèle n'a ni outil ni `Bash`.
+  Une sortie absente, hors schéma ou hors registre : aucune action.
+  (ADR-080, ADR-061, ADR-039)
+- **Le superviseur ne touche jamais** à l'argent (budgets, quotas, autonomie),
+  à une suppression (fichier, branche, worktree, ticket annulé), à un secret, à
+  un projet `confidentiality: professional`, ni à `agents.json`, `.github/`,
+  `CLAUDE.md`, `.git/`. Une règle ou une leçon qui touche une porte (ADR-027,
+  031, 037, 039, 053, 055, 067, 073) ou le superviseur lui-même ne se décide
+  pas : elle va dans « À toi ». (ADR-080)
+- **La délégation se déclare dans `pipeline.superviseur` de `agents.json`, par
+  un humain.** Absente, le superviseur n'accepte ni n'écarte aucune règle ou
+  leçon. Accepter n'est qu'un déplacement de bloc, que le code vérifie.
+  (ADR-080, ADR-055, ADR-074)
+- **Le superviseur ne merge jamais.** Il confie à `CIWatcher` une PR dont le
+  run est approuvé, la tête encore `pushed_sha`, hors `resolveur-conflit`. Il
+  ne relance une file qu'après une coupure d'infrastructure, une fois par cause,
+  jamais sur « non approuvé ». (ADR-080, ADR-039, ADR-033, ADR-030)
+- **Une écriture du superviseur est une intervention** : run `supervision` sous
+  `RunLock`, une action par commit, une ligne dans `memory/supervision.md`.
+  Tant qu'une file tient le projet, il n'écrit pas. Un diff de run qui touche
+  ce journal met le run en `blocked`. (ADR-080, ADR-038, ADR-055)
+- **`signaler` est l'unique chemin d'un agent vers le backlog d'ide-core.** Le
+  projet source se déduit du run, jamais des arguments ; 3 signalements par
+  run, 1 500 caractères ; secret ou terme interdit : refus ; projet
+  `professional` : énumérations seules, sans texte libre. Aucun agent n'écrit
+  dans le dépôt d'ide-core. (ADR-080, ADR-043, ADR-031, ADR-073)
+- **Une revue de projet est un run `design` qui n'écrit que `tickets/**` et
+  `memory/**`** : dix tickets, cinq signalements, 3 $ au plus. Tout autre
+  fichier touché met le run en `blocked`. (ADR-080)
+- **Un numéro rendu par `prochain_numero.py` est un numéro pris**, utilisé ou
+  non : il se réserve à l'appel. (ADR-080)
+
 
 ## Git et périmètre d'écriture
 

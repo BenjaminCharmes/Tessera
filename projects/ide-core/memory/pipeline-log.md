@@ -7832,3 +7832,27 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-05 15:40:25 UTC — [ticket-806] livraison: tests relancés après rebase : rouges (FAILED tests/test_longueur_des_fichiers.py::test_backend_files_respect_their_ceilings !!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!! !!!!!!!!!!!! xdist.dsession.Interrupted: stopping after 1 failures !!!!!!!!!!!! 1 failed, 753 passed in 142.49s (0:02:22) dur�es : myp) (301218ms)
 - 2026-11-05 15:40:25 UTC — [ticket-806] livraison: branche remise sur 1aa4376 (0ms)
 - 2026-11-05 15:40:25 UTC — [ticket-806] livraison: arrêt — Tests rouges après rebase sur develop : rien n'est poussé. La base a avancé pendant le run et le tra
+- 2026-11-05 16:18:11 UTC — [ide-core] file interrompue : Ticket introuvable : ticket-847
+- 2026-11-05 17:29:32 UTC — [ticket-847] branche ticket-847-design-tessera-supervising-itself-without-an-ide
+- 2026-11-05 17:29:33 UTC — [ticket-847] tour 1 — codeur démarré
+- 2026-11-05 17:36:47 UTC — [ticket-847] tour 1 — architect terminé (433891ms)
+- 2026-11-05 17:36:59 UTC — [ticket-847] testeur: OK (exit 0)
+- 2026-11-05 17:39:21 UTC — [ticket-847] securite: PASS — Ce diff est une spécification d'architecture (ADR-080, sans code exécutable) pou (142358ms)
+- 2026-11-05 17:39:21 UTC — [ticket-847] tour 1 — reviewer démarré
+- 2026-11-05 17:39:59 UTC — [ticket-847] tour 1 — reviewer terminé (37594ms)
+- 2026-11-05 17:44:21 UTC — [ticket-847] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-05 17:45:13 UTC — [ticket-847] validateur: fichiers cités joints : projects/ide-core/memory/decisions.md (tronqué) ; non joints (budget épuisé) : projects/ide-core/memory/contraintes.md, projects/ide-core/tickets/todo/
+- 2026-11-05 17:45:13 UTC — [ticket-847] validateur: APPROVED — Ticket de conception pure : une ADR-080 qui gouverne le superviseur interne, hui (351842ms)
+- 2026-11-05 17:45:13 UTC — [ticket-847] CHANGES_REQUESTED tour 1: Reviewer : 1. ticket-864 s'appuie sur l'outil `signaler` de ticket-863. Il borne cet outil à 5 signalements par revue, et son test `test_professional_project_review_emits_no_report` vérifie qu'une rev
+- 2026-11-05 17:45:13 UTC — [ticket-847] tour 2 — codeur démarré
+- 2026-11-05 17:45:26 UTC — [ticket-847] tour 2 — architect terminé (12484ms)
+- 2026-11-05 17:47:33 UTC — [ticket-847] testeur: OK (exit 0)
+- 2026-11-05 17:50:21 UTC — [ticket-847] securite: PASS — Ce diff ajoute une spécification de conception (ADR-080) pour un superviseur Tes (167375ms)
+- 2026-11-05 17:50:21 UTC — [ticket-847] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-11-05 17:50:21 UTC — [ticket-847] tour 2 — reviewer démarré
+- 2026-11-05 17:50:31 UTC — [ticket-847] tour 2 — reviewer terminé (9295ms)
+- 2026-11-05 17:51:02 UTC — [ticket-847] validateur: fichiers cités joints : projects/ide-core/memory/decisions.md (tronqué) ; non joints (budget épuisé) : projects/ide-core/memory/contraintes.md, projects/ide-core/tickets/todo/
+- 2026-11-05 17:51:02 UTC — [ticket-847] validateur: APPROVED — Ticket de conception validé. ADR-080 fixe le superviseur sur quatre actions ferm (40813ms)
+- 2026-11-05 17:51:02 UTC — [ticket-847] APPROVED après 2 tour(s)
+- 2026-11-05 17:51:09 UTC — [ticket-847] fichiers non suivis laissés par le run : tickets/todo/ticket-848-prochain-numero-reserves-the-number-it-returns.md, tickets/todo/ticket-849-a-queue-refuses-tickets-absent-from-origin-base-before-it-opens.md, tickets/todo/ticket-850-the-registry-says-when-a-queue-holds-a-project-between-two-tickets.md, tickets/todo/ticket-851-a-module-holds-the-supervisor-closed-action-registry-and-its-guards.md, tickets/todo/ticket-852-the-supervisor-role-config-and-prompt-exist.md, tickets/todo/ticket-853-the-supervision-journal-is-written-by-the-service-only.md, tickets/todo/ticket-854-a-supervision-intervention-is-a-run-with-one-commit-per-action.md, tickets/todo/ticket-855-the-supervisor-turns-a-raw-report-into-a-ticket-in-place.md, tickets/todo/ticket-856-the-supervisor-decides-a-delegated-lesson-or-rule.md, tickets/todo/ticket-857-the-supervisor-hands-an-unwatched-green-pr-back-to-ciwatcher.md et 8 autres (à ignorer dans .gitignore ?)
+- 2026-11-05 17:55:25 UTC — [ticket-847] documentation: 2 fichier(s) (256358ms) — après tour de correction — refusé : doc-technique : description refusée — agents.json : règle « preuve » — l'extrait « def lire_lecons(memory_dir: Path) -> Lecons: » (backend/src/tessera/services/

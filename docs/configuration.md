@@ -36,6 +36,7 @@ Toutes les variables sont dans `.env` (copie de `.env.example`) :
 | `IDE_DB_PATH` | | `tessera.db` | Base SQLite des runs, coûts et événements |
 | `IDE_STATE_DIR` | | `%LOCALAPPDATA%\Tessera` (Windows) ou `~/.local/state/tessera` (autres) | Répertoire pour les fichiers d'état en dehors du dépôt : signalements en attente, etc. Créé au démarrage s'il n'existe pas. |
 | `SECRETS_SOURCE` | | `auto` | Mode de lecture des neuf secrets du coffre du système : `auto` (coffre s'il répond, sinon `.env` avec avertissement), `coffre` (refus sans coffre), `env` (jamais de coffre, CI/Docker). |
+| `OLLAMA_MAX_CONCURRENT` | | `1` | Nombre maximum de requêtes parallèles au serveur Ollama. Au-delà, les requêtes attendent leur créneau |
 | `FORBIDDEN_TERMS` | | `""` | Termes interdits au push et en CI, virgules comme séparateurs. Correspondance insensible à la casse, accents normalisés (ADR-048, ADR-050). |
 | `VERCEL_TOKEN` | | `""` | Jeton Vercel pour déployer. Portée minimale : `read` sur les projects, `write` sur les deployments. À définir avec une date d'expiration. |
 | `VERCEL_TEAM_ID` | | `""` | Identifiant du team Vercel (trouvé dans les settings du team). Utilisé par le client Vercel pour créer ou chercher des projets. |
