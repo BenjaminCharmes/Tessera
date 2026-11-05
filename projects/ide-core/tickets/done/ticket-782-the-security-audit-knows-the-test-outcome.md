@@ -2,7 +2,7 @@
 id: ticket-782
 title: "The security audit knows the test outcome of its round"
 type: fix
-status: todo
+status: done
 pr_number: null
 priority: medium
 agent: codeur
@@ -41,12 +41,12 @@ le diff et un `AuditContext` (`backend/src/tessera/services/security_contexte.py
 
 ## Critères d'acceptation
 
-- [ ] Un test vérifie que `build_audit_context` (ou son appelant) porte le résultat des tests
+- [x] Un test vérifie que `build_audit_context` (ou son appelant) porte le résultat des tests
       quand `run.test_result` existe, et rien quand il n'existe pas
-- [ ] Un test vérifie que le message envoyé à l'auditeur contient le résumé des tests verts du
+- [x] Un test vérifie que le message envoyé à l'auditeur contient le résumé des tests verts du
       tour
-- [ ] Un test vérifie que des tests rouges y figurent avec les noms des tests en échec
-- [ ] `agents/prompts/securite.md` dit qu'une faille affirmant un échec à l'exécution doit
+- [x] Un test vérifie que des tests rouges y figurent avec les noms des tests en échec
+- [x] `agents/prompts/securite.md` dit qu'une faille affirmant un échec à l'exécution doit
       s'accorder avec le résultat des tests fourni
 
 ## Ce que ça ne fait pas

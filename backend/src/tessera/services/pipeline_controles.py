@@ -66,6 +66,7 @@ async def run_security_audit(
             run.ticket,
             getattr(orch, "_queue_ids", None),
             getattr(orch, "_ticket_svc", None),
+            run.test_result,
         )
         audit = await orch._security_auditor.audit(
             code_diff=run.reviewed_code,
