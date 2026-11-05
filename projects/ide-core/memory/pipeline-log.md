@@ -7882,3 +7882,14 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-05 19:23:01 UTC — [ticket-848] livraison: tests relancés après rebase : rouges (FAILED tests/test_ruff_propre.py::test_ruff_check_passes_on_src_and_tests - A... !!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!! !!!!!!!!!!!! xdist.dsession.Interrupted: stopping after 1 failures !!!!!!!!!!!! 1 failed, 4306 passed, 64 warnings in 776.66s (0:12:56) ruf) (1520703ms)
 - 2026-11-05 19:23:01 UTC — [ticket-848] livraison: branche remise sur 17dacf1 ; résolution de conflit abandonnée (0ms)
 - 2026-11-05 19:23:01 UTC — [ticket-848] livraison: arrêt — Tests rouges après rebase sur develop : rien n'est poussé. La base a avancé pendant le run et le tra
+- 2026-11-05 19:49:02 UTC — [ide-core] ticket-849 PR #936 confiée au CIWatcher
+- 2026-11-05 19:49:10 UTC — [ticket-850] branche ticket-850-the-registry-says-when-a-queue-holds-a-project-be
+- 2026-11-05 19:49:11 UTC — [ticket-850] tour 1 — codeur démarré
+- 2026-11-05 19:50:47 UTC — [ticket-850] tour 1 — codeur terminé (95343ms)
+- 2026-11-05 19:53:36 UTC — [ticket-850] testeur: dur�es : ruff 0 s, mypy 6 s, mypy-linux 7 s, pytest 165 s
+- 2026-11-05 19:54:46 UTC — [ticket-850] securite: PASS — Le diff ajoute une méthode interne `projet_tenu_par_file()` au registry avec tes (70187ms)
+- 2026-11-05 19:54:46 UTC — [ticket-850] tour 1 — reviewer démarré
+- 2026-11-05 19:55:09 UTC — [ticket-850] tour 1 — reviewer terminé (23016ms)
+- 2026-11-05 19:56:36 UTC — [ticket-850] validateur: APPROVED — Tous les tests critiques sont passés et l'implémentation de `RunRegistry.projet_ (109907ms)
+- 2026-11-05 19:56:36 UTC — [ticket-850] APPROVED après 1 tour(s)
+- 2026-11-05 19:58:15 UTC — [ticket-850] documentation: 0 fichier(s) (91375ms)

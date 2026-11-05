@@ -188,6 +188,12 @@ class RunRegistry:
                 return run
         return None
 
+    def projet_tenu_par_file(self, project_id: str) -> bool:
+        """True while a queue or autonomous run holds the project, between tickets too."""
+        # Une file est un seul `RunActif`, de `ouvrir` à `fermer` : jamais retiré entre deux tickets.
+        return any(r.project_id == project_id and r.mode in ("queue", "autonomous")
+                   for r in self._runs.values())
+
     def get(self, run_id: str) -> RunActif | None:
         return self._runs.get(run_id)
 
