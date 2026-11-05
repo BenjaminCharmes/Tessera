@@ -74,3 +74,12 @@ class Etape:
     #: Rouverte par un nouveau début sans fin entre les deux : ni mesure, ni
     #: échantillon. Le testeur figé n'entre donc pas dans la médiane qui le juge.
     abandonnee: bool = False
+
+
+@dataclass(frozen=True)
+class LigneOuverte:
+    """The unfinished `single` row of a ticket in `pipeline_runs`."""
+
+    id: str
+    ticket_id: str
+    started_at: str

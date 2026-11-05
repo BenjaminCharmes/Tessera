@@ -53,3 +53,87 @@ def etape_longue(
         etape=etape.nom,
         agent=etape.agent,
     )
+
+
+def cout_median(
+    cout_usd: float,
+    passes_usd: Sequence[float],
+    *,
+    ticket_id: str,
+    ligne_id: str,
+    plancher_usd: float = 0.5,
+    facteur: float = 3.0,
+    minimum: int = 10,
+) -> Anomalie | None:
+    """A ticket costing more than `max(facteur x median, plancher_usd)`."""
+    mediane = mediane_si_assez(passes_usd, minimum)
+    if mediane is None:
+        return None
+    seuil = max(facteur * mediane, plancher_usd)
+    if cout_usd <= seuil:
+        return None
+    return Anomalie(
+        regle="cout_anormal",
+        cle=f"cout_median:{ligne_id}",
+        ticket_id=ticket_id,
+        message=(
+            f"Ce ticket a déjà coûté {cout_usd:.2f} USD, "
+            f"pour une médiane de {mediane:.2f} USD sur le projet."
+        ),
+        mesure=cout_usd,
+        seuil=seuil,
+        unite="usd",
+    )
+
+
+def cout_budget(
+    cumul_usd: float,
+    budget_usd: float,
+    *,
+    ticket_id: str,
+    run_id: str,
+    part: float = 0.8,
+) -> Anomalie | None:
+    """An autonomous run at `part` of its budget or more (ADR-020 only acts between tickets)."""
+    if budget_usd <= 0 or cumul_usd < part * budget_usd:
+        return None
+    return Anomalie(
+        regle="cout_anormal",
+        cle=f"cout_budget:{run_id}",
+        ticket_id=ticket_id,
+        message=(
+            f"Le run autonome a dépensé {cumul_usd:.2f} USD "
+            f"sur un budget de {budget_usd:.2f} USD."
+        ),
+        mesure=cumul_usd / budget_usd * 100,
+        seuil=part * 100,
+        unite="pourcent",
+    )
+
+
+def cout_anormal(
+    cout_usd: float,
+    passes_usd: Sequence[float],
+    *,
+    ticket_id: str,
+    ligne_id: str = "",
+    run_id: str = "",
+    plancher_usd: float = 0.5,
+    cumul_usd: float | None = None,
+    budget_usd: float | None = None,
+    facteur: float = 3.0,
+    minimum: int = 10,
+    part: float = 0.8,
+) -> Anomalie | None:
+    """The cost rule: the median rule first, then the budget rule (autonomous runs only).
+
+    Le détecteur appelle `cout_median` et `cout_budget` séparément pour signaler
+    les deux quand les deux valent ; ici, le premier constat l'emporte.
+    """
+    constat = cout_median(
+        cout_usd, passes_usd, ticket_id=ticket_id, ligne_id=ligne_id,
+        plancher_usd=plancher_usd, facteur=facteur, minimum=minimum,
+    )
+    if constat is not None or cumul_usd is None or budget_usd is None:
+        return constat
+    return cout_budget(cumul_usd, budget_usd, ticket_id=ticket_id, run_id=run_id, part=part)

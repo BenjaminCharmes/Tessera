@@ -9,7 +9,7 @@ from typing import Any
 
 from tessera.services.anomalies.etapes import etapes_depuis, types_de_l_etape
 from tessera.services.anomalies.lecture_base import ouvrir_en_lecture
-from tessera.services.anomalies.modeles import EvenementLu
+from tessera.services.anomalies.modeles import EvenementLu, LigneOuverte
 
 #: Lignes lues par type d'événement : de quoi couvrir 20 étapes, sans la table entière.
 BORNE_PAR_TYPE = 200
@@ -49,3 +49,51 @@ async def durees_passees(
     ]
     closes.sort(key=lambda e: e.debut, reverse=True)
     return [(e.fin - e.debut).total_seconds() for e in closes[:n] if e.fin is not None]
+
+
+#: Un run `single` : une ligne sans mode date d'avant le ticket-263 et se lit `single`.
+_SINGLE = "(r.mode IS NULL OR r.mode = 'single')"
+
+
+async def couts_passes(db_path: Path | str, project_id: str, n: int = 20) -> list[float]:
+    """Cost (USD) of the `n` latest finished `single` runs of the project, newest first.
+
+    Les enveloppes de file ne portent aucun appel d'agent ; un run à coût nul
+    n'est pas un échantillon.
+    """
+    requete = f"""
+        SELECT SUM(c.cost_usd) AS cout
+        FROM pipeline_runs r JOIN agent_calls c ON c.run_id = r.id
+        WHERE r.project_id = ? AND {_SINGLE} AND r.finished_at IS NOT NULL
+        GROUP BY r.id HAVING cout > 0
+        ORDER BY r.started_at DESC, r.rowid DESC LIMIT ?
+    """  # noqa: S608 — `_SINGLE` est une constante du module
+    async with ouvrir_en_lecture(db_path) as db:
+        async with db.execute(requete, (project_id, n)) as curseur:
+            return [float(ligne[0]) for ligne in await curseur.fetchall()]
+
+
+async def ligne_ouverte_du_ticket(
+    db_path: Path | str, project_id: str, ticket_id: str
+) -> LigneOuverte | None:
+    """The unfinished `single` row of the ticket, if any."""
+    requete = f"""
+        SELECT r.id, r.ticket_id, r.started_at FROM pipeline_runs r
+        WHERE r.project_id = ? AND r.ticket_id = ? AND {_SINGLE} AND r.finished_at IS NULL
+        ORDER BY r.started_at DESC, r.rowid DESC LIMIT 1
+    """  # noqa: S608
+    async with ouvrir_en_lecture(db_path) as db:
+        async with db.execute(requete, (project_id, ticket_id)) as curseur:
+            ligne = await curseur.fetchone()
+    return None if ligne is None else LigneOuverte(ligne[0], ligne[1], ligne[2])
+
+
+async def cout_du_ticket(db_path: Path | str, run_row_id: str) -> float:
+    """What the agent calls of one `pipeline_runs` row cost so far."""
+    async with ouvrir_en_lecture(db_path) as db:
+        async with db.execute(
+            "SELECT COALESCE(SUM(cost_usd), 0.0) FROM agent_calls WHERE run_id = ?",
+            (run_row_id,),
+        ) as curseur:
+            ligne = await curseur.fetchone()
+    return float(ligne[0]) if ligne else 0.0
