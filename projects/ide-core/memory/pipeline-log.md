@@ -7990,3 +7990,4 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-05 22:45:53 UTC — [ticket-864] validateur: APPROVED — Tous les critères d'acceptation sont vérifiés par le code et les tests passent ( (332375ms)
 - 2026-11-05 22:45:53 UTC — [ticket-864] APPROVED après 3 tour(s)
 - 2026-11-05 22:46:15 UTC — [ticket-864] leçons: une leçon proposée
+- 2026-11-05 22:52:28 UTC — [ticket-864] documentation: 1 fichier(s) (363108ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « preuve » — l'extrait « anomalies: list[dict] » (backend/src/tessera/services/run_registry.py) n'est ni dans le di
