@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 from tests.test_providers_base import FakeProvider
-from tessera.services.test_runner import EtapeTest, TestResult
+from tessera.services.verification.test_runner import EtapeTest, TestResult
 from tessera.services.verdicts.validator import (
     CriterionResult,
     ValidationResult,

@@ -8,16 +8,16 @@ import time
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from tessera.services.commande_chainee import decouper
-from tessera.services.detail_du_delai import detail_du_delai
-from tessera.services.erreur_de_sortie import detail_avec_erreur
-from tessera.services.groupe_d_etape import GroupeDEtape
+from tessera.services.verification.commande_chainee import decouper
+from tessera.services.verification.detail_du_delai import detail_du_delai
+from tessera.services.verification.erreur_de_sortie import detail_avec_erreur
+from tessera.services.verification.groupe_d_etape import GroupeDEtape
 from tessera.services.lancement import essais_de_commande
-from tessera.services.limiteur_de_suites import LimiteurDeSuites
-from tessera.services.minuteur_d_etape import MinuteurDEtape
-from tessera.services.outil_introuvable import outil_introuvable
-from tessera.services.process_registry import CommandeInvalide, resoudre_le_cwd
-from tessera.services.sortie_de_test import (
+from tessera.services.verification.limiteur_de_suites import LimiteurDeSuites
+from tessera.services.verification.minuteur_d_etape import MinuteurDEtape
+from tessera.services.verification.outil_introuvable import outil_introuvable
+from tessera.services.verification.process_registry import CommandeInvalide, resoudre_le_cwd
+from tessera.services.verification.sortie_de_test import (
     extract_counts,
     extract_errors,
     extract_failure_details,

@@ -6,8 +6,8 @@ diff approuvé touche un fichier d'interface ; sinon, aucun processus n'est cré
 """
 from typing import TYPE_CHECKING
 
-from tessera.services.captures_session import lire_le_jeton
-from tessera.services.controle_visuel import ControleVisuel, controle_du
+from tessera.services.verification.captures_session import lire_le_jeton
+from tessera.services.verification.controle_visuel import ControleVisuel, controle_du
 from tessera.services.diff_changements import lire_diff
 from tessera.services.etape_de_capture import ResultatCapture, prendre_les_captures
 from tessera.services.git_workspace import GitWorkspaceError

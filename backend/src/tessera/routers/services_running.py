@@ -11,7 +11,7 @@ from tessera.config import settings
 from tessera.services.groupe_de_processus import tuer_l_arbre
 from tessera.models.inventaire import AppEnCours, PortOccupe
 from tessera.services.supervision.inventaire_apps import inventaire, inventaire_complet
-from tessera.services.process_registry import PROCESS_REGISTRY
+from tessera.services.verification.process_registry import PROCESS_REGISTRY
 from tessera.services.supervision.sonde_systeme import SondeReelle, SondeSysteme
 
 router = APIRouter(prefix="/services", tags=["services"])

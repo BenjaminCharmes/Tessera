@@ -7,7 +7,7 @@ dans `agents.json` (`--port 8026`) et le `vite.config.ts` du front
 import re
 from pathlib import Path
 
-from tessera.services.process_registry import CommandeInvalide, resoudre_le_cwd
+from tessera.services.verification.process_registry import CommandeInvalide, resoudre_le_cwd
 from tessera.services.project_loader import load_services_config
 from tessera.utils.logger import get_logger
 

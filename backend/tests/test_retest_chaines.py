@@ -19,7 +19,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from tessera.services.chaines_de_test import (
+from tessera.services.verification.chaines_de_test import (
     PREFIXES_BACKEND,
     PREFIXES_FRONTEND,
     chaine_commune,
@@ -27,7 +27,7 @@ from tessera.services.chaines_de_test import (
 )
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.retest_apres_rebase import RetestApresRebase, retest_du_run
-from tessera.services.test_runner import TestResult
+from tessera.services.verification.test_runner import TestResult
 
 _VERIFIER = Path(__file__).resolve().parents[2] / "scripts" / "verifier.py"
 

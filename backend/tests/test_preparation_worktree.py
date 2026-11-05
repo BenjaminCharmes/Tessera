@@ -10,7 +10,7 @@ from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketTy
 from tessera.models.worktree_config import ConfigWorktree
 from tessera.services import preparation_worktree
 from tessera.services.git_workspace import GitWorkspaceError
-from tessera.services.commande_effective import PlaceholderInconnu, setup_effectif
+from tessera.services.verification.commande_effective import PlaceholderInconnu, setup_effectif
 from tessera.services.orchestrator import Orchestrator
 from tessera.services.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.pipeline_run import PipelineRun
@@ -22,7 +22,7 @@ from tessera.services.preparation_worktree import (
 )
 from tessera.services.run_dans_worktree import adopter_la_branche
 from tessera.services.run_worktree import RunWorktree
-from tessera.services.test_runner import EtapeTest, TestResult
+from tessera.services.verification.test_runner import EtapeTest, TestResult
 from tessera.services.worktree_politique import lire_worktree
 from tests.doubles_git import GitWorkspaceDouble
 

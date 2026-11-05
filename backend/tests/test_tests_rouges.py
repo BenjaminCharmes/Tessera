@@ -11,7 +11,7 @@ from tessera.models.ticket import (
 )
 from tessera.services.orchestrator import Orchestrator
 from tessera.services.pipeline_events import OrchestratorEvent
-from tessera.services.test_runner import TestResult
+from tessera.services.verification.test_runner import TestResult
 
 
 class _FauxTestRunner:

@@ -14,9 +14,9 @@ from pathlib import Path
 from typing import Any, Protocol
 from urllib.parse import urlsplit, urlunsplit
 
-from tessera.services.captures import app_repond
-from tessera.services.captures_config import ConfigCaptures
-from tessera.services.controle_visuel import JETON_PORT, Demarrage
+from tessera.services.verification.captures import app_repond
+from tessera.services.verification.captures_config import ConfigCaptures
+from tessera.services.verification.controle_visuel import JETON_PORT, Demarrage
 from tessera.services.groupe_de_processus import (
     creer_groupe,
     fermer_le_groupe,

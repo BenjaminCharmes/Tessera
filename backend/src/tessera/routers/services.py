@@ -14,7 +14,7 @@ from tessera.services.event_hub import EVENT_HUB
 from tessera.services.supervision.inventaire_apps import inventaire
 from tessera.services.supervision.sonde_systeme import SondeSysteme
 from tessera.services.pipeline_events import EventType, OrchestratorEvent
-from tessera.services.process_registry import (
+from tessera.services.verification.process_registry import (
     PROCESS_REGISTRY,
     CommandeInvalide,
     Service,
@@ -22,7 +22,7 @@ from tessera.services.process_registry import (
 )
 from tessera.routers.dependencies import require_valid_project_id
 from tessera.services.project_loader import load_services_config
-from tessera.services.service_etat import (
+from tessera.services.verification.service_etat import (
     ServiceEtat,
     ServicesArretes,
     ServicesDemarres,

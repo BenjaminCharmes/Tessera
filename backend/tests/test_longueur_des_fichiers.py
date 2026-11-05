@@ -18,11 +18,11 @@ PLAFONDS: dict[str, int] = {
     "services/livraison.py": 571,
     "services/orchestrator.py": 633,
     "services/pipeline_outcomes.py": 490,
-    "services/process_registry.py": 409,
+    "services/verification/process_registry.py": 409,
     "services/providers/agent_sdk.py": 452,
     "services/reprise_orphelin.py": 361,
     "services/run_executor.py": 336,
-    "services/test_runner.py": 524,
+    "services/verification/test_runner.py": 524,
     "services/ticket_service.py": 461,
 }
 

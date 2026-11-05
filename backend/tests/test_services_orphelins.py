@@ -27,7 +27,7 @@ _SCENARIO = """
 import asyncio, json, sys
 sys.path.insert(0, {src!r})
 from pathlib import Path
-from tessera.services.process_registry import ProcessRegistry
+from tessera.services.verification.process_registry import ProcessRegistry
 
 async def main():
     registre = ProcessRegistry()

@@ -15,9 +15,9 @@ from fastapi.testclient import TestClient
 
 from tessera.config import settings
 from tessera.main import app
-from tessera.services import captures
-from tessera.services.captures_config import ConfigCaptures, load_captures_config
-from tessera.services.captures_session import lire_le_jeton
+from tessera.services.verification import captures
+from tessera.services.verification.captures_config import ConfigCaptures, load_captures_config
+from tessera.services.verification.captures_session import lire_le_jeton
 
 JETON = "s3cr3t-jeton-de-test"
 _SESSION = {"chemin": "/api/session", "jeton_env": "ACCESS_TOKEN", "fichier_env": "backend/.env"}

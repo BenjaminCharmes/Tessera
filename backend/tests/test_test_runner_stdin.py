@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from tessera.services.test_runner import TestRunnerService
+from tessera.services.verification.test_runner import TestRunnerService
 
 
 async def test_each_step_is_launched_with_a_closed_stdin(tmp_path: Path) -> None:

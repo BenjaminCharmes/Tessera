@@ -10,9 +10,9 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from tessera.services import groupe_d_etape
-from tessera.services.groupe_d_etape import GroupeDEtape
-from tessera.services.test_runner import TestRunnerService
+from tessera.services.verification import groupe_d_etape
+from tessera.services.verification.groupe_d_etape import GroupeDEtape
+from tessera.services.verification.test_runner import TestRunnerService
 
 # Le parent lance un petit-enfant de longue durée qui hérite de stdout, note
 # son pid, puis dort : seul le groupe peut les atteindre tous les deux.

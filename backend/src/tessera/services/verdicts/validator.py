@@ -18,7 +18,7 @@ from tessera.services.modeles_par_defaut import MODELE_JUGEMENT
 from tessera.utils.logger import get_logger
 
 if TYPE_CHECKING:
-    from tessera.services.test_runner import TestResult
+    from tessera.services.verification.test_runner import TestResult
 
 _logger = get_logger(__name__)
 

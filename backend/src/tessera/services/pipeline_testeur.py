@@ -1,7 +1,7 @@
 """Stage — the project's test suite (ticket-688, split from `pipeline_stages`)."""
 from typing import TYPE_CHECKING
 
-from tessera.services.detail_du_delai import detail_du_delai, ligne_de_delai
+from tessera.services.verification.detail_du_delai import detail_du_delai, ligne_de_delai
 from tessera.services.pipeline_events import EventType, PipelineResult
 from tessera.services.pipeline_outcomes import finish_timeout_expired
 from tessera.services.pipeline_run import PipelineRun, emit
@@ -9,7 +9,7 @@ from tessera.utils.logger import get_logger
 
 if TYPE_CHECKING:
     from tessera.services.orchestrator import Orchestrator
-    from tessera.services.test_runner import TestResult
+    from tessera.services.verification.test_runner import TestResult
 
 _logger = get_logger(__name__)
 
@@ -50,7 +50,7 @@ async def run_tests(
     if not (orch._test_runner and orch._project_path):
         return True
 
-    from tessera.services.test_runner import TestCommandNotFound
+    from tessera.services.verification.test_runner import TestCommandNotFound
 
     try:
         async def _on_attente() -> None:

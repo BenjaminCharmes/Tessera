@@ -5,10 +5,10 @@ from unittest.mock import AsyncMock, MagicMock
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 from tessera.services import pipeline_testeur
-from tessera.services.detail_du_delai import detail_du_delai, ligne_de_delai, nom_court
+from tessera.services.verification.detail_du_delai import detail_du_delai, ligne_de_delai, nom_court
 from tessera.services.pipeline_reprise import _TESTS_SANS_RESULTAT, verifier_travail_repris
 from tessera.services.pipeline_run import PipelineRun
-from tessera.services.test_runner import (
+from tessera.services.verification.test_runner import (
     EtapeCoupee,
     EtapeTest,
     TestResult,

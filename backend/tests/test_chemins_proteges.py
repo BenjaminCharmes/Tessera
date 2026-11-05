@@ -13,7 +13,7 @@ import pytest
 
 from tessera.config import Settings
 from tessera.models.worktree_config import ConfigWorktree
-from tessera.services.commande_effective import commande_effective
+from tessera.services.verification.commande_effective import commande_effective
 from tessera.services.politique_run import PolitiqueRun
 from tessera.services.providers.chemins_proteges import (
     PROTECTION_REFUS,

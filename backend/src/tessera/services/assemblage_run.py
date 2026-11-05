@@ -15,7 +15,7 @@ from tessera.services.adr import lire_contraintes
 from tessera.services.agents.agent_registry import AgentRegistryService
 from tessera.services.agents.agent_runner import OUTILS_DE_RELECTURE, AgentRunner
 from tessera.services.agents.carte_du_depot import CarteDuDepot
-from tessera.services.controle_visuel import lire_le_controle
+from tessera.services.verification.controle_visuel import lire_le_controle
 from tessera.services.documentation.documenteur_run import documenteur
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.journal_pipeline import journal_vers, journaliser_mode_rapide
@@ -44,7 +44,7 @@ from tessera.services.surveillance_run import (
     lecteur_etat_pr,
     surveillance_pour,
 )
-from tessera.services.test_runner import TestRunnerService
+from tessera.services.verification.test_runner import TestRunnerService
 from tessera.services.ticket_service import TicketService
 from tessera.services.verdicts.validator import ValidatorService
 

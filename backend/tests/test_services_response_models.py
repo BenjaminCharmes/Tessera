@@ -9,8 +9,8 @@ from fastapi.testclient import TestClient
 
 from tessera.config import settings
 from tessera.main import app
-from tessera.services.process_registry import PROCESS_REGISTRY, Service
-from tessera.services.service_etat import (
+from tessera.services.verification.process_registry import PROCESS_REGISTRY, Service
+from tessera.services.verification.service_etat import (
     ServiceEtat,
     ServicesArretes,
     ServicesDemarres,

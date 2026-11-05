@@ -702,17 +702,17 @@ class _TestRunnerResult:
 
 
 def _expired_result() -> object:
-    from tessera.services.test_runner import TestResult
+    from tessera.services.verification.test_runner import TestResult
     return TestResult(passed=False, expiree=True, total=0, failed=0, output_summary="Timeout après 60s — cmd")
 
 
 def _green_result() -> object:
-    from tessera.services.test_runner import TestResult
+    from tessera.services.verification.test_runner import TestResult
     return TestResult(passed=True, expiree=False, total=5, failed=0, output_summary="5 passed in 0.5s")
 
 
 def _red_result() -> object:
-    from tessera.services.test_runner import TestResult
+    from tessera.services.verification.test_runner import TestResult
     return TestResult(passed=False, expiree=False, total=5, failed=1, output_summary="1 failed, 4 passed in 0.5s")
 
 

@@ -12,10 +12,10 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from tessera.services import pipeline_testeur
-from tessera.services.detail_du_delai import ligne_de_delai
-from tessera.services.groupe_d_etape import GroupeDEtape
-from tessera.services.minuteur_d_etape import MARGE_S
-from tessera.services.test_runner import TestResult, TestRunnerService
+from tessera.services.verification.detail_du_delai import ligne_de_delai
+from tessera.services.verification.groupe_d_etape import GroupeDEtape
+from tessera.services.verification.minuteur_d_etape import MARGE_S
+from tessera.services.verification.test_runner import TestResult, TestRunnerService
 
 # La commande note son pid puis dort : seul un arrêt venu de l'extérieur de la
 # boucle peut l'atteindre pendant que celle-ci est bloquée.
@@ -93,7 +93,7 @@ class TestMinuteurAnnule:
     ) -> None:
         commande = f'"{sys.executable}" -c "print(\'5 passed in 0.1s\')"'
 
-        with patch("tessera.services.minuteur_d_etape.threading.Timer") as timer:
+        with patch("tessera.services.verification.minuteur_d_etape.threading.Timer") as timer:
             result = await TestRunnerService().run_tests(projet, test_command=commande)
 
         assert result.passed is True

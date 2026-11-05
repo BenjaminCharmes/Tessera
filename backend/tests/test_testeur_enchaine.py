@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock
 
-from tessera.services.test_runner import TestResult, TestRunnerService
+from tessera.services.verification.test_runner import TestResult, TestRunnerService
 
 PY = f'"{sys.executable}" -c'
 

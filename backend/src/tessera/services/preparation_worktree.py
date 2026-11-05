@@ -12,13 +12,13 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from tessera.services.commande_effective import setup_effectif
+from tessera.services.verification.commande_effective import setup_effectif
 from tessera.services.pipeline_events import EventType, PipelineResult
 from tessera.services.pipeline_outcomes import commit_ou_bloquer
 from tessera.services.pipeline_run import PipelineRun, emit, set_status
 from tessera.services.pipeline_text import _unapproved_commit_message
 from tessera.services.politique_run import PolitiqueRun
-from tessera.services.test_runner import TestResult, TestRunnerService
+from tessera.services.verification.test_runner import TestResult, TestRunnerService
 from tessera.models.ticket import TicketStatus
 from tessera.utils.logger import get_logger
 

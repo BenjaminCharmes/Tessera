@@ -4,7 +4,7 @@ import asyncio
 import pytest
 
 from tessera.config import settings
-from tessera.services.limiteur_de_suites import LimiteurDeSuites
+from tessera.services.verification.limiteur_de_suites import LimiteurDeSuites
 
 
 async def _laisser_tourner() -> None:

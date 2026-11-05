@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 from unittest.mock import AsyncMock
 
-from tessera.services.build_warning import build_warnings, folders_with_build_script
+from tessera.services.verification.build_warning import build_warnings, folders_with_build_script
 from tessera.services.orchestrator import Orchestrator
 
 

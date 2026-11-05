@@ -1,6 +1,6 @@
 // Capture les écrans d'un projet lancé — ticket-432.
 //
-// Lancé par le backend (services/captures.py) : la configuration arrive en
+// Lancé par le backend (services/verification/captures.py) : la configuration arrive en
 // JSON sur stdin, le dossier de sortie en premier argument. Le Playwright
 // utilisé est celui du frontend de Tessera, déjà installé pour les tests de
 // bout en bout ; `scripts/` ne résout pas `frontend/node_modules`, d'où le

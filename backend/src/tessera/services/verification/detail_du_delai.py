@@ -8,7 +8,7 @@ from pathlib import PurePath
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from tessera.services.test_runner import TestResult
+    from tessera.services.verification.test_runner import TestResult
 
 # Au-delà, le dernier argument est un script en ligne ou un chemin, pas un nom.
 _NOM_MAX = 30

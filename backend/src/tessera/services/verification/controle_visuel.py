@@ -9,7 +9,7 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
 
-from tessera.services.captures_config import ConfigCaptures, parse_captures_config
+from tessera.services.verification.captures_config import ConfigCaptures, parse_captures_config
 from tessera.services.manifeste import lire_objet, lire_valeur
 
 MODES: tuple[str, ...] = ("joindre", "relire")

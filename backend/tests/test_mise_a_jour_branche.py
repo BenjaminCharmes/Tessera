@@ -16,7 +16,7 @@ from tessera.services import mise_a_jour_branche as module
 from tessera.services.git_runner import GitResult
 from tessera.services.mise_a_jour_branche import MiseAJour, mettre_a_jour_branche
 from tessera.services.retest_apres_rebase import RetestApresRebase
-from tessera.services.test_runner import TestResult
+from tessera.services.verification.test_runner import TestResult
 
 _BRANCHE = "ticket-732-merge"
 _BASE = "develop"

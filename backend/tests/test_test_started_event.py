@@ -10,7 +10,7 @@ from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketTy
 from tessera.services import pipeline_testeur
 from tessera.services.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.pipeline_run import PipelineRun
-from tessera.services.test_runner import TestResult
+from tessera.services.verification.test_runner import TestResult
 
 
 def _run(journal: list[str]) -> PipelineRun:

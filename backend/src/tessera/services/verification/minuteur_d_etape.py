@@ -8,7 +8,7 @@ l'arbre de l'étape à l'échéance, boucle libre ou non.
 import threading
 import time
 
-from tessera.services.groupe_d_etape import GroupeDEtape
+from tessera.services.verification.groupe_d_etape import GroupeDEtape
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

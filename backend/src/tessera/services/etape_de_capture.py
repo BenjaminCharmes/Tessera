@@ -11,7 +11,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from tessera.services.app_du_run import (
+from tessera.services.verification.app_du_run import (
     AppLancee,
     Demarreur,
     DemarrageEchoue,
@@ -22,8 +22,8 @@ from tessera.services.app_du_run import (
     demarrer_processus,
     port_libre,
 )
-from tessera.services.captures import CapturesEchouees, Executeur, app_repond, capturer
-from tessera.services.controle_visuel import ControleVisuel
+from tessera.services.verification.captures import CapturesEchouees, Executeur, app_repond, capturer
+from tessera.services.verification.controle_visuel import ControleVisuel
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

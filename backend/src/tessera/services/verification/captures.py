@@ -14,13 +14,13 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 from tessera.config import settings
-from tessera.services.captures_config import ConfigCaptures
+from tessera.services.verification.captures_config import ConfigCaptures
 from tessera.services.lancement import essais_de_commande
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
 
-_SCRIPT = Path(__file__).resolve().parents[4] / "scripts" / "captures.mjs"
+_SCRIPT = Path(__file__).resolve().parents[5] / "scripts" / "captures.mjs"
 _DELAI_SONDE_S = 2.0
 _DELAI_EXECUTEUR_S = 300.0
 

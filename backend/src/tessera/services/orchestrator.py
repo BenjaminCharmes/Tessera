@@ -25,7 +25,7 @@ from tessera.services.pipeline_events import (
     OrchestratorEvent,
     PipelineResult,
 )
-from tessera.services.build_warning import build_warnings
+from tessera.services.verification.build_warning import build_warnings
 from tessera.services.ticket_service import TicketService
 from tessera.utils.logger import get_logger
 
@@ -57,13 +57,13 @@ if TYPE_CHECKING:
     from tessera.services.preparation_worktree import Preparation
     from tessera.services.providers.refus_garde import JournalDesRefus
     from tessera.services.agents.carte_du_depot import CarteDuDepot
-    from tessera.services.controle_visuel import ControleVisuel
+    from tessera.services.verification.controle_visuel import ControleVisuel
     from tessera.services.quota_tracker import QuotaTracker
     from tessera.services.run_recorder import RunRecorder
     from tessera.services.run_worktree import RunWorktree
     from tessera.services.git_workspace import GitWorkspaceService
     from tessera.services.verdicts.security_auditor import SecurityAuditorService
-    from tessera.services.test_runner import TestRunnerService
+    from tessera.services.verification.test_runner import TestRunnerService
     from tessera.services.verdicts.validator import ValidatorService
 
 _logger = get_logger(__name__)

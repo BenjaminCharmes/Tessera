@@ -27,7 +27,7 @@ from tessera.services.groupe_de_processus import (
     tuer_l_arbre,
 )
 from tessera.services.providers.perimetre import racine_autorisee
-from tessera.services.service_etat import ServiceEtat
+from tessera.services.verification.service_etat import ServiceEtat
 from tessera.services.lancement import essais_de_commande, options_de_lancement
 from tessera.utils.logger import get_logger
 

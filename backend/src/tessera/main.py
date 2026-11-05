@@ -12,7 +12,7 @@ from tessera import reglages
 from tessera.auth import HostOriginMiddleware, StaticTokenMiddleware
 from tessera.config import settings
 from tessera.config_coffre import source_effective
-from tessera.services.process_registry import PROCESS_REGISTRY
+from tessera.services.verification.process_registry import PROCESS_REGISTRY
 from tessera.services.shell_detection import agent_shell_ok, resolve_git_bash, warn_if_shell_missing
 from tessera.routers import (
     agent_admin,

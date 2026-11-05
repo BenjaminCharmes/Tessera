@@ -24,7 +24,7 @@ from tessera.config import settings
 from tessera.main import app
 from tessera.routers.services_running import get_sonde
 from tessera.services.database import init_db
-from tessera.services.process_registry import PROCESS_REGISTRY
+from tessera.services.verification.process_registry import PROCESS_REGISTRY
 from tessera.services.supervision.sonde_systeme import InfoProcessus
 
 #: Un « service » qui vit assez longtemps pour être observé puis arrêté, sans
@@ -283,7 +283,7 @@ def test_un_operateur_dans_un_argument_cite_reste_permis() -> None:
     # la chaîne entière refusait `python -c "import time; time.sleep(30)"`,
     # où le point-virgule appartient au code Python, pas au shell. Le contrôle
     # porte sur les tokens après découpage.
-    from tessera.services.process_registry import verifier_la_commande
+    from tessera.services.verification.process_registry import verifier_la_commande
 
     args = verifier_la_commande('python -c "import time; time.sleep(30)"')
 
@@ -293,7 +293,7 @@ def test_un_operateur_dans_un_argument_cite_reste_permis() -> None:
 def test_un_operateur_isole_reste_refuse() -> None:
     # Le pendant : sans lui, alléger le contrôle laisserait passer une ligne
     # de shell entière, dont seule la première moitié serait lancée.
-    from tessera.services.process_registry import (
+    from tessera.services.verification.process_registry import (
         CommandeInvalide,
         verifier_la_commande,
     )
@@ -327,7 +327,7 @@ def _racine_et_projet(tmp_path: Path, git_root: str | None) -> tuple[Path, Path]
 def test_sans_declaration_le_cwd_reste_enferme(tmp_path: Path) -> None:
     # Le défaut protège : six dépôts clients côte à côte, et un `cwd` mal
     # écrit démarre un serveur chez le voisin.
-    from tessera.services.process_registry import CommandeInvalide, resoudre_le_cwd
+    from tessera.services.verification.process_registry import CommandeInvalide, resoudre_le_cwd
 
     _, projet = _racine_et_projet(tmp_path, git_root=None)
 
@@ -339,7 +339,7 @@ def test_git_root_ancestor_ouvre_le_depot_qui_contient(tmp_path: Path) -> None:
     # ADR-028 : le projet bootstrap construit l'IDE, donc il travaille
     # volontairement au-dessus de lui, dans `backend/` et `frontend/`. Sans
     # cette exception, `ide-core` ne pourrait pas lancer ses propres services.
-    from tessera.services.process_registry import resoudre_le_cwd
+    from tessera.services.verification.process_registry import resoudre_le_cwd
 
     depot, projet = _racine_et_projet(tmp_path, git_root="ancestor")
 
@@ -349,7 +349,7 @@ def test_git_root_ancestor_ouvre_le_depot_qui_contient(tmp_path: Path) -> None:
 def test_une_valeur_inconnue_de_git_root_ne_desarme_rien(tmp_path: Path) -> None:
     # Élargir un périmètre est le geste qui se relit le moins bien : seule la
     # valeur exacte compte, comme pour ADR-021 et ADR-023.
-    from tessera.services.process_registry import CommandeInvalide, resoudre_le_cwd
+    from tessera.services.verification.process_registry import CommandeInvalide, resoudre_le_cwd
 
     _, projet = _racine_et_projet(tmp_path, git_root="parent")
 
@@ -363,7 +363,7 @@ def test_un_executable_introuvable_dit_quoi_essayer() -> None:
     # prix assumé de ne pas passer par un shell (ADR-042).
     import os
 
-    from tessera.services.process_registry import introuvable
+    from tessera.services.verification.process_registry import introuvable
 
     message = introuvable("npm")
 
@@ -555,7 +555,7 @@ def test_la_sortie_est_conservee_pour_qui_arrive_apres(
 def test_la_sortie_conservee_est_bornee(workspace: Path) -> None:
     # Garder les lignes fait grossir le registre : la borne est ce qui
     # l'empêche, et elle garde les plus récentes.
-    from tessera.services.process_registry import LIGNES_CONSERVEES, Service
+    from tessera.services.verification.process_registry import LIGNES_CONSERVEES, Service
 
     service = Service(nom="api", project_id="mon-projet")
     for i in range(LIGNES_CONSERVEES + 50):
@@ -568,7 +568,7 @@ def test_la_sortie_conservee_est_bornee(workspace: Path) -> None:
 def test_a_line_keeps_its_absolute_number_when_the_buffer_overflows() -> None:
     # Le numéro d'une ligne = lignes_ecartees + rang : il ne glisse pas
     # d'une relecture à l'autre quand le tampon déborde (ticket-769).
-    from tessera.services.process_registry import LIGNES_CONSERVEES, Service
+    from tessera.services.verification.process_registry import LIGNES_CONSERVEES, Service
 
     service = Service(nom="api", project_id="mon-projet")
     for i in range(LIGNES_CONSERVEES + 10):
@@ -591,7 +591,7 @@ def test_les_couleurs_ansi_sont_retirees_de_la_sortie() -> None:
     #   http://localhost:\x1b[1m5175\x1b[22m/\x1b[39m
     # L'adresse était donc extraite corrompue, et le `<pre>` du panneau
     # affichait « [32m » un peu partout (ticket-148).
-    from tessera.services.process_registry import sans_couleurs
+    from tessera.services.verification.process_registry import sans_couleurs
 
     brut = "  \x1b[32m➜\x1b[39m  \x1b[1mLocal\x1b[22m:   \x1b[36mhttp://localhost:\x1b[1m5175\x1b[22m/\x1b[39m"
 
@@ -602,7 +602,7 @@ def test_les_couleurs_ansi_sont_retirees_de_la_sortie() -> None:
 
 
 def test_une_ligne_sans_couleur_n_est_pas_modifiee() -> None:
-    from tessera.services.process_registry import sans_couleurs
+    from tessera.services.verification.process_registry import sans_couleurs
 
     assert sans_couleurs("INFO: Uvicorn running on http://127.0.0.1:8000") == (
         "INFO: Uvicorn running on http://127.0.0.1:8000"

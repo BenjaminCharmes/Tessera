@@ -24,7 +24,7 @@ from tessera.services.retest_apres_rebase import (
     etape_de,
     retest_du_run,
 )
-from tessera.services.test_runner import TestCommandNotFound, TestResult
+from tessera.services.verification.test_runner import TestCommandNotFound, TestResult
 
 
 def _verts() -> TestResult:

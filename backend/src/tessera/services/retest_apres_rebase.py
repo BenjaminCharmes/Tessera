@@ -17,9 +17,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Protocol
 
-from tessera.services.chaines_de_test import chaine_commune
-from tessera.services.process_registry import CommandeInvalide, resoudre_le_cwd
-from tessera.services.test_runner import TestCommandNotFound, TestResult, TestRunnerService
+from tessera.services.verification.chaines_de_test import chaine_commune
+from tessera.services.verification.process_registry import CommandeInvalide, resoudre_le_cwd
+from tessera.services.verification.test_runner import TestCommandNotFound, TestResult, TestRunnerService
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

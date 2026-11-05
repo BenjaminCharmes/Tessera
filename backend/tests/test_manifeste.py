@@ -14,7 +14,7 @@ import pytest
 from tessera.services import manifeste
 from tessera.services.artifacts import read_artifact_mode
 from tessera.services.autonomie import NiveauAutonomie, lire_niveau
-from tessera.services.captures_config import load_captures_config
+from tessera.services.verification.captures_config import load_captures_config
 from tessera.services.manifeste import (
     ecrire_clef,
     ecrire_manifeste,

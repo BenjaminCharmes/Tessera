@@ -7,7 +7,7 @@ from fastapi.testclient import TestClient
 
 from tessera.config import settings
 from tessera.main import app
-from tessera.services.process_registry import PROCESS_REGISTRY, Service
+from tessera.services.verification.process_registry import PROCESS_REGISTRY, Service
 from tessera.services.supervision.project_overview import clear_overview_cache
 
 _BASE = "/api/v1/projects"

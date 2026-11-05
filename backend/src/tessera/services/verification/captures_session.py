@@ -6,7 +6,7 @@ journal, une ligne de commande ou `agents.json`.
 """
 from pathlib import Path
 
-from tessera.services.captures_config import SessionCaptures
+from tessera.services.verification.captures_config import SessionCaptures
 
 
 def _valeur(ligne: str, nom: str) -> str | None:

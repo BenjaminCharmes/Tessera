@@ -2,7 +2,7 @@
 id: ticket-815
 title: "The verification modules move to services/verification"
 type: refactor
-status: todo
+status: done
 pr_number: null
 priority: low
 agent: codeur
@@ -32,13 +32,13 @@ commande de test) touche cette zone : sa PR est mergée avant ce ticket.
 
 ## Critères d'acceptation
 
-- [ ] Les quinze modules de la section `verification` sont sous `services/verification/`, aucun
+- [x] Les quinze modules de la section `verification` sont sous `services/verification/`, aucun
       n'est resté à plat
-- [ ] `captures._SCRIPT` désigne `scripts/captures.mjs`, un test le vérifie
-- [ ] `A_DEPLACER` n'a plus d'entrée `verification`, `ECARTS_DOMAINES` n'a grandi d'aucune ligne
-- [ ] Aucune occurrence des anciens chemins pointés ne reste dans `backend/src`, `backend/tests`,
+- [x] `captures._SCRIPT` désigne `scripts/captures.mjs`, un test le vérifie
+- [x] `A_DEPLACER` n'a plus d'entrée `verification`, `ECARTS_DOMAINES` n'a grandi d'aucune ligne
+- [x] Aucune occurrence des anciens chemins pointés ne reste dans `backend/src`, `backend/tests`,
       `scripts/`, `Makefile`
-- [ ] Le diff n'est que des renommages, des lignes d'import ou de chaîne, et la correction de
+- [x] Le diff n'est que des renommages, des lignes d'import ou de chaîne, et la correction de
       `parents[N]` ; la suite passe
 
 ## Ce que ça ne fait pas
@@ -49,3 +49,7 @@ Aucun changement de comportement du lancement des tests ni des captures.
 
 Un chemin trop haut ou trop bas pour `captures.mjs` ne casse rien avant la première capture : d'où
 le test sur le chemin.
+
+## Notes de réalisation
+
+Le domaine compte dix-neuf modules, pas quinze : `scripts/domaines_services.py` fait foi. `captures.py` passe à la main de `parents[4]` à `parents[5]` ; `test_capture_script_is_found_from_the_module_folder` (`test_captures_largeurs.py`) le prouve, vu échouer avec `parents[4]`. Le commentaire de `scripts/captures.mjs` est réécrit par le script. Seuls des documents historiques citent les anciens chemins : ils restent tels quels.

@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 
 from tessera.models.worktree_config import ConfigWorktree
-from tessera.services.commande_effective import (
+from tessera.services.verification.commande_effective import (
     PlaceholderInconnu,
     commande_effective,
     environnement_effectif,
