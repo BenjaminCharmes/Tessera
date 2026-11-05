@@ -659,6 +659,11 @@ Neuf secrets (`ANTHROPIC_API_KEY`, `GITHUB_TOKEN`, `VERCEL_TOKEN`, `NEON_API_KEY
 
 **Masquage et sécurité** : les 8 secrets (tout sauf `FORBIDDEN_TERMS`, qui est une liste) sont masqués dans les logs via `logger.py` et vidés de l'environnement du CLI (`env_sdk.py`). Le hook `pre-push` lit `FORBIDDEN_TERMS` par `coffre_cli termes` au lieu de `.env`, ce qui fonctionne depuis tout worktree. Une garde lexicale (`garde_coffre.py`) refuse à tout agent les commandes qui accèdent au coffre (`keyring`, `cmdkey`, `vaultcmd`, `secret-tool`, imports Python de keyring, etc.) : les secrets sont lus au démarrage du backend, pas à la demande.
 
+
+### Réglages globaux dynamiques (ADR-075)
+
+Cinq réglages—`run_max_budget_usd`, `llm_max_budget_usd`, `dialogue_timeout_s`, `max_parallel_test_runs`, `keep_awake_during_runs`—se lisent et se changent depuis l'UI du rail sans redémarrer le backend. Les écritures exigent un `Origin` déclaré, refusant les tentatives par le CLI. Le limiteur de suites relit sa limite à chaque acquisition, appliquant dynamiquement les changements.
+
 ## Endpoints implémentés
 
 ### Projets
