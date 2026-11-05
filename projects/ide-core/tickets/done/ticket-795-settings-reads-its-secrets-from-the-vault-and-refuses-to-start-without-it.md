@@ -2,7 +2,7 @@
 id: ticket-795
 title: "Settings reads its secrets from the vault when it holds them, and from .env otherwise"
 type: feat
-status: todo
+status: done
 pr_number: null
 priority: medium
 agent: codeur
@@ -64,12 +64,12 @@ et non `coffre` (refus de démarrer sans coffre) comme dans le design d'origine.
 
 ## Critères d'acceptation
 
-- [ ] Les tests ci-dessus existent dans `backend/tests/test_config_coffre.py` et passent
-- [ ] `test_absent_vault_in_auto_mode_starts_on_dotenv_and_warns_once` vérifie que les secrets
+- [x] Les tests ci-dessus existent dans `backend/tests/test_config_coffre.py` et passent
+- [x] `test_absent_vault_in_auto_mode_starts_on_dotenv_and_warns_once` vérifie que les secrets
       viennent de `.env` et que l'avertissement ne contient aucune valeur
-- [ ] `test_absent_vault_in_auto_mode_refuses_when_dotenv_marks_a_migrated_secret` vérifie le
+- [x] `test_absent_vault_in_auto_mode_refuses_when_dotenv_marks_a_migrated_secret` vérifie le
       refus, message sans valeur
-- [ ] `backend/tests/conftest.py` est nommé et modifié : la suite complète passe sans coffre
+- [x] `backend/tests/conftest.py` est nommé et modifié : la suite complète passe sans coffre
 
 ## Ce que ça ne fait pas
 

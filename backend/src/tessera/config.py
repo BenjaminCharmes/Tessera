@@ -1,11 +1,12 @@
 import os
 import sys
 from pathlib import Path
-from typing import ClassVar
+from typing import ClassVar, Literal
 
 from pydantic import SecretStr, ValidationError
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, PydanticBaseSettingsSource, SettingsConfigDict
 
+from tessera.config_coffre import sources_des_secrets
 from tessera.config_errors import ConfigurationError, describe_validation_error
 
 # Racine du dépôt : backend/src/tessera/config.py -> remonter de 4 niveaux.
@@ -53,6 +54,25 @@ class Settings(BaseSettings):
 
     # Le `.env` de Tessera, que le hook de lecture refuse aux agents (ADR-053).
     env_file: ClassVar[Path] = Path(_ENV_FILE)
+
+    # Où lire les neuf secrets (ADR-073) : `auto` (coffre s'il répond, sinon
+    # `.env` avec un avertissement), `coffre` (refus sans lui), `env` (CI,
+    # Docker, tests). Lu avant le reste par `config_coffre`.
+    secrets_source: Literal["auto", "coffre", "env"] = "auto"
+
+    @classmethod
+    def settings_customise_sources(
+        cls,
+        settings_cls: type[BaseSettings],
+        init_settings: PydanticBaseSettingsSource,
+        env_settings: PydanticBaseSettingsSource,
+        dotenv_settings: PydanticBaseSettingsSource,
+        file_secret_settings: PydanticBaseSettingsSource,
+    ) -> tuple[PydanticBaseSettingsSource, ...]:
+        """Put the system vault between the environment and .env (ADR-073)."""
+        return sources_des_secrets(
+            settings_cls, init_settings, env_settings, dotenv_settings, file_secret_settings
+        )
 
     # Jetons de mise en ligne (ADR-053). `SecretStr` : ni `repr` ni `model_dump`
     # ne montrent la valeur. Vides : la mise en ligne reste inactive. Portée
