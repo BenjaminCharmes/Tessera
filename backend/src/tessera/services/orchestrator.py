@@ -19,7 +19,6 @@ from tessera.services.providers.enregistrant import activer_enregistrement
 from tessera.services.journal_pipeline import ajouter_ligne
 from tessera.services.livraison import Livraison
 from tessera.services.attente_dependance import ids_termines
-from tessera.services.livraison_evenements import evenements_de_livraison
 from tessera.services.pipeline_events import (
     EventCallback,
     EventType,
@@ -37,7 +36,8 @@ from tessera.services import pipeline_branche, pipeline_controles, pipeline_prod
 from tessera.services.pipeline_run import PipelineRun, set_status, tolerant
 from tessera.services.pipeline_contraintes import arret_contraintes_hors_proposees
 from tessera.services.pipeline_critere_protege import arret_critere_protege
-from tessera.services.pipeline_approbation import apres_approbation, retenir_pour_relecture
+from tessera.services.pipeline_approbation import apres_approbation
+from tessera.services.pipeline_livraison import livrer_le_resultat
 from tessera.services.pipeline_plan import run_plan
 from tessera.services.run_dans_worktree import retirer_apres_echec, retirer_en_fin_de_run
 from tessera.services.pipeline_tickets import relever_etat_initial, renvoyer_si_problemes
@@ -299,52 +299,7 @@ class Orchestrator:
 
         if self._livrer is None:
             return resultat
-
-        await on_event(
-            OrchestratorEvent(
-                type=EventType.LIVRAISON_STARTED,
-                ticket_id=ticket_id,
-            )
-        )
-        # Phase 1 seulement : rebase, push, PR. La phase 2 (attente CI + merge)
-        # est confiée à `CIWatcher` en tâche de fond (ADR-051). Le verrou
-        # (ADR-038) se libère dès que `run_pipeline` rend la main, c'est-à-dire
-        # dès la PR ouverte — pas après le merge.
-        with evenements_de_livraison(on_event, ticket_id):
-            livraison = retenir_pour_relecture(await self._livrer(resultat), resultat.relecture)
-        for etape, duree_ms in zip(livraison.etapes, livraison.durees_ms):
-            self._log(f"[{ticket_id}] livraison: {etape} ({duree_ms:.0f}ms)")
-        if livraison.arret:
-            self._log(f"[{ticket_id}] livraison: arrêt — {livraison.arret[:100]}")
-        if livraison.bloque_le_ticket:
-            resultat = await self._bloquer_branche_modifiee(
-                resultat, livraison, project_id, on_event
-            )
-        # Commit the delivery log lines just written, then return to the base
-        # branch so the working tree is clean after a delivered run (ticket-378).
-        await fin_de_file.finaliser_livraison(self, livraison)
-        await on_event(
-            OrchestratorEvent(
-                type=EventType.LIVRAISON_DONE,
-                ticket_id=ticket_id,
-                data=livraison.__dict__,
-            )
-        )
-        # Si la phase 1 a ouvert une PR sans conflit, confier la phase 2 au
-        # CIWatcher : il attend la CI et merge en arrière-plan. `surveiller`
-        # retourne immédiatement (crée une tâche asyncio), ce qui permet à
-        # `run_pipeline` de rendre la main et au verrou de se libérer avant
-        # que `ci_merge_done` soit émis.
-        # Une PR dont la phase 1 a levé après l'ouverture (`pr_orpheline`) est
-        # surveillée malgré son `arret` ; un conflit résolu ne l'est jamais.
-        if (
-            livraison.pr_number is not None
-            and (livraison.arret is None or livraison.pr_orpheline)
-            and self._surveiller is not None
-        ):
-            await self._surveiller(project_id, ticket_id, livraison.pr_number, on_event)
-
-        return resultat.model_copy(update={"livraison": livraison})
+        return await livrer_le_resultat(self, resultat, project_id, on_event)
 
     async def _bloquer_branche_modifiee(
         self,

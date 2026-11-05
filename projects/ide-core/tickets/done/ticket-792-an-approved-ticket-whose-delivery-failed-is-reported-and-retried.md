@@ -2,7 +2,7 @@
 id: ticket-792
 title: "An approved ticket whose delivery failed is reported as undelivered and retried at the end of the queue"
 type: fix
-status: todo
+status: done
 pr_number: null
 priority: high
 agent: codeur
@@ -46,10 +46,10 @@ Sinon, rien ne se passe, ce qui est voulu : une exception de livraison ne fait p
 
 ## Critères d'acceptation
 
-- [ ] Un test de `classer_les_tickets` vérifie qu'un ticket approuvé dont la livraison porte un
+- [x] Un test de `classer_les_tickets` vérifie qu'un ticket approuvé dont la livraison porte un
       `arret` et aucun `pr_number` est rangé dans `non_livres` et pas dans `approuves`
-- [ ] Un test vérifie que `queue_progress` porte `non_livres`
-- [ ] Un test vérifie, avec des doubles, qu'en fin de file la livraison d'un ticket non livré est
+- [x] Un test vérifie que `queue_progress` porte `non_livres`
+- [x] Un test vérifie, avec des doubles, qu'en fin de file la livraison d'un ticket non livré est
       relancée une fois, et qu'un succès le fait passer dans `approuves`
-- [ ] Un test vérifie qu'un second échec de livraison laisse le ticket dans `non_livres`, sans
+- [x] Un test vérifie qu'un second échec de livraison laisse le ticket dans `non_livres`, sans
       troisième tentative

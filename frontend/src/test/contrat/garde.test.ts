@@ -46,7 +46,7 @@ describe("contract guard on mocked responses", () => {
 describe("fixtures drawn from the schema", () => {
   it("builds an object that carries every field of the response", () => {
     expect(Object.keys(statutDuRun()).sort()).toEqual(
-      ["approuves", "arretes", "debut", "faits", "fin", "mode", "project_id", "restants", "statut", "ticket_courant"],
+      ["approuves", "arretes", "debut", "faits", "fin", "mode", "non_livres", "project_id", "restants", "statut", "ticket_courant"],
     );
   });
 

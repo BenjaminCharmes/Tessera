@@ -62,9 +62,9 @@ export const CONFRONTATIONS: Confrontation[] = [
     descente: [],
     ...champs<StatutDuRun>({
       project_id: true, mode: true, statut: true, ticket_courant: true, approuves: true,
-      restants: true, debut: true, fin: true, arretes: true,
+      restants: true, debut: true, fin: true, arretes: true, non_livres: true,
     }),
-    ecartes: { faits: "déprécié, calculé : approuves suivis des tickets de arretes" },
+    ecartes: { faits: "déprécié, calculé : approuves suivis des tickets de arretes et de non_livres" },
   },
   {
     libelle: "StatutDuRun.arretes[]",

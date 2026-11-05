@@ -22,7 +22,7 @@ function fabriquer<T extends object>(libelle: string, surcharges: Partial<T>): T
 
 /** Une réponse de `GET /runs/{id}` : aucun ticket, un seul tableau vide à la fois. */
 export function statutDuRun(surcharges: Partial<StatutDuRun> = {}): StatutDuRun {
-  return fabriquer<StatutDuRun>("StatutDuRun", { ticket_courant: null, fin: null, approuves: [], arretes: [], restants: [], ...surcharges });
+  return fabriquer<StatutDuRun>("StatutDuRun", { ticket_courant: null, fin: null, approuves: [], arretes: [], non_livres: [], restants: [], ...surcharges });
 }
 
 /** Une réponse de `GET /projects/{id}/usage/breakdown`, sans dépense par défaut. */
