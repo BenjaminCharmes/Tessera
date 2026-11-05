@@ -964,6 +964,14 @@ Une file qui s'arrête prématurément — sur budget, ticket non approuvé, ou 
 
 Quand le quota Claude de ton abonnement s'épuise, la file s'arrête gracieusement — y compris si c'est pendant l'audit de sécurité. Le journal affiche « quota épuisé — reprise vers HH:MM » (heure locale estimée), le ticket courant repasse en `todo`, et tu peux relancer la file une fois ton quota renouvelé. Ce n'est jamais un blocage d'agent : c'est un arrêt normal de ressource.
 
+### Quand le détecteur d'anomalies prévient
+
+Un détecteur observe les runs en cours et le dit dans la cloche, le fil du run et le Bureau. Il prévient quand il repère un pattern anormal : plus de 15 minutes sans événement, outil appelé quatre fois identiquement de suite, dernier tour de revue, étape ou coût bien au-delà de la normale du projet, ou blocages répétés pour la même cause. Il n'arrête, ne relance ni ne modifie aucun run — c'est un témoin.
+
+La notification apparaît comme une alerte de type « anomalie ». Sur le Bureau, le poste du codeur affiche un petit marqueur montrant le nombre d'anomalies détectées.
+
+Si tu veux désactiver ce détecteur, mets `ANOMALIES_ACTIVES=false` dans `.env`.
+
 ## 5 bis. Se repérer dans l'écran
 
 Tessera n'essaie pas d'être un éditeur. Monaco est là pour **lire**, pas pour

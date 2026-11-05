@@ -12,6 +12,8 @@ from tessera.services.gardes.contraintes_touchees import lignes_hors_proposees
 from tessera.services.gardes.lecons_touchees import lignes_de_lecons
 from tessera.services.noyau.pipeline_events import EventType, PipelineResult
 from tessera.services.pipeline.pipeline_outcomes import commit_ou_bloquer
+from tessera.services.pipeline.pipeline_revue import RESUME as RESUME_REVUE
+from tessera.services.pipeline.pipeline_revue import raison_revue_hors_perimetre
 from tessera.services.pipeline.pipeline_run import PipelineRun, emit, set_status
 from tessera.services.pipeline.pipeline_text import _unapproved_commit_message
 
@@ -40,12 +42,14 @@ async def arret_contraintes_hors_proposees(
     """Block the run after the coder's turn when it wrote a rule outside the proposals.
 
     Le même point d'arrêt garde `memory/lecons.md` (ticket-804) : le contrôle
-    des leçons passe juste après, sur le même diff.
+    des leçons passe juste après, sur le même diff, puis celui du périmètre
+    d'une revue de projet (ticket-864).
     """
     raison = raison_contraintes_hors_proposees(orch, run)
     if raison is None:
-        return await arret_lecons_modifiees(orch, run)
-    return await _bloquer(
+        arret = await arret_lecons_modifiees(orch, run)
+        return arret if arret is not None else await arret_revue_hors_perimetre(orch, run)
+    return await bloquer(
         orch, run, "constraints_outside_proposed", raison,
         "contraintes.md changed outside the Proposées section",
     )
@@ -73,12 +77,22 @@ async def arret_lecons_modifiees(
     raison = raison_lecons_modifiees(run)
     if raison is None:
         return None
-    return await _bloquer(
+    return await bloquer(
         orch, run, "lessons_file_modified", raison, "lecons.md changed by an agent"
     )
 
 
-async def _bloquer(
+async def arret_revue_hors_perimetre(
+    orch: "Orchestrator", run: PipelineRun
+) -> PipelineResult | None:
+    """Block a review run whose diff leaves `tickets/` and `memory/`, or creates too many tickets."""
+    raison = await raison_revue_hors_perimetre(orch, run)
+    if raison is None:
+        return None
+    return await bloquer(orch, run, raison[0], raison[1], RESUME_REVUE)
+
+
+async def bloquer(
     orch: "Orchestrator", run: PipelineRun, code: str, raison: str, resume: str
 ) -> PipelineResult:
     """End the run `blocked`, with its unapproved commit, naming `raison`."""

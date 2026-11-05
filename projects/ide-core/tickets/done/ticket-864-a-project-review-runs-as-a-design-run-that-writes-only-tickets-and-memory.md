@@ -1,14 +1,17 @@
 ---
-id: ticket-864
-title: "A project review runs as a design run that writes only tickets and memory"
-type: feat
-status: todo
-priority: medium
 agent: codeur
-depends_on: [ticket-848, ticket-862, ticket-863]
-estimated_days: 1
 created: 2026-11-05
-pr_number: null
+depends_on:
+- ticket-848
+- ticket-862
+- ticket-863
+estimated_days: 1
+id: ticket-864
+pr_number: 943
+priority: medium
+status: done
+title: A project review runs as a design run that writes only tickets and memory
+type: feat
 ---
 
 # ticket-864 — Une revue de projet est un run `design` qui n'écrit que `tickets/**` et `memory/**`

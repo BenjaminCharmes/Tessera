@@ -6,9 +6,12 @@ confidentiality come from the run, never from an agent's arguments.
 from typing import TYPE_CHECKING
 
 from tessera.models.agent import AgentRole
+from tessera.services.pipeline.pipeline_revue import projet_en_revue
 from tessera.services.pipeline.pipeline_run import PipelineRun
+from tessera.services.pipeline.revue_projet import MAX_SIGNALEMENTS
 from tessera.services.pipeline.signalements_en_attente import mettre_en_attente
 from tessera.services.projets.manifeste import lire_chaine
+from tessera.services.providers.signal_agent import MAX_PAR_RUN
 from tessera.services.providers.signaler import ContexteSignal
 
 if TYPE_CHECKING:
@@ -24,11 +27,18 @@ def signaler_for(orch: "Orchestrator", run: PipelineRun) -> ContexteSignal | Non
     """
     if orch._project_path is None:
         return None
+    confidentialite = lire_chaine(orch._project_path, "confidentiality") or "personal"
+    # Une revue de projet pèse sur un projet `professional` : elle n'en émet
+    # aucun signalement, pas même par énumérations (ticket-864, ADR-080).
+    en_revue = projet_en_revue(run.project_id)
+    if en_revue and confidentialite == "professional":
+        return None
     return ContexteSignal(
         projet=run.project_id,
         ticket=run.ticket_id,
         role=AgentRole.codeur.value,
-        confidentialite=lire_chaine(orch._project_path, "confidentiality") or "personal",
+        confidentialite=confidentialite,
         deposer=mettre_en_attente,
         compteur=run.compteur_signaux,
+        max_par_run=MAX_SIGNALEMENTS if en_revue else MAX_PAR_RUN,
     )
