@@ -6,12 +6,14 @@ from pydantic import BaseModel, Field, field_validator
 
 from tessera import reglages
 from tessera.config import settings
+from tessera.models.file_vivante import AppendRequest, AppendResult, RemoveRequest, RemoveResult
 from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.github.issues_agent_ready import tirer_les_issues as _tirer_les_issues
 from tessera.services.livraison.reprise_outils import ecrire_log
 from tessera.services.noyau.event_hub import EVENT_HUB
 from tessera.services.pipeline.assemblage_run import build_orchestrator
+from tessera.services.pipeline.controle_base import refus_avant_ouverture, refuser_absents_de_la_base
 from tessera.services.pipeline.controles_depart import manques_avant_depart
 from tessera.services.pipeline.file_vivante import FileFermee, FileVivante, lecteur_sur_la_base, trier_ajouts
 from tessera.services.pipeline.orchestrator import Orchestrator
@@ -213,6 +215,13 @@ async def run_pipeline(request: RunRequest) -> RunStarted:
             "depart_force",
             extra={"project_id": request.project_id, "manques": manques},
         )
+    # Une file dont un ticket manque s'arrêterait au milieu : refus d'emblée,
+    # sans verrou (ticket-849).
+    absent = request.mode == "queue" and await refus_avant_ouverture(
+        project_path, ticket_svc, request.ticket_ids
+    )
+    if absent:
+        raise HTTPException(status_code=422, detail=absent)
 
     try:
         run = RUN_REGISTRY.ouvrir(
@@ -253,18 +262,6 @@ async def run_pipeline(request: RunRequest) -> RunStarted:
     return RunStarted(run_id=run.run_id)
 
 
-class AppendRequest(BaseModel):
-    ticket_ids: list[str] = Field(min_length=1)
-
-
-class AppendResult(BaseModel):
-    """What an append did: added at the end, left alone, or refused with a reason."""
-
-    ajoutes: list[str]
-    ignores: dict[str, str]
-    refuses: dict[str, str]
-
-
 @router.post("/runs/{run_id}/append", response_model=AppendResult)
 async def append_to_run(run_id: str, request: AppendRequest) -> AppendResult:
     """Add tickets to the end of a queue that is still running (ticket-478).
@@ -290,24 +287,13 @@ async def append_to_run(run_id: str, request: AppendRequest) -> AppendResult:
     acceptes, ignores, refuses = await trier_ajouts(
         file, ticket_svc, request.ticket_ids, repli
     )
+    await refuser_absents_de_la_base(project_path, acceptes, refuses)
     try:
         # Aucun `await` entre le contrôle d'ouverture de `ajouter` et l'ajout.
         ajoutes = file.ajouter_acceptes(acceptes, ignores)
     except FileFermee as exc:
         raise HTTPException(status_code=409, detail=str(exc)) from exc
     return AppendResult(ajoutes=ajoutes, ignores=ignores, refuses=refuses)
-
-
-class RemoveRequest(BaseModel):
-    ticket_ids: list[str] = Field(min_length=1)
-
-
-class RemoveResult(BaseModel):
-    """What a removal did: taken out of the queue, absent, or refused with a reason."""
-
-    retires: list[str]
-    ignores: dict[str, str]
-    refuses: dict[str, str]
 
 
 @router.post("/runs/{run_id}/remove", response_model=RemoveResult)

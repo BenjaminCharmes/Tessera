@@ -65,6 +65,14 @@ def client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Iterator[TestClie
     projet = tmp_path / "workspace" / "projet-file"
     projet.mkdir(parents=True)
     (projet / "CLAUDE.md").write_text("# projet-file\n", encoding="utf-8")
+    # Une file ne s'ouvre que sur des tickets que le projet porte (ticket-849).
+    (projet / "tickets" / "todo").mkdir(parents=True)
+    for numero in ("001", "002", "003"):
+        (projet / "tickets" / "todo" / f"ticket-{numero}.md").write_text(
+            f"---\nid: ticket-{numero}\ntitle: \"T {numero}\"\ntype: feat\n"
+            "status: todo\npriority: medium\nagent: codeur\n---\n\n# T\n",
+            encoding="utf-8",
+        )
     monkeypatch.setattr(settings, "ide_workspace_dir", tmp_path / "workspace")
 
     async def _build(project_id: str) -> _FileDoublee:

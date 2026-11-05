@@ -1,14 +1,14 @@
 ---
-id: ticket-849
-title: "A queue refuses tickets absent from origin base before it opens"
-type: fix
-status: todo
-priority: high
 agent: codeur
+created: 2026-11-05
 depends_on: []
 estimated_days: 1
-created: 2026-11-05
-pr_number: null
+id: ticket-849
+pr_number: 936
+priority: high
+status: done
+title: A queue refuses tickets absent from origin base before it opens
+type: fix
 ---
 
 # ticket-849 — Une file refuse, avant d'ouvrir, un ticket absent de `origin/<base>`

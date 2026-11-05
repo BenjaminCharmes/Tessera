@@ -1403,6 +1403,21 @@ Pour chaque type d'événement, deux cases à cocher :
 
 **Son** : l'événement doit-il émettre un son ? Par défaut, seules la **Question** et la **CI rouge** sonnent.
 
+Clique sur l'engrenage au pied du rail pour ouvrir le panneau des réglages globaux. Tu y lis et changes en direct, sans créer de ticket, les cinq réglages qui s'appliquent à tous les runs.
+
+Chaque réglage affiche sa valeur actuelle, son défaut de `.env`, ses limites, et l'effet du changement : « au prochain run » (au lancement du ticket suivant), « dès la prochaine suite de tests » (immédiat), ou « à l'ouverture du prochain premier run ».
+
+Pour changer une valeur, tape ou coche, puis clique « Appliquer ». Si elle sort des limites (p. ex., zéro pour un plafond) ou si le type est mauvais, le panneau te montre l'erreur.
+
+Si tu as changé la valeur, clique « Revenir au défaut » pour revenir à celle de `.env`.
+
+Quand tu changes un réglage « au prochain run » pendant que d'autres runs tournent, le panneau te dit combien gardent l'ancienne valeur : « 2 runs gardent l'ancienne valeur ». Ces runs continueront avec leur valeur figée, pas celle nouvellement posée.
+
+Erreurs possibles :
+- **403** : l'interface doit être servie depuis une `Origin` déclarée. L'administrateur doit l'ajouter à `ALLOWED_ORIGINS` dans `.env`.
+- **404** : ce réglage n'existe pas.
+- **422** : la valeur sort des limites. Le message dit laquelle.
+
 ### Ce que ça ne fait pas
 
 - L'historique ne vit que dans ton navigateur — il ne remonte pas avant ton dernier chargement de l'écran.
