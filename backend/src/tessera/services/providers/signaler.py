@@ -22,7 +22,7 @@ from typing import Any
 from claude_agent_sdk import SdkMcpTool, create_sdk_mcp_server, tool
 
 from tessera.services.providers.ask_user import ASK_USER_SERVER_NAME, ASK_USER_TOOL_NAME, build_ask_user_tool
-from tessera.services.providers.signal_agent import CATEGORIES, COMPOSANTS, Refus, SignalValide, valider_signal
+from tessera.services.providers.signal_agent import CATEGORIES, COMPOSANTS, MAX_PAR_RUN, Refus, SignalValide, valider_signal
 from tessera.services.providers.signal_agent_registre import emis_du_jour, enregistrer_signal
 from tessera.utils.logger import get_logger
 
@@ -88,6 +88,9 @@ class ContexteSignal:
     confidentialite: str
     deposer: Deposer
     compteur: CompteurRun
+    #: Combien de signalements ce run peut émettre ; une revue de projet en
+    #: reçoit plus qu'un run de ticket (ticket-864).
+    max_par_run: int = MAX_PAR_RUN
 
 
 def role_recoit_signaler(role: str) -> bool:
@@ -121,6 +124,7 @@ def _raison(contexte: ContexteSignal, args: Mapping[str, object]) -> str:
         ticket=contexte.ticket,
         deja_emis_run=contexte.compteur.emis,
         deja_emis_jour=emis_du_jour(contexte.projet),
+        max_par_run=contexte.max_par_run,
     )
     if isinstance(verdict, Refus):
         return verdict.raison

@@ -85,9 +85,9 @@ def _texte(args: Mapping[str, object], cle: str) -> str | None:
     return valeur.strip() if isinstance(valeur, str) else None
 
 
-def _refus_de_bornes(deja_emis_run: int, deja_emis_jour: int) -> Refus | None:
-    if deja_emis_run >= MAX_PAR_RUN:
-        return Refus(f"Signalement refusé : {MAX_PAR_RUN} par run au plus, déjà atteints.")
+def _refus_de_bornes(deja_emis_run: int, deja_emis_jour: int, max_par_run: int) -> Refus | None:
+    if deja_emis_run >= max_par_run:
+        return Refus(f"Signalement refusé : {max_par_run} par run au plus, déjà atteints.")
     if deja_emis_jour >= MAX_PAR_JOUR:
         return Refus(
             f"Signalement refusé : {MAX_PAR_JOUR} par projet et par jour au plus, "
@@ -156,6 +156,7 @@ def valider_signal(
     ticket: str,
     deja_emis_run: int,
     deja_emis_jour: int,
+    max_par_run: int = MAX_PAR_RUN,
 ) -> SignalValide | Refus:
     """Check one ``signaler`` call: bounds, enumerations, sizes, guards.
 
@@ -163,7 +164,7 @@ def valider_signal(
     project keeps only the enumerations: the title is built here and the free
     text is dropped. Duplicates are the job of ``signal_agent_registre``.
     """
-    refus = _refus_de_bornes(deja_emis_run, deja_emis_jour)
+    refus = _refus_de_bornes(deja_emis_run, deja_emis_jour, max_par_run)
     if refus is not None:
         return refus
     enumerations = _enumerations(args)

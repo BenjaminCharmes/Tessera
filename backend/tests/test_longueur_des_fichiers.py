@@ -9,7 +9,7 @@ PLAFOND_GENERAL = 300
 # un découpage baisse l'entrée (ou la retire sous 300 lignes), jamais l'inverse.
 PLAFONDS: dict[str, int] = {
     "routers/chat.py": 377,
-    "routers/orchestrator.py": 321,
+    "routers/orchestrator.py": 311,
     "routers/tickets.py": 548,
     "services/livraison/ci_watcher.py": 525,
     "services/documentation/documentation.py": 401,
