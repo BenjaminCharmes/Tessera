@@ -1734,6 +1734,18 @@ Cette détection est la deuxième porte de l'ADR-050, après le hook `pre-push` 
 
 Lorsqu'un diff ne touche que des fichiers de consignes — dans `projects/*/memory/` (contraintes et décisions), `agents/prompts/` (system prompts), `.claude/skills/` (skills), ou tout `CLAUDE.md` — le script `verifier.py` lance automatiquement `test_consignes_coherentes.py` même sans modification de code (ticket-734). Cela empêche les changements de configuration ou de règles de dépasser sans vérification.
 
+## Gestion des leçons du projet (ADR-074, tickets 801–804)
+
+Les leçons capturent les pièges rencontrés lors d'un run approuvé qui a dû corriger un échec. Elles n'atteignent que le codeur et le reviewer pour guider les tours suivants.
+
+Un module `services/lecons.py` — prouvé à exister par l'import dans les tests — fournit l'interface `Lecons` (dataclass avec `en_vigueur` et `proposees`), et les fonctions `lire_lecons(memory_dir)`, `refus_de_lecon(texte, preuve, existantes, retour)` et `ajouter_proposee(memory_dir, texte, ticket_id, jour)`. Les leçons sous `## Proposées` du fichier `memory/lecons.md` attendent l'approbation humaine ; seules celles sous `## En vigueur` sont injectées.
+
+Injection : `build_project_context` (ticket-802) ajoute une section `## Leçons du projet` au contexte projet, lue par `section_lecons(project_path / "memory")`. La fonction `adr_pertinents` filtre cette section : seuls les rôles `codeur` et `reviewer` (constante `ROLES_AVEC_LECONS`) la reçoivent (ADR-074). Un rôle créé après coup n'en recevra pas : le défaut protège.
+
+Production (ticket-803) : après un run approuvé, le service sans outils appelle le rôle `lecons` si `pipeline.lecons` est activé dans `agents.json`. Il reçoit le retour du run (borné à 4 Ko) et propose au plus une leçon sous `## Proposées`, avec la source posée par le service. Tout refus ou défaillance (JSON invalide, refus du contrôle, fichier plein) est journalisé sans bloquer le run.
+
+Protection du fichier (ticket-804) : le diff d'un run ne peut pas toucher `memory/lecons.md`, sauf s'il a été écrit par le service après approbation. Une ligne ajoutée, retirée ou déplacée par le codeur bloque le run avant le premier tour, avec message d'erreur.
+
 ## Gestion des signalements en attente (ticket-421)
 
 Quand un signalement (`POST /api/v1/signalements`, ticket-407) arrive pendant qu'un run ide-core est actif, il n'est pas écrit immédiatement dans l'arbre. Cela évite qu'il soit emporté dans le commit du run en cours — ce qui poluerait le diff réel avec une métadonnée Tessera.
