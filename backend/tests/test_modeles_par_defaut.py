@@ -3,7 +3,8 @@ import json
 import re
 from pathlib import Path
 
-from tessera.services import documentation, security_auditor, validator
+from tessera.services import security_auditor, validator
+from tessera.services.documentation import documentation
 from tessera.services.modeles_par_defaut import (
     MODELE_JUGEMENT,
     MODELE_PRODUCTION,

@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from tessera.config import settings
-from tessera.services.documentation_reponse import donnees_de
+from tessera.services.documentation.documentation_reponse import donnees_de
 from tessera.services.journal_pipeline import journal_vers
 from tessera.services.lecons import ajouter_proposee, lire_lecons, refus_de_lecon
 from tessera.services.modeles_par_defaut import modele_par_defaut

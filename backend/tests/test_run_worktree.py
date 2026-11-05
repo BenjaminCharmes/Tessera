@@ -220,7 +220,7 @@ def test_only_the_run_wiring_imports_run_worktree() -> None:
     assert appelants == [
         "routers/orchestrator.py",
         "services/assemblage_run.py",
-        "services/documenteur_run.py",
+        "services/documentation/documenteur_run.py",
         "services/livreur_run.py",
         "services/orchestrator.py",
         "services/pipeline_branche.py",

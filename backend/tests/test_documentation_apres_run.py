@@ -11,7 +11,7 @@ from unittest.mock import AsyncMock, MagicMock
 
 from tessera.models.agent import AgentResult, AgentRole
 from tessera.models.ticket import TicketStatus
-from tessera.services.documentation import DocumentationService, ResultatDocumentation
+from tessera.services.documentation.documentation import DocumentationService, ResultatDocumentation
 from tessera.services.pipeline_events import EventType, OrchestratorEvent
 from tests.matiere_factice import matiere_factice
 from tests.test_orchestrator import (
@@ -174,7 +174,7 @@ async def test_integration_quinze_tickets_tronque_event(tmp_path: Path) -> None:
     Vérifie le chemin complet : DocumentationService tronque à _PLAFOND,
     et l'orchestrateur émet l'événement même sans fichier doc modifié.
     """
-    from tessera.services.documentation import DocumentationService, _PLAFOND
+    from tessera.services.documentation.documentation import DocumentationService, _PLAFOND
 
     project_path, prompts = _init_projet(tmp_path, _PLAFOND + 5)  # 15 tickets
     _avec_marqueur_vide(project_path)
@@ -235,7 +235,7 @@ async def test_integration_provider_qui_leve_emet_documentation_failed(tmp_path:
     Vérifie que l'exception levée par provider.complete() remonte hors du
     service, est attrapée par documenter_le_run, et produit l'événement attendu.
     """
-    from tessera.services.documentation import DocumentationService
+    from tessera.services.documentation.documentation import DocumentationService
     from tessera.services.providers.base import ProviderResult
 
     class _RaisingProvider:

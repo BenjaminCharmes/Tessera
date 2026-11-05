@@ -30,20 +30,20 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from tessera.services import documentation_claude_md as claude_md_doc
-from tessera.services.documentation_base import EditionRefusee
-from tessera.services.documentation_description import appliquer_description
-from tessera.services.documentation_reponse import donnees_de, editions_de, editions_depuis
-from tessera.services.documentation_code import (
+from tessera.services.documentation import documentation_claude_md as claude_md_doc
+from tessera.services.documentation.documentation_base import EditionRefusee
+from tessera.services.documentation.documentation_description import appliquer_description
+from tessera.services.documentation.documentation_reponse import donnees_de, editions_de, editions_depuis
+from tessera.services.documentation.documentation_code import (
     FournisseurMatiere,
     MatiereCode,
     bloc_diffs,
     bloc_fichiers,
     matiere_du_lot,
 )
-from tessera.services.documentation_editions import _documentable, appliquer_editions
-from tessera.services.documentation_preuve import fichiers_de_la_matiere
-from tessera.services.documentation_selection import (
+from tessera.services.documentation.documentation_editions import _documentable, appliquer_editions
+from tessera.services.documentation.documentation_preuve import fichiers_de_la_matiere
+from tessera.services.documentation.documentation_selection import (
     MARQUEUR,
     TicketADocumenter,
     marquer_documente,

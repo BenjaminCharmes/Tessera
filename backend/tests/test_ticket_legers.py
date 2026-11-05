@@ -13,7 +13,7 @@ import frontmatter
 import pytest
 
 from tessera.models.agent import AgentResult, AgentRole
-from tessera.services.documentation import ResultatDocumentation
+from tessera.services.documentation.documentation import ResultatDocumentation
 from tessera.services.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.security_auditor import SecurityAuditResult
 from tessera.services.ticket_service import TicketService

@@ -10,9 +10,9 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services.documentation import DocumentationService, EditionRefusee
-from tessera.services.documentation_editions import appliquer_editions
-from tessera.services.documentation_claude_md import BUDGET_CLAUDE_MD
+from tessera.services.documentation.documentation import DocumentationService, EditionRefusee
+from tessera.services.documentation.documentation_editions import appliquer_editions
+from tessera.services.documentation.documentation_claude_md import BUDGET_CLAUDE_MD
 from tessera.services.providers.base import ProviderResult
 from tests.matiere_factice import matiere_factice
 

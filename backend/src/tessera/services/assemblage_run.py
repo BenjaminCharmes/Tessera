@@ -16,7 +16,7 @@ from tessera.services.agent_registry import AgentRegistryService
 from tessera.services.agent_runner import OUTILS_DE_RELECTURE, AgentRunner
 from tessera.services.carte_du_depot import CarteDuDepot
 from tessera.services.controle_visuel import lire_le_controle
-from tessera.services.documenteur_run import documenteur
+from tessera.services.documentation.documenteur_run import documenteur
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.journal_pipeline import journal_vers, journaliser_mode_rapide
 from tessera.services.lecons import section_lecons

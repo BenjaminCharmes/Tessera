@@ -1,7 +1,7 @@
 """The documentation roles a project keeps active."""
 from pathlib import Path
 
-from tessera.services.documentation import ROLES_DOCUMENTATION
+from tessera.services.documentation.documentation import ROLES_DOCUMENTATION
 from tessera.services.providers.par_role import config_du_role
 
 

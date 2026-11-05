@@ -14,9 +14,9 @@ relecture, à qui il donne la citation à vérifier.
 import re
 from re import Match, Pattern
 
-from tessera.services.documentation_base import EditionRefusee, normaliser_typo
-from tessera.services.documentation_code import MatiereCode
-from tessera.services.documentation_diff import sections_du_diff
+from tessera.services.documentation.documentation_base import EditionRefusee, normaliser_typo
+from tessera.services.documentation.documentation_code import MatiereCode
+from tessera.services.documentation.documentation_diff import sections_du_diff
 
 #: Ce qu'une édition `ancien`/`nouveau` a le droit de remplacer, en caractères,
 #: et ce qu'un rôle remplace sur un lot. À ajuster après les premiers lots.

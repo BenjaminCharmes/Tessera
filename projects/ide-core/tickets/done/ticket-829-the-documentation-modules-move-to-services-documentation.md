@@ -2,7 +2,7 @@
 id: ticket-829
 title: "The documentation modules move to services/documentation"
 type: refactor
-status: todo
+status: done
 pr_number: null
 priority: low
 agent: codeur
@@ -31,12 +31,12 @@ et le dossier portent le même nom : l'import devient `tessera.services.document
 
 ## Critères d'acceptation
 
-- [ ] Les douze modules de la section `documentation` sont sous `services/documentation/`, aucun
+- [x] Les douze modules de la section `documentation` sont sous `services/documentation/`, aucun
       n'est resté à plat
-- [ ] `A_DEPLACER` n'a plus d'entrée `documentation`, `ECARTS_DOMAINES` n'a grandi d'aucune ligne
-- [ ] Aucune occurrence des anciens chemins pointés ne reste dans `backend/src`, `backend/tests`,
+- [x] `A_DEPLACER` n'a plus d'entrée `documentation`, `ECARTS_DOMAINES` n'a grandi d'aucune ligne
+- [x] Aucune occurrence des anciens chemins pointés ne reste dans `backend/src`, `backend/tests`,
       `scripts/`, `Makefile`
-- [ ] Le diff n'est que des renommages et des lignes d'import ou de chaîne ; la suite passe
+- [x] Le diff n'est que des renommages et des lignes d'import ou de chaîne ; la suite passe
 
 ## Ce que ça ne fait pas
 
@@ -46,3 +46,7 @@ Aucun changement de comportement, aucune édition des textes de documentation.
 
 Le nom du module égal au nom du dossier : un `import tessera.services.documentation as d` visait le
 module et viserait désormais le paquet vide. Le script le signale ; le relire à la main.
+
+## Notes de réalisation
+
+Douze modules, comme annoncé. `from tessera.services.documentation import documentation` vise bien le module (tests `test_documentation_roles_actifs`, `test_documentation_worktree`, `test_modeles_par_defaut`). Seul chemin de documentation vivante mis à jour : `docs/architecture.md` ; les specs, audits, journaux et tickets terminés gardent l'ancien chemin, qui date l'état décrit.

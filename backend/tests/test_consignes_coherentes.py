@@ -212,7 +212,8 @@ def test_aucun_reglage_de_pipeline_n_est_mort() -> None:
     from tessera.models.agent import AgentPipelineConfig
     from tessera.services import orchestrator as orch_service
     from tessera.routers import orchestrator as orch_router
-    from tessera.services import assemblage_run, documenteur_run
+    from tessera.services import assemblage_run
+    from tessera.services.documentation import documenteur_run
 
     sources = (
         inspect.getsource(orch_service)

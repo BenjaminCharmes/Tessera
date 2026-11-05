@@ -1171,7 +1171,7 @@ Exemples d'erreurs ainsi empêchées :
 
 Une ADR (ticket-535) formalise cette règle.
 
-Le module `services/documentation_code.py` (ticket-540) produit ce contenu. Pour chaque ticket d'une file, il extrait :
+Le module `services/documentation/documentation_code.py` (ticket-540) produit ce contenu. Pour chaque ticket d'une file, il extrait :
 
 - **Diff filtré** : les changements du ticket, en excluant `tickets/`, `memory/`, `agents.json`, `README.md`, `docs/` et en réduisant les lockfiles à une seule ligne. Le diff est prélevé depuis la racine du dépôt, même pour un projet situé sous `projects/` (les exclusions portent alors le chemin complet du projet). Un diff supérieur à 12 000 caractères par ticket est tronqué, avec un total de 60 000 caractères par lot ; la troncature nomme les fichiers non affichés.
 - **Fichiers modifiés ou ajoutés** : le contenu des fichiers du diff, jusqu'à 8 000 caractères par fichier et 40 000 au total, trié par nombre de lignes changées décroissant. Un fichier trop long reste représenté par ses hunks.

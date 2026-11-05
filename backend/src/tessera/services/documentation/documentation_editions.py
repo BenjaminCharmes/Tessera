@@ -7,11 +7,11 @@ validées. Le contrat et ses raisons sont décrits dans ``documentation``.
 import re
 from pathlib import Path
 
-from tessera.services import documentation_claude_md as claude_md_doc
-from tessera.services.documentation_base import EditionRefusee
-from tessera.services.documentation_base import normaliser_typo as _normaliser_typo
-from tessera.services.documentation_code import MatiereCode
-from tessera.services.documentation_preuve import ControleDePreuve
+from tessera.services.documentation import documentation_claude_md as claude_md_doc
+from tessera.services.documentation.documentation_base import EditionRefusee
+from tessera.services.documentation.documentation_base import normaliser_typo as _normaliser_typo
+from tessera.services.documentation.documentation_code import MatiereCode
+from tessera.services.documentation.documentation_preuve import ControleDePreuve
 
 #: Ce qu'un agent de documentation a le droit de toucher. Il documente ; le
 #: code, les tickets et les ADR ne sont pas à lui.

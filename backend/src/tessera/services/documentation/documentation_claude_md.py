@@ -16,7 +16,7 @@ règle 5 réserve à un ticket explicite.
 """
 from pathlib import Path
 
-from tessera.services.documentation_base import EditionRefusee
+from tessera.services.documentation.documentation_base import EditionRefusee
 
 #: Le nom sous lequel l'agent désigne le CLAUDE.md du projet.
 NOM = "CLAUDE.md"

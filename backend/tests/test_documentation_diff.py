@@ -1,5 +1,5 @@
 """A diff cut into sections, delivered lines only — ticket-757."""
-from tessera.services.documentation_diff import sections_du_diff
+from tessera.services.documentation.documentation_diff import sections_du_diff
 
 _DIFF = (
     "diff --git a/x.py b/x.py\n"

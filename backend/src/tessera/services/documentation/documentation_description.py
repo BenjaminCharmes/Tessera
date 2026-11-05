@@ -12,9 +12,9 @@ le code livré qui le fonde, et ses jetons vérifiables doivent y figurer.
 import json
 from pathlib import Path
 
-from tessera.services.documentation_base import EditionRefusee
-from tessera.services.documentation_code import MatiereCode
-from tessera.services.documentation_preuve import ControleDePreuve
+from tessera.services.documentation.documentation_base import EditionRefusee
+from tessera.services.documentation.documentation_code import MatiereCode
+from tessera.services.documentation.documentation_preuve import ControleDePreuve
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

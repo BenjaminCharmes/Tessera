@@ -141,7 +141,7 @@ def _coder_runner(approuve: bool = True) -> Any:
 
 
 async def test_documentation_started_emis_avant_doc_updated(tmp_path: Path) -> None:
-    from tessera.services.documentation import ResultatDocumentation
+    from tessera.services.documentation.documentation import ResultatDocumentation
     from tests.test_orchestrator import _FakeGit
 
     documenter = AsyncMock(
