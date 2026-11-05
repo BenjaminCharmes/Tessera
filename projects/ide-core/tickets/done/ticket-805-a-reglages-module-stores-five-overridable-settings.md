@@ -4,7 +4,7 @@ created: 2026-11-05
 depends_on: []
 estimated_days: 1
 id: ticket-805
-pr_number: null
+pr_number: 924
 priority: low
 status: done
 title: A reglages module stores five overridable settings in SQLite
