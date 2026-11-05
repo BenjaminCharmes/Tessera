@@ -4,7 +4,7 @@ created: 2026-11-05
 depends_on: []
 estimated_days: 1
 id: ticket-850
-pr_number: null
+pr_number: 937
 priority: high
 status: done
 title: The registry says when a queue holds a project between two tickets
