@@ -33,7 +33,7 @@ _CONSIGNE = (
 )
 
 #: Les fichiers signalés dès qu'ils changent, par motif de nom.
-_NOMS_SIGNALES = (
+NOMS_SIGNALES = (
     "conftest.py",
     "pytest.ini",
     "tox.ini",
@@ -151,7 +151,7 @@ def porte_config_nommee(
 
 def _touche_la_configuration(fichier: FichierModifie, racines: list[Path]) -> bool:
     nom = fichier.chemin.rsplit("/", 1)[-1]
-    if any(fnmatch(nom, motif) for motif in _NOMS_SIGNALES):
+    if any(fnmatch(nom, motif) for motif in NOMS_SIGNALES):
         return True
     if nom not in ("pyproject.toml", "package.json"):
         return False

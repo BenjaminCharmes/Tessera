@@ -6,7 +6,7 @@ estimated_days: 1
 id: ticket-801
 pr_number: null
 priority: medium
-status: todo
+status: done
 title: A lessons module parses and checks the project lessons file
 type: feat
 ---
@@ -68,17 +68,17 @@ un agent.
 
 ## Critères d'acceptation
 
-- [ ] `lecons.py` porte la dataclasse, les trois fonctions et les trois constantes
+- [x] `lecons.py` porte la dataclasse, les trois fonctions et les trois constantes
       ci-dessus
-- [ ] `backend/tests/test_lecons.py` couvre : fichier absent ; lecture des deux sections ;
+- [x] `backend/tests/test_lecons.py` couvre : fichier absent ; lecture des deux sections ;
       chaque cause de refus (forme, longueur, preuve absente, doublon exact, doublon
       approché, fichier de configuration nommé, `skip` associé à un test) ; une leçon valide
       acceptée ; ajout qui crée le fichier et pose la source ; ajout refusé au plafond
       d'octets et au plafond de leçons
-- [ ] Un test écrit la leçon du ticket-736 (« Quand une méthode s'ajoute à
+- [x] Un test écrit la leçon du ticket-736 (« Quand une méthode s'ajoute à
       `GitWorkspaceService`, chercher les doubles de test qui la redéfinissent… ») avec sa
       preuve et vérifie qu'elle passe
-- [ ] Aucun appel à un provider, aucun import de `orchestrator`
+- [x] Aucun appel à un provider, aucun import de `orchestrator`
 
 ## Ce que ça ne fait pas
 
