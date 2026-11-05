@@ -20,15 +20,17 @@ trousseau sait quoi déclarer.
 
 ## Contexte
 
-Design §3 et §5. Sans ce ticket, le refus de démarrer du ticket-795 tombe sur une machine Docker
-sans mode `env`, et `doctor` continue de dire « renseigne `.env` » pour une clé qui n'y est plus.
+Design §3 et §5. Le ticket-795 lit le coffre en mode `auto` par défaut (repli sur `.env` avec un
+avertissement, refus si un secret migré manque) : `doctor` doit dire d'où vient chaque secret,
+au lieu de « renseigne `.env` » pour une clé qui n'y est plus.
 
 ## Ce que le ticket fait
 
 - `backend/src/tessera/doctor.py` : une vérification « Secrets » — mode, coffre joignable ou
   non, noms encore en clair dans `.env` avec la commande `tessera.ps1 secrets migrer`. Les
   messages existants qui renvoient à `.env` pour `ANTHROPIC_API_KEY` disent « coffre ou `.env` ».
-- `GET /health` : un champ `secrets` valant `coffre` ou `env`, jamais un nom ni une valeur.
+- `GET /health` : un champ `secrets` valant `coffre`, `env` ou `env-repli` (mode `auto` sans
+  coffre), jamais un nom ni une valeur.
 - `.env.example` : les secrets restent en exemple commenté pour le mode `env` ; un bloc explique le
   coffre, `SECRETS_SOURCE` et `tessera.ps1 secrets`. `scripts/tessera.ps1 setup` indique la
   commande de migration après la copie.

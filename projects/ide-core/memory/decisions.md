@@ -678,7 +678,7 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 ## ADR-073 — Les secrets de Tessera vivent dans le coffre du système
 
 **Date** : 2026-11-05
-**Décision** : complète ADR-053. Neuf secrets (`ANTHROPIC_API_KEY`, `GITHUB_TOKEN`, les cinq jetons de mise en ligne, `STATIC_TOKEN`, `FORBIDDEN_TERMS`) vont dans le coffre du système, via `keyring`. Lecture : variable d'environnement, coffre, puis `.env`. `SECRETS_SOURCE=coffre` par défaut : sans coffre, ou coffre en erreur, le backend ne démarre pas ; `env` se déclare pour la CI et Docker. Un secret ne s'exporte jamais dans un sous-processus. Le hook `pre-push` lit par le backend et refuse s'il ne peut pas lire. Le garde d'ADR-053 refuse aussi les commandes qui exécutent le coffre.
+**Décision** : complète ADR-053. Neuf secrets (`ANTHROPIC_API_KEY`, `GITHUB_TOKEN`, les cinq jetons de mise en ligne, `STATIC_TOKEN`, `FORBIDDEN_TERMS`) vont dans le coffre du système, via `keyring`. Lecture : variable d'environnement, coffre, puis `.env`. `SECRETS_SOURCE=auto` par défaut (05/11, multi-PC) : sans coffre, `.env` et avertissement, refus si un secret migré manque ; un PC migré passe en `coffre` ; `env` pour CI et Docker. Un secret ne s'exporte jamais dans un sous-processus. Le hook `pre-push` lit par le backend et refuse s'il ne peut pas lire. Le garde d'ADR-053 refuse aussi les commandes qui exécutent le coffre.
 **Raison** : `.env` se lit, se copie et se synchronise ; le coffre chiffre au repos. Tout processus de l'utilisateur le lit pourtant : le plafond d'un jeton reste sa portée.
 **Alternative rejetée** : chiffrer `.env` — la clé de déchiffrement reste à côté.
 **Détail** : `docs/superpowers/specs/2026-11-05-secrets-dans-le-coffre-design.md`.

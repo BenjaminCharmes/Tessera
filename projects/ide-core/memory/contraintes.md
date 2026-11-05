@@ -12,37 +12,6 @@ Cette section n'est injectée dans aucun appel d'agent. Une règle nouvelle
 s'écrit ici, avec son ADR ; un humain l'accepte en la déplaçant dans sa
 section. (ADR-055)
 
-- **Un module de `services/` vit dans son domaine et n'importe que son domaine
-  ou un plus bas.** Ordre : noyau, projets, usage, provisioning, gardes,
-  git_workspace, worktrees, github, providers, verification, verdicts, agents,
-  documentation, creation_projet, livraison, pipeline, file, supervision. Un
-  module nouveau s'inscrit dans son domaine ; aucun paquet de premier niveau
-  hors `models`, `services`, `routers`, `utils`. (ADR-076)
-- **Un secret de Tessera se range dans le coffre du système, pas dans `.env`.**
-  Neuf noms, listés dans `coffre.py`. Lecture : variable d'environnement, coffre,
-  puis `.env`. `SECRETS_SOURCE=coffre` par défaut : sans coffre, ou coffre en
-  erreur, le backend ne démarre pas ; `env` se déclare pour la CI et Docker.
-  Jamais exporté dans l'environnement d'un sous-processus, jamais affiché ni
-  passé en argument de commande. (ADR-073, ADR-053)
-- **Aucun agent n'exécute le coffre.** Le garde d'ADR-053 refuse les commandes
-  Bash qui lancent `keyring`, `cmdkey` ou `coffre_cli`, plafond lexical compris :
-  il attrape une erreur, pas une évasion. (ADR-073, ADR-053)
-- **Une leçon de projet s'écrit sous `## Proposées` de `memory/lecons.md`, par
-  le service seul.** Un humain la déplace sous `## En vigueur`, la seule section
-  injectée (codeur, reviewer, après les contraintes qui priment ; 25 leçons,
-  4 Ko). Le service refuse une leçon hors forme, de plus de 200 caractères, sans
-  preuve citée du retour, en doublon ou qui affaiblit une vérification. Un diff
-  de run qui touche ce fichier met le run en `blocked`. (ADR-074, ADR-055)
-- **Cinq réglages globaux se changent depuis l'interface, aucun autre.**
-  `run_max_budget_usd`, `llm_max_budget_usd`, `dialogue_timeout_s`,
-  `max_parallel_test_runs`, `keep_awake_during_runs` : registre fermé et borné de
-  `reglages.py`, valeur dans la table `reglages` de SQLite par-dessus `.env`, que rien
-  ne réécrit. On les lit par `reglages.courants()`, jamais par `settings.<nom>`. Un run
-  fige plafonds et délai à son ouverture. (ADR-075)
-- **Écrire un réglage exige un `Origin` déclaré, et aucun agent n'appelle
-  `/api/v1/reglages`.** Sans `Origin` ou hors liste : 403. Le garde de `Bash` refuse les
-  commandes d'accès réseau qui nomment la route : il attrape une erreur, pas une
-  évasion. (ADR-075, ADR-031)
 
 ## Git et périmètre d'écriture
 
@@ -53,40 +22,35 @@ section. (ADR-055)
 - **Un lien de `populate` ne vise que ce que git ignore, et se retire avant
   toute suppression récursive.** Ce qui s'édite se copie. Jamais le `.env` de
   Tessera ; une entrée absente se journalise sans bloquer. (ADR-056, ADR-053)
-
-- **Ne jamais écrire hors de la racine d'écriture du run** — le projet, ou
-  son worktree s'il en déclare un (ADR-056). Un hook `PreToolUse`
-  bloque `Write`, `Edit`, `NotebookEdit` et les redirections Bash simples
-  (`>`, `>>`, `tee`) vers tout chemin hors du dossier du projet — ou du
-  dépôt ancêtre pour les projets qui déclarent `git_root: ancestor`.
-  Lire hors du projet reste permis, sauf le `.env` de Tessera. (ADR-031,
-  ADR-053)
+- **Ne jamais écrire hors de la racine d'écriture du run** — le projet, son
+  worktree (ADR-056) ou le dépôt ancêtre si `git_root: ancestor`. Un hook
+  `PreToolUse` bloque ailleurs `Write`, `Edit`, `NotebookEdit` et les
+  redirections Bash simples. Lire hors du projet reste permis, sauf le `.env`
+  de Tessera. (ADR-031, ADR-053)
 - **Le service de documentation n'écrit dans `agents.json` que la clé
-  `description`.** Aucun agent n'écrit ce fichier : doc-technique propose le
-  texte, le service le contrôle (preuve, 220 caractères, une ligne) et le
-  remplace sans toucher au reste du fichier. (ADR-068, ADR-027, ADR-057)
+  `description`**, proposée par doc-technique et contrôlée (preuve, 220
+  caractères, une ligne). (ADR-068, ADR-027, ADR-057)
 - **Ne jamais émettre une commande git ou `gh` en écriture.** Le hook
-  `PreToolUse` n'admet que des lectures nommées : une sous-commande absente
-  de la liste blanche est refusée, options globales lues avant elle ; `-c`
-  n'accepte que des clés cosmétiques. `agents.json`, `.git/`,
-  `.claude/settings*.json` et `.github/workflows/` se refusent aussi en
-  écriture. (ADR-067, ADR-027)
+  `PreToolUse` n'admet que des lectures nommées (liste blanche, options globales
+  lues avant ; `-c` cosmétique seulement). `agents.json`, `.git/`,
+  `.claude/settings*.json` et `.github/workflows/` se refusent en écriture.
+  (ADR-067, ADR-027)
 - **Le script que `test_command` lance se refuse en écriture**, comme
-  `agents.json` : le premier argument qui désigne un fichier existant, résolu
-  depuis `pipeline.test_cwd`. Un diff qui touche la configuration des tests
-  (`conftest.py`, `pytest.ini`, `tox.ini`, `setup.cfg`, `mypy.ini`, `.coveragerc`,
+  `agents.json`. Un diff qui touche la configuration des tests (`conftest.py`,
   `[tool.pytest*]`, `[tool.mypy]`, `vite.config.*`, `vitest.*`, `eslint.config.*`,
-  `tsconfig*.json`, `scripts` de `package.json`) sans que le ticket la nomme par
-  son chemin complet s'ouvre, pour le reviewer, sur un avertissement. (ADR-027,
-  ADR-072)
+  `tsconfig*.json`, `scripts` de `package.json`…) sans que le ticket la nomme par
+  son chemin complet est refusé à la revue. (ADR-027, ADR-072)
 - **Une règle nouvelle s'écrit sous `## Proposées` dans `contraintes.md`,
   avec son ADR.** Un diff qui modifie ce fichier ailleurs met le run en
   `blocked` : un humain accepte la règle en la déplaçant dans sa section.
   (ADR-055)
-- **Avant toute création de branche, vérifier que `git rev-parse
-  --show-toplevel` renvoie exactement le dossier du projet.** Sinon,
-  lever `NotAGitRepository`. Exception déclarée : `git_root: ancestor`
-  dans `agents.json`. (ADR-024, ADR-028)
+- **Une leçon s'écrit sous `## Proposées` de `memory/lecons.md`, par le
+  service seul.** Seule `## En vigueur`, où un humain la déplace, atteint le
+  codeur et le reviewer. Un diff de run qui touche ce fichier met le run en
+  `blocked`. (ADR-074, ADR-055)
+- **Avant toute création de branche, `git rev-parse --show-toplevel` doit
+  renvoyer le dossier du projet**, sinon `NotAGitRepository` ; exception :
+  `git_root: ancestor`. (ADR-024, ADR-028)
 
 ## Livraison et autonomie
 
@@ -101,14 +65,11 @@ section. (ADR-055)
 - **Déclarer le niveau d'autonomie dans `agents.json`** (`autonomy:
   commit | pr | merge`, défaut : `commit`). Le merge n'intervient que sur
   CI verte — sauf `merge_without_ci: true`. (ADR-029, ADR-045)
-- **Une approbation vaut pour un commit précis.** `approved_sha` se note à
-  l'approbation ; avant le push, seuls des commits de rangement du pipeline
-  (`tickets/**`, `memory/pipeline-log.md`) peuvent le suivre, sinon le run est
-  `blocked` sans push. `CIWatcher` ne merge pas une PR dont la tête n'est plus
-  `pushed_sha` : ticket `blocked`, PR ouverte. La tête se relit après le
-  verdict de la CI, et le merge est lié à `pushed_sha` (champ `sha` de l'API
-  GitHub). Un SHA inconnu refuse aussi.
-  (ticket-492, ADR-039)
+- **Une approbation vaut pour un commit précis.** Avant le push, seuls des
+  commits de rangement (`tickets/**`, `memory/pipeline-log.md`) peuvent suivre
+  `approved_sha`, sinon `blocked` sans push. `CIWatcher` ne merge qu'une PR dont
+  la tête relue est encore `pushed_sha`, merge lié à ce SHA ; sinon `blocked`,
+  PR ouverte. (ticket-492, ADR-039)
 - **Un run non approuvé ne se livre jamais.** Les exceptions de livraison
   restent dans `Livraison.arret` et ne font pas échouer le run. (ADR-030)
 - **Sur un conflit de rebase, `resolveur-conflit` tente.** Une résolution
@@ -118,10 +79,9 @@ section. (ADR-055)
   projet.** La phase 2 (attente CI, merge) tourne dans `CIWatcher`, en
   fond. `depends_on` bloque le ticket suivant jusqu'au merge. Une CI rouge
   met le ticket en `blocked`, PR laissée ouverte, sans relance. (ADR-051)
-- **La livraison d'un ticket attend que les PR déjà confiées à `CIWatcher`
-  pour le projet soient mergées ou bloquées, dans une limite de temps.**
-  Le rebase se fait ainsi sur une base qui les porte ; passé le délai, la
-  livraison part comme avant. (ADR-065, ADR-051)
+- **Une livraison attend, dans une limite de temps, que les PR déjà confiées
+  à `CIWatcher` pour le projet soient mergées ou bloquées**, pour rebaser sur
+  une base qui les porte. (ADR-065, ADR-051)
 - **Une PR devenue conflictuelle ne se met à jour que par un merge de la base
   dans sa tête poussée, sans push forcé.** Sa tête doit encore être `pushed_sha` ;
   seuls des conflits de journaux résolus en union sont admis, sans agent.
@@ -159,9 +119,8 @@ section. (ADR-055)
   (`services: [{nom, commande}]`).** Rien de déclaré : pas de bouton de
   lancement. (ADR-042)
 - **Un run ne lance ni serveur ni capture sans `pipeline.controle_visuel`
-  déclaré.** Fichiers d'interface, largeurs et démarrage se déclarent, jamais
-  devinés ; l'app démarre depuis le worktree du run, sur un port libre, et
-  ne tue jamais un processus existant. Les captures restent hors du dépôt.
+  déclaré.** L'app démarre depuis le worktree du run, sur un port libre, sans
+  tuer de processus existant ; les captures restent hors du dépôt.
   (ADR-062, ADR-042, ADR-021)
 
 *(codeur, reviewer)*
@@ -176,12 +135,11 @@ section. (ADR-055)
 
 - **Les services passent toujours par `LLMProvider` (`complete`/`stream`),
   jamais par le SDK directement.** (ADR-017)
-- **Déclarer `provider`, `model` et `fallback` dans `agents.json` pour
-  chaque rôle ; un rôle sans `provider` prend `agent_sdk`.** Toute
-  construction de provider passe par `provider_pour_role`. Seuls une
-  indisponibilité, qui émet `provider_fallback`, un run lancé `rapide`, ou un
-  prompt au-delà du `fallback_above_chars` d'un rôle `ollama` déclenchent le
-  repli. Une réponse illisible n'en déclenche aucun. (ADR-046, ADR-059, ADR-071)
+- **Chaque rôle déclare `provider`, `model` et `fallback` dans `agents.json`**
+  (défaut `agent_sdk`), construits par `provider_pour_role`. Le repli ne part
+  que sur indisponibilité (`provider_fallback`), run `rapide` ou prompt au-delà
+  du `fallback_above_chars` d'un rôle `ollama`, jamais sur une réponse
+  illisible. (ADR-046, ADR-059, ADR-071)
 - **Un rôle déclaré `"web": true` reçoit `WebFetch` et `WebSearch` et
   perd `Bash`.** (ADR-049)
 
@@ -196,6 +154,14 @@ section. (ADR-055)
 - **Le verdict du reviewer, de l'audit sécurité et du validateur se lit dans
   une sortie structurée validée par un schéma, jamais dans le texte.** Une
   sortie absente, hors schéma ou contradictoire refuse. (ADR-061, ADR-009)
+- **Un module de `services/` vit dans son domaine et n'importe que son
+  domaine ou un plus bas** (ordre dans `memory/services-domaines.md`). Aucun
+  paquet de premier niveau hors `models`, `services`, `routers`, `utils`.
+  (ADR-076)
+- **Seuls les cinq réglages de `reglages.py` se changent depuis l'interface**,
+  lus par `reglages.courants()` et figés à l'ouverture d'un run. Écrire exige
+  un `Origin` déclaré ; aucun agent n'appelle `/api/v1/reglages`. (ADR-075,
+  ADR-031)
 - **`role: github-sync` est géré dans `POST /api/v1/agents/run`, pas
   dans un endpoint dédié.** (ADR-010)
 
@@ -207,10 +173,12 @@ section. (ADR-055)
 - **Avant tout push, vérifier le diff ajouté, les messages de commit et
   les auteurs contre `FORBIDDEN_TERMS`.** Un projet déclare
   `"confidentiality": "professional"` pour s'exempter. (ADR-048)
-- **Un jeton de service en ligne (Vercel, Stripe, Resend, Cloudflare) ne
-  quitte pas le `.env` de Tessera.** Un agent ne le reçoit pas, ne lit pas ce
-  fichier et ne crée aucune ressource en ligne : seule une action de
-  l'utilisateur le fait. (ADR-053)
+- **Un secret de Tessera se lit : environnement, coffre du système, puis
+  `.env`** (`SECRETS_SOURCE=auto` ; `coffre` exige le coffre, `env` pour la CI
+  et Docker). Il n'est ni exporté à un sous-processus, ni affiché, ni passé en
+  argument, et ne va à aucun agent ; seule une action de l'utilisateur crée une
+  ressource en ligne. Aucun agent n'exécute le coffre (`keyring`, `cmdkey`,
+  `coffre_cli`). (ADR-073, ADR-053)
 - **Les termes interdits sont arrêtés à trois portes :** push pipeline,
   hook `pre-push`, CI sur chaque PR. Une porte qui ne peut pas juger
   refuse. (ADR-050)
@@ -228,11 +196,10 @@ section. (ADR-055)
   `design/charts/`, jamais les familles CSS en brut. (ADR-047)
 - **L'app Tauri n'expose aucune permission `fs:*` ou `shell:*`.** Le
   frontend passe toujours par `routers/fs.py`. (ADR-040)
-- **Rien n'est décoratif dans le Bureau.** Un sprite d'état rend une donnée
-  du store de run ou de l'API ; sans donnée, rien. Le mobilier se dessine
-  toujours, sans voyant ; le cosmétique sans état est permis. Tout sprite vient
-  du moteur `lib/bureau/sprites/`, en `<use>` du `<defs>` commun, ses tons en
-  jetons de `sprites-theme.css`, un état en `etat-*`. (ADR-070, ADR-058, ADR-026)
+- **Rien n'est décoratif dans le Bureau.** Un sprite d'état rend une donnée du
+  store de run ou de l'API ; sans donnée, rien (mobilier et cosmétique sans état
+  permis). Tout sprite vient de `lib/bureau/sprites/` : `<use>` du `<defs>`
+  commun, tons de `sprites-theme.css`, états `etat-*`. (ADR-070, ADR-058, ADR-026)
 - **Un agent de produit ne se dessine que depuis `services[].activite`.**
   Le backend lit ce fichier, borné en taille et résolu dans le projet ;
   absent, périmé, hors schéma ou service arrêté : aucun agent. Tessera
