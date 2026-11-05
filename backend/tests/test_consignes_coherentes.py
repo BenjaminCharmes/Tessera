@@ -540,6 +540,57 @@ def test_tout_adr_cite_existe_encore() -> None:
     assert inconnus == {}, f"ADR cités mais introuvables : {inconnus}"
 
 
+#: Les trois fichiers dont une citation garde une ADR dans `decisions.md`.
+_CITANTS_D_ADR = (
+    "projects/ide-core/memory/contraintes.md",
+    "CLAUDE.md",
+    "projects/ide-core/CLAUDE.md",
+)
+
+
+def _adr_de(nom: str) -> list[str]:
+    texte = _lire(f"projects/ide-core/memory/{nom}")
+    return re.findall(r"^## (ADR-\d{3})", texte, re.M)
+
+
+def test_chaque_adr_de_decisions_est_citee_par_une_consigne() -> None:
+    # Une ADR que plus aucune règle ne cite n'apprend rien à un agent et pèse
+    # dans chaque appel : elle part dans l'archive, son numéro inchangé
+    # (ticket-830).
+    citees: set[str] = set()
+    for chemin in _CITANTS_D_ADR:
+        citees |= set(re.findall(r"ADR-\d{3}", _lire(chemin)))
+    assert citees, "aucune ADR citée — les chemins ont bougé"
+
+    a_archiver = [n for n in _adr_de("decisions.md") if n not in citees]
+
+    assert a_archiver == [], (
+        f"ADR citées ni par contraintes.md ni par un CLAUDE.md, "
+        f"à déplacer dans decisions-archive.md : {a_archiver}"
+    )
+
+
+def test_une_adr_n_est_pas_a_la_fois_en_vigueur_et_archivee() -> None:
+    doubles = set(_adr_de("decisions.md")) & set(_adr_de("decisions-archive.md"))
+
+    assert doubles == set(), f"présentes dans les deux fichiers : {sorted(doubles)}"
+
+
+def test_une_adr_archivee_remplacee_porte_sa_ligne_remplacee_par() -> None:
+    # « Remplacé par » dit en prose ne se retrouve pas à la lecture : la ligne
+    # `**Remplacée par**` est ce qui marque une ADR comme dépassée.
+    texte = _lire("projects/ide-core/memory/decisions-archive.md")
+    sans_ligne = [
+        bloc.splitlines()[0]
+        for bloc in re.split(r"\n(?=## ADR-)", texte)
+        if bloc.startswith("## ADR-")
+        and re.search(r"remplacé par \*\*ADR-\d{3}", bloc)
+        and not re.search(r"\*\*Remplacée par\*\* : ADR-\d{3}", bloc)
+    ]
+
+    assert sans_ligne == [], f"sans ligne **Remplacée par** : {sans_ligne}"
+
+
 def test_l_archive_n_est_importee_nulle_part() -> None:
     # Elle existe pour *sortir* du prompt : l'importer annulerait le ticket.
     # `rglob` descend dans `.venv` avant de filtrer et échoue sur des entrées

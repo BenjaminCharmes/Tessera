@@ -1,14 +1,15 @@
 ---
-id: ticket-830
-title: "decisions.md keeps only the ADRs that still ground a rule, the rest go to the archive"
-type: chore
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-11-05
 depends_on: []
 estimated_days: 1
-created: 2026-11-05
+id: ticket-830
+pr_number: 923
+priority: medium
+status: done
+title: decisions.md keeps only the ADRs that still ground a rule, the rest go to the
+  archive
+type: chore
 ---
 
 # ticket-830 — decisions.md ne garde que les ADR qui fondent encore une règle
