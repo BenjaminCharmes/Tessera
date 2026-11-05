@@ -40,6 +40,7 @@ export type EventType =
   | "external_wait"
   | "conflict_resolution"
   | "visual_check"
+  | "run_anomaly"
   | "error";
 
 /** État du quota d'abonnement, diffusé par l'événement `quota_updated`. */
