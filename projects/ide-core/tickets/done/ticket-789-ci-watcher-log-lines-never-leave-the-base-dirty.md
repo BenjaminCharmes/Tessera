@@ -2,7 +2,7 @@
 id: ticket-789
 title: "CI watcher log lines never leave the base checkout dirty"
 type: fix
-status: todo
+status: done
 pr_number: null
 priority: high
 agent: codeur
@@ -43,9 +43,9 @@ quand aucune file n'est ouverte.
 
 ## Critères d'acceptation
 
-- [ ] Un test vérifie, sur un dépôt git temporaire dont le journal est suivi, qu'après
+- [x] Un test vérifie, sur un dépôt git temporaire dont le journal est suivi, qu'après
       `ajouter_au_log` `git status --porcelain` est vide et la ligne figure dans le fichier
       d'attente
-- [ ] Un test vérifie qu'avec un journal non suivi la ligne est ajoutée au journal, comme avant
-- [ ] Un test vérifie qu'une ligne mise en attente par CIWatcher est réécrite dans le journal de
+- [x] Un test vérifie qu'avec un journal non suivi la ligne est ajoutée au journal, comme avant
+- [x] Un test vérifie qu'une ligne mise en attente par CIWatcher est réécrite dans le journal de
       la branche du run suivant

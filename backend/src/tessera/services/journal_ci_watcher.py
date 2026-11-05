@@ -6,17 +6,25 @@ elles ne lisent aucun état du watcher.
 from datetime import datetime, timezone
 from pathlib import Path
 
+from tessera.services.journal_attente import attente_vers_fichier
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
 
 
 def ajouter_au_log(pipeline_log_path: Path | None, texte: str) -> None:
-    """Append one timestamped line to the pipeline log; never raises."""
+    """Append one timestamped line to the pipeline log; never raises.
+
+    CIWatcher writes after the checkout is back on the base: a line added to a
+    tracked log would leave that tree dirty, so it waits outside the repository
+    for the next run instead (ticket-789). An untracked log keeps the append.
+    """
     if pipeline_log_path is None:
         return
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
     line = f"- {ts} — {texte}\n"
+    if attente_vers_fichier(pipeline_log_path, line):
+        return
     try:
         pipeline_log_path.parent.mkdir(parents=True, exist_ok=True)
         with pipeline_log_path.open("a", encoding="utf-8") as f:

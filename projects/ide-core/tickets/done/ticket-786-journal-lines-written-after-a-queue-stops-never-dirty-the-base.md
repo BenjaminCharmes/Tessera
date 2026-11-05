@@ -2,7 +2,7 @@
 id: ticket-786
 title: "Journal lines written after a queue stops never leave the base dirty"
 type: fix
-status: todo
+status: done
 pr_number: null
 priority: high
 agent: codeur
@@ -41,8 +41,8 @@ fait sur la base (règle du dépôt).
 
 ## Critères d'acceptation
 
-- [ ] Un test vérifie, sur un dépôt git temporaire, qu'après une file interrompue dont la
+- [x] Un test vérifie, sur un dépôt git temporaire, qu'après une file interrompue dont la
       dernière ligne est écrite sur la base, `git status --porcelain` est vide
-- [ ] Un test vérifie que la ligne mise de côté figure dans le journal de la branche du run
+- [x] Un test vérifie que la ligne mise de côté figure dans le journal de la branche du run
       suivant, et que le fichier d'attente est vidé ensuite
-- [ ] Un test vérifie qu'un journal non suivi par git n'est ni mis de côté ni remis à `HEAD`
+- [x] Un test vérifie qu'un journal non suivi par git n'est ni mis de côté ni remis à `HEAD`
