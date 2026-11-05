@@ -1,14 +1,14 @@
 ---
-id: ticket-851
-title: "A module holds the supervisor closed action registry and its guards"
-type: feat
-status: todo
-priority: high
 agent: codeur
+created: 2026-11-05
 depends_on: []
 estimated_days: 1
-created: 2026-11-05
-pr_number: null
+id: ticket-851
+pr_number: 939
+priority: high
+status: done
+title: A module holds the supervisor closed action registry and its guards
+type: feat
 ---
 
 # ticket-851 — Le registre fermé des actions du superviseur, et ses gardes

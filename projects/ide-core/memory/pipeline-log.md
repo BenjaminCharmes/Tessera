@@ -7909,3 +7909,17 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-05 19:56:36 UTC — [ticket-850] validateur: APPROVED — Tous les tests critiques sont passés et l'implémentation de `RunRegistry.projet_ (109907ms)
 - 2026-11-05 19:56:36 UTC — [ticket-850] APPROVED après 1 tour(s)
 - 2026-11-05 19:58:15 UTC — [ticket-850] documentation: 0 fichier(s) (91375ms)
+- 2026-11-05 20:20:49 UTC — [ide-core] ticket-850 : base réalignée sur develop
+- 2026-11-05 20:20:49 UTC — [ide-core] ticket-850 PR #937 confiée au CIWatcher
+- 2026-11-05 20:04:07 UTC — [ticket-849] livraison: arrêt — PR #936 non mergée : CI failing : la PR #936 reste ouverte.
+- 2026-11-05 20:20:44 UTC — [ide-core] ticket-850 PR #937 mergée (CI verte)
+- 2026-11-05 20:20:54 UTC — [ticket-851] branche ticket-851-a-module-holds-the-supervisor-closed-action-regis
+- 2026-11-05 20:20:56 UTC — [ticket-851] tour 1 — codeur démarré
+- 2026-11-05 20:24:03 UTC — [ticket-851] tour 1 — codeur terminé (187297ms)
+- 2026-11-05 20:24:15 UTC — [ticket-851] testeur: dur�es : ruff 0 s, mypy 3 s, mypy-linux 2 s, pytest 9 s
+- 2026-11-05 20:25:52 UTC — [ticket-851] securite: PASS — Le ticket-851 introduit un service pur de validation des actions du superviseur  (96218ms)
+- 2026-11-05 20:25:52 UTC — [ticket-851] tour 1 — reviewer démarré
+- 2026-11-05 20:26:37 UTC — [ticket-851] tour 1 — reviewer terminé (44983ms)
+- 2026-11-05 20:27:48 UTC — [ticket-851] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (116500ms)
+- 2026-11-05 20:27:48 UTC — [ticket-851] APPROVED après 1 tour(s)
+- 2026-11-05 20:28:41 UTC — [ticket-851] documentation: 0 fichier(s) (43875ms)
