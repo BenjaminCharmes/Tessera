@@ -55,14 +55,19 @@ def _normalize_source(source_path: Path) -> Path:
     return candidate.resolve()
 
 
-def _refuse_too_broad(resolved: Path) -> None:
-    """Refuse a drive root, the home folder or one of its parents.
+def is_too_broad(resolved: Path) -> bool:
+    """Say whether a folder is a drive root, the home folder or one of its parents.
 
-    A linked import adds its target to the editor's writable roots: a folder
+    A linked project adds its target to the editor's writable roots: a folder
     this wide would make most of the machine writable.
     """
     home = Path.home().resolve()
-    if resolved.parent == resolved or resolved == home or resolved in home.parents:
+    return resolved.parent == resolved or resolved == home or resolved in home.parents
+
+
+def _refuse_too_broad(resolved: Path) -> None:
+    """Refuse an import whose source `is_too_broad`."""
+    if is_too_broad(resolved):
         raise ImportError(
             f"Ce dossier est trop large pour être importé : {resolved}. "
             "Choisis le dossier du projet lui-même."

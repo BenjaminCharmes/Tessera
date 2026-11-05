@@ -188,6 +188,46 @@ def test_un_lien_pose_dans_le_workspace_ne_donne_pas_acces_a_l_exterieur(
     assert "clef-privee" not in resp.text
 
 
+def test_a_link_to_the_home_folder_does_not_make_it_writable(
+    workspace: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Home factice : le test ne doit jamais toucher au vrai dossier personnel.
+    home = tmp_path / "home"
+    home.mkdir()
+    monkeypatch.setattr(Path, "home", classmethod(lambda cls: home))
+    try:
+        (workspace / "x").symlink_to(home, target_is_directory=True)
+    except (OSError, NotImplementedError):
+        pytest.skip("symlinks indisponibles sur cette machine")
+
+    resp = _client().put(
+        "/api/v1/fs/write", json={"path": str(home / "f.txt"), "content": "pwn"}
+    )
+
+    assert resp.status_code == 403
+    assert not (home / "f.txt").exists()
+
+
+def test_a_link_to_an_ordinary_project_folder_stays_writable(
+    workspace: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    home = tmp_path / "home"
+    project = home / "projets" / "ordinaire"
+    project.mkdir(parents=True)
+    monkeypatch.setattr(Path, "home", classmethod(lambda cls: home))
+    try:
+        (workspace / "lie").symlink_to(project, target_is_directory=True)
+    except (OSError, NotImplementedError):
+        pytest.skip("symlinks indisponibles sur cette machine")
+
+    resp = _client().put(
+        "/api/v1/fs/write", json={"path": str(project / "f.txt"), "content": "ok"}
+    )
+
+    assert resp.status_code == 204
+    assert (project / "f.txt").read_text(encoding="utf-8") == "ok"
+
+
 # ------------------------------------------------------------------
 # Fichiers qui s'exécutent seuls — ticket-707
 # ------------------------------------------------------------------

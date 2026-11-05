@@ -18,6 +18,7 @@ from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel
 
 from tessera.config import settings
+from tessera.services.project_importer import is_too_broad
 from tessera.utils.logger import get_logger
 from tessera.utils.noms_windows import normaliser_segments
 
@@ -55,9 +56,15 @@ def _workspace_roots() -> list[Path]:
         for child in workspace.iterdir():
             if child.is_symlink() and child.is_dir():
                 try:
-                    roots.append(child.resolve(strict=True))
+                    target = child.resolve(strict=True)
                 except OSError:
                     continue
+                # Même borne qu'à l'import : un lien créé avant elle, ou
+                # autrement, ne doit pas ouvrir le home ou un disque entier.
+                if is_too_broad(target):
+                    _logger.warning("fs_link_root_too_broad", extra={"path": str(target)})
+                    continue
+                roots.append(target)
     return roots
 
 
