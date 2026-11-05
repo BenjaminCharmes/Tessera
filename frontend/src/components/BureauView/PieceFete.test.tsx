@@ -6,8 +6,8 @@ import Piece from "./Piece";
 import { T0, etatApresPhase2 } from "./etatsDeTest";
 
 const LIVRAISON = { type: "livraison_done", data: { pr_number: 42, arret: null } } as const;
-const MERGEE = { type: "ci_merge_done", data: { merged: true } } as const;
-const REFUSEE = { type: "ci_merge_done", data: { merged: false } } as const;
+const MERGEE = { type: "ci_merge_done", data: { pr_number: 42, merged: true } } as const;
+const REFUSEE = { type: "ci_merge_done", data: { pr_number: 42, merged: false } } as const;
 
 beforeEach(() => {
   vi.spyOn(api.services, "list").mockResolvedValue([]);

@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { api } from "../../lib/api";
+import { INITIAL, applyEvent } from "../../hooks/streamState";
 import type { EventType } from "../../types/api";
 import Piece from "./Piece";
 import { T0, etatApresPipeline, nomme } from "./etatsDeTest";
@@ -82,5 +83,25 @@ describe("Piece during the delivery", () => {
 
     expect(container.querySelector('[data-agent="codeur"]')?.getAttribute("data-activite")).not.toBe("depose");
     expect(screen.queryByRole("img", { name: nomme("Codeur, dépose la PR", "codeur") })).toBeNull();
+  });
+});
+
+describe("Piece during the CI of a pull request (ticket-791)", () => {
+  const evt = (type: EventType, data: Record<string, unknown> = {}, agent: null = null) => ({
+    type, agent, ticket_id: "ticket-001", data, timestamp: "2026-10-27T10:00:00.000Z",
+  });
+  const enCi = applyEvent(INITIAL, evt("livraison_done", { pr_number: 4, arret: null }));
+
+  it("leaves the validator desk empty while it waits in the break room", () => {
+    render(<Piece projet="ide-core" etat={enCi} maintenant={T0} />);
+
+    expect(screen.getByRole("button", { name: /, validateur, / }).parentElement).toHaveAttribute("data-absent", "true");
+  });
+
+  it("keeps the validator at its desk when the current run occupies it", () => {
+    const etat = applyEvent(enCi, evt("validation_started"));
+    render(<Piece projet="ide-core" etat={etat} maintenant={T0} />);
+
+    expect(screen.getByRole("button", { name: /, validateur, / }).parentElement).toHaveAttribute("data-absent", "false");
   });
 });
