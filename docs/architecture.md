@@ -556,6 +556,15 @@ Chaque agent reçoit un contexte filtré selon sa portée définie dans les ADR 
 
 `adr_pertinents` (`backend/src/tessera/services/adr.py`) découpe à cette limite. Les ADRs au format `contraintes.md` (`contraintes_pour`) n'en ont pas besoin : leurs blocs s'arrêtent déjà au titre de niveau 2 suivant.
 
+### Composition du contexte : priorité aux contraintes
+
+Chaque agent reçoit deux fichiers de mémoire du projet, dans l'ordre de priorité :
+
+1. `memory/contraintes.md` — Les règles en vigueur pour le projet, spécifiques au rôle de l'agent
+2. `memory/decisions.md` — ADRs et décisions architecturales, en repli si le premier n'existe pas
+
+Le filtrage par rôle est implémenté dans les routers (`orchestrator.py`, `agents.py`, `chat.py`), qui passent par `services/adr.py`. Une contrainte est une ligne portant un label entre crochets — ex. `[codeur]` — indiquant son champ d'application. Les agents n'appliquent que les contraintes qui les concernent.
+
 ### Contraintes proposées (ticket-493)
 
 Les règles communes à tous les agents (`memory/contraintes.md`) sont injectées réduites au rôle dans chaque appel. Depuis le ticket-493, tout run qui doit proposer une nouvelle règle ne peut l'écrire que dans la section `## Proposées` en tête du fichier. Cette section n'est jamais injectée : seul le reste du fichier l'est dans les contextes des agents.
@@ -1014,6 +1023,20 @@ vérification plus faible.
 **Ce qui n'est pas fait** : le commit n'est jamais refusé même si la
 vérification s'affaiblit — c'est le rôle du reviewer et du validateur.
 
+### Écriture refusée dans les chemins protégés
+
+Les agents ne peuvent pas modifier certains fichiers système de l'IDE :
+
+- Workflows GitHub : `.github/workflows/`
+- Configuration Claude Code : `.claude/` (`settings*.json`, `skills/`, `commands/`, `agents/`)
+- Historique git : `.git/`
+- Registre des agents : `agents.json` (ADR-027, ticket-240)
+- Règles du projet : `CLAUDE.md`, `CLAUDE.local.md`
+
+Cette protection est implémentée dans `chemins_proteges.py`. Un ticket dont le livrable vit dans ces chemins se fait **à la main** : lancé dans le pipeline, il tourne trois tours sur un diff vide et se bloque. Le ticket peut porter la partie autorisée (tests, code métier) et indiquer que le reste est manuel.
+
+Une phrase du type « Ce ticket autorise la modification de `CLAUDE.md` » n'ouvre pas le garde-fou. La règle d'autorisation des modifications reste : seul un ticket explicite et autorisé peut proposer un changement, pas une phrase dans l'objectif.
+
 ## Synchronisation de la base au démarrage
 
 Au début de chaque run, avant la création de la branche, si un espace git et une branche de base sont connus et que l'arbre se trouve sur la base, l'orchestrateur appelle `sync_base_depuis_distant(base_branch)` (ticket-406). Cette fonction met les lignes de journal non commitées de côté, avance la base par `merge --ff-only` depuis le distant, puis réécrit les lignes à la suite.
@@ -1371,6 +1394,8 @@ Quand l'appel d'ouverture de la PR échoue avec une erreur de transport (`httpx.
 
 Pour récupérer cette PR orpheline, la phase 1 cherche une PR ouverte dont la branche de tête est celle du run courant (`GET /pulls?head=<owner>:<branche>&state=open`). Si elle existe, elle est traitée comme une `LivraisonInterrompue` avec `pr_orpheline=True` : elle passe au CIWatcher pour le suivi du statut CI. Si la recherche elle-même échoue ou qu'aucune PR n'est trouvée, l'arrêt d'origine est conservé sans nouvelle erreur.
 
+Le ticket-788 étend ce mécanisme aux erreurs serveur GitHub (réponses 5xx). Quand l'ouverture de PR échoue, le système cherche d'abord une PR déjà ouverte malgré l'erreur, avec des délais croissants de 2 et 5 secondes, avant de retenter l'ouverture une fois. Les délais sont définis dans `_DELAIS_RECHERCHE_S`.
+
 #### Retry automatique pour les indisponibilités GitHub
 
 Lors de la lecture du statut CI ou du merge d'une PR, une indisponibilité passagère de GitHub (502 Bad Gateway, 503 Service Unavailable, 504 Gateway Timeout) n'arrête plus le run. Le CIWatcher réessaye jusqu'à trois fois avec une attente croissante (1 s, 2 s, 4 s) avant abandon définitif. Les erreurs 4xx (403 Forbidden, 404 Not Found…) ne déclenchent pas de retry — elles reflètent une vraie permission manquante ou une ressource disparue (ticket-461).
@@ -1460,6 +1485,8 @@ Après le merge d'une PR, le workspace se réaligne sur la branche de base. Deux
 - **Fichiers non suivis et non ignorés laissés par le run** : listés au journal du pipeline, sans être supprimés.
 
 Résultat : `git pull` ne refuse jamais, et le workspace est propre pour le ticket suivant.
+
+Le ticket-789 améliore cet invariant en gérant les lignes écrites par le CIWatcher après le retour sur la base. Quand le journal du pipeline est suivi par git et que CIWatcher ajoute une ligne en arrière-plan, celle-ci est mise en attente dans un fichier hors du dépôt (nommé `tessera-pipeline-log-attente` dans le répertoire git commun) plutôt que d'être ajoutée directement au checkout. Le run suivant reprend ces lignes et les réécrit dans son journal avant de committer.
 
 ### Finalisation de tous les runs et journalisation des défaillances (tickets-377, 390)
 

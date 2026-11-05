@@ -12,6 +12,22 @@ Cette section n'est injectée dans aucun appel d'agent. Une règle nouvelle
 s'écrit ici, avec son ADR ; un humain l'accepte en la déplaçant dans sa
 section. (ADR-055)
 
+- **Un secret de Tessera se range dans le coffre du système, pas dans `.env`.**
+  Neuf noms, listés dans `coffre.py`. Lecture : variable d'environnement, coffre,
+  puis `.env`. `SECRETS_SOURCE=coffre` par défaut : sans coffre, ou coffre en
+  erreur, le backend ne démarre pas ; `env` se déclare pour la CI et Docker.
+  Jamais exporté dans l'environnement d'un sous-processus, jamais affiché ni
+  passé en argument de commande. (ADR-073, ADR-053)
+- **Aucun agent n'exécute le coffre.** Le garde d'ADR-053 refuse les commandes
+  Bash qui lancent `keyring`, `cmdkey` ou `coffre_cli`, plafond lexical compris :
+  il attrape une erreur, pas une évasion. (ADR-073, ADR-053)
+- **Une leçon de projet s'écrit sous `## Proposées` de `memory/lecons.md`, par
+  le service seul.** Un humain la déplace sous `## En vigueur`, la seule section
+  injectée (codeur, reviewer, après les contraintes qui priment ; 25 leçons,
+  4 Ko). Le service refuse une leçon hors forme, de plus de 200 caractères, sans
+  preuve citée du retour, en doublon ou qui affaiblit une vérification. Un diff
+  de run qui touche ce fichier met le run en `blocked`. (ADR-074, ADR-055)
+
 ## Git et périmètre d'écriture
 
 - **Un projet qui déclare `worktree` exécute chaque run dans son worktree,

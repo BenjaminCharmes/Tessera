@@ -672,3 +672,22 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 **Raison** : `pytest.ini` et `mypy.ini` priment sur `pyproject.toml`, et la configuration vitest de ce dépôt vit dans le bloc `test:` de `vite.config.ts` : la porte était inerte sur eux. Un ticket qui citait `frontend/src/x/vitest.config.ts` couvrait aussi `frontend/vitest.config.ts`.
 **Alternative rejetée** : lire le bloc `test:` de `vite.config.ts` seul — plus fin, mais un changement ailleurs dans ce fichier (alias, plugins) peut aussi désarmer les tests ; le ticket n'a qu'à le nommer.
 **Détail** : ticket-748 ; relevé par l'audit du 30/10.
+
+---
+
+## ADR-073 — Les secrets de Tessera vivent dans le coffre du système
+
+**Date** : 2026-11-05
+**Décision** : complète ADR-053. Neuf secrets (`ANTHROPIC_API_KEY`, `GITHUB_TOKEN`, les cinq jetons de mise en ligne, `STATIC_TOKEN`, `FORBIDDEN_TERMS`) vont dans le coffre du système, via `keyring`. Lecture : variable d'environnement, coffre, puis `.env`. `SECRETS_SOURCE=coffre` par défaut : sans coffre, ou coffre en erreur, le backend ne démarre pas ; `env` se déclare pour la CI et Docker. Un secret ne s'exporte jamais dans un sous-processus. Le hook `pre-push` lit par le backend et refuse s'il ne peut pas lire. Le garde d'ADR-053 refuse aussi les commandes qui exécutent le coffre.
+**Raison** : `.env` se lit, se copie et se synchronise ; le coffre chiffre au repos. Tout processus de l'utilisateur le lit pourtant : le plafond d'un jeton reste sa portée.
+**Alternative rejetée** : chiffrer `.env` — la clé de déchiffrement reste à côté.
+**Détail** : `docs/superpowers/specs/2026-11-05-secrets-dans-le-coffre-design.md`.
+
+---
+
+## ADR-074 — Les leçons d'un projet vivent dans `memory/lecons.md`
+
+**Date** : 2026-11-05
+**Décision** : après un run approuvé dont `review_feedback` n'est pas vide, le service, sans outils, écrit au plus une leçon « Quand <situation>, <action>. » sous `## Proposées` de `memory/lecons.md`, artefact d'ADR-021 et ADR-023. Un humain la déplace sous `## En vigueur`, seule section injectée, au codeur et au reviewer, sous les contraintes : 25 leçons, 4 Ko. Refus : hors forme, 200 caractères, preuve absente du retour, doublon, vérification affaiblie. Un diff de run qui touche ce fichier met le run en `blocked` (ADR-055). Une leçon dit un piège observé ; `decisions.md` dit un choix.
+**Raison** : ticket-736 a perdu trois tours sur des doubles de test ; un texte de modèle injecté sans relecture change la consigne de tous (ADR-055).
+**Alternative rejetée** : écriture directe par l'agent, ou activation automatique — la confiance accordée à un texte non relu est une décision humaine.
