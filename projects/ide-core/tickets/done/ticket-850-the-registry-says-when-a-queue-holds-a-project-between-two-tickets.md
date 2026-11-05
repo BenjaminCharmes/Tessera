@@ -1,14 +1,14 @@
 ---
-id: ticket-850
-title: "The registry says when a queue holds a project between two tickets"
-type: feat
-status: todo
-priority: high
 agent: codeur
+created: 2026-11-05
 depends_on: []
 estimated_days: 1
-created: 2026-11-05
-pr_number: null
+id: ticket-850
+pr_number: 937
+priority: high
+status: done
+title: The registry says when a queue holds a project between two tickets
+type: feat
 ---
 
 # ticket-850 — Le registre dit qu'une file tient un projet, y compris entre deux tickets

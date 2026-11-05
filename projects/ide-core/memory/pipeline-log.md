@@ -7898,3 +7898,14 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-05 19:40:13 UTC — [ticket-849] APPROVED après 2 tour(s)
 - 2026-11-05 19:40:41 UTC — [ticket-849] leçons: rien à retenir
 - 2026-11-05 19:48:15 UTC — [ticket-849] documentation: 2 fichier(s) (445813ms) — après tour de correction
+- 2026-11-05 19:49:02 UTC — [ide-core] ticket-849 PR #936 confiée au CIWatcher
+- 2026-11-05 19:49:10 UTC — [ticket-850] branche ticket-850-the-registry-says-when-a-queue-holds-a-project-be
+- 2026-11-05 19:49:11 UTC — [ticket-850] tour 1 — codeur démarré
+- 2026-11-05 19:50:47 UTC — [ticket-850] tour 1 — codeur terminé (95343ms)
+- 2026-11-05 19:53:36 UTC — [ticket-850] testeur: dur�es : ruff 0 s, mypy 6 s, mypy-linux 7 s, pytest 165 s
+- 2026-11-05 19:54:46 UTC — [ticket-850] securite: PASS — Le diff ajoute une méthode interne `projet_tenu_par_file()` au registry avec tes (70187ms)
+- 2026-11-05 19:54:46 UTC — [ticket-850] tour 1 — reviewer démarré
+- 2026-11-05 19:55:09 UTC — [ticket-850] tour 1 — reviewer terminé (23016ms)
+- 2026-11-05 19:56:36 UTC — [ticket-850] validateur: APPROVED — Tous les tests critiques sont passés et l'implémentation de `RunRegistry.projet_ (109907ms)
+- 2026-11-05 19:56:36 UTC — [ticket-850] APPROVED après 1 tour(s)
+- 2026-11-05 19:58:15 UTC — [ticket-850] documentation: 0 fichier(s) (91375ms)
