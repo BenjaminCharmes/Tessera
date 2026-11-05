@@ -6,11 +6,13 @@ from pathlib import Path
 from tests.test_providers_base import FakeProvider
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 from tessera.services.security_auditor import SecurityAuditorService
+from tessera.services.test_runner import TestResult
 from tessera.services.security_contexte import (
     NOT_DONE_MAX_CHARS,
     AuditContext,
     FollowingTicket,
     build_audit_context,
+    describe_test_outcome,
     extract_not_done,
 )
 
@@ -187,3 +189,60 @@ def test_the_prompts_carry_the_two_rules() -> None:
 
     assert "cite-le" in securite and "annoncée par ticket-075" in securite
     assert "faille atteignable entre deux tickets" in planificateur
+
+
+def _tests(passed: bool, errors: list[str] | None = None) -> TestResult:
+    return TestResult(
+        passed=passed,
+        total=12,
+        failed=0 if passed else 2,
+        output_summary="12 passed in 3s" if passed else "2 failed, 10 passed",
+        errors=errors or [],
+    )
+
+
+async def test_context_carries_the_test_outcome_only_when_the_tester_ran() -> None:
+    ticket = _ticket("ticket-074", body=_BODY)
+
+    with_tests = await build_audit_context(ticket, None, None, _tests(True))
+    without = await build_audit_context(ticket, None, None, None)
+
+    assert "12 passed" in with_tests.tests
+    assert without.tests == ""
+    assert "Résultat des tests" not in without.render()
+
+
+def test_describe_test_outcome_names_the_failures() -> None:
+    assert describe_test_outcome(None) == ""
+    text = describe_test_outcome(_tests(False, ["test_cp_moves", "test_rm_all"]))
+    assert "rouges" in text and "- test_cp_moves" in text and "- test_rm_all" in text
+
+
+async def test_audit_message_states_green_tests_as_a_fact(tmp_path: Path) -> None:
+    provider = FakeProvider()
+    provider.set_content(_critical_response())
+    context = await build_audit_context(_ticket("ticket-074"), None, None, _tests(True))
+
+    await SecurityAuditorService(provider, _PROMPTS).audit("+x = 1", tmp_path, context)
+
+    message = provider.calls[0]["user"]
+    assert "Les tests de ce tour sont verts : 12 passed in 3s" in message
+
+
+async def test_audit_message_lists_the_failing_tests(tmp_path: Path) -> None:
+    provider = FakeProvider()
+    provider.set_content(_critical_response())
+    context = await build_audit_context(
+        _ticket("ticket-074"), None, None, _tests(False, ["test_cp_moves"])
+    )
+
+    await SecurityAuditorService(provider, _PROMPTS).audit("+x = 1", tmp_path, context)
+
+    message = provider.calls[0]["user"]
+    assert "rouges" in message and "test_cp_moves" in message
+
+
+def test_the_security_prompt_ties_runtime_claims_to_the_test_result() -> None:
+    securite = " ".join((_PROMPTS / "securite.md").read_text(encoding="utf-8").split())
+
+    assert "échec à l'exécution" in securite and "s'accorder avec ce résultat" in securite
