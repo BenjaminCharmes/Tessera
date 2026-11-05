@@ -4,7 +4,7 @@ created: 2026-11-04
 depends_on: []
 estimated_days: 1
 id: ticket-790
-pr_number: null
+pr_number: 916
 priority: medium
 status: done
 title: A registry records which external tools our prompts borrow from, at which commit
