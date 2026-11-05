@@ -16,6 +16,8 @@ from collections.abc import Callable, Iterable
 from pathlib import Path
 from typing import Literal
 
+from tessera.services.noyau import reservation
+
 Genre = Literal["ticket", "adr"]
 
 BASE_PAR_DEFAUT = "develop"
@@ -186,3 +188,35 @@ def numeros_pris(
 def prochain_numero(depot: Path, genre: Genre, base: str = BASE_PAR_DEFAUT) -> int:
     """The largest number taken plus one."""
     return max(numeros_pris(depot, genre, base), default=0) + 1
+
+
+def cle_du_depot(depot: Path) -> str:
+    """Identity of the project that `depot` belongs to, shared by its worktrees.
+
+    Le dépôt commun de git plus le sous-dossier du projet : un worktree de run et
+    le checkout portent la même clé, deux projets d'un même dépôt non.
+    """
+    try:
+        lignes = lire_git(depot, "rev-parse", "--git-common-dir", "--show-prefix").split("\n")
+    except GitIllisible:
+        return str(depot.resolve())
+    commun = (depot / lignes[0]).resolve()
+    return f"{commun}|{lignes[1].strip() if len(lignes) > 1 else ''}"
+
+
+def reserver(depot: Path, genre: Genre, base: str, dossier_etat: Path) -> int:
+    """Return the next free number and record it: it is never returned twice.
+
+    Le plus grand numéro pris (arbre, base, branches) ou déjà réservé, plus un.
+    Un numéro réservé reste pris, utilisé ou non : un trou est sans importance.
+    """
+    dossier_etat.mkdir(parents=True, exist_ok=True)
+    fichier = dossier_etat / reservation.NOM_FICHIER
+    cle = cle_du_depot(depot)
+    with reservation.verrou(dossier_etat / reservation.NOM_VERROU):
+        reserves = reservation.lire(fichier)
+        deja = reserves.get(cle, {}).get(genre, 0)
+        numero = max(max(numeros_pris(depot, genre, base), default=0), deja) + 1
+        reserves.setdefault(cle, {})[genre] = numero
+        reservation.ecrire(fichier, reserves)
+    return numero

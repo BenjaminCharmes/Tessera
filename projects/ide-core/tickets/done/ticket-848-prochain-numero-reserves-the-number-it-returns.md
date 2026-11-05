@@ -1,14 +1,14 @@
 ---
-id: ticket-848
-title: "prochain_numero reserves the number it returns"
-type: feat
-status: todo
-priority: high
 agent: codeur
+created: 2026-11-05
 depends_on: []
 estimated_days: 1
-created: 2026-11-05
+id: ticket-848
 pr_number: null
+priority: high
+status: done
+title: prochain_numero reserves the number it returns
+type: feat
 ---
 
 # ticket-848 — `prochain_numero` réserve le numéro qu'il rend

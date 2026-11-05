@@ -7856,3 +7856,29 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-05 17:51:02 UTC — [ticket-847] APPROVED après 2 tour(s)
 - 2026-11-05 17:51:09 UTC — [ticket-847] fichiers non suivis laissés par le run : tickets/todo/ticket-848-prochain-numero-reserves-the-number-it-returns.md, tickets/todo/ticket-849-a-queue-refuses-tickets-absent-from-origin-base-before-it-opens.md, tickets/todo/ticket-850-the-registry-says-when-a-queue-holds-a-project-between-two-tickets.md, tickets/todo/ticket-851-a-module-holds-the-supervisor-closed-action-registry-and-its-guards.md, tickets/todo/ticket-852-the-supervisor-role-config-and-prompt-exist.md, tickets/todo/ticket-853-the-supervision-journal-is-written-by-the-service-only.md, tickets/todo/ticket-854-a-supervision-intervention-is-a-run-with-one-commit-per-action.md, tickets/todo/ticket-855-the-supervisor-turns-a-raw-report-into-a-ticket-in-place.md, tickets/todo/ticket-856-the-supervisor-decides-a-delegated-lesson-or-rule.md, tickets/todo/ticket-857-the-supervisor-hands-an-unwatched-green-pr-back-to-ciwatcher.md et 8 autres (à ignorer dans .gitignore ?)
 - 2026-11-05 17:55:25 UTC — [ticket-847] documentation: 2 fichier(s) (256358ms) — après tour de correction — refusé : doc-technique : description refusée — agents.json : règle « preuve » — l'extrait « def lire_lecons(memory_dir: Path) -> Lecons: » (backend/src/tessera/services/
+- 2026-11-05 17:56:35 UTC — [ide-core] ticket-847 PR #932 confiée au CIWatcher
+- 2026-11-05 18:03:58 UTC — [ide-core] ticket-847 PR #932 mergée (CI verte)
+- 2026-11-05 18:08:07 UTC — [ticket-848] branche ticket-848-prochain-numero-reserves-the-number-it-returns
+- 2026-11-05 18:08:10 UTC — [ticket-848] tour 1 — codeur démarré
+- 2026-11-05 18:12:25 UTC — [ticket-848] tour 1 — codeur terminé (255469ms)
+- 2026-11-05 18:21:17 UTC — [ticket-848] testeur: 1 failed, 1915 passed, 71 warnings in 527.13s (0:08:47)
+- 2026-11-05 18:21:17 UTC — [ticket-848] tests rouges au tour 1
+- 2026-11-05 18:21:17 UTC — [ticket-848] tour 2 — codeur démarré
+- 2026-11-05 18:22:40 UTC — [ticket-848] tour 2 — codeur terminé (82265ms)
+- 2026-11-05 18:31:19 UTC — [ticket-848] testeur: 1 failed, 1915 passed, 64 warnings in 514.74s (0:08:34)
+- 2026-11-05 18:31:19 UTC — [ticket-848] tests rouges au tour 2
+- 2026-11-05 18:31:19 UTC — [ticket-848] tour 3 — codeur démarré
+- 2026-11-05 18:33:18 UTC — [ticket-848] tour 3 — codeur terminé (119218ms)
+- 2026-11-05 18:46:35 UTC — [ticket-848] testeur: dur�es : mypy 2 s, mypy-linux 2 s, pytest 794 s
+- 2026-11-05 18:48:23 UTC — [ticket-848] securite: PASS — Ticket-848 introduit une réservation de numéros atomique et partagée entre workt (108077ms)
+- 2026-11-05 18:48:23 UTC — [ticket-848] tour 3 — reviewer démarré
+- 2026-11-05 18:48:47 UTC — [ticket-848] tour 3 — reviewer terminé (24250ms)
+- 2026-11-05 18:50:12 UTC — [ticket-848] validateur: APPROVED — Les quatre critères d'acceptation sont satisfaits. Le code implémente correcteme (109561ms)
+- 2026-11-05 18:50:12 UTC — [ticket-848] APPROVED après 3 tour(s)
+- 2026-11-05 18:51:26 UTC — [ticket-848] leçons: rien à retenir
+- 2026-11-05 18:57:10 UTC — [ticket-848] documentation: 3 fichier(s) (335906ms)
+- 2026-11-05 19:23:01 UTC — [ticket-848] livraison: rebase sur develop (17329ms)
+- 2026-11-05 19:23:01 UTC — [ticket-848] livraison: conflit résolu : backend/tests/test_prochain_numero.py (0ms)
+- 2026-11-05 19:23:01 UTC — [ticket-848] livraison: tests relancés après rebase : rouges (FAILED tests/test_ruff_propre.py::test_ruff_check_passes_on_src_and_tests - A... !!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!! !!!!!!!!!!!! xdist.dsession.Interrupted: stopping after 1 failures !!!!!!!!!!!! 1 failed, 4306 passed, 64 warnings in 776.66s (0:12:56) ruf) (1520703ms)
+- 2026-11-05 19:23:01 UTC — [ticket-848] livraison: branche remise sur 17dacf1 ; résolution de conflit abandonnée (0ms)
+- 2026-11-05 19:23:01 UTC — [ticket-848] livraison: arrêt — Tests rouges après rebase sur develop : rien n'est poussé. La base a avancé pendant le run et le tra

@@ -37,7 +37,9 @@ Trois choix le distinguent d'un assistant de code classique :
   pas affaiblir la vérification qui juge son code. Un diff qui touche la
   configuration des tests est signalé au reviewer pour vérification. Si un ticket
   exige une telle modification, le run s'arrête avant le premier tour avec un
-  message clair.
+  message clair. Quand un run se corrige après un premier refus, une leçon est
+  proposée — un pattern observé à valider. Les leçons approuvées renforcent le
+  contexte des futurs codeurs et reviewers sur ce projet.
 
 Après un run approuvé, seul le commit que le reviewer et le validateur ont lu
 est mergé : Tessera rejette d'office tout changement introduit ultérieurement

@@ -1746,6 +1746,14 @@ Production (ticket-803) : après un run approuvé, le service sans outils appell
 
 Protection du fichier (ticket-804) : le diff d'un run ne peut pas toucher `memory/lecons.md`, sauf s'il a été écrit par le service après approbation. Une ligne ajoutée, retirée ou déplacée par le codeur bloque le run avant le premier tour, avec message d'erreur.
 
+Après un run approuvé qui a dû se corriger — codeur relancé par le reviewer ou le testeur —, l'agent `lecons` propose une règle observée : une situation, une action, 200 caractères max. La leçon est écrite sous `## Proposées` de `memory/lecons.md`.
+
+Flux : humain valide en déplaçant sous `## En vigueur` — aucune autre ligne n'est modifiée, le placement est le seul geste admis. Codeur et reviewer reçoivent alors la section entière dans `## Leçons du projet` de leur contexte projet, via `adr_pertinents()`. Les autres rôles ne la voient pas.
+
+Garde : un diff qui touche `lecons.md` au tour du codeur bloque le run (`blocked`, raison `lessons_file_modified`). Le service écrit après le codeur seul. Un humain qui déplace une leçon le fait à la main, hors run — aucun conflit.
+
+Suivi du projet : le décompte `lecons_proposees` s'affiche dans la liste des projets.
+
 ## Gestion des signalements en attente (ticket-421)
 
 Quand un signalement (`POST /api/v1/signalements`, ticket-407) arrive pendant qu'un run ide-core est actif, il n'est pas écrit immédiatement dans l'arbre. Cela évite qu'il soit emporté dans le commit du run en cours — ce qui poluerait le diff réel avec une métadonnée Tessera.
@@ -1760,6 +1768,19 @@ Quand un signalement (`POST /api/v1/signalements`, ticket-407) arrive pendant qu
 4. Fichier `signalements_en_attente.json` vidé
 
 L'ordre est garanti : deux signalements reçoivent des `position` croissantes et sont écrits dans cet ordre.
+
+
+## Gestion des réglages globaux (ADR-075, tickets 805–808)
+
+Cinq réglages modifiables sans redémarrage — plafonds de dépense, délai de dialogue, limite de tests, veille machine — vivent dans un registre fermé et borné. Une porte unique : validation, stockage SQLite, cache en mémoire.
+
+Structure : `reglages.py` porte `REGISTRE` (cinq noms avec leurs bornes), `valider`, `du_moment` (lecture live), `figer` (épingle snapshot), `courants` (snapshot ou live selon contexte). Table `reglages` pour les surcharges ; `.env` inchangé. Absent, un réglage vaut son défaut de `.env`.
+
+Deux modes de lecture : **Hors run** — `du_moment()` lit `.env` + cache à chaque appel. **Pendant un run** — `figer()` épingle les valeurs à l'ouverture du run, la tâche en hérite via `courants()`. Modification pendant le run = inapplicable à ce run.
+
+Deux catégories d'effet : **« prochain_run »** (`run_max_budget_usd`, `llm_max_budget_usd`, `dialogue_timeout_s`) figées par run. **« machine »** (`max_parallel_test_runs`, `keep_awake_during_runs`) lues au moment où elles s'appliquent — limiteur relit la limite à chaque acquisition, `eveil.retenir()` la relit, `relacher()` non (tiré d'abord, no-op en dernier).
+
+Routes : `GET /api/v1/reglages` liste les cinq avec valeur courante, défaut, bornes, effet. `PUT /{nom}` pose surcharge (422 si hors bornes ou type faux, 404 si secret sans le nommer). `DELETE /{nom}` annule. Contrôle `Origin` strict pour PUT et DELETE : seules origines déclarées passent, pas tout port loopback.
 
 ## Validation des identifiants de projet (ticket-370)
 
