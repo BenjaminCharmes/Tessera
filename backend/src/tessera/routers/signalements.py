@@ -4,7 +4,7 @@ from typing import Literal
 
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, Field, field_validator
 
 from tessera.config import settings
 from tessera.models.ticket import Ticket, TicketType
@@ -23,17 +23,21 @@ attente.installer_vidage(PROJET_CIBLE)
 #: le triage reste une étape humaine.
 LIGNE_CRITERES = "- [ ] À écrire au triage"
 
+#: Bornes en caractères : un signalement est un résumé, pas un journal collé.
+MAX_DESCRIPTION = 20_000
+MAX_CONTEXTE = 20_000
+
 router = APIRouter(tags=["signalements"])
 
 
 class SignalementCreate(BaseModel):
     """Body of ``POST /signalements``."""
 
-    projet: str
+    projet: str = Field(max_length=100)
     nature: Literal["bug", "idee"]
-    titre: str
-    description: str
-    contexte: str = ""
+    titre: str = Field(max_length=200)
+    description: str = Field(max_length=MAX_DESCRIPTION)
+    contexte: str = Field(default="", max_length=MAX_CONTEXTE)
 
     @field_validator("titre", "description")
     @classmethod

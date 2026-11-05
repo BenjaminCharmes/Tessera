@@ -18,7 +18,8 @@ from tessera.utils.logger import get_logger
 _logger = get_logger(__name__)
 
 _GITHUB_URL_RE = re.compile(
-    r"^https://github\.com/[a-zA-Z0-9_.-]+/[a-zA-Z0-9_.-]+$"
+    # `\Z` et non `$` : `$` accepte aussi un saut de ligne final (ticket-758).
+    r"^https://github\.com/[a-zA-Z0-9_.-]+/[a-zA-Z0-9_.-]+\Z"
 )
 
 
@@ -28,13 +29,6 @@ def _sanitize_id(name: str) -> str:
 
 def _repo_name(repo_url: str) -> str:
     return repo_url.rstrip("/").rsplit("/", 1)[-1]
-
-
-def _build_clone_url(repo_url: str, github_token: str | None) -> str:
-    if not github_token:
-        return repo_url
-    path = repo_url[len("https://github.com/"):]
-    return f"https://{github_token}@github.com/{path}"
 
 
 class CloneError(Exception):
@@ -52,7 +46,6 @@ class GitCloneService:
         self,
         repo_url: str,
         project_id: str | None = None,
-        github_token: str | None = None,
     ) -> CloneProjectResponse:
         if not _GITHUB_URL_RE.match(repo_url):
             raise CloneError(
@@ -68,9 +61,9 @@ class GitCloneService:
                 f"Un projet avec l'id '{safe_id}' existe déjà dans le workspace."
             )
 
-        clone_url = _build_clone_url(repo_url, github_token)
+        # L'URL part telle quelle : un jeton dedans irait dans `.git/config`.
         try:
-            await self._run_clone(clone_url, dest)
+            await self._run_clone(repo_url, dest)
         except Exception:
             shutil.rmtree(dest, ignore_errors=True)
             raise

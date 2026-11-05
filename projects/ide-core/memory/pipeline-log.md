@@ -7658,3 +7658,27 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-05 08:57:28 UTC — [ticket-793] livraison: rebase sur develop (4594ms)
 - 2026-11-05 08:57:28 UTC — [ticket-793] livraison: tests relancés après rebase : rouges (Timeout après 1500s) (3000234ms)
 - 2026-11-05 08:57:28 UTC — [ticket-793] livraison: arrêt — Tests rouges après rebase sur develop : rien n'est poussé. La base a avancé pendant le run et le tra
+- 2026-11-05 08:58:06 UTC — [ticket-758] branche ticket-758-hardening-no-token-in-access-logs-or-remote-urls
+- 2026-11-05 08:58:11 UTC — [ticket-758] tour 1 — codeur démarré
+- 2026-11-05 09:04:04 UTC — [ticket-758] tour 1 — codeur terminé (352749ms)
+- 2026-11-05 09:17:03 UTC — [ticket-758] testeur: 1 failed, 2500 passed, 64 warnings in 772.62s (0:12:52)
+- 2026-11-05 09:17:03 UTC — [ticket-758] tests rouges au tour 1
+- 2026-11-05 09:17:03 UTC — [ticket-758] tour 2 — codeur démarré
+- 2026-11-05 09:18:00 UTC — [ticket-758] tour 2 — codeur terminé (57218ms)
+- 2026-11-05 09:22:53 UTC — [ide-core] ticket-761 retiré de la file
+- 2026-11-05 09:22:53 UTC — [ide-core] ticket-772 retiré de la file
+- 2026-11-05 09:22:53 UTC — [ide-core] ticket-774 retiré de la file
+- 2026-11-05 09:22:53 UTC — [ide-core] ticket-775 retiré de la file
+- 2026-11-05 09:22:53 UTC — [ide-core] ticket-776 retiré de la file
+- 2026-11-05 09:22:53 UTC — [ide-core] ticket-780 retiré de la file
+- 2026-11-05 09:22:53 UTC — [ide-core] ticket-783 retiré de la file
+- 2026-11-05 09:22:53 UTC — [ide-core] ticket-790 retiré de la file
+- 2026-11-05 09:22:53 UTC — [ide-core] ticket-773 retiré de la file
+- 2026-11-05 09:32:21 UTC — [ticket-758] testeur: dur�es : mypy 2 s, mypy-linux 6 s, pytest 858 s
+- 2026-11-05 09:34:50 UTC — [ticket-758] securite: PASS — Le diff renforce la sécurité en redactant les tokens WebSocket des logs uvicorn, (148641ms)
+- 2026-11-05 09:34:50 UTC — [ticket-758] tour 2 — reviewer démarré
+- 2026-11-05 09:35:07 UTC — [ticket-758] tour 2 — reviewer terminé (17437ms)
+- 2026-11-05 09:38:01 UTC — [ticket-758] validateur: fichiers cités joints : git_clone.py
+- 2026-11-05 09:38:01 UTC — [ticket-758] validateur: APPROVED — Tous les critères d'acceptation sont respectés : le jeton WebSocket n'apparaît p (191219ms)
+- 2026-11-05 09:38:01 UTC — [ticket-758] APPROVED après 2 tour(s)
+- 2026-11-05 09:42:02 UTC — [ticket-758] documentation: 1 fichier(s) (232953ms)

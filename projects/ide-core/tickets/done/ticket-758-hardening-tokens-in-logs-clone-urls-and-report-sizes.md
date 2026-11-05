@@ -1,14 +1,15 @@
 ---
-id: ticket-758
-title: "Hardening: no token in access logs or remote URLs, strict clone URLs, bounded reports"
-type: chore
-status: todo
-pr_number: null
-priority: low
 agent: codeur
+created: 2026-11-03
 depends_on: []
 estimated_days: 1
-created: 2026-11-03
+id: ticket-758
+pr_number: 908
+priority: low
+status: done
+title: 'Hardening: no token in access logs or remote URLs, strict clone URLs, bounded
+  reports'
+type: chore
 ---
 
 # ticket-758 — Durcissements : jeton hors des journaux et des remotes, URL de clone stricte, signalements bornés
