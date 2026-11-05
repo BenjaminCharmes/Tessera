@@ -1,14 +1,14 @@
 ---
-id: ticket-761
-title: "Dead code and stale notes left by the 30/10 refactors"
-type: chore
-status: todo
-pr_number: null
-priority: low
 agent: codeur
+created: 2026-11-03
 depends_on: []
 estimated_days: 1
-created: 2026-11-03
+id: ticket-761
+pr_number: 909
+priority: low
+status: done
+title: Dead code and stale notes left by the 30/10 refactors
+type: chore
 ---
 
 # ticket-761 — Code mort et notes périmées laissés par les refactorisations du 30/10

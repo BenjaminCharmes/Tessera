@@ -7682,6 +7682,18 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-05 09:38:01 UTC — [ticket-758] validateur: APPROVED — Tous les critères d'acceptation sont respectés : le jeton WebSocket n'apparaît p (191219ms)
 - 2026-11-05 09:38:01 UTC — [ticket-758] APPROVED après 2 tour(s)
 - 2026-11-05 09:42:02 UTC — [ticket-758] documentation: 1 fichier(s) (232953ms)
+- 2026-11-05 09:57:06 UTC — [ide-core] ticket-758 PR #908 confiée au CIWatcher
+- 2026-11-05 09:58:18 UTC — [ticket-761] branche ticket-761-dead-code-and-stale-notes-left-by-the-30-10-refac
+- 2026-11-05 09:58:19 UTC — [ticket-761] tour 1 — codeur démarré
+- 2026-11-05 10:03:55 UTC — [ticket-761] tour 1 — codeur terminé (335358ms)
+- 2026-11-05 10:04:29 UTC — [ide-core] ticket-758 PR #908 mergée (CI verte)
+- 2026-11-05 10:07:51 UTC — [ticket-761] testeur: dur�es : mypy 5 s, mypy-linux 8 s, pytest 233 s
+- 2026-11-05 10:09:04 UTC — [ticket-761] securite: PASS — Le diff est une refactorisation mineure et sûre : suppression de code inutilisé  (73125ms)
+- 2026-11-05 10:09:04 UTC — [ticket-761] tour 1 — reviewer démarré
+- 2026-11-05 10:09:23 UTC — [ticket-761] tour 1 — reviewer terminé (18297ms)
+- 2026-11-05 10:10:48 UTC — [ticket-761] validateur: APPROVED — Les trois critères d'acceptation ont été satisfaits : le code mort a été retiré, (103093ms)
+- 2026-11-05 10:10:48 UTC — [ticket-761] APPROVED après 1 tour(s)
+- 2026-11-05 10:14:02 UTC — [ticket-761] documentation: 0 fichier(s) (187030ms) — après tour de correction
 - 2026-11-05 10:18:26 UTC — [ide-core] ticket-761 PR #909 confiée au CIWatcher
 - 2026-11-05 10:18:33 UTC — [ticket-772] branche ticket-772-design-how-tessera-keeps-its-secrets-in-the-opera
 - 2026-11-05 10:18:35 UTC — [ticket-772] tour 1 — codeur démarré
