@@ -242,6 +242,8 @@ A_DEPLACER: dict[str, str] = {
     "run_lock": "pipeline",
     "run_recorder": "pipeline",
     "run_registry": "pipeline",
+    "run_occupe": "pipeline",
+    "run_suivi": "pipeline",
     "run_status": "pipeline",
     "signalements_en_attente": "pipeline",
     # file
