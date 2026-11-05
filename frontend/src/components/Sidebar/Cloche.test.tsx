@@ -124,7 +124,7 @@ describe("Cloche", () => {
     await userEvent.click(screen.getByRole("button", { name: "Notifications" }));
     await userEvent.click(screen.getByRole("tab", { name: "Réglages" }));
 
-    expect(screen.getAllByRole("checkbox")).toHaveLength(14);
+    expect(screen.getAllByRole("checkbox")).toHaveLength(16);
     const systeme = screen.getByLabelText("Question d'un agent : système");
     const son = screen.getByLabelText("Question d'un agent : son");
     expect(systeme).toBeChecked();
@@ -133,6 +133,20 @@ describe("Cloche", () => {
 
     await userEvent.click(systeme);
     expect(setReglage).toHaveBeenCalledWith("question", "systeme", false);
+  });
+
+  it("test_cloche_settings_tab_lists_the_anomalie_type_with_its_switches", async () => {
+    const setReglage = vi.fn();
+    render(<Cloche cloche={donnees({ setReglage })} />);
+    await userEvent.click(screen.getByRole("button", { name: "Notifications" }));
+    await userEvent.click(screen.getByRole("tab", { name: "Réglages" }));
+
+    expect(screen.getByRole("rowheader", { name: "Anomalie d'un run" })).toBeInTheDocument();
+    expect(screen.getByLabelText("Anomalie d'un run : système")).toBeChecked();
+    expect(screen.getByLabelText("Anomalie d'un run : son")).not.toBeChecked();
+
+    await userEvent.click(screen.getByLabelText("Anomalie d'un run : son"));
+    expect(setReglage).toHaveBeenCalledWith("anomalie", "son", true);
   });
 
   it("closes on Escape", async () => {

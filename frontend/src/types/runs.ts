@@ -79,6 +79,30 @@ export interface RunRequest {
 }
 
 /** L'instantane des runs vivants, envoye a la connexion sur `/observe`. */
+/** Les six règles du détecteur d'anomalies (ADR-078, ticket-834). */
+export type RegleAnomalie =
+  | "outil_repete"
+  | "etape_longue"
+  | "silence"
+  | "cout_anormal"
+  | "tours_de_revue"
+  | "blocages_identiques";
+
+/** Une anomalie relevée sur un run, telle que `run_anomaly` la porte. Jamais l'`input` d'un outil. */
+export interface Anomalie {
+  /** Une règle que ce client ne connaît pas se rend avec son identifiant brut. */
+  regle: RegleAnomalie | (string & {});
+  /** Clé de dédoublonnage : un épisode, pas une règle. */
+  cle: string;
+  ticket_id: string;
+  message: string;
+  mesure: number;
+  seuil: number;
+  unite: "appels" | "s" | "usd" | "pourcent" | "tours" | "runs";
+  etape?: string | null;
+  agent?: string | null;
+}
+
 export interface RunActif {
   run_id: string;
   project_id: string;
@@ -117,6 +141,8 @@ export interface RunActif {
   file_restants?: string[];
   /** Les tickets que la file a déjà traités (ticket-179). */
   file_faits?: string[];
+  /** Les anomalies que le détecteur a relevées, 20 au plus (ADR-078). Absent sur un backend ancien. */
+  anomalies?: Anomalie[];
   demarre_a: string;
 }
 

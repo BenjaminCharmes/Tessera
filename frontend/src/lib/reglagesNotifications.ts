@@ -15,6 +15,15 @@ export interface ReglageDuType {
 
 export type ReglagesParType = Record<TypeNotif, ReglageDuType>;
 
+/**
+ * Ce qu'un réglage mémorisé peut contenir : il date parfois d'avant un type.
+ * Ces types-là, absents, ne le rendent pas invalide ; `completerReglages` leur
+ * donne le défaut au lieu de jeter les cases que l'utilisateur a réglées.
+ */
+export type ReglagesMemorises = Partial<ReglagesParType>;
+
+const TYPES_AJOUTES_APRES: readonly TypeNotif[] = ["anomalie"];
+
 export const CLE_REGLAGES_PAR_TYPE = "notifications.types";
 
 export const LIBELLES_TYPE: Record<TypeNotif, string> = {
@@ -25,6 +34,7 @@ export const LIBELLES_TYPE: Record<TypeNotif, string> = {
   merge: "PR mergée",
   ci_rouge: "CI rouge ou merge refusé",
   quota_bas: "Quota bas",
+  anomalie: "Anomalie d'un run",
 };
 
 const AVEC_SON: readonly TypeNotif[] = ["question", "ci_rouge"];
@@ -44,8 +54,15 @@ function estReglageDuType(v: unknown): v is ReglageDuType {
 }
 
 /** Un réglage mémorisé auquel il manque un type ne vaut rien : les défauts servent. */
-export function estReglagesParType(v: unknown): v is ReglagesParType {
+export function estReglagesParType(v: unknown): v is ReglagesMemorises {
   if (typeof v !== "object" || v === null) return false;
   const r = v as Record<string, unknown>;
-  return TYPES_NOTIF.every((type) => estReglageDuType(r[type]));
+  return TYPES_NOTIF.every(
+    (type) => (r[type] === undefined && TYPES_AJOUTES_APRES.includes(type)) || estReglageDuType(r[type]),
+  );
+}
+
+/** Complète un réglage mémorisé avec les défauts des types qu'il ne connaissait pas. */
+export function completerReglages(memorises: ReglagesMemorises): ReglagesParType {
+  return { ...reglagesParDefaut(), ...memorises };
 }

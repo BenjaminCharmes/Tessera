@@ -2,6 +2,7 @@ import type { RunActif } from "../types/api";
 import type { StreamState } from "../hooks/streamState";
 import { enEtapeSilencieuse } from "./santeAgent";
 import type { SanteAgent } from "./santeAgent";
+import { libelleDeRegle } from "./anomalies";
 import { notificationsQuota } from "./notifQuota";
 import type { RelevesDeQuota } from "./notifQuota";
 
@@ -25,6 +26,7 @@ export const TYPES_NOTIF = [
   "merge",
   "ci_rouge",
   "quota_bas",
+  "anomalie",
 ] as const;
 
 /** Le genre d'événement : c'est lui que les réglages de la cloche choisissent (ticket-554). */
@@ -95,12 +97,32 @@ function notifLivraison(run: RunActif, etat: StreamState, precedent: StreamState
   };
 }
 
+/**
+ * Une notification par anomalie apparue depuis l'instantané précédent (ADR-078).
+ * Un run absent de l'instantané précédent n'en rend aucune : ce qui existe à la
+ * connexion est la base, pas un message.
+ */
+function notifsAnomalies(run: RunActif, avant: Instantane): Notif[] {
+  const precedent = avant.runs.find((r) => r.run_id === run.run_id);
+  if (!precedent) return [];
+  const vues = new Set((precedent.anomalies ?? []).map((a) => a.cle));
+  return (run.anomalies ?? [])
+    .filter((a) => !vues.has(a.cle))
+    .map((a) => ({
+      projectId: run.project_id,
+      type: "anomalie" as const,
+      titre: `${nom(run)} : ${libelleDeRegle(a.regle)}`,
+      corps: a.message,
+    }));
+}
+
 export function notificationsPour(avant: Instantane, apres: Instantane): Notif[] {
   const notifs: Notif[] = [];
 
   for (const run of apres.runs) {
     const etat = apres.etats[run.run_id];
     const precedent = avant.etats[run.run_id];
+    notifs.push(...notifsAnomalies(run, avant));
     if (!etat) continue;
     if (etat.pendingQuestion && etat.pendingQuestion !== precedent?.pendingQuestion) {
       notifs.push({
