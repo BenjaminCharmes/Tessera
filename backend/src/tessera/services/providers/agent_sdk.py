@@ -72,7 +72,7 @@ from tessera.services.providers.messages_sdk import (
 )
 from tessera.services.providers.noms import ProviderIndisponible
 from tessera.services.providers.prompt_fichier import prompt_systeme_pour_sdk
-from tessera.services.quota_tracker import QuotaTracker
+from tessera.services.usage.quota_tracker import QuotaTracker
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

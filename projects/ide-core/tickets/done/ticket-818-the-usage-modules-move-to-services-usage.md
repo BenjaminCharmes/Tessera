@@ -2,7 +2,7 @@
 id: ticket-818
 title: "The usage modules move to services/usage"
 type: refactor
-status: todo
+status: done
 pr_number: null
 priority: low
 agent: codeur
@@ -30,11 +30,11 @@ ADR-076 ; section `usage` de `memory/services-domaines.md`. `providers/` importe
 
 ## Critères d'acceptation
 
-- [ ] Les huit modules de la section `usage` sont sous `services/usage/`, aucun n'est resté à plat
-- [ ] `A_DEPLACER` n'a plus d'entrée `usage`, `ECARTS_DOMAINES` n'a grandi d'aucune ligne
-- [ ] Aucune occurrence des anciens chemins pointés ne reste dans `backend/src`, `backend/tests`,
+- [x] Les huit modules de la section `usage` sont sous `services/usage/`, aucun n'est resté à plat
+- [x] `A_DEPLACER` n'a plus d'entrée `usage`, `ECARTS_DOMAINES` n'a grandi d'aucune ligne
+- [x] Aucune occurrence des anciens chemins pointés ne reste dans `backend/src`, `backend/tests`,
       `scripts/`, `Makefile`
-- [ ] Le diff n'est que des renommages et des lignes d'import ou de chaîne ; la suite passe
+- [x] Le diff n'est que des renommages et des lignes d'import ou de chaîne ; la suite passe
 
 ## Ce que ça ne fait pas
 
@@ -44,3 +44,7 @@ Aucun changement de comportement, aucun calcul de coût modifié.
 
 Le calcul de coût est testé par chaîne dans plusieurs fichiers : relire les restes de
 `tessera.services.cost_calculator` et `tessera.services.quota_tracker` avec `grep`.
+
+## Notes de réalisation
+
+Huit modules, comme annoncé, mais pas les mêmes : `cost_calculator` est passé dans `noyau` au ticket-826 (`scripts/domaines_services.py` fait foi) ; `scripts/mesure_calculs.py`, qui l'importe, se relit donc au ticket-824. Seuls des documents historiques citent les anciens chemins : ils restent tels quels.

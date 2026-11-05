@@ -9,7 +9,7 @@ from fastapi.testclient import TestClient
 from tessera.config import settings
 from tessera.main import app
 from tessera.services.database import init_db
-from tessera.services.usage_stats import usage_stats
+from tessera.services.usage.usage_stats import usage_stats
 
 TODAY = date(2026, 9, 28)
 

@@ -8,7 +8,7 @@ from pathlib import Path
 
 import aiosqlite
 
-from tessera.services.agent_calls import save_agent_call
+from tessera.services.usage.agent_calls import save_agent_call
 from tessera.services.database import init_db
 from tessera.services.database_events import save_event
 from tessera.services.database_runs import (

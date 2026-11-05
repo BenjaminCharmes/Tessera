@@ -11,7 +11,7 @@ class name, so the module loads even where the SDK is absent.
 import re
 from datetime import timezone
 
-from tessera.services.quota_tracker import QuotaSnapshot
+from tessera.services.usage.quota_tracker import QuotaSnapshot
 
 _QUOTA_TEXT_RE = re.compile(r"usage limit|rate limit|allowance|hit your limit", re.IGNORECASE)
 

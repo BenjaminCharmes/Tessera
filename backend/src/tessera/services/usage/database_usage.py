@@ -6,7 +6,7 @@ from typing import Any
 import aiosqlite
 from pydantic import BaseModel
 
-from tessera.services.cost_aggregate import CostColumn, aggregate_cost
+from tessera.services.usage.cost_aggregate import CostColumn, aggregate_cost
 
 
 class TicketUsage(BaseModel):

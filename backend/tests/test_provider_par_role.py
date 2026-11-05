@@ -18,7 +18,7 @@ from tessera.config import settings
 from tessera.main import app
 from tessera.models.agent import AgentConfig, AgentRole
 from tessera.services import project_loader
-from tessera.services.agent_calls import save_agent_call
+from tessera.services.usage.agent_calls import save_agent_call
 from tessera.services.database import init_db
 from tessera.services.database_runs import create_run
 from tessera.services.documentation.documentation import DocumentationService

@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any, Literal, TYPE_CHECKING
 
 from tessera.services.providers.base import LLMProvider
-from tessera.services.quota_exhaustion import is_quota_exhausted
+from tessera.services.usage.quota_exhaustion import is_quota_exhausted
 from tessera.services.verdicts.validator_cited_files import (
     CitedFilesReport,
     build_cited_files_section,

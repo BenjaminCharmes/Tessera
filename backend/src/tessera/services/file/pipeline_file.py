@@ -22,7 +22,7 @@ from tessera.services.file.pipeline_file_reprise import est_non_livre, relivrer_
 from tessera.services.file.pipeline_file_tour import Tour, progres
 from tessera.services.pipeline_fin_de_file import nettoyer_apres_file
 from tessera.services.pipeline_run import tolerant
-from tessera.services.session_limit import extract_reset_time_from_arret
+from tessera.services.usage.session_limit import extract_reset_time_from_arret
 from tessera.utils.logger import get_logger
 
 if TYPE_CHECKING:

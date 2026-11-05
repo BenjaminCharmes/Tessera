@@ -46,9 +46,9 @@ from tessera.services.pipeline_text import (
     _echec_de_tests,
     _first_line,
 )
-from tessera.services.quota_exhaustion import is_quota_exhausted, resume_label
+from tessera.services.usage.quota_exhaustion import is_quota_exhausted, resume_label
 from tessera.services.pipeline_reprise import reprendre_sans_codeur, verifier_travail_repris
-from tessera.services.session_limit import (
+from tessera.services.usage.session_limit import (
     extract_reset_time,
     is_session_limit,
 )
@@ -58,7 +58,7 @@ if TYPE_CHECKING:
     from tessera.services.providers.refus_garde import JournalDesRefus
     from tessera.services.agents.carte_du_depot import CarteDuDepot
     from tessera.services.verification.controle_visuel import ControleVisuel
-    from tessera.services.quota_tracker import QuotaTracker
+    from tessera.services.usage.quota_tracker import QuotaTracker
     from tessera.services.run_recorder import RunRecorder
     from tessera.services.worktrees.run_worktree import RunWorktree
     from tessera.services.git_workspace import GitWorkspaceService

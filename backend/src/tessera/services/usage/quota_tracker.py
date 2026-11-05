@@ -17,7 +17,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any, Literal, Optional
 
-from tessera.services.quota_registry import QUOTA_REGISTRY
+from tessera.services.usage.quota_registry import QUOTA_REGISTRY
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

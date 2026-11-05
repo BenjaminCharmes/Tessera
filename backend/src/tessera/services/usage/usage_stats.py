@@ -24,7 +24,7 @@ from tessera.models.usage import (
     UsageStats,
     UsageTotals,
 )
-from tessera.services.cost_aggregate import CostColumn, aggregate_cost
+from tessera.services.usage.cost_aggregate import CostColumn, aggregate_cost
 
 #: Les périodes que l'écran propose ; l'endpoint refuse les autres.
 PERIODS = (7, 30, 90)

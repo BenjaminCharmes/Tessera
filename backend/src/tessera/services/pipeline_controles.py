@@ -22,7 +22,7 @@ from tessera.services.pipeline_events import (
 from tessera.services.pipeline_outcomes import finish_security_block
 from tessera.services.pipeline_run import PipelineRun, emit
 from tessera.services.pipeline_text import _extract_criteria
-from tessera.services.quota_exhaustion import is_quota_exhausted
+from tessera.services.usage.quota_exhaustion import is_quota_exhausted
 from tessera.services.verdicts.reviewer_schema import REVIEWER_SCHEMA
 from tessera.services.verdicts.security_auditor import SecurityAuditResult
 from tessera.services.verdicts.security_contexte import build_audit_context

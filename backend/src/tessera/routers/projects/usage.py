@@ -6,7 +6,7 @@ from tessera.config import settings
 from tessera.models.usage import UsageBreakdown
 from tessera.routers.projects.shared import new_router
 from tessera.services.database_runs import PipelineRunSummary, list_runs
-from tessera.services.database_usage import (
+from tessera.services.usage.database_usage import (
     ProjectUsage,
     get_project_usage,
     get_usage_breakdown,

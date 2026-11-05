@@ -75,15 +75,6 @@ A_DEPLACER: dict[str, str] = {
     "ticket_archive": "projets",
     "ticket_check": "projets",
     "ticket_service": "projets",
-    # usage
-    "agent_calls": "usage",
-    "cost_aggregate": "usage",
-    "database_usage": "usage",
-    "quota_exhaustion": "usage",
-    "quota_registry": "usage",
-    "quota_tracker": "usage",
-    "session_limit": "usage",
-    "usage_stats": "usage",
     # gardes
     "config_tests_touchee": "gardes",
     "contraintes_touchees": "gardes",

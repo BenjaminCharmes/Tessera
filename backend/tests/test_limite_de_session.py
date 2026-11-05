@@ -14,7 +14,7 @@ from tessera.services.orchestrator import Orchestrator
 from tessera.services.pipeline_events import EventType, OrchestratorEvent, PipelineResult
 from tessera.services.pipeline_run import PipelineRun
 from tests.doubles_git import GitWorkspaceDouble
-from tessera.services.session_limit import (
+from tessera.services.usage.session_limit import (
     extract_reset_time,
     is_session_limit,
 )

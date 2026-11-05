@@ -6,8 +6,8 @@ import pytest
 from fastapi.testclient import TestClient
 
 from tessera.main import app
-from tessera.services.quota_registry import QUOTA_REGISTRY, QuotaRegistry
-from tessera.services.quota_tracker import QuotaSnapshot, QuotaTracker
+from tessera.services.usage.quota_registry import QUOTA_REGISTRY, QuotaRegistry
+from tessera.services.usage.quota_tracker import QuotaSnapshot, QuotaTracker
 
 NOW = datetime(2026, 10, 24, 12, 0, tzinfo=timezone.utc)
 

@@ -17,7 +17,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     # `QuotaTracker` inscrit ses relevés ici : l'import à l'exécution serait circulaire.
-    from tessera.services.quota_tracker import QuotaSnapshot
+    from tessera.services.usage.quota_tracker import QuotaSnapshot
 
 # Un relevé sans fenêtre garde sa place, mais sous une clé qui ne se confond
 # avec aucune fenêtre réelle : afficher « five_hour » à l'aveugle serait faux.
