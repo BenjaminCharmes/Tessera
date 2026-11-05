@@ -701,3 +701,14 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 **Raison** : l'API est ouverte quand `STATIC_TOKEN` est vide et un agent a `Bash` : ni lui ni une page locale ne doivent relever un plafond.
 **Alternative rejetée** : réécrire `.env` — le redémarrage coupe les runs ; appliquer à chaud — un plafond bougerait sous un run.
 **Détail** : `docs/superpowers/specs/2026-11-05-reglages-globaux-design.md`.
+
+---
+
+## ADR-077 — Un outil externe dont on s'inspire s'inscrit au registre et ne se suit jamais en direct
+
+**Date** : 2026-11-05
+**Portée** : architect, codeur
+**Décision** : aucun outil externe n'est suivi en direct : rien ne s'installe pour se mettre à jour seul. Par défaut on réécrit les idées (`idées réécrites`). Une `copie épinglée` (texte repris tel quel, commit précis, attribution) exige un outil de pur texte, sous licence libre compatible, sans binaire, réseau, télémétrie ni hook, qui tient dans le budget de contexte du rôle qui le charge. Toute reprise s'inscrit dans `docs/inspirations.md`. Une nouvelle version d'un outil inscrit ouvre un ticket « relire l'écart et reporter ce qui vaut », jamais une mise à jour automatique.
+**Raison** : un skill est un texte que le modèle exécute ; un changement en amont modifierait les agents sans revue (ADR-055).
+**Alternative rejetée** : laisser les outils se mettre à jour, ou ne rien noter (ticket-715).
+**Détail** : ticket-790.
