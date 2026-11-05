@@ -43,6 +43,10 @@ export default function BureauConnecte({
     projects.map((p) => p.id),
   );
 
+  const leconsAValider = Object.fromEntries(
+    projects.map((p) => [p.id, p.lecons_proposees ?? 0]),
+  );
+
   function ranger(ids: string[]) {
     fermerRuns(ids);
   }
@@ -85,6 +89,7 @@ export default function BureauConnecte({
             onOuvrir={onOuvrirFil}
             onRanger={(runId) => ranger([runId])}
             onOpenProject={onOpenProject && ouvrirLeProjet}
+            leconsAValider={leconsAValider}
           />
         </div>
       )}

@@ -108,6 +108,11 @@ def section_lecons(memory_dir: Path) -> str:
     return f"{TITRE_SECTION_LECONS}\n{ENTETE_SECTION_LECONS}\n{corps}"
 
 
+def nombre_proposees(memory_dir: Path) -> int:
+    """How many lessons wait under `## Proposées`; 0 without a readable file."""
+    return len(lire_lecons(memory_dir).proposees)
+
+
 def refus_de_lecon(texte: str, preuve: str, existantes: Lecons, retour: str) -> str | None:
     """Why `texte` is refused as a lesson, or None when it is acceptable.
 

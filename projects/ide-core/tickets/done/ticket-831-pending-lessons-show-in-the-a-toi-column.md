@@ -2,7 +2,7 @@
 id: ticket-831
 title: "Lessons waiting for approval show in the « À toi » column"
 type: feat
-status: todo
+status: done
 pr_number: null
 priority: medium
 agent: codeur
@@ -37,11 +37,11 @@ ce qui attend Benjamin (questions, PR à relire).
 
 ## Critères d'acceptation
 
-- [ ] Un test backend vérifie que `lecons_proposees` vaut le nombre de lignes sous `## Proposées`
+- [x] Un test backend vérifie que `lecons_proposees` vaut le nombre de lignes sous `## Proposées`
       d'un `memory/lecons.md` temporaire, et 0 sans fichier
-- [ ] Un test de `frontend/src/lib/bureau/aToi.test.ts` vérifie la ligne « 2 leçons à valider »
+- [x] Un test de `frontend/src/lib/bureau/aToi.test.ts` vérifie la ligne « 2 leçons à valider »
       pour un projet qui en a deux, et aucune ligne pour un projet à 0
-- [ ] Un test de `ColonneAToi.test.tsx` vérifie que la ligne s'affiche avec le nom du projet
+- [x] Un test de `ColonneAToi.test.tsx` vérifie que la ligne s'affiche avec le nom du projet
 
 ## Ce que ça ne fait pas
 

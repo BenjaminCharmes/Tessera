@@ -120,6 +120,32 @@ describe("ColonneAToi", () => {
     expect(screen.queryByLabelText("Réponse pour projet-a")).not.toBeInTheDocument();
   });
 
+  it("shows the pending lessons with the project name and the file", () => {
+    const envoyer = vi.fn();
+    render(
+      <BureauView
+        projets={[{ nom: "projet-a", etat: INITIAL }]}
+        envoyer={envoyer}
+        son={{ actif: true, regler: vi.fn() }}
+        leconsAValider={{ "projet-a": 2, "projet-b": 0 }}
+      />,
+    );
+
+    const colonne = screen.getByRole("complementary", { name: "À toi" });
+    expect(within(colonne).getByText("Leçons")).toBeInTheDocument();
+    expect(within(colonne).getByText("projet-a")).toBeInTheDocument();
+    expect(within(colonne).getByText(/2 leçons à valider/)).toHaveTextContent("memory/lecons.md");
+    expect(within(colonne).queryByText("projet-b")).not.toBeInTheDocument();
+    expect(within(colonne).queryByText("Rien n'attend ta réponse.")).not.toBeInTheDocument();
+  });
+
+  it("shows no lesson line when no project has a pending lesson", () => {
+    rendre([{ nom: "projet-a", etat: INITIAL }]);
+
+    expect(screen.queryByText("Leçons")).not.toBeInTheDocument();
+    expect(screen.getByText("Rien n'attend ta réponse.")).toBeInTheDocument();
+  });
+
   it("flips the sound setting through the Bureau button", () => {
     const { son } = rendre([{ nom: "projet-a", etat: INITIAL }], { actif: true, regler: vi.fn() });
 
@@ -141,7 +167,7 @@ function ColonneSurLaCloche() {
     actif: cloche.reglages.question.son,
     regler: (v: boolean) => cloche.setReglage("question", "son", v),
   };
-  const contenu = { questions: [], figes: [], prs: [] };
+  const contenu = { questions: [], figes: [], prs: [], lecons: [] };
   return <ColonneAToi contenu={contenu} maintenant={0} onAnswer={vi.fn()} son={son} />;
 }
 
