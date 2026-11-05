@@ -4,6 +4,7 @@ Une anomalie est un constat, jamais un ordre : elle dit qu'un run sort de
 l'ordinaire, et c'est tout. Les six règles sont décrites dans la spec
 `2026-11-05-detecteur-d-anomalies-design.md`.
 """
+from dataclasses import dataclass
 from typing import Literal
 
 from pydantic import BaseModel, Field
@@ -37,3 +38,16 @@ class Anomalie(BaseModel):
     unite: Unite
     etape: str | None = None
     agent: str | None = None
+
+
+@dataclass(frozen=True)
+class AppelOutil:
+    """One tool call of an agent, reduced to what compares: never its input."""
+
+    id: int
+    agent: str | None
+    tool: str
+    #: Hachage du JSON canonique de l'`input` : deux appels identiques ont le
+    #: même, et le contenu (chemin, jeton) ne quitte jamais la lecture (ADR-053).
+    input_hash: str
+    ticket_id: str
