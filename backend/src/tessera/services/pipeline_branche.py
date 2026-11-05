@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Optional
 
 from tessera.models.ticket import TicketStatus
-from tessera.services import journal_en_attente, pipeline_fin_de_file as fin_de_file
+from tessera.services import journal_attente, journal_en_attente, pipeline_fin_de_file as fin_de_file
 from tessera.services.git_workspace import GitWorkspaceError, NotAGitRepository
 from tessera.services.pipeline_events import EventType, PipelineResult
 from tessera.services.pipeline_rangement import ranger_les_bloques_livres
@@ -108,6 +108,9 @@ async def create_branch(
 
     racine = orch._project_path
     lignes = await journal_en_attente.mettre_de_cote(racine) if racine else []
+    if racine:
+        # Lignes rangées hors de l'arbre depuis le dernier run (tickets 786, 789).
+        lignes += await journal_attente.reprendre(racine)
     try:
         return await _basculer(orch, run, racine, lignes)
     finally:

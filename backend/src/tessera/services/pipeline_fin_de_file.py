@@ -7,6 +7,7 @@ functions take the orchestrator as their first argument, like the other
 import asyncio
 from typing import TYPE_CHECKING
 
+from tessera.services import journal_attente
 from tessera.services.livraison_evenements import attente_annoncee
 from tessera.services.pipeline_events import EventCallback
 from tessera.utils.logger import get_logger
@@ -154,6 +155,24 @@ async def nettoyer_apres_file(orch: "Orchestrator") -> None:
         await orch._git_workspace.retourner_sur_base(orch._base_branch)
     except Exception as exc:  # noqa: BLE001
         _logger.warning("queue_checkout_base_failed", extra={"error": str(exc)})
+    await _ranger_le_journal(orch)
+
+
+async def _ranger_le_journal(orch: "Orchestrator") -> None:
+    """Set the log lines left on the base aside, outside the tree (ticket-786).
+
+    No next ticket will carry them: they wait for the next run of the project.
+    Only done once the tree is on the base; elsewhere the bookkeeping commit
+    above already took them. Errors are logged and swallowed.
+    """
+    racine = getattr(orch, "_project_path", None)
+    if racine is None:
+        return
+    try:
+        if await sur_la_base(orch):
+            await journal_attente.ranger_apres_file(racine)
+    except Exception as exc:  # noqa: BLE001
+        _logger.warning("queue_log_aside_failed", extra={"error": str(exc)})
 
 
 async def sur_la_base(orch: "Orchestrator") -> bool:
