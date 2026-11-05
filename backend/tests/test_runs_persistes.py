@@ -17,8 +17,8 @@ from tests.test_providers_base import FakeProvider
 from tessera.config import settings
 from tessera.main import app
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services.agent_registry import AgentRegistryService
-from tessera.services.agent_runner import AgentRunner
+from tessera.services.agents.agent_registry import AgentRegistryService
+from tessera.services.agents.agent_runner import AgentRunner
 from tessera.services.database import init_db
 from tessera.services.orchestrator import Orchestrator
 from tessera.services.run_recorder import RunRecorder

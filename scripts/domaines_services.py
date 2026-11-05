@@ -134,13 +134,6 @@ A_DEPLACER: dict[str, str] = {
     "sortie_de_test": "verification",
     "limiteur_de_suites": "verification",
     "test_runner": "verification",
-    # agents
-    "agent_creator": "agents",
-    "agent_registry": "agents",
-    "agent_runner": "agents",
-    "carte_du_depot": "agents",
-    "chat_service": "agents",
-    "chat_suggestion": "agents",
     # creation_projet
     "git_clone": "creation_projet",
     "git_link": "creation_projet",

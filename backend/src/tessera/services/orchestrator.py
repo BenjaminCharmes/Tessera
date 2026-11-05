@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING, Any, Optional
 
 from tessera.models.agent import AgentConfig, AgentRole
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus
-from tessera.services.agent_runner import AgentRunner
+from tessera.services.agents.agent_runner import AgentRunner
 from tessera.services.dialogue import DialogueChannel
 from tessera.services.file_vivante import est_termine
 from tessera.services.providers.enregistrant import activer_enregistrement
@@ -56,7 +56,7 @@ from tessera.services.session_limit import (
 if TYPE_CHECKING:
     from tessera.services.preparation_worktree import Preparation
     from tessera.services.providers.refus_garde import JournalDesRefus
-    from tessera.services.carte_du_depot import CarteDuDepot
+    from tessera.services.agents.carte_du_depot import CarteDuDepot
     from tessera.services.controle_visuel import ControleVisuel
     from tessera.services.quota_tracker import QuotaTracker
     from tessera.services.run_recorder import RunRecorder

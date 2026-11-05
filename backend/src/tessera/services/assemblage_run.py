@@ -12,9 +12,9 @@ from tessera import reglages
 from tessera.config import settings
 from tessera.models.ticket import TicketStatus
 from tessera.services.adr import lire_contraintes
-from tessera.services.agent_registry import AgentRegistryService
-from tessera.services.agent_runner import OUTILS_DE_RELECTURE, AgentRunner
-from tessera.services.carte_du_depot import CarteDuDepot
+from tessera.services.agents.agent_registry import AgentRegistryService
+from tessera.services.agents.agent_runner import OUTILS_DE_RELECTURE, AgentRunner
+from tessera.services.agents.carte_du_depot import CarteDuDepot
 from tessera.services.controle_visuel import lire_le_controle
 from tessera.services.documentation.documenteur_run import documenteur
 from tessera.services.git_workspace import GitWorkspaceService

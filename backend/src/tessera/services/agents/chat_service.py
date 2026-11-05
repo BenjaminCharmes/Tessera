@@ -20,7 +20,7 @@ from typing import Optional, Protocol
 
 from pydantic import BaseModel
 
-from tessera.services.chat_suggestion import (
+from tessera.services.agents.chat_suggestion import (
     parse_pipeline_suggestion,
     strip_suggestion_marker,
 )

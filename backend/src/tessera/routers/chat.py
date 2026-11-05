@@ -11,8 +11,8 @@ from pydantic import BaseModel
 from tessera.config import settings
 from tessera.services.adr import adr_pertinents, lire_contraintes
 from tessera.services.assemblage_run import build_orchestrator
-from tessera.services.chat_service import ChatBudgetExceeded, ChatService
-from tessera.services.chat_suggestion import summarize_conversation
+from tessera.services.agents.chat_service import ChatBudgetExceeded, ChatService
+from tessera.services.agents.chat_suggestion import summarize_conversation
 from tessera.services.event_hub import EVENT_HUB
 from tessera.services.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.run_executor import emetteur

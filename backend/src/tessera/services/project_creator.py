@@ -8,7 +8,7 @@ from tessera.models.project import (
     ProjectCreate,
 )
 from tessera.models.ticket import TicketDraft, TicketPriority, TicketType
-from tessera.services.agent_registry import AgentRegistryService
+from tessera.services.agents.agent_registry import AgentRegistryService
 from tessera.services.cost_calculator import DEFAULT_MODEL
 from tessera.services.project_loader import ProjectLoader
 from tessera.services.providers.base import LLMProvider

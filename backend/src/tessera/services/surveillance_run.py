@@ -3,7 +3,7 @@
 from collections.abc import Awaitable, Callable
 
 from tessera.config import settings
-from tessera.services.agent_runner import AgentRunner
+from tessera.services.agents.agent_runner import AgentRunner
 from tessera.services.ci_watcher import ControleTete, EstAncetre, TetePr
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.github_service import GitHubService

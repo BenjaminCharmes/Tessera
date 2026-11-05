@@ -6,7 +6,7 @@ from typing import Any
 from tessera.models.agent import AgentConfig, AgentResult, AgentRole
 from tessera.models.ticket import Ticket
 from tessera.services.adr import adr_pertinents
-from tessera.services.agent_registry import AgentNotFoundError, AgentRegistryService
+from tessera.services.agents.agent_registry import AgentNotFoundError, AgentRegistryService
 from tessera.services.cost_calculator import DEFAULT_MODEL, calculate_cost
 from tessera.services.agent_calls import save_agent_call
 from tessera.services.providers.base import (

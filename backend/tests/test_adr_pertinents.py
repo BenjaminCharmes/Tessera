@@ -188,7 +188,7 @@ def test_le_prompt_du_codeur_ne_porte_pas_les_adr_de_l_architecte(
 ) -> None:
     # Un filtre écrit mais jamais branché ne filtre rien : c'est exactement
     # l'erreur que le test des hooks d'ADR-027 empêchait déjà ailleurs.
-    from tessera.services.agent_runner import AgentRunner
+    from tessera.services.agents.agent_runner import AgentRunner
 
     runner = AgentRunner(provider=None, registry=None)  # type: ignore[arg-type]
     contexte = f"# projet\n\n## Décisions récentes\n{_FICHIER}"
@@ -204,7 +204,7 @@ def test_le_prompt_du_codeur_ne_porte_pas_les_adr_de_l_architecte(
 def test_un_contexte_sans_section_de_decisions_traverse_intact(
     tmp_path: Path,
 ) -> None:
-    from tessera.services.agent_runner import AgentRunner
+    from tessera.services.agents.agent_runner import AgentRunner
 
     runner = AgentRunner(provider=None, registry=None)  # type: ignore[arg-type]
 
@@ -351,7 +351,7 @@ def test_le_prompt_du_codeur_contient_une_regle_de_contraintes_et_non_le_titre_d
         encoding="utf-8",
     )
 
-    from tessera.services.agent_runner import AgentRunner
+    from tessera.services.agents.agent_runner import AgentRunner
     runner = AgentRunner(provider=None, registry=None)  # type: ignore[arg-type]
     contenu = lire_contraintes(memory)
     contexte = f"# projet\n\n## Décisions récentes\n{contenu}"
@@ -370,7 +370,7 @@ def test_une_regle_scoped_n_atteint_pas_le_validateur(tmp_path: Path) -> None:
         encoding="utf-8",
     )
 
-    from tessera.services.agent_runner import AgentRunner
+    from tessera.services.agents.agent_runner import AgentRunner
     runner = AgentRunner(provider=None, registry=None)  # type: ignore[arg-type]
     contenu = lire_contraintes(memory)
     contexte = f"# projet\n\n## Décisions récentes\n{contenu}"
@@ -389,7 +389,7 @@ def test_sans_contraintes_md_le_prompt_recoit_decisions_md(tmp_path: Path) -> No
         encoding="utf-8",
     )
 
-    from tessera.services.agent_runner import AgentRunner
+    from tessera.services.agents.agent_runner import AgentRunner
     runner = AgentRunner(provider=None, registry=None)  # type: ignore[arg-type]
     contenu = lire_contraintes(memory)
     contexte = f"# projet\n\n## Décisions récentes\n{contenu}"

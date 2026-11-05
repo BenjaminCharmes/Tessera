@@ -8,9 +8,9 @@ import pytest
 from tests.test_providers_base import FakeProvider
 from tessera.models.agent import AgentConfig, AgentResult, AgentRole
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services.agent_registry import AgentRegistryService
+from tessera.services.agents.agent_registry import AgentRegistryService
 from tessera.services.prompt_loader import MissingPromptError
-from tessera.services.agent_runner import (
+from tessera.services.agents.agent_runner import (
     _DEFAULT_MAX_TOKENS,
     _DEFAULT_MODEL,
     AgentRunner,
@@ -434,7 +434,7 @@ async def test_le_reviewer_recoit_un_provider_en_lecture_seule(tmp_path: Path) -
     # Son prompt dit « tu ne modifies rien » ; il recevait pourtant `Write`,
     # `Edit` et `Bash` comme le codeur. Une règle qui tient à la bonne volonté
     # de l'agent n'est pas une règle (ADR-027, même raisonnement).
-    from tessera.services.agent_runner import OUTILS_DE_RELECTURE
+    from tessera.services.agents.agent_runner import OUTILS_DE_RELECTURE
 
     fabrique = _Fabrique()
     runner, commun = _runner_avec_fabrique(tmp_path, fabrique)

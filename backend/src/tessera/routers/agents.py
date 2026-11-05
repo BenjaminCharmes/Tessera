@@ -9,12 +9,12 @@ from tessera.models.agent import AgentResult, AgentRole, AgentRunRequest, Create
 from tessera.models.project import ConversationMessage, CreateProjectRequest, CreateProjectResponse, ProjectContext
 from tessera.models.ticket import TicketStatus
 from tessera.services.adr import lire_contraintes
-from tessera.services.agent_creator import AgentCreatorService
-from tessera.services.agent_registry import AgentRegistryService
-from tessera.services.agent_runner import AgentRunner
+from tessera.services.agents.agent_creator import AgentCreatorService
+from tessera.services.agents.agent_registry import AgentRegistryService
+from tessera.services.agents.agent_runner import AgentRunner
 from tessera.services.github_service import GitHubService
 from tessera.services.project_creator import ProjectCreatorService
-from tessera.services.agent_runner import OUTILS_DE_RELECTURE
+from tessera.services.agents.agent_runner import OUTILS_DE_RELECTURE
 from tessera.services.providers.base import LLMProvider
 from tessera.services.providers.par_role import provider_pour_role
 from tessera.services.project_loader import ProjectLoader, load_agents_config

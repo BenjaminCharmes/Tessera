@@ -2,7 +2,7 @@
 id: ticket-813
 title: "The agent modules move to services/agents"
 type: refactor
-status: todo
+status: done
 pr_number: null
 priority: low
 agent: codeur
@@ -29,12 +29,12 @@ ADR-076 ; section `agents` de `memory/services-domaines.md`. Ne pas confondre av
 
 ## Critères d'acceptation
 
-- [ ] Les six modules de la section `agents` sont sous `services/agents/`, aucun n'est resté à plat
-- [ ] `A_DEPLACER` n'a plus d'entrée `agents`, `ECARTS_DOMAINES` n'a grandi d'aucune ligne
-- [ ] Aucune occurrence des anciens chemins pointés ne reste dans `backend/src`, `backend/tests`,
+- [x] Les six modules de la section `agents` sont sous `services/agents/`, aucun n'est resté à plat
+- [x] `A_DEPLACER` n'a plus d'entrée `agents`, `ECARTS_DOMAINES` n'a grandi d'aucune ligne
+- [x] Aucune occurrence des anciens chemins pointés ne reste dans `backend/src`, `backend/tests`,
       `scripts/`, `Makefile`
-- [ ] `tessera/agents/github_sync.py` n'est pas touché (ticket-816)
-- [ ] Le diff n'est que des renommages et des lignes d'import ou de chaîne ; la suite passe
+- [x] `tessera/agents/github_sync.py` n'est pas touché (ticket-816)
+- [x] Le diff n'est que des renommages et des lignes d'import ou de chaîne ; la suite passe
 
 ## Ce que ça ne fait pas
 
@@ -44,3 +44,7 @@ Aucun changement de comportement. Le paquet `tessera/agents/` reste en place.
 
 Les chemins `tessera.agents` et `tessera.services.agents` coexistent jusqu'au ticket-816 : le
 script ne doit réécrire que `tessera.services.<module>`.
+
+## Notes de réalisation
+
+Six modules, comme annoncé. L'écart connu `services/chat_suggestion.py -> pipeline` de `ECARTS_DOMAINES` suit le module (`services/agents/chat_suggestion.py`), sans ligne ajoutée. Seuls des documents historiques citent les anciens chemins : ils restent tels quels.

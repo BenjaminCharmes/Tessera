@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services.chat_service import (
+from tessera.services.agents.chat_service import (
     ChatBudgetExceeded,
     ChatReply,
     ChatService,

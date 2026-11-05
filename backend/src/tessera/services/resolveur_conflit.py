@@ -17,7 +17,7 @@ from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketTy
 from tessera.utils.logger import get_logger
 
 if TYPE_CHECKING:
-    from tessera.services.agent_runner import AgentRunner
+    from tessera.services.agents.agent_runner import AgentRunner
 
 _logger = get_logger(__name__)
 

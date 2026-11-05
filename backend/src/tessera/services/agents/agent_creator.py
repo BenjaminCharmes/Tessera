@@ -4,7 +4,7 @@ from pathlib import Path
 
 from tessera.models.agent import AgentCreatedInfo, CreateAgentConversationResponse
 from tessera.models.project import ConversationMessage
-from tessera.services.agent_registry import AgentRegistryService
+from tessera.services.agents.agent_registry import AgentRegistryService
 from tessera.services.cost_calculator import DEFAULT_MODEL
 from tessera.services.providers.base import LLMProvider
 from tessera.utils.conversation import format_conversation

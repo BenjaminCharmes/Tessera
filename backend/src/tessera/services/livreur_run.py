@@ -4,7 +4,7 @@ from collections.abc import Awaitable, Callable
 from dataclasses import replace
 
 from tessera.config import settings
-from tessera.services.agent_runner import AgentRunner
+from tessera.services.agents.agent_runner import AgentRunner
 from tessera.services.attente_des_merges import apres_les_merges
 from tessera.services.autonomie import NiveauAutonomie
 from tessera.services.git_workspace import GitWorkspaceService
