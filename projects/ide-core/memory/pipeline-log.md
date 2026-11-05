@@ -7923,3 +7923,34 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-05 20:27:48 UTC — [ticket-851] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (116500ms)
 - 2026-11-05 20:27:48 UTC — [ticket-851] APPROVED après 1 tour(s)
 - 2026-11-05 20:28:41 UTC — [ticket-851] documentation: 0 fichier(s) (43875ms)
+- 2026-11-05 20:45:41 UTC — [ide-core] ticket-852 sauté : dépend de ticket-851, non mergé
+- 2026-11-05 20:45:41 UTC — [ide-core] ticket-853 sauté : dépend de ticket-851, non mergé
+- 2026-11-05 20:45:41 UTC — [ide-core] ticket-857 sauté : dépend de ticket-851, non mergé
+- 2026-11-05 20:45:41 UTC — [ide-core] ticket-854 sauté : dépend de ticket-853, sauté
+- 2026-11-05 20:45:41 UTC — [ide-core] ticket-858 sauté : dépend de ticket-851, non mergé
+- 2026-11-05 20:45:41 UTC — [ide-core] ticket-860 sauté : dépend de ticket-853, sauté
+- 2026-11-05 20:45:41 UTC — [ide-core] ticket-855 sauté : dépend de ticket-851, non mergé
+- 2026-11-05 20:45:41 UTC — [ide-core] ticket-856 sauté : dépend de ticket-851, non mergé
+- 2026-11-05 20:45:41 UTC — [ide-core] ticket-861 sauté : dépend de ticket-860, sauté
+- 2026-11-05 20:45:41 UTC — [ide-core] ticket-859 sauté : dépend de ticket-855, sauté
+- 2026-11-05 20:45:41 UTC — [ide-core] ticket-851 PR #939 confiée au CIWatcher
+- 2026-11-05 20:45:41 UTC — [ticket-851] livraison: arrêt — PR #939 non mergée : Fin de l'attente : la CI de la PR #939 n'a pas rendu de verdict. La PR reste ouverte.
+- 2026-11-05 20:45:50 UTC — [ticket-862] branche ticket-862-an-agent-report-is-checked-bounded-and-deduplicat
+- 2026-11-05 20:45:51 UTC — [ticket-862] tour 1 — codeur démarré
+- 2026-11-05 20:48:23 UTC — [ticket-862] tour 1 — codeur terminé (151766ms)
+- 2026-11-05 20:48:37 UTC — [ticket-862] testeur: dur�es : ruff 0 s, mypy 4 s, mypy-linux 4 s, pytest 9 s
+- 2026-11-05 20:52:14 UTC — [ticket-862] securite: PASS — Ticket-862 introduces secure validation and ledger management for agent signaler (216516ms)
+- 2026-11-05 20:52:14 UTC — [ticket-862] tour 1 — reviewer démarré
+- 2026-11-05 20:52:36 UTC — [ticket-862] tour 1 — reviewer terminé (22109ms)
+- 2026-11-05 20:54:20 UTC — [ticket-862] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (126141ms)
+- 2026-11-05 20:54:20 UTC — [ticket-862] CHANGES_REQUESTED tour 1: Reviewer : 1. Le contrôle de confidentialité peut être contourné. `_refus_de_confidentialite` passe `"+" + a_plat` à `TermesInterditsService.verifier`. Or `verifier` (termes_interdits.py:146-151) pren
+- 2026-11-05 20:54:20 UTC — [ticket-862] tour 2 — codeur démarré
+- 2026-11-05 20:55:10 UTC — [ticket-862] tour 2 — codeur terminé (49811ms)
+- 2026-11-05 20:55:30 UTC — [ticket-862] testeur: dur�es : ruff 0 s, mypy 8 s, mypy-linux 7 s, pytest 15 s
+- 2026-11-05 20:58:33 UTC — [ticket-862] securite: PASS — Pure validation logic for agent signal calls (ticket-862, ADR-080): correctly ha (183436ms)
+- 2026-11-05 20:58:33 UTC — [ticket-862] tour 2 — reviewer démarré
+- 2026-11-05 20:58:45 UTC — [ticket-862] tour 2 — reviewer terminé (11921ms)
+- 2026-11-05 21:02:12 UTC — [ticket-862] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (219141ms)
+- 2026-11-05 21:02:12 UTC — [ticket-862] APPROVED après 2 tour(s)
+- 2026-11-05 21:04:34 UTC — [ticket-862] leçons: une leçon proposée
+- 2026-11-05 21:06:53 UTC — [ticket-862] documentation: 0 fichier(s) (132563ms) — après tour de correction

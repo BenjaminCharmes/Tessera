@@ -1,14 +1,14 @@
 ---
-id: ticket-862
-title: "An agent report is checked, bounded and deduplicated by pure functions"
-type: feat
-status: todo
-priority: medium
 agent: codeur
+created: 2026-11-05
 depends_on: []
 estimated_days: 1
-created: 2026-11-05
-pr_number: null
+id: ticket-862
+pr_number: 941
+priority: medium
+status: done
+title: An agent report is checked, bounded and deduplicated by pure functions
+type: feat
 ---
 
 # ticket-862 — Un signalement d'agent : contrôle, bornes, doublons
