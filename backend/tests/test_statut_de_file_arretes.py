@@ -124,3 +124,16 @@ async def test_a_child_without_an_end_under_a_finished_queue_is_never_approved()
 
     assert corps["approuves"] == []
     assert corps["faits"] == ["ticket-075"]
+
+
+async def test_an_approved_ticket_whose_delivery_failed_is_not_among_the_approved() -> None:
+    enveloppe = await _file([])
+    await _enfant(enveloppe, "ticket-070", True, "done")
+    await _enfant(enveloppe, "ticket-071", True, "blocked", "Livraison interrompue : push")
+
+    corps = _statut(enveloppe)
+
+    assert corps["approuves"] == ["ticket-070"]
+    assert corps["non_livres"] == ["ticket-071"]
+    assert corps["arretes"] == []
+    assert corps["faits"] == ["ticket-070", "ticket-071"]

@@ -30,6 +30,16 @@ class GitHistory(GitPoussee):
             return
         await self._run("checkout", base_branch)
 
+    async def se_placer_sur(self, branch: str) -> None:
+        """Check out an existing branch, to deliver it again (ticket-792).
+
+        In a run worktree (ADR-056) it does nothing: the branch is the one the
+        worktree was created on.
+        """
+        if self._worktree is not None:
+            return
+        await self._run("checkout", branch)
+
     async def branche_courante(self) -> str:
         """Name of the checked-out branch (``HEAD`` when detached)."""
         return (await self._run("rev-parse", "--abbrev-ref", "HEAD")).strip()

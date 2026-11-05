@@ -12,6 +12,8 @@ class Tour:
     ticket_ids: list[str]
     index: int
     ticket_id: str
+    #: Approved tickets whose delivery stopped without a PR (ticket-792).
+    non_livres: tuple[str, ...] = ()
 
     @property
     def restants(self) -> list[str]:
@@ -25,6 +27,7 @@ class Tour:
             "total": len(self.ticket_ids),
             "restants": list(self.ticket_ids[debut:]),
             "faits": list(self.ticket_ids[: self.index - 1]),
+            "non_livres": list(self.non_livres),
         }
 
 

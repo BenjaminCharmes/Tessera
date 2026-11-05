@@ -39,7 +39,7 @@ class RunStatus(BaseModel):
     ``approuves`` ended approved; ``arretes`` stopped (blocked, unapproved,
     interrupted); ``restants`` have not produced a result and can be launched
     again. ``faits`` is deprecated: always ``approuves`` followed by the
-    tickets of ``arretes``.
+    tickets of ``arretes`` and ``non_livres``.
     """
 
     project_id: str
@@ -48,6 +48,9 @@ class RunStatus(BaseModel):
     ticket_courant: str | None = None
     approuves: list[str]
     arretes: list[TicketArrete]
+    #: Approved, but the delivery stopped without opening a PR: the work sits on
+    #: a local branch (ticket-792). Not in ``approuves``.
+    non_livres: list[str] = []
     restants: list[str]
     debut: str
     fin: str | None = None
@@ -56,7 +59,7 @@ class RunStatus(BaseModel):
     @property
     def faits(self) -> list[str]:
         """Deprecated: ``approuves`` + the tickets of ``arretes``."""
-        return [*self.approuves, *(a.ticket_id for a in self.arretes)]
+        return [*self.approuves, *(a.ticket_id for a in self.arretes), *self.non_livres]
 
 
 def statut_d_un_run_termine(final_status: str | None, restants: list[str]) -> str:
@@ -116,12 +119,16 @@ class _Classement(BaseModel):
 
     approuves: list[str] = []
     arretes: list[TicketArrete] = []
+    non_livres: list[str] = []
     coupes: list[str] = []
     en_cours: str | None = None
 
 
 def classer_les_tickets(lignes: list[aiosqlite.Row], file_finie: bool) -> _Classement:
-    """Sort child rows: approved, stopped, or cut before any result (`todo`).
+    """Sort child rows: approved, undelivered, stopped, or cut before any result (`todo`).
+
+    Undelivered: approved, then blocked by a delivery that stopped without a PR
+    (`arret` set); the pipeline stores that stop on the row (ticket-792).
 
     A row without an end under a finished queue is stopped, never approved;
     under a queue still open it is the current ticket.
@@ -135,6 +142,8 @@ def classer_les_tickets(lignes: list[aiosqlite.Row], file_finie: bool) -> _Class
             c.en_cours = ticket
         elif ligne["finished_at"] is None:
             c.arretes.append(TicketArrete(ticket_id=ticket, motif="no outcome recorded"))
+        elif ligne["approved"] and ligne["final_status"] == "blocked" and ligne["arret"]:
+            c.non_livres.append(ticket)
         elif ligne["approved"]:
             c.approuves.append(ticket)
         elif ligne["final_status"] == "todo":
@@ -189,6 +198,7 @@ async def statut_en_base(db_path: Path | str, run_id: str) -> RunStatus | None:
         ticket_courant=classement.en_cours,
         approuves=classement.approuves,
         arretes=classement.arretes,
+        non_livres=classement.non_livres,
         restants=restants,
         debut=en_utc(row["started_at"]),
         fin=row["finished_at"],

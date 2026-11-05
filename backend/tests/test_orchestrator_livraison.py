@@ -538,8 +538,9 @@ async def test_livraison_sans_pr_ne_bloque_pas_le_ticket_suivant(
 
     results = await orch.run_queue("proj", ["ticket-001", "ticket-002"])
 
-    # La file n'est pas arrêtée par la livraison échouée.
-    assert departs == ["ticket-001", "ticket-002"]
+    # La file n'est pas arrêtée par la livraison échouée ; en fin de file, chaque
+    # ticket non livré est relivré une seule fois (ticket-792).
+    assert departs == ["ticket-001", "ticket-002", "ticket-001", "ticket-002"]
     assert len(results) == 2
 
 

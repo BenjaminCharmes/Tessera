@@ -18,6 +18,7 @@ from tessera.services.pipeline_events import (
     PipelineResult,
 )
 from tessera.services.pipeline_file_livraison import livraison_arrete_la_file
+from tessera.services.pipeline_file_reprise import est_non_livre, relivrer_les_non_livres
 from tessera.services.pipeline_file_tour import Tour, progres
 from tessera.services.pipeline_fin_de_file import nettoyer_apres_file
 from tessera.services.pipeline_run import tolerant
@@ -160,11 +161,12 @@ async def run_queue(
     orch._in_queue = True
     orch._queue_ids = ticket_ids
     orch._interruption = None
+    non_livres: list[str] = []
     for index, ticket_id in enumerate(ticket_ids, start=1):
         # Dit à la file vivante où en est la boucle : un retrait ne touche que
         # ce qui est après (ticket-513).
         marquer_position_si_vivante(ticket_ids, index)
-        tour = Tour(project_id, ticket_ids, index, ticket_id)
+        tour = Tour(project_id, ticket_ids, index, ticket_id, tuple(non_livres))
         if await _arret_avant_ticket(orch, tour, dialogue, budget_override_usd, callback):
             break
         if await _deja_termine(orch, tour):
@@ -178,8 +180,15 @@ async def run_queue(
         if not result.approved:
             await _arret_non_approuve(orch, tour, result, callback)
             break
+        if est_non_livre(result):
+            non_livres.append(ticket_id)
         if await livraison_arrete_la_file(orch, tour, results, callback):
             break
+    else:
+        # La file est allée au bout : une seule reprise des livraisons arrêtées
+        # (ticket-792), jamais de push forcé (ADR-022).
+        if non_livres:
+            await _reprise_finale(orch, project_id, ticket_ids, results, callback)
     # Fermer **avant** le premier `await` suivant : un ajout qui passerait
     # entre la fin de la lecture et ici rendrait 200 sans jamais s'exécuter.
     fermer_si_vivante(ticket_ids)
@@ -187,6 +196,19 @@ async def run_queue(
     orch._queue_ids = None
     await nettoyer_apres_file(orch)
     return results
+
+
+async def _reprise_finale(
+    orch: "Orchestrator",
+    project_id: str,
+    ticket_ids: list[str],
+    results: list[PipelineResult],
+    callback: EventCallback,
+) -> None:
+    """Redeliver the undelivered tickets, then say which ones still are."""
+    restent = await relivrer_les_non_livres(orch, project_id, results, callback)
+    tour = Tour(project_id, ticket_ids, len(ticket_ids), ticket_ids[-1], tuple(restent))
+    await progres(callback, tour.ticket_id, tour.donnees(depuis=len(ticket_ids)))
 
 
 def _budget_epuise(orch: "Orchestrator", project_id: str) -> bool:

@@ -29,7 +29,7 @@ def test_tour_payload_names_the_done_and_remaining_tickets() -> None:
 
     assert tour.restants == ["c"]
     assert tour.donnees() == {
-        "index": 2, "total": 3, "restants": ["c"], "faits": ["a"],
+        "index": 2, "total": 3, "restants": ["c"], "faits": ["a"], "non_livres": [],
     }
 
 
