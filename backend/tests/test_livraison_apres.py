@@ -2,6 +2,7 @@
 from tessera.services.git_workspace import GitWorkspaceError
 from tessera.services.livraison_apres import (
     branche_modifiee,
+    ouvrir_avec_recours,
     pr_a_relire,
     pr_ouverte_malgre,
     sha_pousse,
@@ -77,3 +78,25 @@ def test_entry_stop_messages() -> None:
     assert "reviewer a refusé" in ARRET_NON_APPROUVE
     assert "commité sur ticket-1" in arret_niveau_commit("ticket-1")
     assert '"autonomy": "pr"' in arret_niveau_commit("ticket-1")
+
+
+async def test_opening_that_succeeds_is_not_retried_nor_searched() -> None:
+    appels: list[int] = []
+
+    async def ouvrir() -> object:
+        appels.append(1)
+
+        class _R:
+            pr_number = 9
+
+        return _R()
+
+    async def dormir(_s: float) -> None:
+        raise AssertionError("no wait expected")
+
+    etapes: list[str] = []
+    resultat = await ouvrir_avec_recours(ouvrir, _Workflow(RuntimeError("x")), "b", etapes, dormir)
+
+    assert resultat == (9, None)
+    assert appels == [1]
+    assert etapes == []

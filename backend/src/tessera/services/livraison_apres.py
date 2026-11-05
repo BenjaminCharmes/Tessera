@@ -3,13 +3,18 @@
 Sortis de `livraison.py` pour que le fichier rétrécisse : chaque fonction lit
 un maillon (git, workflow) qu'on lui passe, et rend un arrêt ou une valeur.
 """
-from typing import Protocol
+from typing import Any, Awaitable, Callable, Protocol
+
+import httpx
 
 from tessera.services.git_workspace import GitWorkspaceError
 from tessera.services.livraison_resultat import Livraison
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
+
+#: Attente avant l'unique nouvelle tentative d'ouverture sur une erreur 5xx.
+_DELAI_NOUVELLE_TENTATIVE_S = 5.0
 
 
 class _GitApres(Protocol):
@@ -66,6 +71,50 @@ async def pr_ouverte_malgre(workflow: _WorkflowApres, branch: str) -> int | None
     except Exception as exc:  # noqa: BLE001 — la recherche ne masque pas l'erreur d'origine
         _logger.warning("recherche_pr_perdue_echouee", extra={"erreur": str(exc)})
         return None
+
+
+async def _tenter_l_ouverture(
+    ouvrir: Callable[[], Awaitable[Any]], workflow: _WorkflowApres, branch: str
+) -> tuple[int, Exception | None]:
+    """Open once; a lost response is searched for (ticket-455).
+
+    Returns the PR number and, when the PR was only found afterwards, the
+    transport error that hid it.
+    """
+    try:
+        return int((await ouvrir()).pr_number), None
+    except httpx.TransportError as exc:
+        pr_perdue = await pr_ouverte_malgre(workflow, branch)
+        if pr_perdue is None:
+            raise
+        return pr_perdue, exc
+
+
+async def ouvrir_avec_recours(
+    ouvrir: Callable[[], Awaitable[Any]],
+    workflow: _WorkflowApres,
+    branch: str,
+    etapes: list[str],
+    dormir: Callable[[float], Awaitable[None]],
+) -> tuple[int, Exception | None]:
+    """Open the PR, surviving one GitHub server error (ticket-781).
+
+    A 5xx first looks for a PR opened despite the error, then retries the
+    opening once. A 4xx, or a second error, is raised as is.
+    """
+    try:
+        return await _tenter_l_ouverture(ouvrir, workflow, branch)
+    except httpx.HTTPStatusError as exc:
+        if exc.response.status_code < 500:
+            raise
+        statut = exc.response.status_code
+    existante = await pr_ouverte_malgre(workflow, branch)
+    if existante is not None:
+        etapes.append(f"PR #{existante} reprise malgré l'erreur {statut}")
+        return existante, None
+    await dormir(_DELAI_NOUVELLE_TENTATIVE_S)
+    etapes.append(f"nouvelle tentative d'ouverture de la PR après l'erreur {statut}")
+    return await _tenter_l_ouverture(ouvrir, workflow, branch)
 
 
 def pr_a_relire(
