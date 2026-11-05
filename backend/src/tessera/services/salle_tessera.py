@@ -57,10 +57,8 @@ def agents_en_cours(moi: int, procs: dict[int, InfoProcessus]) -> int:
     return sum(1 for pid in descendants if pid in procs and "claude" in procs[pid].commande.lower())
 
 
-async def processus_de_tessera(sonde: SondeSysteme) -> list[ProcessusDeTessera]:
-    """The backend (this process) and the Vite that serves the frontend."""
-    ecouteurs = await sonde.ecouteurs()
-    procs = await sonde.processus()
+def processus_de_tessera(ecouteurs: dict[int, int], procs: dict[int, InfoProcessus]) -> list[ProcessusDeTessera]:
+    """The backend (this process) and the Vite that serves the frontend, from one probe."""
     moi = os.getpid()
     port_backend = next((port for port, pid in ecouteurs.items() if pid == moi), 0)
     return [
@@ -165,9 +163,11 @@ async def salle_tessera(
     base: Path,
 ) -> SalleTessera:
     """The room, assembled from facts read now."""
+    # Une seule sonde par requête : lister les processus du système coûte des secondes sous charge.
     procs = await sonde.processus()
+    ecouteurs = await sonde.ecouteurs()
     return SalleTessera(
-        processus=await processus_de_tessera(sonde),
+        processus=processus_de_tessera(ecouteurs, procs),
         agents=agents_en_cours(os.getpid(), procs),
         runs_du_jour=await runs_du_jour(base),
         ollama=EtatOllama(url=ollama_url, refroidissement_s=refroidissement_s),
