@@ -10,7 +10,7 @@ from typing import Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, ValidationInfo, field_validator
 
-from tessera.services.manifeste import lire_valeur
+from tessera.services.projets.manifeste import lire_valeur
 
 Resource = Literal["vercel", "database", "resend", "dns", "stripe"]
 

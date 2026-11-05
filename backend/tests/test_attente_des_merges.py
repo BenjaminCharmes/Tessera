@@ -3,13 +3,13 @@ import asyncio
 from collections.abc import Awaitable, Callable
 
 from tessera.models.ticket import TicketStatus
-from tessera.services.attente_des_merges import (
+from tessera.services.livraison.attente_des_merges import (
     apres_les_merges,
     attendre_les_merges_en_cours,
 )
-from tessera.services.ci_watcher import CIWatcher
-from tessera.services.livraison import Livraison
-from tessera.services.pipeline_events import PipelineResult
+from tessera.services.livraison.ci_watcher import CIWatcher
+from tessera.services.livraison.livraison import Livraison
+from tessera.services.noyau.pipeline_events import PipelineResult
 
 
 class _FausseSurveillance:

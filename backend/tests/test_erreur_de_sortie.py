@@ -1,10 +1,10 @@
 """Tests for the error line surfaced in a failed step's detail (ticket-473)."""
 
-from tessera.services.erreur_de_sortie import (
+from tessera.services.verification.erreur_de_sortie import (
     detail_avec_erreur,
     premiere_ligne_d_erreur,
 )
-from tessera.services.test_runner import EtapeTest, _parse_failed_step
+from tessera.services.verification.test_runner import EtapeTest, _parse_failed_step
 
 _CONSEIL = "corepack"
 _CONSEIL_BIN = "node_modules/.bin"

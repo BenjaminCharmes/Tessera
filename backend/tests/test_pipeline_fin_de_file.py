@@ -5,12 +5,12 @@ from pathlib import Path
 from typing import cast
 from unittest.mock import AsyncMock, MagicMock
 
-from tessera.services import orchestrator as orchestrator_module
-from tessera.services.livraison import Livraison
-from tessera.services.orchestrator import Orchestrator
-from tessera.services.pipeline_documentation import documenter_le_run
-from tessera.services.pipeline_events import EventType, OrchestratorEvent, PipelineResult
-from tessera.services.pipeline_fin_de_file import (
+from tessera.services.pipeline import orchestrator as orchestrator_module
+from tessera.services.livraison.livraison import Livraison
+from tessera.services.pipeline.orchestrator import Orchestrator
+from tessera.services.pipeline.pipeline_documentation import documenter_le_run
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent, PipelineResult
+from tessera.services.pipeline.pipeline_fin_de_file import (
     attendre_merge_et_syncer,
     finaliser_livraison,
     nettoyer_apres_file,
@@ -62,9 +62,9 @@ def test_the_new_modules_import_orchestrator_only_for_typing() -> None:
             r"^from tessera\.services\.orchestrator import", source, re.M
         )
         assert len(hors_typage) == 0
-        assert source.count("from tessera.services.orchestrator import") == 1
+        assert source.count("from tessera.services.pipeline.orchestrator import") == 1
         assert source.index("if TYPE_CHECKING:") < source.index(
-            "from tessera.services.orchestrator import"
+            "from tessera.services.pipeline.orchestrator import"
         )
 
 

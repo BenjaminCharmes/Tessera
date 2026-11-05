@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services.project_removal import (
+from tessera.services.creation_projet.project_removal import (
     RemovalError,
     RemovalPlan,
     delete_project,
@@ -182,7 +182,7 @@ def test_un_projet_detache_atterrit_hors_du_depot_de_l_ide(tmp_path: Path) -> No
     # Le projet detache y restait, non suivi — et depuis qu'un projet peut
     # travailler dans le depot parent (ADR-028), un `git add -A` depuis la
     # racine pouvait l'y committer en entier (ticket-078).
-    from tessera.services.project_removal import _detached_destination
+    from tessera.services.creation_projet.project_removal import _detached_destination
 
     depot = tmp_path / "Tessera"
     (depot / ".git").mkdir(parents=True)
@@ -196,7 +196,7 @@ def test_un_projet_detache_atterrit_hors_du_depot_de_l_ide(tmp_path: Path) -> No
 
 
 def test_sans_depot_au_dessus_le_comportement_ne_change_pas(tmp_path: Path) -> None:
-    from tessera.services.project_removal import _detached_destination
+    from tessera.services.creation_projet.project_removal import _detached_destination
 
     projet = tmp_path / "workspace" / "projects" / "mon-projet"
     projet.mkdir(parents=True)

@@ -14,17 +14,17 @@ import pytest
 
 from tessera.config import settings
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services.attente_dependance import attendre_si_dependant as _attendre_si_dependant
-from tessera.services.ci_watcher import CIWatcher
-from tessera.services.database import init_db
-from tessera.services.database_events import get_run_events
-from tessera.services.database_runs import create_run
-from tessera.services.event_hub import EventHub
-from tessera.services.livraison import Livraison
-from tessera.services.orchestrator import Orchestrator
-from tessera.services.pipeline_events import EventType, OrchestratorEvent, PipelineResult
-from tessera.services.run_executor import emetteur
-from tessera.services.run_registry import RunActif
+from tessera.services.livraison.attente_dependance import attendre_si_dependant as _attendre_si_dependant
+from tessera.services.livraison.ci_watcher import CIWatcher
+from tessera.services.noyau.database import init_db
+from tessera.services.noyau.database_events import get_run_events
+from tessera.services.noyau.database_runs import create_run
+from tessera.services.noyau.event_hub import EventHub
+from tessera.services.livraison.livraison import Livraison
+from tessera.services.pipeline.orchestrator import Orchestrator
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent, PipelineResult
+from tessera.services.pipeline.run_executor import emetteur
+from tessera.services.pipeline.run_registry import RunActif
 
 
 def _resultat(ticket_id: str) -> PipelineResult:

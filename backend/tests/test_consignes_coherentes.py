@@ -210,9 +210,10 @@ def test_aucun_reglage_de_pipeline_n_est_mort() -> None:
     import inspect
 
     from tessera.models.agent import AgentPipelineConfig
-    from tessera.services import orchestrator as orch_service
+    from tessera.services.pipeline import orchestrator as orch_service
     from tessera.routers import orchestrator as orch_router
-    from tessera.services import assemblage_run, documenteur_run
+    from tessera.services.pipeline import assemblage_run
+    from tessera.services.documentation import documenteur_run
 
     sources = (
         inspect.getsource(orch_service)
@@ -364,7 +365,7 @@ def test_aucune_clef_du_manifeste_genere_n_est_morte() -> None:
     """
     import json
 
-    from tessera.services.project_loader import _default_agents_json
+    from tessera.services.projets.project_loader import _default_agents_json
 
     manifeste = json.loads(_default_agents_json("p", [], "tracked"))
 
@@ -393,7 +394,7 @@ def _clefs_mortes(manifeste: dict[str, object]) -> list[str]:
     # ne s'en servait. Le générateur et les déclarations de modèles sont donc
     # retirés des sources avant la recherche.
     exclus = [
-        _RACINE / "backend" / "src" / "tessera" / "services" / "gabarits_projet.py",
+        _RACINE / "backend" / "src" / "tessera" / "services" / "projets" / "gabarits_projet.py",
         _RACINE / "backend" / "src" / "tessera" / "models" / "agent.py",
     ]
     ailleurs = sources
@@ -640,7 +641,7 @@ def test_tracabilite_chaque_regle_sans_portee_est_citee_dans_contraintes() -> No
     fichier qui remplace decisions.md dans le prompt des agents.
     Une règle absente de contraintes.md serait silencieusement ignorée.
     """
-    from tessera.services.adr import decouper, portee_de
+    from tessera.services.projets.adr import decouper, portee_de
 
     decisions = _lire("projects/ide-core/memory/decisions.md")
     audit = _audit_classement()

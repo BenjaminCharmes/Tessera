@@ -2,12 +2,12 @@
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from tessera.services.anomalies.lecture_evenements import (
+from tessera.services.supervision.anomalies.lecture_evenements import (
     AppelOutil,
     derniers_appels_d_outils,
     hacher_input,
 )
-from tessera.services.anomalies.regles_directes import outil_repete, silence, tours_de_revue
+from tessera.services.supervision.anomalies.regles_directes import outil_repete, silence, tours_de_revue
 from tests.anomalies_base import base_neuve, evenement, ligne_de_run
 
 T0 = datetime(2026, 11, 5, 10, 0, tzinfo=timezone.utc)
@@ -126,7 +126,7 @@ async def test_ouvrir_en_lecture_refuses_any_write(tmp_path: Path) -> None:
     import aiosqlite
     import pytest
 
-    from tessera.services.anomalies.lecture_base import ouvrir_en_lecture
+    from tessera.services.supervision.anomalies.lecture_base import ouvrir_en_lecture
 
     db = await base_neuve(tmp_path / "t.db")
     async with ouvrir_en_lecture(db) as c:

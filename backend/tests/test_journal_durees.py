@@ -12,14 +12,14 @@ from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services import pipeline_controles, pipeline_production, pipeline_testeur
-from tessera.services.livraison import Livraison
-from tessera.services.orchestrator import Orchestrator
-from tessera.services.pipeline_documentation import documenter_le_run
-from tessera.services.pipeline_events import EventType, OrchestratorEvent, PipelineResult
-from tessera.services.pipeline_run import PipelineRun
-from tessera.services.security_auditor import SecurityAuditResult
-from tessera.services.validator import ValidationResult
+from tessera.services.pipeline import pipeline_controles, pipeline_production, pipeline_testeur
+from tessera.services.livraison.livraison import Livraison
+from tessera.services.pipeline.orchestrator import Orchestrator
+from tessera.services.pipeline.pipeline_documentation import documenter_le_run
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent, PipelineResult
+from tessera.services.pipeline.pipeline_run import PipelineRun
+from tessera.services.verdicts.security_auditor import SecurityAuditResult
+from tessera.services.verdicts.validator import ValidationResult
 
 
 # ------------------------------------------------------------------

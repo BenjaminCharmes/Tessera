@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services.github_workflow import (
+from tessera.services.github.github_workflow import (
     GitHubWorkflowService,
     WorkflowError,
     build_pr_body,
@@ -237,7 +237,7 @@ def test_le_merge_passe_toujours_par_la_porte(tmp_path: Path) -> None:
     """
     import inspect
 
-    from tessera.services import github_workflow
+    from tessera.services.github import github_workflow
 
     source = inspect.getsource(github_workflow)
     lignes = [
@@ -253,7 +253,7 @@ def test_le_merge_passe_toujours_par_la_porte(tmp_path: Path) -> None:
 
 
 def test_un_projet_sans_declaration_ne_merge_jamais(tmp_path: Path) -> None:
-    from tessera.services.autonomie import peut_merger
+    from tessera.services.projets.autonomie import peut_merger
 
     projet = tmp_path / "sans-declaration"
     projet.mkdir()
@@ -406,7 +406,7 @@ def test_sans_issue_le_corps_de_pr_ne_referme_rien() -> None:
 
 
 async def test_la_pr_referme_l_issue_du_ticket(tmp_path: Path) -> None:
-    from tessera.services.sync_map import SyncEntry, SyncMapService
+    from tessera.services.github.sync_map import SyncEntry, SyncMapService
 
     projet = _projet(tmp_path, "pr")
     SyncMapService().save(projet, {"ticket-042": SyncEntry(issue=12)})
@@ -521,7 +521,7 @@ def _projet_merge_method(tmp_path: Path, manifeste: dict[str, object]) -> Path:
 async def test_sans_merge_method_la_pr_est_mergee_en_squash(tmp_path: Path) -> None:
     # Absent de agents.json : le défaut fermé retombe sur squash (ticket-265).
     github = _FakeGitHub(ci_status="passing")
-    from tessera.services.politique_run import PolitiqueRun
+    from tessera.services.gardes.politique_run import PolitiqueRun
 
     projet = _projet_merge_method(tmp_path, {})
     politique = PolitiqueRun.lire(projet)
@@ -542,7 +542,7 @@ async def test_sans_merge_method_la_pr_est_mergee_en_squash(tmp_path: Path) -> N
 async def test_merge_method_merge_transmet_merge_a_github(tmp_path: Path) -> None:
     # Un projet déclarant "merge_method": "merge" obtient un merge commit.
     github = _FakeGitHub(ci_status="passing")
-    from tessera.services.politique_run import PolitiqueRun
+    from tessera.services.gardes.politique_run import PolitiqueRun
 
     projet = _projet_merge_method(tmp_path, {"merge_method": "merge"})
     politique = PolitiqueRun.lire(projet)
@@ -562,7 +562,7 @@ async def test_merge_method_merge_transmet_merge_a_github(tmp_path: Path) -> Non
 async def test_merge_method_inconnu_retombe_sur_squash(tmp_path: Path) -> None:
     # Une valeur non reconnue ne désarme pas le défaut (ADR-023 pattern).
     github = _FakeGitHub(ci_status="passing")
-    from tessera.services.politique_run import PolitiqueRun
+    from tessera.services.gardes.politique_run import PolitiqueRun
 
     projet = _projet_merge_method(tmp_path, {"merge_method": "fast-forward"})
     politique = PolitiqueRun.lire(projet)
@@ -587,7 +587,7 @@ async def test_attente_fusionnabilite_vient_des_reglages(
 
     monkeypatch.setattr(settings, "attente_fusionnabilite_max_s", 42.0)
     github = _FakeGitHub(ci_status="passing")
-    from tessera.services.politique_run import PolitiqueRun
+    from tessera.services.gardes.politique_run import PolitiqueRun
 
     projet = _projet_merge_method(tmp_path, {})
     svc = GitHubWorkflowService(

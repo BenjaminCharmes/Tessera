@@ -104,7 +104,7 @@ test-coverage:
 # fautifs ; sort en erreur au moindre problème (ticket-433).
 check-tickets:
 	@[ -n "$(PROJET)" ] || { echo "usage : make check-tickets PROJET=<id>"; exit 2; }
-	cd backend && uv run python -m tessera.services.ticket_check "$(PROJET)"
+	cd backend && uv run python -m tessera.services.projets.ticket_check "$(PROJET)"
 
 lint:
 	cd backend && uv run mypy src/ && uv run mypy --platform linux src/

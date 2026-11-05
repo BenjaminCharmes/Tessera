@@ -12,12 +12,12 @@ from pathlib import Path
 import pytest
 
 from tessera.config import settings
-from tessera.services import documenteur_run
-from tessera.services.documenteur_run import documenteur
-from tessera.services import documentation
-from tessera.services.politique_run import PolitiqueRun
-from tessera.services.run_dans_worktree import ouvrir_worktree
-from tessera.services.run_worktree import RunWorktree
+from tessera.services.documentation import documenteur_run
+from tessera.services.documentation.documenteur_run import documenteur
+from tessera.services.documentation import documentation
+from tessera.services.gardes.politique_run import PolitiqueRun
+from tessera.services.pipeline.run_dans_worktree import ouvrir_worktree
+from tessera.services.worktrees.run_worktree import RunWorktree
 from tests.depot_worktree import construire, git
 from tests.matiere_factice import matiere_factice
 from tests.test_providers_base import FakeProvider

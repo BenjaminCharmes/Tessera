@@ -6,10 +6,10 @@ l'événement `ticket_status_changed` pour les observateurs déjà connectés.
 """
 import pytest
 
-from tessera.services.event_hub import EventHub
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
-from tessera.services.run_executor import emetteur
-from tessera.services.run_registry import RunActif
+from tessera.services.noyau.event_hub import EventHub
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.pipeline.run_executor import emetteur
+from tessera.services.pipeline.run_registry import RunActif
 
 
 def _run(

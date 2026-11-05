@@ -13,8 +13,8 @@ from fastapi.testclient import TestClient
 from tessera.config import settings
 from tessera.main import app
 from tessera.models.ticket import TicketStatus
-from tessera.services.pipeline_events import PipelineResult
-from tessera.services.run_registry import RUN_REGISTRY
+from tessera.services.noyau.pipeline_events import PipelineResult
+from tessera.services.pipeline.run_registry import RUN_REGISTRY
 
 _MESSAGE = "un ticket à la fois"
 

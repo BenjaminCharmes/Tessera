@@ -14,9 +14,9 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from tessera.services.git_clone import GitCloneService
+from tessera.services.creation_projet.git_clone import GitCloneService
 from tessera.services.git_workspace import GitWorkspaceService
-from tessera.services.livraison import Livraison, LivraisonService
+from tessera.services.livraison.livraison import Livraison, LivraisonService
 
 _BRANCHE = "ticket-001-slug"
 _REFSPEC_COMPLET = "+refs/heads/*:refs/remotes/origin/*"

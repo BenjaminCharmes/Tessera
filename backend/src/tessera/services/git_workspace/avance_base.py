@@ -1,6 +1,6 @@
 """Fast-forwarding the checked-out base branch, files included."""
 
-from tessera.services import journal_en_attente
+from tessera.services.git_workspace import journal_en_attente
 from tessera.services.git_workspace.chemins import _JOURNAL_PIPELINE
 from tessera.services.git_workspace.erreurs import GitCommandError
 from tessera.services.git_workspace.historique import GitHistory

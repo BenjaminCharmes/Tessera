@@ -9,16 +9,16 @@ from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisco
 from pydantic import BaseModel
 
 from tessera.config import settings
-from tessera.services.adr import adr_pertinents, lire_contraintes
-from tessera.services.assemblage_run import build_orchestrator
-from tessera.services.chat_service import ChatBudgetExceeded, ChatService
-from tessera.services.chat_suggestion import summarize_conversation
-from tessera.services.event_hub import EVENT_HUB
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
-from tessera.services.run_executor import emetteur
-from tessera.services.run_lock import RUN_LOCK
-from tessera.services.run_registry import RUN_REGISTRY, RunActif, RunAlreadyInProgress
-from tessera.services.database_chat import (
+from tessera.services.projets.adr import adr_pertinents, lire_contraintes
+from tessera.services.pipeline.assemblage_run import build_orchestrator
+from tessera.services.agents.chat_service import ChatBudgetExceeded, ChatService
+from tessera.services.agents.chat_suggestion import summarize_conversation
+from tessera.services.noyau.event_hub import EVENT_HUB
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.pipeline.run_executor import emetteur
+from tessera.services.pipeline.run_lock import RUN_LOCK
+from tessera.services.pipeline.run_registry import RUN_REGISTRY, RunActif, RunAlreadyInProgress
+from tessera.services.noyau.database_chat import (
     ChatMessageRow,
     ConversationSummary,
     conversation_cost_usd,
@@ -27,11 +27,11 @@ from tessera.services.database_chat import (
     save_chat_message,
 )
 from tessera.services.git_workspace import GitWorkspaceService
-from tessera.services.project_loader import load_project
+from tessera.services.projets.project_loader import load_project
 from tessera.routers.dependencies import require_valid_project_id
 from tessera.utils.project_id import validate_project_id
 from tessera.services.providers.par_role import provider_pour_role
-from tessera.services.ticket_service import TicketService
+from tessera.services.projets.ticket_service import TicketService
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

@@ -7,9 +7,9 @@ from pathlib import Path
 import pytest
 
 from tessera.config import settings
-from tessera.services import run_worktree
+from tessera.services.worktrees import run_worktree
 from tessera.services.git_workspace import GitCommandError
-from tessera.services.run_worktree import (
+from tessera.services.worktrees.run_worktree import (
     BrancheDejaExtraite,
     CheminRefuse,
     RunWorktree,
@@ -140,7 +140,7 @@ async def test_supprimer_finishes_with_extended_paths_when_git_cannot_empty_the_
     monkeypatch.setattr(run_worktree, "run_git", git_qui_echoue)
     monkeypatch.setattr(run_worktree, "chemin_etendu", espion)
 
-    with caplog.at_level(logging.WARNING, logger="tessera.services.run_worktree"):
+    with caplog.at_level(logging.WARNING, logger="tessera.services.worktrees.run_worktree"):
         await supprimer(wt, checkout)
 
     assert etendus == [wt.racine]
@@ -208,9 +208,9 @@ def test_only_the_run_wiring_imports_run_worktree() -> None:
     # La reprise au démarrage (ticket-520) retire des worktrees sans lancer de run :
     # elle ne compte pas comme un branchement.
     propres = {
-        src / "services" / "run_worktree.py",
-        src / "services" / "run_worktree_populate.py",
-        src / "services" / "reprise_worktrees.py",
+        src / "services" / "worktrees" / "run_worktree.py",
+        src / "services" / "worktrees" / "run_worktree_populate.py",
+        src / "services" / "pipeline" / "reprise_worktrees.py",
     }
     appelants = sorted(
         fichier.relative_to(src).as_posix()
@@ -219,14 +219,14 @@ def test_only_the_run_wiring_imports_run_worktree() -> None:
     )
     assert appelants == [
         "routers/orchestrator.py",
-        "services/assemblage_run.py",
-        "services/documenteur_run.py",
-        "services/livreur_run.py",
-        "services/orchestrator.py",
-        "services/pipeline_branche.py",
-        "services/preparation_run.py",
-        "services/run_dans_worktree.py",
-        "services/surveillance_run.py",
+        "services/documentation/documenteur_run.py",
+        "services/livraison/surveillance_run.py",
+        "services/pipeline/assemblage_run.py",
+        "services/pipeline/livreur_run.py",
+        "services/pipeline/orchestrator.py",
+        "services/pipeline/pipeline_branche.py",
+        "services/pipeline/preparation_run.py",
+        "services/pipeline/run_dans_worktree.py",
     ]
 
 

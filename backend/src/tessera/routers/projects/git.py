@@ -7,15 +7,15 @@ from pydantic import BaseModel
 
 from tessera.config import settings
 from tessera.routers.projects.shared import new_router, require_project_path
-from tessera.services.git_link import (
+from tessera.services.creation_projet.git_link import (
     GitLinkError,
     RemoteNotEmpty,
     git_status,
     init_repository,
     link_remote,
 )
-from tessera.services.github_service import GitHubService
-from tessera.services.politique_run import PolitiqueRun
+from tessera.services.github.github_service import GitHubService
+from tessera.services.gardes.politique_run import PolitiqueRun
 
 router = new_router()
 

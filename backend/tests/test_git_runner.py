@@ -11,17 +11,12 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services import (
-    branch_cleanup,
-    git_runner,
-    journal_en_attente,
-    project_removal,
-    realignement_base,
-    reprise_orphelin,
-    temporary_worktree,
-    ticket_diff,
-)
-from tessera.services.git_runner import GitResult, git, writes
+from tessera.services.pipeline import reprise_orphelin
+from tessera.services.livraison import branch_cleanup, realignement_base
+from tessera.services.git_workspace import git_runner, journal_en_attente, ticket_diff
+from tessera.services.worktrees import temporary_worktree
+from tessera.services.creation_projet import project_removal
+from tessera.services.git_workspace.git_runner import GitResult, git, writes
 from tessera.services.git_workspace import GitCommandError
 
 #: Hooks qui, ensemble, couvrent un commit, un checkout et toute mise à jour de ref.
@@ -271,7 +266,7 @@ def test_no_caller_spawns_git_itself(module: object) -> None:
     source = inspect.getsource(module)  # type: ignore[arg-type]
 
     assert "create_subprocess_exec" not in source
-    assert "tessera.services.git_runner" in source
+    assert "tessera.services.git_workspace.git_runner" in source
 
 
 async def test_read_only_callers_answer_through_the_common_runner(tmp_path: Path) -> None:

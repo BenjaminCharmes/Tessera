@@ -1,7 +1,7 @@
 """A code material source for documentation tests that run outside a git repository."""
 from pathlib import Path
 
-from tessera.services.documentation_code import (
+from tessera.services.documentation.documentation_code import (
     DiffDeTicket,
     FichierLivre,
     FournisseurMatiere,

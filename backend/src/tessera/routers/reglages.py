@@ -10,7 +10,7 @@ from pydantic import BaseModel
 
 from tessera import reglages
 from tessera.config import settings
-from tessera.services.run_registry import RUN_REGISTRY
+from tessera.services.pipeline.run_registry import RUN_REGISTRY
 
 router = APIRouter(prefix="/reglages", tags=["reglages"])
 

@@ -9,8 +9,8 @@ from pydantic import SecretStr
 
 from tessera.config import settings
 from tessera.main import app
-from tessera.services.event_hub import EVENT_HUB, Abonnement
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.noyau.event_hub import EVENT_HUB, Abonnement
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.provisioning import (
     OnlineConfig,
     ProvisioningContext,

@@ -8,7 +8,7 @@ from fastapi.testclient import TestClient
 from tessera import config
 from tessera.config import _REPO_ROOT, settings
 from tessera.main import app
-from tessera.services import signalements_en_attente as attente
+from tessera.services.pipeline import signalements_en_attente as attente
 
 
 def _entree(titre: str) -> dict[str, str]:

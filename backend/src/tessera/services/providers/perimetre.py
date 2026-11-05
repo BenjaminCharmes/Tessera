@@ -26,7 +26,7 @@ from typing import Any, Awaitable, Callable
 
 from claude_agent_sdk import HookContext, HookInput, HookJSONOutput
 
-from tessera.services.racine_depot import declare_ancestor, racine_ecriture_projet
+from tessera.services.projets.racine_depot import declare_ancestor, racine_ecriture_projet
 from tessera.services.providers.chemins_proteges import (
     INTERPRETE_PROTEGE_REFUS,
     motif_de_protection,

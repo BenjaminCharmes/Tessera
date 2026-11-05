@@ -1,0 +1,116 @@
+"""Service GitCloneService — ticket-030."""
+import asyncio
+import re
+import shutil
+from pathlib import Path
+
+from tessera.models.project import CloneProjectResponse, Project
+from tessera.services.projets.manifeste import ecrire_clef
+from tessera.services.creation_projet.project_analyzer import ProjectAnalyzerService
+from tessera.services.creation_projet.project_importer import _scaffold_artifact_dirs
+from tessera.services.projets.artifacts import (
+    apply_artifact_mode,
+    default_mode_for,
+)
+from tessera.services.projets.project_loader import load_project
+from tessera.utils.logger import get_logger
+
+_logger = get_logger(__name__)
+
+_GITHUB_URL_RE = re.compile(
+    # `\Z` et non `$` : `$` accepte aussi un saut de ligne final (ticket-758).
+    r"^https://github\.com/[a-zA-Z0-9_.-]+/[a-zA-Z0-9_.-]+\Z"
+)
+
+
+def _sanitize_id(name: str) -> str:
+    return re.sub(r"[^a-z0-9-]", "-", name.lower())[:50]
+
+
+def _repo_name(repo_url: str) -> str:
+    return repo_url.rstrip("/").rsplit("/", 1)[-1]
+
+
+class CloneError(Exception):
+    """Erreur métier lors du clonage."""
+
+
+class GitCloneService:
+    CLONE_TIMEOUT = 60
+
+    def __init__(self, workspace: Path, analyzer: ProjectAnalyzerService) -> None:
+        self._workspace = workspace.resolve()
+        self._analyzer = analyzer
+
+    async def clone(
+        self,
+        repo_url: str,
+        project_id: str | None = None,
+    ) -> CloneProjectResponse:
+        if not _GITHUB_URL_RE.match(repo_url):
+            raise CloneError(
+                f"URL GitHub invalide : {repo_url!r}. "
+                "Format attendu : https://github.com/owner/repo"
+            )
+
+        safe_id = project_id or _sanitize_id(_repo_name(repo_url))
+        dest = self._workspace / safe_id
+
+        if dest.exists() or dest.is_symlink():
+            raise CloneError(
+                f"Un projet avec l'id '{safe_id}' existe déjà dans le workspace."
+            )
+
+        # L'URL part telle quelle : un jeton dedans irait dans `.git/config`.
+        try:
+            await self._run_clone(repo_url, dest)
+        except Exception:
+            shutil.rmtree(dest, ignore_errors=True)
+            raise
+
+        _scaffold_artifact_dirs(dest)
+        self._store_github_remote(dest, repo_url)
+        # Le dépôt appartient déjà à quelqu'un d'autre : les artefacts
+        # Tessera restent locaux par défaut (ticket-062). L'utilisateur
+        # peut toujours choisir de les partager ensuite.
+        await apply_artifact_mode(dest, default_mode_for("clone"))
+
+        analysis = await self._analyzer.analyze(dest)
+
+        project = load_project(dest)
+        return CloneProjectResponse(
+            project=project,
+            claude_md_generated=analysis.claude_md_written,
+            detected_stack=analysis.detected_stack,
+        )
+
+    async def _run_clone(self, url: str, dest: Path) -> None:
+        proc = await asyncio.create_subprocess_exec(
+            # `--depth` implique `--single-branch` : le refspec se réduisait à
+            # la seule branche clonée, et un push de la branche du ticket ne
+            # laissait aucune référence `origin/<branche>` (ticket-517).
+            "git", "clone", "--depth=1", "--no-single-branch", url, str(dest),
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
+        try:
+            _, stderr = await asyncio.wait_for(
+                proc.communicate(), timeout=self.CLONE_TIMEOUT
+            )
+        except asyncio.TimeoutError:
+            proc.kill()
+            await proc.communicate()
+            raise CloneError(f"Le clone a dépassé {self.CLONE_TIMEOUT}s.")
+
+        if proc.returncode != 0:
+            _logger.warning(
+                "git_clone_failed",
+                extra={"returncode": proc.returncode},
+            )
+            raise CloneError(
+                f"git clone a échoué (code {proc.returncode}). "
+                "Vérifiez l'URL et vos droits d'accès."
+            )
+
+    def _store_github_remote(self, project_path: Path, repo_url: str) -> None:
+        ecrire_clef(project_path, "github_remote", repo_url)

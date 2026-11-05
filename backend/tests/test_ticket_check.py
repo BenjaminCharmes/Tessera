@@ -6,8 +6,8 @@ from fastapi.testclient import TestClient
 
 from tessera.config import settings
 from tessera.main import app
-from tessera.services import ticket_check
-from tessera.services.ticket_check import verifier_tickets
+from tessera.services.projets import ticket_check
+from tessera.services.projets.ticket_check import verifier_tickets
 
 _TEMPLATE = """---
 id: {id}

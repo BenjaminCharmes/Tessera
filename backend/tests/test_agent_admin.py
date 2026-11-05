@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from tessera.routers.agent_admin import get_registry, router
-from tessera.services.agent_registry import AgentRegistryService
+from tessera.services.agents.agent_registry import AgentRegistryService
 
 BASE = "/api/v1/agents/registry"
 

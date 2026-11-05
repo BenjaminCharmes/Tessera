@@ -10,7 +10,7 @@ import from here are re-exported below.
 """
 import asyncio  # noqa: F401  # les tests patchent `tessera.services.git_workspace.asyncio`
 
-from tessera.services.git_runner import _dossier_sans_hooks
+from tessera.services.git_workspace.git_runner import _dossier_sans_hooks
 from tessera.services.git_workspace.branche import GitBranch
 from tessera.services.git_workspace.erreurs import (
     BaseIntrouvable,

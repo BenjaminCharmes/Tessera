@@ -4,10 +4,10 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services.documentation import EditionRefusee, _PLAFOND
-from tessera.services.documentation_editions import appliquer_editions
-from tessera.services.documentation_selection import marquer_documente, tickets_a_documenter
-from tessera.services.documentation_code import DiffDeTicket, FichierLivre, MatiereCode
+from tessera.services.documentation.documentation import EditionRefusee, _PLAFOND
+from tessera.services.documentation.documentation_editions import appliquer_editions
+from tessera.services.documentation.documentation_selection import marquer_documente, tickets_a_documenter
+from tessera.services.documentation.documentation_code import DiffDeTicket, FichierLivre, MatiereCode
 from tests.matiere_factice import matiere_factice
 
 
@@ -270,7 +270,7 @@ class _FauxProvider:
 def _service(  # type: ignore[no-untyped-def]
     tmp_path: Path, reponses: list[str], sans_diff: tuple[str, ...] = ()
 ):
-    from tessera.services.documentation import DocumentationService
+    from tessera.services.documentation.documentation import DocumentationService
 
     prompts = tmp_path / "prompts"
     prompts.mkdir(exist_ok=True)
@@ -392,8 +392,8 @@ async def test_un_lot_sans_aucun_diff_n_appelle_aucun_agent(tmp_path: Path) -> N
 
 
 def test_le_brief_donne_tickets_diffs_fichiers_puis_documentation_dans_cet_ordre() -> None:
-    from tessera.services.documentation import _brief
-    from tessera.services.documentation_selection import TicketADocumenter
+    from tessera.services.documentation.documentation import _brief
+    from tessera.services.documentation.documentation_selection import TicketADocumenter
 
     tickets = [TicketADocumenter("ticket-001", "Titre un", "Corps du ticket un")]
     matiere = MatiereCode(
@@ -416,8 +416,8 @@ def test_le_brief_donne_tickets_diffs_fichiers_puis_documentation_dans_cet_ordre
 
 
 def test_le_brief_sans_matiere_de_code_reste_valide() -> None:
-    from tessera.services.documentation import _brief
-    from tessera.services.documentation_selection import TicketADocumenter
+    from tessera.services.documentation.documentation import _brief
+    from tessera.services.documentation.documentation_selection import TicketADocumenter
 
     brief = _brief([TicketADocumenter("ticket-001", "T", "Corps")], MatiereCode())
 
@@ -791,7 +791,7 @@ def test_fichier_trop_long_remplace_par_ses_titres_et_borne_respectee(
 ) -> None:
     """Au-delà de la borne, un fichier est remplacé par ses titres et le message
     ne dépasse pas la borne."""
-    from tessera.services.documentation import _contenu_documentable
+    from tessera.services.documentation.documentation import _contenu_documentable
 
     corps = "paragraphe " * 500  # ~5 500 caractères de corps
     (tmp_path / "README.md").write_text(
@@ -815,7 +815,7 @@ def test_fichier_trop_long_remplace_par_ses_titres_et_borne_respectee(
 def test_titres_fichiers_vises_ne_lit_que_la_documentation(tmp_path: Path, chemin: str) -> None:
     """Ticket-395 security audit: the corrective round never reads a file the
     agent names outside the documentation, nor outside the root."""
-    from tessera.services.documentation import _titres_fichiers_vises
+    from tessera.services.documentation.documentation import _titres_fichiers_vises
 
     racine = tmp_path / "projet"
     (racine / "src").mkdir(parents=True)
@@ -826,7 +826,7 @@ def test_titres_fichiers_vises_ne_lit_que_la_documentation(tmp_path: Path, chemi
 
 
 def test_titres_fichiers_vises_lit_un_fichier_de_doc(tmp_path: Path) -> None:
-    from tessera.services.documentation import _titres_fichiers_vises
+    from tessera.services.documentation.documentation import _titres_fichiers_vises
 
     (tmp_path / "docs").mkdir()
     (tmp_path / "docs" / "guide.md").write_text("# Guide\n\n## Étapes\n", encoding="utf-8")

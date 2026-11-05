@@ -11,7 +11,7 @@ from pathlib import Path
 from tessera import reglages
 from tessera.config import settings
 from tessera.models.agent import AgentConfig
-from tessera.services.project_loader import load_agents_config
+from tessera.services.projets.project_loader import load_agents_config
 from tessera.services.providers import get_provider
 from tessera.services.providers.agent_sdk import ClaudeAgentSDKProvider
 from tessera.services.providers.base import LLMProvider

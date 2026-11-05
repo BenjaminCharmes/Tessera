@@ -5,7 +5,7 @@ from typing import Any
 
 import aiosqlite
 
-from tessera.services.database import init_db
+from tessera.services.noyau.database import init_db
 
 
 async def base_neuve(chemin: Path) -> Path:

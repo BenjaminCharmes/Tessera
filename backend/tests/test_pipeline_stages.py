@@ -10,10 +10,15 @@ from pathlib import Path
 import pytest
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services import pipeline_branche, pipeline_controles, pipeline_production, pipeline_testeur
+from tessera.services.pipeline import (
+    pipeline_branche,
+    pipeline_controles,
+    pipeline_production,
+    pipeline_testeur,
+)
 from tessera.services.git_workspace import GitCommandError, GitWorkspaceService, NotAGitRepository
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
-from tessera.services.pipeline_run import PipelineRun
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.pipeline.pipeline_run import PipelineRun
 from tests.doubles_git import GitWorkspaceDouble
 
 
@@ -461,7 +466,7 @@ def test_l_outil_ask_user_n_est_offert_qu_en_mode_interactif() -> None:
     # Offrir `ask_user` a un run non interactif promettrait a l'agent une
     # réponse que personne ne peut donner : il attendrait le delai complet a
     # chaque question, pour rien (ADR-025).
-    from tessera.services.dialogue import DialogueChannel
+    from tessera.services.noyau.dialogue import DialogueChannel
 
     run = _run()
     assert pipeline_production.asker_for(run) is None
@@ -521,7 +526,7 @@ class _AuditeurEnRepli:
     async def audit(
         self, code_diff: str, project_path: Path, contexte: object = None
     ) -> object:
-        from tessera.services.security_auditor import SecurityAuditResult
+        from tessera.services.verdicts.security_auditor import SecurityAuditResult
 
         return SecurityAuditResult(
             issues=[], verdict="PASS", summary="ok", fallback_reason="tours épuisés"
@@ -553,7 +558,7 @@ class _AuditeurEspion:
     async def audit(
         self, code_diff: str, project_path: Path, contexte: object = None
     ) -> object:
-        from tessera.services.security_auditor import SecurityAuditResult
+        from tessera.services.verdicts.security_auditor import SecurityAuditResult
 
         self.contexte = contexte
         return SecurityAuditResult(issues=[], verdict="PASS", summary="ok")
@@ -612,7 +617,7 @@ async def test_run_validation_sans_validateur_approuve_avec_raison_vide() -> Non
 
 
 def test_en_dict_contient_etapes_en_cours_vide_par_defaut() -> None:
-    from tessera.services.run_registry import RunActif
+    from tessera.services.pipeline.run_registry import RunActif
 
     run = RunActif(run_id="r1", project_id="p1")
     d = run.en_dict()
@@ -622,7 +627,7 @@ def test_en_dict_contient_etapes_en_cours_vide_par_defaut() -> None:
 
 
 def test_en_dict_expose_les_etapes_en_cours() -> None:
-    from tessera.services.run_registry import RunActif
+    from tessera.services.pipeline.run_registry import RunActif
 
     run = RunActif(run_id="r1", project_id="p1")
     run.etapes_en_cours = ["revue", "validation"]
@@ -634,9 +639,9 @@ def test_en_dict_expose_les_etapes_en_cours() -> None:
 def test_suivre_ajoute_revue_et_validation_dans_etapes_en_cours() -> None:
     """_suivre tracks both stages when reviewer and validator run concurrently."""
     from tessera.models.agent import AgentRole
-    from tessera.services.pipeline_events import EventType, OrchestratorEvent
-    from tessera.services.run_executor import _suivre
-    from tessera.services.run_registry import RunActif
+    from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
+    from tessera.services.pipeline.run_executor import _suivre
+    from tessera.services.pipeline.run_registry import RunActif
 
     run_actif = RunActif(run_id="r1", project_id="p1")
 
@@ -702,17 +707,17 @@ class _TestRunnerResult:
 
 
 def _expired_result() -> object:
-    from tessera.services.test_runner import TestResult
+    from tessera.services.verification.test_runner import TestResult
     return TestResult(passed=False, expiree=True, total=0, failed=0, output_summary="Timeout après 60s — cmd")
 
 
 def _green_result() -> object:
-    from tessera.services.test_runner import TestResult
+    from tessera.services.verification.test_runner import TestResult
     return TestResult(passed=True, expiree=False, total=5, failed=0, output_summary="5 passed in 0.5s")
 
 
 def _red_result() -> object:
-    from tessera.services.test_runner import TestResult
+    from tessera.services.verification.test_runner import TestResult
     return TestResult(passed=False, expiree=False, total=5, failed=1, output_summary="1 failed, 4 passed in 0.5s")
 
 
@@ -724,7 +729,7 @@ async def test_run_tests_sans_runner_rend_true() -> None:
 
 async def test_run_tests_premier_expire_second_vert_passe_a_la_securite() -> None:
     """First timeout + second green: continues without invoking the coder again (ticket-349)."""
-    from tessera.services.pipeline_events import PipelineResult
+    from tessera.services.noyau.pipeline_events import PipelineResult
 
     runner = _TestRunnerResult([_expired_result(), _green_result()])
     orch = _Orch(
@@ -740,7 +745,7 @@ async def test_run_tests_premier_expire_second_vert_passe_a_la_securite() -> Non
 
 async def test_run_tests_deux_expirements_bloquent_le_run() -> None:
     """Two consecutive timeouts terminate the run as blocked (ticket-349)."""
-    from tessera.services.pipeline_events import PipelineResult
+    from tessera.services.noyau.pipeline_events import PipelineResult
     from tessera.models.ticket import TicketStatus
 
     class _TicketSvcMock:

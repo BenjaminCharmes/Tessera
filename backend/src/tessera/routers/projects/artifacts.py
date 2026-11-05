@@ -3,7 +3,7 @@
 from pydantic import BaseModel
 
 from tessera.routers.projects.shared import new_router, require_project_path
-from tessera.services.artifacts import (
+from tessera.services.projets.artifacts import (
     ArtifactMode,
     apply_artifact_mode,
     read_artifact_mode,

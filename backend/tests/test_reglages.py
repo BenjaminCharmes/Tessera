@@ -8,7 +8,7 @@ import pytest
 from tessera import reglages
 from tessera.config import CHAMPS_JETONS, Settings, settings
 from tessera.reglages import REGISTRE, ReglageInvalide
-from tessera.services.database import init_db
+from tessera.services.noyau.database import init_db
 
 
 @pytest.fixture(autouse=True)

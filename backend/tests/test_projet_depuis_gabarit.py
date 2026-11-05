@@ -11,8 +11,8 @@ from unittest.mock import AsyncMock, patch
 import pytest
 
 from tessera.config import _REPO_ROOT
-from tessera.services.git_link import GitStatus
-from tessera.services.project_from_template import (
+from tessera.services.creation_projet.git_link import GitStatus
+from tessera.services.creation_projet.project_from_template import (
     _collect_used_ports,
     create_project_from_template,
 )
@@ -23,7 +23,7 @@ _TEMPLATE_DIR = _REPO_ROOT / "templates" / "fastapi-react"
 _GIT_OK = GitStatus(is_own_repository=True, has_commits=True)
 
 # Namespace où init_repository est importé dans le module du service.
-_PATCH_GIT = "tessera.services.project_from_template.init_repository"
+_PATCH_GIT = "tessera.services.creation_projet.project_from_template.init_repository"
 
 
 @pytest.fixture

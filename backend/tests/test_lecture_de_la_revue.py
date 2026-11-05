@@ -2,7 +2,7 @@
 from tessera.config import settings
 from tessera.models.agent import AgentResult, AgentRole
 from tessera.models.ticket import TicketStatus
-from tessera.services.verdict_reviewer import donnees_fin_de_revue, juger_revue
+from tessera.services.verdicts.verdict_reviewer import donnees_fin_de_revue, juger_revue
 from tests.revue_structuree import revue
 
 

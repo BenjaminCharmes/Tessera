@@ -5,7 +5,7 @@ import logging
 import httpx
 import pytest
 
-from tessera.services.pipeline_events import OrchestratorEvent
+from tessera.services.noyau.pipeline_events import OrchestratorEvent
 from tessera.services.provisioning import (
     DatabaseStep,
     NeonClient,

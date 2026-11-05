@@ -5,7 +5,7 @@ from pathlib import Path
 from tessera.services.git_workspace.chemins import _relatif_au_projet
 from tessera.services.git_workspace.conflits import GitConflicts
 from tessera.services.git_workspace.erreurs import GitCommandError
-from tessera.services.regles_conflit import resoudre_fichier
+from tessera.services.git_workspace.regles_conflit import resoudre_fichier
 from tessera.utils.logger import get_logger
 
 

@@ -5,9 +5,9 @@ from pathlib import Path
 
 from tests.test_providers_base import FakeProvider
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services.security_auditor import SecurityAuditorService
-from tessera.services.test_runner import TestResult
-from tessera.services.security_contexte import (
+from tessera.services.verdicts.security_auditor import SecurityAuditorService
+from tessera.services.verification.test_runner import TestResult
+from tessera.services.verdicts.security_contexte import (
     NOT_DONE_MAX_CHARS,
     AuditContext,
     FollowingTicket,

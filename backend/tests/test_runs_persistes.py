@@ -17,11 +17,11 @@ from tests.test_providers_base import FakeProvider
 from tessera.config import settings
 from tessera.main import app
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services.agent_registry import AgentRegistryService
-from tessera.services.agent_runner import AgentRunner
-from tessera.services.database import init_db
-from tessera.services.orchestrator import Orchestrator
-from tessera.services.run_recorder import RunRecorder
+from tessera.services.agents.agent_registry import AgentRegistryService
+from tessera.services.agents.agent_runner import AgentRunner
+from tessera.services.noyau.database import init_db
+from tessera.services.pipeline.orchestrator import Orchestrator
+from tessera.services.pipeline.run_recorder import RunRecorder
 from tests.doubles_git import GitWorkspaceDouble
 
 
@@ -229,7 +229,7 @@ async def test_l_orchestrateur_construit_par_le_routeur_enregistre_ses_runs(
     workspace: Path,
 ) -> None:
     # C'est par la que passent `/chat/run`, la file et le run autonome.
-    from tessera.services.assemblage_run import build_orchestrator
+    from tessera.services.pipeline.assemblage_run import build_orchestrator
 
     orchestrator = await build_orchestrator("mon-projet")
 

@@ -18,10 +18,10 @@ from typing import Any
 import pytest
 
 from tessera.config import settings
-from tessera.services.event_hub import EventHub
-from tessera.services.run_executor import executer
-from tessera.services.run_registry import RunActif, RunRegistry
-from tessera.services.database import init_db
+from tessera.services.noyau.event_hub import EventHub
+from tessera.services.pipeline.run_executor import executer
+from tessera.services.pipeline.run_registry import RunActif, RunRegistry
+from tessera.services.noyau.database import init_db
 
 
 # ---------------------------------------------------------------------------
@@ -125,7 +125,7 @@ def test_log_pipeline_refuse_un_identifiant_qui_sort_du_workspace(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, project_id: str
 ) -> None:
     """Ticket-377 security audit: no write outside the workspace."""
-    from tessera.services.run_executor import _log_pipeline
+    from tessera.services.pipeline.run_executor import _log_pipeline
 
     workspace = tmp_path / "workspace"
     workspace.mkdir()
@@ -140,7 +140,7 @@ def test_log_pipeline_refuse_un_identifiant_qui_sort_du_workspace(
 def test_log_pipeline_ne_cree_aucun_dossier(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    from tessera.services.run_executor import _log_pipeline
+    from tessera.services.pipeline.run_executor import _log_pipeline
 
     workspace = tmp_path / "workspace"
     workspace.mkdir()
@@ -154,7 +154,7 @@ def test_log_pipeline_ne_cree_aucun_dossier(
 def test_log_pipeline_ecrit_une_seule_ligne(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    from tessera.services.run_executor import _log_pipeline
+    from tessera.services.pipeline.run_executor import _log_pipeline
 
     workspace = tmp_path / "workspace"
     (workspace / "mon-projet" / "memory").mkdir(parents=True)

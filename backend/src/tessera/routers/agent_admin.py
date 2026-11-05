@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, field_validator
 
 from tessera.config import settings
-from tessera.services.agent_registry import AgentNotFoundError, AgentRegistryService
+from tessera.services.agents.agent_registry import AgentNotFoundError, AgentRegistryService
 
 _ROLE_RE = re.compile(r"^[a-z][a-z0-9-]*$")
 

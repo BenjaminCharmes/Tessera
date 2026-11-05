@@ -325,7 +325,7 @@ Un worktree neuf est peuplé avant tout lancement : ses entrées déclarées (fi
 
 **Protection contre la suppression de liens traversés** : avant tout `worktree remove` ou `rmtree`, une étape retire chaque jonction et lien sans jamais en traverser l'intérieur — cela évite le bug du 14/10 où une jonction vidait le `node_modules` du dépôt principal. Sous Windows, la détection s'appuie sur l'attribut de point d'analyse (`st_file_attributes`). Si un lien subsiste après, la suppression du worktree s'arrête sans effacer le reste.
 
-Implémentation : `services/run_worktree_populate.py` (ticket-523, ADR-056).
+Implémentation : `services/worktrees/run_worktree_populate.py` (ticket-523, ADR-056).
 
 Sous Windows, les chemins de plus de 260 caractères (courant avec pnpm et les arbres imbriqués de `node_modules`) levaient `WinError 3` lors de la suppression du worktree, interrompant le run même après la livraison de la PR (ticket-531). La correction applique le préfixe étendu `\?\` pour les appels système du nettoyage et rattrape les erreurs `OSError` et `GitWorkspaceError` : le résultat du run reste inchangé (livré reste livré), un avertissement `run_worktree_non_supprime` est journalisé, et le dossier peut être nettoyé au prochain démarrage (ticket-520).
 
@@ -408,7 +408,7 @@ sans attendre que le testeur les installe.
 En cas d'échec ou dépassement, le run passe en `blocked` avec la sortie de la commande
 — le codeur n'est pas appelé (ADR-037).
 
-**Validation** : validée à la lecture du projet par `services/worktree_politique.py`
+**Validation** : validée à la lecture du projet par `services/gardes/worktree_politique.py`
 (ticket-521). Absente, aucune commande ne s'exécute avant le codeur.
 
 ### Reprise de runs orphelins (ticket-369)
@@ -554,7 +554,7 @@ Chaque agent reçoit un contexte filtré selon sa portée définie dans les ADR 
 
 **Invariant** : le contexte d'un agent inclut toujours le diff git, les résultats des étapes précédentes et l'audit, indépendamment de la portée des ADR du projet. Seule la section des décisions elle-même est filtrée par rôle.
 
-`adr_pertinents` (`backend/src/tessera/services/adr.py`) découpe à cette limite. Les ADRs au format `contraintes.md` (`contraintes_pour`) n'en ont pas besoin : leurs blocs s'arrêtent déjà au titre de niveau 2 suivant.
+`adr_pertinents` (`backend/src/tessera/services/projets/adr.py`) découpe à cette limite. Les ADRs au format `contraintes.md` (`contraintes_pour`) n'en ont pas besoin : leurs blocs s'arrêtent déjà au titre de niveau 2 suivant.
 
 ### Composition du contexte : priorité aux contraintes
 
@@ -563,7 +563,7 @@ Chaque agent reçoit deux fichiers de mémoire du projet, dans l'ordre de priori
 1. `memory/contraintes.md` — Les règles en vigueur pour le projet, spécifiques au rôle de l'agent
 2. `memory/decisions.md` — ADRs et décisions architecturales, en repli si le premier n'existe pas
 
-Le filtrage par rôle est implémenté dans les routers (`orchestrator.py`, `agents.py`, `chat.py`), qui passent par `services/adr.py`. Une contrainte est une ligne portant un label entre crochets — ex. `[codeur]` — indiquant son champ d'application. Les agents n'appliquent que les contraintes qui les concernent.
+Le filtrage par rôle est implémenté dans les routers (`orchestrator.py`, `agents.py`, `chat.py`), qui passent par `services/projets/adr.py`. Une contrainte est une ligne portant un label entre crochets — ex. `[codeur]` — indiquant son champ d'application. Les agents n'appliquent que les contraintes qui les concernent.
 
 ### Contraintes proposées (ticket-493)
 
@@ -647,7 +647,7 @@ limite de silence (ticket-381) qui coupe après 1200 s sans message.
 
 ### Lancement isolé des services (ticket-664)
 
-Les services lancés par Tessera (backends, workers déclarés par les projets) ne doivent pas arrêter le backend orchestrateur. Sous Windows, un processus enfant qui reçoit `CTRL_C_EVENT` (ex: `uvicorn --reload`) le propage à toute sa console ; partagée, elle arrête le backend et tous ses enfants. Tessera isole chaque service dans sa propre console, son groupe de processus (`CREATE_NO_WINDOW | CREATE_NEW_PROCESS_GROUP` sur Windows, `start_new_session` ailleurs). La fonction `options_de_lancement(systeme)` dans `services/lancement.py` est appelée par `ProcessRegistry._lancer()`.
+Les services lancés par Tessera (backends, workers déclarés par les projets) ne doivent pas arrêter le backend orchestrateur. Sous Windows, un processus enfant qui reçoit `CTRL_C_EVENT` (ex: `uvicorn --reload`) le propage à toute sa console ; partagée, elle arrête le backend et tous ses enfants. Tessera isole chaque service dans sa propre console, son groupe de processus (`CREATE_NO_WINDOW | CREATE_NEW_PROCESS_GROUP` sur Windows, `start_new_session` ailleurs). La fonction `options_de_lancement(systeme)` dans `services/noyau/lancement.py` est appelée par `ProcessRegistry._lancer()`.
 
 ### Coffre du système et gestion des secrets (ADR-073, tickets 794-798)
 
@@ -1171,7 +1171,7 @@ Exemples d'erreurs ainsi empêchées :
 
 Une ADR (ticket-535) formalise cette règle.
 
-Le module `services/documentation_code.py` (ticket-540) produit ce contenu. Pour chaque ticket d'une file, il extrait :
+Le module `services/documentation/documentation_code.py` (ticket-540) produit ce contenu. Pour chaque ticket d'une file, il extrait :
 
 - **Diff filtré** : les changements du ticket, en excluant `tickets/`, `memory/`, `agents.json`, `README.md`, `docs/` et en réduisant les lockfiles à une seule ligne. Le diff est prélevé depuis la racine du dépôt, même pour un projet situé sous `projects/` (les exclusions portent alors le chemin complet du projet). Un diff supérieur à 12 000 caractères par ticket est tronqué, avec un total de 60 000 caractères par lot ; la troncature nomme les fichiers non affichés.
 - **Fichiers modifiés ou ajoutés** : le contenu des fichiers du diff, jusqu'à 8 000 caractères par fichier et 40 000 au total, trié par nombre de lignes changées décroissant. Un fichier trop long reste représenté par ses hunks.
@@ -1460,7 +1460,7 @@ rapide, la branche n'est pas réécrite ; la raison s'ajoute à `Livraison.arret
 
 ### Réalignement de la base locale après merge du CIWatcher (ticket-420)
 
-Après qu'un run autonome soit mergé par le `CIWatcher` (`services/ci_watcher.py`), la base locale doit être réalignée sur la base distante pour que les services du projet servent le code à jour.
+Après qu'un run autonome soit mergé par le `CIWatcher` (`services/livraison/ci_watcher.py`), la base locale doit être réalignée sur la base distante pour que les services du projet servent le code à jour.
 
 **Condition** : le réalignement ne s'effectue que si :
 - Aucun run n'occupe actuellement le projet (`RUN_REGISTRY.projet_occupe()` retourne faux)
@@ -1553,7 +1553,7 @@ une fiche pour garantir que le numéro n'est pris ni sur l'arbre, ni sur `origin
 
 L'endpoint `/projects/{id}/tickets/{id}/pr-status` affichait le statut de chaque PR en interrogeant GitHub, sans cache. Chaque appel lancait deux requêtes GitHub (la PR, puis ses check-runs). Avec 139 tickets portant un `pr_number` dans ide-core, ouvrir le projet provoquait 139 appels à l'endpoint, soit ~280 requêtes GitHub — consommant 5,6 % du quota horaire (5 000 requêtes).
 
-Le module `backend/src/tessera/services/pr_status_cache.py` implémente deux niveaux de cache :
+Le module `backend/src/tessera/services/livraison/pr_status_cache.py` implémente deux niveaux de cache :
 
 - **Statuts définitifs** (`merged`, `closed`) : persistés dans une table SQLite `pr_status_cache`, relus sans appel GitHub — y compris après redémarrage.
 - **Statuts ouverts** : gardés en mémoire 30 secondes, puis redemandés.
@@ -1753,7 +1753,7 @@ L'ordre est garanti : deux signalements reçoivent des `position` croissantes et
 
 Toutes les routes contenant un paramètre `project_id` valident cet identifiant pour assurer que le chemin du projet reste conforme au dossier des projets configuré. Un `project_id` invalide — contenant `.`, `..`, `/`, `\` ou tout caractère ne correspondant pas au pattern `^[A-Za-z0-9][A-Za-z0-9._-]*$` — retourne une `404` sans jamais accéder au disque.
 
-La validation est centralisée dans `backend/src/tessera/services/project_loader.py` :
+La validation est centralisée dans `backend/src/tessera/services/projets/project_loader.py` :
 
 1. **Paramètres de chemin** — FastAPI refuse un identifiant invalide avant l'appel du routeur (→ `404`)
 2. **Corps de requête** — les objets `RunRequest` et `RunAutonomousRequest` rejettent un `project_id` invalide (→ `422`)
@@ -1794,7 +1794,7 @@ CREATE TABLE agent_events (
     ts        TEXT NOT NULL
 );
 
--- Un appel LLM d'un run — tous les rôles (backend/src/tessera/services/database.py)
+-- Un appel LLM d'un run — tous les rôles (backend/src/tessera/services/noyau/database.py)
 CREATE TABLE agent_calls (
     id                INTEGER PRIMARY KEY AUTOINCREMENT,
     run_id            TEXT NOT NULL REFERENCES pipeline_runs(id),

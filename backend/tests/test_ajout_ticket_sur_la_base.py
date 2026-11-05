@@ -14,10 +14,10 @@ from fastapi.testclient import TestClient
 
 from tessera.config import settings
 from tessera.main import app
-from tessera.services.file_vivante import FileVivante
+from tessera.services.pipeline.file_vivante import FileVivante
 from tessera.services.git_workspace import GitWorkspaceService
-from tessera.services.politique_run import PolitiqueRun
-from tessera.services.run_registry import RUN_REGISTRY
+from tessera.services.gardes.politique_run import PolitiqueRun
+from tessera.services.pipeline.run_registry import RUN_REGISTRY
 
 _PROJET = "mon-projet"
 _NOUVEAU = "tickets/todo/ticket-503-sante.md"

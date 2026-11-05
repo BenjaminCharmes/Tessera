@@ -7,8 +7,8 @@ import httpx
 import respx
 
 from tessera.services.providers.ollama import OllamaProvider, _reset_cooldowns
-from tessera.services.validator import ValidatorService
-from tessera.services.validator_cited_files import (
+from tessera.services.verdicts.validator import ValidatorService
+from tessera.services.verdicts.validator_cited_files import (
     CITED_FILES_MAX_CHARS,
     CitedFilesReport,
     build_cited_files_section,

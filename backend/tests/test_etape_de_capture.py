@@ -7,13 +7,13 @@ from typing import Any, cast
 import pytest
 
 from tessera.config import settings
-from tessera.services import pipeline_capture
-from tessera.services.captures import CapturesEchouees, dossier_des_captures
-from tessera.services.captures_config import ConfigCaptures
-from tessera.services.controle_visuel import ControleVisuel, lire_le_controle
-from tessera.services.etape_de_capture import ResultatCapture, prendre_les_captures
-from tessera.services.pipeline_capture import capturer_le_run
-from tessera.services.pipeline_events import EventType, OrchestratorEvent, PipelineResult
+from tessera.services.pipeline import pipeline_capture
+from tessera.services.verification.captures import CapturesEchouees, dossier_des_captures
+from tessera.services.verification.captures_config import ConfigCaptures
+from tessera.services.verification.controle_visuel import ControleVisuel, lire_le_controle
+from tessera.services.pipeline.etape_de_capture import ResultatCapture, prendre_les_captures
+from tessera.services.pipeline.pipeline_capture import capturer_le_run
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent, PipelineResult
 from tessera.models.ticket import TicketStatus
 
 JETON = "s3cr3t-token-618"

@@ -7,11 +7,11 @@ from pydantic import ValidationError
 
 from tessera.config import Settings
 from tessera.models.agent import AgentRole
-from tessera.services.anomalies.modeles import Anomalie
-from tessera.services.event_hub import JETABLES, Abonnement, EventHub
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
-from tessera.services.run_registry import RunActif, RunRegistry
-from tessera.services.run_suivi import suivre
+from tessera.services.supervision.anomalies.modeles import Anomalie
+from tessera.services.noyau.event_hub import JETABLES, Abonnement, EventHub
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.pipeline.run_registry import RunActif, RunRegistry
+from tessera.services.pipeline.run_suivi import suivre
 
 
 def _ev(type_: EventType, agent: AgentRole | None = None, **data: Any) -> OrchestratorEvent:

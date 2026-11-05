@@ -10,8 +10,8 @@ from fastapi.testclient import TestClient
 from tessera.config import settings
 from tessera.main import app
 from tessera.models.ticket import TicketStatus
-from tessera.services.database import init_db
-from tessera.services.pipeline_events import EventType, OrchestratorEvent, PipelineResult
+from tessera.services.noyau.database import init_db
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent, PipelineResult
 
 
 @pytest.fixture(autouse=True)
@@ -396,8 +396,8 @@ def test_le_livreur_passe_le_titre_et_le_corps_du_ticket(
 ) -> None:
     # Le corps de la PR se rédige depuis le ticket : passer son identifiant en
     # guise de titre donnait une PR nommée « ticket-001 — ticket-001 ».
-    from tessera.services.livreur_run import livreur
-    from tessera.services.livraison import Livraison
+    from tessera.services.pipeline.livreur_run import livreur
+    from tessera.services.livraison.livraison import Livraison
 
     recu: dict[str, object] = {}
 
@@ -405,7 +405,7 @@ def test_le_livreur_passe_le_titre_et_le_corps_du_ticket(
         recu.update(kwargs)
         return Livraison(pr_number=7)
 
-    monkeypatch.setattr("tessera.services.livraison.LivraisonService.livrer_phase_1", _livrer)
+    monkeypatch.setattr("tessera.services.livraison.livraison.LivraisonService.livrer_phase_1", _livrer)
 
     livraison = asyncio.run(livreur("mon-projet")(_approved()))
 
@@ -420,12 +420,12 @@ def test_une_livraison_qui_leve_ne_fait_pas_echouer_le_run(
 ) -> None:
     # Le travail est commité : perdre la réponse du run parce que GitHub est
     # injoignable ferait croire que le pipeline lui-même a échoué.
-    from tessera.services.livreur_run import livreur
+    from tessera.services.pipeline.livreur_run import livreur
 
     async def _livrer(self: object, **kwargs: object) -> object:
         raise RuntimeError("GitHub injoignable")
 
-    monkeypatch.setattr("tessera.services.livraison.LivraisonService.livrer_phase_1", _livrer)
+    monkeypatch.setattr("tessera.services.livraison.livraison.LivraisonService.livrer_phase_1", _livrer)
 
     livraison = asyncio.run(livreur("mon-projet")(_approved()))
 
@@ -440,12 +440,12 @@ def test_une_exception_sans_message_nomme_son_type_dans_l_arret(
 ) -> None:
     # Le 2026-10-13, « Livraison interrompue : » s'est écrit sans motif : un
     # `TimeoutError()` n'a pas de message. (ticket-415)
-    from tessera.services.livreur_run import livreur
+    from tessera.services.pipeline.livreur_run import livreur
 
     async def _livrer(self: object, **kwargs: object) -> object:
         raise TimeoutError()
 
-    monkeypatch.setattr("tessera.services.livraison.LivraisonService.livrer_phase_1", _livrer)
+    monkeypatch.setattr("tessera.services.livraison.livraison.LivraisonService.livrer_phase_1", _livrer)
 
     with caplog.at_level("WARNING"):
         livraison = asyncio.run(livreur("mon-projet")(_approved()))
@@ -464,13 +464,13 @@ def test_une_exception_apres_la_pr_garde_son_numero(
 ) -> None:
     # La PR #13 de curio était ouverte, mais la livraison ne le savait plus :
     # la phase 2 n'est jamais partie. (ticket-415)
-    from tessera.services.livreur_run import livreur
-    from tessera.services.livraison import LivraisonInterrompue
+    from tessera.services.pipeline.livreur_run import livreur
+    from tessera.services.livraison.livraison import LivraisonInterrompue
 
     async def _livrer(self: object, **kwargs: object) -> object:
         raise LivraisonInterrompue(13, TimeoutError())
 
-    monkeypatch.setattr("tessera.services.livraison.LivraisonService.livrer_phase_1", _livrer)
+    monkeypatch.setattr("tessera.services.livraison.livraison.LivraisonService.livrer_phase_1", _livrer)
 
     livraison = asyncio.run(livreur("mon-projet")(_approved()))
 
@@ -485,8 +485,8 @@ def test_une_exception_apres_la_pr_garde_son_numero(
 def test_la_sync_en_echec_n_efface_pas_la_cause_d_une_pr_orpheline(
     workspace: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    from tessera.services.livreur_run import livreur
-    from tessera.services.livraison import LivraisonInterrompue
+    from tessera.services.pipeline.livreur_run import livreur
+    from tessera.services.livraison.livraison import LivraisonInterrompue
 
     async def _livrer(self: object, **kwargs: object) -> object:
         raise LivraisonInterrompue(13, TimeoutError())
@@ -495,7 +495,7 @@ def test_la_sync_en_echec_n_efface_pas_la_cause_d_une_pr_orpheline(
         async def sync_base_depuis_distant(self, base: str) -> str:
             return "base non alignée"
 
-    monkeypatch.setattr("tessera.services.livraison.LivraisonService.livrer_phase_1", _livrer)
+    monkeypatch.setattr("tessera.services.livraison.livraison.LivraisonService.livrer_phase_1", _livrer)
 
     livraison = asyncio.run(
         livreur("mon-projet", espace=_Espace())(_approved())  # type: ignore[arg-type]
@@ -508,7 +508,7 @@ def test_la_sync_en_echec_n_efface_pas_la_cause_d_une_pr_orpheline(
 
 
 def _livrer_la_pr(numero: int) -> object:
-    from tessera.services.livraison import Livraison
+    from tessera.services.livraison.livraison import Livraison
 
     async def _livrer(self: object, **kwargs: object) -> Livraison:
         # Simule la phase 1 : livrer_phase_1() ouvre la PR et appelle
@@ -531,10 +531,10 @@ def test_le_livreur_note_la_pr_dans_le_ticket(
 ) -> None:
     # La livraison ouvrait et mergeait la PR sans jamais l'écrire : la carte
     # du ticket, qui lit `pr_number`, proposait d'en ouvrir une (ticket-205).
-    from tessera.services.livreur_run import livreur
+    from tessera.services.pipeline.livreur_run import livreur
 
     monkeypatch.setattr(
-        "tessera.services.livraison.LivraisonService.livrer_phase_1", _livrer_la_pr(7)
+        "tessera.services.livraison.livraison.LivraisonService.livrer_phase_1", _livrer_la_pr(7)
     )
 
     asyncio.run(livreur("mon-projet")(_approved()))
@@ -550,7 +550,7 @@ def test_noter_la_pr_laisse_l_arbre_propre(
     # coup enverrait le run suivant en `blocked` (ADR-018).
     import subprocess
 
-    from tessera.services.livreur_run import livreur
+    from tessera.services.pipeline.livreur_run import livreur
 
     projet = workspace / "mon-projet"
 
@@ -565,7 +565,7 @@ def test_noter_la_pr_laisse_l_arbre_propre(
     git("add", "-A")
     git("commit", "-q", "-m", "init")
     monkeypatch.setattr(
-        "tessera.services.livraison.LivraisonService.livrer_phase_1", _livrer_la_pr(7)
+        "tessera.services.livraison.livraison.LivraisonService.livrer_phase_1", _livrer_la_pr(7)
     )
 
     asyncio.run(livreur("mon-projet")(_approved()))
@@ -579,7 +579,7 @@ def test_noter_la_pr_synchronise_la_base_distante(
 ) -> None:
     # Après la phase 1 (PR ouverte), la base distante est synchronisée pour
     # que le ticket suivant forke depuis origin/<base> (ADR-051).
-    from tessera.services.livreur_run import livreur
+    from tessera.services.pipeline.livreur_run import livreur
 
     appels: list[str] = []
 
@@ -595,7 +595,7 @@ def test_noter_la_pr_synchronise_la_base_distante(
             return None
 
     monkeypatch.setattr(
-        "tessera.services.livraison.LivraisonService.livrer_phase_1", _livrer_la_pr(7)
+        "tessera.services.livraison.livraison.LivraisonService.livrer_phase_1", _livrer_la_pr(7)
     )
 
     asyncio.run(livreur("mon-projet", espace=_Espace())(_approved()))  # type: ignore[arg-type]
@@ -608,16 +608,16 @@ def test_noter_la_pr_qui_echoue_ne_change_pas_la_livraison(
 ) -> None:
     # La PR est mergée : un ticket qu'on n'a pas pu réécrire ne fait pas
     # croire que la livraison a échoué (ADR-030).
-    from tessera.services.livreur_run import livreur
+    from tessera.services.pipeline.livreur_run import livreur
 
     async def _leve(self: object, ticket_id: str, pr_number: int) -> object:
         raise OSError("disque plein")
 
     monkeypatch.setattr(
-        "tessera.services.livraison.LivraisonService.livrer_phase_1", _livrer_la_pr(7)
+        "tessera.services.livraison.livraison.LivraisonService.livrer_phase_1", _livrer_la_pr(7)
     )
     monkeypatch.setattr(
-        "tessera.services.ticket_service.TicketService.set_pr_number", _leve
+        "tessera.services.projets.ticket_service.TicketService.set_pr_number", _leve
     )
 
     livraison = asyncio.run(livreur("mon-projet")(_approved()))
@@ -655,7 +655,7 @@ def test_un_run_autonome_peut_partir_des_issues_github(
         return _R()
 
     monkeypatch.setattr("tessera.routers.orchestrator.build_orchestrator", _build)
-    monkeypatch.setattr("tessera.agents.github_sync.GithubSyncAgent.run", _run)
+    monkeypatch.setattr("tessera.services.github.github_sync.GithubSyncAgent.run", _run)
 
     with _client_persistant() as client:
         with client.websocket_connect("/api/v1/orchestrator/observe") as ws:
@@ -690,7 +690,7 @@ def test_un_run_autonome_ne_touche_pas_a_github_sans_le_demander(
         raise AssertionError("github-sync ne doit pas tourner ici")
 
     monkeypatch.setattr("tessera.routers.orchestrator.build_orchestrator", _build)
-    monkeypatch.setattr("tessera.agents.github_sync.GithubSyncAgent.run", _run)
+    monkeypatch.setattr("tessera.services.github.github_sync.GithubSyncAgent.run", _run)
 
     with _client_persistant() as client:
         with client.websocket_connect("/api/v1/orchestrator/observe") as ws:
@@ -753,6 +753,6 @@ def test_run_interrompu_clot_le_run_et_ne_renvoie_pas_500(
 
 
 async def _lister_runs() -> list[dict[str, object]]:
-    from tessera.services.database_runs import list_runs
+    from tessera.services.noyau.database_runs import list_runs
 
     return await list_runs(settings.ide_db_path, "mon-projet")

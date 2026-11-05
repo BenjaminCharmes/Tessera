@@ -7,8 +7,8 @@ from fastapi import APIRouter, HTTPException, Query
 
 from tessera.config import settings
 from tessera.models.usage import QuotaWindowReading, QuotaWindows, RecentRun, UsageStats
-from tessera.services.quota_registry import QUOTA_REGISTRY
-from tessera.services.usage_stats import PERIODS, recent_runs, usage_stats
+from tessera.services.usage.quota_registry import QUOTA_REGISTRY
+from tessera.services.usage.usage_stats import PERIODS, recent_runs, usage_stats
 
 router = APIRouter(prefix="/usage", tags=["usage"])
 

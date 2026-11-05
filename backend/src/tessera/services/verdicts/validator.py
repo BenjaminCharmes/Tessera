@@ -1,0 +1,299 @@
+# -*- coding: utf-8 -*-
+import re
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any, Literal, TYPE_CHECKING
+
+from tessera.services.providers.base import LLMProvider
+from tessera.services.usage.quota_exhaustion import is_quota_exhausted
+from tessera.services.verdicts.validator_cited_files import (
+    CitedFilesReport,
+    build_cited_files_section,
+    extract_file_refs,
+    format_cited_files_log,
+)
+from tessera.services.verdicts.validator_decisions import Exchanges, build_decisions_section
+from tessera.services.verdicts.validator_schema import VALIDATOR_SCHEMA
+from tessera.services.noyau.modeles_par_defaut import MODELE_JUGEMENT
+from tessera.utils.logger import get_logger
+
+if TYPE_CHECKING:
+    from tessera.services.verification.test_runner import TestResult
+
+_logger = get_logger(__name__)
+
+_MODEL = MODELE_JUGEMENT
+_MAX_TOKENS = 2048
+_PROMPT_FILE = "validateur.md"
+# Same cap as the security audit: at 8 000 chars a branch diff made most
+# criteria unverifiable (ticket-221).
+_CODE_MAX_CHARS = 120_000
+
+Verdict = Literal["APPROVED", "CHANGES_REQUESTED"]
+
+# Ticket types that must have acceptance criteria to be approved (ticket-360).
+# A code ticket without criteria cannot be validated — nothing was verified.
+_CODE_TICKET_TYPES: frozenset[str] = frozenset({"feat", "fix", "refactor"})
+
+_CHECKBOX_PREFIX = re.compile(r"^\s*-?\s*\[[ xX]?\]\s*")
+# Matches backtick, ASCII quotes, guillemets and typographic curly quotes.
+# \uXXXX escapes keep this file 100 % ASCII on disk (avoids cp1252/UTF-8 mix).
+_QUOTES_AND_TICKS = re.compile("[\x60\"'«»“”‘’]")
+_PUNCTUATION_TAIL = re.compile(r"[.,;:!?]+$")
+_MULTI_SPACE = re.compile(r"\s+")
+
+
+@dataclass
+class CriterionResult:
+    criterion: str
+    passed: bool
+    note: str = ""
+
+
+@dataclass
+class ValidationResult:
+    all_passed: bool
+    criteria: list[CriterionResult]
+    verdict: Verdict
+    feedback: str
+    # What the validator received of the cited files (ticket-434).
+    cited_files: CitedFilesReport | None = None
+
+
+class ValidatorService:
+    def __init__(
+        self, provider: LLMProvider, prompts_dir: Path, model: str | None = None
+    ) -> None:
+        self._provider = provider
+        self._prompts_dir = prompts_dir
+        # Model comes from the project manifest when it declares this role
+        # (ticket-188); otherwise the previous default, nothing changes.
+        self._model = model or _MODEL
+
+    async def validate(
+        self,
+        criteria: list[str],
+        code_produced: str,
+        test_result: "TestResult | None",
+        project_root: Path | None = None,
+        ticket_type: str | None = None,
+        refus: str = "",
+        exchanges: Exchanges = (),
+    ) -> ValidationResult:
+        if not criteria:
+            # Un ticket de code sans critère ne peut pas être validé : rien
+            # n'a été vérifié (ADR-039, ticket-360).
+            if ticket_type in _CODE_TICKET_TYPES:
+                return ValidationResult(
+                    all_passed=False,
+                    criteria=[],
+                    verdict="CHANGES_REQUESTED",
+                    feedback=(
+                        "Aucun critère d'acceptation pour un ticket"
+                        f" `{ticket_type}` — ajouter une section"
+                        " `## Critères d'acceptation` au ticket."
+                    ),
+                )
+            return ValidationResult(
+                all_passed=True,
+                criteria=[],
+                verdict="APPROVED",
+                feedback=(
+                    "Aucun critère d'acceptation"
+                    " — approbation automatique."
+                ),
+            )
+
+        system_prompt = self._load_system_prompt()
+        user_message, cited_files = self._build_user_message(
+            criteria, code_produced, test_result, project_root, refus, exchanges
+        )
+
+        try:
+            result = await self._provider.complete(
+                system=system_prompt,
+                user=user_message,
+                model=self._model,
+                max_tokens=_MAX_TOKENS,
+                schema=VALIDATOR_SCHEMA,
+            )
+        except Exception as exc:
+            # Same policy as unreadable JSON: a validation that did not happen
+            # must not approve anything (ticket-122).
+            _logger.warning("validator_llm_failed", extra={"error": str(exc)})
+            # Un quota épuisé n'est pas un verdict : l'orchestrateur le traite
+            # comme un arrêt de quota (ticket-505).
+            if is_quota_exhausted(exc, None):
+                raise
+            return ValidationResult(
+                all_passed=False,
+                criteria=[],
+                verdict="CHANGES_REQUESTED",
+                feedback=f"Validation indisponible : {exc}",
+                cited_files=cited_files,
+            )
+
+        parsed = self._parse_structured(result.structured, result.content, criteria)
+        parsed.cited_files = cited_files
+        return parsed
+
+    def _load_system_prompt(self) -> str:
+        prompt_path = self._prompts_dir / _PROMPT_FILE
+        if prompt_path.exists():
+            return prompt_path.read_text(encoding="utf-8")
+        return "Validate acceptance criteria and respond with JSON."
+
+    def _build_user_message(
+        self,
+        criteria: list[str],
+        code_produced: str,
+        test_result: "TestResult | None",
+        project_root: Path | None = None,
+        refus: str = "",
+        exchanges: Exchanges = (),
+    ) -> tuple[str, CitedFilesReport]:
+        # Number the criteria so the LLM can return an `index`.
+        criteria_block = "\n".join(
+            f"{i}. {c}" for i, c in enumerate(criteria, start=1)
+        )
+        test_block = ""
+        if test_result is not None:
+            badge = "✅" if test_result.passed else "❌"
+            # Chaque étape lancée et son code : sans elles, « typecheck, lint
+            # et build passent » restait invérifiable (ticket-337).
+            etapes = "".join(
+                f"- `{e.commande}` — exit {e.code}\n" for e in test_result.etapes
+            )
+            test_block = (
+                f"\n\n## Résultats des tests {badge}\n"
+                + (f"Étapes lancées, dans l'ordre :\n{etapes}\n" if etapes else "")
+                + f"{test_result.output_summary}\n"
+                + (
+                    "\nErreurs:\n" + "\n".join(test_result.errors[:3])
+                    if test_result.errors
+                    else ""
+                )
+            )
+        cited_block, report = "", CitedFilesReport()
+        if project_root is not None:
+            refs = extract_file_refs(criteria)
+            cited_block, report = build_cited_files_section(refs, project_root)
+        message = (
+            f"## Critères d'acceptation\n{criteria_block}\n\n"
+            + build_decisions_section(exchanges)
+            + f"## Code produit\n{code_produced[:_CODE_MAX_CHARS]}"
+            # Hors de la coupe : un refus tronqué avec le code ne dirait rien.
+            + refus
+            + test_block
+            + cited_block
+        )
+        return message, report
+
+    def _parse_structured(
+        self, parsed: dict[str, Any] | None, raw: str, sent_criteria: list[str]
+    ) -> ValidationResult:
+        # Sans sortie structurée, ou sans `criteria`, rien n'a été jugé : la
+        # validation échoue fermée (ADR-039).
+        if not parsed or "criteria" not in parsed:
+            _logger.warning("validator_invalid_json", extra={"raw": raw[:200]})
+            return ValidationResult(
+                all_passed=False,
+                criteria=[],
+                verdict="CHANGES_REQUESTED",
+                feedback="Réponse du validateur sans sortie structurée valide.",
+            )
+
+        raw_entries = [c for c in parsed.get("criteria", []) if isinstance(c, dict)]
+        index_map, tolerant_map = _build_criterion_lookups(raw_entries, len(sent_criteria))
+        criteria = _reconcile_criteria(sent_criteria, index_map, tolerant_map)
+
+        # Verdict is recomputed from reconciled criteria; the LLM "verdict"
+        # field is informational only and no longer drives anything.
+        all_passed = all(c.passed for c in criteria) if criteria else True
+        verdict: Verdict = "APPROVED" if all_passed else "CHANGES_REQUESTED"
+        feedback = _build_feedback(str(parsed.get("feedback", "")), criteria)
+
+        return ValidationResult(
+            all_passed=all_passed,
+            criteria=criteria,
+            verdict=verdict,
+            feedback=feedback,
+        )
+
+
+def _build_criterion_lookups(
+    raw_entries: list[dict[str, Any]],
+    n_criteria: int,
+) -> tuple[dict[int, CriterionResult], dict[str, CriterionResult]]:
+    """Build index-based and tolerant-text-based lookup maps from LLM response entries."""
+    index_map: dict[int, CriterionResult] = {}
+    tolerant_map: dict[str, CriterionResult] = {}
+    for entry in raw_entries:
+        cr = CriterionResult(
+            criterion=str(entry.get("criterion", "")),
+            passed=bool(entry.get("passed", False)),
+            note=str(entry.get("note", "")),
+        )
+        raw_idx = entry.get("index")
+        if isinstance(raw_idx, int) and 1 <= raw_idx <= n_criteria:
+            index_map[raw_idx] = cr
+        norm = _tolerant_normalize(cr.criterion)
+        if norm:
+            tolerant_map[norm] = cr
+    return index_map, tolerant_map
+
+
+def _reconcile_criteria(
+    sent_criteria: list[str],
+    index_map: dict[int, CriterionResult],
+    tolerant_map: dict[str, CriterionResult],
+) -> list[CriterionResult]:
+    """Match each sent criterion to an LLM response entry, by index then by text."""
+    criteria: list[CriterionResult] = []
+    for i, sent in enumerate(sent_criteria, start=1):
+        matched: CriterionResult | None = index_map.get(i)
+        if matched is None:
+            matched = tolerant_map.get(_tolerant_normalize(sent))
+        if matched is not None:
+            # Texte envoyé : la sortie structurée n'exige que `index` (ticket-662).
+            criteria.append(CriterionResult(sent, matched.passed, matched.note))
+        else:
+            criteria.append(
+                CriterionResult(
+                    criterion=sent,
+                    passed=False,
+                    note="non jugé par le validateur",
+                )
+            )
+    return criteria
+
+
+def _build_feedback(base_feedback: str, criteria: list[CriterionResult]) -> str:
+    """Prepend a warning to the feedback if any criterion was not judged."""
+    unjudged = sum(1 for c in criteria if "non jugé" in c.note)
+    if not unjudged:
+        return base_feedback
+    prefix = (
+        f"{unjudged} critère(s) absent(s)"
+        " de la réponse du validateur. "
+    )
+    return prefix + base_feedback
+
+
+def _tolerant_normalize(text: str) -> str:
+    """Normalize tolerantly: strip checkboxes, backticks, quotes, trailing punctuation."""
+    text = _CHECKBOX_PREFIX.sub("", text.strip())
+    text = _QUOTES_AND_TICKS.sub("", text)
+    text = _PUNCTUATION_TAIL.sub("", text.strip())
+    text = _MULTI_SPACE.sub(" ", text)
+    return text.lower().strip()
+
+
+__all__ = [
+    "CitedFilesReport",
+    "CriterionResult",
+    "ValidationResult",
+    "ValidatorService",
+    "extract_file_refs",
+    "format_cited_files_log",
+]

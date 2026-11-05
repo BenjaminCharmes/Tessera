@@ -10,8 +10,8 @@ from pathlib import Path
 import pytest
 
 from tessera.config import settings
-from tessera.services import captures
-from tessera.services.captures_config import ConfigCaptures, load_captures_config
+from tessera.services.verification import captures
+from tessera.services.verification.captures_config import ConfigCaptures, load_captures_config
 
 JETON = "s3cr3t-jeton-de-test"
 

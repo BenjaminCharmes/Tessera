@@ -10,9 +10,9 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from tessera.services import groupe_d_etape
-from tessera.services.groupe_d_etape import GroupeDEtape
-from tessera.services.test_runner import TestRunnerService
+from tessera.services.verification import groupe_d_etape
+from tessera.services.verification.groupe_d_etape import GroupeDEtape
+from tessera.services.verification.test_runner import TestRunnerService
 
 # Le parent lance un petit-enfant de longue durée qui hérite de stdout, note
 # son pid, puis dort : seul le groupe peut les atteindre tous les deux.
@@ -93,7 +93,7 @@ class TestExpirationTueLArbre:
         commande = f'"{sys.executable}" -c "print(\'5 passed in 0.1s\')"'
 
         with patch(
-            "tessera.services.groupe_de_processus.creer_groupe", return_value=None
+            "tessera.services.noyau.groupe_de_processus.creer_groupe", return_value=None
         ) as creer:
             result = await TestRunnerService().run_tests(projet, test_command=commande)
 
@@ -107,7 +107,7 @@ class TestExpirationTueLArbre:
     ) -> None:
         commande = f'"{sys.executable}" -c "import time; time.sleep(600)"'
 
-        with patch("tessera.services.groupe_de_processus.creer_groupe", return_value=None):
+        with patch("tessera.services.noyau.groupe_de_processus.creer_groupe", return_value=None):
             result = await TestRunnerService().run_tests(
                 projet, test_command=commande, timeout=2
             )
@@ -119,10 +119,10 @@ class TestGroupeDEtape:
     def test_each_step_gets_its_own_group_closed_once(self) -> None:
         with (
             patch(
-                "tessera.services.groupe_de_processus.creer_groupe", return_value=object()
+                "tessera.services.noyau.groupe_de_processus.creer_groupe", return_value=object()
             ),
             patch(
-                "tessera.services.groupe_de_processus.fermer_le_groupe",
+                "tessera.services.noyau.groupe_de_processus.fermer_le_groupe",
                 return_value=True,
             ) as fermer,
         ):
@@ -134,12 +134,12 @@ class TestGroupeDEtape:
 
     def test_a_pid_that_is_not_an_int_is_not_attached(self) -> None:
         with patch(
-            "tessera.services.groupe_de_processus.creer_groupe", return_value=object()
+            "tessera.services.noyau.groupe_de_processus.creer_groupe", return_value=object()
         ):
             assert GroupeDEtape().rattacher(MagicMock()) is False
 
     def test_an_ungrouped_step_reports_no_tree_closed(self) -> None:
-        with patch("tessera.services.groupe_de_processus.creer_groupe", return_value=None):
+        with patch("tessera.services.noyau.groupe_de_processus.creer_groupe", return_value=None):
             assert GroupeDEtape().fermer() is False
 
 

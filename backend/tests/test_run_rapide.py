@@ -11,8 +11,8 @@ import pytest
 
 from tessera.config import settings
 from tessera.routers.orchestrator import RunRequest
-from tessera.services.assemblage_run import build_orchestrator
-from tessera.services.journal_pipeline import journaliser_mode_rapide
+from tessera.services.pipeline.assemblage_run import build_orchestrator
+from tessera.services.noyau.journal_pipeline import journaliser_mode_rapide
 from tessera.services.providers import par_role
 from tessera.services.providers.par_role import provider_pour_role
 from tessera.services.providers.repli import ProviderAvecRepli

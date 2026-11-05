@@ -12,8 +12,8 @@ from fastapi.testclient import TestClient
 
 from tessera.config import settings
 from tessera.main import app
-from tessera.services import captures
-from tessera.services.captures_config import (
+from tessera.services.verification import captures
+from tessera.services.verification.captures_config import (
     LARGEURS,
     THEMES,
     ConfigCaptures,
@@ -159,3 +159,9 @@ def test_route_serves_a_custom_width_and_still_refuses_traversal(
     assert client.get(f"{base}/..%2Fx.png").status_code == 404
     assert client.get(f"{base}/accueil-1025-clair.png").status_code == 404
     assert client.get(f"{base}/accueil-1024-clair.txt").status_code == 404
+
+
+def test_capture_script_is_found_from_the_module_folder() -> None:
+    # Le module vit dans services/verification/ : le script part de la racine du dépôt.
+    assert captures._SCRIPT.is_file()
+    assert captures._SCRIPT.parent.name == "scripts"

@@ -4,8 +4,8 @@ from pathlib import Path
 import pytest
 
 from tessera.models.ticket import TicketDraftPlan, TicketStatus
-from tessera.services.pipeline_text import _extract_criteria
-from tessera.services.ticket_service import TicketService
+from tessera.services.pipeline.pipeline_text import _extract_criteria
+from tessera.services.projets.ticket_service import TicketService
 
 
 # ------------------------------------------------------------------

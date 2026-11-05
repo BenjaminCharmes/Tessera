@@ -1,6 +1,6 @@
 """What a late observer gets back — ticket-185."""
-from tessera.services.journal_du_texte import JournalDuTexte
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.noyau.journal_du_texte import JournalDuTexte
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 
 
 def _texte(run_id: str, contenu: str) -> OrchestratorEvent:

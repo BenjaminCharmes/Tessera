@@ -9,11 +9,11 @@ import asyncio
 from pathlib import Path
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services import journal_en_attente
-from tessera.services import pipeline_branche
+from tessera.services.git_workspace import journal_en_attente
+from tessera.services.pipeline import pipeline_branche
 from tessera.services.git_workspace import GitWorkspaceService
-from tessera.services.pipeline_events import OrchestratorEvent
-from tessera.services.pipeline_run import PipelineRun
+from tessera.services.noyau.pipeline_events import OrchestratorEvent
+from tessera.services.pipeline.pipeline_run import PipelineRun
 
 _LOG = Path("memory") / "pipeline-log.md"
 _LIGNE_LIVRAISON = "- 2026-10-03 07:07:27 UTC — [ticket-016] livraison: PR #16 ouverte (4469ms)"

@@ -50,7 +50,7 @@ from tessera.services.providers.perimetre import (
     hook_refus_hors_perimetre,
     racine_autorisee,
 )
-from tessera.services.racine_depot import depot_au_dessus
+from tessera.services.projets.racine_depot import depot_au_dessus
 from tessera.services.providers.refus_cli import ReleveDesRefusCli
 from tessera.services.providers.refus_garde import JournalDesRefus
 from tessera.services.providers.ask_user import (
@@ -72,7 +72,7 @@ from tessera.services.providers.messages_sdk import (
 )
 from tessera.services.providers.noms import ProviderIndisponible
 from tessera.services.providers.prompt_fichier import prompt_systeme_pour_sdk
-from tessera.services.quota_tracker import QuotaTracker
+from tessera.services.usage.quota_tracker import QuotaTracker
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

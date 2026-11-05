@@ -38,8 +38,8 @@ from tessera.config import settings
 from tessera.services.providers.base import LLMProvider
 from tessera.services.providers.noms import ProviderIndisponible
 from tessera.services.providers.par_role import provider_pour_role
-from tessera.services.reviewer_schema import REVIEWER_SCHEMA
-from tessera.services.verdict_reviewer import _invalid_cause
+from tessera.services.verdicts.reviewer_schema import REVIEWER_SCHEMA
+from tessera.services.verdicts.verdict_reviewer import _invalid_cause
 
 _RACINE = Path(__file__).resolve().parent.parent
 _ESSAI = _RACINE / "docs" / "essais" / "seconde-revue"

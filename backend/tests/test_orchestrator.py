@@ -5,7 +5,7 @@ import pytest
 
 from tessera.models.agent import AgentConfig, AgentResult, AgentRole
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services.orchestrator import (
+from tessera.services.pipeline.orchestrator import (
     EventType,
     Orchestrator,
     OrchestratorEvent,
@@ -15,8 +15,8 @@ from tessera.services.orchestrator import (
 from tests.doubles_git import GitWorkspaceDouble
 from tests.revue_structuree import revue_depuis_texte
 from tessera.services.git_workspace import GitWorkspaceError, NotAGitRepository
-from tessera.services.security_auditor import SecurityAuditResult, SecurityIssue
-from tessera.services.validator import ValidationResult
+from tessera.services.verdicts.security_auditor import SecurityAuditResult, SecurityIssue
+from tessera.services.verdicts.validator import ValidationResult
 
 
 # ------------------------------------------------------------------
@@ -182,7 +182,7 @@ class _RecordingRunner:
 
 
 def test_agent_tool_use_event_existe() -> None:
-    from tessera.services.orchestrator import EventType
+    from tessera.services.pipeline.orchestrator import EventType
 
     assert EventType.AGENT_TOOL_USE.value == "agent_tool_use"
 
@@ -1356,8 +1356,8 @@ async def test_reviewer_et_validateur_tournent_en_parallele(tmp_path: Path) -> N
     orchestrator = _make_orchestrator(tmp_path, runner=_RecordingRunner(), git_workspace=_FakeGit())
 
     with (
-        patch("tessera.services.pipeline_controles.run_review", fake_review),
-        patch("tessera.services.pipeline_controles.run_validation", fake_validation),
+        patch("tessera.services.pipeline.pipeline_controles.run_review", fake_review),
+        patch("tessera.services.pipeline.pipeline_controles.run_validation", fake_validation),
     ):
         result = await orchestrator.run_pipeline("projet", "ticket-001", _noop)
 
@@ -1396,8 +1396,8 @@ async def test_audit_block_ne_demarre_ni_reviewer_ni_validateur(tmp_path: Path) 
     )
 
     with (
-        patch("tessera.services.pipeline_controles.run_review", spy_review),
-        patch("tessera.services.pipeline_controles.run_validation", spy_validation),
+        patch("tessera.services.pipeline.pipeline_controles.run_review", spy_review),
+        patch("tessera.services.pipeline.pipeline_controles.run_validation", spy_validation),
     ):
         result = await orchestrator.run_pipeline("projet", "ticket-001", _noop)
 
@@ -1408,7 +1408,7 @@ async def test_audit_block_ne_demarre_ni_reviewer_ni_validateur(tmp_path: Path) 
 
 async def test_reviewer_approuve_et_validateur_refuse_donne_un_refus(tmp_path: Path) -> None:
     """The turn is refused when the reviewer approves but the validator does not."""
-    from tessera.services.validator import ValidationResult, CriterionResult
+    from tessera.services.verdicts.validator import ValidationResult, CriterionResult
 
     class _RefusingValidator:
         async def validate(
@@ -1447,7 +1447,7 @@ async def test_double_refus_inclut_les_deux_motifs_avec_auteur(tmp_path: Path) -
     with their author label.  Two rounds are needed: round 1 produces the
     combined feedback, round 2 lets us intercept the coder context before it runs.
     """
-    from tessera.services.validator import ValidationResult, CriterionResult
+    from tessera.services.verdicts.validator import ValidationResult, CriterionResult
 
     class _RefusingValidator:
         async def validate(

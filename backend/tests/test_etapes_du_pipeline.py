@@ -16,14 +16,14 @@ from unittest.mock import AsyncMock, MagicMock
 
 from tessera.models.agent import AgentResult, AgentRole
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services import pipeline_controles
-from tessera.services.livraison import Livraison
-from tessera.services.orchestrator import Orchestrator
-from tessera.services.pipeline_events import EventType, OrchestratorEvent, PipelineResult
-from tessera.services.pipeline_run import PipelineRun
-from tessera.services.run_executor import _suivre
-from tessera.services.run_registry import RunActif
-from tessera.services.validator import CriterionResult, ValidationResult
+from tessera.services.pipeline import pipeline_controles
+from tessera.services.livraison.livraison import Livraison
+from tessera.services.pipeline.orchestrator import Orchestrator
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent, PipelineResult
+from tessera.services.pipeline.pipeline_run import PipelineRun
+from tessera.services.pipeline.run_executor import _suivre
+from tessera.services.pipeline.run_registry import RunActif
+from tessera.services.verdicts.validator import CriterionResult, ValidationResult
 
 
 # ------------------------------------------------------------------
@@ -141,7 +141,7 @@ def _coder_runner(approuve: bool = True) -> Any:
 
 
 async def test_documentation_started_emis_avant_doc_updated(tmp_path: Path) -> None:
-    from tessera.services.documentation import ResultatDocumentation
+    from tessera.services.documentation.documentation import ResultatDocumentation
     from tests.test_orchestrator import _FakeGit
 
     documenter = AsyncMock(
@@ -345,7 +345,7 @@ class _OrchJournal(_Orch):
 
 class _ValidateurFichiers:
     async def validate(self, **kwargs: object) -> ValidationResult:
-        from tessera.services.validator_cited_files import CitedFilesReport
+        from tessera.services.verdicts.validator_cited_files import CitedFilesReport
 
         return ValidationResult(
             verdict="APPROVED",

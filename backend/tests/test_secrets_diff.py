@@ -3,9 +3,9 @@ from __future__ import annotations
 
 import pytest
 
-from tessera.services.github_workflow import GitHubWorkflowService, WorkflowError
-from tessera.services.politique_run import PolitiqueRun
-from tessera.services.secrets_diff import (
+from tessera.services.github.github_workflow import GitHubWorkflowService, WorkflowError
+from tessera.services.gardes.politique_run import PolitiqueRun
+from tessera.services.gardes.secrets_diff import (
     ViolationSecret,
     chercher_secrets,
     refus_secrets,

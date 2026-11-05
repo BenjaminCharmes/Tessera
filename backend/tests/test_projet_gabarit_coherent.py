@@ -10,7 +10,7 @@ from pathlib import Path
 import pytest
 
 from tessera.config import _REPO_ROOT
-from tessera.services.project_from_template import create_project_from_template
+from tessera.services.creation_projet.project_from_template import create_project_from_template
 
 _TEMPLATE_DIR = _REPO_ROOT / "templates" / "fastapi-react"
 

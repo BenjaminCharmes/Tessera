@@ -47,7 +47,7 @@ def _set_agents_json(ws: Path, data: dict) -> None:  # type: ignore[type-arg]
 def _make_fake_open_pr(captured: dict) -> object:  # type: ignore[type-arg]
     """Returns a coroutine that records the base_branch passed to GitHubWorkflowService."""
 
-    from tessera.services.github_workflow import PullRequestResult
+    from tessera.services.github.github_workflow import PullRequestResult
 
     async def _fake_open(
         self: object,
@@ -73,7 +73,7 @@ def test_open_pr_uses_declared_base_branch(
     captured: dict[str, object] = {}
 
     monkeypatch.setattr(
-        "tessera.services.github_workflow.GitHubWorkflowService.open_pull_request",
+        "tessera.services.github.github_workflow.GitHubWorkflowService.open_pull_request",
         _make_fake_open_pr(captured),
     )
 
@@ -95,7 +95,7 @@ def test_open_pr_falls_back_to_settings_when_no_base_branch_declared(
     captured: dict[str, object] = {}
 
     monkeypatch.setattr(
-        "tessera.services.github_workflow.GitHubWorkflowService.open_pull_request",
+        "tessera.services.github.github_workflow.GitHubWorkflowService.open_pull_request",
         _make_fake_open_pr(captured),
     )
 

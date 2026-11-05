@@ -10,8 +10,8 @@ from typing import Any
 import pytest
 
 from tessera.models.ticket import TicketStatus
-from tessera.services.security_auditor import SecurityAuditorService
-from tessera.services.validator import ValidatorService
+from tessera.services.verdicts.security_auditor import SecurityAuditorService
+from tessera.services.verdicts.validator import ValidatorService
 from tests.test_orchestrator import (
     _FakeGit,
     _make_orchestrator,

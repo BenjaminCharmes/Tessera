@@ -3,7 +3,7 @@ import asyncio
 
 import pytest
 
-from tessera.services.dialogue import DialogueChannel, NO_HUMAN_ANSWER, AnswerOutcome
+from tessera.services.noyau.dialogue import DialogueChannel, NO_HUMAN_ANSWER, AnswerOutcome
 
 
 # ------------------------------------------------------------------

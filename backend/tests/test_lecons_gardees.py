@@ -4,16 +4,16 @@ from pathlib import Path
 import pytest
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services import lecons_run
-from tessera.services.lecons import lire_lecons
-from tessera.services.lecons_touchees import lignes_de_lecons
-from tessera.services.lecons_run import proposer_lecon
-from tessera.services.pipeline_contraintes import (
+from tessera.services.pipeline import lecons_run
+from tessera.services.gardes.lecons import lire_lecons
+from tessera.services.gardes.lecons_touchees import lignes_de_lecons
+from tessera.services.pipeline.lecons_run import proposer_lecon
+from tessera.services.pipeline.pipeline_contraintes import (
     arret_contraintes_hors_proposees,
     arret_lecons_modifiees,
 )
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
-from tessera.services.pipeline_run import PipelineRun
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.pipeline.pipeline_run import PipelineRun
 from tests.doubles_git import GitWorkspaceDouble
 from tests.test_lecons_run import LECON, PREUVE, RETOUR, _Fournisseur, _projet, _reponse
 
@@ -150,7 +150,7 @@ async def test_a_lesson_added_by_the_service_after_the_coder_turn_does_not_stop(
 
 def test_the_lessons_check_runs_before_the_service_writes_its_lesson() -> None:
     # Le garde est au tour du codeur ; la leçon s'écrit à l'approbation.
-    orchestrateur = (_SERVICES / "orchestrator.py").read_text(encoding="utf-8")
+    orchestrateur = (_SERVICES / "pipeline" / "orchestrator.py").read_text(encoding="utf-8")
     tour = orchestrateur.index("async def _produire_et_tester")
     assert "arret_contraintes_hors_proposees(self, run)" in orchestrateur[tour:]
     # `_run_pipeline` produit (donc garde) avant d'approuver.
@@ -158,6 +158,6 @@ def test_the_lessons_check_runs_before_the_service_writes_its_lesson() -> None:
         "outcomes.finish_approved(self, run)"
     )
 
-    approuve = (_SERVICES / "pipeline_outcomes.py").read_text(encoding="utf-8")
+    approuve = (_SERVICES / "pipeline" / "pipeline_outcomes.py").read_text(encoding="utf-8")
     assert "proposer_lecon(orch, run)" in approuve[approuve.index("async def finish_approved") :]
 

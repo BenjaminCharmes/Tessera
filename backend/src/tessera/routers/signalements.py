@@ -8,9 +8,9 @@ from pydantic import BaseModel, Field, field_validator
 
 from tessera.config import settings
 from tessera.models.ticket import Ticket, TicketType
-from tessera.services import signalements_en_attente as attente
-from tessera.services.run_registry import RUN_REGISTRY
-from tessera.services.ticket_service import TicketService
+from tessera.services.pipeline import signalements_en_attente as attente
+from tessera.services.pipeline.run_registry import RUN_REGISTRY
+from tessera.services.projets.ticket_service import TicketService
 from tessera.utils.project_id import validate_project_id
 
 #: Le projet qui reçoit tous les signalements : le backlog de Tessera lui-même.

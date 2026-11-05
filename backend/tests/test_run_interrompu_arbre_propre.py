@@ -18,10 +18,10 @@ from pathlib import Path
 import pytest
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services import pipeline_outcomes as outcomes
+from tessera.services.pipeline import pipeline_outcomes as outcomes
 from tessera.services.git_workspace import GitWorkspaceService
-from tessera.services.pipeline_events import OrchestratorEvent
-from tessera.services.pipeline_run import PipelineRun
+from tessera.services.noyau.pipeline_events import OrchestratorEvent
+from tessera.services.pipeline.pipeline_run import PipelineRun
 
 
 # ---------------------------------------------------------------------------

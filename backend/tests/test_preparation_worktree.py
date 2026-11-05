@@ -8,22 +8,22 @@ import pytest
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 from tessera.models.worktree_config import ConfigWorktree
-from tessera.services import preparation_worktree
+from tessera.services.pipeline import preparation_worktree
 from tessera.services.git_workspace import GitWorkspaceError
-from tessera.services.commande_effective import PlaceholderInconnu, setup_effectif
-from tessera.services.orchestrator import Orchestrator
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
-from tessera.services.pipeline_run import PipelineRun
-from tessera.services.politique_run import PolitiqueRun
-from tessera.services.preparation_worktree import (
+from tessera.services.verification.commande_effective import PlaceholderInconnu, setup_effectif
+from tessera.services.pipeline.orchestrator import Orchestrator
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.pipeline.pipeline_run import PipelineRun
+from tessera.services.gardes.politique_run import PolitiqueRun
+from tessera.services.pipeline.preparation_worktree import (
     ResultatPreparation,
     preparation_du_run,
     preparer_le_worktree,
 )
-from tessera.services.run_dans_worktree import adopter_la_branche
-from tessera.services.run_worktree import RunWorktree
-from tessera.services.test_runner import EtapeTest, TestResult
-from tessera.services.worktree_politique import lire_worktree
+from tessera.services.pipeline.run_dans_worktree import adopter_la_branche
+from tessera.services.worktrees.run_worktree import RunWorktree
+from tessera.services.verification.test_runner import EtapeTest, TestResult
+from tessera.services.gardes.worktree_politique import lire_worktree
 from tests.doubles_git import GitWorkspaceDouble
 
 _DEPOT = Path("/depot")

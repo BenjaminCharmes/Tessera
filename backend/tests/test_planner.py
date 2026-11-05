@@ -5,12 +5,12 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services.prompt_loader import MissingPromptError
+from tessera.services.noyau.prompt_loader import MissingPromptError
 
 from tests.test_providers_base import FakeProvider
 from tessera.models.project import PlanResult
 from tessera.models.ticket import TicketDraftPlan
-from tessera.services.planner import PlannerService
+from tessera.services.file.planner import PlannerService
 
 
 # ------------------------------------------------------------------
@@ -221,7 +221,7 @@ async def test_illisible_logs_full_raw_response(
     """An unreadable response is logged in full before the error is raised."""
     raw_response = "Désolé, voici quelque chose d'illisible — " + "x" * 500
     svc = _make_service(tmp_path, raw_response)
-    with caplog.at_level(logging.WARNING, logger="tessera.services.planner"):
+    with caplog.at_level(logging.WARNING, logger="tessera.services.file.planner"):
         with pytest.raises(ValueError, match="JSON valide"):
             await svc.plan("proj", "description")
     records = [r for r in caplog.records if r.getMessage() == "planner_reponse_illisible"]

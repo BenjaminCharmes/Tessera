@@ -97,11 +97,11 @@ def _singletons_propres() -> Iterator[None]:
     Les caches de parsing de ticket et de projet sont également vidés pour
     que les tests restent indépendants (ticket-352).
     """
-    from tessera.services.event_hub import EVENT_HUB
-    from tessera.services.run_registry import RUN_REGISTRY
-    from tessera.services import ticket_service as _ts_module
-    from tessera.services import project_loader as _pl_module
-    from tessera.services import pr_status_cache as _prc_module
+    from tessera.services.noyau.event_hub import EVENT_HUB
+    from tessera.services.pipeline.run_registry import RUN_REGISTRY
+    from tessera.services.projets import ticket_service as _ts_module
+    from tessera.services.projets import project_loader as _pl_module
+    from tessera.services.livraison import pr_status_cache as _prc_module
 
     yield
     RUN_REGISTRY._runs.clear()
@@ -171,7 +171,7 @@ def _aucun_jeton_de_mise_en_ligne_de_la_machine(
 @pytest.fixture(scope="session")
 def _modele_de_base(tmp_path_factory: pytest.TempPathFactory) -> Path:
     """Schéma de la base, créé une seule fois pour toute la suite."""
-    from tessera.services.database import init_db
+    from tessera.services.noyau.database import init_db
 
     modele = tmp_path_factory.mktemp("modele_base") / "tessera.db"
     asyncio.run(init_db(modele))
@@ -214,7 +214,7 @@ def _dossier_de_donnees_isole(
     supprimerait, un vrai `backend/signalements_en_attente.json`.
     """
     from tessera.config import settings
-    from tessera.services import signalements_en_attente
+    from tessera.services.pipeline import signalements_en_attente
 
     dossier = tmp_path_factory.mktemp("etat_test")
     monkeypatch.setattr(settings, "ide_state_dir", dossier / "etat")

@@ -27,7 +27,7 @@ _SCENARIO = """
 import asyncio, json, sys
 sys.path.insert(0, {src!r})
 from pathlib import Path
-from tessera.services.process_registry import ProcessRegistry
+from tessera.services.verification.process_registry import ProcessRegistry
 
 async def main():
     registre = ProcessRegistry()
@@ -114,7 +114,7 @@ def test_le_filet_se_declare_et_ne_bloque_pas_le_lancement() -> None:
     # Là où la plateforme ne sait pas tuer les enfants avec le parent, le
     # service doit quand même démarrer : refuser de lancer parce que le filet
     # manque coûterait plus que le risque qu'il couvre. Mais ça se sait.
-    from tessera.services.groupe_de_processus import (
+    from tessera.services.noyau.groupe_de_processus import (
         groupe_disponible,
         rattacher,
     )
@@ -126,6 +126,6 @@ def test_le_filet_se_declare_et_ne_bloque_pas_le_lancement() -> None:
 
 def test_rattacher_ne_leve_jamais() -> None:
     # Un service lancé ne doit pas mourir parce que le filet a échoué.
-    from tessera.services.groupe_de_processus import rattacher
+    from tessera.services.noyau.groupe_de_processus import rattacher
 
     assert rattacher(999_999_999) is False

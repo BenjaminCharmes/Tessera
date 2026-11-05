@@ -2,7 +2,7 @@ import type { TicketStatus } from "./tickets";
 
 export type AgentRole = "orchestrateur" | "codeur" | "reviewer" | "architect" | "project-creator" | "github-sync";
 
-// Aligné sur EventType côté backend (services/pipeline_events.py) : un test
+// Aligné sur EventType côté backend (services/noyau/pipeline_events.py) : un test
 // de `backend/tests` le vérifie dans les deux sens.
 export type EventType =
   | "agent_started"

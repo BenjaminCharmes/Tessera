@@ -14,8 +14,8 @@ from typing import Any
 import aiosqlite
 import pytest
 
-from tessera.services.database import init_db
-from tessera.services.database_runs import create_run
+from tessera.services.noyau.database import init_db
+from tessera.services.noyau.database_runs import create_run
 from tessera.services.providers.base import ProviderResult
 from tessera.services.providers.enregistrant import (
     ProviderEnregistrant,
@@ -23,8 +23,8 @@ from tessera.services.providers.enregistrant import (
 )
 from tessera.services.providers.noms import ProviderIndisponible
 from tessera.services.providers.repli import ProviderAvecRepli
-from tessera.services.security_auditor import SecurityAuditorService
-from tessera.services.validator import ValidatorService
+from tessera.services.verdicts.security_auditor import SecurityAuditorService
+from tessera.services.verdicts.validator import ValidatorService
 from tests.test_providers_base import FakeProvider
 
 

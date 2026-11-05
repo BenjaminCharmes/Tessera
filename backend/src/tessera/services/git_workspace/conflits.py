@@ -10,7 +10,7 @@ from tessera.services.git_workspace.chemins import (
 from tessera.services.git_workspace.erreurs import GitCommandError
 from tessera.services.git_workspace.socle import GitCore
 from tessera.services.git_workspace.textes import _MARQUEUR_CONFLIT, _union_json_lists, _union_lines
-from tessera.services.prisma_conflits import fusionner_ajouts, planifier_renumerotation
+from tessera.services.git_workspace.prisma_conflits import fusionner_ajouts, planifier_renumerotation
 from tessera.utils.logger import get_logger
 
 

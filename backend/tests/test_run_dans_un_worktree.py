@@ -12,27 +12,27 @@ from pathlib import Path
 import pytest
 
 from tessera.config import settings
-from tessera.services import run_dans_worktree
+from tessera.services.pipeline import run_dans_worktree
 from tessera.services.git_workspace import GitWorkspaceError
 from tessera.models.agent import AgentResult, AgentRole
 from tessera.models.ticket import TicketStatus
-from tessera.services.assemblage_run import build_orchestrator
-from tessera.services.database import init_db
-from tessera.services.livraison import Livraison
-from tessera.services.orchestrator import Orchestrator
-from tessera.services.pipeline_events import OrchestratorEvent, PipelineResult
-from tessera.services.politique_run import PolitiqueRun
-from tessera.services.run_dans_worktree import (
+from tessera.services.pipeline.assemblage_run import build_orchestrator
+from tessera.services.noyau.database import init_db
+from tessera.services.livraison.livraison import Livraison
+from tessera.services.pipeline.orchestrator import Orchestrator
+from tessera.services.noyau.pipeline_events import OrchestratorEvent, PipelineResult
+from tessera.services.gardes.politique_run import PolitiqueRun
+from tessera.services.pipeline.run_dans_worktree import (
     OrchestrateurRefuse,
     RunRefuse,
     ouvrir_worktree,
     retirer_en_fin_de_run,
 )
-from tessera.services.run_worktree import RunWorktree
+from tessera.services.worktrees.run_worktree import RunWorktree
 from tests.depot_worktree import construire, git
 from tests.revue_structuree import revue_depuis_texte
 
-_LOGGER = "tessera.services.run_dans_worktree"
+_LOGGER = "tessera.services.pipeline.run_dans_worktree"
 PROJET = "checkout"
 TICKET = "ticket-7"
 TITRE = "demo"

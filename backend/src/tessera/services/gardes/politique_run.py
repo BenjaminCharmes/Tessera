@@ -1,0 +1,134 @@
+"""Ce qu'un run a le droit de faire, figé avant le premier agent — ticket-119.
+
+`autonomy`, `git_root`, `artifacts`, `test_command` et `base_branch` bornent le
+run : jusqu'où il livre, où il stage, ce qui reste hors du dépôt, ce qui rend la
+suite verte, et sur quelle branche il rejoue.
+Chaque service les relisait dans `agents.json` **au moment d'agir** — donc
+après le passage du codeur. Or `agents.json` est sous la racine du projet, et
+un agent a `Edit` : un ticket pouvait déclarer `merge` + `ancestor` au milieu
+du run, et la livraison obéissait au fichier réécrit. ADR-029 et ADR-031
+tenaient sur le papier, pas en exécution.
+
+La politique se lit donc **une fois**, par l'orchestrateur, et voyage jusqu'aux
+services qui en dépendent. Ce qu'un agent écrit dans `agents.json` ne vaut
+qu'au run suivant — et le hook de périmètre le lui refuse de toute façon.
+"""
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Literal
+
+from tessera.services.projets.artifacts import ArtifactMode, read_artifact_mode
+from tessera.services.projets.autonomie import NiveauAutonomie, lire_niveau
+from tessera.services.projets.manifeste import lire_booleen, lire_chaine
+from tessera.models.worktree_config import ConfigWorktree
+from tessera.services.projets.project_loader import load_pipeline_config
+from tessera.services.projets.racine_depot import est_ancestor, racine_ecriture_projet
+from tessera.services.gardes.worktree_dossiers import DossiersWorktree
+from tessera.services.gardes.worktree_politique import lire_worktree
+
+#: Méthodes de merge acceptées par GitHub.
+MergeMethod = Literal["squash", "merge", "rebase"]
+
+#: Valeurs reconnues — toute autre valeur retombe sur le défaut fermé.
+_MERGE_METHODS_VALIDES: frozenset[str] = frozenset({"squash", "merge", "rebase"})
+
+
+@dataclass(frozen=True)
+class PolitiqueRun:
+    """Les réglages d'`agents.json` qui bornent un run."""
+
+    autonomy: NiveauAutonomie = NiveauAutonomie.commit
+    git_root: str | None = None
+    artifacts: ArtifactMode = "local"
+    test_command: str | None = None
+    #: La branche sur laquelle la livraison rejoue. `None` — le projet ne
+    #: déclare rien — laisse l'appelant choisir son repli : rendre le défaut
+    #: global ici empêcherait de distinguer « non déclaré » de « déclaré
+    #: develop » (ticket-166).
+    base_branch: str | None = None
+    #: Le projet déclare n'avoir pas de CI, et accepte que le verdict du
+    #: pipeline suffise à merger (ADR-045). Faux par défaut : le défaut
+    #: protège, l'exception s'énonce.
+    merge_without_ci: bool = False
+    #: Valeur de la clef `confidentiality` dans agents.json. `None` si absente.
+    #: Seule la valeur `"professional"` exempte le projet du contrôle des
+    #: termes interdits (ADR-048).
+    confidentialite: str | None = None
+    #: Méthode de merge transmise à GitHub pour les PR de ticket (ticket-265).
+    #: Absente ou inconnue dans agents.json : `squash`. Le défaut protège :
+    #: squash est la convention de ce dépôt (CLAUDE.md, section Git).
+    merge_method: MergeMethod = "squash"
+    #: Le worktree que le projet déclare (ADR-056, ticket-521). `None` : clef
+    #: absente, illisible, mal typée, ou projet en `artifacts: local` — le run
+    #: reste dans le checkout. Rien ne le consomme encore.
+    worktree: ConfigWorktree | None = None
+
+    @classmethod
+    def lire(cls, project_path: Path) -> "PolitiqueRun":
+        """Lit la politique **maintenant** ; l'appelant la garde pour tout le run.
+
+        Réutilise les lecteurs existants plutôt que d'en écrire un cinquième :
+        chacun porte son défaut fermé et son traitement du fichier illisible.
+        """
+        git_root = lire_chaine(project_path, "git_root")
+        artifacts = read_artifact_mode(project_path)
+        racine_depot = cls(git_root=git_root).racine_ecriture(project_path)
+        return cls(
+            autonomy=lire_niveau(project_path),
+            git_root=git_root,
+            artifacts=artifacts,
+            test_command=load_pipeline_config(project_path).test_command,
+            base_branch=lire_chaine(project_path, "base_branch"),
+            merge_without_ci=lire_booleen(project_path, "merge_without_ci"),
+            confidentialite=lire_chaine(project_path, "confidentiality"),
+            merge_method=_lire_merge_method(project_path),
+            worktree=lire_worktree(project_path, racine_depot, artifacts),
+        )
+
+    @property
+    def exempte_controle_termes(self) -> bool:
+        """True ssi le projet se déclare professionnel (ADR-048).
+
+        Un dépôt professionnel peut légitimement contenir des noms d'employeur
+        ou de client dans son code. Seule la valeur exacte ``"professional"``
+        ouvre l'exemption — une valeur inconnue ne la désarme pas.
+        """
+        return self.confidentialite == "professional"
+
+    @property
+    def dans_le_depot_parent(self) -> bool:
+        """True si le projet travaille dans le dépôt qui le contient (ADR-028)."""
+        return est_ancestor(self.git_root)
+
+    def racine_ecriture(
+        self, project_path: Path, worktree: DossiersWorktree | None = None
+    ) -> Path:
+        """Le dossier sous lequel les agents de ce run ont le droit d'écrire.
+
+        Le dossier du projet, ou le dépôt qui le contient s'il l'a déclaré —
+        le dépôt, pas le simple parent : `projects/` ne serait ni la bonne
+        racine ni une racine qui veut dire quelque chose (ADR-031).
+
+        Avec un worktree (ADR-056), la racine est la sienne et jamais celle du
+        checkout : la racine du worktree pour un projet `ancestor`, le dossier
+        du projet dans le worktree sinon. Résolue comme les autres : un lien
+        posé dans le worktree sort de la racine, donc reste en lecture seule.
+        """
+        if worktree is not None:
+            if self.dans_le_depot_parent:
+                return worktree.racine.resolve()
+            return worktree.projet.resolve()
+        return racine_ecriture_projet(project_path, self.dans_le_depot_parent)
+
+
+def _lire_merge_method(project_path: Path) -> MergeMethod:
+    """La méthode de merge déclarée dans agents.json, ou `squash` par défaut.
+
+    Une valeur absente, illisible ou inconnue retombe sur `squash` : le défaut
+    protège, l'exception s'énonce (ADR-023). `squash` est la convention de
+    ticket → develop sur ce dépôt (CLAUDE.md, section Git).
+    """
+    valeur = lire_chaine(project_path, "merge_method")
+    if valeur in _MERGE_METHODS_VALIDES:
+        return valeur  # type: ignore[return-value]
+    return "squash"

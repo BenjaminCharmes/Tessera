@@ -8,8 +8,8 @@ import pytest
 import respx
 
 from tessera.services.providers.ollama import OllamaProvider, _reset_cooldowns
-from tessera.services.validator import ValidatorService
-from tessera.services.validator_schema import VALIDATOR_SCHEMA
+from tessera.services.verdicts.validator import ValidatorService
+from tessera.services.verdicts.validator_schema import VALIDATOR_SCHEMA
 
 _BASE = "http://ollama.test:11434"
 

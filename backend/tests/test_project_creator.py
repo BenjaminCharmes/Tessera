@@ -7,7 +7,7 @@ import pytest
 from tests.test_providers_base import FakeProvider
 from tessera.models.project import ConversationMessage, CreateProjectResponse
 from tessera.models.ticket import TicketDraft, TicketPriority, TicketType
-from tessera.services.project_creator import ProjectCreatorService
+from tessera.services.creation_projet.project_creator import ProjectCreatorService
 
 
 # ------------------------------------------------------------------
@@ -349,7 +349,7 @@ async def test_bootstrap_uses_haiku_model(tmp_path: Path) -> None:
     # Les appels de bootstrap doivent utiliser Haiku. Seul `redacteur` en
     # déclenche un : `orchestrateur` et `planificateur` sont livrés avec le
     # dépôt, donc natifs (ticket-079).
-    from tessera.services.project_creator import _BOOTSTRAP_MODEL
+    from tessera.services.creation_projet.project_creator import _BOOTSTRAP_MODEL
 
     provider = svc._provider
     bootstrap_calls = provider.calls[1:]

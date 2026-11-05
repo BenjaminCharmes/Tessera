@@ -16,7 +16,7 @@ import pytest
 
 import tessera.services.providers.agent_sdk as agent_sdk_module
 from tessera.config import settings
-from tessera.services.journal_pipeline import journal_vers
+from tessera.services.noyau.journal_pipeline import journal_vers
 from tessera.services.providers import par_role
 from tessera.services.providers.agent_sdk import ClaudeAgentSDKProvider
 from tessera.services.providers.base import ProviderResult

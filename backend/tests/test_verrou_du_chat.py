@@ -20,8 +20,8 @@ from fastapi.testclient import TestClient
 
 from tessera.config import settings
 from tessera.main import app
-from tessera.services.database import init_db
-from tessera.services.run_registry import RUN_REGISTRY, RunActif
+from tessera.services.noyau.database import init_db
+from tessera.services.pipeline.run_registry import RUN_REGISTRY, RunActif
 
 
 @pytest.fixture(autouse=True)
@@ -146,7 +146,7 @@ def test_le_chat_ne_se_signale_pas_lui_meme_comme_run_en_cours(
     # Effet de bord du verrou : le tour le tient, donc `is_running` répond oui
     # depuis l'intérieur du tour. Sans distinction, l'UI cacherait le bouton
     # « lancer » à cause d'une occupation qui est la sienne.
-    from tessera.services.chat_service import ChatReply
+    from tessera.services.agents.chat_service import ChatReply
 
     class _ServiceMuet:
         async def send(self, **kwargs: object) -> ChatReply:

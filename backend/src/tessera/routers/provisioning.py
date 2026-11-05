@@ -12,8 +12,8 @@ from pydantic import BaseModel
 from tessera.config import settings
 from tessera.models.project import Project
 from tessera.routers.dependencies import require_valid_project_id
-from tessera.services.politique_run import PolitiqueRun
-from tessera.services.project_loader import load_project
+from tessera.services.gardes.politique_run import PolitiqueRun
+from tessera.services.projets.project_loader import load_project
 from tessera.services.provisioning.launcher import (
     PROVISIONING_LOCK,
     ProvisioningSetup,

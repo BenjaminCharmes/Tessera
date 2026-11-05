@@ -1,7 +1,7 @@
 """Suivi du quota d'abonnement — ticket-054."""
 from datetime import datetime, timezone
 
-from tessera.services.quota_tracker import (
+from tessera.services.usage.quota_tracker import (
     QuotaSnapshot,
     QuotaTracker,
     snapshot_from_rate_limit,

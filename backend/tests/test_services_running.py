@@ -18,9 +18,9 @@ from tessera.config import settings
 from tessera.main import app
 from tessera.routers import services_running
 from tessera.routers.services_running import get_sonde
-from tessera.services.database import init_db
-from tessera.services.process_registry import PROCESS_REGISTRY
-from tessera.services.sonde_systeme import InfoProcessus
+from tessera.services.noyau.database import init_db
+from tessera.services.verification.process_registry import PROCESS_REGISTRY
+from tessera.services.supervision.sonde_systeme import InfoProcessus
 
 _DORMEUR = f'"{sys.executable}" -c "import time; time.sleep(30)"'
 

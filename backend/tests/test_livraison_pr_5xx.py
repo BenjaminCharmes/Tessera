@@ -5,7 +5,7 @@ from pathlib import Path
 import httpx
 import pytest
 
-from tessera.services.livraison import Livraison, LivraisonService
+from tessera.services.livraison.livraison import Livraison, LivraisonService
 
 
 class _FauxGit:

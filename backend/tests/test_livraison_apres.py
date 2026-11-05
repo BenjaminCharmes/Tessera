@@ -1,6 +1,6 @@
 """The standalone steps of delivery phase one (ticket-700)."""
 from tessera.services.git_workspace import GitWorkspaceError
-from tessera.services.livraison_apres import (
+from tessera.services.livraison.livraison_apres import (
     branche_modifiee,
     chercher_pr,
     ouvrir_avec_recours,
@@ -8,7 +8,7 @@ from tessera.services.livraison_apres import (
     pr_ouverte_malgre,
     sha_pousse,
 )
-from tessera.services.livraison_arrets import ARRET_NON_APPROUVE, arret_niveau_commit
+from tessera.services.livraison.livraison_arrets import ARRET_NON_APPROUVE, arret_niveau_commit
 
 
 class _Git:

@@ -9,7 +9,7 @@ l'autre bout.
 import json
 from pathlib import Path
 
-from tessera.services.project_loader import load_project
+from tessera.services.projets.project_loader import load_project
 
 
 def _projet(racine: Path, nom: str, **manifeste: object) -> Path:

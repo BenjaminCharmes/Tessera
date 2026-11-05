@@ -4,8 +4,8 @@ from typing import Any
 
 import pytest
 
-from tessera.services import process_registry
-from tessera.services.process_registry import ProcessRegistry, Service
+from tessera.services.verification import process_registry
+from tessera.services.verification.process_registry import ProcessRegistry, Service
 
 
 class FakeProcess:

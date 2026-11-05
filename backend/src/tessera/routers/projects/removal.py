@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 from tessera.config import settings
 from tessera.routers.projects.shared import new_router, require_project_path
-from tessera.services.project_removal import (
+from tessera.services.creation_projet.project_removal import (
     RemovalError,
     delete_project,
     describe_removal,

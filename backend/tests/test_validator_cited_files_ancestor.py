@@ -3,7 +3,7 @@
 import json
 from pathlib import Path
 
-from tessera.services.validator_cited_files import (
+from tessera.services.verdicts.validator_cited_files import (
     _find_file_in_project,
     build_cited_files_section,
     extract_file_refs,

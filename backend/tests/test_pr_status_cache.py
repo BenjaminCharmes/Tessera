@@ -14,9 +14,9 @@ from pathlib import Path
 import httpx
 import pytest
 
-from tessera.services import pr_status_cache
-from tessera.services.database import init_db
-from tessera.services.github_service import PRStatus
+from tessera.services.livraison import pr_status_cache
+from tessera.services.noyau.database import init_db
+from tessera.services.github.github_service import PRStatus
 
 
 # ---------------------------------------------------------------------------

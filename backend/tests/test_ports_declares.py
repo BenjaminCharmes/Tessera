@@ -2,7 +2,7 @@
 import json
 from pathlib import Path
 
-from tessera.services.ports_declares import (
+from tessera.services.supervision.ports_declares import (
     port_de_vite_config,
     ports_d_une_commande,
     ports_du_projet,

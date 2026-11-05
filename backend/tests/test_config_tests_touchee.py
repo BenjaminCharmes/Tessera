@@ -4,7 +4,7 @@ from pathlib import Path
 from unittest.mock import AsyncMock
 
 from tessera.models.agent import AgentResult, AgentRole
-from tessera.services.config_tests_touchee import (
+from tessera.services.gardes.config_tests_touchee import (
     TITRE_CONFIG_TESTS,
     avertissement_config_tests,
     config_tests_du_diff,
@@ -13,9 +13,9 @@ from tessera.services.config_tests_touchee import (
     imposer_config_nommee,
     porte_config_nommee,
 )
-from tessera.services.diff_changements import lire_diff
-from tessera.services.orchestrator import Orchestrator
-from tessera.services.validator import ValidatorService
+from tessera.services.noyau.diff_changements import lire_diff
+from tessera.services.pipeline.orchestrator import Orchestrator
+from tessera.services.verdicts.validator import ValidatorService
 from tests.test_orchestrator import _FakeGit, _make_agent_result, _make_ticket, _noop
 from tests.test_providers_base import FakeProvider
 

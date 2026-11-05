@@ -1,9 +1,9 @@
 """Consecutive blocks with the same cause — ticket-838 (ADR-078)."""
 from pathlib import Path
 
-from tessera.services.anomalies.lecture_historique import derniers_runs_finis
-from tessera.services.anomalies.modeles import RunFini
-from tessera.services.anomalies.regles_historiques import blocages_identiques, signature_d_arret
+from tessera.services.supervision.anomalies.lecture_historique import derniers_runs_finis
+from tessera.services.supervision.anomalies.modeles import RunFini
+from tessera.services.supervision.anomalies.regles_historiques import blocages_identiques, signature_d_arret
 from tests.anomalies_base import base_neuve, ligne_de_run
 
 # Un vrai `arret` de livraison coupée par le réseau (relevé dans `pipeline_runs`),

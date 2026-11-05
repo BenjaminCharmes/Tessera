@@ -2,8 +2,8 @@
 
 from pathlib import Path
 
-from tessera.services import journal_en_attente
-from tessera.services.git_attributes import declare_union_merge
+from tessera.services.git_workspace import journal_en_attente
+from tessera.services.git_workspace.git_attributes import declare_union_merge
 from tessera.services.git_workspace.base import GitBase
 from tessera.services.git_workspace.chemins import (
     _BOOKKEEPING_COMMIT_MESSAGE,

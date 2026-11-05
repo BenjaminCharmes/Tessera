@@ -9,10 +9,10 @@ from pathlib import Path
 import pytest
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services import pipeline_branche
+from tessera.services.pipeline import pipeline_branche
 from tessera.services.git_workspace import GitWorkspaceService
-from tessera.services.pipeline_events import OrchestratorEvent
-from tessera.services.pipeline_run import PipelineRun
+from tessera.services.noyau.pipeline_events import OrchestratorEvent
+from tessera.services.pipeline.pipeline_run import PipelineRun
 
 _JOURNAL = "memory/pipeline-log.md"
 _LIGNE_DEJA_SUR_LA_BASE = "- 2026-10-15 09:00:00 UTC — [ticket-001] PR #1 mergée"

@@ -18,7 +18,7 @@ from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel
 
 from tessera.config import settings
-from tessera.services.project_importer import is_too_broad
+from tessera.services.creation_projet.project_importer import is_too_broad
 from tessera.utils.logger import get_logger
 from tessera.utils.noms_windows import normaliser_segments
 

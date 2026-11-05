@@ -11,7 +11,7 @@ import pytest
 
 from tests.conftest import requires_symlinks
 
-from tessera.services.test_runner import (
+from tessera.services.verification.test_runner import (
     EtapeTest,
     TestCommandNotFound,
     TestResult,
@@ -20,7 +20,7 @@ from tessera.services.test_runner import (
     _parse_failed_step,
     reset_semaphore_for_tests,
 )
-from tessera.services.sortie_de_test import (
+from tessera.services.verification.sortie_de_test import (
     extract_failure_details as _extract_failure_details,
     extract_pytest_failures_section as _extract_pytest_failures_section,
     extract_pytest_short_summary as _extract_pytest_short_summary,
@@ -323,7 +323,7 @@ class TestCommandeNonDemarree:
         # testeur lance sans shell, et `npm` n'existe pas sous Windows — c'est
         # `npm.cmd`. La reprise existait dans `ProcessRegistry` depuis le
         # ticket-149 et n'avait pas été portée ici (ticket-157).
-        from tessera.services.lancement import essais_de_commande
+        from tessera.services.noyau.lancement import essais_de_commande
 
         essais = essais_de_commande(["npm", "run", "test"])
 
@@ -334,7 +334,7 @@ class TestCommandeNonDemarree:
             assert essais == [["npm", "run", "test"]]
 
     async def test_une_commande_deja_suffixee_n_est_pas_redoublee(self) -> None:
-        from tessera.services.lancement import essais_de_commande
+        from tessera.services.noyau.lancement import essais_de_commande
 
         assert essais_de_commande(["npm.cmd", "test"]) == [["npm.cmd", "test"]]
 

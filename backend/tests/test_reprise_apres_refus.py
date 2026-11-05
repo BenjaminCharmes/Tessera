@@ -2,8 +2,8 @@
 from pathlib import Path
 
 from tessera.models.agent import AgentRole
-from tessera.services.orchestrator import EventType
-from tessera.services.refus_precedent import Refus, refus_precedent
+from tessera.services.pipeline.orchestrator import EventType
+from tessera.services.pipeline.refus_precedent import Refus, refus_precedent
 from tests.test_pipeline_reprise import (
     _VERT,
     _FakeTestRunner,

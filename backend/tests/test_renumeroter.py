@@ -18,9 +18,9 @@ import pytest
 
 from tests.depot_numerotation import creer_depot, ecrire, fiche, git
 from tessera.services.git_workspace import GitWorkspaceService
-from tessera.services.livraison import Livraison, LivraisonService
-from tessera.services.numerotation import GitIllisible
-from tessera.services.renumeroter import Renumeroteur, renumeroter
+from tessera.services.livraison.livraison import Livraison, LivraisonService
+from tessera.services.noyau.numerotation import GitIllisible
+from tessera.services.livraison.renumeroter import Renumeroteur, renumeroter
 
 _JOURNAL = "memory/pipeline-log.md"
 

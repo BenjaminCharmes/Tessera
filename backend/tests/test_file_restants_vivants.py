@@ -7,9 +7,9 @@ from fastapi.testclient import TestClient
 
 from tessera.config import settings
 from tessera.main import app
-from tessera.services.file_vivante import FileVivante
-from tessera.services.run_registry import RUN_REGISTRY, RunActif
-from tessera.services.run_status import statut_d_un_run_vivant
+from tessera.services.pipeline.file_vivante import FileVivante
+from tessera.services.pipeline.run_registry import RUN_REGISTRY, RunActif
+from tessera.services.pipeline.run_status import statut_d_un_run_vivant
 
 _PROJET = "mon-projet"
 

@@ -2,10 +2,10 @@
 import sqlite3
 from pathlib import Path
 
-from tessera.services import database
-from tessera.services.anomalies.lecture_evenements import evenements_de_etapes
-from tessera.services.anomalies.lecture_historique import durees_passees
-from tessera.services.database import init_db
+from tessera.services.noyau import database
+from tessera.services.supervision.anomalies.lecture_evenements import evenements_de_etapes
+from tessera.services.supervision.anomalies.lecture_historique import durees_passees
+from tessera.services.noyau.database import init_db
 from tests.anomalies_base import base_neuve, evenement, ligne_de_run
 
 

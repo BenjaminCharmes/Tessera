@@ -5,16 +5,16 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services import project_loader
-from tessera.services.extraction_claude_md import (
+from tessera.services.projets import project_loader
+from tessera.services.projets.extraction_claude_md import (
     lire_readme,
     parse_active_agents,
     parse_description,
     parse_name,
     parse_stack,
 )
-from tessera.services.gabarits_projet import default_agents_json, default_claude_md
-from tessera.services.manifeste_ecriture import (
+from tessera.services.projets.gabarits_projet import default_agents_json, default_claude_md
+from tessera.services.projets.manifeste_ecriture import (
     AgentAbsentDuProjet,
     set_agent_provider,
     set_pipeline_settings,

@@ -7,7 +7,7 @@ from urllib.parse import parse_qs
 import httpx
 import pytest
 
-from tessera.services.pipeline_events import OrchestratorEvent
+from tessera.services.noyau.pipeline_events import OrchestratorEvent
 from tessera.services.provisioning import (
     OnlineConfig,
     ProvisioningContext,

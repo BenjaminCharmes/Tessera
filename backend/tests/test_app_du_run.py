@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services.app_du_run import (
+from tessera.services.verification.app_du_run import (
     DemarrageEchoue,
     attendre_que_l_app_reponde,
     commande_du_run,
@@ -13,8 +13,8 @@ from tessera.services.app_du_run import (
     demarrer_processus,
     port_libre,
 )
-from tessera.services.captures_config import ConfigCaptures, Ecran
-from tessera.services.controle_visuel import Demarrage
+from tessera.services.verification.captures_config import ConfigCaptures, Ecran
+from tessera.services.verification.controle_visuel import Demarrage
 
 
 class _App:

@@ -5,9 +5,9 @@ import pytest
 
 from tessera.config import settings
 from tessera.models.agent import AgentConfig, AgentResult, AgentRole
-from tessera.services.agent_runner import OUTILS_DE_RELECTURE
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
-from tessera.services.ticket_service import TicketService
+from tessera.services.agents.agent_runner import OUTILS_DE_RELECTURE
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.projets.ticket_service import TicketService
 from tests.test_orchestrator import (
     _FakeGit,
     _make_agent_result,
@@ -144,7 +144,7 @@ async def test_le_frontmatter_declare_le_plan(
 async def test_le_plan_n_a_que_les_outils_de_lecture(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    from tessera.services.assemblage_run import build_orchestrator
+    from tessera.services.pipeline.assemblage_run import build_orchestrator
 
     monkeypatch.setattr(settings, "ide_workspace_dir", tmp_path)
     monkeypatch.setattr(settings, "llm_provider", "agent_sdk")

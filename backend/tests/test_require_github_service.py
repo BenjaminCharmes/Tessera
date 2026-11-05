@@ -4,7 +4,7 @@ from fastapi import HTTPException
 
 from tessera.config import settings
 from tessera.routers.dependencies import require_github_service
-from tessera.services.github_service import GitHubService
+from tessera.services.github.github_service import GitHubService
 
 
 def test_refuses_without_github_remote(monkeypatch: pytest.MonkeyPatch) -> None:

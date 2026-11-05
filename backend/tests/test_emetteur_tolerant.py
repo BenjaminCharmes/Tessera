@@ -11,8 +11,8 @@ from unittest.mock import AsyncMock
 from tessera.models.agent import AgentResult, AgentRole
 from tests.revue_structuree import revue_depuis_texte
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services.orchestrator import Orchestrator
-from tessera.services.pipeline_events import OrchestratorEvent
+from tessera.services.pipeline.orchestrator import Orchestrator
+from tessera.services.noyau.pipeline_events import OrchestratorEvent
 from tests.doubles_git import GitWorkspaceDouble
 
 

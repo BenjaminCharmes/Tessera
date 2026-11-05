@@ -14,8 +14,8 @@ import pytest
 import respx
 
 from tessera.config import settings
-from tessera.services.event_hub import EVENT_HUB
-from tessera.services.pipeline_events import EventType
+from tessera.services.noyau.event_hub import EVENT_HUB
+from tessera.services.noyau.pipeline_events import EventType
 from tessera.services.providers import get_provider
 from tessera.services.providers.base import LLMProvider
 from tessera.services.providers.noms import PROVIDERS_CONNUS, ProviderIndisponible
@@ -23,8 +23,8 @@ import tessera.services.providers.ollama as ollama_module
 from tessera.services.providers.ollama import OllamaProvider, _reset_slots, _reset_cooldowns
 from tessera.services.providers import par_role
 from tessera.services.providers.par_role import provider_pour_role
-from tessera.services.security_auditor import SecurityAuditorService
-from tessera.services.project_loader import load_agents_config
+from tessera.services.verdicts.security_auditor import SecurityAuditorService
+from tessera.services.projets.project_loader import load_agents_config
 from tests.test_providers_base import FakeProvider
 
 _BASE = "http://ollama.test:11434"

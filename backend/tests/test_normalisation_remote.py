@@ -10,9 +10,9 @@ from fastapi.testclient import TestClient
 
 from tessera.config import settings
 from tessera.main import app
-from tessera.services.database import init_db
-from tessera.services.forge import forge_supportee, parse_remote
-from tessera.services.project_loader import load_project
+from tessera.services.noyau.database import init_db
+from tessera.services.projets.forge import forge_supportee, parse_remote
+from tessera.services.projets.project_loader import load_project
 
 
 # ---------------------------------------------------------------------------
@@ -80,7 +80,7 @@ async def test_github_service_with_url_form_remote_calls_correct_repo() -> None:
         return_value=httpx.Response(200, json=[])
     )
 
-    from tessera.services.github_service import GitHubService
+    from tessera.services.github.github_service import GitHubService
 
     _, slug = parse_remote("https://github.com/owner/repo.git")
     assert slug == "owner/repo"

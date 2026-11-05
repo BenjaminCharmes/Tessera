@@ -2,7 +2,7 @@
 from pathlib import Path
 
 from tessera.services.git_workspace import GitCommandError
-from tessera.services.livraison_rebase import remettre_la_branche
+from tessera.services.livraison.livraison_rebase import remettre_la_branche
 from tests.test_retest_apres_rebase import _Banc, _rouges, _verts
 
 _AVANT = "b2" * 20

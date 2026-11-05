@@ -6,15 +6,15 @@ from pathlib import Path
 import pytest
 
 from tests.test_providers_base import FakeProvider
-from tessera.services.test_runner import EtapeTest, TestResult
-from tessera.services.validator import (
+from tessera.services.verification.test_runner import EtapeTest, TestResult
+from tessera.services.verdicts.validator import (
     CriterionResult,
     ValidationResult,
     ValidatorService,
     extract_file_refs,
 )
-from tessera.services.validator_schema import VALIDATOR_SCHEMA
-from tessera.services.validator_cited_files import (
+from tessera.services.verdicts.validator_schema import VALIDATOR_SCHEMA
+from tessera.services.verdicts.validator_cited_files import (
     CITED_FILES_MAX_CHARS as _CITED_FILES_MAX_CHARS,
     CitedFilesReport,
     build_cited_files_section,
@@ -731,7 +731,7 @@ class TestCitedFiles:
 
 
 def test_un_fichier_cite_hors_du_projet_n_est_pas_lu(tmp_path: Path) -> None:
-    from tessera.services.validator_cited_files import _find_file_in_project
+    from tessera.services.verdicts.validator_cited_files import _find_file_in_project
 
     projet = tmp_path / "projet"
     projet.mkdir()
@@ -741,7 +741,7 @@ def test_un_fichier_cite_hors_du_projet_n_est_pas_lu(tmp_path: Path) -> None:
 
 
 def test_un_chemin_absolu_cite_n_est_pas_lu(tmp_path: Path) -> None:
-    from tessera.services.validator_cited_files import _find_file_in_project
+    from tessera.services.verdicts.validator_cited_files import _find_file_in_project
 
     projet = tmp_path / "projet"
     projet.mkdir()
@@ -752,7 +752,7 @@ def test_un_chemin_absolu_cite_n_est_pas_lu(tmp_path: Path) -> None:
 
 
 def test_un_fichier_du_projet_reste_trouve(tmp_path: Path) -> None:
-    from tessera.services.validator_cited_files import _find_file_in_project
+    from tessera.services.verdicts.validator_cited_files import _find_file_in_project
 
     projet = tmp_path / "projet"
     (projet / "src").mkdir(parents=True)

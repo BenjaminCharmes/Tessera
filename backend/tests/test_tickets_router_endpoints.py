@@ -8,8 +8,8 @@ from fastapi.testclient import TestClient
 
 from tessera.config import settings
 from tessera.main import app
-from tessera.services.database import init_db
-from tessera.services.github_service import PRStatus
+from tessera.services.noyau.database import init_db
+from tessera.services.github.github_service import PRStatus
 
 _TICKET_MD = """---
 id: {id}
@@ -271,7 +271,7 @@ def test_create_pr_cible_develop_quand_la_base_n_est_pas_precisee(
         return 7, "https://github.com/owner/repo/pull/7"
 
     monkeypatch.setattr(
-        "tessera.services.github_service.GitHubService.create_pull_request",
+        "tessera.services.github.github_service.GitHubService.create_pull_request",
         lambda self, **kw: _fake_create(**kw),
     )
 
@@ -313,7 +313,7 @@ def test_pr_status_renvoie_l_etat_et_le_statut_ci(
         )
 
     monkeypatch.setattr(
-        "tessera.services.github_service.GitHubService.get_pull_request_status",
+        "tessera.services.github.github_service.GitHubService.get_pull_request_status",
         _fake_status,
     )
 
@@ -340,7 +340,7 @@ def test_pr_status_of_a_pr_unknown_to_github_is_404_not_500(
         )
 
     monkeypatch.setattr(
-        "tessera.services.github_service.GitHubService.get_pull_request_status",
+        "tessera.services.github.github_service.GitHubService.get_pull_request_status",
         _not_found,
     )
 

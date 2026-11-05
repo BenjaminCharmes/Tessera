@@ -8,14 +8,14 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 
 from tessera.models.ticket import TicketStatus
-from tessera.services import pipeline_approbation, pipeline_capture
-from tessera.services.controle_visuel import ControleVisuel, lire_le_controle
-from tessera.services.etape_de_capture import ResultatCapture
-from tessera.services.livraison import Livraison
-from tessera.services.orchestrator import Orchestrator
-from tessera.services.pipeline_approbation import retenir_pour_relecture
-from tessera.services.pipeline_capture import capturer_le_run
-from tessera.services.pipeline_events import OrchestratorEvent, PipelineResult
+from tessera.services.pipeline import pipeline_approbation, pipeline_capture
+from tessera.services.verification.controle_visuel import ControleVisuel, lire_le_controle
+from tessera.services.pipeline.etape_de_capture import ResultatCapture
+from tessera.services.livraison.livraison import Livraison
+from tessera.services.pipeline.orchestrator import Orchestrator
+from tessera.services.pipeline.pipeline_approbation import retenir_pour_relecture
+from tessera.services.pipeline.pipeline_capture import capturer_le_run
+from tessera.services.noyau.pipeline_events import OrchestratorEvent, PipelineResult
 
 
 def _declarer(projet: Path, mode: str = "relire", **extra: object) -> ControleVisuel:
