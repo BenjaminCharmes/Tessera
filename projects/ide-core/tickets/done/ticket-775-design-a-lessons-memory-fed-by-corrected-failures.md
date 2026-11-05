@@ -1,14 +1,14 @@
 ---
-id: ticket-775
-title: "Design a per-project lessons memory fed by corrected failures"
-type: design
-status: todo
-pr_number: null
-priority: medium
 agent: architect
+created: 2026-11-03
 depends_on: []
 estimated_days: 1
-created: 2026-11-03
+id: ticket-775
+pr_number: 912
+priority: medium
+status: done
+title: Design a per-project lessons memory fed by corrected failures
+type: design
 ---
 
 # ticket-775 — Concevoir une mémoire de leçons par projet, nourrie par les échecs corrigés

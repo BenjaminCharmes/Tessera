@@ -556,6 +556,15 @@ Chaque agent reçoit un contexte filtré selon sa portée définie dans les ADR 
 
 `adr_pertinents` (`backend/src/tessera/services/adr.py`) découpe à cette limite. Les ADRs au format `contraintes.md` (`contraintes_pour`) n'en ont pas besoin : leurs blocs s'arrêtent déjà au titre de niveau 2 suivant.
 
+### Composition du contexte : priorité aux contraintes
+
+Chaque agent reçoit deux fichiers de mémoire du projet, dans l'ordre de priorité :
+
+1. `memory/contraintes.md` — Les règles en vigueur pour le projet, spécifiques au rôle de l'agent
+2. `memory/decisions.md` — ADRs et décisions architecturales, en repli si le premier n'existe pas
+
+Le filtrage par rôle est implémenté dans les routers (`orchestrator.py`, `agents.py`, `chat.py`), qui passent par `services/adr.py`. Une contrainte est une ligne portant un label entre crochets — ex. `[codeur]` — indiquant son champ d'application. Les agents n'appliquent que les contraintes qui les concernent.
+
 ### Contraintes proposées (ticket-493)
 
 Les règles communes à tous les agents (`memory/contraintes.md`) sont injectées réduites au rôle dans chaque appel. Depuis le ticket-493, tout run qui doit proposer une nouvelle règle ne peut l'écrire que dans la section `## Proposées` en tête du fichier. Cette section n'est jamais injectée : seul le reste du fichier l'est dans les contextes des agents.
@@ -1013,6 +1022,20 @@ vérification plus faible.
 
 **Ce qui n'est pas fait** : le commit n'est jamais refusé même si la
 vérification s'affaiblit — c'est le rôle du reviewer et du validateur.
+
+### Écriture refusée dans les chemins protégés
+
+Les agents ne peuvent pas modifier certains fichiers système de l'IDE :
+
+- Workflows GitHub : `.github/workflows/`
+- Configuration Claude Code : `.claude/` (`settings*.json`, `skills/`, `commands/`, `agents/`)
+- Historique git : `.git/`
+- Registre des agents : `agents.json` (ADR-027, ticket-240)
+- Règles du projet : `CLAUDE.md`, `CLAUDE.local.md`
+
+Cette protection est implémentée dans `chemins_proteges.py`. Un ticket dont le livrable vit dans ces chemins se fait **à la main** : lancé dans le pipeline, il tourne trois tours sur un diff vide et se bloque. Le ticket peut porter la partie autorisée (tests, code métier) et indiquer que le reste est manuel.
+
+Une phrase du type « Ce ticket autorise la modification de `CLAUDE.md` » n'ouvre pas le garde-fou. La règle d'autorisation des modifications reste : seul un ticket explicite et autorisé peut proposer un changement, pas une phrase dans l'objectif.
 
 ## Synchronisation de la base au démarrage
 
