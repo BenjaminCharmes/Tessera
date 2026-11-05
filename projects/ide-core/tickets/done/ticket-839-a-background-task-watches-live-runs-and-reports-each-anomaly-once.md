@@ -2,7 +2,7 @@
 id: ticket-839
 title: "A background task watches live runs and reports each anomaly once"
 type: feat
-status: todo
+status: done
 pr_number: null
 priority: medium
 agent: codeur
@@ -50,26 +50,26 @@ tourne », « Une seule fois » et « Ce qu'il ne fait jamais ». Règle en vigu
 
 ## Critères d'acceptation
 
-- [ ] `test_passe_without_live_runs_returns_nothing`
-- [ ] `test_passe_reports_each_rule_once_per_episode` : une double passe sur le même état, pour
+- [x] `test_passe_without_live_runs_returns_nothing`
+- [x] `test_passe_reports_each_rule_once_per_episode` : une double passe sur le même état, pour
       chacune des six règles, n'émet qu'un événement
-- [ ] `test_passe_reports_again_after_the_series_breaks_and_reforms` : une série d'outils rompue
+- [x] `test_passe_reports_again_after_the_series_breaks_and_reforms` : une série d'outils rompue
       puis reformée, et un silence rompu puis repris, donnent une seconde clé
-- [ ] `test_passe_marks_the_key_seen_only_after_the_emission`
-- [ ] `test_passe_emits_through_the_hub_and_persists_in_agent_events`
-- [ ] `test_passe_on_a_queue_persists_under_the_envelope_with_the_ticket_id`
-- [ ] `test_passe_never_changes_a_run_beyond_its_anomaly_fields` : les autres champs du `RunActif`
+- [x] `test_passe_marks_the_key_seen_only_after_the_emission`
+- [x] `test_passe_emits_through_the_hub_and_persists_in_agent_events`
+- [x] `test_passe_on_a_queue_persists_under_the_envelope_with_the_ticket_id`
+- [x] `test_passe_never_changes_a_run_beyond_its_anomaly_fields` : les autres champs du `RunActif`
       sont identiques avant et après ; aucun `fermer`, aucun appel au dialogue
-- [ ] `test_passe_calls_no_provider_and_runs_no_git_command`
-- [ ] `test_passe_survives_a_failing_run_and_still_checks_the_others`
-- [ ] `test_silence_is_exempt_during_a_silent_stage_with_an_armed_median` et
+- [x] `test_passe_calls_no_provider_and_runs_no_git_command`
+- [x] `test_passe_survives_a_failing_run_and_still_checks_the_others`
+- [x] `test_silence_is_exempt_during_a_silent_stage_with_an_armed_median` et
       `test_silence_is_reported_during_a_silent_stage_without_a_median`
-- [ ] `test_silence_is_exempt_while_a_question_waits_and_during_an_external_wait`
-- [ ] `test_cout_budget_is_evaluated_only_for_an_autonomous_run`
-- [ ] `test_passe_late_by_601s_logs_the_gap_and_late_by_600s_does_not` (intervalle 300 s)
-- [ ] `test_boucle_does_nothing_when_anomalies_actives_is_false`
-- [ ] `test_lifespan_starts_the_detector_and_cancels_it_on_shutdown`
-- [ ] `test_anomaly_log_line_has_no_tool_input`
+- [x] `test_silence_is_exempt_while_a_question_waits_and_during_an_external_wait`
+- [x] `test_cout_budget_is_evaluated_only_for_an_autonomous_run`
+- [x] `test_passe_late_by_601s_logs_the_gap_and_late_by_600s_does_not` (intervalle 300 s)
+- [x] `test_boucle_does_nothing_when_anomalies_actives_is_false`
+- [x] `test_lifespan_starts_the_detector_and_cancels_it_on_shutdown`
+- [x] `test_anomaly_log_line_has_no_tool_input`
 
 ## Ce que ça ne fait pas
 

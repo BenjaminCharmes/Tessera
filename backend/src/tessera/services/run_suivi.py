@@ -12,7 +12,9 @@ def suivre(run: RunActif, event: OrchestratorEvent) -> None:
     """Keep the registry entry in step with what the run announces."""
     # Chaque événement compte, tokens et appels d'outils compris : c'est de là
     # que le détecteur d'anomalies lit le silence (ticket-834).
-    run.dernier_evenement_a = event.timestamp
+    # Sauf le constat du détecteur lui-même : il dit le silence, il ne le rompt pas.
+    if event.type is not EventType.RUN_ANOMALY:
+        run.dernier_evenement_a = event.timestamp
     if event.type is EventType.AGENT_STARTED:
         run.etape = str(event.data.get("stage") or event.type.value)
         run.agent = event.agent.value if event.agent else None

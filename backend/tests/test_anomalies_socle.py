@@ -104,3 +104,9 @@ def test_anomaly_settings_defaults() -> None:
     assert s.anomalie_plancher_etape_s == 300.0
     assert s.anomalie_plancher_cout_usd == 0.5
     assert s.anomalie_part_budget == 0.8
+
+
+def test_suivre_ignores_the_detector_own_event_for_the_silence_clock() -> None:
+    run = RunActif(run_id="r", project_id="p")
+    suivre(run, _ev(EventType.RUN_ANOMALY))
+    assert run.dernier_evenement_a is None
