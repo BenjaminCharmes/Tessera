@@ -125,7 +125,14 @@ ALTER TABLE pipeline_runs ADD COLUMN pushed_sha TEXT;""",
     """ALTER TABLE pipeline_runs ADD COLUMN depot_repris_at TEXT;
 UPDATE pipeline_runs SET depot_repris_at = COALESCE(finished_at, started_at)
     WHERE final_status = 'interrupted';""",
-    # 11 — ticket-836 : les étapes se relisent dans `agent_events` par type
+    # 11 — ticket-805 : les réglages modifiables depuis l'interface (ADR-075).
+    # `valeur` est un littéral JSON ; une ligne absente vaut le défaut de .env.
+    """CREATE TABLE IF NOT EXISTS reglages (
+    nom        TEXT PRIMARY KEY,
+    valeur     TEXT NOT NULL,
+    modifie_le TEXT NOT NULL
+);""",
+    # 12 — ticket-836 : les étapes se relisent dans `agent_events` par type
     # (le détecteur d'anomalies, ADR-078) ; sans cet index, chaque lecture
     # parcourrait toute la table, tokens compris.
     "CREATE INDEX IF NOT EXISTS idx_ae_type_id ON agent_events (type, id);",
