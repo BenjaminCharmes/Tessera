@@ -12,6 +12,12 @@ Cette section n'est injectée dans aucun appel d'agent. Une règle nouvelle
 s'écrit ici, avec son ADR ; un humain l'accepte en la déplaçant dans sa
 section. (ADR-055)
 
+- **Un module de `services/` vit dans son domaine et n'importe que son domaine
+  ou un plus bas.** Ordre : noyau, projets, usage, provisioning, gardes,
+  git_workspace, worktrees, github, providers, verification, verdicts, agents,
+  documentation, creation_projet, livraison, pipeline, file, supervision. Un
+  module nouveau s'inscrit dans son domaine ; aucun paquet de premier niveau
+  hors `models`, `services`, `routers`, `utils`. (ADR-076)
 - **Un secret de Tessera se range dans le coffre du système, pas dans `.env`.**
   Neuf noms, listés dans `coffre.py`. Lecture : variable d'environnement, coffre,
   puis `.env`. `SECRETS_SOURCE=coffre` par défaut : sans coffre, ou coffre en

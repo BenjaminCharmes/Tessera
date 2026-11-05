@@ -1,14 +1,14 @@
 ---
-id: ticket-776
-title: "Design the backend services/ folder grouped by domain"
-type: design
-status: todo
-pr_number: null
-priority: low
 agent: architect
+created: 2026-11-03
 depends_on: []
 estimated_days: 1
-created: 2026-11-03
+id: ticket-776
+pr_number: 913
+priority: low
+status: done
+title: Design the backend services/ folder grouped by domain
+type: design
 ---
 
 # ticket-776 — Concevoir le regroupement de `services/` par domaine
