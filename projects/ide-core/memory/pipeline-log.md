@@ -7736,3 +7736,13 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-05 11:34:10 UTC — [ticket-780] APPROVED après 1 tour(s)
 - 2026-11-05 11:34:17 UTC — [ticket-780] fichiers non suivis laissés par le run : tickets/todo/ticket-805-a-reglages-module-stores-five-overridable-settings.md, tickets/todo/ticket-806-a-run-keeps-the-budgets-and-the-dialogue-delay-it-opened-with.md, tickets/todo/ticket-807-the-test-limit-and-the-stay-awake-setting-are-read-when-used.md, tickets/todo/ticket-808-a-route-reads-and-writes-the-settings-from-a-declared-origin-only.md, tickets/todo/ticket-809-the-bash-guard-refuses-network-commands-that-name-the-settings-route.md, tickets/todo/ticket-810-a-gear-button-at-the-foot-of-the-rail-opens-the-settings.md (à ignorer dans .gitignore ?)
 - 2026-11-05 11:35:07 UTC — [ticket-780] documentation: 0 fichier(s) (49983ms)
+- 2026-11-05 11:44:34 UTC — [ticket-790] branche ticket-790-a-registry-records-which-external-tools-our-promp
+- 2026-11-05 11:44:35 UTC — [ticket-790] tour 1 — codeur démarré
+- 2026-11-05 11:46:33 UTC — [ticket-790] tour 1 — codeur terminé (117500ms)
+- 2026-11-05 11:47:01 UTC — [ticket-790] testeur: dur�es : pytest 15 s, mypy 16 s, mypy-linux 9 s
+- 2026-11-05 11:49:07 UTC — [ticket-790] securite: PASS — Audit du diff ticket-790 : enregistrement des inspirations externes. Aucune vuln (125890ms)
+- 2026-11-05 11:49:07 UTC — [ticket-790] tour 1 — reviewer démarré
+- 2026-11-05 11:49:44 UTC — [ticket-790] tour 1 — reviewer terminé (37016ms)
+- 2026-11-05 11:53:08 UTC — [ticket-790] validateur: fichiers cités joints : docs/inspirations.md, agents/plugin/skills/design-ui/SKILL.md, agents/prompts/doc-fonctionnelle.md, projects/ide-core/memory/decisions.md (tronqué) ; absents : blader/humanizer, pbakaus/impeccable
+- 2026-11-05 11:53:08 UTC — [ticket-790] validateur: APPROVED — Tous les critères d'acceptation ont été respectés. Le registre des inspirations  (240625ms)
+- 2026-11-05 11:53:08 UTC — [ticket-790] APPROVED après 1 tour(s)
