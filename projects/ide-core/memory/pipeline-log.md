@@ -7697,3 +7697,14 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-05 10:31:47 UTC — [ticket-772] APPROVED après 1 tour(s)
 - 2026-11-05 10:31:55 UTC — [ticket-772] fichiers non suivis laissés par le run : tickets/todo/ticket-794-a-coffre-module-reads-and-writes-secrets-in-the-system-vault.md, tickets/todo/ticket-795-settings-reads-its-secrets-from-the-vault-and-refuses-to-start-without-it.md, tickets/todo/ticket-796-every-vault-secret-is-masked-in-logs-and-blanked-for-subprocesses.md, tickets/todo/ticket-797-a-command-moves-the-dotenv-secrets-into-the-vault-without-writing-them-in-clear.md, tickets/todo/ticket-798-the-pre-push-hook-and-the-history-scan-read-the-forbidden-terms-through-the-backend.md, tickets/todo/ticket-799-the-read-guard-refuses-bash-commands-that-run-the-vault.md, tickets/todo/ticket-800-doctor-health-env-example-and-docker-describe-where-the-secrets-live.md (à ignorer dans .gitignore ?)
 - 2026-11-05 10:36:51 UTC — [ticket-772] documentation: 1 fichier(s) (295844ms) — après tour de correction
+- 2026-11-05 10:53:23 UTC — [ticket-775] branche ticket-775-design-a-per-project-lessons-memory-fed-by-correc
+- 2026-11-05 10:53:24 UTC — [ticket-775] tour 1 — codeur démarré
+- 2026-11-05 10:56:28 UTC — [ticket-775] tour 1 — architect terminé (183563ms)
+- 2026-11-05 10:56:56 UTC — [ticket-775] testeur: OK (exit 0)
+- 2026-11-05 10:58:17 UTC — [ticket-775] securite: PASS — Le diff ajoute uniquement de la documentation (ADR-074 et contrainte proposée) s (80702ms)
+- 2026-11-05 10:58:17 UTC — [ticket-775] tour 1 — reviewer démarré
+- 2026-11-05 10:58:17 UTC — [ticket-775] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-11-05 10:58:43 UTC — [ticket-775] tour 1 — reviewer terminé (25891ms)
+- 2026-11-05 10:58:45 UTC — [ticket-775] validateur: fichiers cités joints : projects/ide-core/memory/decisions.md (tronqué) ; non joints (budget épuisé) : projects/ide-core/tickets/todo/
+- 2026-11-05 10:58:45 UTC — [ticket-775] validateur: APPROVED — Le design ADR-074 est complet et couvre rigoureusement l'architecture d'une mémo (27608ms)
+- 2026-11-05 10:58:45 UTC — [ticket-775] APPROVED après 1 tour(s)
