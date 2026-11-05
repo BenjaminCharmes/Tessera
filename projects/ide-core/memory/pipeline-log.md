@@ -7710,3 +7710,16 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-05 10:58:45 UTC — [ticket-775] APPROVED après 1 tour(s)
 - 2026-11-05 10:58:53 UTC — [ticket-775] fichiers non suivis laissés par le run : tickets/todo/ticket-801-a-lessons-module-parses-and-checks-the-project-lessons-file.md, tickets/todo/ticket-802-the-in-force-lessons-reach-the-coder-and-the-reviewer-only.md, tickets/todo/ticket-803-an-approved-run-that-had-a-corrected-failure-proposes-one-lesson.md, tickets/todo/ticket-804-a-run-diff-that-touches-the-lessons-file-blocks-the-run.md (à ignorer dans .gitignore ?)
 - 2026-11-05 11:02:18 UTC — [ticket-775] documentation: 1 fichier(s) (204875ms)
+- 2026-11-05 11:02:42 UTC — [ide-core] ticket-775 PR #912 confiée au CIWatcher
+- 2026-11-05 11:02:49 UTC — [ticket-776] branche ticket-776-design-the-backend-services-folder-grouped-by-dom
+- 2026-11-05 11:02:50 UTC — [ticket-776] tour 1 — codeur démarré
+- 2026-11-05 11:09:33 UTC — [ide-core] ticket-775 PR #912 mergée (CI verte)
+- 2026-11-05 11:11:47 UTC — [ticket-776] tour 1 — architect terminé (536516ms)
+- 2026-11-05 11:11:58 UTC — [ticket-776] testeur: OK (exit 0)
+- 2026-11-05 11:12:27 UTC — [ticket-776] securite: PASS — Ce diff ajoute une documentation architecturale (ADR-074) et un plan de refactor (29250ms)
+- 2026-11-05 11:12:27 UTC — [ticket-776] tour 1 — reviewer démarré
+- 2026-11-05 11:12:55 UTC — [ticket-776] tour 1 — reviewer terminé (28061ms)
+- 2026-11-05 11:17:27 UTC — [ticket-776] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-05 11:17:55 UTC — [ticket-776] validateur: fichiers cités joints : projects/ide-core/memory/decisions.md (tronqué) ; non joints (budget épuisé) : projects/ide-core/tickets/todo/
+- 2026-11-05 11:17:55 UTC — [ticket-776] validateur: APPROVED — Le ticket a produit ADR-074 avec la liste complète des 207 modules organisés en  (327953ms)
+- 2026-11-05 11:17:55 UTC — [ticket-776] APPROVED après 1 tour(s)
