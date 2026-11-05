@@ -7877,3 +7877,8 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-05 18:50:12 UTC — [ticket-848] APPROVED après 3 tour(s)
 - 2026-11-05 18:51:26 UTC — [ticket-848] leçons: rien à retenir
 - 2026-11-05 18:57:10 UTC — [ticket-848] documentation: 3 fichier(s) (335906ms)
+- 2026-11-05 19:23:01 UTC — [ticket-848] livraison: rebase sur develop (17329ms)
+- 2026-11-05 19:23:01 UTC — [ticket-848] livraison: conflit résolu : backend/tests/test_prochain_numero.py (0ms)
+- 2026-11-05 19:23:01 UTC — [ticket-848] livraison: tests relancés après rebase : rouges (FAILED tests/test_ruff_propre.py::test_ruff_check_passes_on_src_and_tests - A... !!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!! !!!!!!!!!!!! xdist.dsession.Interrupted: stopping after 1 failures !!!!!!!!!!!! 1 failed, 4306 passed, 64 warnings in 776.66s (0:12:56) ruf) (1520703ms)
+- 2026-11-05 19:23:01 UTC — [ticket-848] livraison: branche remise sur 17dacf1 ; résolution de conflit abandonnée (0ms)
+- 2026-11-05 19:23:01 UTC — [ticket-848] livraison: arrêt — Tests rouges après rebase sur develop : rien n'est poussé. La base a avancé pendant le run et le tra
