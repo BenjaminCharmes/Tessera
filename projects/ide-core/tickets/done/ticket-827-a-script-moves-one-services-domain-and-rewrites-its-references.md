@@ -2,7 +2,7 @@
 id: ticket-827
 title: "A script moves one services domain and rewrites its references"
 type: chore
-status: todo
+status: done
 pr_number: null
 priority: medium
 agent: codeur
@@ -58,10 +58,11 @@ Sur un arbre temporaire :
 
 ## Critères d'acceptation
 
-- [ ] `uv run python scripts/deplacer_domaine.py supervision --dry-run` liste les quatorze modules
-      du domaine et n'écrit rien
-- [ ] Les tests ci-dessus passent
-- [ ] Aucun module de `services/` n'a bougé dans ce ticket
+- [x] `uv run python scripts/deplacer_domaine.py supervision --dry-run` liste les quatorze modules
+      du domaine et n'écrit rien — onze depuis le reclassement du ticket-826 (`eveil` passe
+      dans `noyau`, `process_registry` et `service_etat` dans `verification`)
+- [x] Les tests ci-dessus passent
+- [x] Aucun module de `services/` n'a bougé dans ce ticket
 
 ## Ce que ça ne fait pas
 
