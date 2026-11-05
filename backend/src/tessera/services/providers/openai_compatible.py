@@ -16,11 +16,7 @@ from typing import Any
 import httpx
 
 from tessera.services.providers import openai_corps
-from tessera.services.providers.base import (
-    ProviderResult,
-    StreamCallback,
-    ToolEventCallback,
-)
+from tessera.services.providers.base import ProviderResult, StreamCallback, ToolEventCallback
 from tessera.services.providers.duree_max import borner
 from tessera.services.providers.noms import ProviderIndisponible
 

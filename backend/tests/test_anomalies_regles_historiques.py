@@ -1,10 +1,10 @@
 """Rules judged against the project's history — tickets 836 to 838 (ADR-078)."""
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from tessera.services.supervision.anomalies.modeles import Etape
 from tessera.services.supervision.anomalies.regles_historiques import etape_longue, mediane_si_assez
 
-T0 = datetime(2026, 11, 5, 10, 0, tzinfo=timezone.utc)
+T0 = datetime(2026, 11, 5, 10, 0, tzinfo=UTC)
 
 
 def _ouverte(nom: str = "tests") -> Etape:

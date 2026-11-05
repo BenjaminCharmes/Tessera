@@ -17,16 +17,16 @@ import pytest
 
 from tessera.config import settings
 from tessera.models.ticket import TicketStatus
+from tessera.services.github.github_service import PrOuverte
 from tessera.services.livraison import mise_a_jour_pr
 from tessera.services.livraison.ci_watcher import CIWatcher, ControleTete
-from tessera.services.noyau.database_runs import create_run
-from tessera.services.github.github_service import PrOuverte
 from tessera.services.livraison.livraison import Livraison
 from tessera.services.livraison.mise_a_jour_branche import MiseAJour
 from tessera.services.livraison.mise_a_jour_pr import MiseAJourPr, TeteAttendue, mise_a_jour_de
-from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.livraison.sha_approbation import noter_poussee, sha_pousse_du_ticket
 from tessera.services.livraison.surveillance_run import controle_tete_de
+from tessera.services.noyau.database_runs import create_run
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 
 _A = "a" * 40
 _B = "b" * 40

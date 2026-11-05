@@ -2,14 +2,7 @@
 from pathlib import Path
 
 from tessera.models.agent import AgentResult, AgentRole
-from tessera.models.ticket import TicketStatus
-from tests.test_orchestrator import (  # réutilise les doubles existants
-    _FakeGit,
-    _make_agent_result,
-    _make_orchestrator,
-    _make_ticket,
-    _noop,
-)
+from tests.test_orchestrator import _FakeGit, _make_agent_result, _make_orchestrator, _make_ticket  # réutilise les doubles existants
 
 
 class _CostlyRunner:

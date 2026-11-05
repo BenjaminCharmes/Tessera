@@ -1,9 +1,9 @@
 """Pulls the `agent-ready` issues of a project's repository into tickets — ticket-084."""
-from tessera.services.github.github_sync import GithubSyncAgent
 from tessera.config import settings
 from tessera.services.github.github_service import GitHubService
-from tessera.services.projets.project_loader import load_project
+from tessera.services.github.github_sync import GithubSyncAgent
 from tessera.services.github.sync_map import SyncMapService
+from tessera.services.projets.project_loader import load_project
 from tessera.services.projets.ticket_service import TicketService
 from tessera.utils.logger import get_logger
 

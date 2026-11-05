@@ -9,21 +9,13 @@ Les jours sont des jours **UTC** : c'est ainsi que `created_at` et
 backend ne connaît pas. `agent_calls` n'a pas de `project_id` : le projet d'un
 appel passe par son run.
 """
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
 import aiosqlite
 
-from tessera.models.usage import (
-    BreakdownLine,
-    DailyPoint,
-    RecentRun,
-    RunQuality,
-    StatusCount,
-    UsageStats,
-    UsageTotals,
-)
+from tessera.models.usage import BreakdownLine, DailyPoint, RecentRun, RunQuality, StatusCount, UsageStats, UsageTotals
 from tessera.services.usage.cost_aggregate import CostColumn, aggregate_cost
 
 #: Les périodes que l'écran propose ; l'endpoint refuse les autres.
@@ -69,7 +61,7 @@ async def usage_stats(
     today: date | None = None,
 ) -> UsageStats:
     """Everything the statistics screen shows for the last `days` UTC days."""
-    until_day = today or datetime.now(timezone.utc).date()
+    until_day = today or datetime.now(UTC).date()
     since_day = until_day - timedelta(days=days - 1)
     since = since_day.isoformat()
     until = until_day.isoformat()
@@ -219,7 +211,7 @@ async def recent_runs(
     Serves the « Afficher plus » and the search of the recent-runs card
     (ticket-335) without recomputing the whole statistics screen.
     """
-    until_day = today or datetime.now(timezone.utc).date()
+    until_day = today or datetime.now(UTC).date()
     since_day = until_day - timedelta(days=days - 1)
     until_exc = (until_day + timedelta(days=1)).isoformat()
     scope = _Scope(since_day.isoformat(), until_exc, project_id)

@@ -1,6 +1,5 @@
 """A Vercel deployment as the provisioning steps read it — ticket-489."""
 from dataclasses import dataclass
-from typing import Optional
 
 from tessera.services.provisioning.jsonview import as_dict, as_str
 
@@ -37,7 +36,7 @@ class VercelDeployment:
         return self.state == "READY"
 
 
-def deployment_from(raw: object) -> Optional[VercelDeployment]:
+def deployment_from(raw: object) -> VercelDeployment | None:
     """Read a deployment from a list entry or a creation response, ``None`` without an id."""
     corps = as_dict(raw)
     identifiant = as_str(corps.get("uid")) or as_str(corps.get("id"))

@@ -6,15 +6,12 @@ from pathlib import Path
 import pytest
 
 from tessera.models.ticket import TicketStatus
+from tessera.services.gardes.politique_run import PolitiqueRun
+from tessera.services.livraison.reprise_surveillance import SurveillanceProjet, reprendre_surveillances
+from tessera.services.livraison.sha_approbation import noter_poussee
 from tessera.services.noyau.database import init_db
 from tessera.services.noyau.database_runs import create_run
 from tessera.services.noyau.pipeline_events import OrchestratorEvent
-from tessera.services.gardes.politique_run import PolitiqueRun
-from tessera.services.livraison.reprise_surveillance import (
-    SurveillanceProjet,
-    reprendre_surveillances,
-)
-from tessera.services.livraison.sha_approbation import noter_poussee
 from tessera.services.projets.ticket_service import TicketService
 
 PROJET = "demo"

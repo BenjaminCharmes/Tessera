@@ -10,12 +10,7 @@ from typing import Any
 
 from tessera.services.noyau.event_hub import EVENT_HUB
 from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
-from tessera.services.providers.base import (
-    LLMProvider,
-    ProviderResult,
-    StreamCallback,
-    ToolEventCallback,
-)
+from tessera.services.providers.base import LLMProvider, ProviderResult, StreamCallback, ToolEventCallback
 from tessera.services.providers.enregistrant import ticket_courant
 from tessera.services.providers.noms import ProviderIndisponible
 from tessera.utils.logger import get_logger

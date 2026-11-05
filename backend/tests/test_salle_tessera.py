@@ -5,25 +5,25 @@ La sonde est un faux, le journal et le dossier des worktrees sont écrits dans
 """
 import json
 import os
-from datetime import datetime, timedelta, timezone
 from dataclasses import dataclass, field
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import aiosqlite
 from fastapi.testclient import TestClient
 
 from tessera.main import app
-from tessera.services.noyau.database import init_db
 from tessera.routers.services_running import get_sonde
+from tessera.services.noyau.database import init_db
 from tessera.services.providers import ollama
 from tessera.services.supervision.salle_tessera import (
     PORT_DU_FRONTEND,
+    agents_en_cours,
     ci_en_attente,
     fin_du_journal,
-    agents_en_cours,
     processus_de_tessera,
-    runs_vivants,
     runs_du_jour,
+    runs_vivants,
     salle_tessera,
     taille_mo,
 )
@@ -84,8 +84,8 @@ def test_the_log_shows_only_the_event_never_the_payload(tmp_path: Path) -> None:
 
     fin = fin_du_journal(journal)
 
-    assert [l.evenement for l in fin] == [f"evt{i}" for i in range(4, 10)]
-    assert "secret" not in json.dumps([l.model_dump() for l in fin])
+    assert [ln.evenement for ln in fin] == [f"evt{i}" for i in range(4, 10)]
+    assert "secret" not in json.dumps([ln.model_dump() for ln in fin])
 
 
 def test_a_missing_log_gives_no_line(tmp_path: Path) -> None:
@@ -108,7 +108,7 @@ def test_running_agents_are_the_claude_processes_under_the_backend() -> None:
 async def test_runs_of_the_day_count_since_local_midnight(tmp_path: Path) -> None:
     base = tmp_path / "tessera.db"
     await init_db(base)
-    maintenant = datetime.now(timezone.utc)
+    maintenant = datetime.now(UTC)
     async with aiosqlite.connect(base) as db:
         for i, depuis in enumerate([maintenant, maintenant - timedelta(days=3)]):
             await db.execute(
@@ -124,7 +124,7 @@ async def test_runs_of_the_day_count_since_local_midnight(tmp_path: Path) -> Non
 async def test_runs_of_the_day_leave_out_queue_and_autonomous_envelopes(tmp_path: Path) -> None:
     base = tmp_path / "tessera.db"
     await init_db(base)
-    maintenant = datetime.now(timezone.utc).isoformat()
+    maintenant = datetime.now(UTC).isoformat()
     lignes = [
         ("envelope", "queue", "queue"),
         ("auto", "autonomous", "autonomous"),

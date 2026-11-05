@@ -13,18 +13,17 @@ import httpx
 import pytest
 import respx
 
+import tessera.services.providers.ollama as ollama_module
 from tessera.config import settings
 from tessera.services.noyau.event_hub import EVENT_HUB
 from tessera.services.noyau.pipeline_events import EventType
-from tessera.services.providers import get_provider
+from tessera.services.projets.project_loader import load_agents_config
+from tessera.services.providers import get_provider, par_role
 from tessera.services.providers.base import LLMProvider
 from tessera.services.providers.noms import PROVIDERS_CONNUS, ProviderIndisponible
-import tessera.services.providers.ollama as ollama_module
-from tessera.services.providers.ollama import OllamaProvider, _reset_slots, _reset_cooldowns
-from tessera.services.providers import par_role
+from tessera.services.providers.ollama import OllamaProvider, _reset_cooldowns, _reset_slots
 from tessera.services.providers.par_role import provider_pour_role
 from tessera.services.verdicts.security_auditor import SecurityAuditorService
-from tessera.services.projets.project_loader import load_agents_config
 from tests.test_providers_base import FakeProvider
 
 _BASE = "http://ollama.test:11434"
@@ -126,7 +125,7 @@ async def test_stream_livre_chaque_fragment_et_le_contenu_entier() -> None:
          "prompt_eval_count": 7, "eval_count": 2},
     ]
     respx.post(f"{_BASE}/api/chat").mock(
-        return_value=httpx.Response(200, content="\n".join(json.dumps(l) for l in lignes))
+        return_value=httpx.Response(200, content="\n".join(json.dumps(ln) for ln in lignes))
     )
     recus: list[str] = []
 
@@ -352,7 +351,7 @@ async def test_stream_abandonne_rend_le_creneau(
         {"message": {"role": "assistant", "content": ""}, "done": True,
          "prompt_eval_count": 3, "eval_count": 1},
     ]
-    stream_content = "\n".join(json.dumps(l) for l in lignes).encode()
+    stream_content = "\n".join(json.dumps(ln) for ln in lignes).encode()
 
     class _StreamTransport(httpx.AsyncBaseTransport):
         async def handle_async_request(self, request: httpx.Request) -> httpx.Response:

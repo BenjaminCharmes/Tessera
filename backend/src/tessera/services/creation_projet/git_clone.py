@@ -4,14 +4,11 @@ import re
 import shutil
 from pathlib import Path
 
-from tessera.models.project import CloneProjectResponse, Project
-from tessera.services.projets.manifeste import ecrire_clef
+from tessera.models.project import CloneProjectResponse
 from tessera.services.creation_projet.project_analyzer import ProjectAnalyzerService
 from tessera.services.creation_projet.project_importer import _scaffold_artifact_dirs
-from tessera.services.projets.artifacts import (
-    apply_artifact_mode,
-    default_mode_for,
-)
+from tessera.services.projets.artifacts import apply_artifact_mode, default_mode_for
+from tessera.services.projets.manifeste import ecrire_clef
 from tessera.services.projets.project_loader import load_project
 from tessera.utils.logger import get_logger
 
@@ -97,10 +94,10 @@ class GitCloneService:
             _, stderr = await asyncio.wait_for(
                 proc.communicate(), timeout=self.CLONE_TIMEOUT
             )
-        except asyncio.TimeoutError:
+        except TimeoutError:
             proc.kill()
             await proc.communicate()
-            raise CloneError(f"Le clone a dépassé {self.CLONE_TIMEOUT}s.")
+            raise CloneError(f"Le clone a dépassé {self.CLONE_TIMEOUT}s.") from None
 
         if proc.returncode != 0:
             _logger.warning(

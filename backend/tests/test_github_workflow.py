@@ -4,11 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services.github.github_workflow import (
-    GitHubWorkflowService,
-    WorkflowError,
-    build_pr_body,
-)
+from tessera.services.github.github_workflow import GitHubWorkflowService, WorkflowError, build_pr_body
 
 
 class _FakeGit:
@@ -241,14 +237,14 @@ def test_le_merge_passe_toujours_par_la_porte(tmp_path: Path) -> None:
 
     source = inspect.getsource(github_workflow)
     lignes = [
-        l for l in source.splitlines()
-        if l.strip() and not l.strip().lstrip("#").strip().startswith(("#",))
-        and not l.strip().startswith("#")
+        ln for ln in source.splitlines()
+        if ln.strip() and not ln.strip().lstrip("#").strip().startswith(("#",))
+        and not ln.strip().startswith("#")
     ]
-    appels = [l for l in lignes if "merge_quand_fusionnable" in l and "def " not in l]
+    appels = [ln for ln in lignes if "merge_quand_fusionnable" in ln and "def " not in ln]
 
     assert appels, "le merge doit exister pour être testable"
-    for ligne in appels:
+    for _ligne in appels:
         assert "peut_merger" in source, "le merge doit être gardé par peut_merger"
 
 

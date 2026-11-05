@@ -14,8 +14,8 @@ fields move between versions, and an absent event is the nominal case — a
 provider that reports nothing leaves the tracker empty rather than breaking.
 """
 from dataclasses import dataclass
-from datetime import datetime, timezone
-from typing import Any, Literal, Optional
+from datetime import UTC, datetime
+from typing import Any, Literal
 
 from tessera.services.usage.quota_registry import QUOTA_REGISTRY
 from tessera.utils.logger import get_logger
@@ -43,7 +43,7 @@ class QuotaSnapshot:
     resets_at: datetime | None = None
 
 
-def snapshot_from_rate_limit(info: Any) -> Optional[QuotaSnapshot]:
+def snapshot_from_rate_limit(info: Any) -> QuotaSnapshot | None:
     """Normalise the SDK's rate-limit payload, or return None if unusable.
 
     Returns None rather than a zeroed snapshot when the payload carries no
@@ -60,7 +60,7 @@ def snapshot_from_rate_limit(info: Any) -> Optional[QuotaSnapshot]:
     resets_at: datetime | None = None
     if isinstance(resets_at_raw, (int, float)):
         try:
-            resets_at = datetime.fromtimestamp(resets_at_raw, tz=timezone.utc)
+            resets_at = datetime.fromtimestamp(resets_at_raw, tz=UTC)
         except (OverflowError, OSError, ValueError):
             _logger.warning("quota_resets_at_illisible", extra={"value": resets_at_raw})
 

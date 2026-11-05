@@ -25,7 +25,6 @@ from tessera.services.noyau.pipeline_events import EventType, PipelineResult
 from tessera.services.pipeline.run_executor import _clore, emetteur
 from tessera.services.pipeline.run_registry import RunActif
 
-
 # ------------------------------------------------------------------
 # Fixtures
 # ------------------------------------------------------------------

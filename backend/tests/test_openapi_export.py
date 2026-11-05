@@ -4,13 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from tessera.openapi_export import (
-    SCHEMA_PATH,
-    is_up_to_date,
-    main,
-    render_schema,
-    write_schema,
-)
+from tessera.openapi_export import SCHEMA_PATH, is_up_to_date, main, render_schema, write_schema
 
 
 def test_versioned_schema_matches_the_app() -> None:

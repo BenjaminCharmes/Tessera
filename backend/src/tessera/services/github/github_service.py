@@ -4,10 +4,10 @@ from dataclasses import dataclass
 from typing import Any, Literal
 
 import httpx
+from pydantic import BaseModel
 
 from tessera.config import settings
 from tessera.services.github.github_retry import reessayer_5xx
-from pydantic import BaseModel
 
 
 class MergeabiliteTimeoutError(Exception):

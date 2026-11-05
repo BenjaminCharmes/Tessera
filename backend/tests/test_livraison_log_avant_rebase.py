@@ -18,8 +18,7 @@ from pathlib import Path
 import pytest
 
 from tessera.services.git_workspace import GitWorkspaceService
-from tessera.services.livraison.livraison import LivraisonService, Livraison
-
+from tessera.services.livraison.livraison import LivraisonService
 
 # ------------------------------------------------------------------
 # Helpers

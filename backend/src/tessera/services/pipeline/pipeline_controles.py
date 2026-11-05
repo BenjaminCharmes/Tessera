@@ -6,19 +6,11 @@ refusal, never a pass — except an exhausted quota, which must reach
 `run_pipeline` (ticket-498).
 """
 import time
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from tessera.models.agent import AgentRole
-from tessera.services.gardes.config_tests_touchee import (
-    avertissement_config_tests,
-    config_tests_du_diff,
-    porte_config_nommee,
-)
-from tessera.services.noyau.pipeline_events import (
-    EventType,
-    OrchestratorEvent,
-    PipelineResult,
-)
+from tessera.services.gardes.config_tests_touchee import avertissement_config_tests, config_tests_du_diff, porte_config_nommee
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent, PipelineResult
 from tessera.services.pipeline.pipeline_outcomes import finish_security_block
 from tessera.services.pipeline.pipeline_run import PipelineRun, emit
 from tessera.services.pipeline.pipeline_text import _extract_criteria
@@ -50,7 +42,7 @@ def _quota_epuise(orch: "Orchestrator", exc: BaseException) -> bool:
 
 async def run_security_audit(
     orch: "Orchestrator", run: PipelineRun
-) -> Optional[PipelineResult]:
+) -> PipelineResult | None:
     """Audit the diff. A CRITICAL/HIGH verdict ends the run before the reviewer.
 
     Échoue fermé : une exception de l'auditeur sautait l'audit et le diff

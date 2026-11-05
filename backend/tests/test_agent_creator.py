@@ -4,13 +4,10 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services.noyau.prompt_loader import MissingPromptError
-
-from tests.test_providers_base import FakeProvider
-from tessera.models.agent import CreateAgentConversationResponse
 from tessera.models.project import ConversationMessage
 from tessera.services.agents.agent_creator import AgentCreatorService
-
+from tessera.services.noyau.prompt_loader import MissingPromptError
+from tests.test_providers_base import FakeProvider
 
 # ------------------------------------------------------------------
 # Constants / helpers

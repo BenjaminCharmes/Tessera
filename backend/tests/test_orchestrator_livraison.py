@@ -9,16 +9,12 @@ from typing import Any
 
 import pytest
 
+from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.livraison.livraison import Livraison
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent, PipelineResult
 from tessera.services.pipeline.orchestrator import Orchestrator
 from tessera.services.pipeline.pipeline_fin_de_file import nettoyer_apres_file
-from tessera.services.noyau.pipeline_events import (
-    EventType,
-    OrchestratorEvent,
-    PipelineResult,
-)
-from tessera.models.ticket import Ticket, TicketStatus, TicketType, TicketPriority
 
 
 def _resultat(ticket_id: str, approuve: bool = True) -> PipelineResult:
@@ -357,7 +353,7 @@ async def test_run_closed_emis_avant_ci_merge_done(tmp_path: Path) -> None:
     )
 
     # run_pipeline retourne avant que la gate soit levée.
-    result = await orch.run_pipeline("proj", "ticket-001", _capturer)
+    await orch.run_pipeline("proj", "ticket-001", _capturer)
 
     # À ce stade, la phase 2 est bloquée sur la gate : ci_merge_done n'a pas
     # encore été émis.
@@ -380,6 +376,7 @@ async def test_ticket_dependant_attend_le_merge_avant_de_demarrer(
 ) -> None:
     """Critère 3 : ticket dépendant attend ci_merge_done avant de démarrer."""
     from unittest.mock import AsyncMock
+
     from tessera.models.ticket import Ticket
 
     gate = asyncio.Event()
@@ -452,9 +449,10 @@ async def test_ticket_sans_dependance_demarre_sans_attendre(
 ) -> None:
     """Critère 4 : ticket sans dépendance démarre pendant que la PR attend la CI."""
     from unittest.mock import AsyncMock
+
     from tessera.models.ticket import Ticket
 
-    gate = asyncio.Event()
+    _gate = asyncio.Event()
     departs: list[str] = []
 
     class _FakeCIWatcher:
@@ -503,6 +501,7 @@ async def test_livraison_sans_pr_ne_bloque_pas_le_ticket_suivant(
 ) -> None:
     """Critère 5 : livraison échouée sans PR → file continue normalement."""
     from unittest.mock import AsyncMock
+
     from tessera.models.ticket import Ticket
 
     departs: list[str] = []
@@ -556,7 +555,8 @@ async def test_queue_stops_when_approved_no_pr_and_dependent_follows(
     stops before B, livraison.arret names both tickets, log records the
     interruption."""
     from unittest.mock import AsyncMock, MagicMock
-    from tessera.models.ticket import Ticket, TicketType, TicketPriority, TicketStatus
+
+    from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 
     def _make_dep_ticket(tid: str, depends_on: list[str]) -> Ticket:
         return Ticket(
@@ -613,7 +613,8 @@ async def test_queue_continues_when_approved_no_pr_and_no_dependent(
     """Criterion 4: approved ticket with no PR opened, next ticket has no
     dependency on it → queue continues normally."""
     from unittest.mock import AsyncMock, MagicMock
-    from tessera.models.ticket import Ticket, TicketType, TicketPriority, TicketStatus
+
+    from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 
     def _make_nodep_ticket(tid: str) -> Ticket:
         return Ticket(
@@ -853,7 +854,8 @@ async def test_file_s_arrete_quand_dependance_non_mergee(
     """A queue stops and logs 'file interrompue : ticket-… non mergé' when
     the merge of a dependency fails."""
     from unittest.mock import AsyncMock
-    from tessera.models.ticket import Ticket, TicketType, TicketPriority, TicketStatus
+
+    from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 
     class _FakeCIWatcherFail:
         async def attendre_merge(
@@ -909,7 +911,8 @@ async def test_ticket_independant_continue_quand_dependance_non_mergee(
     """A ticket with no dependency on A continues normally even when A's merge
     fails — it is not blocked by A's outcome."""
     from unittest.mock import AsyncMock
-    from tessera.models.ticket import Ticket, TicketType, TicketPriority, TicketStatus
+
+    from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 
     class _FakeCIWatcherFail:
         async def attendre_merge(
@@ -962,7 +965,8 @@ async def _file_avec_dependances(
     Returns the results and the content of the pipeline log.
     """
     from unittest.mock import AsyncMock
-    from tessera.models.ticket import Ticket, TicketType, TicketPriority, TicketStatus
+
+    from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 
     class _FakeCIWatcherFail:
         async def attendre_merge(
@@ -1494,6 +1498,7 @@ async def test_le_ticket_dependant_part_de_la_base_realignee_apres_le_merge(
     starts only after the base was realigned onto the merge — not from the
     stale local base (ticket-400 had started without ticket-399)."""
     from unittest.mock import AsyncMock, MagicMock
+
     from tessera.models.ticket import Ticket
 
     ordre: list[str] = []
@@ -1680,8 +1685,8 @@ async def test_l_arbre_reste_sur_une_branche_de_ticket_revient_sur_la_base_avant
 async def test_un_retour_sur_la_base_refuse_est_journalise_et_le_run_demarre(
     tmp_path: Path,
 ) -> None:
-    from tessera.services.pipeline import pipeline_branche
     from tessera.services.git_workspace import GitCommandError
+    from tessera.services.pipeline import pipeline_branche
 
     ordre: list[str] = []
     git_ws = _espace_git_double(ordre, branche_courante="ticket-000-ancien")

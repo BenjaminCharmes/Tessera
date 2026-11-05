@@ -6,22 +6,11 @@ ever deleted, and a variable that exists is never rewritten (a ``sensitive``
 one cannot be read back, so its value is unknown).
 """
 import secrets
-from typing import Optional
 
 from tessera.services.provisioning.errors import ServiceError
-from tessera.services.provisioning.steps import (
-    ProvisioningContext,
-    StepResult,
-    StepState,
-)
-from tessera.services.provisioning.vercel import (
-    PUBLIC_PREFIX,
-    VercelClient,
-    vercel_name,
-)
-from tessera.services.provisioning.vercel_deploy_step import (
-    VercelRedeployStep as VercelRedeployStep,
-)
+from tessera.services.provisioning.steps import ProvisioningContext, StepResult, StepState
+from tessera.services.provisioning.vercel import PUBLIC_PREFIX, VercelClient, vercel_name
+from tessera.services.provisioning.vercel_deploy_step import VercelRedeployStep as VercelRedeployStep
 from tessera.services.provisioning.vercel_dns import VercelDomain
 from tessera.utils.logger import get_logger
 from tessera.utils.secrets import SECRETS, SecretRegistry
@@ -42,7 +31,7 @@ _NO_TOKEN = StepResult(
 )
 
 
-def _repo_access_missing(repo: Optional[str]) -> StepResult:
+def _repo_access_missing(repo: str | None) -> StepResult:
     """Tell the user how to give Vercel's GitHub application access to the repository."""
     cible = repo or "du projet"
     return StepResult(
@@ -52,7 +41,7 @@ def _repo_access_missing(repo: Optional[str]) -> StepResult:
     )
 
 
-def www_of(domain: str) -> Optional[str]:
+def www_of(domain: str) -> str | None:
     """Return ``www.<domain>``, or ``None`` when the domain already starts with ``www.``."""
     return None if domain.startswith("www.") else f"www.{domain}"
 

@@ -1,20 +1,19 @@
 import asyncio
+import json
 from pathlib import Path
 
 import pytest
 
-import json
-
-from tessera.services.worktrees.run_worktree import RunWorktree
 from tessera.services.git_workspace import (
     GitCommandError,
     GitWorkspaceService,
     InvalidSlugError,
     NotAGitRepository,
     _resumer_lockfiles,
-    _union_lines,
     _union_json_lists,
+    _union_lines,
 )
+from tessera.services.worktrees.run_worktree import RunWorktree
 
 
 async def _git(cwd: Path, *args: str) -> None:
@@ -1835,7 +1834,7 @@ async def test_rebase_journal_pipeline_log_resolves_as_union(repo: Path) -> None
     await _git(repo, "add", "memory/pipeline-log.md")
     await _git(repo, "commit", "-q", "-m", "chore: init log")
 
-    base = (await asyncio.create_subprocess_exec(
+    __base = (await asyncio.create_subprocess_exec(
         "git", "rev-parse", "--abbrev-ref", "HEAD",
         cwd=str(repo), stdout=asyncio.subprocess.PIPE,
     )).stdout  # type: ignore[union-attr]
@@ -2198,8 +2197,8 @@ async def test_la_branche_du_ticket_part_du_commit_distant_et_garde_le_journal(
     the run realigns it first, so the ticket branch forks from the remote
     commit and the log line survives (the state the CIWatcher leaves behind)."""
     from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-    from tessera.services.pipeline import pipeline_branche
     from tessera.services.noyau.pipeline_events import OrchestratorEvent
+    from tessera.services.pipeline import pipeline_branche
     from tessera.services.pipeline.pipeline_run import PipelineRun
 
     local, bare = repo_avec_distant

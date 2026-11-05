@@ -12,21 +12,14 @@ from typing import Any
 from unittest.mock import AsyncMock
 
 import pytest
-from claude_agent_sdk import (
-    AssistantMessage,
-    ResultMessage,
-    TextBlock,
-    ToolResultBlock,
-    ToolUseBlock,
-    UserMessage,
-)
+from claude_agent_sdk import AssistantMessage, ResultMessage, TextBlock, ToolResultBlock, ToolUseBlock, UserMessage
 
 import tessera.services.providers.agent_sdk as agent_sdk_module
 from tessera.models.agent import AgentResult, AgentRole
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
+from tessera.services.noyau.pipeline_events import OrchestratorEvent
 from tessera.services.pipeline import pipeline_production
 from tessera.services.pipeline.orchestrator import Orchestrator
-from tessera.services.noyau.pipeline_events import OrchestratorEvent
 from tessera.services.pipeline.pipeline_run import PipelineRun
 from tessera.services.providers.agent_sdk import ClaudeAgentSDKProvider
 from tessera.services.providers.refus_cli import MESSAGE_REFUS_CLI
@@ -156,8 +149,8 @@ async def test_run_coder_ecrit_une_ligne_par_outil_refuse(tmp_path: Path) -> Non
     await pipeline_production.run_coder(orch, run, "contexte")
 
     lignes = journal.read_text(encoding="utf-8").splitlines()
-    assert any(l.endswith("[ticket-515] codeur: outil Edit refusé par le CLI") for l in lignes)
-    assert any(l.endswith("[ticket-515] codeur: outil Grep refusé par le CLI") for l in lignes)
+    assert any(ln.endswith("[ticket-515] codeur: outil Edit refusé par le CLI") for ln in lignes)
+    assert any(ln.endswith("[ticket-515] codeur: outil Grep refusé par le CLI") for ln in lignes)
 
 
 async def test_run_coder_sans_refus_n_ecrit_aucune_ligne_de_refus(

@@ -4,12 +4,7 @@ from fastapi.testclient import TestClient
 from tessera.config import settings
 from tessera.main import app
 from tessera.services.noyau.database_events import save_event
-from tessera.services.noyau.database_runs import (
-    CAUSE_RUN_ORPHELIN,
-    create_run,
-    finish_run,
-    solder_les_runs_orphelins,
-)
+from tessera.services.noyau.database_runs import CAUSE_RUN_ORPHELIN, create_run, finish_run, solder_les_runs_orphelins
 
 _TS = "2026-10-14T10:00:00+00:00"
 _PROJET = "projet-file"

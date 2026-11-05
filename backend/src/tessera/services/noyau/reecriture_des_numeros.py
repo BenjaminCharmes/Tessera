@@ -1,6 +1,7 @@
 """Rewriting of ticket and ADR numbers on the lines a run adds — ticket-659."""
 import os
 import re
+from collections.abc import Callable
 from pathlib import Path
 
 from tessera.services.noyau.numerotation import Genre, numeros_de_noms
@@ -39,16 +40,21 @@ def reecrire_les_mentions(
     return touches
 
 
+def _remplaceur(
+    genre: Genre, correspondances: dict[int, int]
+) -> Callable[[re.Match[str]], str]:
+    """Binds the loop values, so each genre rewrites with its own table."""
+
+    def remplacer(m: re.Match[str]) -> str:
+        numero = int(m.group(1))
+        return nommer(genre, correspondances[numero]) if numero in correspondances else m.group(0)
+
+    return remplacer
+
+
 def _remplacer(ligne: str, table: dict[Genre, dict[int, int]]) -> str:
     for genre, correspondances in table.items():
-        ligne = _MENTIONS[genre].sub(
-            lambda m: (
-                nommer(genre, correspondances[int(m.group(1))])
-                if int(m.group(1)) in correspondances
-                else m.group(0)
-            ),
-            ligne,
-        )
+        ligne = _MENTIONS[genre].sub(_remplaceur(genre, correspondances), ligne)
     return ligne
 
 

@@ -13,8 +13,8 @@ from pathlib import Path
 
 import pytest
 
-from tests.depot_numerotation import creer_depot, ecrire, fiche, git, pousser_une_branche
 from tessera.services.noyau.numerotation import GitIllisible, numeros_pris, prochain_numero
+from tests.depot_numerotation import creer_depot, ecrire, fiche, git, pousser_une_branche
 
 _SCRIPTS = Path(__file__).resolve().parent.parent.parent / "scripts"
 sys.path.insert(0, str(_SCRIPTS))

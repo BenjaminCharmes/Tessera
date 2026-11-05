@@ -4,7 +4,8 @@ Sortis de `livraison.py` pour que le fichier rétrécisse : chaque fonction lit
 un maillon (git, workflow) qu'on lui passe, et rend un arrêt ou une valeur.
 """
 import asyncio
-from typing import Any, Awaitable, Callable, Protocol
+from collections.abc import Awaitable, Callable
+from typing import Any, Protocol
 
 import httpx
 

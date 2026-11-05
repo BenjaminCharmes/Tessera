@@ -78,7 +78,7 @@ class TestExpirationTueLArbre:
         proc = MagicMock()
         proc.kill = MagicMock()
         proc.wait = jamais
-        proc.communicate = AsyncMock(side_effect=asyncio.TimeoutError())
+        proc.communicate = AsyncMock(side_effect=TimeoutError())
 
         with patch("asyncio.create_subprocess_exec", return_value=proc):
             result = await asyncio.wait_for(

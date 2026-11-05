@@ -75,9 +75,9 @@ def test_aucun_bloc_ne_squashe_develop_dans_main() -> None:
     fautifs = []
     for consigne in _CONSIGNES:
         for bloc in _blocs_de_code(_lire(consigne)):
-            vers_main = any("--base main" in l for l in bloc)
+            vers_main = any("--base main" in ln for ln in bloc)
             squash = [
-                l for l in bloc if "pr merge" in l and "--squash" in l and "PAS" not in l
+                ln for ln in bloc if "pr merge" in ln and "--squash" in ln and "PAS" not in ln
             ]
             if vers_main and squash:
                 fautifs.append(f"{consigne}: {squash[0].strip()[:60]}")
@@ -115,7 +115,7 @@ def test_claude_md_states_the_enforced_length() -> None:
     """
     from tests.test_longueur_des_fichiers import PLAFOND_GENERAL
 
-    ligne = next(l for l in _lire("CLAUDE.md").splitlines() if "petits fichiers" in l)
+    ligne = next(ln for ln in _lire("CLAUDE.md").splitlines() if "petits fichiers" in ln)
     nombres = [int(n) for n in re.findall(r"\d+", ligne.split("**")[-1])]
 
     assert nombres and nombres[0] == PLAFOND_GENERAL, ligne
@@ -210,10 +210,10 @@ def test_aucun_reglage_de_pipeline_n_est_mort() -> None:
     import inspect
 
     from tessera.models.agent import AgentPipelineConfig
-    from tessera.services.pipeline import orchestrator as orch_service
     from tessera.routers import orchestrator as orch_router
-    from tessera.services.pipeline import assemblage_run
     from tessera.services.documentation import documenteur_run
+    from tessera.services.pipeline import assemblage_run
+    from tessera.services.pipeline import orchestrator as orch_service
 
     sources = (
         inspect.getsource(orch_service)
@@ -479,9 +479,9 @@ def test_le_dossier_d_un_ticket_correspond_a_son_champ_status() -> None:
             entete = fichier.read_text(encoding="utf-8").split("---")[1]
             declare = next(
                 (
-                    l.split(":", 1)[1].strip()
-                    for l in entete.splitlines()
-                    if l.startswith("status:")
+                    ln.split(":", 1)[1].strip()
+                    for ln in entete.splitlines()
+                    if ln.startswith("status:")
                 ),
                 None,
             )

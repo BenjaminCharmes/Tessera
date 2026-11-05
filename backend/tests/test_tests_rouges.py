@@ -3,14 +3,9 @@ from pathlib import Path
 from typing import Any
 from unittest.mock import AsyncMock, MagicMock
 
-from tessera.models.ticket import (
-    Ticket,
-    TicketPriority,
-    TicketStatus,
-    TicketType,
-)
-from tessera.services.pipeline.orchestrator import Orchestrator
+from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 from tessera.services.noyau.pipeline_events import OrchestratorEvent
+from tessera.services.pipeline.orchestrator import Orchestrator
 from tessera.services.verification.test_runner import TestResult
 
 

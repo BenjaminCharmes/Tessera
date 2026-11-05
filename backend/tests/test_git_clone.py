@@ -9,13 +9,7 @@ import pytest
 
 from tessera.models.project import AnalysisResult
 from tessera.services.creation_projet import git_clone, git_link
-from tessera.services.creation_projet.git_clone import (
-    CloneError,
-    GitCloneService,
-    _repo_name,
-    _sanitize_id,
-)
-
+from tessera.services.creation_projet.git_clone import CloneError, GitCloneService, _repo_name, _sanitize_id
 
 # ------------------------------------------------------------------
 # Helpers
@@ -327,7 +321,7 @@ async def test_run_clone_raises_on_timeout(tmp_path: Path) -> None:
     mock_proc.kill = MagicMock()
     # First call (inside wait_for) raises TimeoutError; second call (cleanup) returns.
     mock_proc.communicate = AsyncMock(
-        side_effect=[asyncio.TimeoutError(), (b"", b"")]
+        side_effect=[TimeoutError(), (b"", b"")]
     )
 
     with patch("asyncio.create_subprocess_exec", return_value=mock_proc):

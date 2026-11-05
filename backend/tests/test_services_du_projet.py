@@ -10,8 +10,8 @@ Un serveur ne se termine jamais : c'est ce qui sépare ces tests de ceux de
 `TestRunnerService`, qui attend la fin de sa commande.
 """
 import asyncio
-import os
 import json
+import os
 import sys
 from collections.abc import Iterator
 from dataclasses import dataclass, field
@@ -24,8 +24,8 @@ from tessera.config import settings
 from tessera.main import app
 from tessera.routers.services_running import get_sonde
 from tessera.services.noyau.database import init_db
-from tessera.services.verification.process_registry import PROCESS_REGISTRY
 from tessera.services.supervision.sonde_systeme import InfoProcessus
+from tessera.services.verification.process_registry import PROCESS_REGISTRY
 
 #: Un « service » qui vit assez longtemps pour être observé puis arrêté, sans
 #: dépendre de rien d'installé sur la machine de test.
@@ -293,10 +293,7 @@ def test_un_operateur_dans_un_argument_cite_reste_permis() -> None:
 def test_un_operateur_isole_reste_refuse() -> None:
     # Le pendant : sans lui, alléger le contrôle laisserait passer une ligne
     # de shell entière, dont seule la première moitié serait lancée.
-    from tessera.services.verification.process_registry import (
-        CommandeInvalide,
-        verifier_la_commande,
-    )
+    from tessera.services.verification.process_registry import CommandeInvalide, verifier_la_commande
 
     for ligne in ("npm run dev && npm run api", "uvicorn app:app | tee log"):
         with pytest.raises(CommandeInvalide):
@@ -741,7 +738,7 @@ def _descendants(pid: int) -> list[int]:
             capture_output=True,
             text=True,
         ).stdout
-        return [int(l) for l in sortie.split() if l.strip().isdigit()]
+        return [int(ln) for ln in sortie.split() if ln.strip().isdigit()]
     sortie = sp.run(
         [
             "powershell",
@@ -753,4 +750,4 @@ def _descendants(pid: int) -> list[int]:
         capture_output=True,
         text=True,
     ).stdout
-    return [int(l) for l in sortie.split() if l.strip().isdigit()]
+    return [int(ln) for ln in sortie.split() if ln.strip().isdigit()]

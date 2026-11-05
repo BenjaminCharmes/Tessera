@@ -200,8 +200,8 @@ def _inserer(avant: str, edition: dict[str, object], chemin: str) -> str:
     # après normalisation (casse et espaces multiples tolérés).
     candidats = [
         i
-        for i, l in enumerate(lignes)
-        if l.startswith(prefixe) and _normaliser_section(l.rstrip()) == section_norm
+        for i, ln in enumerate(lignes)
+        if ln.startswith(prefixe) and _normaliser_section(ln.rstrip()) == section_norm
     ]
 
     if len(candidats) == 0:

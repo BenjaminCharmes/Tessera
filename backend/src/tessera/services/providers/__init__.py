@@ -4,16 +4,11 @@ from anthropic import AsyncAnthropic
 
 from tessera.config import settings
 from tessera.models.agent import EffortLevel
+from tessera.services.noyau.shell_detection import resolve_git_bash
 from tessera.services.providers.agent_sdk import ClaudeAgentSDKProvider
 from tessera.services.providers.anthropic_api import AnthropicApiProvider
-from tessera.services.providers.base import (
-    LLMProvider,
-    ProviderResult,
-    StreamCallback,
-    ToolEventCallback,
-)
+from tessera.services.providers.base import LLMProvider, ProviderResult, StreamCallback, ToolEventCallback
 from tessera.services.providers.refus_garde import JournalDesRefus
-from tessera.services.noyau.shell_detection import resolve_git_bash
 
 __all__ = [
     "AnthropicApiProvider",

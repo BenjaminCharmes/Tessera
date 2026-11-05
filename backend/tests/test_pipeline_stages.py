@@ -7,17 +7,10 @@ et ce qui permet de couvrir un cas limite sans monter tout un pipeline.
 import asyncio
 from pathlib import Path
 
-import pytest
-
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services.pipeline import (
-    pipeline_branche,
-    pipeline_controles,
-    pipeline_production,
-    pipeline_testeur,
-)
 from tessera.services.git_workspace import GitCommandError, GitWorkspaceService, NotAGitRepository
 from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.pipeline import pipeline_branche, pipeline_controles, pipeline_production, pipeline_testeur
 from tessera.services.pipeline.pipeline_run import PipelineRun
 from tests.doubles_git import GitWorkspaceDouble
 
@@ -729,7 +722,6 @@ async def test_run_tests_sans_runner_rend_true() -> None:
 
 async def test_run_tests_premier_expire_second_vert_passe_a_la_securite() -> None:
     """First timeout + second green: continues without invoking the coder again (ticket-349)."""
-    from tessera.services.noyau.pipeline_events import PipelineResult
 
     runner = _TestRunnerResult([_expired_result(), _green_result()])
     orch = _Orch(
@@ -745,8 +737,8 @@ async def test_run_tests_premier_expire_second_vert_passe_a_la_securite() -> Non
 
 async def test_run_tests_deux_expirements_bloquent_le_run() -> None:
     """Two consecutive timeouts terminate the run as blocked (ticket-349)."""
-    from tessera.services.noyau.pipeline_events import PipelineResult
     from tessera.models.ticket import TicketStatus
+    from tessera.services.noyau.pipeline_events import PipelineResult
 
     class _TicketSvcMock:
         def __init__(self) -> None:
@@ -796,5 +788,5 @@ async def test_run_tests_log_mentionne_relance_sur_timeout() -> None:
     )
     await pipeline_testeur.run_tests(orch, _run())
 
-    relance_logs = [l for l in orch.logs if "délai dépassé, suite relancée" in l]
+    relance_logs = [ln for ln in orch.logs if "délai dépassé, suite relancée" in ln]
     assert relance_logs, "Expected a log line mentioning 'délai dépassé, suite relancée'"

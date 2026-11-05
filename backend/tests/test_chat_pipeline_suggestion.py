@@ -1,15 +1,8 @@
 """Suggestion de lancement de pipeline depuis le chat — ticket-055."""
 import pytest
 
-from tessera.services.agents.chat_suggestion import (
-    PipelineSuggestion,
-    RunLock,
-    RunAlreadyInProgress,
-    parse_pipeline_suggestion,
-    summarize_conversation,
-)
+from tessera.services.agents.chat_suggestion import PipelineSuggestion, RunAlreadyInProgress, RunLock, parse_pipeline_suggestion, summarize_conversation
 from tessera.services.noyau.database_chat import ChatMessageRow
-
 
 # ------------------------------------------------------------------
 # Détection de la suggestion

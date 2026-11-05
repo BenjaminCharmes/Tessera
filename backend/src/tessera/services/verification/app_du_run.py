@@ -14,16 +14,11 @@ from pathlib import Path
 from typing import Any, Protocol
 from urllib.parse import urlsplit, urlunsplit
 
+from tessera.services.noyau.groupe_de_processus import creer_groupe, fermer_le_groupe, rattacher_au_groupe, tuer_l_arbre
+from tessera.services.noyau.lancement import essais_de_commande, options_de_lancement
 from tessera.services.verification.captures import app_repond
 from tessera.services.verification.captures_config import ConfigCaptures
 from tessera.services.verification.controle_visuel import JETON_PORT, Demarrage
-from tessera.services.noyau.groupe_de_processus import (
-    creer_groupe,
-    fermer_le_groupe,
-    rattacher_au_groupe,
-    tuer_l_arbre,
-)
-from tessera.services.noyau.lancement import essais_de_commande, options_de_lancement
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -71,7 +66,7 @@ class _Processus:
             await tuer_l_arbre(self.processus.pid)
             self.processus.terminate()
             await asyncio.wait_for(self.processus.wait(), timeout=_DELAI_D_ARRET_S)
-        except asyncio.TimeoutError:
+        except TimeoutError:
             self.processus.kill()
             await self.processus.wait()
         except ProcessLookupError:

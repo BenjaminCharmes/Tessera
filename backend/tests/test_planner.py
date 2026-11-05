@@ -5,13 +5,11 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services.noyau.prompt_loader import MissingPromptError
-
-from tests.test_providers_base import FakeProvider
 from tessera.models.project import PlanResult
 from tessera.models.ticket import TicketDraftPlan
 from tessera.services.file.planner import PlannerService
-
+from tessera.services.noyau.prompt_loader import MissingPromptError
+from tests.test_providers_base import FakeProvider
 
 # ------------------------------------------------------------------
 # Helpers

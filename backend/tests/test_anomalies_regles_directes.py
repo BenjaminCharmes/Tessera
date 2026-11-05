@@ -1,16 +1,12 @@
 """Direct anomaly rules — ticket-835 (ADR-078): repeated tool, silence, review rounds."""
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
-from tessera.services.supervision.anomalies.lecture_evenements import (
-    AppelOutil,
-    derniers_appels_d_outils,
-    hacher_input,
-)
+from tessera.services.supervision.anomalies.lecture_evenements import AppelOutil, derniers_appels_d_outils, hacher_input
 from tessera.services.supervision.anomalies.regles_directes import outil_repete, silence, tours_de_revue
 from tests.anomalies_base import base_neuve, evenement, ligne_de_run
 
-T0 = datetime(2026, 11, 5, 10, 0, tzinfo=timezone.utc)
+T0 = datetime(2026, 11, 5, 10, 0, tzinfo=UTC)
 
 
 def _appel(i: int, tool: str = "Bash", h: str = "a", agent: str = "codeur") -> AppelOutil:

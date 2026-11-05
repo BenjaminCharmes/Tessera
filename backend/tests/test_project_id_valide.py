@@ -20,7 +20,6 @@ from tessera.main import app
 from tessera.services.noyau.database import init_db
 from tessera.utils.project_id import validate_project_id
 
-
 # ------------------------------------------------------------------ fixtures
 
 

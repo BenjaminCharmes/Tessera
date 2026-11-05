@@ -5,15 +5,15 @@ stage captures what was really written: the git diff and the artifact diff.
 Also holds what every stage reads to build its context.
 """
 from collections.abc import Awaitable, Callable
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any
 
 from tessera.config import settings
 from tessera.models.agent import AgentResult, AgentRole
 from tessera.models.ticket import TicketStatus, TicketType
-from tessera.services.projets.artifact_snapshot import diff_artifacts, snapshot_artifacts
 from tessera.services.git_workspace import GitWorkspaceError
 from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.pipeline.pipeline_run import PipelineRun, set_status
+from tessera.services.projets.artifact_snapshot import diff_artifacts, snapshot_artifacts
 from tessera.services.providers.refus_garde import refus_du_tour
 from tessera.utils.logger import get_logger
 
@@ -81,7 +81,7 @@ def build_context(orch: "Orchestrator", run: PipelineRun) -> str:
     return "".join(parts)
 
 
-def asker_for(run: PipelineRun) -> Optional[Callable[[str], Awaitable[str]]]:
+def asker_for(run: PipelineRun) -> Callable[[str], Awaitable[str]] | None:
     """L'outil `ask_user` à donner à l'agent, ou rien (ticket-066).
 
     Un run non interactif — appel programmatique, test, run autonome — ne doit

@@ -20,7 +20,7 @@ import shutil
 import stat
 from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from tessera.services.git_workspace.git_runner import git
@@ -110,7 +110,7 @@ def _detached_destination(project_path: Path) -> Path:
     l'y committer en entier — et « détaché de l'IDE » n'a jamais voulu dire
     « déposé dans le dépôt de l'IDE » (ticket-078).
     """
-    stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
+    stamp = datetime.now(UTC).strftime("%Y%m%d-%H%M%S")
     racine = _hors_du_depot(project_path.parent.parent)
     return racine / _DETACHED_DIRNAME / f"{project_path.name}-{stamp}"
 

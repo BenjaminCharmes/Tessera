@@ -14,8 +14,8 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 from tessera.config import settings
-from tessera.services.verification.captures_config import ConfigCaptures
 from tessera.services.noyau.lancement import essais_de_commande
+from tessera.services.verification.captures_config import ConfigCaptures
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -87,7 +87,7 @@ async def app_repond(url: str) -> bool:
         _, writer = await asyncio.wait_for(
             asyncio.open_connection(parties.hostname, port), _DELAI_SONDE_S
         )
-    except (OSError, asyncio.TimeoutError):
+    except (TimeoutError, OSError):
         return False
     writer.close()
     return True
@@ -183,7 +183,7 @@ async def capturer(
     try:
         lancer = executeur or executeur_playwright
         await asyncio.wait_for(lancer(config, sortie, jeton), _DELAI_EXECUTEUR_S)
-    except asyncio.TimeoutError as exc:
+    except TimeoutError as exc:
         raise CapturesEchouees(
             f"Les captures n'ont pas fini en {int(_DELAI_EXECUTEUR_S)} s."
         ) from exc

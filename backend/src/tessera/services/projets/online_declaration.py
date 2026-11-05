@@ -7,7 +7,7 @@ to name in the confirmation; an invalid block is still refused, with its reason,
 by ``POST …/provision``.
 """
 from pathlib import Path
-from typing import Literal, Optional
+from typing import Literal
 
 from pydantic import BaseModel
 
@@ -20,11 +20,11 @@ class OnlineDeclaration(BaseModel):
     """The part of the ``online`` block the confirmation names."""
 
     declared: bool = False
-    domain: Optional[str] = None
-    stripe_mode: Optional[StripeMode] = None
+    domain: str | None = None
+    stripe_mode: StripeMode | None = None
 
 
-def _stripe_mode(bloc: dict[str, object]) -> Optional[StripeMode]:
+def _stripe_mode(bloc: dict[str, object]) -> StripeMode | None:
     stripe = bloc.get("stripe")
     if not isinstance(stripe, dict):
         return None

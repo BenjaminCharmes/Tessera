@@ -4,19 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services.verdicts.validator_cited_dirs import (
-    FOLDER_MAX_ENTRIES,
-    list_folder_files,
-    looks_like_folder,
-    render_folder_entry,
-    resolve_folder,
-)
-from tessera.services.verdicts.validator_cited_files import (
-    CITED_FILES_MAX_CHARS,
-    build_cited_files_section,
-    extract_file_refs,
-    format_cited_files_log,
-)
+from tessera.services.verdicts.validator_cited_dirs import FOLDER_MAX_ENTRIES, list_folder_files, looks_like_folder, render_folder_entry, resolve_folder
+from tessera.services.verdicts.validator_cited_files import CITED_FILES_MAX_CHARS, build_cited_files_section, extract_file_refs, format_cited_files_log
 
 
 def _maquette(root: Path, count: int = 3) -> None:

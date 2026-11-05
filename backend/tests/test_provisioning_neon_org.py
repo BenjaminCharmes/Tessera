@@ -4,14 +4,7 @@ import json
 import httpx
 import pytest
 
-from tessera.services.provisioning import (
-    DatabaseStep,
-    NeonClient,
-    OnlineConfig,
-    ProvisioningContext,
-    ServiceError,
-    StepState,
-)
+from tessera.services.provisioning import DatabaseStep, NeonClient, OnlineConfig, ProvisioningContext, ServiceError, StepState
 from tessera.utils.secrets import SecretRegistry
 
 _KEY = "napi_Zk4Lm8Qw2Xr7Vb"

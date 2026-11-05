@@ -9,11 +9,7 @@ import frontmatter  # type: ignore[import-untyped]
 import pytest
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services.projets.ticket_service import (
-    TicketService,
-    _normalize_depends_on,
-    validate_ticket,
-)
+from tessera.services.projets.ticket_service import TicketService, _normalize_depends_on, validate_ticket
 
 
 def _svc(project_path: Path) -> TicketService:

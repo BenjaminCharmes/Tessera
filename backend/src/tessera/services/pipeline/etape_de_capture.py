@@ -13,8 +13,8 @@ from pathlib import Path
 
 from tessera.services.verification.app_du_run import (
     AppLancee,
-    Demarreur,
     DemarrageEchoue,
+    Demarreur,
     Sonde,
     attendre_que_l_app_reponde,
     commande_du_run,

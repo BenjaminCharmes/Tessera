@@ -8,12 +8,7 @@ import respx
 
 from tessera.services.providers.ollama import OllamaProvider, _reset_cooldowns
 from tessera.services.verdicts.validator import ValidatorService
-from tessera.services.verdicts.validator_cited_files import (
-    CITED_FILES_MAX_CHARS,
-    CitedFilesReport,
-    build_cited_files_section,
-    format_cited_files_log,
-)
+from tessera.services.verdicts.validator_cited_files import CITED_FILES_MAX_CHARS, CitedFilesReport, build_cited_files_section, format_cited_files_log
 
 _BASE = "http://ollama.test:11434"
 _MODEL = "qwen3-coder:30b"

@@ -7,9 +7,9 @@ from pydantic import BaseModel
 
 from tessera.routers.projects.shared import new_router, require_project_path
 from tessera.services.gardes.politique_run import PolitiqueRun
+from tessera.services.pipeline.run_registry import RUN_REGISTRY
 from tessera.services.projets.manifeste_ecriture import AgentAbsentDuProjet, set_pipeline_settings
 from tessera.services.projets.project_loader import load_pipeline_config
-from tessera.services.pipeline.run_registry import RUN_REGISTRY
 
 router = new_router()
 

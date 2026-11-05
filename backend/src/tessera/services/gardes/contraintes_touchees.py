@@ -10,8 +10,8 @@ ligne changée, comme `config_tests_touchee` le fait pour `pyproject.toml`.
 """
 from pathlib import Path
 
-from tessera.services.projets.adr import est_titre_proposees
 from tessera.services.noyau.diff_changements import Changement, FichierModifie, lire_diff
+from tessera.services.projets.adr import est_titre_proposees
 
 _FIN_DE_CHEMIN = "memory/contraintes.md"
 

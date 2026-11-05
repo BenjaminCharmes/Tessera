@@ -8,18 +8,7 @@ segment variable, leur ordre est libre.
 
 from fastapi import APIRouter
 
-from tessera.routers.projects import (
-    actions,
-    agents,
-    artifacts,
-    cleanup,
-    creation,
-    git,
-    listing,
-    pipeline,
-    removal,
-    usage,
-)
+from tessera.routers.projects import actions, agents, artifacts, cleanup, creation, git, listing, pipeline, removal, usage
 
 router = APIRouter()
 

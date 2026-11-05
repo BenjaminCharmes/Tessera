@@ -12,15 +12,14 @@ from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services.pipeline import pipeline_controles, pipeline_production, pipeline_testeur
 from tessera.services.livraison.livraison import Livraison
+from tessera.services.noyau.pipeline_events import OrchestratorEvent, PipelineResult
+from tessera.services.pipeline import pipeline_controles, pipeline_production, pipeline_testeur
 from tessera.services.pipeline.orchestrator import Orchestrator
 from tessera.services.pipeline.pipeline_documentation import documenter_le_run
-from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent, PipelineResult
 from tessera.services.pipeline.pipeline_run import PipelineRun
 from tessera.services.verdicts.security_auditor import SecurityAuditResult
 from tessera.services.verdicts.validator import ValidationResult
-
 
 # ------------------------------------------------------------------
 # Helpers partagés
@@ -257,11 +256,11 @@ async def test_livraison_log_une_ligne_par_etape_avec_duree(tmp_path: Path) -> N
     await orch.run_pipeline("proj", "ticket-001", _on_event)
 
     log_content = log_path.read_text(encoding="utf-8")
-    livraison_lines = [l for l in log_content.splitlines() if "livraison:" in l]
+    livraison_lines = [ln for ln in log_content.splitlines() if "livraison:" in ln]
     assert len(livraison_lines) == 4, (
         f"expected 4 livraison log lines, got {len(livraison_lines)}: {livraison_lines}"
     )
-    ci_line = next((l for l in livraison_lines if "CI" in l), None)
+    ci_line = next((ln for ln in livraison_lines if "CI" in ln), None)
     assert ci_line is not None, "no CI step log line"
     assert "8500ms" in ci_line, f"CI duration not found in: {ci_line!r}"
 

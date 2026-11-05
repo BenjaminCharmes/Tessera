@@ -2,14 +2,10 @@
 
 from pathlib import Path
 
-from tessera.services.git_workspace.chemins import (
-    _BOOKKEEPING_COMMIT_MESSAGE,
-    _ORCHESTRATOR_ARTIFACT_PATHS,
-)
+from tessera.services.git_workspace.chemins import _BOOKKEEPING_COMMIT_MESSAGE, _ORCHESTRATOR_ARTIFACT_PATHS
 from tessera.services.git_workspace.erreurs import GitCommandError
 from tessera.services.git_workspace.etat import GitState
 from tessera.utils.logger import get_logger
-
 
 _logger = get_logger("tessera.services.git_workspace")
 

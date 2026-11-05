@@ -6,7 +6,6 @@ from tessera.services.git_workspace.avance_base import GitAvanceBase
 from tessera.services.git_workspace.erreurs import GitCommandError
 from tessera.utils.logger import get_logger
 
-
 _logger = get_logger("tessera.services.git_workspace")
 
 

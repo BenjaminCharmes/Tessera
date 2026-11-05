@@ -10,20 +10,10 @@ import from here are re-exported below.
 """
 import asyncio  # noqa: F401  # les tests patchent `tessera.services.git_workspace.asyncio`
 
-from tessera.services.git_workspace.git_runner import _dossier_sans_hooks
 from tessera.services.git_workspace.branche import GitBranch
-from tessera.services.git_workspace.erreurs import (
-    BaseIntrouvable,
-    GitCommandError,
-    GitWorkspaceError,
-    InvalidSlugError,
-    NotAGitRepository,
-)
-from tessera.services.git_workspace.lockfiles import (
-    LOCKFILE_NAMES,
-    _is_lockfile,
-    _resumer_lockfiles,
-)
+from tessera.services.git_workspace.erreurs import BaseIntrouvable, GitCommandError, GitWorkspaceError, InvalidSlugError, NotAGitRepository
+from tessera.services.git_workspace.git_runner import _dossier_sans_hooks
+from tessera.services.git_workspace.lockfiles import LOCKFILE_NAMES, _is_lockfile, _resumer_lockfiles
 from tessera.services.git_workspace.noms import _branch_name
 from tessera.services.git_workspace.synchro import GitSync
 from tessera.services.git_workspace.textes import _union_json_lists, _union_lines

@@ -15,30 +15,18 @@ n'avait jamais pu aboutir.
 """
 import re
 from dataclasses import dataclass
-from typing import Any, Optional, Protocol
+from pathlib import Path
+from typing import Any, Protocol
 
 import httpx
-from pathlib import Path
 
 from tessera.config import settings
-from tessera.services.projets.autonomie import (
-    NiveauAutonomie,
-    lire_niveau,
-    niveau_peut_merger,
-)
-from tessera.services.github.github_service import (
-    MergeabiliteTimeoutError,
-    PRNonFusionnableError,
-    PrOuverte,
-)
 from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.gardes.secrets_diff import refus_secrets
+from tessera.services.gardes.termes_interdits import CommitInfo, TermesInterditsChecker, TermesInterditsService
+from tessera.services.github.github_service import MergeabiliteTimeoutError, PRNonFusionnableError, PrOuverte
 from tessera.services.github.sync_map import SyncMapService
-from tessera.services.gardes.termes_interdits import (
-    CommitInfo,
-    TermesInterditsChecker,
-    TermesInterditsService,
-)
+from tessera.services.projets.autonomie import NiveauAutonomie, lire_niveau, niveau_peut_merger
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -154,8 +142,8 @@ class GitHubWorkflowService:
 
     def __init__(
         self,
-        git_workspace: Optional[_GitWorkspace],
-        github: Optional[_GitHub],
+        git_workspace: _GitWorkspace | None,
+        github: _GitHub | None,
         base_branch: str,
         project_path: Path | None = None,
         politique: PolitiqueRun | None = None,
@@ -268,7 +256,7 @@ class GitHubWorkflowService:
             return
         assert self._git is not None  # vérifié avant cet appel
         diff = await self._git.diff_de_branche(self._base_branch, branch)
-        lignes_ajoutees = [l for l in diff.splitlines() if l.startswith("+")]
+        lignes_ajoutees = [ln for ln in diff.splitlines() if ln.startswith("+")]
         commits = await self._git.commits_depuis_base(self._base_branch, branch)
         violations = self._termes.verifier(lignes_ajoutees=lignes_ajoutees, commits=commits)
         if violations:

@@ -6,18 +6,13 @@ le ticket suivant. Les autres exceptions gardent le comportement actuel.
 """
 from pathlib import Path
 
-import pytest
-
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent, PipelineResult
 from tessera.services.pipeline import pipeline_outcomes as outcomes
 from tessera.services.pipeline.orchestrator import Orchestrator
-from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent, PipelineResult
 from tessera.services.pipeline.pipeline_run import PipelineRun
+from tessera.services.usage.session_limit import extract_reset_time, is_session_limit
 from tests.doubles_git import GitWorkspaceDouble
-from tessera.services.usage.session_limit import (
-    extract_reset_time,
-    is_session_limit,
-)
 
 # ---------------------------------------------------------------------------
 # Helpers partagés

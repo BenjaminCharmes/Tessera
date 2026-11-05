@@ -1,25 +1,14 @@
 import asyncio
 import re
-from datetime import datetime, timezone
+from collections.abc import Iterator
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Iterator
+from typing import Any
 
 import frontmatter
 
-from tessera.models.ticket import (
-    Ticket,
-    TicketDraftPlan,
-    TicketPriority,
-    TicketStatus,
-    TicketType,
-    TicketUnreadable,
-)
-from tessera.services.projets.ticket_archive import (
-    archive_done_tickets,
-    highest_number,
-    is_archived,
-    iter_archive_files,
-)
+from tessera.models.ticket import Ticket, TicketDraftPlan, TicketPriority, TicketStatus, TicketType, TicketUnreadable
+from tessera.services.projets.ticket_archive import archive_done_tickets, highest_number, is_archived, iter_archive_files
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -229,7 +218,7 @@ class TicketService:
     def create_ticket_sync(self, ticket: Ticket) -> Ticket:
         """Write ``ticket`` under ``todo/``; usable where no event loop is awaited."""
         ticket_id = ticket.id if ticket.id else self._next_id()
-        created = ticket.created or datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        created = ticket.created or datetime.now(UTC).strftime("%Y-%m-%d")
 
         dest_dir = self._tickets_root() / "todo"
         dest_dir.mkdir(parents=True, exist_ok=True)

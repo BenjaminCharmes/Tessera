@@ -2,13 +2,8 @@
 import json
 from pathlib import Path
 
-from tessera.services.providers.perimetre import (
-    ECRITURE_REFUS,
-    hors_perimetre,
-    hook_refus_hors_perimetre,
-    racine_autorisee,
-)
 from tessera.services.gardes.politique_run import PolitiqueRun
+from tessera.services.providers.perimetre import ECRITURE_REFUS, hook_refus_hors_perimetre, hors_perimetre, racine_autorisee
 from tessera.services.worktrees.run_worktree import RunWorktree
 from tests.depot_worktree import lier
 

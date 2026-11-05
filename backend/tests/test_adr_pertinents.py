@@ -1,14 +1,7 @@
 """Chaque agent ne reçoit que les contraintes qui le concernent — tickets 087 et 311."""
 from pathlib import Path
 
-from tessera.services.projets.adr import (
-    adr_pertinents,
-    adr_pour,
-    contraintes_pour,
-    decouper,
-    lire_contraintes,
-    portee_de,
-)
+from tessera.services.projets.adr import adr_pertinents, adr_pour, contraintes_pour, decouper, lire_contraintes, portee_de
 
 _FICHIER = """# Décisions
 
@@ -471,12 +464,7 @@ def test_le_format_contraintes_md_donne_le_meme_resultat_qu_avant() -> None:
 
 
 def _ticket():  # type: ignore[no-untyped-def]
-    from tessera.models.ticket import (
-        Ticket,
-        TicketPriority,
-        TicketStatus,
-        TicketType,
-    )
+    from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 
     return Ticket(
         id="ticket-001",

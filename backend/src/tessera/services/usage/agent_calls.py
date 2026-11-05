@@ -1,7 +1,7 @@
 """Écriture d'un appel d'agent dans `agent_calls`."""
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import aiosqlite
@@ -22,7 +22,7 @@ async def save_agent_call(
     cache_creation_tokens: int = 0,
 ) -> None:
     """Persist one LLM call; `cache_creation_tokens` is kept apart from the input."""
-    created_at = datetime.now(timezone.utc).isoformat()
+    created_at = datetime.now(UTC).isoformat()
     async with aiosqlite.connect(str(db_path)) as db:
         await db.execute(
             """INSERT INTO agent_calls

@@ -12,8 +12,6 @@ import aiosqlite
 import pytest
 from fastapi.testclient import TestClient
 
-from tests.revue_structuree import revue
-from tests.test_providers_base import FakeProvider
 from tessera.config import settings
 from tessera.main import app
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
@@ -23,6 +21,8 @@ from tessera.services.noyau.database import init_db
 from tessera.services.pipeline.orchestrator import Orchestrator
 from tessera.services.pipeline.run_recorder import RunRecorder
 from tests.doubles_git import GitWorkspaceDouble
+from tests.revue_structuree import revue
+from tests.test_providers_base import FakeProvider
 
 
 def _ticket(tid: str) -> Ticket:

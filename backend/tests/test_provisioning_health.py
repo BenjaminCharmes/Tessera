@@ -4,13 +4,7 @@ from pathlib import Path
 
 import httpx
 
-from tessera.services.provisioning import (
-    HealthCheckStep,
-    OnlineConfig,
-    ProvisioningContext,
-    StepState,
-    load_online_config,
-)
+from tessera.services.provisioning import HealthCheckStep, OnlineConfig, ProvisioningContext, StepState, load_online_config
 
 _SECRET_BODY = "x" * 500
 

@@ -1,15 +1,10 @@
 """Branch position, push and commit history reads."""
 
-from tessera.services.git_workspace.chemins import (
-    _JOURNAL_PIPELINE,
-    _is_orchestrator_artifact_path,
-    _relatif_au_projet,
-)
+from tessera.services.gardes.termes_interdits import CommitInfo
+from tessera.services.git_workspace.chemins import _JOURNAL_PIPELINE, _is_orchestrator_artifact_path, _relatif_au_projet
 from tessera.services.git_workspace.erreurs import GitCommandError
 from tessera.services.git_workspace.poussee import GitPoussee
-from tessera.services.gardes.termes_interdits import CommitInfo
 from tessera.utils.logger import get_logger
-
 
 _logger = get_logger("tessera.services.git_workspace")
 

@@ -3,7 +3,6 @@ import json
 
 from tessera.utils.json_extract import extract_json
 
-
 # ------------------------------------------------------------------
 # Cas passants — objets avec chaînes contenant des accolades spéciales
 # ------------------------------------------------------------------

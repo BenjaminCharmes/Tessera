@@ -9,20 +9,16 @@ from __future__ import annotations
 
 import asyncio
 import os
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from pydantic import BaseModel
 
 from tessera.models.project import Project
 from tessera.models.ticket import TicketStatus
-from tessera.services.projets.racine_depot import (
-    declare_ancestor,
-    depot_au_dessus,
-    depot_le_plus_proche,
-)
-from tessera.services.projets.online_declaration import StripeMode, read_online_declaration
 from tessera.services.gardes.politique_run import PolitiqueRun
+from tessera.services.projets.online_declaration import StripeMode, read_online_declaration
+from tessera.services.projets.racine_depot import declare_ancestor, depot_au_dessus, depot_le_plus_proche
 from tessera.services.projets.ticket_service import _STATUS_DIRS
 from tessera.utils.logger import get_logger
 
@@ -210,7 +206,7 @@ def _plus_ancienne(dates: list[str]) -> str | None:
 def _creation_du_dossier(project_path: Path) -> str:
     stat = project_path.stat()
     secondes = getattr(stat, "st_birthtime", stat.st_ctime)
-    return datetime.fromtimestamp(secondes, tz=timezone.utc).isoformat()
+    return datetime.fromtimestamp(secondes, tz=UTC).isoformat()
 
 
 def count_tickets(project_path: Path) -> TicketCounts:

@@ -5,9 +5,9 @@ l'etat du run ne se reconstruisait que depuis les evenements recus en direct,
 et `agent_question` etait passe avant que l'onglet ne regarde.
 """
 
-import pytest
+from datetime import UTC, datetime, timedelta
 
-from datetime import datetime, timedelta, timezone
+import pytest
 
 from tessera.config import settings
 from tessera.models.agent import AgentRole
@@ -119,4 +119,4 @@ async def test_the_channel_announces_when_the_agent_will_move_on(
 
     question = next(e for e in recus if e.type is EventType.AGENT_QUESTION)
     expire = datetime.fromisoformat(str(question.data["expire_a"]))
-    assert expire > datetime.now(timezone.utc) - timedelta(seconds=5)
+    assert expire > datetime.now(UTC) - timedelta(seconds=5)

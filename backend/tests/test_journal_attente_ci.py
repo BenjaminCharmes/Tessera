@@ -2,10 +2,10 @@
 
 from pathlib import Path
 
-from tessera.services.pipeline import pipeline_branche
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.livraison.journal_ci_watcher import ajouter_au_log, ecrire_log_merge
-from tests.test_journal_attente import _LOG, _Orch, _Tickets, _attente, _depot, _git, _run
+from tessera.services.pipeline import pipeline_branche
+from tests.test_journal_attente import _LOG, _attente, _depot, _git, _Orch, _run, _Tickets
 
 
 async def test_ci_watcher_line_on_a_tracked_log_leaves_the_tree_clean(tmp_path: Path) -> None:

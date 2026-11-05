@@ -245,7 +245,7 @@ async def test_conflit_fichier_code_annule_et_remonte(repo: Path) -> None:
     await _git(repo, "commit", "-q", "-m", "init service")
 
     await _git(repo, "checkout", "-q", "-b", "ticket-003-x")
-    sha_branche = await _git(repo, "rev-parse", "HEAD")
+    _sha_branche = await _git(repo, "rev-parse", "HEAD")
     (repo / "service.py").write_text("class S:\n    def run(self): pass\n", encoding="utf-8")
     await _git(repo, "add", "service.py")
     await _git(repo, "commit", "-q", "-m", "feat: add run method")

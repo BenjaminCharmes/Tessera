@@ -9,26 +9,14 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from tessera.config import settings
-from tessera.services.git_workspace import journal_attente, journal_en_attente
-from tessera.services.git_workspace import GitWorkspaceError, _branch_name
-from tessera.services.noyau.pipeline_events import (
-    EventCallback,
-    EventType,
-    OrchestratorEvent,
-    PipelineResult,
-)
-from tessera.services.pipeline.pipeline_run import PipelineRun, emit, set_status
-from tessera.services.gardes.politique_run import PolitiqueRun
-from tessera.services.pipeline.preparation_worktree import preparer_le_worktree
-from tessera.services.worktrees.run_worktree import (
-    LienPersistant,
-    RunWorktree,
-    TravailNonSauve,
-    creer,
-    supprimer,
-)
-from tessera.services.worktrees.run_worktree_populate import peupler
 from tessera.models.ticket import TicketStatus
+from tessera.services.gardes.politique_run import PolitiqueRun
+from tessera.services.git_workspace import GitWorkspaceError, _branch_name, journal_attente, journal_en_attente
+from tessera.services.noyau.pipeline_events import EventCallback, EventType, OrchestratorEvent, PipelineResult
+from tessera.services.pipeline.pipeline_run import PipelineRun, emit, set_status
+from tessera.services.pipeline.preparation_worktree import preparer_le_worktree
+from tessera.services.worktrees.run_worktree import LienPersistant, RunWorktree, TravailNonSauve, creer, supprimer
+from tessera.services.worktrees.run_worktree_populate import peupler
 from tessera.utils.logger import get_logger
 
 if TYPE_CHECKING:

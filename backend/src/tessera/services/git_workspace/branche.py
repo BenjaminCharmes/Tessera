@@ -3,18 +3,14 @@
 from pathlib import Path
 
 from tessera.services.git_workspace import journal_en_attente
-from tessera.services.git_workspace.git_attributes import declare_union_merge
 from tessera.services.git_workspace.base import GitBase
-from tessera.services.git_workspace.chemins import (
-    _BOOKKEEPING_COMMIT_MESSAGE,
-    _JOURNAL_PIPELINE,
-)
+from tessera.services.git_workspace.chemins import _BOOKKEEPING_COMMIT_MESSAGE, _JOURNAL_PIPELINE
 from tessera.services.git_workspace.commits import GitCommits
 from tessera.services.git_workspace.erreurs import GitCommandError
+from tessera.services.git_workspace.git_attributes import declare_union_merge
 from tessera.services.git_workspace.noms import _branch_name
 from tessera.services.git_workspace.rebase import GitRebase
 from tessera.utils.logger import get_logger
-
 
 _logger = get_logger("tessera.services.git_workspace")
 

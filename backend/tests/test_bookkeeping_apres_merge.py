@@ -18,7 +18,6 @@ import pytest
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.projets.ticket_service import TicketService
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------

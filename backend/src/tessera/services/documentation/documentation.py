@@ -32,25 +32,14 @@ from pathlib import Path
 
 from tessera.services.documentation import documentation_claude_md as claude_md_doc
 from tessera.services.documentation.documentation_base import EditionRefusee
+from tessera.services.documentation.documentation_code import FournisseurMatiere, MatiereCode, bloc_diffs, bloc_fichiers, matiere_du_lot
 from tessera.services.documentation.documentation_description import appliquer_description
-from tessera.services.documentation.documentation_reponse import donnees_de, editions_de, editions_depuis
-from tessera.services.documentation.documentation_code import (
-    FournisseurMatiere,
-    MatiereCode,
-    bloc_diffs,
-    bloc_fichiers,
-    matiere_du_lot,
-)
 from tessera.services.documentation.documentation_editions import _documentable, appliquer_editions
 from tessera.services.documentation.documentation_preuve import fichiers_de_la_matiere
-from tessera.services.documentation.documentation_selection import (
-    MARQUEUR,
-    TicketADocumenter,
-    marquer_documente,
-    tickets_a_documenter,
-)
-from tessera.services.providers.base import LLMProvider
+from tessera.services.documentation.documentation_reponse import donnees_de, editions_de, editions_depuis
+from tessera.services.documentation.documentation_selection import MARQUEUR, TicketADocumenter, marquer_documente, tickets_a_documenter
 from tessera.services.noyau.modeles_par_defaut import MODELE_PRODUCTION
+from tessera.services.providers.base import LLMProvider
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -286,7 +275,7 @@ class DocumentationService:
 
 def _titres_markdown(contenu: str) -> str:
     """Extracts Markdown heading lines (starting with #) from file content."""
-    return "\n".join(l for l in contenu.splitlines() if l.startswith("#"))
+    return "\n".join(ln for ln in contenu.splitlines() if ln.startswith("#"))
 
 
 def _contenu_documentable(racine: Path, borne: int = _BORNE_DOC) -> str:

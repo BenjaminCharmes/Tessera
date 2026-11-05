@@ -4,22 +4,22 @@ Le CLI répond par un `ProcessError` à stderr vide quand l'abonnement est à
 sec ; ces tests vérifient que le run le dit, remet le ticket en `todo` et
 arrête la file au lieu de compter un échec.
 """
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from claude_agent_sdk import ProcessError
 
 from tessera.models.ticket import TicketStatus
-from tessera.services.pipeline import pipeline_outcomes as outcomes
 from tessera.services.noyau.pipeline_events import EventType, PipelineResult
-from tessera.services.usage.quota_exhaustion import is_quota_exhausted, resume_label
+from tessera.services.pipeline import pipeline_outcomes as outcomes
 from tessera.services.pipeline.orchestrator import Orchestrator
+from tessera.services.usage.quota_exhaustion import is_quota_exhausted, resume_label
 from tessera.services.usage.quota_tracker import QuotaSnapshot, QuotaStatus, QuotaTracker
+from tests.test_limite_de_session import _collect_events, _Orch, _OrchFile, _run
 from tests.test_orchestrator import _FakeGit, _make_orchestrator, _make_ticket, _noop
-from tests.test_limite_de_session import _Orch, _OrchFile, _collect_events, _run
 
 _EMPTY_STDERR_MSG = "Command failed with exit code 1"
-_RESETS_AT = datetime(2026, 10, 17, 7, 38, tzinfo=timezone.utc)
+_RESETS_AT = datetime(2026, 10, 17, 7, 38, tzinfo=UTC)
 
 
 def _snapshot(

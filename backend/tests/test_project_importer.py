@@ -4,10 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from tests.conftest import requires_symlinks
-
 from tessera.services.creation_projet.project_importer import ImportError, ProjectImporter, _sanitize_id
-
+from tests.conftest import requires_symlinks
 
 # ------------------------------------------------------------------
 # Helpers

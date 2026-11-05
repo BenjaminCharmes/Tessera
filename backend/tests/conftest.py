@@ -3,10 +3,10 @@ import asyncio
 import os
 import shutil
 import tempfile
+from collections.abc import Iterator
 from pathlib import Path
 
 import pytest
-from collections.abc import Iterator
 
 # Avant tout import de `tessera` : `settings` se construit à l'import et lirait
 # sinon le vrai `.env`. Une variable inconnue qui y traîne (cas du ticket-487)
@@ -97,11 +97,11 @@ def _singletons_propres() -> Iterator[None]:
     Les caches de parsing de ticket et de projet sont également vidés pour
     que les tests restent indépendants (ticket-352).
     """
+    from tessera.services.livraison import pr_status_cache as _prc_module
     from tessera.services.noyau.event_hub import EVENT_HUB
     from tessera.services.pipeline.run_registry import RUN_REGISTRY
-    from tessera.services.projets import ticket_service as _ts_module
     from tessera.services.projets import project_loader as _pl_module
-    from tessera.services.livraison import pr_status_cache as _prc_module
+    from tessera.services.projets import ticket_service as _ts_module
 
     yield
     RUN_REGISTRY._runs.clear()

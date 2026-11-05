@@ -18,7 +18,6 @@ Every call goes through `httpx`. The ``Authorization`` header is built per
 request and appears in no log and no error: a failure only carries the HTTP
 status and the API's error code (`ServiceError`).
 """
-from typing import Optional
 from urllib.parse import quote
 
 import httpx
@@ -51,7 +50,7 @@ class VercelClient:
         self,
         token: str,
         team_id: str = "",
-        transport: Optional[httpx.AsyncBaseTransport] = None,
+        transport: httpx.AsyncBaseTransport | None = None,
     ) -> None:
         self._token = token
         self._team_id = team_id
@@ -59,7 +58,7 @@ class VercelClient:
 
     @classmethod
     def from_settings(
-        cls, settings: Settings, transport: Optional[httpx.AsyncBaseTransport] = None
+        cls, settings: Settings, transport: httpx.AsyncBaseTransport | None = None
     ) -> "VercelClient":
         """Build the client from the token and team of ``Settings``."""
         return cls(settings.vercel_token.get_secret_value(), settings.vercel_team_id, transport)
@@ -73,8 +72,8 @@ class VercelClient:
         self,
         method: str,
         path: str,
-        params: Optional[dict[str, str]] = None,
-        body: Optional[dict[str, object]] = None,
+        params: dict[str, str] | None = None,
+        body: dict[str, object] | None = None,
     ) -> httpx.Response:
         query = dict(params or {})
         if self._team_id:
@@ -99,8 +98,8 @@ class VercelClient:
         return reponse
 
     async def _send_or_absent(
-        self, method: str, path: str, params: Optional[dict[str, str]] = None
-    ) -> Optional[httpx.Response]:
+        self, method: str, path: str, params: dict[str, str] | None = None
+    ) -> httpx.Response | None:
         try:
             return await self._send(method, path, params)
         except ServiceError as erreur:
@@ -108,12 +107,12 @@ class VercelClient:
                 return None
             raise
 
-    async def get_project(self, name: str) -> Optional[dict[str, object]]:
+    async def get_project(self, name: str) -> dict[str, object] | None:
         """Return the project called ``name``, ``None`` when it does not exist."""
         reponse = await self._send_or_absent("GET", f"/v9/projects/{quote(name, safe='')}")
         return None if reponse is None else as_dict(reponse.json())
 
-    async def create_project(self, name: str, repo: Optional[str]) -> dict[str, object]:
+    async def create_project(self, name: str, repo: str | None) -> dict[str, object]:
         """Create a project, linked to the GitHub repository ``owner/repo`` if any."""
         corps: dict[str, object] = {"name": name}
         if repo:
@@ -121,14 +120,14 @@ class VercelClient:
         reponse = await self._send("POST", "/v11/projects", body=corps)
         return as_dict(reponse.json())
 
-    async def get_domain(self, project: str, domain: str) -> Optional[VercelDomain]:
+    async def get_domain(self, project: str, domain: str) -> VercelDomain | None:
         """Return the domain as attached to the project, ``None`` when it is not."""
         chemin = f"/v9/projects/{quote(project, safe='')}/domains/{quote(domain, safe='')}"
         reponse = await self._send_or_absent("GET", chemin)
         return None if reponse is None else domain_from(domain, as_dict(reponse.json()))
 
     async def add_domain(
-        self, project: str, domain: str, redirect_to: Optional[str] = None
+        self, project: str, domain: str, redirect_to: str | None = None
     ) -> VercelDomain:
         """Attach a domain to the project, redirecting it (308) to ``redirect_to`` if given."""
         chemin = f"/v10/projects/{quote(project, safe='')}/domains"
@@ -167,14 +166,14 @@ class VercelClient:
         }
         await self._send("POST", f"/v10/projects/{quote(project, safe='')}/env", body=corps)
 
-    async def latest_production_deployment(self, project_id: str) -> Optional[str]:
+    async def latest_production_deployment(self, project_id: str) -> str | None:
         """Return the id of the newest ready production deployment, if any."""
         params = {"projectId": project_id, "target": "production", "state": "READY", "limit": "1"}
         reponse = await self._send("GET", "/v6/deployments", params=params)
         premier = as_dict(next(iter(as_list(as_dict(reponse.json()).get("deployments"))), None))
         return as_str(premier.get("uid")) or None
 
-    async def latest_deployment(self, project_id: str) -> Optional[VercelDeployment]:
+    async def latest_deployment(self, project_id: str) -> VercelDeployment | None:
         """Return the newest production deployment in any state, ``None`` if there is none."""
         params = {"projectId": project_id, "target": "production", "limit": "1"}
         reponse = await self._send("GET", "/v6/deployments", params=params)

@@ -13,12 +13,8 @@ from unittest.mock import AsyncMock, MagicMock
 
 from tessera.models.ticket import TicketStatus
 from tessera.services.livraison.livraison import Livraison, LivraisonService
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent, PipelineResult
 from tessera.services.pipeline.orchestrator import Orchestrator
-from tessera.services.noyau.pipeline_events import (
-    EventType,
-    OrchestratorEvent,
-    PipelineResult,
-)
 
 
 def _resultat() -> PipelineResult:

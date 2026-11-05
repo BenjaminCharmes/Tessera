@@ -15,11 +15,7 @@ from tessera.services.projets.project_loader import load_agents_config
 from tessera.services.providers import get_provider
 from tessera.services.providers.agent_sdk import ClaudeAgentSDKProvider
 from tessera.services.providers.base import LLMProvider
-from tessera.services.providers.declaration import (
-    PROVIDER_OLLAMA,
-    PROVIDER_OPENAI,
-    resoudre_cle,
-)
+from tessera.services.providers.declaration import PROVIDER_OLLAMA, PROVIDER_OPENAI, resoudre_cle
 from tessera.services.providers.refus_garde import JournalDesRefus
 from tessera.services.providers.repli import ProviderAvecRepli
 from tessera.services.providers.repli_direct import ProviderRepliDirect

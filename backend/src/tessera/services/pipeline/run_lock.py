@@ -14,11 +14,7 @@ c'est la supervision qui afficherait le faux (ADR-034).
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
-from tessera.services.pipeline.run_registry import (
-    RUN_REGISTRY,
-    RunAlreadyInProgress,
-    RunRegistry,
-)
+from tessera.services.pipeline.run_registry import RUN_REGISTRY, RunAlreadyInProgress, RunRegistry
 
 #: Ré-exportée : l'exception est levée par le registre, mais tout le code
 #: appelant l'importe d'ici depuis ticket-055.

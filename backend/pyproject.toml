@@ -27,6 +27,7 @@ dev = [
     # compilées sont bloquées par Smart App Control (ticket-385).
     "mypy>=1.10.0,<1.19",
     "respx>=0.23.1",
+    "ruff==0.14.3",
 ]
 
 [tool.uv]
@@ -78,3 +79,36 @@ strict = true
 python_version = "3.11"
 
 
+
+[tool.ruff]
+target-version = "py311"
+line-length = 160
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+# E501 : le code dépasse largement 88 colonnes ; le formateur fera l'objet
+# d'un ticket séparé, ce ticket ne réécrit pas le backend.
+ignore = ["E501"]
+
+[tool.ruff.lint.flake8-bugbear]
+# B008 : les valeurs par défaut FastAPI sont des appels, par conception.
+extend-immutable-calls = [
+    "fastapi.Depends",
+    "fastapi.Query",
+    "fastapi.Body",
+    "fastapi.Header",
+    "fastapi.Path",
+    "fastapi.File",
+    "fastapi.Form",
+    "fastapi.Cookie",
+    "fastapi.Security",
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Fixture pytest importée d'un autre module : le paramètre la « redéfinit »,
+# c'est le mécanisme même des fixtures.
+"tests/test_commits_repris.py" = ["F811"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["tessera"]
+split-on-trailing-comma = false

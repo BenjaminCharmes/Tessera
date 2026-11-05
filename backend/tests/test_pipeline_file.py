@@ -2,10 +2,10 @@
 from types import SimpleNamespace
 from typing import cast
 
-from tessera.services.pipeline.orchestrator import Orchestrator
-from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.file.pipeline_file import plafond_effectif
 from tessera.services.file.pipeline_file_tour import Tour, progres
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.pipeline.orchestrator import Orchestrator
 
 
 def _orch(plafond_par_ticket: float) -> Orchestrator:

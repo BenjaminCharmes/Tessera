@@ -18,11 +18,10 @@ from typing import Any
 import pytest
 
 from tessera.config import settings
+from tessera.services.noyau.database import init_db
 from tessera.services.noyau.event_hub import EventHub
 from tessera.services.pipeline.run_executor import executer
 from tessera.services.pipeline.run_registry import RunActif, RunRegistry
-from tessera.services.noyau.database import init_db
-
 
 # ---------------------------------------------------------------------------
 # Helpers

@@ -11,12 +11,7 @@ import pytest
 from tessera.services.documentation.documentation import DocumentationService
 from tessera.services.documentation.documentation_base import EditionRefusee
 from tessera.services.documentation.documentation_code import DiffDeTicket, MatiereCode
-from tessera.services.documentation.documentation_description import (
-    LONGUEUR_MAX,
-    appliquer_description,
-    ecrire_description,
-    remplacer_description,
-)
+from tessera.services.documentation.documentation_description import LONGUEUR_MAX, appliquer_description, ecrire_description, remplacer_description
 from tessera.services.documentation.documentation_preuve import ControleDePreuve
 from tessera.services.providers.base import ProviderResult
 from tests.matiere_factice import matiere_factice

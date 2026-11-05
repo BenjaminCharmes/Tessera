@@ -1,20 +1,14 @@
-# -*- coding: utf-8 -*-
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Literal, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Literal
 
+from tessera.services.noyau.modeles_par_defaut import MODELE_JUGEMENT
 from tessera.services.providers.base import LLMProvider
 from tessera.services.usage.quota_exhaustion import is_quota_exhausted
-from tessera.services.verdicts.validator_cited_files import (
-    CitedFilesReport,
-    build_cited_files_section,
-    extract_file_refs,
-    format_cited_files_log,
-)
+from tessera.services.verdicts.validator_cited_files import CitedFilesReport, build_cited_files_section, extract_file_refs, format_cited_files_log
 from tessera.services.verdicts.validator_decisions import Exchanges, build_decisions_section
 from tessera.services.verdicts.validator_schema import VALIDATOR_SCHEMA
-from tessera.services.noyau.modeles_par_defaut import MODELE_JUGEMENT
 from tessera.utils.logger import get_logger
 
 if TYPE_CHECKING:

@@ -4,14 +4,7 @@ import httpx
 import pytest
 import respx
 
-from tessera.services.github.github_service import (
-    GitHubIssue,
-    GitHubService,
-    MergeabiliteTimeoutError,
-    PRNonFusionnableError,
-    PRStatus,
-)
-
+from tessera.services.github.github_service import GitHubService, MergeabiliteTimeoutError, PRNonFusionnableError
 
 _TOKEN = "ghp_test_token"
 _REPO = "owner/my-repo"
@@ -34,7 +27,7 @@ def _issue_payload(
         "title": title,
         "body": body,
         "html_url": html_url,
-        "labels": [{"name": l} for l in (labels or [])],
+        "labels": [{"name": ln} for ln in (labels or [])],
     }
 
 

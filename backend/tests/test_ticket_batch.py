@@ -1,12 +1,9 @@
 """Tests TDD pour create_tickets_batch — ticket-029, ticket-359."""
 from pathlib import Path
 
-import pytest
-
 from tessera.models.ticket import TicketDraftPlan, TicketStatus
 from tessera.services.pipeline.pipeline_text import _extract_criteria
 from tessera.services.projets.ticket_service import TicketService
-
 
 # ------------------------------------------------------------------
 # Helpers
@@ -160,7 +157,7 @@ async def test_batch_ticket_preserves_description_as_body(tmp_path: Path) -> Non
 
 async def test_batch_tickets_are_written_to_disk(tmp_path: Path) -> None:
     svc = _svc(tmp_path)
-    result = await svc.create_tickets_batch([_draft("A"), _draft("B")])
+    await svc.create_tickets_batch([_draft("A"), _draft("B")])
     files = list((tmp_path / "my-project" / "tickets" / "todo").glob("ticket-*.md"))
     assert len(files) == 2
 

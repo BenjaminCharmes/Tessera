@@ -9,12 +9,7 @@ from typing import Any
 import pytest
 
 from tessera import config
-from tessera.utils.logger import (
-    _JsonFormatter,
-    configure_file_logging,
-    get_logger,
-    install_asyncio_exception_handler,
-)
+from tessera.utils.logger import _JsonFormatter, configure_file_logging, get_logger, install_asyncio_exception_handler
 
 
 def _record(**extra: Any) -> logging.LogRecord:

@@ -6,11 +6,7 @@ two jobs. The lower-level read/write primitives stay in `services.manifeste`.
 
 from pathlib import Path
 
-from tessera.services.projets.manifeste import (
-    chemin_manifeste,
-    ecrire_manifeste,
-    lire_pour_modifier,
-)
+from tessera.services.projets.manifeste import chemin_manifeste, ecrire_manifeste, lire_pour_modifier
 from tessera.services.providers.declaration import verifier_entree, verifier_provider
 from tessera.services.providers.noms import PROVIDERS_ANTHROPIC, PROVIDERS_CONNUS
 

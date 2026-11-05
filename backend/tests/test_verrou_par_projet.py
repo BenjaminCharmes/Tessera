@@ -23,7 +23,6 @@ from tessera.services.noyau.database import init_db
 from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent, PipelineResult
 from tessera.services.pipeline.run_lock import RUN_LOCK, RunAlreadyInProgress, RunLock
 
-
 # ------------------------------------------------------------------
 # Le verrou lui-meme
 # ------------------------------------------------------------------

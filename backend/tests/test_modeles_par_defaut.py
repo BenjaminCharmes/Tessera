@@ -3,14 +3,10 @@ import json
 import re
 from pathlib import Path
 
-from tessera.services.verdicts import security_auditor, validator
 from tessera.services.documentation import documentation
-from tessera.services.noyau.modeles_par_defaut import (
-    MODELE_JUGEMENT,
-    MODELE_PRODUCTION,
-    modele_par_defaut,
-)
+from tessera.services.noyau.modeles_par_defaut import MODELE_JUGEMENT, MODELE_PRODUCTION, modele_par_defaut
 from tessera.services.projets.project_loader import _default_agents_json
+from tessera.services.verdicts import security_auditor, validator
 
 _SERVICES = Path(__file__).resolve().parents[1] / "src" / "tessera" / "services"
 # Un identifiant daté (« claude-haiku-4-5-20251001 ») ou la génération retirée.

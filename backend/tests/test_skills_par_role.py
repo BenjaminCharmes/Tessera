@@ -11,11 +11,7 @@ from pathlib import Path
 import pytest
 
 from tessera.config import settings
-from tessera.services.providers.agent_sdk import (
-    ClaudeAgentSDKProvider,
-    _TESSERA_PLUGIN_PATH,
-    _build_options,
-)
+from tessera.services.providers.agent_sdk import _TESSERA_PLUGIN_PATH, ClaudeAgentSDKProvider, _build_options
 from tessera.services.providers.par_role import provider_pour_role
 from tessera.services.providers.repli import ProviderAvecRepli
 

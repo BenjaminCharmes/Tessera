@@ -6,8 +6,6 @@ from pathlib import Path
 import pytest
 
 from tessera.services.gardes.politique_run import PolitiqueRun
-from tessera.services.providers.perimetre import racine_autorisee
-from tessera.services.supervision.project_overview import _racine_ancestrale, find_icon
 from tessera.services.projets.racine_depot import (
     GIT_ROOT_ANCESTOR,
     declare_ancestor,
@@ -17,6 +15,8 @@ from tessera.services.projets.racine_depot import (
     est_un_depot,
     racine_ecriture_projet,
 )
+from tessera.services.providers.perimetre import racine_autorisee
+from tessera.services.supervision.project_overview import _racine_ancestrale, find_icon
 
 _SRC = Path(__file__).resolve().parents[1] / "src" / "tessera"
 

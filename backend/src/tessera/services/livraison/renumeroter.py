@@ -27,12 +27,7 @@ from tessera.services.noyau.numerotation import (
     titres_d_adr,
     titres_d_adr_sur_la_base,
 )
-from tessera.services.noyau.reecriture_des_numeros import (
-    JOURNAL,
-    nommer,
-    reecrire_les_mentions,
-    renommer_les_fiches,
-)
+from tessera.services.noyau.reecriture_des_numeros import JOURNAL, nommer, reecrire_les_mentions, renommer_les_fiches
 from tessera.services.noyau.releve_du_diff import Releve, lire_lignes, releve_du_diff
 from tessera.utils.logger import get_logger
 

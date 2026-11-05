@@ -11,10 +11,11 @@ from pathlib import Path
 
 import pytest
 
+from tessera.services.gardes.politique_run import PolitiqueRun
+from tessera.services.gardes.worktree_politique import lire_worktree
 from tessera.services.projets import manifeste
 from tessera.services.projets.artifacts import read_artifact_mode
 from tessera.services.projets.autonomie import NiveauAutonomie, lire_niveau
-from tessera.services.verification.captures_config import load_captures_config
 from tessera.services.projets.manifeste import (
     ecrire_clef,
     ecrire_manifeste,
@@ -29,13 +30,8 @@ from tessera.services.projets.manifeste import (
     lire_valeur,
 )
 from tessera.services.projets.online_declaration import read_online_declaration
-from tessera.services.gardes.politique_run import PolitiqueRun
-from tessera.services.projets.project_loader import (
-    _load_github_remote,
-    load_pipeline_config,
-    load_services_config,
-)
-from tessera.services.gardes.worktree_politique import lire_worktree
+from tessera.services.projets.project_loader import _load_github_remote, load_pipeline_config, load_services_config
+from tessera.services.verification.captures_config import load_captures_config
 
 
 @dataclass(frozen=True)

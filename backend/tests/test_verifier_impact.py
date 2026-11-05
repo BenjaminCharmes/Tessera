@@ -9,14 +9,7 @@ _SCRIPTS_DIR = Path(__file__).resolve().parent.parent.parent / "scripts"
 if str(_SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(_SCRIPTS_DIR))
 
-from verifier import (  # noqa: E402
-    BACKEND_STEPS,
-    FRONTEND_STEPS,
-    TESTS_GLOBAUX,
-    fichiers_de_test_impactes,
-    ligne_des_durees,
-    main,
-)
+from verifier import BACKEND_STEPS, FRONTEND_STEPS, TESTS_GLOBAUX, fichiers_de_test_impactes, ligne_des_durees, main  # noqa: E402
 
 
 def _depot(tmp_path: Path) -> Path:

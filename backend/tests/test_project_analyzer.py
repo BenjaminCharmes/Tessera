@@ -4,11 +4,9 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services.noyau.prompt_loader import MissingPromptError
-
-from tests.test_providers_base import FakeProvider
 from tessera.services.creation_projet.project_analyzer import ProjectAnalyzerService
-
+from tessera.services.noyau.prompt_loader import MissingPromptError
+from tests.test_providers_base import FakeProvider
 
 # ------------------------------------------------------------------
 # Constants / helpers

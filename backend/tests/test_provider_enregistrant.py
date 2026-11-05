@@ -17,10 +17,7 @@ import pytest
 from tessera.services.noyau.database import init_db
 from tessera.services.noyau.database_runs import create_run
 from tessera.services.providers.base import ProviderResult
-from tessera.services.providers.enregistrant import (
-    ProviderEnregistrant,
-    activer_enregistrement,
-)
+from tessera.services.providers.enregistrant import ProviderEnregistrant, activer_enregistrement
 from tessera.services.providers.noms import ProviderIndisponible
 from tessera.services.providers.repli import ProviderAvecRepli
 from tessera.services.verdicts.security_auditor import SecurityAuditorService

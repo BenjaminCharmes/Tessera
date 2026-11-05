@@ -7,7 +7,6 @@ online while a pipeline run works on its code, and the other way round.
 """
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Optional
 
 from tessera.config import settings
 from tessera.services.noyau.event_hub import EVENT_HUB
@@ -25,11 +24,7 @@ from tessera.services.provisioning.steps import ProvisioningContext, Provisionin
 from tessera.services.provisioning.stripe_client import StripeClient
 from tessera.services.provisioning.stripe_step import StripeStep
 from tessera.services.provisioning.vercel import VercelClient, VercelEnvWriter
-from tessera.services.provisioning.vercel_steps import (
-    VercelProjectStep,
-    VercelRedeployStep,
-    VercelVariablesStep,
-)
+from tessera.services.provisioning.vercel_steps import VercelProjectStep, VercelRedeployStep, VercelVariablesStep
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -76,7 +71,7 @@ class ProvisioningSetup:
     context: ProvisioningContext
 
 
-SetupFactory = Callable[[str, OnlineConfig, Optional[str]], ProvisioningSetup]
+SetupFactory = Callable[[str, OnlineConfig, str | None], ProvisioningSetup]
 
 
 def _build_steps(online: OnlineConfig, vercel: VercelClient) -> list[ProvisioningStep]:
@@ -102,7 +97,7 @@ def _build_steps(online: OnlineConfig, vercel: VercelClient) -> list[Provisionin
 
 
 def build_setup(
-    project_id: str, online: OnlineConfig, github_remote: Optional[str]
+    project_id: str, online: OnlineConfig, github_remote: str | None
 ) -> ProvisioningSetup:
     """Build the ordered steps from ``online.resources`` and the Tessera tokens.
 

@@ -19,7 +19,7 @@ garantir :
 Aucune dépendance ajoutée : `ctypes` fait partie de la bibliothèque standard.
 """
 import os
-from typing import Any, Optional
+from typing import Any
 
 from tessera.utils.logger import get_logger
 
@@ -32,7 +32,7 @@ _TUER_A_LA_FERMETURE = 0x2000
 #: Le job du process, gardé ouvert pour toute sa vie : c'est la fermeture du
 #: dernier handle qui déclenche la mise à mort, donc le lâcher trop tôt
 #: reviendrait à ne rien faire.
-_job: Optional[Any] = None
+_job: Any | None = None
 
 
 def _kernel32() -> Any:
@@ -45,17 +45,17 @@ def _kernel32() -> Any:
     """
     import ctypes
 
-    return getattr(ctypes, "WinDLL")("kernel32", use_last_error=True)
+    return getattr(ctypes, "WinDLL")("kernel32", use_last_error=True)  # noqa: B009
 
 
 def _derniere_erreur() -> int:
     """Return the last Win32 error code."""
     import ctypes
 
-    return int(getattr(ctypes, "get_last_error")())
+    return int(getattr(ctypes, "get_last_error")())  # noqa: B009
 
 
-def _construire_le_job() -> Optional[Any]:
+def _construire_le_job() -> Any | None:
     import ctypes
     from ctypes import wintypes
 
@@ -109,7 +109,7 @@ def _construire_le_job() -> Optional[Any]:
     return job
 
 
-def creer_groupe() -> Optional[Any]:
+def creer_groupe() -> Any | None:
     """Un groupe propre à un service, qu'on fermera pour tuer tout son arbre.
 
     `taskkill /T` ne suit que la filiation **déclarée** par Windows. Or

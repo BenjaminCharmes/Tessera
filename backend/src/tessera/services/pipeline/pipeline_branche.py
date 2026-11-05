@@ -7,13 +7,12 @@ ticket-406) and the pending pipeline-log lines are set aside around the switch
 returning `None` means "carry on".
 """
 from pathlib import Path
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from tessera.models.ticket import TicketStatus
-from tessera.services.pipeline import pipeline_fin_de_file as fin_de_file
-from tessera.services.git_workspace import journal_attente, journal_en_attente
-from tessera.services.git_workspace import GitWorkspaceError, NotAGitRepository
+from tessera.services.git_workspace import GitWorkspaceError, NotAGitRepository, journal_attente, journal_en_attente
 from tessera.services.noyau.pipeline_events import EventType, PipelineResult
+from tessera.services.pipeline import pipeline_fin_de_file as fin_de_file
 from tessera.services.pipeline.pipeline_rangement import ranger_les_bloques_livres
 from tessera.services.pipeline.pipeline_run import PipelineRun, emit, set_status
 from tessera.services.pipeline.run_dans_worktree import adopter_la_branche
@@ -28,7 +27,7 @@ _logger = get_logger(__name__)
 
 async def ensure_clean_tree(
     orch: "Orchestrator", run: PipelineRun
-) -> Optional[PipelineResult]:
+) -> PipelineResult | None:
     """Refuse to start on a tree something outside Tessera has modified.
 
     Every run now commits its own work, approved or not, so a dirty tree is
@@ -80,7 +79,7 @@ async def ensure_clean_tree(
 
 async def create_branch(
     orch: "Orchestrator", run: PipelineRun
-) -> Optional[PipelineResult]:
+) -> PipelineResult | None:
     """Switch to the ticket's own branch; degrade without one if git is absent.
 
     Aligns the base ref with the remote before forking (ticket-285).
@@ -120,7 +119,7 @@ async def create_branch(
         _reecrire_journal(racine, lignes)
 
 
-def _reecrire_journal(racine: Optional[Path], lignes: list[str]) -> None:
+def _reecrire_journal(racine: Path | None, lignes: list[str]) -> None:
     if racine is None:
         return
     try:
@@ -129,7 +128,7 @@ def _reecrire_journal(racine: Optional[Path], lignes: list[str]) -> None:
         _logger.warning("pending_log_rewrite_failed", extra={"error": str(exc)})
 
 
-async def _realigner_base_au_depart(orch: "Orchestrator") -> Optional[str]:
+async def _realigner_base_au_depart(orch: "Orchestrator") -> str | None:
     """Fast-forward the local base onto the remote before forking (ticket-406).
 
     The last ticket of a queue is merged by the CIWatcher after the run is
@@ -142,7 +141,7 @@ async def _realigner_base_au_depart(orch: "Orchestrator") -> Optional[str]:
     a refusal (checkout included) never stops the run.
     """
     # getattr : les doubles d'orchestrateur des tests d'étape n'ont pas de base.
-    base: Optional[str] = getattr(orch, "_base_branch", None)
+    base: str | None = getattr(orch, "_base_branch", None)
     if orch._git_workspace is None or base is None:
         return None
     try:
@@ -171,9 +170,9 @@ async def _depart_sur_la_base(orch: "Orchestrator") -> bool:
 async def _basculer(
     orch: "Orchestrator",
     run: PipelineRun,
-    racine: Optional[Path],
+    racine: Path | None,
     lignes: list[str],
-) -> Optional[PipelineResult]:
+) -> PipelineResult | None:
     assert orch._git_workspace is not None
 
     # Avant tout commit de tenue de livres : le journal est déjà mis de côté,

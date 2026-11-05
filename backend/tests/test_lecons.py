@@ -5,15 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services.gardes.lecons import (
-    LONGUEUR_MAX,
-    PLAFOND_LECONS,
-    PLAFOND_OCTETS,
-    Lecons,
-    ajouter_proposee,
-    lire_lecons,
-    refus_de_lecon,
-)
+from tessera.services.gardes.lecons import LONGUEUR_MAX, PLAFOND_LECONS, PLAFOND_OCTETS, Lecons, ajouter_proposee, lire_lecons, refus_de_lecon
 
 RETOUR = (
     "Les tests sont rouges : FakeWorkspace ne définit pas la nouvelle méthode "

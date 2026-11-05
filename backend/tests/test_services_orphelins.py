@@ -114,10 +114,7 @@ def test_le_filet_se_declare_et_ne_bloque_pas_le_lancement() -> None:
     # Là où la plateforme ne sait pas tuer les enfants avec le parent, le
     # service doit quand même démarrer : refuser de lancer parce que le filet
     # manque coûterait plus que le risque qu'il couvre. Mais ça se sait.
-    from tessera.services.noyau.groupe_de_processus import (
-        groupe_disponible,
-        rattacher,
-    )
+    from tessera.services.noyau.groupe_de_processus import groupe_disponible, rattacher
 
     assert groupe_disponible() is (os.name == "nt")
     # Un PID qui n'existe pas : l'appel échoue, et rend False sans lever.

@@ -1,16 +1,11 @@
 """Working tree state: diffs, dirty files and policy file detection."""
 
-from tessera.services.git_workspace.chemins import (
-    _EMPTY_TREE_SHA,
-    _is_orchestrator_artifact_path,
-    _is_run_policy_path,
-)
+from tessera.services.git_workspace.chemins import _EMPTY_TREE_SHA, _is_orchestrator_artifact_path, _is_run_policy_path
 from tessera.services.git_workspace.erreurs import GitCommandError
 from tessera.services.git_workspace.historique import GitHistory
 from tessera.services.git_workspace.ignores import GitIgnores
 from tessera.services.git_workspace.lockfiles import _resumer_lockfiles
 from tessera.utils.logger import get_logger
-
 
 _logger = get_logger("tessera.services.git_workspace")
 

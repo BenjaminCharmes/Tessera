@@ -14,18 +14,8 @@ from tessera.models.project import Project
 from tessera.routers.dependencies import require_valid_project_id
 from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.projets.project_loader import load_project
-from tessera.services.provisioning.launcher import (
-    PROVISIONING_LOCK,
-    ProvisioningSetup,
-    SetupFactory,
-    get_setup_factory,
-    run_provisioning,
-)
-from tessera.services.provisioning.online_config import (
-    OnlineConfig,
-    OnlineConfigError,
-    load_online_config,
-)
+from tessera.services.provisioning.launcher import PROVISIONING_LOCK, ProvisioningSetup, SetupFactory, get_setup_factory, run_provisioning
+from tessera.services.provisioning.online_config import OnlineConfig, OnlineConfigError, load_online_config
 from tessera.services.provisioning.plan import ProvisioningPlan
 from tessera.utils.logger import get_logger
 

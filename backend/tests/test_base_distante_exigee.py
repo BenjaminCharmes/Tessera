@@ -12,9 +12,9 @@ from pathlib import Path
 
 import pytest
 
+from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.git_workspace import GitCommandError, GitWorkspaceService
 from tessera.services.git_workspace import base as gw
-from tessera.services.gardes.politique_run import PolitiqueRun
 
 
 async def _git(cwd: Path, *args: str) -> str:
@@ -139,8 +139,8 @@ async def test_the_branch_stage_blocks_a_dependent_ticket_without_a_readable_rem
     depot: tuple[Path, str],
 ) -> None:
     from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-    from tessera.services.pipeline import pipeline_branche
     from tessera.services.noyau.pipeline_events import OrchestratorEvent
+    from tessera.services.pipeline import pipeline_branche
     from tessera.services.pipeline.pipeline_run import PipelineRun
 
     local, _ = depot

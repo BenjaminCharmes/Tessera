@@ -1,5 +1,5 @@
 """Signalements : un défaut ou une idée repérés ailleurs deviennent un ticket ide-core — ticket-407."""
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Literal
 
 from fastapi import APIRouter, HTTPException
@@ -80,7 +80,7 @@ def _exiger_projet(project_id: str) -> None:
 async def create_signalement(body: SignalementCreate) -> Ticket | JSONResponse:
     _exiger_projet(body.projet)
     _exiger_projet(PROJET_CIBLE)
-    recu_le = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    recu_le = datetime.now(UTC).strftime("%Y-%m-%d")
     type_ticket = TicketType.fix if body.nature == "bug" else TicketType.feat
     corps = _corps_du_ticket(body, recu_le)
     if RUN_REGISTRY.projet_occupe(PROJET_CIBLE):

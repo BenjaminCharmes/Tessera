@@ -1,11 +1,7 @@
 """Suivi du quota d'abonnement — ticket-054."""
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
-from tessera.services.usage.quota_tracker import (
-    QuotaSnapshot,
-    QuotaTracker,
-    snapshot_from_rate_limit,
-)
+from tessera.services.usage.quota_tracker import QuotaSnapshot, QuotaTracker, snapshot_from_rate_limit
 
 
 class _FakeRateLimitInfo:
@@ -39,7 +35,7 @@ def test_normalise_un_evenement_du_sdk() -> None:
     assert snapshot.utilization == 0.82
     assert snapshot.window == "five_hour"
     assert snapshot.resets_at is not None
-    assert snapshot.resets_at.tzinfo is timezone.utc
+    assert snapshot.resets_at.tzinfo is UTC
 
 
 def test_un_evenement_sans_utilisation_est_ignore() -> None:
@@ -107,7 +103,7 @@ def test_le_tracker_expose_un_etat_serialisable() -> None:
             status="allowed_warning",
             utilization=0.75,
             window="seven_day",
-            resets_at=datetime(2026, 9, 16, 12, 0, tzinfo=timezone.utc),
+            resets_at=datetime(2026, 9, 16, 12, 0, tzinfo=UTC),
         )
     )
     data = tracker.as_event_data()

@@ -8,8 +8,8 @@ sur « Ticket introuvable » (démineur, 2026-10-05).
 import asyncio
 from pathlib import Path
 
-from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.gardes.politique_run import PolitiqueRun
+from tessera.services.git_workspace import GitWorkspaceService
 
 _TICKET = "tickets/todo/ticket-040-nouvelle-feature.md"
 

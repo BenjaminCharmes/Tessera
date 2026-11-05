@@ -4,11 +4,10 @@ from pathlib import Path
 
 import pytest
 
-from tests.test_providers_base import FakeProvider
-from tessera.models.project import ConversationMessage, CreateProjectResponse
+from tessera.models.project import ConversationMessage
 from tessera.models.ticket import TicketDraft, TicketPriority, TicketType
 from tessera.services.creation_projet.project_creator import ProjectCreatorService
-
+from tests.test_providers_base import FakeProvider
 
 # ------------------------------------------------------------------
 # Helpers

@@ -1,13 +1,7 @@
 """La lecture de ce que `netstat`, `ss`, PowerShell et `ps` rendent — ticket-416."""
 import asyncio
 
-from tessera.services.supervision.sonde_systeme import (
-    SondeReelle,
-    lire_netstat,
-    lire_powershell,
-    lire_ps,
-    lire_ss,
-)
+from tessera.services.supervision.sonde_systeme import SondeReelle, lire_netstat, lire_powershell, lire_ps, lire_ss
 
 _NETSTAT = """
 Connexions actives

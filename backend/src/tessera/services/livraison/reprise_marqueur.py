@@ -6,7 +6,7 @@ records that its repository was put back in order.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import aiosqlite
 
@@ -43,6 +43,6 @@ async def marquer_depots_repris(db: aiosqlite.Connection, run_ids: list[str]) ->
     placeholders = ",".join("?" * len(run_ids))
     await db.execute(
         f"UPDATE pipeline_runs SET depot_repris_at = ? WHERE id IN ({placeholders})",
-        [datetime.now(timezone.utc).isoformat(), *run_ids],
+        [datetime.now(UTC).isoformat(), *run_ids],
     )
     await db.commit()

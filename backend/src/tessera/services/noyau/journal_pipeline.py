@@ -5,7 +5,7 @@ Partagé par `Orchestrator._log` et par ce qui écrit dans le journal sans en
 journalise et n'arrête rien : le journal est une trace, pas une porte.
 """
 from collections.abc import Callable
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from tessera.utils.logger import get_logger
@@ -15,7 +15,7 @@ _logger = get_logger(__name__)
 
 def ajouter_ligne(chemin: Path, message: str) -> None:
     """Appends `- <UTC timestamp> — <message>` to the log at `chemin`."""
-    ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+    ts = datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S UTC")
     ligne = f"- {ts} — {message}\n"
     try:
         chemin.parent.mkdir(parents=True, exist_ok=True)

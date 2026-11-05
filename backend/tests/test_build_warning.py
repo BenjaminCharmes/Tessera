@@ -3,8 +3,8 @@ import json
 from pathlib import Path
 from unittest.mock import AsyncMock
 
-from tessera.services.verification.build_warning import build_warnings, folders_with_build_script
 from tessera.services.pipeline.orchestrator import Orchestrator
+from tessera.services.verification.build_warning import build_warnings, folders_with_build_script
 
 
 def _package_json(folder: Path, scripts: dict[str, str] | None) -> None:

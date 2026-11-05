@@ -14,8 +14,8 @@ from dataclasses import dataclass, replace
 from pathlib import Path
 
 from tessera.config import settings
-from tessera.services.livraison.controle_tete import ControleTete, decrire_exception, verifier_tete
 from tessera.services.github.github_service import PrOuverte
+from tessera.services.livraison.controle_tete import ControleTete, decrire_exception, verifier_tete
 from tessera.services.livraison.mise_a_jour_branche import MiseAJour, mettre_a_jour_branche
 from tessera.services.livraison.sha_approbation import noter_poussee_du_ticket
 
@@ -134,7 +134,7 @@ async def _lancer(mise_a_jour: MiseAJourPr, tete: str, delai_s: float) -> MiseAJ
     """Run the update under its bound; a failure of any kind is a refusal, not a raise."""
     try:
         return await asyncio.wait_for(mise_a_jour(tete), timeout=delai_s)
-    except asyncio.TimeoutError:
+    except TimeoutError:
         return MiseAJour(sha=None, arret=f"délai dépassé ({delai_s:g} s)")
     except Exception as exc:  # noqa: BLE001 — le watcher ne doit pas voir une exception ici
         return MiseAJour(sha=None, arret=decrire_exception(exc))

@@ -23,12 +23,7 @@ from typing import Any
 from claude_agent_sdk import HookContext, HookInput, HookJSONOutput
 
 from tessera.services.providers import git_guard_lexique as lexique
-from tessera.services.providers.git_guard_lectures import (
-    gh_interdit,
-    gh_sans_sous_commande,
-    git_interdit,
-    git_sans_sous_commande,
-)
+from tessera.services.providers.git_guard_lectures import gh_interdit, gh_sans_sous_commande, git_interdit, git_sans_sous_commande
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

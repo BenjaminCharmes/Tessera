@@ -14,14 +14,7 @@ from tessera.models.ticket import TicketStatus
 from tessera.services.documentation.documentation import DocumentationService, ResultatDocumentation
 from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 from tests.matiere_factice import matiere_factice
-from tests.test_orchestrator import (
-    _FakeGit,
-    _make_agent_result,
-    _make_orchestrator,
-    _make_ticket,
-    _make_ticket_service_for,
-    _noop,
-)
+from tests.test_orchestrator import _FakeGit, _make_agent_result, _make_orchestrator, _make_ticket, _make_ticket_service_for, _noop
 from tests.test_providers_base import FakeProvider
 
 
@@ -174,7 +167,7 @@ async def test_integration_quinze_tickets_tronque_event(tmp_path: Path) -> None:
     Vérifie le chemin complet : DocumentationService tronque à _PLAFOND,
     et l'orchestrateur émet l'événement même sans fichier doc modifié.
     """
-    from tessera.services.documentation.documentation import DocumentationService, _PLAFOND
+    from tessera.services.documentation.documentation import _PLAFOND, DocumentationService
 
     project_path, prompts = _init_projet(tmp_path, _PLAFOND + 5)  # 15 tickets
     _avec_marqueur_vide(project_path)
@@ -224,7 +217,7 @@ async def test_integration_tickets_sans_diff_listes_dans_l_evenement_et_le_journ
     assert len(doc_events) == 1
     assert doc_events[0].data["ecartes"] == ["ticket-002"]
     assert doc_events[0].data["tickets"] == ["ticket-001", "ticket-003"]
-    journal = [l for l in lignes if "pas de diff retrouvable, non documenté" in l]
+    journal = [ln for ln in lignes if "pas de diff retrouvable, non documenté" in ln]
     assert len(journal) == 1
     assert "ticket-002" in journal[0]
 

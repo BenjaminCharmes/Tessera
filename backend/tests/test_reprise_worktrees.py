@@ -10,10 +10,10 @@ from pathlib import Path
 import pytest
 
 from tessera.config import settings
-from tessera.services.pipeline import reprise_worktrees
 from tessera.services.git_workspace import GitCommandError
-from tessera.services.worktrees.run_worktree import RunWorktree, creer
+from tessera.services.pipeline import reprise_worktrees
 from tessera.services.pipeline.reprise_worktrees import reprendre_worktrees_orphelins
+from tessera.services.worktrees.run_worktree import RunWorktree, creer
 from tests.depot_worktree import BRANCHE, construire, git, lier
 
 

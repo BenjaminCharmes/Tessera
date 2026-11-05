@@ -6,18 +6,17 @@ passe par un module appelant : le témoin ne doit jamais apparaître.
 import inspect
 import subprocess
 from collections.abc import Awaitable, Callable
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
 
-from tessera.services.pipeline import reprise_orphelin
-from tessera.services.livraison import branch_cleanup, realignement_base
-from tessera.services.git_workspace import git_runner, journal_en_attente, ticket_diff
-from tessera.services.worktrees import temporary_worktree
 from tessera.services.creation_projet import project_removal
+from tessera.services.git_workspace import GitCommandError, git_runner, journal_en_attente, ticket_diff
 from tessera.services.git_workspace.git_runner import GitResult, git, writes
-from tessera.services.git_workspace import GitCommandError
+from tessera.services.livraison import branch_cleanup, realignement_base
+from tessera.services.pipeline import reprise_orphelin
+from tessera.services.worktrees import temporary_worktree
 
 #: Hooks qui, ensemble, couvrent un commit, un checkout et toute mise à jour de ref.
 _HOOKS = ("pre-commit", "post-checkout", "post-merge", "reference-transaction")
@@ -199,7 +198,7 @@ async def _scenario_reprise(tmp_path: Path) -> Path:
     (repo / "README.md").write_text("modifie\n", encoding="utf-8")
     temoin = _pieger(repo, tmp_path)
     await reprise_orphelin._reprendre_depot_seul(
-        "proj", "ticket-001", workspace, datetime(2020, 1, 1, tzinfo=timezone.utc)
+        "proj", "ticket-001", workspace, datetime(2020, 1, 1, tzinfo=UTC)
     )
     assert _sync(repo, "branch", "--show-current") == "develop"
     assert _sync(repo, "rev-list", "--count", "develop..ticket-001-x") == "1"

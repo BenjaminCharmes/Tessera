@@ -8,13 +8,13 @@ que le refus liste tous les manques d'un coup plutôt qu'un par tentative.
 import shutil
 from pathlib import Path
 
+from tessera.services.gardes.politique_run import PolitiqueRun
+from tessera.services.livraison.livraison_possible import raison_de_refus_livraison
 from tessera.services.projets.autonomie import NiveauAutonomie
+from tessera.services.projets.project_loader import load_pipeline_config
 from tessera.services.verification.commande_chainee import decouper
 from tessera.services.verification.commande_effective import PlaceholderInconnu, commande_effective
-from tessera.services.livraison.livraison_possible import raison_de_refus_livraison
-from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.verification.process_registry import CommandeInvalide, resoudre_le_cwd
-from tessera.services.projets.project_loader import load_pipeline_config
 
 
 def manques_avant_depart(

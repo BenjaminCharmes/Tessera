@@ -6,13 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services.creation_projet.project_removal import (
-    RemovalError,
-    RemovalPlan,
-    delete_project,
-    describe_removal,
-    detach_project,
-)
+from tessera.services.creation_projet.project_removal import RemovalError, RemovalPlan, delete_project, describe_removal, detach_project
 
 
 async def _git(cwd: Path, *args: str) -> None:

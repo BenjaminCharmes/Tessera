@@ -11,8 +11,8 @@ from pathlib import Path
 import pytest
 
 from tessera.config import settings
-from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.gardes.politique_run import PolitiqueRun
+from tessera.services.git_workspace import GitWorkspaceService
 
 
 async def _git(cwd: Path, *args: str) -> None:

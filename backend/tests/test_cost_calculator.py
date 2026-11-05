@@ -3,9 +3,9 @@ import pytest
 import tessera.services.agents.agent_creator as agent_creator
 import tessera.services.agents.agent_runner as agent_runner
 import tessera.services.agents.chat_service as chat_service
-import tessera.services.file.planner as planner
 import tessera.services.creation_projet.project_analyzer as project_analyzer
 import tessera.services.creation_projet.project_creator as project_creator
+import tessera.services.file.planner as planner
 from tessera.services.noyau.cost_calculator import DEFAULT_MODEL, calculate_cost, modeles_connus
 
 

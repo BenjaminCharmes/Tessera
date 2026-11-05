@@ -4,13 +4,9 @@ from pathlib import Path
 
 from fastapi import HTTPException
 
-from tessera.services.verification.commande_effective import (
-    PlaceholderInconnu,
-    commande_effective,
-    environnement_effectif,
-)
 from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.pipeline.preparation_worktree import Preparation, preparation_du_run
+from tessera.services.verification.commande_effective import PlaceholderInconnu, commande_effective, environnement_effectif
 from tessera.services.worktrees.run_worktree import RunWorktree
 
 

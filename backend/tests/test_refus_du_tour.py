@@ -7,12 +7,7 @@ from tessera.models.agent import AgentResult, AgentRole
 from tessera.models.ticket import TicketStatus
 from tessera.services.pipeline.orchestrator import Orchestrator
 from tessera.services.providers.perimetre import hook_refus_hors_perimetre
-from tessera.services.providers.refus_garde import (
-    TITRE_REFUS,
-    JournalDesRefus,
-    refus_du_tour,
-    section_refus,
-)
+from tessera.services.providers.refus_garde import TITRE_REFUS, JournalDesRefus, refus_du_tour, section_refus
 from tessera.services.verdicts.validator import ValidatorService
 from tests.test_orchestrator import _FakeGit, _make_agent_result, _make_ticket, _noop
 from tests.test_providers_base import FakeProvider

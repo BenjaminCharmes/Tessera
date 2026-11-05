@@ -12,17 +12,16 @@ them from the index before the commit once they are listed in `.gitignore`.
 """
 
 import asyncio
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services.pipeline import pipeline_outcomes as outcomes
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.noyau.pipeline_events import OrchestratorEvent
+from tessera.services.pipeline import pipeline_outcomes as outcomes
 from tessera.services.pipeline.pipeline_run import PipelineRun
-
 
 # ---------------------------------------------------------------------------
 # Repo fixture
@@ -74,7 +73,7 @@ class _OrchInterrompu:
         self._log_path = projet / "memory" / "pipeline-log.md"
 
     def _log(self, message: str) -> None:
-        ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+        ts = datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S UTC")
         line = f"- {ts} — {message}\n"
         self._log_path.parent.mkdir(parents=True, exist_ok=True)
         with self._log_path.open("a", encoding="utf-8") as f:

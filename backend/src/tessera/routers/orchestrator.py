@@ -6,30 +6,20 @@ from pydantic import BaseModel, Field, field_validator
 
 from tessera import reglages
 from tessera.config import settings
-from tessera.services.pipeline.assemblage_run import build_orchestrator
-from tessera.services.pipeline.controles_depart import manques_avant_depart
-from tessera.services.noyau.event_hub import EVENT_HUB
-from tessera.services.pipeline.file_vivante import (
-    FileFermee,
-    FileVivante,
-    lecteur_sur_la_base,
-    trier_ajouts,
-)
+from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.github.issues_agent_ready import tirer_les_issues as _tirer_les_issues
-from tessera.services.pipeline.orchestrator import Orchestrator
-from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.livraison.reprise_outils import ecrire_log
-from tessera.services.pipeline.run_dans_worktree import (
-    OrchestrateurRefuse,
-    RunRefuse,
-    ouvrir_worktree,
-    retirer_apres_echec,
-)
+from tessera.services.noyau.event_hub import EVENT_HUB
+from tessera.services.pipeline.assemblage_run import build_orchestrator
+from tessera.services.pipeline.controles_depart import manques_avant_depart
+from tessera.services.pipeline.file_vivante import FileFermee, FileVivante, lecteur_sur_la_base, trier_ajouts
+from tessera.services.pipeline.orchestrator import Orchestrator
+from tessera.services.pipeline.run_dans_worktree import OrchestrateurRefuse, RunRefuse, ouvrir_worktree, retirer_apres_echec
 from tessera.services.pipeline.run_executor import executer
 from tessera.services.pipeline.run_registry import RUN_REGISTRY, RunActif, RunAlreadyInProgress
-from tessera.services.worktrees.run_worktree import RunWorktree
 from tessera.services.projets.ticket_service import TicketService
+from tessera.services.worktrees.run_worktree import RunWorktree
 from tessera.utils.logger import get_logger
 from tessera.utils.project_id import validate_project_id
 

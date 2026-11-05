@@ -4,16 +4,11 @@ import shutil
 from collections.abc import Awaitable, Callable
 from pathlib import Path
 
-from tessera.services.git_workspace.chemins import (
-    _JOURNAL_UNION_SUFFIXES,
-    _is_orchestrator_artifact_path,
-    _relatif_au_projet,
-)
+from tessera.services.git_workspace.chemins import _JOURNAL_UNION_SUFFIXES, _is_orchestrator_artifact_path, _relatif_au_projet
 from tessera.services.git_workspace.conflits_regles import GitConflictsRegles
 from tessera.services.git_workspace.erreurs import BaseIntrouvable, GitCommandError
 from tessera.services.git_workspace.textes import _extraire_fichiers_bloques
 from tessera.utils.logger import get_logger
-
 
 _logger = get_logger("tessera.services.git_workspace")
 

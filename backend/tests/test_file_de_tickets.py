@@ -3,8 +3,8 @@ import pytest
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 from tessera.services.noyau.dialogue import DialogueChannel
-from tessera.services.pipeline.file_vivante import FileFermee, FileVivante, fermer_si_vivante
 from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent, PipelineResult
+from tessera.services.pipeline.file_vivante import FileFermee, FileVivante, fermer_si_vivante
 
 
 def _ticket(tid: str) -> Ticket:

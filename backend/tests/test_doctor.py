@@ -5,13 +5,7 @@ from pathlib import Path
 import pytest
 
 from tessera.config import settings
-from tessera.doctor import (
-    check_checkout,
-    check_prompts_dir,
-    check_provider_auth,
-    check_workspace,
-    run_checks,
-)
+from tessera.doctor import check_checkout, check_prompts_dir, check_provider_auth, check_workspace, run_checks
 
 
 def test_prompts_manquants_sont_signales(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

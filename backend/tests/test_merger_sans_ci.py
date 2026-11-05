@@ -8,8 +8,8 @@ verification et coute un aller-retour par ticket.
 import json
 from pathlib import Path
 
-from tessera.services.projets.autonomie import NiveauAutonomie, niveau_peut_merger
 from tessera.services.gardes.politique_run import PolitiqueRun
+from tessera.services.projets.autonomie import NiveauAutonomie, niveau_peut_merger
 
 
 def _manifeste(racine: Path, **champs: object) -> Path:

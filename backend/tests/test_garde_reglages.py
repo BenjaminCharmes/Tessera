@@ -98,6 +98,6 @@ async def test_refusal_log_holds_the_tool_name_only(
         assert await _refuse(tmp_path, f"curl -X PUT {_ROUTE}")
     records = [r for r in caplog.records if r.getMessage() == "route_reglages_refusee"]
     assert len(records) == 1
-    assert getattr(records[0], "outil") == "Bash"
+    assert records[0].outil == "Bash"
     assert "127.0.0.1" not in str(records[0].__dict__)
     assert "curl" not in str(records[0].__dict__)

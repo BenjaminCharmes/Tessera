@@ -6,10 +6,10 @@ from tessera.models.agent import AgentCreatedInfo, CreateAgentConversationRespon
 from tessera.models.project import ConversationMessage
 from tessera.services.agents.agent_registry import AgentRegistryService
 from tessera.services.noyau.cost_calculator import DEFAULT_MODEL
+from tessera.services.noyau.prompt_loader import load_system_prompt
 from tessera.services.providers.base import LLMProvider
 from tessera.utils.conversation import format_conversation
 from tessera.utils.json_extract import extract_json
-from tessera.services.noyau.prompt_loader import load_system_prompt
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
