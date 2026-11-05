@@ -1,14 +1,15 @@
 ---
-id: ticket-756
-title: "Link roots are bounded wherever the file API reads them"
-type: fix
-status: todo
-pr_number: null
-priority: low
 agent: codeur
-depends_on: ["ticket-747"]
-estimated_days: 1
 created: 2026-11-03
+depends_on:
+- ticket-747
+estimated_days: 1
+id: ticket-756
+pr_number: 895
+priority: low
+status: done
+title: Link roots are bounded wherever the file API reads them
+type: fix
 ---
 
 # ticket-756 — Les racines de lien sont bornées partout où l'API fichiers les lit

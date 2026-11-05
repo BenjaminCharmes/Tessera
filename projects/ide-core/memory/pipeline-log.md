@@ -7607,3 +7607,17 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-04 16:26:20 UTC — [ticket-757] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Les tests ont été ajoutés pour (191984ms)
 - 2026-11-04 16:26:20 UTC — [ticket-757] APPROVED après 1 tour(s)
 - 2026-11-04 16:27:36 UTC — [ticket-757] documentation: 0 fichier(s) (66109ms)
+- 2026-11-04 15:31:04 UTC — [ide-core] ticket-767 PR #893 mergée (CI verte)
+- 2026-11-04 15:31:11 UTC — [ide-core] ticket-767 : base réalignée sur develop
+- 2026-11-04 15:31:11 UTC — [ide-core] ticket-767 PR #893 confiée au CIWatcher
+- 2026-11-04 15:31:29 UTC — [ticket-756] branche ticket-756-link-roots-are-bounded-wherever-the-file-api-read
+- 2026-11-04 15:31:32 UTC — [ticket-756] tour 1 — codeur démarré
+- 2026-11-04 15:37:54 UTC — [ticket-756] tour 1 — codeur terminé (382703ms)
+- 2026-11-04 15:55:58 UTC — [ticket-756] testeur: OK (exit 0)
+- 2026-11-04 15:58:00 UTC — [ticket-756] securite: PASS — Symlink hardening is correctly implemented. The `is_too_broad()` check prevents  (121562ms)
+- 2026-11-04 15:58:00 UTC — [ticket-756] tour 1 — reviewer démarré
+- 2026-11-04 15:58:19 UTC — [ticket-756] tour 1 — reviewer terminé (18983ms)
+- 2026-11-04 15:59:50 UTC — [ticket-756] validateur: fichiers cités joints : aucun ; absents : Path.home()/f.txt
+- 2026-11-04 15:59:50 UTC — [ticket-756] validateur: APPROVED — Les deux critères d'acceptation sont satisfaits. Le code implémente une vérifica (110625ms)
+- 2026-11-04 15:59:50 UTC — [ticket-756] APPROVED après 1 tour(s)
+- 2026-11-04 16:01:19 UTC — [ticket-756] documentation: 0 fichier(s) (80312ms)
