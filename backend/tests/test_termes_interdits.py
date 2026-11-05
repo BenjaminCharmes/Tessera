@@ -482,3 +482,24 @@ def test_the_service_reads_the_list_from_the_backend_settings(
     monkeypatch.delenv("FORBIDDEN_TERMS", raising=False)
     monkeypatch.setattr(settings, "forbidden_terms", "zorglub")
     assert TermesInterditsService().actif
+
+
+def test_a_github_token_in_a_diff_line_is_a_violation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # ticket-796 : `GITHUB_TOKEN` n'était pas un terme interdit.
+    from tessera.config import settings
+
+    monkeypatch.delenv("FORBIDDEN_TERMS", raising=False)
+    monkeypatch.setattr(settings, "forbidden_terms", "")
+    monkeypatch.setattr(settings, "github_token", "ghp_FactIceJetonDeTest0042")
+    service = TermesInterditsService()
+
+    violations = service.verifier(
+        lignes_ajoutees=_diff_lines("config.py", "jeton = 'ghp_FactIceJetonDeTest0042'"),
+        commits=[],
+    )
+
+    assert service.actif
+    assert len(violations) == 1
+    assert "ghp_FactIce" not in str(violations[0])

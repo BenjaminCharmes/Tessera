@@ -14,12 +14,18 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from tessera.config import settings
+from tessera.config import Settings, settings
 from tessera.utils.secrets import SECRETS
 
-# Les jetons configurés sont inscrits dès le chargement du logger, donc avant
+
+def inscrire_les_secrets(reglages: Settings) -> None:
+    """Register the eight secrets of the settings for masking (ADR-073)."""
+    SECRETS.register_all(reglages.valeurs_des_secrets())
+
+
+# Les secrets configurés sont inscrits dès le chargement du logger, donc avant
 # la première ligne écrite par le backend (ADR-053).
-SECRETS.register_all(settings.valeurs_des_jetons())
+inscrire_les_secrets(settings)
 
 # Les attributs qu'un `LogRecord` porte toujours, plus ceux que `Formatter`
 # ajoute en formatant. Tout ce qui n'y figure pas vient d'un `extra` de

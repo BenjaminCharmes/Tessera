@@ -1,11 +1,13 @@
 import os
 import sys
 from pathlib import Path
-from typing import ClassVar
+from typing import ClassVar, Literal
 
 from pydantic import SecretStr, ValidationError
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, PydanticBaseSettingsSource, SettingsConfigDict
 
+from tessera.coffre import NOMS_SECRETS
+from tessera.config_coffre import sources_des_secrets
 from tessera.config_errors import ConfigurationError, describe_validation_error
 
 # Racine du dépôt : backend/src/tessera/config.py -> remonter de 4 niveaux.
@@ -53,6 +55,25 @@ class Settings(BaseSettings):
 
     # Le `.env` de Tessera, que le hook de lecture refuse aux agents (ADR-053).
     env_file: ClassVar[Path] = Path(_ENV_FILE)
+
+    # Où lire les neuf secrets (ADR-073) : `auto` (coffre s'il répond, sinon
+    # `.env` avec un avertissement), `coffre` (refus sans lui), `env` (CI,
+    # Docker, tests). Lu avant le reste par `config_coffre`.
+    secrets_source: Literal["auto", "coffre", "env"] = "auto"
+
+    @classmethod
+    def settings_customise_sources(
+        cls,
+        settings_cls: type[BaseSettings],
+        init_settings: PydanticBaseSettingsSource,
+        env_settings: PydanticBaseSettingsSource,
+        dotenv_settings: PydanticBaseSettingsSource,
+        file_secret_settings: PydanticBaseSettingsSource,
+    ) -> tuple[PydanticBaseSettingsSource, ...]:
+        """Put the system vault between the environment and .env (ADR-073)."""
+        return sources_des_secrets(
+            settings_cls, init_settings, env_settings, dotenv_settings, file_secret_settings
+        )
 
     # Jetons de mise en ligne (ADR-053). `SecretStr` : ni `repr` ni `model_dump`
     # ne montrent la valeur. Vides : la mise en ligne reste inactive. Portée
@@ -210,10 +231,21 @@ class Settings(BaseSettings):
     # Désactivable si un outil externe gère déjà la veille.
     keep_awake_during_runs: bool = True
 
-    def valeurs_des_jetons(self) -> list[str]:
-        """Return the non-empty values of the online-service tokens (ADR-053)."""
-        valeurs = (getattr(self, champ).get_secret_value() for champ in CHAMPS_JETONS)
-        return [valeur for valeur in valeurs if valeur]
+    def valeurs_des_secrets(self) -> list[str]:
+        """Return the non-empty values of the eight secrets (ADR-073).
+
+        Every name of ``NOMS_SECRETS`` but ``FORBIDDEN_TERMS``: that one is the
+        list the push gate already applies, not a value to mask.
+        """
+        valeurs: list[str] = []
+        for nom in NOMS_SECRETS:
+            if nom == "FORBIDDEN_TERMS":
+                continue
+            valeur = getattr(self, nom.lower())
+            texte = valeur.get_secret_value() if isinstance(valeur, SecretStr) else valeur
+            if texte:
+                valeurs.append(texte)
+        return valeurs
 
 
 def load_settings(env_file: Path | None = None) -> Settings:

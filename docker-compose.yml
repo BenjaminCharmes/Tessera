@@ -12,6 +12,9 @@ services:
       # API-credits provider here; this overrides LLM_PROVIDER even if .env
       # sets (or omits) it.
       - LLM_PROVIDER=anthropic_api
+      # Un conteneur n'a pas de coffre du système (ADR-073) : les secrets
+      # viennent de .env et de l'environnement, sans jamais chercher de coffre.
+      - SECRETS_SOURCE=env
     volumes:
       - ./projects:/app/projects
       - ./agents/prompts:/app/prompts

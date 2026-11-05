@@ -1,5 +1,9 @@
 """The environment handed to the SDK's subprocess."""
-from tessera.config import VARIABLES_JETONS
+from tessera.coffre import NOMS_SECRETS
+
+# Design §9 : les lectures `gh` des agents (ADR-067) peuvent dépendre de
+# `GITHUB_TOKEN` ; le vider se décide après mesure, pas ici.
+_TRANSMIS: frozenset[str] = frozenset({"GITHUB_TOKEN"})
 
 
 def env_du_sous_processus(git_bash_path: str | None) -> dict[str, str]:
@@ -14,11 +18,10 @@ def env_du_sous_processus(git_bash_path: str | None) -> dict[str, str]:
     On la neutralise explicitement pour le sous-process du SDK ; la clef
     reste disponible pour `AnthropicApiProvider`, qui est le seul à devoir
     l'utiliser.
-    Même traitement pour les jetons de mise en ligne (ADR-053) : un jeton
-    exporté dans le shell qui a lancé le backend serait hérité par le CLI.
+    Même traitement pour les autres secrets du coffre (ADR-053, ADR-073) : un
+    jeton exporté dans le shell qui a lancé le backend serait hérité par le CLI.
     """
-    env: dict[str, str] = {"ANTHROPIC_API_KEY": ""}
-    env.update({variable: "" for variable in VARIABLES_JETONS})
+    env: dict[str, str] = {nom: "" for nom in NOMS_SECRETS if nom not in _TRANSMIS}
     # Sous Windows, le SDK n'active `Bash` que si cette variable pointe vers
     # un bash.exe. Sans elle, l'outil disparaît en silence (ticket-319).
     if git_bash_path:

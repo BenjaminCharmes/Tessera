@@ -2,7 +2,7 @@
 id: ticket-800
 title: "Doctor, health, the env example and Docker describe where the secrets live"
 type: chore
-status: todo
+status: done
 pr_number: null
 priority: low
 agent: codeur
@@ -47,8 +47,8 @@ au lieu de « renseigne `.env` » pour une clé qui n'y est plus.
 
 ## Critères d'acceptation
 
-- [ ] Les tests ci-dessus passent
-- [ ] `.github/workflows/ci.yml` n'est pas modifié : la suite pose `SECRETS_SOURCE=env` par
+- [x] Les tests ci-dessus passent
+- [x] `.github/workflows/ci.yml` n'est pas modifié : la suite pose `SECRETS_SOURCE=env` par
       `conftest.py` (ticket-795), et un agent n'écrit pas dans `.github/workflows/`
 
 ## Ce que ça ne fait pas

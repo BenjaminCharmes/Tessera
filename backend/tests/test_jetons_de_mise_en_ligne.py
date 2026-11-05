@@ -40,7 +40,7 @@ def test_the_five_tokens_are_empty_by_default(monkeypatch: pytest.MonkeyPatch) -
 
     vides = Settings(_env_file=None)
 
-    assert vides.valeurs_des_jetons() == []
+    assert vides.valeurs_des_secrets() == []
     assert vides.vercel_team_id == ""
 
 
@@ -61,7 +61,7 @@ def test_settings_hide_every_token_value() -> None:
 
 
 def test_settings_still_hand_the_values_to_the_backend() -> None:
-    assert set(_reglages().valeurs_des_jetons()) == set(_JETONS.values())
+    assert set(_reglages().valeurs_des_secrets()) == set(_JETONS.values())
 
 
 def test_the_environment_feeds_the_token_fields(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -118,7 +118,7 @@ def _enregistrement(message: str, **extra: Any) -> logging.LogRecord:
 
 
 def test_logger_masks_a_configured_token() -> None:
-    SECRETS.register_all(_reglages().valeurs_des_jetons())
+    SECRETS.register_all(_reglages().valeurs_des_secrets())
 
     ligne = _JsonFormatter().format(
         _enregistrement(

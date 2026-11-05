@@ -17,6 +17,9 @@ says so.
 
 Only the ``.env`` of Tessera is refused: a project's own ``.env`` and
 ``.env.example`` are different files and pass.
+
+The same hook refuses a ``Bash`` command that runs the system vault
+(``garde_coffre.py``, ADR-073): the vault holds the same secrets.
 """
 import fnmatch
 import os
@@ -27,6 +30,7 @@ from typing import Any, Awaitable, Callable
 from claude_agent_sdk import HookContext, HookInput, HookJSONOutput
 
 from tessera.config import Settings
+from tessera.services.providers.garde_coffre import COFFRE_REFUS, commande_execute_le_coffre
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -187,16 +191,24 @@ def hook_refus_env_tessera(
         donnees: dict[str, Any] = dict(entree)
         entrees: dict[str, Any] = donnees.get("tool_input", {})
         outil = donnees.get("tool_name")
+        # Ni la valeur ni le contenu de la commande : le nom de l'outil suffit.
+        if outil == "Bash" and commande_execute_le_coffre(str(entrees.get("command", ""))):
+            _logger.warning("execution_coffre_refusee", extra={"outil": str(outil)})
+            return _refus(COFFRE_REFUS)
         if not _outil_vise_le_env(outil, entrees, base, cible):
             return {}
-        # Ni la valeur ni le contenu de la commande : le nom de l'outil suffit.
         _logger.warning("lecture_env_tessera_refusee", extra={"outil": str(outil)})
-        return {
-            "hookSpecificOutput": {
-                "hookEventName": "PreToolUse",
-                "permissionDecision": "deny",
-                "permissionDecisionReason": ENV_REFUS,
-            }
-        }
+        return _refus(ENV_REFUS)
 
     return hook
+
+
+def _refus(raison: str) -> HookJSONOutput:
+    """Build the ``deny`` answer of a ``PreToolUse`` hook."""
+    return {
+        "hookSpecificOutput": {
+            "hookEventName": "PreToolUse",
+            "permissionDecision": "deny",
+            "permissionDecisionReason": raison,
+        }
+    }

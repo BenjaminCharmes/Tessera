@@ -17,12 +17,16 @@
 [CmdletBinding()]
 param(
     [Parameter(Position = 0)]
-    [ValidateSet('help', 'setup', 'doctor', 'run', 'dev', 'dev-frontend', 'stop', 'test', 'lint', 'verify', 'check-tickets')]
+    [ValidateSet('help', 'setup', 'doctor', 'run', 'dev', 'dev-frontend', 'stop', 'test', 'lint', 'verify', 'check-tickets', 'secrets')]
     [string]$Task = 'help',
 
-    # Identifiant du projet, pour `check-tickets`.
+    # Identifiant du projet, pour `check-tickets` ; sous-verbe, pour `secrets`.
     [Parameter(Position = 1)]
-    [string]$Projet = ''
+    [string]$Projet = '',
+
+    # Nom du secret, pour `secrets set` et `secrets supprimer`.
+    [Parameter(Position = 2)]
+    [string]$Nom = ''
 )
 
 $ErrorActionPreference = 'Stop'
@@ -39,6 +43,10 @@ function Show-Help {
     Write-Host '  .\scripts\tessera.ps1 test         Suite de tests backend'
     Write-Host '  .\scripts\tessera.ps1 lint         Type-check mypy'
     Write-Host '  .\scripts\tessera.ps1 check-tickets <id>  Verifie les tickets d un projet avant de les committer'
+    Write-Host '  .\scripts\tessera.ps1 secrets migrer      Range les secrets de .env dans le coffre du systeme'
+    Write-Host '  .\scripts\tessera.ps1 secrets lister      Dit ou vit chaque secret (coffre, .env, absent)'
+    Write-Host '  .\scripts\tessera.ps1 secrets set <NOM>   Range un secret, saisi masque'
+    Write-Host '  .\scripts\tessera.ps1 secrets supprimer <NOM>  Retire un secret du coffre'
     Write-Host ''
 }
 
@@ -53,11 +61,38 @@ function Invoke-Setup {
     if (-not (Test-Path $envFile)) {
         Copy-Item (Join-Path $Root '.env.example') $envFile
         Write-Host "-> .env cree depuis .env.example"
+        Write-Host "-> Secrets : range-les dans le coffre du systeme, pas dans .env :"
+        Write-Host "   .\scripts\tessera.ps1 secrets set <NOM>, ou secrets migrer apres les avoir mis dans .env"
     }
     Push-Location (Join-Path $Root 'backend')
     try { & uv sync --extra dev } finally { Pop-Location }
     Push-Location (Join-Path $Root 'frontend')
     try { & npm install } finally { Pop-Location }
+}
+
+function Invoke-Secrets([string]$SousVerbe, [string]$NomSecret) {
+    # ADR-073 : aucune valeur en argument ni a l'ecran. `set` la saisit
+    # masquee et la passe par l'entree standard.
+    $permis = @('migrer', 'set', 'supprimer', 'lister')
+    $avecNom = @('set', 'supprimer')
+    if (($permis -notcontains $SousVerbe) -or (($avecNom -contains $SousVerbe) -and -not $NomSecret)) {
+        Write-Host 'usage : .\scripts\tessera.ps1 secrets migrer|lister|set <NOM>|supprimer <NOM>' -ForegroundColor Red
+        exit 2
+    }
+    Push-Location (Join-Path $Root 'backend')
+    try {
+        if ($SousVerbe -eq 'set') {
+            $saisie = Read-Host -AsSecureString "Valeur de $NomSecret"
+            $clair = [System.Net.NetworkCredential]::new('', $saisie).Password
+            $clair | & uv run python -m tessera.coffre_cli set $NomSecret
+            $clair = $null
+        } elseif ($SousVerbe -eq 'supprimer') {
+            & uv run python -m tessera.coffre_cli supprimer $NomSecret
+        } else {
+            & uv run python -m tessera.coffre_cli $SousVerbe
+        }
+    } finally { Pop-Location }
+    exit $LASTEXITCODE
 }
 
 function Get-ProcessusTessera {
@@ -153,6 +188,7 @@ switch ($Task) {
     'help' { Show-Help }
     'setup' { Invoke-Setup }
     'doctor' { Invoke-Doctor }
+    'secrets' { Invoke-Secrets $Projet $Nom }
     'stop' { Stop-Tessera }
     'dev' { Start-Backend; Write-Host '-> http://localhost:8100/docs' }
     'dev-frontend' { Start-Frontend; Write-Host '-> http://localhost:5173' }

@@ -92,6 +92,7 @@ def test_le_rapport_couvre_tous_les_controles() -> None:
         "Toolchain Rust (Tauri)",
         "Ports libres",
         "Checkout sur develop",
+        "Secrets",
     }
 
 
@@ -169,3 +170,60 @@ def test_checkout_passes_when_head_equals_origin_develop(tmp_path: Path) -> None
 
 def test_checkout_fails_outside_a_git_repository(tmp_path: Path) -> None:
     assert check_checkout(tmp_path).ok is False
+
+
+# ── Secrets (ticket-800, ADR-073) ────────────────────────────────────────────
+
+
+def test_doctor_reports_the_secrets_mode(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from tessera import config_coffre, doctor
+
+    monkeypatch.setattr(settings, "secrets_source", "auto")
+    monkeypatch.setattr(config_coffre, "_source_effective", "env-repli")
+
+    check = doctor.check_secrets(tmp_path / "absent.env")
+
+    assert check.name == "Secrets"
+    assert check.ok is True
+    assert "auto" in check.detail
+    assert "injoignable" in check.detail
+
+
+def test_doctor_names_secrets_still_in_clear_in_dotenv(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from tessera import config_coffre, doctor
+
+    monkeypatch.setattr(config_coffre, "_source_effective", "coffre")
+    fichier = tmp_path / ".env"
+    fichier.write_text(
+        "GITHUB_TOKEN=faux-github-0042\nANTHROPIC_API_KEY=sk-ant-...\nVERCEL_TEAM_ID=team\n",
+        encoding="utf-8",
+    )
+
+    check = doctor.check_secrets(fichier)
+
+    assert "GITHUB_TOKEN" in check.detail
+    assert "ANTHROPIC_API_KEY" not in check.detail
+    assert "secrets migrer" in check.fix
+    # Un secret en clair n'empêche pas de lancer : `run` s'arrête sur un échec.
+    assert check.ok is True
+
+
+def test_doctor_never_prints_a_secret_value(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    from tessera import doctor
+
+    fichier = tmp_path / ".env"
+    fichier.write_text("STATIC_TOKEN=faux-static-0042\n", encoding="utf-8")
+    monkeypatch.setattr(settings, "static_token", "faux-static-0042")
+    monkeypatch.setattr(doctor, "run_checks", lambda: [doctor.check_secrets(fichier)])
+
+    doctor.main()
+
+    sortie = capsys.readouterr()
+    assert "STATIC_TOKEN" in sortie.out
+    assert "faux-static-0042" not in sortie.out + sortie.err

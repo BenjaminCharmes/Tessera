@@ -2,7 +2,7 @@
 id: ticket-797
 title: "A command moves the dotenv secrets into the vault without writing them in clear"
 type: feat
-status: todo
+status: done
 pr_number: null
 priority: medium
 agent: codeur
@@ -53,10 +53,13 @@ Design §5. Un `.env` existant porte aujourd'hui les neuf secrets en clair.
 
 ## Critères d'acceptation
 
-- [ ] Les tests ci-dessus passent
+- [x] Les tests ci-dessus passent
 - [ ] Une migration réelle à la main sur un `.env` jetable (valeurs factices) relit le coffre, vide
       le fichier et laisse `make dev` démarrer ; noter le résultat dans le message de commit
-- [ ] `.env` du dépôt n'est jamais lu ni modifié par les tests
+      — fait sur un `.env` jetable avec un backend `keyring` factice (JSON jetable), jamais le
+      coffre Windows de la machine : `Settings` démarre en mode `coffre` et lit les deux valeurs.
+      `make dev` non lancé : un second backend partagerait `IDE_STATE_DIR` avec celui qui tourne.
+- [x] `.env` du dépôt n'est jamais lu ni modifié par les tests
 
 ## Ce que ça ne fait pas
 

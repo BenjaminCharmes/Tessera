@@ -2,7 +2,7 @@
 id: ticket-798
 title: "The pre-push hook and the history scan read the forbidden terms through the backend"
 type: feat
-status: todo
+status: done
 pr_number: null
 priority: medium
 agent: codeur
@@ -51,8 +51,10 @@ Design §6, ADR-050. Le hook lit `Path(".env")` relatif au dossier courant (abse
 
 - [ ] Un push de test depuis un worktree, avec la liste dans le coffre, est arrêté sur un terme
       factice ; le résultat est noté dans le message de commit
-- [ ] `termes_interdits_ci.py` et la CI ne changent pas (le secret GitHub reste l'environnement)
-- [ ] Le hook reste sans import hors de la bibliothèque standard
+      — non fait : il exigerait le vrai coffre de la machine (interdit pour cette chaîne) et un
+      `uv run` dans le venv du worktree (bloqué par le contrôle d'applications). À faire à la main.
+- [x] `termes_interdits_ci.py` et la CI ne changent pas (le secret GitHub reste l'environnement)
+- [x] Le hook reste sans import hors de la bibliothèque standard
 
 ## Ce que ça ne fait pas
 

@@ -3,6 +3,9 @@
 
 Run `make install-hooks` after cloning to activate this hook.
 Git runs this script before every push; it exits 1 to abort.
+
+The list is read through the backend (ADR-073): environment, system vault,
+then .env, the same order as the settings. Standard library only.
 """
 from __future__ import annotations
 
@@ -10,10 +13,24 @@ import re
 import subprocess
 import sys
 import unicodedata
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
 NULL_SHA = "0" * 40
+
+#: Délai de la lecture par le backend : `uv run` peut synchroniser l'env d'abord.
+DELAI_LECTURE_S = 120
+
+_REFUS_LECTURE = (
+    "Lecture des termes interdits impossible : push refusé. Lance `uv sync` dans "
+    "backend/, ou déclare SECRETS_SOURCE=env (FORBIDDEN_TERMS dans l'environnement "
+    "ou .env)."
+)
+
+
+class LectureImpossible(Exception):
+    """The backend could not say which terms are forbidden."""
 
 
 @dataclass(frozen=True)
@@ -32,20 +49,39 @@ class Violation:
     source: str
 
 
-def load_forbidden_terms(env_path: Path) -> list[str]:
-    """Load and normalize FORBIDDEN_TERMS from a .env file.
+def racine_du_depot() -> Path:
+    """Return the repository root, deduced from this hook's own path.
 
-    Parses KEY=value lines. Returns an empty list when the file is absent
-    or FORBIDDEN_TERMS is not declared.
+    `scripts/hooks/pre-push` or `.git/hooks/pre-push`: two levels up either
+    way. From a worktree, git runs the hook of the main checkout, whose
+    backend reads the same vault.
     """
-    if not env_path.exists():
-        return []
-    for line in env_path.read_text(encoding="utf-8").splitlines():
-        stripped = line.strip()
-        if stripped.startswith("FORBIDDEN_TERMS="):
-            raw = stripped[len("FORBIDDEN_TERMS="):]
-            return [_normaliser(t.strip()) for t in raw.split(",") if t.strip()]
-    return []
+    return Path(__file__).resolve().parents[2]
+
+
+def load_forbidden_terms(
+    racine: Path, lancer: Callable[..., "subprocess.CompletedProcess[str]"] = subprocess.run
+) -> list[str]:
+    """Ask the backend for FORBIDDEN_TERMS, normalized.
+
+    Exit 0 with an empty output: no list declared, no local control. Any
+    other failure raises LectureImpossible: a control that cannot judge lets
+    nothing through.
+    """
+    commande = [
+        "uv", "run", "--project", str(racine / "backend"),
+        "python", "-m", "tessera.coffre_cli", "termes",
+    ]
+    try:
+        resultat = lancer(
+            commande, capture_output=True, text=True, encoding="utf-8",
+            errors="replace", timeout=DELAI_LECTURE_S, check=False,
+        )
+    except (OSError, subprocess.SubprocessError):
+        raise LectureImpossible from None
+    if resultat.returncode != 0:
+        raise LectureImpossible
+    return [_normaliser(t.strip()) for t in resultat.stdout.split(",") if t.strip()]
 
 
 def _normaliser(texte: str) -> str:
@@ -164,8 +200,11 @@ def _get_diff_lines(local_sha: str, remote_sha: str) -> list[str]:
 
 def main() -> int:
     """Entry point called by git before a push."""
-    env_path = Path(".env")
-    termes = load_forbidden_terms(env_path)
+    try:
+        termes = load_forbidden_terms(racine_du_depot())
+    except LectureImpossible:
+        print(_REFUS_LECTURE, file=sys.stderr)
+        return 1
 
     if not termes:
         return 0
