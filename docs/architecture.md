@@ -649,6 +649,16 @@ limite de silence (ticket-381) qui coupe après 1200 s sans message.
 
 Les services lancés par Tessera (backends, workers déclarés par les projets) ne doivent pas arrêter le backend orchestrateur. Sous Windows, un processus enfant qui reçoit `CTRL_C_EVENT` (ex: `uvicorn --reload`) le propage à toute sa console ; partagée, elle arrête le backend et tous ses enfants. Tessera isole chaque service dans sa propre console, son groupe de processus (`CREATE_NO_WINDOW | CREATE_NEW_PROCESS_GROUP` sur Windows, `start_new_session` ailleurs). La fonction `options_de_lancement(systeme)` dans `services/lancement.py` est appelée par `ProcessRegistry._lancer()`.
 
+### Coffre du système et gestion des secrets (ADR-073, tickets 794-798)
+
+Neuf secrets (`ANTHROPIC_API_KEY`, `GITHUB_TOKEN`, `VERCEL_TOKEN`, `NEON_API_KEY`, `RESEND_API_KEY`, `STRIPE_API_KEY`, `CLOUDFLARE_API_TOKEN`, `STATIC_TOKEN`, `FORBIDDEN_TERMS`) sont lus depuis le coffre du système (Credential Manager Windows, Keychain macOS, Secret Service Linux) plutôt que du `.env`. `SECRETS_SOURCE` choisit le mode : `auto` (défaut, coffre puis `.env`), `coffre` (refus sans coffre), `env` (CI, Docker, tests).
+
+**Flux de lecture** : `config.py` ordonne les sources Pydantic — environnement, `SourceCoffre`, `.env` — ce qui place les secrets du coffre entre les variables d'environnement et le fichier. En mode `auto`, l'absence ou l'erreur du coffre bascule silencieusement sur `.env` avec un avertissement, sauf si `.env` marque un secret comme migré : il devient une erreur de configuration.
+
+**Migration** : `python -m tessera.coffre_cli migrer` transfère les secrets de `.env` au coffre, les y relit pour en garantir l'exactitude, puis remplace chaque ligne par un commentaire. Aucune valeur n'est écrite en fichier temporaire.
+
+**Masquage et sécurité** : les 8 secrets (tout sauf `FORBIDDEN_TERMS`, qui est une liste) sont masqués dans les logs via `logger.py` et vidés de l'environnement du CLI (`env_sdk.py`). Le hook `pre-push` lit `FORBIDDEN_TERMS` par `coffre_cli termes` au lieu de `.env`, ce qui fonctionne depuis tout worktree. Une garde lexicale (`garde_coffre.py`) refuse à tout agent les commandes qui accèdent au coffre (`keyring`, `cmdkey`, `vaultcmd`, `secret-tool`, imports Python de keyring, etc.) : les secrets sont lus au démarrage du backend, pas à la demande.
+
 ## Endpoints implémentés
 
 ### Projets
