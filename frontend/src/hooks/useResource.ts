@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useReducer, useState } from "react";
 
 export interface UseResourceResult<T> {
   data: T;
@@ -114,16 +114,25 @@ export function useResource<T>(
   const cleCache = cle !== undefined ? cleInterne(cle) : undefined;
   const [tick, setTick] = useState(0);
   const [reponse, setReponse] = useState<Reponse<T> | null>(null);
+  // Rendu forcé : une réponse annulée remplit le cache sans toucher à `reponse`.
+  const [, relire] = useReducer((n: number) => n + 1, 0);
 
   useEffect(() => {
     if (!fetcher) return;
     let cancelled = false;
     lireUneFois(cleCache, fetcher)
       .then((data) => {
-        if (cancelled) return;
         // `cle` est capturée depuis la closure au moment où l'effet se lance :
-        // elle correspond toujours au fetcher qui vient de répondre.
+        // elle correspond toujours au fetcher qui vient de répondre. Une réponse
+        // réussie remplit le cache même si son effet a été annulé (ticket-771) :
+        // sous charge, la relance suivante arrive avant elle, et la donnée ne
+        // s'afficherait qu'après une réponse passée entre deux relances.
         if (cleCache !== undefined) setCached(cleCache, data);
+        if (cancelled) {
+          // Seul l'état de la requête courante l'ignore ; le rendu relit le cache.
+          if (cleCache !== undefined) relire();
+          return;
+        }
         setReponse({ fetcher, tick, data, error: null });
       })
       .catch((err: unknown) => {

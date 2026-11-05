@@ -2,7 +2,7 @@
 id: ticket-771
 title: "The Tessera room probes processes once per request and shows its first answer"
 type: fix
-status: todo
+status: done
 pr_number: null
 priority: high
 agent: codeur
@@ -42,12 +42,12 @@ d'« En cours » pendant près de 30 s. Mesuré dans la page : `GET /tessera/sal
 
 ## Critères d'acceptation
 
-- [ ] Un test vérifie, avec une sonde double qui compte ses appels, que `salle_tessera`
+- [x] Un test vérifie, avec une sonde double qui compte ses appels, que `salle_tessera`
       appelle `processus()` une fois et `ecouteurs()` une fois
-- [ ] Un test vérifie qu'une réponse arrivée après un changement de `fetcher` (avec clé)
+- [x] Un test vérifie qu'une réponse arrivée après un changement de `fetcher` (avec clé)
       remplit le cache, et que le hook rend cette donnée tant que la nouvelle requête n'a pas
       répondu
-- [ ] Un test vérifie que `SalleTessera` est rendue quand la première réponse arrive après une
+- [x] Un test vérifie que `SalleTessera` est rendue quand la première réponse arrive après une
       relance de `lueA`
 
 ## Dépendances

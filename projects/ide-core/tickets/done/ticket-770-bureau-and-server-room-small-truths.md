@@ -2,7 +2,7 @@
 id: ticket-770
 title: "Working agents are counted from agent processes only, and two small Bureau slips"
 type: fix
-status: todo
+status: done
 pr_number: null
 priority: low
 agent: codeur
@@ -29,11 +29,11 @@ Clore trois écarts relevés par l'audit du 30/10 (relecture du 03/11).
 
 ## Critères d'acceptation
 
-- [ ] Un test vérifie que `agents_en_cours` ne compte qu'un processus dont l'exécutable est
+- [x] Un test vérifie que `agents_en_cours` ne compte qu'un processus dont l'exécutable est
       celui de l'agent (`claude.exe` ou le CLI), pas un shell dont la ligne contient « claude »
-- [ ] Un test vérifie que la ronde ne vise pas le poste du validateur quand le projet n'a pas
+- [x] Un test vérifie que la ronde ne vise pas le poste du validateur quand le projet n'a pas
       de validateur actif
-- [ ] Un test vérifie que l'identifiant d'un journal dont le service s'appelle « mon api » ne
+- [x] Un test vérifie que l'identifiant d'un journal dont le service s'appelle « mon api » ne
       contient pas d'espace
 
 ## Dépendances

@@ -19,3 +19,12 @@ export const TON_DE_LIGNE: Record<NiveauDeLigne, string> = {
   avertissement: "text-amber-300",
   info: "text-zinc-300",
 };
+
+/**
+ * L'identifiant du journal d'un service, partagé par son écran (`aria-controls`) et
+ * son volet (`id`). Le nom d'un service peut porter une espace, qui couperait la
+ * référence en deux : on l'encode, sans confondre « mon api » et « mon-api ».
+ */
+export function idDuJournal(service: { project_id: string; nom: string }): string {
+  return `journal-${service.project_id}-${encodeURIComponent(service.nom)}`;
+}
