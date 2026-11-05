@@ -93,6 +93,8 @@ export interface ServiceActif {
    * l'IDE apres le demarrage ne verrait jamais l'adresse annoncee.
    */
   sortie: string[];
+  /** Lignes ecartees par le tampon avant la premiere de `sortie` (ticket-769). */
+  lignes_ecartees?: number;
   /**
    * Vrai quand c'est l'utilisateur qui a demande l'arret (ticket-151).
    * `terminate()` laisse un code non nul sur certaines plateformes : sans ce

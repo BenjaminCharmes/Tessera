@@ -65,7 +65,7 @@ export default function SalleReunion({
     >
       {/* Pendant la résolution, le reviewer rejoint le résolveur à la table ; ensuite le résolveur
           attend, la PR en main, la relecture humaine qu'aucun merge seul ne remplace (ADR-033, ticket-784). */}
-      {occupants.flatMap(({ projet, reunion }) =>
+      {occupants.flatMap(({ projet, reunion, postes }) =>
         reunion.temps === "conflit"
           ? [
               <li key={`${projet}-resolveur`} data-agent="resolveur" title={visiteur(projet, "resolveur", nomDuPoste("resolveur"))}>
@@ -73,11 +73,15 @@ export default function SalleReunion({
                   <AgentDebout projet={projet} role="resolveur" />
                 </Agrandi>
               </li>,
-              <li key={`${projet}-reviewer`} data-agent="reviewer" title={visiteur(projet, "reviewer", nomDuPoste("reviewer"))}>
-                <Agrandi>
-                  <AgentDebout projet={projet} role="reviewer" />
-                </Agrandi>
-              </li>,
+              ...(postes.includes("reviewer")
+                ? [
+                    <li key={`${projet}-reviewer`} data-agent="reviewer" title={visiteur(projet, "reviewer", nomDuPoste("reviewer"))}>
+                      <Agrandi>
+                        <AgentDebout projet={projet} role="reviewer" />
+                      </Agrandi>
+                    </li>,
+                  ]
+                : []),
             ]
           : [
               <li

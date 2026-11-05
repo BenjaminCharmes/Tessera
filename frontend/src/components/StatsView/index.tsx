@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useMaintenant } from "../../hooks/useMaintenant";
 import { api } from "../../lib/api";
 import { useResource } from "../../hooks/useResource";
 import RegionTitle from "../../design/RegionTitle";
@@ -45,8 +46,8 @@ export default function StatsView({ projectId, days }: StatsViewProps) {
   // Le run sélectionné dans l'historique — ouvre sa vue en lecture seule (ticket-281).
   const [selectedRun, setSelectedRun] = useState<RecentRun | null>(null);
   // Le quota réel, relu chaque minute, comme pour les notifications (ticket-726).
-  const [ouvertA] = useState(() => Date.now());
-  const quota = useQuotaLu(ouvertA);
+  const maintenant = useMaintenant(60_000);
+  const quota = useQuotaLu(maintenant);
 
   if (selectedRun) {
     return (

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { ServiceActif } from "../../types/api";
 import Button from "../../design/ui/Button";
 import { libelleDeLEtat } from "../../design/etatDuService";
-import { niveauDeLigne, TON_DE_LIGNE } from "./journal";
+import { idDuJournal, niveauDeLigne, TON_DE_LIGNE } from "./journal";
 
 interface JournalDuServiceProps {
   projectName: string;
@@ -24,13 +24,15 @@ export default function JournalDuService({ projectName, service, onFermer }: Jou
   const fin = useRef<HTMLDivElement>(null);
   const sortie = useMemo(() => service.sortie ?? [], [service.sortie]);
 
+  const ecartees = service.lignes_ecartees ?? 0;
+
   const lignes = useMemo(() => {
     const cherche = recherche.trim().toLowerCase();
     return sortie
-      .map((texte, index) => ({ texte, numero: index + 1, niveau: niveauDeLigne(texte) }))
+      .map((texte, index) => ({ texte, numero: ecartees + index + 1, niveau: niveauDeLigne(texte) }))
       .filter((l) => filtre === "tout" || l.niveau === "erreur")
       .filter((l) => cherche === "" || l.texte.toLowerCase().includes(cherche));
-  }, [sortie, filtre, recherche]);
+  }, [sortie, ecartees, filtre, recherche]);
   const erreurs = sortie.filter((l) => niveauDeLigne(l) === "erreur").length;
 
   useEffect(() => {
@@ -40,7 +42,7 @@ export default function JournalDuService({ projectName, service, onFermer }: Jou
 
   return (
     <section
-      id={`journal-${service.project_id}-${service.nom}`}
+      id={idDuJournal(service)}
       aria-label={`Journal de ${projectName} · ${service.nom}`}
       data-journal={service.nom}
       // Échap ferme ce journal-ci seulement, quand le focus est dedans : pas

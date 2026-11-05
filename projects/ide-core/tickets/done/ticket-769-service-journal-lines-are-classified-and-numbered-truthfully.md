@@ -2,7 +2,7 @@
 id: ticket-769
 title: "Service journal lines are classified and numbered truthfully"
 type: fix
-status: todo
+status: done
 pr_number: null
 priority: low
 agent: codeur
@@ -29,8 +29,8 @@ Audit du 30/10 (relecture du 03/11), ticket-710.
 
 ## Critères d'acceptation
 
-- [ ] Un test vérifie que « ✓ built, 0 error » et « 0 errors » ne sont pas des erreurs, et que
+- [x] Un test vérifie que « ✓ built, 0 error » et « 0 errors » ne sont pas des erreurs, et que
       « Error: boom » en est une
-- [ ] Le backend rend, avec le tampon, le nombre de lignes écartées en tête, et un test
+- [x] Le backend rend, avec le tampon, le nombre de lignes écartées en tête, et un test
       vérifie que le numéro d'une même ligne ne change pas entre deux relectures quand le
       tampon déborde

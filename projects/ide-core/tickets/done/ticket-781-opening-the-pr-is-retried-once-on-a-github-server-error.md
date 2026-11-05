@@ -2,7 +2,7 @@
 id: ticket-781
 title: "Opening the PR is retried once on a GitHub server error"
 type: fix
-status: todo
+status: done
 pr_number: null
 priority: medium
 agent: codeur
@@ -39,9 +39,9 @@ phase 2 (CIWatcher).
 
 ## Critères d'acceptation
 
-- [ ] Un test vérifie, avec des doubles, qu'une erreur 500 puis un succès ouvrent la PR et
+- [x] Un test vérifie, avec des doubles, qu'une erreur 500 puis un succès ouvrent la PR et
       journalisent « nouvelle tentative »
-- [ ] Un test vérifie que deux erreurs 500 de suite rendent l'arrêt, avec deux appels seulement
-- [ ] Un test vérifie qu'une erreur 422 n'est pas retentée
-- [ ] Un test vérifie qu'une erreur 500 alors que la PR existe déjà reprend cette PR sans en
+- [x] Un test vérifie que deux erreurs 500 de suite rendent l'arrêt, avec deux appels seulement
+- [x] Un test vérifie qu'une erreur 422 n'est pas retentée
+- [x] Un test vérifie qu'une erreur 500 alors que la PR existe déjà reprend cette PR sans en
       ouvrir une seconde

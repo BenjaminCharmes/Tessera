@@ -197,11 +197,23 @@ describe("ronde", () => {
 
   it("goes to congratulate the validator when a ticket is approved", () => {
     const enCours = enCodage(T0);
-    const approuve = applyEvent(enCours, ev("pipeline_done", T0 + TICK, null, { approved: true, rounds: 1, final_status: "done" }));
+    const approuve = [
+      ev("validation_started", T0 + TICK - 2),
+      ev("validation_done", T0 + TICK - 1),
+      ev("pipeline_done", T0 + TICK, null, { approved: true, rounds: 1, final_status: "done" }),
+    ].reduce(applyEvent, enCours);
     const vu = ronde(MEMOIRE_VIERGE, [{ nom: "a", etat: enCours }], null, T0);
 
     const apres = ronde(vu, [{ nom: "a", etat: approuve }], null, T0 + TICK);
     expect(apres.visite).toEqual({ projet: "a", poste: "validateur", depuis: T0 + TICK, motif: "approuve" });
+  });
+
+  it("does not aim at the validator's desk when the project has no active validator", () => {
+    const enCours = enCodage(T0);
+    const approuve = applyEvent(enCours, ev("pipeline_done", T0 + TICK, null, { approved: true, rounds: 1, final_status: "done" }));
+    const vu = ronde(MEMOIRE_VIERGE, [{ nom: "a", etat: enCours }], null, T0);
+
+    expect(ronde(vu, [{ nom: "a", etat: approuve }], null, T0 + TICK).visite).toBeNull();
   });
 
   it("does not leave for a round or an approval he sees for the first time", () => {

@@ -2,7 +2,7 @@
 id: ticket-768
 title: "The statistics quota is reread every minute and run durations truncate again"
 type: fix
-status: todo
+status: done
 pr_number: null
 priority: low
 agent: codeur
@@ -28,5 +28,5 @@ Audit du 30/10 (relecture du 03/11).
 
 ## Critères d'acceptation
 
-- [ ] Un test vérifie, avec une horloge simulée, que le quota est relu après une minute
-- [ ] Un test vérifie que la notation `run` affiche 119,6 s comme « 1m 59s »
+- [x] Un test vérifie, avec une horloge simulée, que le quota est relu après une minute
+- [x] Un test vérifie que la notation `run` affiche 119,6 s comme « 1m 59s »

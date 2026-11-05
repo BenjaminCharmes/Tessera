@@ -30,6 +30,10 @@ describe("formatDurationMs", () => {
     expect(formatDurationMs(65_000, "run")).toBe("1m 05s");
   });
 
+  it("truncates the run notation instead of rounding it", () => {
+    expect(formatDurationMs(119_600, "run")).toBe("1m 59s");
+  });
+
   it("writes an hour and more in each notation", () => {
     expect(formatDurationMs(3_900_000)).toBe("1 h 05");
     expect(formatDurationMs(3_900_000, "fil")).toBe("65 min 0 s");

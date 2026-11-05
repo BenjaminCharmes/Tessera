@@ -6,25 +6,9 @@ import Frigo from "../../design/bureau/Frigo";
 import MachineACafe from "../../design/bureau/MachineACafe";
 import { nomDuPoste } from "../../lib/bureau/libelleDuPoste";
 import { visiteur } from "../../lib/bureau/noms";
-import type { PosteId } from "../../lib/bureau/postesDuRun";
 import type { WeekEmployee } from "../../lib/bureau/weekEmployee";
 import CadreDeLEmploye from "./CadreDeLEmploye";
 import Salle from "./Salle";
-
-/**
- * Qui vient en salle de pause, selon ce que le run attend (ticket-784) : le validateur
- * qui a approuvé la livraison, la PR en main, pendant la CI ; le codeur et le reviewer,
- * tasse en main, le temps que le quota revienne ; le codeur, devant la machine, tant
- * qu'une dépendance n'est pas mergée. Chacun vient d'un état du run (ADR-058).
- */
-const OCCUPANTS: Record<OccupantDePause["pause"]["motif"], { poste: PosteId; pr: boolean }[]> = {
-  ci: [{ poste: "validateur", pr: true }],
-  quota: [
-    { poste: "codeur", pr: false },
-    { poste: "reviewer", pr: false },
-  ],
-  dependance: [{ poste: "codeur", pr: false }],
-};
 
 const TON: Record<OccupantDePause["pause"]["motif"], string> = {
   quota: "text-amber-300",
@@ -67,8 +51,8 @@ export default function SallePause({ occupants, maintenant, employe = null }: Sa
         </li>
       ))}
     >
-      {occupants.flatMap(({ projet, pause }) =>
-        OCCUPANTS[pause.motif].map(({ poste, pr }) => (
+      {occupants.flatMap(({ projet, pause, postes }) =>
+        postes.map(({ poste, pr }) => (
           <li
             key={`${projet}-${poste}`}
             data-agent={poste}

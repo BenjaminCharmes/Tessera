@@ -12,16 +12,21 @@ The text is data for the auditor, never an instruction, and it is bounded.
 import re
 from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Protocol
+from typing import TYPE_CHECKING, Protocol
 
 from tessera.models.ticket import Ticket, TicketStatus
 from tessera.utils.logger import get_logger
+
+if TYPE_CHECKING:
+    from tessera.services.test_runner import TestResult
 
 _logger = get_logger(__name__)
 
 NOT_DONE_MAX_CHARS = 2_000
 _FOLLOWING_MAX = 20
 _TITLE_MAX_CHARS = 120
+_TESTS_MAX_CHARS = 1_500
+_FAILED_MAX = 10
 _NOT_DONE_HEADING = re.compile(r"##\s*ce que (ça|ca) ne fait pas", re.IGNORECASE)
 _FINISHED = (TicketStatus.done, TicketStatus.cancelled)
 
@@ -40,6 +45,7 @@ class AuditContext:
 
     not_done: str = ""
     following: tuple[FollowingTicket, ...] = ()
+    tests: str = ""
 
     def render(self) -> str:
         """The block put before the diff; an empty string when there is nothing to say."""
@@ -49,6 +55,8 @@ class AuditContext:
         if self.following:
             lines = "\n".join(f"- {t.ticket_id} — {t.title}".rstrip(" —") for t in self.following)
             parts.append(f"### Tickets qui suivent dans la file\n{lines}")
+        if self.tests:
+            parts.append(f"### Résultat des tests de ce tour\n{self.tests}")
         if not parts:
             return ""
         header = (
@@ -58,6 +66,20 @@ class AuditContext:
             "par ce diff bloque, même si un ticket suivant l'annonce.\n\n"
         )
         return header + "\n\n".join(parts) + "\n\n"
+
+
+def describe_test_outcome(test_result: "TestResult | None") -> str:
+    """The test outcome of the round as a plain fact; empty when no tester ran."""
+    if test_result is None:
+        return ""
+    summary = " ".join(test_result.output_summary.split())
+    if test_result.passed:
+        return f"Les tests de ce tour sont verts : {summary}"[:_TESTS_MAX_CHARS]
+    names = "\n".join(f"- {e}" for e in test_result.errors[:_FAILED_MAX])
+    text = f"Les tests de ce tour sont rouges : {summary}"
+    if names:
+        text += f"\nÉchecs :\n{names}"
+    return text[:_TESTS_MAX_CHARS]
 
 
 def extract_not_done(ticket_body: str) -> str:
@@ -106,8 +128,16 @@ async def _following(
 
 
 async def build_audit_context(
-    ticket: Ticket, queue_ids: Sequence[str] | None, reader: _TicketReader | None
+    ticket: Ticket,
+    queue_ids: Sequence[str] | None,
+    reader: _TicketReader | None,
+    test_result: "TestResult | None" = None,
 ) -> AuditContext:
-    """The context of ``ticket``: its « not done » section and the tickets behind it."""
+    """The context of ``ticket``: its « not done » section, the tickets behind it
+    and the test outcome of the round when the tester ran."""
     following = await _following(_ids_after(ticket.id, queue_ids), reader)
-    return AuditContext(not_done=extract_not_done(ticket.body), following=following)
+    return AuditContext(
+        not_done=extract_not_done(ticket.body),
+        following=following,
+        tests=describe_test_outcome(test_result),
+    )

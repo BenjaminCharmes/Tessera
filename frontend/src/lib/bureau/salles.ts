@@ -3,6 +3,8 @@ import type { OrchestratorEvent } from "../../types/api";
 import { prARelire } from "./aToi";
 import type { ProjetPourLaColonne } from "./aToi";
 import { boiteAuxLettres, surveilleeParLeWatcher } from "./boiteAuxLettres";
+import { postesDuRun } from "./postesDuRun";
+import type { PosteId } from "./postesDuRun";
 
 /** Ce qui met un run en salle de pause : ni du travail, ni un blocage. */
 export interface Pause {
@@ -16,14 +18,56 @@ export interface Pause {
  */
 export type Reunion = { temps: "conflit"; fichiers: string[] } | { temps: "relecture"; pr: number };
 
+/** Un agent en salle de pause ; `pr` : il tient la PR en main plutôt qu'une tasse. */
+export interface PosteEnPause {
+  poste: PosteId;
+  pr: boolean;
+}
+
+/**
+ * Qui vient en salle de pause, selon ce que le run attend (ticket-784) : le validateur
+ * qui a approuvé la livraison, la PR en main, pendant la CI ; le codeur et le reviewer,
+ * tasse en main, le temps que le quota revienne ; le codeur, devant la machine, tant
+ * qu'une dépendance n'est pas mergée. Chacun vient d'un état du run (ADR-058).
+ */
+const POSTES_EN_PAUSE: Record<Pause["motif"], PosteEnPause[]> = {
+  ci: [{ poste: "validateur", pr: true }],
+  quota: [
+    { poste: "codeur", pr: false },
+    { poste: "reviewer", pr: false },
+  ],
+  dependance: [{ poste: "codeur", pr: false }],
+};
+
 export interface OccupantDePause {
   projet: string;
   pause: Pause;
+  /** Les agents de la pause qui ont quitté leur bureau : pas ceux que le run courant occupe. */
+  postes: PosteEnPause[];
 }
 
 export interface OccupantDeReunion {
   projet: string;
   reunion: Reunion;
+  /** Les agents de la table qui ont quitté leur bureau (le reviewer, pendant un conflit). */
+  postes: PosteId[];
+}
+
+/** Les postes que le run courant occupe : un agent au travail reste à son bureau. */
+function postesOccupes(etat: StreamState): Set<PosteId> {
+  return new Set(postesDuRun(etat).filter((p) => p.etat === "occupe").map((p) => p.poste));
+}
+
+/** Les agents d'une pause qui sont réellement en salle de pause, hors ceux que le run occupe. */
+export function postesEnPause(etat: StreamState, pause: Pause): PosteEnPause[] {
+  const occupes = postesOccupes(etat);
+  return POSTES_EN_PAUSE[pause.motif].filter((p) => !occupes.has(p.poste));
+}
+
+/** Les agents d'une réunion qui sont réellement à la table : le reviewer pendant un conflit, s'il n'est pas au travail. */
+export function postesEnReunion(etat: StreamState, reunion: Reunion): PosteId[] {
+  if (reunion.temps !== "conflit") return [];
+  return postesOccupes(etat).has("reviewer") ? [] : ["reviewer"];
 }
 
 const HEURE_INCONNUE = "heure inconnue";
@@ -113,7 +157,7 @@ export function laReunion(etat: StreamState): Reunion | null {
 export function occupantsDeLaPause(projets: readonly ProjetPourLaColonne[]): OccupantDePause[] {
   return projets.flatMap(({ nom, etat }) => {
     const pause = laPause(etat);
-    return pause === null ? [] : [{ projet: nom, pause }];
+    return pause === null ? [] : [{ projet: nom, pause, postes: postesEnPause(etat, pause) }];
   });
 }
 
@@ -121,6 +165,6 @@ export function occupantsDeLaPause(projets: readonly ProjetPourLaColonne[]): Occ
 export function occupantsDeLaReunion(projets: readonly ProjetPourLaColonne[]): OccupantDeReunion[] {
   return projets.flatMap(({ nom, etat }) => {
     const reunion = laReunion(etat);
-    return reunion === null ? [] : [{ projet: nom, reunion }];
+    return reunion === null ? [] : [{ projet: nom, reunion, postes: postesEnReunion(etat, reunion) }];
   });
 }

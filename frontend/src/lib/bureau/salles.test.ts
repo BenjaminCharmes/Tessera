@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { laPause, laReunion, occupantsDeLaPause, occupantsDeLaReunion } from "./salles";
+import { laPause, laReunion, occupantsDeLaPause, occupantsDeLaReunion, postesEnPause, postesEnReunion } from "./salles";
 import { INITIAL, applyEvent } from "../../hooks/streamState";
 import type { StreamState } from "../../hooks/streamState";
 import type { EventType } from "../../types/api";
@@ -165,5 +165,40 @@ describe("occupants", () => {
 
     expect(occupantsDeLaPause(projets).map((o) => o.projet)).toEqual(["alpha"]);
     expect(occupantsDeLaReunion(projets).map((o) => o.projet)).toEqual(["gamma"]);
+  });
+});
+
+function evAgent(type: EventType, agent: "reviewer") {
+  return { ...ev(type), agent };
+}
+
+describe("postesEnPause", () => {
+  const enCi = rejouer(ev("livraison_done", { pr_number: 4, arret: null }));
+
+  it("puts the validator in the break room during the CI when the run does not occupy it", () => {
+    const pause = laPause(enCi);
+    expect(pause).not.toBeNull();
+
+    expect(postesEnPause(enCi, pause!)).toEqual([{ poste: "validateur", pr: true }]);
+  });
+
+  it("keeps the validator at its desk when the current run occupies it", () => {
+    const etat = applyEvent(enCi, ev("validation_started"));
+    const pause = laPause(etat);
+    expect(pause).toEqual({ motif: "ci", libelle: "CI en cours de la PR #4" });
+
+    expect(postesEnPause(etat, pause!)).toEqual([]);
+    expect(occupantsDeLaPause([{ nom: "alpha", etat }])[0].postes).toEqual([]);
+  });
+});
+
+describe("postesEnReunion", () => {
+  it("seats the reviewer at the table during a conflict, unless it is at work", () => {
+    const conflit = { temps: "conflit" as const, fichiers: ["a.py"] };
+    const etat = rejouer(ev("conflict_resolution", CONFLIT));
+
+    expect(postesEnReunion(etat, conflit)).toEqual(["reviewer"]);
+    expect(postesEnReunion(applyEvent(etat, evAgent("agent_started", "reviewer")), conflit)).toEqual([]);
+    expect(postesEnReunion(etat, { temps: "relecture", pr: 9 })).toEqual([]);
   });
 });

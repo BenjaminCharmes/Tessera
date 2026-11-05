@@ -218,6 +218,65 @@ describe("useResource — requêtes partagées et dernière donnée (ticket-767)
   });
 });
 
+describe("useResource — réponse d'une requête relancée (ticket-771)", () => {
+  beforeEach(() => {
+    fetchListe.mockReset();
+    // Par défaut, une lecture qui ne répond jamais : seule celle qu'on résout compte.
+    fetchListe.mockImplementation(() => new Promise<string[]>(() => undefined));
+    _viderCacheResource();
+  });
+
+  it("fills the cache of its key when the response arrives after a change of fetcher", async () => {
+    const lente = differee<string[]>();
+    fetchListe.mockImplementationOnce(() => lente.promise);
+
+    const { result, rerender } = renderHook(
+      ({ cle }: { cle: string }) => useListeAvecCle(cle),
+      { initialProps: { cle: "p1" } },
+    );
+    act(() => {
+      rerender({ cle: "p2" });
+    });
+    await act(async () => {
+      lente.resolve(["arrivee-tard"]);
+      await lente.promise;
+    });
+    // La réponse annulée ne s'affiche pas sous la requête courante...
+    expect(result.current.data).toBe(AUCUN);
+
+    // ... mais elle a rempli le cache de sa clé : le retour la rend aussitôt.
+    act(() => {
+      rerender({ cle: "p1" });
+    });
+    expect(result.current.data).toEqual(["arrivee-tard"]);
+    expect(result.current.loading).toBe(true);
+  });
+
+  it("renders the first answer when it arrives after the fetcher changed under the same key", async () => {
+    const premiere = differee<string[]>();
+    fetchListe.mockImplementationOnce(() => premiere.promise);
+    const useParTick = (n: number) =>
+      useResource(
+        useMemo(() => () => fetchListe(`tick-${n}`), [n]),
+        AUCUN,
+        { projet: "proj-a", ressource: "r" },
+      );
+
+    const { result, rerender } = renderHook(({ n }: { n: number }) => useParTick(n), {
+      initialProps: { n: 1 },
+    });
+    act(() => {
+      rerender({ n: 2 });
+    });
+    await act(async () => {
+      premiere.resolve(["premiere"]);
+      await premiere.promise;
+    });
+
+    expect(result.current.data).toEqual(["premiere"]);
+  });
+});
+
 describe("useResource", () => {
   beforeEach(() => {
     vi.clearAllMocks();

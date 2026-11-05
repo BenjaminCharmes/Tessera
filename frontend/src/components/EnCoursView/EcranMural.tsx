@@ -1,7 +1,7 @@
 import type { ServiceActif } from "../../types/api";
 import { etatDuService, libelleDeLEtat } from "../../design/etatDuService";
 import { PASTILLE_DE_L_ETAT, TEXTE_DE_L_ETAT } from "../../design/bureau/tons";
-import { niveauDeLigne, TON_DE_LIGNE } from "./journal";
+import { idDuJournal, niveauDeLigne, TON_DE_LIGNE } from "./journal";
 import MoniteurMural from "./MoniteurMural";
 
 interface EcranMuralProps {
@@ -37,7 +37,7 @@ export default function EcranMural({ service, deplie, onBasculer }: EcranMuralPr
       vide="(rien d'écrit pour l'instant)"
       onClick={onBasculer}
       deplie={deplie}
-      controle={`journal-${service.project_id}-${service.nom}`}
+      controle={idDuJournal(service)}
       data={{ "data-ecran-mural": service.nom }}
     />
   );

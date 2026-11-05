@@ -150,6 +150,25 @@ describe("the Tessera server room (ticket-726)", () => {
     expect(screen.getByText("tessera.db 122,0 Mo")).toBeInTheDocument();
   });
 
+  it("shows the room when its first answer arrives after lueA was renewed (ticket-771)", async () => {
+    let repondre!: (valeur: SalleTessera) => void;
+    vi.mocked(lireLaSalleTessera).mockImplementationOnce(() => new Promise<SalleTessera>((r) => { repondre = r; }));
+    vi.mocked(lireLaSalleTessera).mockImplementation(() => new Promise<SalleTessera>(() => undefined));
+    const etat = (lueA: number): UseAppsEnCoursResult => ({
+      apps: [], lueA, erreur: null,
+      arreter: vi.fn(), rafraichir: vi.fn(), arreterProjet: vi.fn(), lancer: vi.fn(),
+      enArret: () => false, enLancement: () => false,
+    });
+    const { rerender } = render(<EnCoursView appsEnCours={etat(1)} vueInitiale="salles" />);
+    rerender(<EnCoursView appsEnCours={etat(2)} vueInitiale="salles" />);
+    await act(async () => {
+      repondre(salle());
+      await new Promise((r) => setTimeout(r, 0));
+    });
+
+    expect(screen.getByRole("article", { name: "Salle Tessera" })).toBeInTheDocument();
+  });
+
   it("is left out of the list view", async () => {
     vi.mocked(lireLaSalleTessera).mockResolvedValue(salle());
     rendre("liste");

@@ -1,14 +1,14 @@
 ---
-id: ticket-793
-title: "The retest after rebase runs only the backend tests the rebase can affect"
-type: feat
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-11-04
 depends_on: []
 estimated_days: 1
-created: 2026-11-04
+id: ticket-793
+pr_number: null
+priority: high
+status: done
+title: The retest after rebase runs only the backend tests the rebase can affect
+type: feat
 ---
 
 # ticket-793 — Le retest après rebase ne lance que les tests backend que le rebase peut toucher

@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from tessera.config import settings
+from tessera.services import journal_attente, journal_en_attente
 from tessera.services.git_workspace import GitWorkspaceError, _branch_name
 from tessera.services.pipeline_events import (
     EventCallback,
@@ -132,11 +133,21 @@ async def adopter_la_branche(orch: "Orchestrator", run: PipelineRun) -> Pipeline
             rounds=0, approved=False, arret=str(exc),
         )
     await emit(run, EventType.BRANCH_CREATED, branch=run.branch)
+    await _reprendre_les_lignes_en_attente(orch)
     orch._log(f"[{run.ticket_id}] branche {run.branch} (worktree {wt.racine})")
     for chemin in orch._chemins_absents:
         orch._log(f"[{run.ticket_id}] worktree: « {chemin} » absent du checkout, non peuplé")
     # Avant tout agent : le codeur doit trouver les dépendances du projet (ticket-536).
     return await preparer_le_worktree(orch, run)
+
+
+async def _reprendre_les_lignes_en_attente(orch: "Orchestrator") -> None:
+    """Write the log lines queued outside the tree into the worktree's log (tickets 786, 789)."""
+    chemin = getattr(orch, "_log_path", None)
+    racine = journal_attente.racine_du_journal(chemin) if chemin is not None else None
+    if racine is None:
+        return
+    journal_en_attente.reecrire(racine, await journal_attente.reprendre(racine))
 
 
 class RunRefuse:

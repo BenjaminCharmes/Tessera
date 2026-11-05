@@ -112,8 +112,8 @@ export const CONFRONTATIONS: Confrontation[] = [
     descente: ["[]"],
     ...champs<Service>({
       nom: true, project_id: true, pid: true, demarre_a: true, en_cours: true,
-      code_de_sortie: true, sortie: true, arrete_a_la_main: true,
-    }),
+      code_de_sortie: true, sortie: true, arrete_a_la_main: true, lignes_ecartees: true,
+    }, { lignes_ecartees: true }),
   },
   {
     libelle: "services/start",

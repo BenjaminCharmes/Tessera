@@ -46,21 +46,19 @@ def _info(ppid: int, memoire_mo: float) -> InfoProcessus:
     return InfoProcessus(ppid=ppid, memoire_mo=memoire_mo, demarre_a=None)
 
 
-async def test_backend_counts_only_itself_and_frontend_counts_its_tree() -> None:
+def test_backend_counts_only_itself_and_frontend_counts_its_tree() -> None:
     moi = os.getpid()
-    sonde = FausseSonde(
-        ports={8100: moi, PORT_DU_FRONTEND: 50},
-        procs={moi: _info(1, 400.0), 900: _info(moi, 300.0), 50: _info(1, 100.0), 51: _info(50, 20.5)},
-    )
+    ports = {8100: moi, PORT_DU_FRONTEND: 50}
+    procs = {moi: _info(1, 400.0), 900: _info(moi, 300.0), 50: _info(1, 100.0), 51: _info(50, 20.5)}
 
-    backend, frontend = await processus_de_tessera(sonde)
+    backend, frontend = processus_de_tessera(ports, procs)
 
     assert (backend.nom, backend.port, backend.memoire_mo) == ("backend", 8100, 400.0)
     assert (frontend.nom, frontend.pid, frontend.memoire_mo) == ("frontend", 50, 120.5)
 
 
-async def test_a_frontend_nobody_serves_has_no_pid() -> None:
-    _, frontend = await processus_de_tessera(FausseSonde(procs={os.getpid(): _info(1, 1.0)}))
+def test_a_frontend_nobody_serves_has_no_pid() -> None:
+    _, frontend = processus_de_tessera({}, {os.getpid(): _info(1, 1.0)})
 
     assert frontend.pid is None
     assert frontend.memoire_mo == 0.0
@@ -207,3 +205,47 @@ def test_the_route_bounds_the_journal_length() -> None:
         assert client.get("/api/v1/tessera/salle?journal=500").status_code == 422
     finally:
         app.dependency_overrides.pop(get_sonde, None)
+
+
+@dataclass
+class SondeQuiCompte(FausseSonde):
+    appels_processus: int = 0
+    appels_ecouteurs: int = 0
+
+    async def ecouteurs(self) -> dict[int, int]:
+        self.appels_ecouteurs += 1
+        return self.ports
+
+    async def processus(self) -> dict[int, InfoProcessus]:
+        self.appels_processus += 1
+        return self.procs
+
+
+async def test_the_room_probes_processes_and_listeners_once(tmp_path: Path) -> None:
+    sonde = SondeQuiCompte(procs={os.getpid(): _info(1, 10.0)})
+
+    await salle_tessera(
+        sonde,
+        instantane=[],
+        ci_en_attente={},
+        ollama_url="http://127.0.0.1:11434",
+        refroidissement_s=None,
+        journal=tmp_path / "absent.log",
+        base=tmp_path / "absent.db",
+    )
+
+    assert (sonde.appels_processus, sonde.appels_ecouteurs) == (1, 1)
+
+
+def test_a_shell_whose_line_mentions_claude_is_not_an_agent() -> None:
+    moi = os.getpid()
+    snapshot = 'bash -c "source ~/.claude/shell-snapshots/snapshot-bash-1.sh && git status"'
+    procs = {
+        moi: _info(1, 1.0),
+        10: InfoProcessus(ppid=moi, memoire_mo=1.0, demarre_a=None, commande='"C:\outils\claude.exe" --print'),
+        11: InfoProcessus(ppid=10, memoire_mo=1.0, demarre_a=None, commande=snapshot),
+        12: InfoProcessus(ppid=10, memoire_mo=1.0, demarre_a=None, commande="node mcp-server.js --config ~/.claude/mcp.json"),
+        13: InfoProcessus(ppid=moi, memoire_mo=1.0, demarre_a=None, commande="/usr/bin/zsh -c 'claude-notes'"),
+    }
+
+    assert agents_en_cours(moi, procs) == 1
