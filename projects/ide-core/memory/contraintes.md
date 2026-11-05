@@ -27,6 +27,16 @@ section. (ADR-055)
   4 Ko). Le service refuse une leçon hors forme, de plus de 200 caractères, sans
   preuve citée du retour, en doublon ou qui affaiblit une vérification. Un diff
   de run qui touche ce fichier met le run en `blocked`. (ADR-074, ADR-055)
+- **Cinq réglages globaux se changent depuis l'interface, aucun autre.**
+  `run_max_budget_usd`, `llm_max_budget_usd`, `dialogue_timeout_s`,
+  `max_parallel_test_runs`, `keep_awake_during_runs` : registre fermé et borné de
+  `reglages.py`, valeur dans la table `reglages` de SQLite par-dessus `.env`, que rien
+  ne réécrit. On les lit par `reglages.courants()`, jamais par `settings.<nom>`. Un run
+  fige plafonds et délai à son ouverture. (ADR-075)
+- **Écrire un réglage exige un `Origin` déclaré, et aucun agent n'appelle
+  `/api/v1/reglages`.** Sans `Origin` ou hors liste : 403. Le garde de `Bash` refuse les
+  commandes d'accès réseau qui nomment la route : il attrape une erreur, pas une
+  évasion. (ADR-075, ADR-031)
 
 ## Git et périmètre d'écriture
 
