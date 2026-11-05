@@ -19,7 +19,7 @@ import aiosqlite
 from tessera.models.ticket import TicketStatus
 from tessera.services.database import init_db
 from tessera.services.database_runs import create_run
-from tessera.services.github_workflow import GitHubWorkflowService
+from tessera.services.github.github_workflow import GitHubWorkflowService
 from tessera.services.livraison import Livraison
 from tessera.services.orchestrator import Orchestrator
 from tessera.services.pipeline_approbation import suivre_documentation

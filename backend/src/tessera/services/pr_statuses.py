@@ -16,7 +16,7 @@ from pathlib import Path
 from typing import Literal
 
 from tessera.models.ticket import Ticket
-from tessera.services.github_service import CiStatus, GitHubService, PRStatus
+from tessera.services.github.github_service import CiStatus, GitHubService, PRStatus
 from tessera.services import pr_status_cache
 from tessera.utils.logger import get_logger
 

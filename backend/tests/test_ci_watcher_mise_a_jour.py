@@ -20,7 +20,7 @@ from tessera.models.ticket import TicketStatus
 from tessera.services import mise_a_jour_pr
 from tessera.services.ci_watcher import CIWatcher, ControleTete
 from tessera.services.database_runs import create_run
-from tessera.services.github_service import PrOuverte
+from tessera.services.github.github_service import PrOuverte
 from tessera.services.livraison import Livraison
 from tessera.services.mise_a_jour_branche import MiseAJour
 from tessera.services.mise_a_jour_pr import MiseAJourPr, TeteAttendue, mise_a_jour_de

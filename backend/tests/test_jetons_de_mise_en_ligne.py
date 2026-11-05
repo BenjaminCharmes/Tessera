@@ -8,7 +8,7 @@ from pydantic import SecretStr
 
 from tessera.config import CHAMPS_JETONS, VARIABLES_JETONS, Settings, settings
 from tessera.services.livreur_run import livraison_interrompue
-from tessera.services.github_workflow import GitHubWorkflowService, WorkflowError
+from tessera.services.github.github_workflow import GitHubWorkflowService, WorkflowError
 from tessera.services.politique_run import PolitiqueRun
 from tessera.services.providers.agent_sdk import _build_options
 from tessera.services.termes_interdits import CommitInfo, TermesInterditsService

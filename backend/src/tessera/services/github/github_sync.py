@@ -5,8 +5,8 @@ from typing import Literal
 from pydantic import BaseModel
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services.github_service import GitHubIssue, GitHubService
-from tessera.services.sync_map import SyncEntry, SyncMapService
+from tessera.services.github.github_service import GitHubIssue, GitHubService
+from tessera.services.github.sync_map import SyncEntry, SyncMapService
 from tessera.services.ticket_service import TicketService
 
 _TYPE_MAP: dict[str, TicketType] = {

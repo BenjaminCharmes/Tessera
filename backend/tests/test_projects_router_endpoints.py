@@ -375,7 +375,7 @@ def test_lier_un_depot_distant_inaccessible_est_refuse(
 ) -> None:
     # Dépôt inexistant ou token sans droits : l'utilisateur doit savoir que le
     # problème est côté GitHub, pas côté projet.
-    from tessera.services.github_service import RepositoryInfo
+    from tessera.services.github.github_service import RepositoryInfo
 
     monkeypatch.setattr(settings, "github_token", "ghp_test")
 
@@ -383,7 +383,7 @@ def test_lier_un_depot_distant_inaccessible_est_refuse(
         return RepositoryInfo(exists=False)
 
     monkeypatch.setattr(
-        "tessera.services.github_service.GitHubService.get_repository_info", _absent
+        "tessera.services.github.github_service.GitHubService.get_repository_info", _absent
     )
     _client().post("/api/v1/projects/mon-projet/git/init")
 
@@ -399,7 +399,7 @@ def test_lier_un_depot_distant_inaccessible_est_refuse(
 def test_un_depot_distant_non_vide_demande_confirmation(
     workspace: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    from tessera.services.github_service import RepositoryInfo
+    from tessera.services.github.github_service import RepositoryInfo
 
     monkeypatch.setattr(settings, "github_token", "ghp_test")
 
@@ -407,7 +407,7 @@ def test_un_depot_distant_non_vide_demande_confirmation(
         return RepositoryInfo(exists=True, is_empty=False)
 
     monkeypatch.setattr(
-        "tessera.services.github_service.GitHubService.get_repository_info", _non_vide
+        "tessera.services.github.github_service.GitHubService.get_repository_info", _non_vide
     )
     _client().post("/api/v1/projects/mon-projet/git/init")
 

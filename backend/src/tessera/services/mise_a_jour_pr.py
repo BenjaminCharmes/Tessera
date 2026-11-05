@@ -15,7 +15,7 @@ from pathlib import Path
 
 from tessera.config import settings
 from tessera.services.controle_tete import ControleTete, decrire_exception, verifier_tete
-from tessera.services.github_service import PrOuverte
+from tessera.services.github.github_service import PrOuverte
 from tessera.services.mise_a_jour_branche import MiseAJour, mettre_a_jour_branche
 from tessera.services.sha_approbation import noter_poussee_du_ticket
 

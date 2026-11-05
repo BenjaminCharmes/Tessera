@@ -655,7 +655,7 @@ def test_un_run_autonome_peut_partir_des_issues_github(
         return _R()
 
     monkeypatch.setattr("tessera.routers.orchestrator.build_orchestrator", _build)
-    monkeypatch.setattr("tessera.agents.github_sync.GithubSyncAgent.run", _run)
+    monkeypatch.setattr("tessera.services.github.github_sync.GithubSyncAgent.run", _run)
 
     with _client_persistant() as client:
         with client.websocket_connect("/api/v1/orchestrator/observe") as ws:
@@ -690,7 +690,7 @@ def test_un_run_autonome_ne_touche_pas_a_github_sans_le_demander(
         raise AssertionError("github-sync ne doit pas tourner ici")
 
     monkeypatch.setattr("tessera.routers.orchestrator.build_orchestrator", _build)
-    monkeypatch.setattr("tessera.agents.github_sync.GithubSyncAgent.run", _run)
+    monkeypatch.setattr("tessera.services.github.github_sync.GithubSyncAgent.run", _run)
 
     with _client_persistant() as client:
         with client.websocket_connect("/api/v1/orchestrator/observe") as ws:

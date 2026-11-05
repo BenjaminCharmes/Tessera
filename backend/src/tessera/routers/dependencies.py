@@ -3,7 +3,7 @@ from fastapi import HTTPException
 from starlette.requests import Request
 
 from tessera.config import settings
-from tessera.services.github_service import GitHubService
+from tessera.services.github.github_service import GitHubService
 from tessera.utils.project_id import validate_project_id
 
 

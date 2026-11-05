@@ -21,9 +21,9 @@ from domaines_services import A_DEPLACER, ORDRE  # noqa: E402
 
 # Paquets de premier niveau de `tessera/` admis par ADR-076.
 PAQUETS_AUTORISES: frozenset[str] = frozenset({"models", "services", "routers", "utils"})
-# Paquet encore présent, que le ticket-816 fait disparaître : il se retire
-# d'ici à ce moment-là, et le test refuse une tolérance devenue sans objet.
-PAQUETS_TOLERES: frozenset[str] = frozenset({"agents"})
+# Paquets encore tolérés hors des couches : aucun depuis le ticket-816, et le
+# test refuse une tolérance devenue sans objet.
+PAQUETS_TOLERES: frozenset[str] = frozenset()
 
 # Écarts mesurés à l'ouverture du ticket-826, après reclassement, au format
 # "chemin relatif à src/tessera -> domaine importé". Cliquet : un écart corrigé

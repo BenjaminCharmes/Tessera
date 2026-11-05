@@ -19,11 +19,11 @@ from tessera.services.autonomie import NiveauAutonomie
 from tessera.services.ci_watcher import CI_WATCHER
 from tessera.services.event_hub import EVENT_HUB
 from tessera.services.git_workspace import GitWorkspaceService
-from tessera.services.github_service import GitHubService
-from tessera.services.github_workflow import GitHubWorkflowService, PullRequestResult
+from tessera.services.github.github_service import GitHubService
+from tessera.services.github.github_workflow import GitHubWorkflowService, PullRequestResult
 from tessera.services.livraison import LivraisonService
 from tessera.services.politique_run import PolitiqueRun
-from tessera.services.proposal_workspace import ProposalWorkspace
+from tessera.services.github.proposal_workspace import ProposalWorkspace
 from tessera.services.racine_depot import GIT_ROOT_ANCESTOR
 from tessera.services.temporary_worktree import detached_worktree, run_git
 from tessera.services.ticket_service import validate_ticket

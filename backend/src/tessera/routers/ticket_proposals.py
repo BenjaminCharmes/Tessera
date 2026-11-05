@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field
 from tessera.config import settings
 from tessera.routers.dependencies import require_github_service, require_valid_project_id
 from tessera.services.git_workspace import GitWorkspaceError
-from tessera.services.github_workflow import WorkflowError
+from tessera.services.github.github_workflow import WorkflowError
 from tessera.services.politique_run import PolitiqueRun
 from tessera.services.project_loader import ProjectLoader
 from tessera.services.ticket_proposal import (

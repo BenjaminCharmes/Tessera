@@ -7,8 +7,8 @@ import pytest
 import respx
 
 from tessera.services.livreur_run import livraison_interrompue
-from tessera.services.github_service import GitHubService
-from tessera.services.github_workflow import GitHubWorkflowService
+from tessera.services.github.github_service import GitHubService
+from tessera.services.github.github_workflow import GitHubWorkflowService
 from tessera.services.livraison import LivraisonInterrompue, LivraisonService
 
 _BASE = "https://api.github.com"

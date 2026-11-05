@@ -9,7 +9,7 @@ from pydantic import BaseModel
 from tessera.config import settings
 from tessera.services.ticket_diff import TicketDiff, diff_du_ticket
 from tessera.models.ticket import Ticket, TicketBatchCreate, TicketBatchResponse, TicketCreate, TicketListResponse, TicketStatus, TicketStatusUpdate
-from tessera.services.github_service import CiStatus, GitHubService, PRStatus
+from tessera.services.github.github_service import CiStatus, GitHubService, PRStatus
 from tessera.services.autonomie import lire_niveau
 from tessera.services.database_runs import list_runs, list_runs_for_ticket
 from tessera.services.pr_status_cache import get_cached_status
@@ -19,12 +19,12 @@ from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
 from tessera.services.git_workspace import GitWorkspaceError, GitWorkspaceService
-from tessera.services.github_workflow import GitHubWorkflowService, WorkflowError
+from tessera.services.github.github_workflow import GitHubWorkflowService, WorkflowError
 from tessera.services.politique_run import PolitiqueRun
 from tessera.routers.dependencies import require_github_service, require_valid_project_id
 from tessera.services.project_loader import load_project
 from tessera.services.project_loader import ProjectLoader
-from tessera.services.sync_map import SyncMapService
+from tessera.services.github.sync_map import SyncMapService
 from tessera.services.ticket_check import Probleme, verifier_tickets
 from tessera.services.ticket_service import TicketService
 

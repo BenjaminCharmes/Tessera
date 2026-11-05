@@ -6,7 +6,7 @@ from typing import Any, Literal
 import httpx
 
 from tessera.config import settings
-from tessera.services.github_retry import reessayer_5xx
+from tessera.services.github.github_retry import reessayer_5xx
 from pydantic import BaseModel
 
 

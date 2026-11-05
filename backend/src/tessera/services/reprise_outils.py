@@ -10,7 +10,7 @@ import re
 from datetime import datetime, timezone
 from pathlib import Path
 
-from tessera.services.github_service import PrOuverte
+from tessera.services.github.github_service import PrOuverte
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

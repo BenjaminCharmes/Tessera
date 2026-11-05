@@ -6,8 +6,8 @@ from tessera.config import settings
 from tessera.services.agents.agent_runner import AgentRunner
 from tessera.services.ci_watcher import ControleTete, EstAncetre, TetePr
 from tessera.services.git_workspace import GitWorkspaceService
-from tessera.services.github_service import GitHubService
-from tessera.services.github_workflow import GitHubWorkflowService
+from tessera.services.github.github_service import GitHubService
+from tessera.services.github.github_workflow import GitHubWorkflowService
 from tessera.services.livraison import Livraison, LivraisonService
 from tessera.services.pipeline_events import EventCallback
 from tessera.services.politique_run import PolitiqueRun

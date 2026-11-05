@@ -4,7 +4,7 @@ import httpx
 import pytest
 import respx
 
-from tessera.services.github_service import (
+from tessera.services.github.github_service import (
     GitHubIssue,
     GitHubService,
     MergeabiliteTimeoutError,

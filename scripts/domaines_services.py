@@ -107,13 +107,6 @@ A_DEPLACER: dict[str, str] = {
     "run_worktree": "worktrees",
     "run_worktree_populate": "worktrees",
     "temporary_worktree": "worktrees",
-    # github
-    "github_retry": "github",
-    "github_service": "github",
-    "github_workflow": "github",
-    "issues_agent_ready": "github",
-    "proposal_workspace": "github",
-    "sync_map": "github",
     # livraison
     "attente_dependance": "livraison",
     "attente_des_merges": "livraison",

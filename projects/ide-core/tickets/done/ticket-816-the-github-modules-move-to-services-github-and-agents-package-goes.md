@@ -2,7 +2,7 @@
 id: ticket-816
 title: "The github modules move to services/github and the agents package goes"
 type: refactor
-status: todo
+status: done
 pr_number: null
 priority: low
 agent: codeur
@@ -34,12 +34,12 @@ ADR-010 (`role: github-sync` géré dans `POST /api/v1/agents/run`) ne change pa
 
 ## Critères d'acceptation
 
-- [ ] Les huit modules de la section `github` et `github_sync` sont sous `services/github/`
-- [ ] `backend/src/tessera/agents/` n'existe plus, `PAQUETS_TOLERES` est vide
-- [ ] `A_DEPLACER` n'a plus d'entrée `github`, `ECARTS_DOMAINES` n'a grandi d'aucune ligne
-- [ ] Aucune occurrence de `tessera.agents` ni des anciens chemins pointés ne reste dans
+- [x] Les huit modules de la section `github` et `github_sync` sont sous `services/github/`
+- [x] `backend/src/tessera/agents/` n'existe plus, `PAQUETS_TOLERES` est vide
+- [x] `A_DEPLACER` n'a plus d'entrée `github`, `ECARTS_DOMAINES` n'a grandi d'aucune ligne
+- [x] Aucune occurrence de `tessera.agents` ni des anciens chemins pointés ne reste dans
       `backend/src`, `backend/tests`, `scripts/`, `Makefile`
-- [ ] Le diff n'est que des renommages, des lignes d'import ou de chaîne et la suppression du
+- [x] Le diff n'est que des renommages, des lignes d'import ou de chaîne et la suppression du
       dossier vide ; la suite passe
 
 ## Ce que ça ne fait pas
@@ -49,3 +49,7 @@ Aucun changement de comportement de la synchronisation des issues.
 ## Risques
 
 Le ticket-758 (jetons dans les URL, rapports bornés) touche `github_service` : sa PR est mergée avant.
+
+## Notes de réalisation
+
+Le domaine compte six modules à plat, pas huit, plus `github_sync` : `scripts/domaines_services.py` fait foi. `github_sync.py` est déplacé à la main (le script ne lit que la table) ; ses importeurs sont `routers/agents.py`, `routers/projects/actions.py`, `services/github/issues_agent_ready.py` et deux fichiers de test, dont deux chaînes de `monkeypatch` dans `test_orchestrator_router_endpoints.py`. Seuls des documents historiques citent les anciens chemins : ils restent tels quels.

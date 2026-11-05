@@ -17,7 +17,7 @@ from tessera.config import settings
 from tessera.main import app
 from tessera.services.ci_watcher import CI_WATCHER
 from tessera.services.git_workspace import GitCommandError
-from tessera.services.github_service import GitHubService
+from tessera.services.github.github_service import GitHubService
 from tessera.services.politique_run import PolitiqueRun
 from tessera.services.ticket_proposal import (
     ProposalRefused,

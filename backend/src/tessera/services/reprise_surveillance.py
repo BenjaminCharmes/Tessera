@@ -33,7 +33,7 @@ from pathlib import Path
 from tessera.models.ticket import Ticket, TicketStatus
 from tessera.services.autonomie import NiveauAutonomie
 from tessera.services.ci_watcher import EtatPr, decrire_exception
-from tessera.services.github_service import PrOuverte
+from tessera.services.github.github_service import PrOuverte
 from tessera.services.pipeline_events import EventCallback
 from tessera.services.politique_run import PolitiqueRun
 from tessera.services.reprise_outils import ecrire_log as _ecrire_log

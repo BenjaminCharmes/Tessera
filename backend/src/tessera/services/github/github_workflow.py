@@ -26,14 +26,14 @@ from tessera.services.autonomie import (
     lire_niveau,
     niveau_peut_merger,
 )
-from tessera.services.github_service import (
+from tessera.services.github.github_service import (
     MergeabiliteTimeoutError,
     PRNonFusionnableError,
     PrOuverte,
 )
 from tessera.services.politique_run import PolitiqueRun
 from tessera.services.secrets_diff import refus_secrets
-from tessera.services.sync_map import SyncMapService
+from tessera.services.github.sync_map import SyncMapService
 from tessera.services.termes_interdits import (
     CommitInfo,
     TermesInterditsChecker,

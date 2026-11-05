@@ -6,7 +6,7 @@ from pathlib import Path
 
 import aiosqlite
 
-from tessera.services.github_service import PRStatus
+from tessera.services.github.github_service import PRStatus
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

@@ -8,8 +8,8 @@ from tessera.services.agents.agent_runner import AgentRunner
 from tessera.services.attente_des_merges import apres_les_merges
 from tessera.services.autonomie import NiveauAutonomie
 from tessera.services.git_workspace import GitWorkspaceService
-from tessera.services.github_service import GitHubService
-from tessera.services.github_workflow import GitHubWorkflowService
+from tessera.services.github.github_service import GitHubService
+from tessera.services.github.github_workflow import GitHubWorkflowService
 from tessera.services.livraison import Livraison, LivraisonInterrompue, LivraisonService
 from tessera.services.orchestrator import PipelineResult
 from tessera.services.politique_run import PolitiqueRun
