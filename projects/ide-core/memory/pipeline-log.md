@@ -7647,3 +7647,14 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-05 07:59:15 UTC — [ticket-793] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le code implémente correctemen (212967ms)
 - 2026-11-05 07:59:15 UTC — [ticket-793] APPROVED après 1 tour(s)
 - 2026-11-05 08:06:05 UTC — [ticket-793] documentation: 0 fichier(s) (403515ms) — après tour de correction
+- 2026-11-05 08:07:30 UTC — [ide-core] ticket-782 retiré de la file
+- 2026-11-05 08:16:50 UTC — [ide-core] ticket-792 retiré de la file
+- 2026-11-05 08:20:21 UTC — [ide-core] ticket-781 retiré de la file
+- 2026-11-05 08:20:21 UTC — [ide-core] ticket-788 retiré de la file
+- 2026-11-05 08:22:57 UTC — [ide-core] ticket-786 retiré de la file
+- 2026-11-05 08:22:57 UTC — [ide-core] ticket-789 retiré de la file
+- 2026-11-05 08:28:12 UTC — [ide-core] ticket-770 retiré de la file
+- 2026-11-05 08:28:12 UTC — [ide-core] ticket-771 retiré de la file
+- 2026-11-05 08:57:28 UTC — [ticket-793] livraison: rebase sur develop (4594ms)
+- 2026-11-05 08:57:28 UTC — [ticket-793] livraison: tests relancés après rebase : rouges (Timeout après 1500s) (3000234ms)
+- 2026-11-05 08:57:28 UTC — [ticket-793] livraison: arrêt — Tests rouges après rebase sur develop : rien n'est poussé. La base a avancé pendant le run et le tra
