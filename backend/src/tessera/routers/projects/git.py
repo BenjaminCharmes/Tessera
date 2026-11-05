@@ -15,7 +15,7 @@ from tessera.services.creation_projet.git_link import (
     link_remote,
 )
 from tessera.services.github.github_service import GitHubService
-from tessera.services.politique_run import PolitiqueRun
+from tessera.services.gardes.politique_run import PolitiqueRun
 
 router = new_router()
 

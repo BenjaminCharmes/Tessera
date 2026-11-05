@@ -21,7 +21,7 @@ from tessera.services.database import init_db
 from tessera.services.livraison import Livraison
 from tessera.services.orchestrator import Orchestrator
 from tessera.services.pipeline_events import OrchestratorEvent, PipelineResult
-from tessera.services.politique_run import PolitiqueRun
+from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.run_dans_worktree import (
     OrchestrateurRefuse,
     RunRefuse,

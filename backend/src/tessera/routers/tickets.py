@@ -20,7 +20,7 @@ from tessera.utils.logger import get_logger
 _logger = get_logger(__name__)
 from tessera.services.git_workspace import GitWorkspaceError, GitWorkspaceService
 from tessera.services.github.github_workflow import GitHubWorkflowService, WorkflowError
-from tessera.services.politique_run import PolitiqueRun
+from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.routers.dependencies import require_github_service, require_valid_project_id
 from tessera.services.project_loader import load_project
 from tessera.services.project_loader import ProjectLoader

@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services.politique_run import PolitiqueRun
+from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.providers.perimetre import racine_autorisee
 from tessera.services.supervision.project_overview import _racine_ancestrale, find_icon
 from tessera.services.racine_depot import (

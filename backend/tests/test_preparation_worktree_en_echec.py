@@ -15,7 +15,7 @@ from tessera.services.assemblage_run import build_orchestrator
 from tessera.services.database import init_db
 from tessera.services.orchestrator import Orchestrator
 from tessera.services.pipeline_events import OrchestratorEvent, PipelineResult
-from tessera.services.politique_run import PolitiqueRun
+from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.preparation_worktree import ResultatPreparation
 from tessera.services.run_dans_worktree import ouvrir_worktree
 from tessera.services.worktrees.run_worktree import RunWorktree

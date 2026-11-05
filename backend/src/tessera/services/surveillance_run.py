@@ -10,7 +10,7 @@ from tessera.services.github.github_service import GitHubService
 from tessera.services.github.github_workflow import GitHubWorkflowService
 from tessera.services.livraison import Livraison, LivraisonService
 from tessera.services.pipeline_events import EventCallback
-from tessera.services.politique_run import PolitiqueRun
+from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.project_loader import load_project
 from tessera.services.mise_a_jour_pr import TeteAttendue, mise_a_jour_de
 from tessera.services.realignement_base import Realignement

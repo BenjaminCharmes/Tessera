@@ -23,8 +23,8 @@ from tessera.services.manifeste import lire_booleen, lire_chaine
 from tessera.models.worktree_config import ConfigWorktree
 from tessera.services.project_loader import load_pipeline_config
 from tessera.services.racine_depot import est_ancestor, racine_ecriture_projet
-from tessera.services.worktree_dossiers import DossiersWorktree
-from tessera.services.worktree_politique import lire_worktree
+from tessera.services.gardes.worktree_dossiers import DossiersWorktree
+from tessera.services.gardes.worktree_politique import lire_worktree
 
 #: Méthodes de merge acceptées par GitHub.
 MergeMethod = Literal["squash", "merge", "rebase"]

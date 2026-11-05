@@ -408,7 +408,7 @@ sans attendre que le testeur les installe.
 En cas d'échec ou dépassement, le run passe en `blocked` avec la sortie de la commande
 — le codeur n'est pas appelé (ADR-037).
 
-**Validation** : validée à la lecture du projet par `services/worktree_politique.py`
+**Validation** : validée à la lecture du projet par `services/gardes/worktree_politique.py`
 (ticket-521). Absente, aucune commande ne s'exécute avant le codeur.
 
 ### Reprise de runs orphelins (ticket-369)

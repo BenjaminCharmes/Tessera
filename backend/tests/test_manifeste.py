@@ -29,13 +29,13 @@ from tessera.services.manifeste import (
     lire_valeur,
 )
 from tessera.services.online_declaration import read_online_declaration
-from tessera.services.politique_run import PolitiqueRun
+from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.project_loader import (
     _load_github_remote,
     load_pipeline_config,
     load_services_config,
 )
-from tessera.services.worktree_politique import lire_worktree
+from tessera.services.gardes.worktree_politique import lire_worktree
 
 
 @dataclass(frozen=True)

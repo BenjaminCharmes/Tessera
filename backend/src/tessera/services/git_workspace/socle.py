@@ -9,8 +9,8 @@ from tessera.services.git_workspace.erreurs import GitCommandError, NotAGitRepos
 from tessera.services.racine_depot import declare_ancestor
 
 if TYPE_CHECKING:
-    from tessera.services.politique_run import PolitiqueRun
-    from tessera.services.worktree_dossiers import DossiersWorktree
+    from tessera.services.gardes.politique_run import PolitiqueRun
+    from tessera.services.gardes.worktree_dossiers import DossiersWorktree
 
 
 class GitCore:

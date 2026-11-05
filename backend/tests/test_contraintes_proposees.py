@@ -5,7 +5,7 @@ import pytest
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 from tessera.services.adr import adr_pertinents, contraintes_pour, lire_contraintes
-from tessera.services.contraintes_touchees import lignes_hors_proposees
+from tessera.services.gardes.contraintes_touchees import lignes_hors_proposees
 from tessera.services.pipeline_contraintes import arret_contraintes_hors_proposees
 from tessera.services.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.pipeline_run import PipelineRun

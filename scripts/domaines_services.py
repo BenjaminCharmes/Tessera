@@ -75,16 +75,6 @@ A_DEPLACER: dict[str, str] = {
     "ticket_archive": "projets",
     "ticket_check": "projets",
     "ticket_service": "projets",
-    # gardes
-    "config_tests_touchee": "gardes",
-    "contraintes_touchees": "gardes",
-    "lecons": "gardes",
-    "lecons_touchees": "gardes",
-    "politique_run": "gardes",
-    "secrets_diff": "gardes",
-    "termes_interdits": "gardes",
-    "worktree_dossiers": "gardes",
-    "worktree_politique": "gardes",
     # git_workspace
     "diff_sections": "git_workspace",
     "git_attributes": "git_workspace",

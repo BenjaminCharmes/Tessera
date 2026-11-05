@@ -18,7 +18,7 @@ from tessera.services.pipeline_events import (
     PipelineResult,
 )
 from tessera.services.pipeline_run import PipelineRun, emit, set_status
-from tessera.services.politique_run import PolitiqueRun
+from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.preparation_worktree import preparer_le_worktree
 from tessera.services.worktrees.run_worktree import (
     LienPersistant,

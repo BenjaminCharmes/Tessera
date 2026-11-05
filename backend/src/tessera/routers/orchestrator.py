@@ -18,7 +18,7 @@ from tessera.services.file_vivante import (
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.github.issues_agent_ready import tirer_les_issues as _tirer_les_issues
 from tessera.services.orchestrator import Orchestrator
-from tessera.services.politique_run import PolitiqueRun
+from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.reprise_outils import ecrire_log
 from tessera.services.run_dans_worktree import (
     OrchestrateurRefuse,

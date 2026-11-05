@@ -7,7 +7,7 @@ from tessera.services.git_workspace.chemins import (
 )
 from tessera.services.git_workspace.erreurs import GitCommandError
 from tessera.services.git_workspace.poussee import GitPoussee
-from tessera.services.termes_interdits import CommitInfo
+from tessera.services.gardes.termes_interdits import CommitInfo
 from tessera.utils.logger import get_logger
 
 

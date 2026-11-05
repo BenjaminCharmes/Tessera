@@ -22,7 +22,7 @@ from tessera.services.racine_depot import (
     depot_le_plus_proche,
 )
 from tessera.services.online_declaration import StripeMode, read_online_declaration
-from tessera.services.politique_run import PolitiqueRun
+from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.ticket_service import _STATUS_DIRS
 from tessera.utils.logger import get_logger
 

@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 
 from tessera.config import settings
 from tessera.main import app
-from tessera.services.lecons import nombre_proposees
+from tessera.services.gardes.lecons import nombre_proposees
 from tessera.services.database import init_db
 
 BASE = "/api/v1/projects"

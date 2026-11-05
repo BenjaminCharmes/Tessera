@@ -10,7 +10,7 @@ from tessera.services.database import init_db
 from tessera.services.database_runs import create_run
 from tessera.services.github.github_service import GitHubService, PrOuverte
 from tessera.services.pipeline_events import OrchestratorEvent
-from tessera.services.politique_run import PolitiqueRun
+from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.reprise_outils import prs_a_reprendre, ticket_de_branche
 from tessera.services.reprise_surveillance import (
     SurveillanceProjet,

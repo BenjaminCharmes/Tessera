@@ -36,7 +36,7 @@ from tessera.services.livraison_rebase import (
 )
 from tessera.services.livraison_resultat import Livraison as Livraison
 from tessera.services.renumeroter import etape_de_numerotation
-from tessera.services.politique_run import PolitiqueRun
+from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.retest_apres_rebase import RetestApresRebase
 from tessera.utils.logger import get_logger
 

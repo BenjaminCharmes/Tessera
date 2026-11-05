@@ -1,5 +1,5 @@
 """La porte de configuration des tests connaît tous les fichiers — ticket-748."""
-from tessera.services.config_tests_touchee import (
+from tessera.services.gardes.config_tests_touchee import (
     fichiers_de_config_touches,
     fichiers_non_nommes,
 )

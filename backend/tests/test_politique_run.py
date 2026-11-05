@@ -17,7 +17,7 @@ from tessera.services.autonomie import NiveauAutonomie
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.github.github_workflow import GitHubWorkflowService, WorkflowError
 from tessera.services.livraison import LivraisonService
-from tessera.services.politique_run import PolitiqueRun
+from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.providers.perimetre import hook_refus_hors_perimetre
 from tessera.services.worktrees.run_worktree import RunWorktree
 
@@ -363,7 +363,7 @@ def test_un_projet_local_qui_declare_un_worktree_n_en_a_pas(
 ) -> None:
     projet = _projet(tmp_path, {"artifacts": "local", "worktree": {"populate": []}})
 
-    with caplog.at_level(logging.WARNING, logger="tessera.services.worktree_politique"):
+    with caplog.at_level(logging.WARNING, logger="tessera.services.gardes.worktree_politique"):
         politique = PolitiqueRun.lire(projet)
 
     assert politique.worktree is None
@@ -383,7 +383,7 @@ def test_une_entree_retiree_est_journalisee(
 ) -> None:
     projet = _avec_worktree(tmp_path, {"populate": [{"path": "a", "mode": "symlink"}]})
 
-    with caplog.at_level(logging.WARNING, logger="tessera.services.worktree_politique"):
+    with caplog.at_level(logging.WARNING, logger="tessera.services.gardes.worktree_politique"):
         PolitiqueRun.lire(projet)
 
     assert any(r.getMessage() == "worktree_populate_retire" for r in caplog.records)

@@ -14,7 +14,7 @@ from typing import TYPE_CHECKING
 from tessera.utils.logger import get_logger
 
 if TYPE_CHECKING:
-    from tessera.services.politique_run import PolitiqueRun
+    from tessera.services.gardes.politique_run import PolitiqueRun
 
 _logger = get_logger(__name__)
 

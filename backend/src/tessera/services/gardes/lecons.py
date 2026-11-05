@@ -14,7 +14,7 @@ from datetime import date
 from fnmatch import fnmatch
 from pathlib import Path
 
-from tessera.services.config_tests_touchee import NOMS_SIGNALES
+from tessera.services.gardes.config_tests_touchee import NOMS_SIGNALES
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

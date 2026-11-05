@@ -17,7 +17,7 @@ from tessera.services.pipeline_events import EventType, PipelineResult
 from tessera.services.pipeline_outcomes import commit_ou_bloquer
 from tessera.services.pipeline_run import PipelineRun, emit, set_status
 from tessera.services.pipeline_text import _unapproved_commit_message
-from tessera.services.politique_run import PolitiqueRun
+from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.verification.test_runner import TestResult, TestRunnerService
 from tessera.models.ticket import TicketStatus
 from tessera.utils.logger import get_logger

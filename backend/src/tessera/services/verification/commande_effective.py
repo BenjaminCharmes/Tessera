@@ -11,7 +11,7 @@ from collections.abc import Mapping
 from pathlib import Path
 
 from tessera.models.worktree_config import ConfigWorktree
-from tessera.services.politique_run import PolitiqueRun
+from tessera.services.gardes.politique_run import PolitiqueRun
 
 #: `{nom}` but not `${nom}`, which a shell expands itself.
 _PLACEHOLDER = re.compile(r"(?<!\$)\{([A-Za-z_][A-Za-z0-9_]*)\}")

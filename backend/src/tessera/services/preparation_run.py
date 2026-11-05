@@ -9,7 +9,7 @@ from tessera.services.verification.commande_effective import (
     commande_effective,
     environnement_effectif,
 )
-from tessera.services.politique_run import PolitiqueRun
+from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.preparation_worktree import Preparation, preparation_du_run
 from tessera.services.worktrees.run_worktree import RunWorktree
 

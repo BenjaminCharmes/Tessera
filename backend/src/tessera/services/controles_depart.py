@@ -12,7 +12,7 @@ from tessera.services.autonomie import NiveauAutonomie
 from tessera.services.verification.commande_chainee import decouper
 from tessera.services.verification.commande_effective import PlaceholderInconnu, commande_effective
 from tessera.services.livraison_possible import raison_de_refus_livraison
-from tessera.services.politique_run import PolitiqueRun
+from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.verification.process_registry import CommandeInvalide, resoudre_le_cwd
 from tessera.services.project_loader import load_pipeline_config
 

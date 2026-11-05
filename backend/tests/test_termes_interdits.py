@@ -7,8 +7,8 @@ from pathlib import Path
 import pytest
 
 from tessera.services.github.github_workflow import GitHubWorkflowService, WorkflowError
-from tessera.services.politique_run import PolitiqueRun
-from tessera.services.termes_interdits import (
+from tessera.services.gardes.politique_run import PolitiqueRun
+from tessera.services.gardes.termes_interdits import (
     CommitInfo,
     TermesInterditsService,
     ViolationTerme,
@@ -477,7 +477,7 @@ def test_the_service_reads_the_list_from_the_backend_settings(
     # Le backend lit `.env` dans ses réglages sans l'exporter : le service doit
     # les lire, sinon il reste inactif en production (ticket-206).
     from tessera.config import settings
-    from tessera.services.termes_interdits import TermesInterditsService
+    from tessera.services.gardes.termes_interdits import TermesInterditsService
 
     monkeypatch.delenv("FORBIDDEN_TERMS", raising=False)
     monkeypatch.setattr(settings, "forbidden_terms", "zorglub")

@@ -35,7 +35,7 @@ from tessera.services.autonomie import NiveauAutonomie
 from tessera.services.ci_watcher import EtatPr, decrire_exception
 from tessera.services.github.github_service import PrOuverte
 from tessera.services.pipeline_events import EventCallback
-from tessera.services.politique_run import PolitiqueRun
+from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.reprise_outils import ecrire_log as _ecrire_log
 from tessera.services.reprise_outils import prs_a_reprendre
 from tessera.services.sha_approbation import sha_pousse_du_ticket

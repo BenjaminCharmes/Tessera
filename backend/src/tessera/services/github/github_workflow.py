@@ -31,10 +31,10 @@ from tessera.services.github.github_service import (
     PRNonFusionnableError,
     PrOuverte,
 )
-from tessera.services.politique_run import PolitiqueRun
-from tessera.services.secrets_diff import refus_secrets
+from tessera.services.gardes.politique_run import PolitiqueRun
+from tessera.services.gardes.secrets_diff import refus_secrets
 from tessera.services.github.sync_map import SyncMapService
-from tessera.services.termes_interdits import (
+from tessera.services.gardes.termes_interdits import (
     CommitInfo,
     TermesInterditsChecker,
     TermesInterditsService,

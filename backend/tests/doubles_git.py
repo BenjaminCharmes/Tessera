@@ -8,7 +8,7 @@ to the service then breaks no double that does not use it (ticket-742).
 
 from collections.abc import Awaitable, Callable
 
-from tessera.services.termes_interdits import CommitInfo
+from tessera.services.gardes.termes_interdits import CommitInfo
 
 
 class GitWorkspaceDouble:

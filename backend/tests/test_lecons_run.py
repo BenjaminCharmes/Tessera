@@ -12,7 +12,7 @@ import pytest
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 from tessera.services import lecons_run, pipeline_outcomes as outcomes
-from tessera.services.lecons import lire_lecons
+from tessera.services.gardes.lecons import lire_lecons
 from tessera.services.lecons_run import produire_lecon, proposer_lecon
 from tessera.services.pipeline_events import OrchestratorEvent
 from tessera.services.pipeline_run import PipelineRun

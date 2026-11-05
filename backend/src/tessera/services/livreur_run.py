@@ -12,7 +12,7 @@ from tessera.services.github.github_service import GitHubService
 from tessera.services.github.github_workflow import GitHubWorkflowService
 from tessera.services.livraison import Livraison, LivraisonInterrompue, LivraisonService
 from tessera.services.orchestrator import PipelineResult
-from tessera.services.politique_run import PolitiqueRun
+from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.project_loader import load_project
 from tessera.services.renumeroter import Renumeroteur
 from tessera.services.resolveur_conflit import ResolveurConflitService

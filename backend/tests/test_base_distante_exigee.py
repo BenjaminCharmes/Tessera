@@ -14,7 +14,7 @@ import pytest
 
 from tessera.services.git_workspace import GitCommandError, GitWorkspaceService
 from tessera.services.git_workspace import base as gw
-from tessera.services.politique_run import PolitiqueRun
+from tessera.services.gardes.politique_run import PolitiqueRun
 
 
 async def _git(cwd: Path, *args: str) -> str:

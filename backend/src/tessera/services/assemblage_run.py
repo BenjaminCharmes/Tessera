@@ -19,11 +19,11 @@ from tessera.services.verification.controle_visuel import lire_le_controle
 from tessera.services.documentation.documenteur_run import documenteur
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.journal_pipeline import journal_vers, journaliser_mode_rapide
-from tessera.services.lecons import section_lecons
+from tessera.services.gardes.lecons import section_lecons
 from tessera.services.livreur_run import livreur
 from tessera.services.orchestrator import Orchestrator
 from tessera.services.pipeline_plan import ROLE_PLAN
-from tessera.services.politique_run import PolitiqueRun
+from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.preparation_run import preparation_du_run_declaree, tests_du_run
 from tessera.services.project_loader import (
     ProjectLoader,

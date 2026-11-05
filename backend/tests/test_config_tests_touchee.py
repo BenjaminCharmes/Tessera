@@ -4,7 +4,7 @@ from pathlib import Path
 from unittest.mock import AsyncMock
 
 from tessera.models.agent import AgentResult, AgentRole
-from tessera.services.config_tests_touchee import (
+from tessera.services.gardes.config_tests_touchee import (
     TITRE_CONFIG_TESTS,
     avertissement_config_tests,
     config_tests_du_diff,

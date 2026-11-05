@@ -8,8 +8,8 @@ raison part dans le journal et dans l'événement d'erreur.
 from typing import TYPE_CHECKING
 
 from tessera.models.ticket import TicketStatus
-from tessera.services.contraintes_touchees import lignes_hors_proposees
-from tessera.services.lecons_touchees import lignes_de_lecons
+from tessera.services.gardes.contraintes_touchees import lignes_hors_proposees
+from tessera.services.gardes.lecons_touchees import lignes_de_lecons
 from tessera.services.pipeline_events import EventType, PipelineResult
 from tessera.services.pipeline_outcomes import commit_ou_bloquer
 from tessera.services.pipeline_run import PipelineRun, emit, set_status

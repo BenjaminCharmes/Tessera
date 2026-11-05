@@ -8,9 +8,9 @@ main working tree.
 from pathlib import Path
 
 from tessera.services.git_workspace import GitWorkspaceService
-from tessera.services.politique_run import PolitiqueRun
+from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.worktrees.temporary_worktree import run_git
-from tessera.services.termes_interdits import CommitInfo
+from tessera.services.gardes.termes_interdits import CommitInfo
 
 
 class ProposalWorkspace:

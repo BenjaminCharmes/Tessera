@@ -9,7 +9,7 @@ from tessera.services.verification.commande_effective import (
     commande_effective,
     environnement_effectif,
 )
-from tessera.services.politique_run import PolitiqueRun
+from tessera.services.gardes.politique_run import PolitiqueRun
 
 _WT = Path("/work/wt")
 _DEPOT = Path("/work/repo")

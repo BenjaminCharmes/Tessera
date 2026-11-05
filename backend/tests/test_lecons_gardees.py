@@ -5,8 +5,8 @@ import pytest
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 from tessera.services import lecons_run
-from tessera.services.lecons import lire_lecons
-from tessera.services.lecons_touchees import lignes_de_lecons
+from tessera.services.gardes.lecons import lire_lecons
+from tessera.services.gardes.lecons_touchees import lignes_de_lecons
 from tessera.services.lecons_run import proposer_lecon
 from tessera.services.pipeline_contraintes import (
     arret_contraintes_hors_proposees,

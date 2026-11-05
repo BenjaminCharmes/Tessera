@@ -22,7 +22,7 @@ from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.github.github_service import GitHubService
 from tessera.services.github.github_workflow import GitHubWorkflowService, PullRequestResult
 from tessera.services.livraison import LivraisonService
-from tessera.services.politique_run import PolitiqueRun
+from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.github.proposal_workspace import ProposalWorkspace
 from tessera.services.racine_depot import GIT_ROOT_ANCESTOR
 from tessera.services.worktrees.temporary_worktree import detached_worktree, run_git

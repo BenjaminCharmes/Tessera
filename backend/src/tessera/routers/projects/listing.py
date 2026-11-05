@@ -10,7 +10,7 @@ from tessera.models.ticket import TicketStatus
 from tessera.routers.projects.shared import loader, new_router, require_project_path, ticket_svc
 from tessera.config import settings
 from tessera.services.adr import lire_contraintes
-from tessera.services.lecons import nombre_proposees
+from tessera.services.gardes.lecons import nombre_proposees
 from tessera.services.verification.process_registry import PROCESS_REGISTRY
 from tessera.services.project_loader import (
     fait_tourner_l_ide,
