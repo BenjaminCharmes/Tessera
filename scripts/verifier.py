@@ -1,6 +1,6 @@
 """Verification script: runs backend and frontend checks in parallel chains.
 
-Three chains run side by side — pytest, typing (mypy → mypy-linux) and
+Three chains run side by side — pytest, typing (ruff → mypy → mypy-linux) and
 frontend (tsc → eslint → vitest) — each stopping at its first failure. Outputs
 are captured and printed together once every chain finishes — never
 interleaved.
@@ -83,7 +83,14 @@ BACKEND_STEPS: list[Step] = [
 # Une chaîne à part, à côté de pytest plutôt qu'après lui. Chaque plateforme a
 # son propre cache : partagé, chaque passage invalidait celui de l'autre (39 s
 # à froid, 12 s à chaud pour win32 seul ; 46 s puis 47 s en alternant).
+# Ruff ouvre la chaîne : une seconde, et une erreur de lint coûte moins cher
+# à dire avant les deux mypy (ticket-773).
 TYPE_STEPS: list[Step] = [
+    Step(
+        name="ruff",
+        cmd=[_PYTHON, "-m", "ruff", "check", "src", "tests"],
+        cwd=BACKEND_DIR,
+    ),
     Step(
         name="mypy",
         cmd=[_PYTHON, "-m", "mypy", "--cache-dir", ".mypy_cache/native", "src/"],
