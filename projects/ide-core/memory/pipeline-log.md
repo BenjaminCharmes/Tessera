@@ -7621,3 +7621,13 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-04 15:59:50 UTC — [ticket-756] validateur: APPROVED — Les deux critères d'acceptation sont satisfaits. Le code implémente une vérifica (110625ms)
 - 2026-11-04 15:59:50 UTC — [ticket-756] APPROVED après 1 tour(s)
 - 2026-11-04 16:01:19 UTC — [ticket-756] documentation: 0 fichier(s) (80312ms)
+- 2026-11-04 16:43:05 UTC — [ide-core] ticket-757 PR #896 confiée au CIWatcher
+- 2026-11-04 16:43:11 UTC — [ticket-793] branche ticket-793-the-retest-after-rebase-runs-only-the-backend-tes
+- 2026-11-04 16:43:12 UTC — [ticket-793] tour 1 — codeur démarré
+- 2026-11-04 16:44:53 UTC — [ticket-793] tour 1 — codeur terminé (101296ms)
+- 2026-11-04 16:55:36 UTC — [ticket-757] livraison: nouvelle tentative de la PR #896 après une erreur réseau (ConnectError: [Errno 11001] getaddrinfo failed), PR non mergée
+- 2026-11-04 16:55:36 UTC — [ticket-757] livraison: arrêt — PR #896 non mergée : tête de la PR #896 illisible (ConnectError: [Errno 11001] getaddrinfo failed) : elle reste ouverte
+- 2026-11-04 22:47:27 UTC — [ticket-793] testeur: délai dépassé, suite relancée
+- 2026-11-04 22:47:27 UTC — [ticket-793] testeur: délai dépassé (1500 s, durée réelle 21751 s) — ../scripts/verifier.py coupé après 21751 s
+- 2026-11-05 07:35:57 UTC — [ticket-793] testeur: délai dépassé (1500 s, durée réelle 31709 s) — ../scripts/verifier.py coupé après 31710 s
+- 2026-11-05 07:36:08 UTC — [ticket-793] BLOCKED — testeur: délai dépassé deux fois
