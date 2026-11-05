@@ -85,3 +85,23 @@ def test_main_with_impact_skips_pytest_when_no_test_is_concerned() -> None:
         assert main(["--impact", "abc123"]) == 0
     pytest_steps, frontend, _types = run.call_args.args
     assert pytest_steps == [] and frontend == FRONTEND_STEPS
+
+
+def test_impact_base_selects_from_the_ticket_diff_without_asking_git() -> None:
+    with patch("verifier.changed_paths", return_value=["backend/src/tessera/x.py"]), \
+         patch("verifier._git") as git, \
+         patch("verifier.fichiers_de_test_impactes", return_value=["tests/test_x.py"]) as choix, \
+         patch("verifier.run_parallel", return_value=0) as run:
+        assert main(["--impact", "base"]) == 0
+    git.assert_not_called()
+    choix.assert_called_once_with(["backend/src/tessera/x.py"])
+    assert run.call_args.args[0][0].cmd[-1] == "tests/test_x.py"
+
+
+def test_the_last_impact_option_wins() -> None:
+    with patch("verifier.changed_paths", return_value=["backend/src/tessera/x.py"]), \
+         patch("verifier._git", return_value="backend/src/tessera/y.py\n"), \
+         patch("verifier.fichiers_de_test_impactes", return_value=["tests/test_y.py"]) as choix, \
+         patch("verifier.run_parallel", return_value=0):
+        assert main(["--impact", "base", "--impact", "abc123"]) == 0
+    assert "backend/src/tessera/y.py" in choix.call_args.args[0]
