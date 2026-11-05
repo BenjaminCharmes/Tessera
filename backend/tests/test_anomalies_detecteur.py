@@ -16,16 +16,16 @@ from fastapi.testclient import TestClient
 
 from tessera.config import settings
 from tessera.main import app
-from tessera.services.anomalies import detecteur as module_detecteur
-from tessera.services.anomalies import lecture_evenements
-from tessera.services.anomalies.detecteur import DetecteurDAnomalies
+from tessera.services.supervision.anomalies import detecteur as module_detecteur
+from tessera.services.supervision.anomalies import lecture_evenements
+from tessera.services.supervision.anomalies.detecteur import DetecteurDAnomalies
 from tessera.services.noyau.event_hub import EventHub
 from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.pipeline.run_registry import RunActif, RunRegistry
 from tests.anomalies_base import appel_d_agent, evenement, ligne_de_run
 
 NOW = datetime(2026, 11, 5, 12, 0, tzinfo=timezone.utc)
-LOGGER = "tessera.services.anomalies.detecteur"
+LOGGER = "tessera.services.supervision.anomalies.detecteur"
 
 
 def _iso(secondes_avant: float) -> str:

@@ -4,7 +4,7 @@ Pure : aucune I/O, aucun événement de plus à émettre.
 """
 from collections.abc import Sequence
 
-from tessera.services.anomalies.modeles import Etape, EvenementLu
+from tessera.services.supervision.anomalies.modeles import Etape, EvenementLu
 
 #: Étape → (type de début, types de fin). Les étapes d'agent (`codeur`,
 #: `reviewer`, …) n'y figurent pas : elles s'écrivent `agent_started` /

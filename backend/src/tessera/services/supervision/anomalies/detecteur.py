@@ -14,11 +14,11 @@ from pathlib import Path
 from typing import Any
 
 from tessera.models.agent import AgentRole
-from tessera.services.anomalies import lecture_evenements, lecture_historique
-from tessera.services.anomalies.etapes import ETAPES_SILENCIEUSES, etapes_depuis
-from tessera.services.anomalies.modeles import Anomalie, Etape
-from tessera.services.anomalies.regles_directes import outil_repete, silence, tours_de_revue
-from tessera.services.anomalies.regles_historiques import (
+from tessera.services.supervision.anomalies import lecture_evenements, lecture_historique
+from tessera.services.supervision.anomalies.etapes import ETAPES_SILENCIEUSES, etapes_depuis
+from tessera.services.supervision.anomalies.modeles import Anomalie, Etape
+from tessera.services.supervision.anomalies.regles_directes import outil_repete, silence, tours_de_revue
+from tessera.services.supervision.anomalies.regles_historiques import (
     blocages_identiques,
     cout_budget,
     cout_median,

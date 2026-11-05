@@ -1,12 +1,12 @@
 """Cost anomaly rule and its readings — ticket-837 (ADR-078)."""
 from pathlib import Path
 
-from tessera.services.anomalies.lecture_historique import (
+from tessera.services.supervision.anomalies.lecture_historique import (
     cout_du_ticket,
     couts_passes,
     ligne_ouverte_du_ticket,
 )
-from tessera.services.anomalies.regles_historiques import cout_anormal
+from tessera.services.supervision.anomalies.regles_historiques import cout_anormal
 from tests.anomalies_base import appel_d_agent, base_neuve, ligne_de_run
 
 T = "ticket-001"

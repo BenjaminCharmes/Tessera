@@ -1,8 +1,8 @@
 """Stages read from persisted events — ticket-836 (ADR-078)."""
 from datetime import datetime, timedelta, timezone
 
-from tessera.services.anomalies.etapes import etapes_depuis
-from tessera.services.anomalies.modeles import EvenementLu
+from tessera.services.supervision.anomalies.etapes import etapes_depuis
+from tessera.services.supervision.anomalies.modeles import EvenementLu
 
 T0 = datetime(2026, 11, 5, 10, 0, tzinfo=timezone.utc)
 

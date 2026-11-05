@@ -7,7 +7,7 @@ from collections.abc import Sequence
 from datetime import datetime
 from statistics import median
 
-from tessera.services.anomalies.modeles import Anomalie, Etape, RunFini
+from tessera.services.supervision.anomalies.modeles import Anomalie, Etape, RunFini
 
 
 def mediane_si_assez(echantillon: Sequence[float], minimum: int = 10) -> float | None:

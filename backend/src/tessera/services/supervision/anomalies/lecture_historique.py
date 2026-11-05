@@ -7,9 +7,9 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from tessera.services.anomalies.etapes import etapes_depuis, types_de_l_etape
-from tessera.services.anomalies.lecture_base import ouvrir_en_lecture
-from tessera.services.anomalies.modeles import EvenementLu, LigneOuverte, RunFini
+from tessera.services.supervision.anomalies.etapes import etapes_depuis, types_de_l_etape
+from tessera.services.supervision.anomalies.lecture_base import ouvrir_en_lecture
+from tessera.services.supervision.anomalies.modeles import EvenementLu, LigneOuverte, RunFini
 
 #: Lignes lues par type d'événement : de quoi couvrir 20 étapes, sans la table entière.
 BORNE_PAR_TYPE = 200

@@ -36,7 +36,7 @@ from tessera.routers import (
     usage,
     salle_tessera,
 )
-from tessera.services.anomalies.detecteur import DetecteurDAnomalies, arreter_le_detecteur
+from tessera.services.supervision.anomalies.detecteur import DetecteurDAnomalies, arreter_le_detecteur
 from tessera.services.noyau.database import init_db
 from tessera.services.noyau.database_runs import solder_les_runs_orphelins
 from tessera.services.noyau.eveil import relacher as eveil_relacher

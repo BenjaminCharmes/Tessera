@@ -6,7 +6,7 @@ viennent de `settings`, lus par l'appelant.
 from collections.abc import Sequence
 from datetime import datetime
 
-from tessera.services.anomalies.modeles import Anomalie, AppelOutil
+from tessera.services.supervision.anomalies.modeles import Anomalie, AppelOutil
 
 
 def _serie_finale(appels: Sequence[AppelOutil], seuil: int) -> list[AppelOutil]:

@@ -8,9 +8,9 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from tessera.services.anomalies.etapes import TYPES_D_ETAPE
-from tessera.services.anomalies.lecture_base import ouvrir_en_lecture
-from tessera.services.anomalies.modeles import AppelOutil, EvenementLu
+from tessera.services.supervision.anomalies.etapes import TYPES_D_ETAPE
+from tessera.services.supervision.anomalies.lecture_base import ouvrir_en_lecture
+from tessera.services.supervision.anomalies.modeles import AppelOutil, EvenementLu
 
 __all__ = ["AppelOutil", "derniers_appels_d_outils", "evenements_de_etapes", "hacher_input"]
 
