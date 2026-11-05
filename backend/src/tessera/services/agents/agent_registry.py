@@ -77,6 +77,7 @@ class AgentRegistryService:
             "resolveur-conflit",
             "reviewer",
             "securite",
+            "superviseur",
             "validateur",
         }
     )
