@@ -352,6 +352,12 @@ Chaque carte a un menu accessible (trois points verticaux). Clique dessus pour :
 
 La liste se recharge, et la barre latérale s'actualise.
 
+### Leçons du projet
+
+Après qu'un run approuvé a corrigé quelque chose, l'agent propose une leçon dans `memory/lecons.md`. Un compteur sur la carte du projet indique les leçons en attente de ta relecture. Celles que tu approuves, tu les déplaces sous `## En vigueur` — elles deviennent une consigne pour les agents à venir.
+
+Un run qui essaierait de modifier ce fichier est bloqué : seul le service écrit dedans.
+
 ### États de la vue
 
 - **Chargement** : tu vois des cartes-squelettes gris clair
@@ -1372,6 +1378,16 @@ Le bouton « Tout marquer comme lu » remet le compteur de la pastille à zéro.
 L'historique s'efface à minuit (fin du jour). Le jour suivant, tu repartiras de zéro.
 
 ### L'onglet « Réglages »
+
+Tu accèdes aux réglages par le bouton d'engrenage de la barre latérale. Cinq paramètres y sont affichés, chacun avec son défaut de `.env`, ses bornes, et deux boutons (**Appliquer** ou **Revenir au défaut**) :
+
+- **Plafond de dépense d'un run** (USD) — le run s'arrête au-delà ; vaut au prochain run.
+- **Plafond de dépense d'un appel** (USD) — un appel qui le dépasse met le run en échec.
+- **Délai de reprise** (secondes) — l'agent reprend avec une hypothèse après ce délai. Vaut au prochain run.
+- **Suites de tests simultanées** — maximum en parallèle ; change immédiatement pour le prochain créneau.
+- **Machine éveillée pendant un run** (Windows) — l'écran peut s'éteindre, le système reste éveillé. Vaut au prochain run.
+
+Si tu changes un réglage pendant qu'une file tourne, un texte t'indique combien de runs gardent l'ancienne valeur. Les runs ouverts gelent leurs réglages à l'ouverture — seul le suivant les applique.
 
 Pour chaque type d'événement, deux cases à cocher :
 
