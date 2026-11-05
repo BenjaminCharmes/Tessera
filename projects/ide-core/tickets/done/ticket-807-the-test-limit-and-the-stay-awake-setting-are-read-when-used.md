@@ -2,7 +2,7 @@
 id: ticket-807
 title: "The test limit and the stay-awake setting are read when they are used"
 type: feat
-status: todo
+status: done
 pr_number: null
 priority: low
 agent: codeur
@@ -48,8 +48,8 @@ laisserait la machine éveillée pour toujours.
 
 ## Critères d'acceptation
 
-- [ ] Les tests ci-dessus passent ; `backend/tests/test_test_runner*.py` existants inchangés et verts
-- [ ] Le test de garde échoue sur un `settings.max_parallel_test_runs` ajouté à la main dans un service
+- [x] Les tests ci-dessus passent ; `backend/tests/test_test_runner*.py` existants inchangés et verts
+- [x] Le test de garde échoue sur un `settings.max_parallel_test_runs` ajouté à la main dans un service
 
 ## Ce que ça ne fait pas
 

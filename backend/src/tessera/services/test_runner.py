@@ -13,6 +13,7 @@ from tessera.services.detail_du_delai import detail_du_delai
 from tessera.services.erreur_de_sortie import detail_avec_erreur
 from tessera.services.groupe_d_etape import GroupeDEtape
 from tessera.services.lancement import essais_de_commande
+from tessera.services.limiteur_de_suites import LimiteurDeSuites
 from tessera.services.minuteur_d_etape import MinuteurDEtape
 from tessera.services.outil_introuvable import outil_introuvable
 from tessera.services.process_registry import CommandeInvalide, resoudre_le_cwd
@@ -28,32 +29,24 @@ _logger = get_logger(__name__)
 
 _DEFAULT_TIMEOUT = 120
 
-# Sémaphore partagé entre tous les TestRunnerService du processus.
-# Créé paresseusement : il n'y a pas de boucle asyncio à l'import (ticket-348).
-_semaphore: asyncio.Semaphore | None = None
+# Limiteur partagé entre tous les TestRunnerService du processus. Créé
+# paresseusement : il n'y a pas de boucle asyncio à l'import (ticket-348). Sa
+# limite se relit à chaque acquisition (ticket-807, ADR-075).
+_semaphore: LimiteurDeSuites | None = None
 
 
-def _get_semaphore() -> asyncio.Semaphore | None:
-    """Return (or create) the process-wide test slot semaphore.
-
-    Lazily created on first call so that no event loop is required at import
-    time.  Returns ``None`` when the bound is disabled (limit ≤ 0).
-    """
+def _get_semaphore() -> LimiteurDeSuites:
+    """Return (or create) the process-wide test slot limiter."""
     global _semaphore
-    from tessera.config import settings
-
-    limit = settings.max_parallel_test_runs
-    if limit <= 0:
-        return None
     if _semaphore is None:
-        _semaphore = asyncio.Semaphore(limit)
+        _semaphore = LimiteurDeSuites()
     return _semaphore
 
 
 def reset_semaphore_for_tests(limit: int | None = None) -> None:
-    """Reset the shared semaphore.  For test isolation only."""
+    """Reset the shared limiter, forcing `limit` if > 0.  For test isolation only."""
     global _semaphore
-    _semaphore = asyncio.Semaphore(limit) if (limit is not None and limit > 0) else None
+    _semaphore = LimiteurDeSuites(limit if (limit is not None and limit > 0) else None)
 
 
 @asynccontextmanager
@@ -63,19 +56,17 @@ async def _acquis(
     """Hold the shared test slot for the duration of a ``run_tests`` call.
 
     Calls ``en_attente_fn`` once if the slot is not immediately available.
-    A ``None`` semaphore (limit ≤ 0) lets every call through without waiting.
-    The check of ``_value`` is safe in asyncio's single-threaded model : no
-    other coroutine runs between the check and the ``async with`` unless we
-    yield, and we only yield here when the slot is already taken.
+    A limit of 0 or less lets every call through without waiting. The check
+    is safe in asyncio's single-threaded model : no other coroutine runs
+    between the check and the acquisition unless we yield, and we only yield
+    here when the slot is already taken.
     """
-    sem = _get_semaphore()
-    if sem is None:
-        yield
-        return
-    if sem._value <= 0 and en_attente_fn is not None:
+    limiteur = _get_semaphore()
+    if not limiteur.libre() and en_attente_fn is not None:
         await en_attente_fn()
-    async with sem:
+    async with limiteur:
         yield
+
 
 # pytest sort 5 quand il n'a collecté aucun test. Ce n'est pas un test rouge :
 # lu comme tel, un projet neuf renvoyait le codeur corriger des tests qui

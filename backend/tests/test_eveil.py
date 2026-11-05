@@ -101,7 +101,9 @@ def test_keep_awake_false_aucun_appel_api(
     run = registry.ouvrir("projet-alpha")
     registry.fermer(run.run_id)
 
-    api_mock.assert_not_called()
+    # Ticket-807 : relâcher est toujours sûr, mais rien ne retient la machine.
+    drapeaux = [c[0][0] for c in api_mock.call_args_list]
+    assert _ES_CONTINUOUS | _ES_SYSTEM_REQUIRED not in drapeaux
 
 
 # ---------------------------------------------------------------------------
@@ -148,3 +150,25 @@ def test_drapeaux_corrects_pour_retenir_et_relacher(
     relacher_drapeau = api_mock.call_args_list[1][0][0]
     assert retenir_drapeau == _ES_CONTINUOUS | _ES_SYSTEM_REQUIRED
     assert relacher_drapeau == _ES_CONTINUOUS
+
+
+# ---------------------------------------------------------------------------
+# Ticket-807 — le réglage se lit à l'ouverture, jamais à la fermeture
+# ---------------------------------------------------------------------------
+
+
+def test_retenir_does_nothing_when_the_setting_is_off(
+    api_mock: MagicMock, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(settings, "keep_awake_during_runs", False)
+    eveil.retenir()
+    api_mock.assert_not_called()
+
+
+def test_relacher_releases_even_when_the_setting_was_turned_off_after_retenir(
+    api_mock: MagicMock, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    eveil.retenir()
+    monkeypatch.setattr(settings, "keep_awake_during_runs", False)
+    eveil.relacher()
+    assert api_mock.call_args_list[-1][0][0] == _ES_CONTINUOUS

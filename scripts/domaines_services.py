@@ -132,6 +132,7 @@ A_DEPLACER: dict[str, str] = {
     "process_registry": "verification",
     "service_etat": "verification",
     "sortie_de_test": "verification",
+    "limiteur_de_suites": "verification",
     "test_runner": "verification",
     # verdicts
     "critere_protege": "verdicts",
