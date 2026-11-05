@@ -1,14 +1,15 @@
 ---
-id: ticket-772
-title: "Design how Tessera keeps its secrets in the operating system vault instead of a plain .env"
-type: design
-status: todo
-pr_number: null
-priority: medium
 agent: architect
+created: 2026-11-03
 depends_on: []
 estimated_days: 1
-created: 2026-11-03
+id: ticket-772
+pr_number: 910
+priority: medium
+status: done
+title: Design how Tessera keeps its secrets in the operating system vault instead
+  of a plain .env
+type: design
 ---
 
 # ticket-772 — Concevoir le rangement des secrets dans le coffre du système

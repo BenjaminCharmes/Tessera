@@ -1371,6 +1371,8 @@ Quand l'appel d'ouverture de la PR échoue avec une erreur de transport (`httpx.
 
 Pour récupérer cette PR orpheline, la phase 1 cherche une PR ouverte dont la branche de tête est celle du run courant (`GET /pulls?head=<owner>:<branche>&state=open`). Si elle existe, elle est traitée comme une `LivraisonInterrompue` avec `pr_orpheline=True` : elle passe au CIWatcher pour le suivi du statut CI. Si la recherche elle-même échoue ou qu'aucune PR n'est trouvée, l'arrêt d'origine est conservé sans nouvelle erreur.
 
+Le ticket-788 étend ce mécanisme aux erreurs serveur GitHub (réponses 5xx). Quand l'ouverture de PR échoue, le système cherche d'abord une PR déjà ouverte malgré l'erreur, avec des délais croissants de 2 et 5 secondes, avant de retenter l'ouverture une fois. Les délais sont définis dans `_DELAIS_RECHERCHE_S`.
+
 #### Retry automatique pour les indisponibilités GitHub
 
 Lors de la lecture du statut CI ou du merge d'une PR, une indisponibilité passagère de GitHub (502 Bad Gateway, 503 Service Unavailable, 504 Gateway Timeout) n'arrête plus le run. Le CIWatcher réessaye jusqu'à trois fois avec une attente croissante (1 s, 2 s, 4 s) avant abandon définitif. Les erreurs 4xx (403 Forbidden, 404 Not Found…) ne déclenchent pas de retry — elles reflètent une vraie permission manquante ou une ressource disparue (ticket-461).
@@ -1460,6 +1462,8 @@ Après le merge d'une PR, le workspace se réaligne sur la branche de base. Deux
 - **Fichiers non suivis et non ignorés laissés par le run** : listés au journal du pipeline, sans être supprimés.
 
 Résultat : `git pull` ne refuse jamais, et le workspace est propre pour le ticket suivant.
+
+Le ticket-789 améliore cet invariant en gérant les lignes écrites par le CIWatcher après le retour sur la base. Quand le journal du pipeline est suivi par git et que CIWatcher ajoute une ligne en arrière-plan, celle-ci est mise en attente dans un fichier hors du dépôt (nommé `tessera-pipeline-log-attente` dans le répertoire git commun) plutôt que d'être ajoutée directement au checkout. Le run suivant reprend ces lignes et les réécrit dans son journal avant de committer.
 
 ### Finalisation de tous les runs et journalisation des défaillances (tickets-377, 390)
 
