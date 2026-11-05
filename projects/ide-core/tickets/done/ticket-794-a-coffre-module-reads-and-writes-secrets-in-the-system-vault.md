@@ -2,7 +2,7 @@
 id: ticket-794
 title: "A coffre module reads and writes secrets in the system vault"
 type: feat
-status: todo
+status: done
 pr_number: null
 priority: medium
 agent: codeur
@@ -49,12 +49,12 @@ Rien ne lit encore le coffre : ce ticket ne change aucun comportement du backend
 
 ## Critères d'acceptation
 
-- [ ] `backend/src/tessera/coffre.py` expose les noms et signatures du design, sans importer
+- [x] `backend/src/tessera/coffre.py` expose les noms et signatures du design, sans importer
       `tessera.config`
-- [ ] Les tests ci-dessus passent sans toucher le vrai coffre de la machine
-- [ ] `uv sync` réussit avec `keyring` ; sous Smart App Control, ses dépendances Windows sont du
+- [x] Les tests ci-dessus passent sans toucher le vrai coffre de la machine
+- [x] `uv sync` réussit avec `keyring` ; sous Smart App Control, ses dépendances Windows sont du
       Python pur (à noter dans le message de commit si ce n'est pas le cas)
-- [ ] mypy passe sur les deux plateformes (`--platform linux` compris)
+- [x] mypy passe sur les deux plateformes (`--platform linux` compris)
 
 ## Ce que ça ne fait pas
 
