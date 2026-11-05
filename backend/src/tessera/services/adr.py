@@ -28,6 +28,14 @@ _MARQUEUR_ROLE = re.compile(r"^\*\(([^)]+)\)\*$")
 TITRE_PROPOSEES = "## Proposées"
 
 
+#: Les seuls rôles qui reçoivent les leçons du projet (ADR-074, ticket-802) :
+#: un rôle créé après coup n'en reçoit pas, le défaut protège.
+ROLES_AVEC_LECONS = frozenset({"codeur", "reviewer"})
+
+#: Le titre de la section des leçons dans le contexte projet.
+_TITRE_LECONS = "## Leçons du projet"
+
+
 @dataclass(frozen=True)
 class BlocADR:
     numero: str
@@ -190,6 +198,21 @@ def _separer_decisions_et_queue(decisions: str) -> tuple[str, str]:
     return decisions[: m.start()], decisions[m.start() :]
 
 
+def sans_lecons(contexte: str) -> str:
+    """Drop the `## Leçons du projet` section, from its title to the next `## `."""
+    retenues: list[str] = []
+    dans_lecons = False
+    for ligne in contexte.splitlines(keepends=True):
+        if ligne.strip() == _TITRE_LECONS:
+            dans_lecons = True
+            continue
+        if dans_lecons and ligne.lstrip().startswith("## "):
+            dans_lecons = False
+        if not dans_lecons:
+            retenues.append(ligne)
+    return "".join(retenues)
+
+
 def adr_pertinents(contexte_projet: str, role: str) -> str:
     """Réduit la section « Décisions récentes » d'un contexte projet à ce rôle.
 
@@ -203,6 +226,8 @@ def adr_pertinents(contexte_projet: str, role: str) -> str:
     Un contexte sans section de décisions traverse intact : c'est le cas d'un
     projet qui n'en a pas encore, et celui de la plupart des tests.
     """
+    if role.strip().lower() not in ROLES_AVEC_LECONS:
+        contexte_projet = sans_lecons(contexte_projet)
     tete, separateur, decisions = contexte_projet.partition(_SECTION)
     if not separateur:
         return contexte_projet
