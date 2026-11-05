@@ -4,7 +4,7 @@ created: 2026-11-03
 depends_on: []
 estimated_days: 1
 id: ticket-761
-pr_number: null
+pr_number: 909
 priority: low
 status: done
 title: Dead code and stale notes left by the 30/10 refactors
