@@ -8004,3 +8004,5 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-05 23:11:33 UTC — [ticket-865] validateur: fichiers cités joints : RevueProjetBouton.test.tsx
 - 2026-11-05 23:11:33 UTC — [ticket-865] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le composant `RevueProjetBouto (139688ms)
 - 2026-11-05 23:11:33 UTC — [ticket-865] APPROVED après 1 tour(s)
+- 2026-11-05 23:21:04 UTC — [ticket-865] documentation: 0 fichier(s) (558750ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « jeton vérifiable » — ticket « ticket-833 » n'est ni dans le texte remplacé, ni dans les tickets, le diff ou les f — refusé : doc-fonctionnelle : docs/guide-utilisateur.md : règle « preuve » — l'extrait « RUN_ANOMALY = "run_anomaly"
+    #: Le détecteur d'anomalies  » (backend/src/tesse
