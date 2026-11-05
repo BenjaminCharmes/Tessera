@@ -2,7 +2,7 @@
 id: ticket-844
 title: "A replay script runs a candidate reviewer on the corpus with a spending cap"
 type: chore
-status: todo
+status: done
 priority: low
 agent: codeur
 created: 2026-11-05
@@ -61,16 +61,16 @@ Règles :
 
 ## Critères d'acceptation
 
-- [ ] `scripts/seconde_revue.py` porte les deux fonctions et la commande `rejouer`
-- [ ] `backend/tests/test_seconde_revue.py`, avec un faux `LLMProvider` injecté par `construire`,
+- [x] `scripts/seconde_revue.py` porte les deux fonctions et la commande `rejouer`
+- [x] `backend/tests/test_seconde_revue.py`, avec un faux `LLMProvider` injecté par `construire`,
       couvre : une ligne `ok` consignée avec coût et durée ; `hors_fenetre` sans appel ;
       `indisponible` sans second appel ; `hors_schema` ; arrêt avant l'appel qui dépasserait
       le plafond, avec les lignes déjà écrites conservées ; reprise qui ne rejoue pas une
       entrée faite ; refus d'un fichier de résultats d'un autre `gel_sha256`
-- [ ] Un test lit le `agents.json` écrit : un seul rôle, aucune clé `fallback`
-- [ ] Un test vérifie que le dossier temporaire est supprimé, y compris sur erreur, et que le
+- [x] Un test lit le `agents.json` écrit : un seul rôle, aucune clé `fallback`
+- [x] Un test vérifie que le dossier temporaire est supprimé, y compris sur erreur, et que le
       `agents.json` d'ide-core est inchangé (octets identiques)
-- [ ] `grep get_provider scripts/seconde_revue.py` ne rend rien ; aucun fichier de
+- [x] `grep get_provider scripts/seconde_revue.py` ne rend rien ; aucun fichier de
       `backend/src` ne mentionne `seconde_revue`
 
 ## Ce que ça ne fait pas
