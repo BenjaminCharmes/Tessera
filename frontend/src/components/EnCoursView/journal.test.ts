@@ -13,4 +13,11 @@ describe("niveauDeLigne", () => {
     expect(niveauDeLigne("watch round 10: 7 checked, 0 failed")).toBe("info");
     expect(niveauDeLigne("0 errors")).toBe("info");
   });
+
+  it("does not redden a clean build summary but still flags a real error", () => {
+    expect(niveauDeLigne("✓ built, 0 error")).toBe("info");
+    expect(niveauDeLigne("0 errors")).toBe("info");
+    expect(niveauDeLigne("Error: boom")).toBe("erreur");
+    expect(niveauDeLigne("0 error then Error: boom")).toBe("erreur");
+  });
 });
