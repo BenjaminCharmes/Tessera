@@ -4,8 +4,11 @@ export type NiveauDeLigne = "erreur" | "avertissement" | "info";
 const ERREUR = /\b(error|erreur|exception|traceback|fatal)\b/i;
 const AVERTISSEMENT = /\b(warn|warning|avertissement|deprecated)\b/i;
 
+// « 0 error », « no errors » : un compte nul ou une absence n'est pas un échec.
+const ABSENCE_D_ERREUR = /\b(0|no|zero|aucune?|sans)\s+(error|erreur|exception|fatal)s?\b/gi;
+
 export function niveauDeLigne(ligne: string): NiveauDeLigne {
-  if (ERREUR.test(ligne)) return "erreur";
+  if (ERREUR.test(ligne.replace(ABSENCE_D_ERREUR, ""))) return "erreur";
   if (AVERTISSEMENT.test(ligne)) return "avertissement";
   return "info";
 }
