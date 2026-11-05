@@ -7710,3 +7710,15 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-05 10:58:45 UTC — [ticket-775] APPROVED après 1 tour(s)
 - 2026-11-05 10:58:53 UTC — [ticket-775] fichiers non suivis laissés par le run : tickets/todo/ticket-801-a-lessons-module-parses-and-checks-the-project-lessons-file.md, tickets/todo/ticket-802-the-in-force-lessons-reach-the-coder-and-the-reviewer-only.md, tickets/todo/ticket-803-an-approved-run-that-had-a-corrected-failure-proposes-one-lesson.md, tickets/todo/ticket-804-a-run-diff-that-touches-the-lessons-file-blocks-the-run.md (à ignorer dans .gitignore ?)
 - 2026-11-05 11:02:18 UTC — [ticket-775] documentation: 1 fichier(s) (204875ms)
+- 2026-11-05 11:20:19 UTC — [ide-core] ticket-776 PR #913 non surveillée (livraison arrêtée)
+- 2026-11-05 11:20:24 UTC — [ticket-780] branche ticket-780-design-global-settings-that-can-be-changed-from-t
+- 2026-11-05 11:20:25 UTC — [ticket-780] tour 1 — codeur démarré
+- 2026-11-05 11:25:31 UTC — [ticket-780] tour 1 — architect terminé (305421ms)
+- 2026-11-05 11:25:43 UTC — [ticket-780] testeur: OK (exit 0)
+- 2026-11-05 11:28:41 UTC — [ticket-780] securite: PASS — Ce diff ajoute une spécification et des contraintes proposées (non injectées aux (178327ms)
+- 2026-11-05 11:28:41 UTC — [ticket-780] tour 1 — reviewer démarré
+- 2026-11-05 11:29:03 UTC — [ticket-780] tour 1 — reviewer terminé (21592ms)
+- 2026-11-05 11:33:41 UTC — [ticket-780] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-05 11:34:10 UTC — [ticket-780] validateur: fichiers cités joints : projects/ide-core/memory/decisions.md (tronqué) ; non joints (budget épuisé) : contraintes.md, projects/ide-core/tickets/todo/
+- 2026-11-05 11:34:10 UTC — [ticket-780] validateur: APPROVED — Le design de ticket-780 est complet. ADR-075 créée avec ses deux règles en contr (328094ms)
+- 2026-11-05 11:34:10 UTC — [ticket-780] APPROVED après 1 tour(s)
