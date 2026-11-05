@@ -4,7 +4,7 @@ created: 2026-11-05
 depends_on: []
 estimated_days: 1
 id: ticket-862
-pr_number: null
+pr_number: 941
 priority: medium
 status: done
 title: An agent report is checked, bounded and deduplicated by pure functions
