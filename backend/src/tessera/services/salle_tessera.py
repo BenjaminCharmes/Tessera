@@ -97,6 +97,7 @@ def runs_vivants(instantane: list[dict[str, Any]]) -> list[RunVivant]:
             file_index=int(run.get("file_index") or 0),
             file_total=int(run.get("file_total") or 0),
             suivants=[str(t) for t in (run.get("file_restants") or [])],
+            anomalies=len(run.get("anomalies") or []),
         )
         for run in instantane
     ]

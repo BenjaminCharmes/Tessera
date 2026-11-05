@@ -2,7 +2,7 @@
 id: ticket-835
 title: "Direct anomaly rules: repeated tool, silence and review rounds"
 type: feat
-status: todo
+status: done
 pr_number: null
 priority: medium
 agent: codeur
@@ -43,20 +43,20 @@ paramètre, aucune I/O.
 
 ## Critères d'acceptation
 
-- [ ] `test_outil_repete_three_identical_calls_is_none` et
+- [x] `test_outil_repete_three_identical_calls_is_none` et
       `test_outil_repete_four_identical_calls_reports` (3 sous le seuil, 4 au seuil)
-- [ ] `test_outil_repete_five_calls_keeps_the_key_of_the_series_start` : 5 appels donnent la clé
+- [x] `test_outil_repete_five_calls_keeps_the_key_of_the_series_start` : 5 appels donnent la clé
       des 4
-- [ ] `test_outil_repete_a_different_input_or_tool_in_between_breaks_the_series`
-- [ ] `test_outil_repete_message_never_contains_the_tool_input` : un `input` portant un faux
+- [x] `test_outil_repete_a_different_input_or_tool_in_between_breaks_the_series`
+- [x] `test_outil_repete_message_never_contains_the_tool_input` : un `input` portant un faux
       jeton ne se retrouve pas dans `message`
-- [ ] `test_silence_899s_is_none` et `test_silence_900s_reports`
-- [ ] `test_silence_is_none_when_exempt_or_when_no_event_was_seen`
-- [ ] `test_tours_de_revue_round_2_is_none` et `test_tours_de_revue_round_3_reports`
-- [ ] `test_derniers_appels_d_outils_ignores_calls_before_the_last_agent_started`
-- [ ] `test_derniers_appels_d_outils_never_writes` : la base est ouverte en lecture seule ou
+- [x] `test_silence_899s_is_none` et `test_silence_900s_reports`
+- [x] `test_silence_is_none_when_exempt_or_when_no_event_was_seen`
+- [x] `test_tours_de_revue_round_2_is_none` et `test_tours_de_revue_round_3_reports`
+- [x] `test_derniers_appels_d_outils_ignores_calls_before_the_last_agent_started`
+- [x] `test_derniers_appels_d_outils_never_writes` : la base est ouverte en lecture seule ou
       inchangée après l'appel
-- [ ] `test_input_hash_is_stable_across_key_order`
+- [x] `test_input_hash_is_stable_across_key_order`
 
 ## Ce que ça ne fait pas
 

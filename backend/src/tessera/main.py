@@ -1,3 +1,4 @@
+import asyncio
 from pathlib import Path
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
@@ -34,10 +35,12 @@ from tessera.routers import (
     usage,
     salle_tessera,
 )
+from tessera.services.anomalies.detecteur import DetecteurDAnomalies, arreter_le_detecteur
 from tessera.services.database import init_db
 from tessera.services.database_runs import solder_les_runs_orphelins
 from tessera.services.eveil import relacher as eveil_relacher
 from tessera.services.event_hub import EVENT_HUB
+from tessera.services.run_registry import RUN_REGISTRY
 from tessera.services.reprise_orphelin import reprendre_depots_orphelins
 from tessera.services.reprise_worktrees import reprendre_worktrees_orphelins
 from tessera.services.reprise_surveillance import reprendre_surveillances
@@ -104,7 +107,16 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         settings.ide_workspace_dir, settings.ide_worktrees_dir
     )
     await _reprendre_les_surveillances()
+    # Le témoin des runs (ADR-078) : une tâche de fond, qui n'agit sur rien.
+    detecteur = (
+        asyncio.create_task(
+            DetecteurDAnomalies(RUN_REGISTRY, EVENT_HUB, settings.ide_db_path, settings).boucle()
+        )
+        if settings.anomalies_actives
+        else None
+    )
     yield
+    await arreter_le_detecteur(detecteur)
     # Les services lancés pour un projet sont des enfants de ce process et
     # s'arrêtent avec lui (ADR-042). Les terminer explicitement rend l'arrêt
     # propre plutôt que brutal : l'alternative — les détacher — laisserait un

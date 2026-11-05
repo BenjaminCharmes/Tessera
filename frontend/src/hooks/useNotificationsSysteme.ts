@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { isTauri } from "@tauri-apps/api/core";
 import {
   isPermissionGranted,
@@ -15,9 +15,11 @@ import {
 } from "../lib/notifications";
 import {
   CLE_REGLAGES_PAR_TYPE,
+  completerReglages,
   estReglagesParType,
   reglagesParDefaut,
   type ReglageDuType,
+  type ReglagesMemorises,
   type ReglagesParType,
 } from "../lib/reglagesNotifications";
 import { enEtapeSilencieuse, santeAgent, type SanteAgent } from "../lib/santeAgent";
@@ -123,15 +125,20 @@ export function useNotificationsSysteme(
     true,
     (v): v is boolean => typeof v === "boolean",
   );
-  const [reglages, setReglages] = useEtatPersistant<ReglagesParType>(
+  const [memorises, setReglages] = useEtatPersistant<ReglagesMemorises>(
     CLE_REGLAGES_PAR_TYPE,
     reglagesParDefaut(),
     estReglagesParType,
   );
+  // Un réglage mémorisé avant un type reçoit le défaut de ce type (ticket-840).
+  const reglages = useMemo(() => completerReglages(memorises), [memorises]);
   const { historique, nonLus, enregistrer, toutMarquerLu } = useHistoriqueNotifications();
   const setReglage = useCallback(
     (type: TypeNotif, champ: keyof ReglageDuType, valeur: boolean) =>
-      setReglages((prev) => ({ ...prev, [type]: { ...prev[type], [champ]: valeur } })),
+      setReglages((prev) => {
+        const complets = completerReglages(prev);
+        return { ...complets, [type]: { ...complets[type], [champ]: valeur } };
+      }),
     [setReglages],
   );
   const precedent = useRef<Instantane>({ runs: [], etats: {} });

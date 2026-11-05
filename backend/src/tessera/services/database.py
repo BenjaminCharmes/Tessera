@@ -132,6 +132,10 @@ UPDATE pipeline_runs SET depot_repris_at = COALESCE(finished_at, started_at)
     valeur     TEXT NOT NULL,
     modifie_le TEXT NOT NULL
 );""",
+    # 12 — ticket-836 : les étapes se relisent dans `agent_events` par type
+    # (le détecteur d'anomalies, ADR-078) ; sans cet index, chaque lecture
+    # parcourrait toute la table, tokens compris.
+    "CREATE INDEX IF NOT EXISTS idx_ae_type_id ON agent_events (type, id);",
 ]
 
 

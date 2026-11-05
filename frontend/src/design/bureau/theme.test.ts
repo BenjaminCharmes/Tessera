@@ -9,7 +9,7 @@ import { scene } from "../../lib/bureau/sprites/ecrans";
 import type { Sprite } from "../../lib/bureau/sprites/grille";
 import { bibliotheque, etagere, machineACafe, meubleBas, plante } from "../../lib/bureau/sprites/mobilier";
 import { fenetre, horloge, interrupteur, plafonnier, porte } from "../../lib/bureau/sprites/mur";
-import { boite, confetti, corbeille, dossier, gyrophare, imprimante, vapeur } from "../../lib/bureau/sprites/objets";
+import { boite, confetti, corbeille, dossier, gyrophare, imprimante, marqueurAnomalie, vapeur } from "../../lib/bureau/sprites/objets";
 import { poste } from "../../lib/bureau/sprites/poste";
 import { agentAuPupitre, baieGpu, pupitreVide } from "../../lib/bureau/sprites/produit";
 import { baieHaute, boucheVmc, climatiseur, extincteur, petiteBaie, porteCoupeFeu } from "../../lib/bureau/sprites/serveurs";
@@ -41,7 +41,7 @@ const TOUS: Sprite[] = [
   bibliotheque(), etagere(), machineACafe(), meubleBas(), plante("pot"), plante("cactus"), plante("ficus"),
   fenetre({ jour: true, soleil: true, nuages: 2 }), fenetre({ jour: false, soleil: true, nuages: 0 }),
   horloge(10, 10), interrupteur(true), plafonnier(true), plafonnier(false), porte(),
-  boite("ouverte"), boite("ci"), boite("mergee"), boite("refusee"), corbeille(3), dossier(), gyrophare(), imprimante(), vapeur(),
+  boite("ouverte"), boite("ci"), boite("mergee"), boite("refusee"), corbeille(3), dossier(), gyrophare(), imprimante(), marqueurAnomalie(), vapeur(),
   ...[0, 1, 2, 3, 4].map(confetti),
   ...Object.values(TENUES).map((tenue) =>
     poste({ physique: PH, tenue, vide: false, expression: "blocage", tape: true, etatEcran: "attente", scene: false }),
@@ -75,6 +75,8 @@ describe("sprite theme", () => {
       actif: ["#93c5fd", "#60a5fa", "#3b82f6", "#2563eb", "#1d4ed8"],
       attente: ["#a1a1aa", "#71717a", "#52525b", "#3f3f46", "#27272a"],
       question: ["#fcd34d", "#fbbf24", "#f59e0b", "#d97706", "#b45309"],
+      // Le détecteur d'anomalies (ADR-078) : une attente à vérifier, ambre comme la question.
+      anomalie: ["#fcd34d", "#fbbf24", "#f59e0b", "#d97706", "#b45309"],
       blocage: ["#fca5a5", "#f87171", "#ef4444", "#dc2626", "#b91c1c"],
       fait: ["#86efac", "#4ade80", "#22c55e", "#16a34a", "#15803d"],
     };

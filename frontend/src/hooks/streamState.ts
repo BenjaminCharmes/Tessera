@@ -15,6 +15,7 @@ import type {
 } from "../types/api";
 import { boundEvents } from "./boundEvents";
 import { appliquerAgent, appliquerToken } from "./streamAgents";
+import { appliquerAnomalie } from "./streamAnomalies";
 import { appliquerDialogue } from "./streamDialogue";
 import type { DernierOutil, EntreeFil } from "./streamEntrees";
 import { appliquerEtape } from "./streamEtapes";
@@ -26,6 +27,7 @@ export { MAX_EVENTS } from "./boundEvents";
 
 export type {
   DernierOutil,
+  EntreeAnomalie,
   EntreeFil,
   EntreeSecurite,
   EntreeTesteur,
@@ -234,7 +236,9 @@ export function clearTokensForReplay(s: StreamState): StreamState {
 
 /** Applique l'événement et note quand il est arrivé, jeton d'agent compris (ticket-549). */
 export function applyEvent(s: StreamState, ev: OrchestratorEvent): StreamState {
-  return { ...appliquerEvenement(s, ev), dernierEvenementA: ev.timestamp };
+  // Le constat du détecteur ne rompt pas le silence qu'il signale (ADR-078).
+  const dernier = ev.type === "run_anomaly" ? s.dernierEvenementA : ev.timestamp;
+  return { ...appliquerEvenement(s, ev), dernierEvenementA: dernier };
 }
 
 /**
@@ -277,6 +281,7 @@ function morceauDe(s: StreamState, ev: OrchestratorEvent): Partial<StreamState> 
     appliquerEtape(s, ev) ??
     appliquerVerdict(s, ev) ??
     appliquerRun(s, ev) ??
+    appliquerAnomalie(s, ev) ??
     appliquerDialogue(s, ev) ??
     {}
   );

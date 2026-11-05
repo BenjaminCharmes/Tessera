@@ -2,7 +2,7 @@
 id: ticket-840
 title: "The bell and the run thread show run anomalies"
 type: feat
-status: todo
+status: done
 pr_number: null
 priority: medium
 agent: codeur
@@ -41,17 +41,17 @@ cases par type sont réglées dans la cloche (ticket-554, ticket-779).
 
 ## Critères d'acceptation
 
-- [ ] `test_notificationsPour_reports_one_notification_for_a_new_anomaly`
-- [ ] `test_notificationsPour_is_silent_when_the_anomaly_was_already_in_the_previous_snapshot`
-- [ ] `test_notificationsPour_without_a_previous_snapshot_reports_no_anomaly`
-- [ ] `test_notificationsPour_reports_two_notifications_for_two_new_anomalies`
-- [ ] `test_reglagesParDefaut_includes_anomalie` et
+- [x] `test_notificationsPour_reports_one_notification_for_a_new_anomaly`
+- [x] `test_notificationsPour_is_silent_when_the_anomaly_was_already_in_the_previous_snapshot`
+- [x] `test_notificationsPour_without_a_previous_snapshot_reports_no_anomaly`
+- [x] `test_notificationsPour_reports_two_notifications_for_two_new_anomalies`
+- [x] `test_reglagesParDefaut_includes_anomalie` et
       `test_estReglagesParType_accepts_a_stored_setting_without_anomalie`
-- [ ] `test_cloche_settings_tab_lists_the_anomalie_type_with_its_switches`
-- [ ] `test_fil_du_run_renders_a_run_anomaly_line_with_rule_and_message`
-- [ ] `test_fil_du_run_ignores_a_run_anomaly_without_a_known_rule_label_gracefully` : une règle
+- [x] `test_cloche_settings_tab_lists_the_anomalie_type_with_its_switches`
+- [x] `test_fil_du_run_renders_a_run_anomaly_line_with_rule_and_message`
+- [x] `test_fil_du_run_ignores_a_run_anomaly_without_a_known_rule_label_gracefully` : une règle
       inconnue se rend avec son identifiant brut, sans planter
-- [ ] `test_run_anomaly_text_uses_amber_never_violet`
+- [x] `test_run_anomaly_text_uses_amber_never_violet`
 
 ## Ce que ça ne fait pas
 

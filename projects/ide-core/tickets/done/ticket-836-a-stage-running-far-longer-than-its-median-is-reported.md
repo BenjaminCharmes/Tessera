@@ -2,7 +2,7 @@
 id: ticket-836
 title: "A stage running far longer than its median is reported"
 type: feat
-status: todo
+status: done
 pr_number: null
 priority: medium
 agent: codeur
@@ -41,21 +41,21 @@ de la spec). Une étape jamais close n'entre pas dans la médiane qui la juge.
 
 ## Critères d'acceptation
 
-- [ ] `test_etapes_depuis_pairs_start_and_end_events_per_stage` (codeur, tests, sécurité,
+- [x] `test_etapes_depuis_pairs_start_and_end_events_per_stage` (codeur, tests, sécurité,
       validation, documentation, livraison)
-- [ ] `test_etapes_depuis_leaves_an_unclosed_stage_open`
-- [ ] `test_etapes_depuis_marks_a_restarted_stage_as_abandoned`
-- [ ] `test_etapes_depuis_keeps_review_and_validation_apart_when_they_overlap`
-- [ ] `test_mediane_si_assez_9_samples_is_none` et `test_mediane_si_assez_10_samples_returns_median`
-- [ ] `test_etape_longue_just_under_three_medians_is_none` et
+- [x] `test_etapes_depuis_leaves_an_unclosed_stage_open`
+- [x] `test_etapes_depuis_marks_a_restarted_stage_as_abandoned`
+- [x] `test_etapes_depuis_keeps_review_and_validation_apart_when_they_overlap`
+- [x] `test_mediane_si_assez_9_samples_is_none` et `test_mediane_si_assez_10_samples_returns_median`
+- [x] `test_etape_longue_just_under_three_medians_is_none` et
       `test_etape_longue_just_over_three_medians_reports` (médiane 600 s : 1799 s puis 1801 s)
-- [ ] `test_etape_longue_floor_300s_under_is_none` et `test_etape_longue_floor_300s_over_reports`
+- [x] `test_etape_longue_floor_300s_under_is_none` et `test_etape_longue_floor_300s_over_reports`
       (médiane 20 s : 299 s puis 301 s)
-- [ ] `test_etape_longue_without_enough_samples_is_none` et `test_etape_longue_ignores_a_closed_stage`
-- [ ] `test_durees_passees_returns_the_20_most_recent_closed_stages_of_the_project` (21 étapes
+- [x] `test_etape_longue_without_enough_samples_is_none` et `test_etape_longue_ignores_a_closed_stage`
+- [x] `test_durees_passees_returns_the_20_most_recent_closed_stages_of_the_project` (21 étapes
       closes : la plus ancienne sort ; un autre projet, une étape ouverte et une étape abandonnée
       sont exclus)
-- [ ] `test_agent_events_index_exists_and_init_db_stays_idempotent` : l'index existe sur une base
+- [x] `test_agent_events_index_exists_and_init_db_stays_idempotent` : l'index existe sur une base
       neuve et sur une base ancienne migrée
 
 ## Risques

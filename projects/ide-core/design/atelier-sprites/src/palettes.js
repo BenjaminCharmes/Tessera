@@ -56,7 +56,7 @@ const JOUR_PAR_DEFAUT = {
 };
 
 /** États : jamais thémés (ADR-026), mêmes teintes jour et nuit. */
-const ETATS = { actif: "#60a5fa", attente: "#71717a", question: "#fbbf24", blocage: "#f87171", fait: "#4ade80" };
+const ETATS = { actif: "#60a5fa", attente: "#71717a", question: "#fbbf24", blocage: "#f87171", fait: "#4ade80", anomalie: "#fbbf24" };
 /**
  * Les rampes des états, prises telles quelles dans leur famille Tailwind (ADR-026) :
  * reflet 300, base 400, ombre 500, creux 600, contour 700 (zinc décalé d'un cran,
@@ -67,6 +67,8 @@ const ETAT_RAMPES = {
   actif: { hi: "#93c5fd", b: "#60a5fa", s: "#3b82f6", d: "#2563eb", bl: "#60a5fa", ol: "#1d4ed8" },
   attente: { hi: "#a1a1aa", b: "#71717a", s: "#52525b", d: "#3f3f46", bl: "#71717a", ol: "#27272a" },
   question: { hi: "#fcd34d", b: "#fbbf24", s: "#f59e0b", d: "#d97706", bl: "#fbbf24", ol: "#b45309" },
+  // Le détecteur d'anomalies (ADR-078) : une attente à vérifier, donc ambre comme la question.
+  anomalie: { hi: "#fcd34d", b: "#fbbf24", s: "#f59e0b", d: "#d97706", bl: "#fbbf24", ol: "#b45309" },
   blocage: { hi: "#fca5a5", b: "#f87171", s: "#ef4444", d: "#dc2626", bl: "#f87171", ol: "#b91c1c" },
   fait: { hi: "#86efac", b: "#4ade80", s: "#22c55e", d: "#16a34a", bl: "#4ade80", ol: "#15803d" },
 };

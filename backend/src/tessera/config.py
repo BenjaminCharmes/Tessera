@@ -230,6 +230,19 @@ class Settings(BaseSettings):
     # Utilise SetThreadExecutionState sous Windows ; no-op ailleurs.
     # Désactivable si un outil externe gère déjà la veille.
     keep_awake_during_runs: bool = True
+    # Détecteur d'anomalies des runs (ticket-834, ADR-078) : un témoin, qui
+    # dit et n'agit pas. Seuils de la spec 2026-11-05-detecteur-d-anomalies.
+    anomalies_actives: bool = True
+    anomalie_intervalle_s: float = 300.0
+    anomalie_outil_repete: int = 4
+    anomalie_silence_s: float = 900.0
+    anomalie_tours: int = 3
+    anomalie_facteur_median: float = 3.0
+    anomalie_echantillon_min: int = 10
+    anomalie_fenetre: int = 20
+    anomalie_plancher_etape_s: float = 300.0
+    anomalie_plancher_cout_usd: float = 0.5
+    anomalie_part_budget: float = 0.8
 
     def valeurs_des_secrets(self) -> list[str]:
         """Return the non-empty values of the eight secrets (ADR-073).

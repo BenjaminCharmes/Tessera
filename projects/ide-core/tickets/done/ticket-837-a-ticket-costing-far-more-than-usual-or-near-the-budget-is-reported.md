@@ -2,7 +2,7 @@
 id: ticket-837
 title: "A ticket costing far more than usual, or near the budget, is reported"
 type: feat
-status: todo
+status: done
 pr_number: null
 priority: medium
 agent: codeur
@@ -37,18 +37,18 @@ le coût d'un ticket est celui de sa ligne `single`.
 
 ## Critères d'acceptation
 
-- [ ] `test_cout_anormal_just_under_three_medians_is_none` et
+- [x] `test_cout_anormal_just_under_three_medians_is_none` et
       `test_cout_anormal_just_over_three_medians_reports` (médiane 2,00 USD : 5,99 puis 6,01)
-- [ ] `test_cout_anormal_floor_under_is_none` et `test_cout_anormal_floor_over_reports`
+- [x] `test_cout_anormal_floor_under_is_none` et `test_cout_anormal_floor_over_reports`
       (médiane 0,10 USD : 0,49 puis 0,51)
-- [ ] `test_cout_anormal_without_enough_samples_skips_the_median_rule` (9 échantillons)
-- [ ] `test_cout_anormal_budget_at_79_percent_is_none` et
+- [x] `test_cout_anormal_without_enough_samples_skips_the_median_rule` (9 échantillons)
+- [x] `test_cout_anormal_budget_at_79_percent_is_none` et
       `test_cout_anormal_budget_at_80_percent_reports` (3,99 puis 4,00 USD sur 5,00)
-- [ ] `test_cout_anormal_without_a_budget_never_reports_the_budget_rule`
-- [ ] `test_couts_passes_keeps_the_20_most_recent_single_runs_of_the_project` (enveloppes,
+- [x] `test_cout_anormal_without_a_budget_never_reports_the_budget_rule`
+- [x] `test_couts_passes_keeps_the_20_most_recent_single_runs_of_the_project` (enveloppes,
       autre projet, runs non finis et coût nul exclus)
-- [ ] `test_ligne_ouverte_du_ticket_returns_the_unfinished_single_row_only`
-- [ ] `test_cout_du_ticket_sums_the_calls_of_its_row`
+- [x] `test_ligne_ouverte_du_ticket_returns_the_unfinished_single_row_only`
+- [x] `test_cout_du_ticket_sums_the_calls_of_its_row`
 
 ## Ce que ça ne fait pas
 

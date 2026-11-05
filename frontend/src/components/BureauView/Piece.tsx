@@ -36,6 +36,7 @@ import {
 import StatusPill from "../../design/ui/StatusPill";
 import { libelleDeSuite } from "../../lib/bureau/etapeDeSuite";
 import { posteEnPlan } from "../../lib/bureau/plan";
+import { posteDuMarqueur } from "../../lib/bureau/marqueurAnomalie";
 import { postesDuRun } from "../../lib/bureau/postesDuRun";
 import { placerLesRedacteurs } from "../../lib/bureau/redaction";
 import { documentationEnCours, livraisonEnCours } from "../../lib/bureau/suite";
@@ -154,6 +155,14 @@ export default function Piece({
   const livraison = livraisonEnCours(etat) && !auRepos;
   const redacteurs = placerLesRedacteurs(documentationEnCours(etat) && !auRepos);
   const roles = rolesDesPostes(etat);
+  const estAbsent = (poste: PosteId) =>
+    absents.includes(poste) || plan === poste || (livraison && poste === POSTE_DE_LA_LIVRAISON);
+  // Le marqueur d'anomalie : sur le premier agent au travail, un seul par run (ADR-078).
+  const marqueur = posteDuMarqueur(
+    run,
+    clos || fete,
+    postes.filter((p) => p.etat === "occupe" && !estAbsent(p.poste)).map((p) => p.poste),
+  );
   const agents = placerLesAgents(
     faits,
     activites,
@@ -256,11 +265,8 @@ export default function Piece({
                 sante={sante}
                 auRepos={auRepos}
                 parti={clos || fete}
-                absent={
-                  absents.includes(p.poste) ||
-                  plan === p.poste ||
-                  (livraison && p.poste === POSTE_DE_LA_LIVRAISON)
-                }
+                absent={estAbsent(p.poste)}
+                anomalies={marqueur?.poste === p.poste ? marqueur.nombre : 0}
                 onChoisir={onChoisir && ((poste) => onChoisir(projet, poste))}
                 outil={outil?.poste === p.poste ? outil.phrase : null}
                 ecran={ecranDuPoste(etat, p.poste, p.etat)}
