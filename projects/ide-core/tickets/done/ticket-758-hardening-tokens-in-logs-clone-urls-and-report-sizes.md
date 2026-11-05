@@ -4,7 +4,7 @@ created: 2026-11-03
 depends_on: []
 estimated_days: 1
 id: ticket-758
-pr_number: null
+pr_number: 908
 priority: low
 status: done
 title: 'Hardening: no token in access logs or remote URLs, strict clone URLs, bounded
