@@ -21,7 +21,7 @@ function salle(over: Partial<SalleTessera> = {}): SalleTessera {
     ],
     ollama: { url: "http://127.0.0.1:11434", refroidissement_s: null },
     runs: [
-      { project_id: "ide-core", ticket_id: "ticket-677", agent: "codeur", etape: "production", file_index: 4, file_total: 38, suivants: ["ticket-708", "ticket-713"] },
+      { project_id: "ide-core", ticket_id: "ticket-677", agent: "codeur", etape: "production", file_index: 4, file_total: 38, suivants: ["ticket-708", "ticket-713"], anomalies: 0 },
     ],
     ci_en_attente: { curio: ["ticket-070"] },
     journal: [
