@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette.requests import Request
 
+from tessera import reglages
 from tessera.auth import HostOriginMiddleware, StaticTokenMiddleware
 from tessera.config import settings
 from tessera.config_coffre import source_effective
@@ -84,6 +85,8 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     install_asyncio_exception_handler()
     warn_if_shell_missing(_GIT_BASH_PATH)
     await init_db(settings.ide_db_path)
+    # Les surcharges de réglages passent en cache : la base est prête (ADR-075).
+    await reglages.charger(settings.ide_db_path)
     # La file des signalements a quitté le dépôt (ticket-430).
     migrer_ancien_fichier()
     # Les runs qu'un processus tué a laissés « en cours » (ticket-177).
