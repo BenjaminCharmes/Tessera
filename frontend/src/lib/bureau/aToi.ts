@@ -21,10 +21,17 @@ export interface PrARelire {
   pr: number;
 }
 
+/** Les leçons d'un projet qui attendent une validation humaine (ADR-074). */
+export interface LeconsAValider {
+  projet: string;
+  nombre: number;
+}
+
 export interface ContenuAToi {
   questions: QuestionAToi[];
   figes: string[];
   prs: PrARelire[];
+  lecons: LeconsAValider[];
 }
 
 /**
@@ -46,13 +53,24 @@ export function prARelire(etat: StreamState): number | null {
 }
 
 /**
- * Tout ce qui attend une action humaine : questions, agents figés, PR à relire.
+ * Tout ce qui attend une action humaine : questions, agents figés, PR à relire,
+ * leçons à valider.
+ *
+ * `lecons` donne, par identifiant de projet, le nombre de leçons proposées : un
+ * projet à 0 n'a aucune ligne, et un projet sans run en a une quand même.
  *
  * Un run clos n'est jamais « figé » : son dernier événement est vieux de
  * toujours (même règle que `contourDeLaPiece`).
  */
-export function contenuAToi(projets: readonly ProjetPourLaColonne[], maintenant: number): ContenuAToi {
-  const contenu: ContenuAToi = { questions: [], figes: [], prs: [] };
+export function contenuAToi(
+  projets: readonly ProjetPourLaColonne[],
+  maintenant: number,
+  lecons: Readonly<Record<string, number>> = {},
+): ContenuAToi {
+  const contenu: ContenuAToi = { questions: [], figes: [], prs: [], lecons: [] };
+  for (const [projet, nombre] of Object.entries(lecons)) {
+    if (nombre > 0) contenu.lecons.push({ projet, nombre });
+  }
   for (const { nom, etat, runId = null } of projets) {
     if (etat.pendingQuestion) {
       contenu.questions.push({

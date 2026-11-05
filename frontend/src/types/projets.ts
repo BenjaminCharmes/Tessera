@@ -15,6 +15,8 @@ export interface Project {
    * « Lancer » demarrerait un second backend sur un port deja pris.
    */
   fait_tourner_l_ide?: boolean;
+  /** Les leçons proposées qui attendent d'être déplacées sous « En vigueur » (ticket-831). */
+  lecons_proposees?: number;
 }
 
 export interface ProjectCreationResult {

@@ -18,6 +18,7 @@ from tessera.services.controle_visuel import lire_le_controle
 from tessera.services.documenteur_run import documenteur
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.journal_pipeline import journal_vers, journaliser_mode_rapide
+from tessera.services.lecons import section_lecons
 from tessera.services.livreur_run import livreur
 from tessera.services.orchestrator import Orchestrator
 from tessera.services.pipeline_plan import ROLE_PLAN
@@ -106,12 +107,18 @@ async def build_project_context(project_id: str) -> str:
         else ""
     )
 
+    # Les leçons en vigueur (ADR-074) : `adr_pertinents` ne les laisse passer
+    # qu'au codeur et au reviewer.
+    lecons = section_lecons(project_path / "memory")
+    section_des_lecons = f"\n\n{lecons}" if lecons else ""
+
     return (
         f"# {project_id}\n\n"
         f"{claude_md_section}"
         f"## Agents actifs\n{', '.join(project.active_agents)}\n\n"
         f"## Tickets ouverts\n{tickets_summary}\n\n"
         f"## Décisions récentes\n{recent_decisions or '_Aucune décision._'}"
+        f"{section_des_lecons}"
     )
 
 

@@ -6,7 +6,7 @@ estimated_days: 1
 id: ticket-802
 pr_number: null
 priority: medium
-status: todo
+status: done
 title: The in-force lessons reach the coder and the reviewer only
 type: feat
 ---
@@ -42,14 +42,14 @@ possibles par ticket (sobriété), d'où deux rôles seulement.
 
 ## Critères d'acceptation
 
-- [ ] `backend/tests/test_lecons_injection.py` : contexte avec leçons en vigueur → présentes
+- [x] `backend/tests/test_lecons_injection.py` : contexte avec leçons en vigueur → présentes
       pour `codeur` et `reviewer`, absentes pour `securite`, `validateur`, `architect`,
       `doc-technique` et un rôle inconnu
-- [ ] Une leçon sous `## Proposées` n'apparaît dans le contexte d'aucun rôle
-- [ ] Fichier absent ou sans leçon en vigueur : le contexte est identique à celui d'avant
+- [x] Une leçon sous `## Proposées` n'apparaît dans le contexte d'aucun rôle
+- [x] Fichier absent ou sans leçon en vigueur : le contexte est identique à celui d'avant
       (test d'égalité sur un projet sans `lecons.md`)
-- [ ] Un fichier de plus de 4 Ko ne produit qu'une section tronquée, sans exception
-- [ ] Les tests existants de `adr_pertinents` et `build_project_context` passent inchangés
+- [x] Un fichier de plus de 4 Ko ne produit qu'une section tronquée, sans exception
+- [x] Les tests existants de `adr_pertinents` et `build_project_context` passent inchangés
 
 ## Ce que ça ne fait pas
 

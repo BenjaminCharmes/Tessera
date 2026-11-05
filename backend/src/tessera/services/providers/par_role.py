@@ -29,7 +29,9 @@ OUTILS_WEB = ["WebFetch", "WebSearch"]
 #: Les rôles qui rendent du texte ou du JSON, et dont un appel a une durée
 #: totale maximale (ticket-518). Le codeur et le reviewer en sont exclus : un
 #: tour légitime de codeur dure longtemps, et c'est le silence qui le borne.
-ROLES_TEXTE = frozenset({"validateur", "securite", "doc-technique", "doc-fonctionnelle"})
+ROLES_TEXTE = frozenset(
+    {"validateur", "securite", "doc-technique", "doc-fonctionnelle", "lecons"}
+)
 
 
 def outils_du_role(

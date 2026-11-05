@@ -106,6 +106,10 @@ class AgentPipelineConfig(BaseModel):
     #: Le lot de documentation tient aussi le CLAUDE.md du projet, dans un
     #: budget de taille (ticket-244). Faux par défaut : la consigne se déclare.
     doc_claude_md: bool = False
+    #: Un run approuvé qui a corrigé quelque chose propose une leçon sous
+    #: `## Proposées` de `memory/lecons.md` (ticket-803, ADR-074). Faux par
+    #: défaut : l'étape ajoute un appel de modèle, un projet la déclare.
+    lecons: bool = False
 
 
 class AgentResult(BaseModel):

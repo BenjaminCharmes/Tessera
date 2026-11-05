@@ -61,6 +61,20 @@ describe("contenuAToi", () => {
     expect(contenu.prs).toEqual([{ projet: "c", pr: 5 }]);
   });
 
+  it("lists the pending lessons of a project, and nothing at zero", () => {
+    const contenu = contenuAToi(
+      [{ nom: "a", etat: INITIAL }],
+      T0,
+      { a: 2, b: 1, c: 0 },
+    );
+
+    expect(contenu.lecons).toEqual([
+      { projet: "a", nombre: 2 },
+      { projet: "b", nombre: 1 },
+    ]);
+    expect(contenuAToi([{ nom: "a", etat: INITIAL }], T0).lecons).toEqual([]);
+  });
+
   it("never lists a closed run as frozen", () => {
     const clos = rejouer(ev("agent_started"), ev("run_closed"));
     expect(contenuAToi([{ nom: "a", etat: clos }], T0 + 900_000).figes).toEqual([]);
