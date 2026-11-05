@@ -682,3 +682,12 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 **Raison** : `.env` se lit, se copie et se synchronise ; le coffre chiffre au repos. Tout processus de l'utilisateur le lit pourtant : le plafond d'un jeton reste sa portée.
 **Alternative rejetée** : chiffrer `.env` — la clé de déchiffrement reste à côté.
 **Détail** : `docs/superpowers/specs/2026-11-05-secrets-dans-le-coffre-design.md`.
+
+---
+
+## ADR-074 — Les leçons d'un projet vivent dans `memory/lecons.md`
+
+**Date** : 2026-11-05
+**Décision** : après un run approuvé dont `review_feedback` n'est pas vide, le service, sans outils, écrit au plus une leçon « Quand <situation>, <action>. » sous `## Proposées` de `memory/lecons.md`, artefact d'ADR-021 et ADR-023. Un humain la déplace sous `## En vigueur`, seule section injectée, au codeur et au reviewer, sous les contraintes : 25 leçons, 4 Ko. Refus : hors forme, 200 caractères, preuve absente du retour, doublon, vérification affaiblie. Un diff de run qui touche ce fichier met le run en `blocked` (ADR-055). Une leçon dit un piège observé ; `decisions.md` dit un choix.
+**Raison** : ticket-736 a perdu trois tours sur des doubles de test ; un texte de modèle injecté sans relecture change la consigne de tous (ADR-055).
+**Alternative rejetée** : écriture directe par l'agent, ou activation automatique — la confiance accordée à un texte non relu est une décision humaine.
