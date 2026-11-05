@@ -7632,3 +7632,17 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-05 07:35:57 UTC — [ticket-793] testeur: délai dépassé (1500 s, durée réelle 31709 s) — ../scripts/verifier.py coupé après 31710 s
 - 2026-11-05 07:36:08 UTC — [ticket-793] BLOCKED — testeur: délai dépassé deux fois
 - 2026-11-05 07:36:34 UTC — [ide-core] file interrompue : ticket-793 non approuvé
+- 2026-11-05 07:38:06 UTC — [ticket-793] branche ticket-793-the-retest-after-rebase-runs-only-the-backend-tes
+- 2026-11-05 07:53:06 UTC — [ticket-793] testeur: dur�es : mypy 8 s, mypy-linux 6 s, pytest 895 s
+- 2026-11-05 07:53:06 UTC — [ticket-793] branche reprise (3 commit(s)) — tests green, codeur sauté
+- 2026-11-05 07:55:42 UTC — [ticket-793] securite: PASS — Le diff ajoute une méthode `merge_base()` et une logique pour lancer les tests i (154342ms)
+- 2026-11-05 07:55:42 UTC — [ticket-793] tour 1 — reviewer démarré
+- 2026-11-05 07:55:59 UTC — [ticket-793] tour 1 — reviewer terminé (16625ms)
+- 2026-11-05 07:59:10 UTC — [ide-core] ticket-768 retiré de la file
+- 2026-11-05 07:59:10 UTC — [ide-core] ticket-769 retiré de la file
+- 2026-11-05 07:59:10 UTC — [ide-core] ticket-791 retiré de la file
+- 2026-11-05 07:59:10 UTC — [ide-core] ticket-787 retiré de la file
+- 2026-11-05 07:59:10 UTC — [ide-core] ticket-773 retiré de la file
+- 2026-11-05 07:59:15 UTC — [ticket-793] validateur: fichiers cités joints : retest_apres_rebase.py
+- 2026-11-05 07:59:15 UTC — [ticket-793] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le code implémente correctemen (212967ms)
+- 2026-11-05 07:59:15 UTC — [ticket-793] APPROVED après 1 tour(s)
