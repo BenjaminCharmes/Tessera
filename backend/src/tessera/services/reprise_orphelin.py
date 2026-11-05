@@ -32,7 +32,7 @@ import aiosqlite
 import frontmatter as fm
 
 from tessera.models.ticket import TicketStatus
-from tessera.services.git_runner import git
+from tessera.services.git_workspace.git_runner import git
 from tessera.services.manifeste import lire_chaine
 from tessera.services.pipeline_text import _unapproved_commit_message
 from tessera.services.racine_depot import depot_le_plus_proche

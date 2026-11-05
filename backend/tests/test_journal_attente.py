@@ -9,7 +9,8 @@ from pathlib import Path
 from typing import Any
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services import journal_attente, pipeline_branche
+from tessera.services import pipeline_branche
+from tessera.services.git_workspace import journal_attente
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.pipeline_events import OrchestratorEvent
 from tessera.services.pipeline_fin_de_file import nettoyer_apres_file

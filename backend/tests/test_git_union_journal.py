@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services.git_attributes import declare_union_merge, union_attribute_line
+from tessera.services.git_workspace.git_attributes import declare_union_merge, union_attribute_line
 from tessera.services.git_workspace import GitWorkspaceService, _union_json_lists
 
 _LIGNE = "memory/pipeline-log.md merge=union"

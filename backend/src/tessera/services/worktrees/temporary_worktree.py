@@ -11,7 +11,7 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from tessera.services.git_runner import git
+from tessera.services.git_workspace.git_runner import git
 from tessera.services.git_workspace import GitCommandError
 from tessera.utils.logger import get_logger
 

@@ -10,7 +10,7 @@ livres.
 """
 from pathlib import Path
 
-from tessera.services.git_runner import git
+from tessera.services.git_workspace.git_runner import git
 
 _JOURNAL = Path("memory") / "pipeline-log.md"
 

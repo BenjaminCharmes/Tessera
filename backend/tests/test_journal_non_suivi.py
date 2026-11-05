@@ -16,7 +16,7 @@ import pytest
 from unittest.mock import AsyncMock, MagicMock
 
 from tessera.models.ticket import TicketStatus
-from tessera.services import journal_en_attente
+from tessera.services.git_workspace import journal_en_attente
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.livraison import Livraison
 from tessera.services.orchestrator import Orchestrator

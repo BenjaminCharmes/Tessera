@@ -13,7 +13,7 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field
 
-from tessera.services.git_runner import git
+from tessera.services.git_workspace.git_runner import git
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

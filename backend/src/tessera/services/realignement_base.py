@@ -12,8 +12,8 @@ base, avec pour seule modification le journal du pipeline. Tout le reste
 from dataclasses import dataclass
 from pathlib import Path
 
-from tessera.services import journal_en_attente
-from tessera.services.git_runner import git
+from tessera.services.git_workspace import journal_en_attente
+from tessera.services.git_workspace.git_runner import git
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

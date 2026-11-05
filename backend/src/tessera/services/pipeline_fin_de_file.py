@@ -7,7 +7,7 @@ functions take the orchestrator as their first argument, like the other
 import asyncio
 from typing import TYPE_CHECKING
 
-from tessera.services import journal_attente
+from tessera.services.git_workspace import journal_attente
 from tessera.services.livraison_evenements import attente_annoncee
 from tessera.services.pipeline_events import EventCallback
 from tessera.utils.logger import get_logger

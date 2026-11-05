@@ -1,7 +1,7 @@
 """Deterministic rules for the trivial blocks of a rebase conflict — ticket-548."""
 import pytest
 
-from tessera.services.regles_conflit import (
+from tessera.services.git_workspace.regles_conflit import (
     Resolution,
     resoudre_bloc,
     resoudre_fichier,

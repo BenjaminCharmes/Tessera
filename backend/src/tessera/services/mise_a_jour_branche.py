@@ -12,7 +12,7 @@ Le module ne lève jamais vers l'appelant : tout refus est un `MiseAJour` dont
 from dataclasses import dataclass
 from pathlib import Path
 
-from tessera.services.git_runner import git
+from tessera.services.git_workspace.git_runner import git
 from tessera.services.git_workspace import GitCommandError
 from tessera.services.git_workspace.chemins import (
     _JOURNAL_PIPELINE,

@@ -12,8 +12,8 @@ from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from tessera.services.diff_sections import Section, borner, decouper, marqueur
-from tessera.services.ticket_diff import diff_du_ticket
+from tessera.services.git_workspace.diff_sections import Section, borner, decouper, marqueur
+from tessera.services.git_workspace.ticket_diff import diff_du_ticket
 
 #: Bornes en caractères : par ticket et pour le lot (diffs), par fichier et
 #: pour le lot (contenus). Des constantes, à ajuster après les premiers lots.

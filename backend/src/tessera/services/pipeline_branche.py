@@ -10,7 +10,8 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Optional
 
 from tessera.models.ticket import TicketStatus
-from tessera.services import journal_attente, journal_en_attente, pipeline_fin_de_file as fin_de_file
+from tessera.services import pipeline_fin_de_file as fin_de_file
+from tessera.services.git_workspace import journal_attente, journal_en_attente
 from tessera.services.git_workspace import GitWorkspaceError, NotAGitRepository
 from tessera.services.pipeline_events import EventType, PipelineResult
 from tessera.services.pipeline_rangement import ranger_les_bloques_livres

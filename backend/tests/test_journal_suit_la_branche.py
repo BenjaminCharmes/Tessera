@@ -9,7 +9,7 @@ import asyncio
 from pathlib import Path
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services import journal_en_attente
+from tessera.services.git_workspace import journal_en_attente
 from tessera.services import pipeline_branche
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.pipeline_events import OrchestratorEvent

@@ -6,7 +6,7 @@ elles ne lisent aucun état du watcher.
 from datetime import datetime, timezone
 from pathlib import Path
 
-from tessera.services.journal_attente import attente_vers_fichier
+from tessera.services.git_workspace.journal_attente import attente_vers_fichier
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

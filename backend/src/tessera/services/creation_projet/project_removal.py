@@ -23,7 +23,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
-from tessera.services.git_runner import git
+from tessera.services.git_workspace.git_runner import git
 from tessera.services.racine_depot import est_un_depot
 from tessera.utils.logger import get_logger
 

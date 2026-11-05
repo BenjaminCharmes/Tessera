@@ -122,7 +122,7 @@ def test_git_link_does_not_spawn_git_itself() -> None:
     source = inspect.getsource(git_link)
 
     assert "create_subprocess_exec" not in source
-    assert "tessera.services.git_runner" in source
+    assert "tessera.services.git_workspace.git_runner" in source
 
 
 async def test_init_sur_un_depot_existant_ne_le_touche_pas(project: Path) -> None:

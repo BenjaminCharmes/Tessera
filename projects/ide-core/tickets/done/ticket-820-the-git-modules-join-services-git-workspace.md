@@ -2,7 +2,7 @@
 id: ticket-820
 title: "The git modules join services/git_workspace"
 type: refactor
-status: todo
+status: done
 pr_number: null
 priority: low
 agent: codeur
@@ -33,11 +33,11 @@ Les gardes git (ADR-067) vivent dans `providers/`, hors de ce ticket.
 
 ## Critères d'acceptation
 
-- [ ] Les cinq modules sont sous `services/git_workspace/`, aucun n'est resté à plat
-- [ ] `A_DEPLACER` n'a plus d'entrée `git_workspace`, `ECARTS_DOMAINES` n'a grandi d'aucune ligne
-- [ ] Aucune occurrence des anciens chemins pointés ne reste dans `backend/src`, `backend/tests`,
+- [x] Les cinq modules sont sous `services/git_workspace/`, aucun n'est resté à plat
+- [x] `A_DEPLACER` n'a plus d'entrée `git_workspace`, `ECARTS_DOMAINES` n'a grandi d'aucune ligne
+- [x] Aucune occurrence des anciens chemins pointés ne reste dans `backend/src`, `backend/tests`,
       `scripts/`, `Makefile`
-- [ ] Le diff n'est que des renommages et des lignes d'import ou de chaîne ; la suite passe
+- [x] Le diff n'est que des renommages et des lignes d'import ou de chaîne ; la suite passe
 
 ## Ce que ça ne fait pas
 
@@ -47,3 +47,7 @@ Aucun changement de comportement, aucune API de `GitWorkspace` modifiée.
 
 Un import circulaire avec l'`__init__.py` du dossier, qui importe lui-même `git_runner` : si le
 cycle apparaît, importer `git_runner` par son module plutôt que par le paquet, sans changer d'API.
+
+## Notes de réalisation
+
+Le domaine compte huit modules à plat, pas cinq : `scripts/domaines_services.py` fait foi (`worktree_dossiers` est dans `gardes`, et `diff_sections`, `journal_attente`, `journal_en_attente`, `ticket_diff` rejoignent `git_workspace`). `git_workspace/__init__.py` ne change que son import de `_dossier_sans_hooks`, qui se résout sans import circulaire : `git_runner` n'importe rien de `tessera`, et l'import de `git_runner`, de `socle` et du paquet passe, chacun dans un processus neuf.

@@ -10,8 +10,8 @@ réécrit dans le journal de sa branche, qui la commite avec sa tenue de livres.
 import subprocess
 from pathlib import Path
 
-from tessera.services import journal_en_attente
-from tessera.services.git_runner import git
+from tessera.services.git_workspace import journal_en_attente
+from tessera.services.git_workspace.git_runner import git
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

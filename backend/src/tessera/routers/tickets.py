@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from tessera.config import settings
-from tessera.services.ticket_diff import TicketDiff, diff_du_ticket
+from tessera.services.git_workspace.ticket_diff import TicketDiff, diff_du_ticket
 from tessera.models.ticket import Ticket, TicketBatchCreate, TicketBatchResponse, TicketCreate, TicketListResponse, TicketStatus, TicketStatusUpdate
 from tessera.services.github.github_service import CiStatus, GitHubService, PRStatus
 from tessera.services.autonomie import lire_niveau
