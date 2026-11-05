@@ -26,7 +26,7 @@ section. (ADR-055)
   git_workspace, worktrees, github, providers, verification, verdicts, agents,
   documentation, creation_projet, livraison, pipeline, file, supervision. Un
   module nouveau s'inscrit dans son domaine ; aucun paquet de premier niveau
-  hors `models`, `services`, `routers`, `utils`. (ADR-074)
+  hors `models`, `services`, `routers`, `utils`. (ADR-075)
 
 ## Git et périmètre d'écriture
 

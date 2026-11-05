@@ -20,7 +20,7 @@ déplacement, un module à plat ne passe plus.
 
 ## Contexte
 
-ADR-074. Les tickets 803 à 818 ont vidé `A_DEPLACER`. Reste la règle sans son échafaudage.
+ADR-075. Les tickets 803 à 818 ont vidé `A_DEPLACER`. Reste la règle sans son échafaudage.
 
 ## Ce que le ticket fait
 
@@ -31,14 +31,14 @@ ADR-074. Les tickets 803 à 818 ont vidé `A_DEPLACER`. Reste la règle sans son
   dossier.
 - Supprime `scripts/deplacer_domaine.py` et son test, et `memory/services-domaines.md` (la liste
   est devenue l'arborescence).
-- Vérifie que `contraintes.md` (règle d'ADR-074) dit la même chose que le test, sans la recopier.
+- Vérifie que `contraintes.md` (règle d'ADR-075) dit la même chose que le test, sans la recopier.
 
 ## Critères d'acceptation
 
 - [ ] Un fichier posé à plat sous `services/` fait échouer `test_domaines_services.py`
 - [ ] `scripts/domaines_services.py`, `scripts/deplacer_domaine.py`, `test_deplacer_domaine.py` et
       `memory/services-domaines.md` n'existent plus
-- [ ] `ORDRE` du test porte les dix-huit domaines, dans l'ordre d'ADR-074
+- [ ] `ORDRE` du test porte les dix-huit domaines, dans l'ordre d'ADR-075
 - [ ] La suite passe, `ECARTS_DOMAINES` n'a grandi d'aucune ligne
 
 ## Ce que ça ne fait pas

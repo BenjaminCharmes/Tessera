@@ -20,7 +20,7 @@ Les vingt-neuf modules du domaine `livraison` (rebase, PR, CI, merge, surveillan
 
 ## Contexte
 
-ADR-074 ; section `livraison` de `memory/services-domaines.md`. C'est un des deux plus gros
+ADR-075 ; section `livraison` de `memory/services-domaines.md`. C'est un des deux plus gros
 déplacements, et le plus touché par les tickets récents (781, 787, 788, 792) : il se lance quand
 aucune PR du projet n'est ouverte, sinon le rebase de la PR en cours entre en conflit avec les
 renommages. Les portes de livraison (ADR-029, 030, 033, 039, 051, 065, 069) ne bougent pas.

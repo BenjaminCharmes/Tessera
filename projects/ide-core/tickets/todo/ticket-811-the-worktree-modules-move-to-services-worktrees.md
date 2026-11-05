@@ -20,7 +20,7 @@ Les huit modules du domaine `worktrees` (cycle de vie des worktrees de run) vive
 
 ## Contexte
 
-ADR-074 ; section `worktrees` de `memory/services-domaines.md`. Ces modules portent ADR-056 et
+ADR-075 ; section `worktrees` de `memory/services-domaines.md`. Ces modules portent ADR-056 et
 ADR-037 (un worktree avec du travail non commité ne se supprime pas) : aucune de ces portes ne bouge.
 
 ## Ce que le ticket fait

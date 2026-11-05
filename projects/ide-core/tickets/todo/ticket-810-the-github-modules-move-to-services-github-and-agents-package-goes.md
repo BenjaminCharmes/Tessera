@@ -20,7 +20,7 @@ Les huit modules du domaine `github` et `tessera/agents/github_sync.py` vivent d
 
 ## Contexte
 
-ADR-074 ; section `github` de `memory/services-domaines.md`. `tessera/agents/` ne porte que
+ADR-075 ; section `github` de `memory/services-domaines.md`. `tessera/agents/` ne porte que
 `github_sync.py`, qui importe `models` et `services` : il échappait au test d'architecture.
 ADR-010 (`role: github-sync` géré dans `POST /api/v1/agents/run`) ne change pas.
 

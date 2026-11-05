@@ -20,7 +20,7 @@ de mise en ligne) vivent dans `services/projets/`, à comportement constant.
 
 ## Contexte
 
-ADR-074 ; section `projets` de `memory/services-domaines.md`. `manifeste` est le lecteur unique de
+ADR-075 ; section `projets` de `memory/services-domaines.md`. `manifeste` est le lecteur unique de
 `agents.json` (ADR-068) et `project_loader` est importé presque partout : ce déplacement réécrit le
 plus de lignes d'import, d'où sa place tardive. Le dossier et le module `manifeste` ne se
 confondent pas (`projets` / `manifeste`).

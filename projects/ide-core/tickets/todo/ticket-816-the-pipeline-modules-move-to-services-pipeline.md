@@ -20,7 +20,7 @@ Les trente et un modules du domaine `pipeline` (phases et orchestration d'un run
 
 ## Contexte
 
-ADR-074 ; section `pipeline` de `memory/services-domaines.md`. Plus gros déplacement, et le plus
+ADR-075 ; section `pipeline` de `memory/services-domaines.md`. Plus gros déplacement, et le plus
 patché par chaîne : `orchestrator`, `run_registry` et `run_lock` sont aussi touchés par
 `backend/tests/conftest.py`. ADR-008 et ADR-038 (orchestrateur sans état, `RunLock`) ne bougent pas.
 

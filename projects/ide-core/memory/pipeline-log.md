@@ -7725,3 +7725,8 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-05 11:17:55 UTC — [ticket-776] APPROVED après 1 tour(s)
 - 2026-11-05 11:18:03 UTC — [ticket-776] fichiers non suivis laissés par le run : tickets/todo/ticket-801-the-architecture-test-knows-the-services-domains.md, tickets/todo/ticket-802-a-script-moves-one-services-domain-and-rewrites-its-references.md, tickets/todo/ticket-803-the-supervision-modules-move-to-services-supervision.md, tickets/todo/ticket-804-the-documentation-modules-move-to-services-documentation.md, tickets/todo/ticket-805-the-queue-modules-move-to-services-file.md, tickets/todo/ticket-806-the-verdict-modules-move-to-services-verdicts.md, tickets/todo/ticket-807-the-agent-modules-move-to-services-agents.md, tickets/todo/ticket-808-the-project-creation-modules-move-to-services-creation-projet.md, tickets/todo/ticket-809-the-verification-modules-move-to-services-verification.md, tickets/todo/ticket-810-the-github-modules-move-to-services-github-and-agents-package-goes.md et 9 autres (à ignorer dans .gitignore ?)
 - 2026-11-05 11:18:49 UTC — [ticket-776] documentation: 0 fichier(s) (46297ms)
+- 2026-11-05 11:19:05 UTC — renumérotation : ticket-801 → ticket-820 (numéro déjà pris sur origin/develop)
+- 2026-11-05 11:19:05 UTC — renumérotation : ticket-802 → ticket-821 (numéro déjà pris sur origin/develop)
+- 2026-11-05 11:19:05 UTC — renumérotation : ticket-803 → ticket-822 (numéro déjà pris sur origin/develop)
+- 2026-11-05 11:19:05 UTC — renumérotation : ticket-804 → ticket-823 (numéro déjà pris sur origin/develop)
+- 2026-11-05 11:19:05 UTC — renumérotation : ADR-074 → ADR-075 (numéro déjà pris sur origin/develop)

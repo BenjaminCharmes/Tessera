@@ -20,7 +20,7 @@ dans `services/verification/`, à comportement constant.
 
 ## Contexte
 
-ADR-074 ; section `verification` de `memory/services-domaines.md`. Le ticket-773 (ruff dans la
+ADR-075 ; section `verification` de `memory/services-domaines.md`. Le ticket-773 (ruff dans la
 commande de test) touche cette zone : sa PR est mergée avant ce ticket.
 
 ## Ce que le ticket fait

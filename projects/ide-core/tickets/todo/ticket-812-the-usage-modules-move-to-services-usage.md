@@ -20,7 +20,7 @@ Les huit modules du domaine `usage` (coûts, quotas, appels d'agent) vivent dans
 
 ## Contexte
 
-ADR-074 ; section `usage` de `memory/services-domaines.md`. `providers/` importe `agent_calls`,
+ADR-075 ; section `usage` de `memory/services-domaines.md`. `providers/` importe `agent_calls`,
 `cost_calculator` et `quota_tracker` : `usage` est de rang plus bas, le sens est permis.
 
 ## Ce que le ticket fait

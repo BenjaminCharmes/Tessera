@@ -21,7 +21,7 @@ comportement constant.
 
 ## Contexte
 
-ADR-074 ; section `git_workspace` de `memory/services-domaines.md`. Le dossier est déjà un domaine
+ADR-075 ; section `git_workspace` de `memory/services-domaines.md`. Le dossier est déjà un domaine
 et son `__init__.py` réexporte : celui-ci ne change pas, sauf son import de `_dossier_sans_hooks`.
 Les gardes git (ADR-067) vivent dans `providers/`, hors de ce ticket.
 

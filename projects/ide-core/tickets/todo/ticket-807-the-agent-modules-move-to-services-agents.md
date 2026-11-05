@@ -20,7 +20,7 @@ Les six modules du domaine `agents` (registre, exécution d'un agent, chat) vive
 
 ## Contexte
 
-ADR-074 ; section `agents` de `memory/services-domaines.md`. Ne pas confondre avec le paquet
+ADR-075 ; section `agents` de `memory/services-domaines.md`. Ne pas confondre avec le paquet
 `tessera/agents/`, qui disparaît au ticket-810.
 
 ## Ce que le ticket fait

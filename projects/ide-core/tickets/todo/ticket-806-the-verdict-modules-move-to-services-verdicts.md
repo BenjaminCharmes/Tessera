@@ -20,7 +20,7 @@ Les douze modules du domaine `verdicts` (reviewer, audit sécurité, validateur)
 
 ## Contexte
 
-ADR-074 ; section `verdicts` de `memory/services-domaines.md`. Ces modules portent des portes qui
+ADR-075 ; section `verdicts` de `memory/services-domaines.md`. Ces modules portent des portes qui
 échouent fermées (ADR-039, ADR-061) : le déplacement ne doit en changer aucune.
 
 ## Ce que le ticket fait

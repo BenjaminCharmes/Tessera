@@ -20,7 +20,7 @@ vivent dans `services/noyau/`, à comportement constant.
 
 ## Contexte
 
-ADR-074 ; section `noyau` de `memory/services-domaines.md`. Dernier domaine : tout le reste en
+ADR-075 ; section `noyau` de `memory/services-domaines.md`. Dernier domaine : tout le reste en
 importe, ce déplacement touche le plus de fichiers, d'où le calendrier. Ce qui reste à plat après lui
 est vide.
 

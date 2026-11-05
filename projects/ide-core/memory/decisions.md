@@ -685,7 +685,7 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 
 ---
 
-## ADR-074 — Ranger `services/` par domaine, sans import vers un rang plus haut
+## ADR-075 — Ranger `services/` par domaine, sans import vers un rang plus haut
 
 **Date** : 2026-11-05
 **Décision** : `services/` se range en dix-huit domaines, du plus bas au plus haut : noyau, projets, usage, provisioning, gardes, git_workspace, worktrees, github, providers, verification, verdicts, agents, documentation, creation_projet, livraison, pipeline, file, supervision. Un module n'importe que son domaine ou un plus bas ; `test_sens_des_imports.py` le mesure, avec cliquet. `tessera/agents/` disparaît : `github_sync` rejoint `github`. Classement : `memory/services-domaines.md`. Les déplacements gardent le comportement, un domaine par ticket, chacun attendant le merge du précédent.

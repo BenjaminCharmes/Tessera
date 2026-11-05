@@ -20,7 +20,7 @@ dans `services/creation_projet/`, à comportement constant.
 
 ## Contexte
 
-ADR-074 ; section `creation_projet` de `memory/services-domaines.md`. Le ticket-758 (durcissement
+ADR-075 ; section `creation_projet` de `memory/services-domaines.md`. Le ticket-758 (durcissement
 des URL de clone) touche `git_clone` : il passe avant ce ticket, ou sa PR est mergée avant lui.
 
 ## Ce que le ticket fait

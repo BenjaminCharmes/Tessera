@@ -20,7 +20,7 @@ run, configuration des tests) vivent dans `services/gardes/`, à comportement co
 
 ## Contexte
 
-ADR-074 ; section `gardes` de `memory/services-domaines.md`. Ces modules échouent fermés (ADR-050,
+ADR-075 ; section `gardes` de `memory/services-domaines.md`. Ces modules échouent fermés (ADR-050,
 ADR-072). Le ticket-798 (le hook `pre-push` lit les termes interdits par le backend) touche
 `termes_interdits` : sa PR est mergée avant ce ticket. Le hook `pre-push` appelle peut-être le
 module par son chemin : le relire.

@@ -6,7 +6,7 @@ status: todo
 pr_number: null
 priority: low
 agent: codeur
-depends_on: [ticket-804]
+depends_on: [ticket-823]
 estimated_days: 1
 created: 2026-11-05
 ---
@@ -20,7 +20,7 @@ Les sept modules du domaine `file` (file, mode autonome, planificateur) vivent d
 
 ## Contexte
 
-ADR-074 ; section `file` de `memory/services-domaines.md`.
+ADR-075 ; section `file` de `memory/services-domaines.md`.
 
 ## Ce que le ticket fait
 

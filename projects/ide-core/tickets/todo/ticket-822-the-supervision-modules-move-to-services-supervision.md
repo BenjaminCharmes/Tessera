@@ -1,17 +1,17 @@
 ---
-id: ticket-803
+id: ticket-822
 title: "The supervision modules move to services/supervision"
 type: refactor
 status: todo
 pr_number: null
 priority: low
 agent: codeur
-depends_on: [ticket-802]
+depends_on: [ticket-821]
 estimated_days: 1
 created: 2026-11-05
 ---
 
-# ticket-803 — Les modules de supervision passent dans `services/supervision/`
+# ticket-822 — Les modules de supervision passent dans `services/supervision/`
 
 ## Objectif
 
@@ -20,8 +20,8 @@ Les quatorze modules du domaine `supervision` (processus, services, apps, salles
 
 ## Contexte
 
-ADR-074 ; liste du domaine dans `memory/services-domaines.md`, section `supervision`. Premier
-déplacement : c'est le domaine que le moins de fichiers importent, il éprouve le script (ticket-802).
+ADR-075 ; liste du domaine dans `memory/services-domaines.md`, section `supervision`. Premier
+déplacement : c'est le domaine que le moins de fichiers importent, il éprouve le script (ticket-821).
 
 ## Ce que le ticket fait
 

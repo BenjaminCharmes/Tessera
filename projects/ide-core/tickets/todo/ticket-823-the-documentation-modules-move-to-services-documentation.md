@@ -1,17 +1,17 @@
 ---
-id: ticket-804
+id: ticket-823
 title: "The documentation modules move to services/documentation"
 type: refactor
 status: todo
 pr_number: null
 priority: low
 agent: codeur
-depends_on: [ticket-803]
+depends_on: [ticket-822]
 estimated_days: 1
 created: 2026-11-05
 ---
 
-# ticket-804 — Les modules de documentation passent dans `services/documentation/`
+# ticket-823 — Les modules de documentation passent dans `services/documentation/`
 
 ## Objectif
 
@@ -20,7 +20,7 @@ constant.
 
 ## Contexte
 
-ADR-074 ; section `documentation` de `memory/services-domaines.md`. Le module `documentation.py`
+ADR-075 ; section `documentation` de `memory/services-domaines.md`. Le module `documentation.py`
 et le dossier portent le même nom : l'import devient `tessera.services.documentation.documentation`.
 
 ## Ce que le ticket fait

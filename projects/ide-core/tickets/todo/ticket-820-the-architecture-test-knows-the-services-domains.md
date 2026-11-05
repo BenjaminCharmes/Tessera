@@ -1,5 +1,5 @@
 ---
-id: ticket-801
+id: ticket-820
 title: "The architecture test knows the services domains"
 type: test
 status: todo
@@ -11,7 +11,7 @@ estimated_days: 1
 created: 2026-11-05
 ---
 
-# ticket-801 — Le test d'architecture connaît les domaines de `services/`
+# ticket-820 — Le test d'architecture connaît les domaines de `services/`
 
 ## Objectif
 
@@ -20,7 +20,7 @@ ne bouge, et un module nouveau ne peut plus naître sans domaine.
 
 ## Contexte
 
-ADR-074 et `memory/services-domaines.md` (ordre des domaines, classement des 207 modules).
+ADR-075 et `memory/services-domaines.md` (ordre des domaines, classement des 207 modules).
 `backend/tests/test_sens_des_imports.py` ne connaît aujourd'hui que `models > services > routers`
 (ticket-670, cliquet `ECARTS_CONNUS`). Ce ticket n'en change pas les règles : il ajoute celles des
 domaines à côté, sans déplacer de module.
@@ -63,7 +63,7 @@ Sur des arbres temporaires, comme `test_sens_des_imports.py` :
 
 ## Critères d'acceptation
 
-- [ ] `scripts/domaines_services.py` porte les dix-huit domaines dans l'ordre d'ADR-074 et un
+- [ ] `scripts/domaines_services.py` porte les dix-huit domaines dans l'ordre d'ADR-075 et un
       domaine pour chaque module à plat du dossier
 - [ ] `test_real_tree_follows_the_domains` passe sur l'arbre réel
 - [ ] Un module à plat ajouté sans ligne dans `A_DEPLACER` fait échouer ce test
@@ -71,7 +71,7 @@ Sur des arbres temporaires, comme `test_sens_des_imports.py` :
 
 ## Ce que ça ne fait pas
 
-Aucun déplacement (tickets 803 et suivants), aucun outil de déplacement (ticket-802). Aucune règle
+Aucun déplacement (tickets 803 et suivants), aucun outil de déplacement (ticket-821). Aucune règle
 pour `utils/`.
 
 ## Risques
