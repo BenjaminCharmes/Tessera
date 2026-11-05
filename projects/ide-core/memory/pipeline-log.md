@@ -7788,3 +7788,4 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-05 14:26:25 UTC — [ticket-830] validateur: fichiers cités joints : backend/tests/test_consignes_coherentes.py (tronqué) ; non joints (budget épuisé) : projects/ide-core/memory/decisions.md, contraintes.md, CLAUDE.md, projects/ide-core/CLAUDE.md, projects/ide-core/memory/decisions-archive.md
 - 2026-11-05 14:26:25 UTC — [ticket-830] validateur: APPROVED — Tous les critères sont satisfaits. Les 13 ADR non citées ont bien été archivées  (54827ms)
 - 2026-11-05 14:26:25 UTC — [ticket-830] APPROVED après 2 tour(s)
+- 2026-11-05 14:31:18 UTC — [ticket-830] documentation: 1 fichier(s) (285983ms) — après tour de correction
