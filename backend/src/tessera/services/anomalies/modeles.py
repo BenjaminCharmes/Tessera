@@ -5,6 +5,7 @@ l'ordinaire, et c'est tout. Les six règles sont décrites dans la spec
 `2026-11-05-detecteur-d-anomalies-design.md`.
 """
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Literal
 
 from pydantic import BaseModel, Field
@@ -51,3 +52,25 @@ class AppelOutil:
     #: même, et le contenu (chemin, jeton) ne quitte jamais la lecture (ADR-053).
     input_hash: str
     ticket_id: str
+
+
+@dataclass(frozen=True)
+class EvenementLu:
+    """A persisted event, reduced to what the stage reading needs."""
+
+    type: str
+    agent: str | None
+    ts: datetime
+
+
+@dataclass(frozen=True)
+class Etape:
+    """A stage of a run, read from its start and end events."""
+
+    nom: str
+    debut: datetime
+    fin: datetime | None
+    agent: str | None
+    #: Rouverte par un nouveau début sans fin entre les deux : ni mesure, ni
+    #: échantillon. Le testeur figé n'entre donc pas dans la médiane qui le juge.
+    abandonnee: bool = False
