@@ -606,6 +606,22 @@ Le validateur joindra la liste des fichiers du dossier et pourra vérifier qu'il
 
 Le validateur vérifie l'existence du dossier, pas son contenu. Pour un critère de contenu (« la classe X existe »), cite le fichier spécifique plutôt que le dossier.
 
+#### Critères sur les tests
+
+**Pas de « `uv run pytest` passe » ni de « `npm run test` passe »** tant que le testeur est désactivé sur le projet : le validateur ne reçoit alors aucun résultat de test, juge le critère invérifiable, et un critère invérifiable fait refuser le run. Nomme plutôt le test qui doit exister ; faire tourner les suites relève de la vérification avant merge. Testeur actif, le validateur voit chaque étape de la `test_command` et son code de sortie : « `npm run build` passe » ne se vérifie que si `build` en fait partie.
+
+#### Fichiers cités en backticks
+
+**Un critère satisfait par du code déjà là nomme son fichier entre backticks.** Le validateur ne voit que le diff, plus les fichiers que les critères citent ainsi. « La grille porte `overflow-x: auto` », déjà vrai dans un CSS que le run ne touche pas, se refuse ; « `main.css` donne `overflow-x: auto` à la grille » se vérifie.
+
+#### Pas de critères négatifs
+
+**Pas de critère négatif sur tout le code.** « Rien n'appelle encore X » ou « aucun chemin n'atteint Y » ne se prouve pas sur un diff : le validateur le juge invérifiable et refuse. Ramène le critère au diff (« le diff ne modifie ni `a.py` ni `b.py` ») ou à un test (« un test vérifie, avec des doubles, que … »).
+
+#### Numéros figés dans les critères
+
+**Pas de numéro d'ADR ni de ticket figé dans un critère.** « ADR-012 est écrit » se refuse dès qu'un autre ticket de la file a pris ce numéro avant. Écris plutôt « une ADR au prochain numéro libre de `memory/decisions.md` décrit … ».
+
 ### Fichiers qu'un agent ne peut pas modifier
 
 Certains fichiers définissent le projet lui-même et restent hors d'atteinte des agents : `CLAUDE.md`, `CLAUDE.local.md`, `agents.json`, `.claude/`, `.github/workflows/`, `.git/`.
@@ -622,6 +638,19 @@ Reformule le critère pour qu'il ignore ces fichiers, ou fais la modification à
 Ton script de vérification est aussi protégé en écriture. Si ton projet déclare `test_command` et désigne un fichier sur disque (par exemple `../scripts/verifier.py`), aucun agent ne peut le modifier — tu verras la tentative refusée avec un message clair. L'idée est d'empêcher un ticket d'affaiblir le test qui doit le juger.
 
 Quand un ticket modifie la configuration des tests — `conftest.py`, `vitest.config.ts`, `eslint.config.js`, la clé `scripts` de `package.json`, ou les sections `[tool.pytest*]` et `[tool.mypy]` de `pyproject.toml` —, le reviewer en reçoit un avertissement au début de son message. À lui de vérifier qu'aucune étape de vérification n'a été retirée ou désactivée.
+
+Aucun agent ne peut écrire dans les chemins suivants, même si un ticket l'autorise explicitement :
+
+- `.github/workflows/` — la CI
+- `.claude/` (`settings*.json`, `skills/`, `commands/`, `agents/`) — la configuration Claude Code
+- `.git/` — l'historique git
+- `agents.json` — la déclaration des agents
+- `CLAUDE.md` et `CLAUDE.local.md` — les règles du projet
+- `memory/contraintes.md` — les contraintes vivantes
+
+Un ticket dont le livrable vit là se fait **à la main** : lancé dans le pipeline, il tourne trois tours sur un diff vide et se bloque. Tu peux écrire la partie autorisée — un test, du code — et dire que le reste est manuel.
+
+**« Ce ticket autorise la modification de `CLAUDE.md` » n'ouvre pas le garde-fou.** Seul le droit de décision suffit : un agent qui lit cette phrase comme une permission et contourne le refus contrevient aux règles. La partie `CLAUDE.md` d'un tel ticket se fait à la main, après le merge.
 
     ## Critères d'acceptation
     
