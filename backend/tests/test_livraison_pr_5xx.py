@@ -37,6 +37,7 @@ class _Workflow:
         self._existante = existante
         self.ouvertures = 0
         self.recherches = 0
+        self.recherche_en_echec = False
 
     async def open_pull_request(self, **kwargs: object) -> object:
         self.ouvertures += 1
@@ -50,6 +51,8 @@ class _Workflow:
 
     async def pr_ouverte_de(self, branch: str) -> int | None:
         self.recherches += 1
+        if self.recherche_en_echec:
+            raise httpx.ConnectError("recherche impossible")
         return self._existante
 
 
@@ -110,3 +113,16 @@ async def test_a_500_when_the_pr_exists_resumes_it_without_opening_another(
 
     assert livraison.pr_number == 42
     assert workflow.ouvertures == 1
+
+
+async def test_a_500_with_a_search_that_never_answers_opens_no_second_pr(
+    tmp_path: Path,
+) -> None:
+    workflow = _Workflow([_erreur(500)])
+    workflow.recherche_en_echec = True
+
+    with pytest.raises(httpx.HTTPStatusError):
+        await _livrer(tmp_path, workflow)
+
+    assert workflow.ouvertures == 1
+    assert workflow.recherches == 3
