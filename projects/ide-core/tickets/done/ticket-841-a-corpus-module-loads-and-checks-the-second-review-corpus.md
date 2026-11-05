@@ -2,7 +2,7 @@
 id: ticket-841
 title: "A corpus module loads and checks the second-review trial corpus"
 type: chore
-status: todo
+status: done
 priority: low
 agent: codeur
 created: 2026-11-05
@@ -61,8 +61,8 @@ sensibles.
 
 ## Critères d'acceptation
 
-- [ ] `scripts/seconde_revue_corpus.py` porte les types et les six fonctions ci-dessus
-- [ ] `backend/tests/test_seconde_revue_corpus.py` couvre : `est_sensible` vrai pour
+- [x] `scripts/seconde_revue_corpus.py` porte les types et les six fonctions ci-dessus
+- [x] `backend/tests/test_seconde_revue_corpus.py` couvre : `est_sensible` vrai pour
       `backend/src/tessera/services/providers/git_guard.py` et faux pour
       `frontend/src/App.tsx` ; `somme_gel` stable quand l'ordre change et différente quand une
       entrée change ; `charger_corpus` sur un fichier valide, puis une cause de refus par
@@ -70,7 +70,7 @@ sensibles.
       `fichiers_defaut`, somme de gel fausse) ; `verifier_taille` sur un corpus trop petit et
       sur un corpus conforme ; `shas_manquants` et `diff_de` sur un dépôt temporaire créé par
       le test avec deux commits
-- [ ] Les appels git sont en lecture seule (`cat-file`, `diff`) ; aucun import de `tessera`
+- [x] Les appels git sont en lecture seule (`cat-file`, `diff`) ; aucun import de `tessera`
 
 ## Ce que ça ne fait pas
 
