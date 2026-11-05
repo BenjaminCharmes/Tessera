@@ -1,7 +1,7 @@
 """Response models of the services routes — ticket-679."""
 import json
 import re
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
@@ -10,11 +10,7 @@ from fastapi.testclient import TestClient
 from tessera.config import settings
 from tessera.main import app
 from tessera.services.verification.process_registry import PROCESS_REGISTRY, Service
-from tessera.services.verification.service_etat import (
-    ServiceEtat,
-    ServicesArretes,
-    ServicesDemarres,
-)
+from tessera.services.verification.service_etat import ServiceEtat, ServicesArretes, ServicesDemarres
 
 _BASE = "/api/v1/projects/mon-projet/services"
 _API_TS = Path(__file__).resolve().parents[2] / "frontend/src/types/projets.ts"
@@ -41,7 +37,7 @@ def _service() -> Service:
         project_id="mon-projet",
         pid=4242,
         processus=_FakeProcess(None),
-        demarre_a=datetime(2026, 10, 30, 8, 0, 0, tzinfo=timezone.utc),
+        demarre_a=datetime(2026, 10, 30, 8, 0, 0, tzinfo=UTC),
         sortie=["ready on http://localhost:5175/"],
     )
 

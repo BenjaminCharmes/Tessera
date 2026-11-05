@@ -6,17 +6,14 @@ from pathlib import Path
 import httpx
 import respx
 
+from tessera.services.gardes.politique_run import PolitiqueRun
+from tessera.services.github.github_service import GitHubService, PrOuverte
+from tessera.services.livraison.reprise_outils import prs_a_reprendre, ticket_de_branche
+from tessera.services.livraison.reprise_surveillance import SurveillanceProjet, reprendre_surveillances
+from tessera.services.livraison.sha_approbation import noter_poussee
 from tessera.services.noyau.database import init_db
 from tessera.services.noyau.database_runs import create_run
-from tessera.services.github.github_service import GitHubService, PrOuverte
 from tessera.services.noyau.pipeline_events import OrchestratorEvent
-from tessera.services.gardes.politique_run import PolitiqueRun
-from tessera.services.livraison.reprise_outils import prs_a_reprendre, ticket_de_branche
-from tessera.services.livraison.reprise_surveillance import (
-    SurveillanceProjet,
-    reprendre_surveillances,
-)
-from tessera.services.livraison.sha_approbation import noter_poussee
 
 PROJET = "demo"
 BASE = "develop"

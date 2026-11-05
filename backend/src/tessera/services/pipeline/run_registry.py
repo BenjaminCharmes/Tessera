@@ -13,8 +13,8 @@ import uuid
 from collections.abc import AsyncIterator, Callable
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from typing import Any, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 from tessera.reglages import ReglagesEffectifs, du_moment
 from tessera.services.noyau import eveil
@@ -99,7 +99,7 @@ class RunActif:
     #: Hors de `en_dict()`.
     reglages: ReglagesEffectifs = field(default_factory=du_moment)
     demarre_a: datetime = field(
-        default_factory=lambda: datetime.now(timezone.utc)
+        default_factory=lambda: datetime.now(UTC)
     )
     #: Quand le run a émis son dernier événement, tokens et appels d'outils
     #: compris (ticket-834). Le détecteur d'anomalies y lit le silence.
@@ -216,7 +216,7 @@ class RunRegistry:
         ticket_id: str | None = None,
         *,
         mode: str = "single",
-        run_id: Optional[str] = None,
+        run_id: str | None = None,
         dialogue: Any = None,
         ticket_titre: str | None = None,
     ) -> RunActif:
@@ -270,7 +270,7 @@ class RunRegistry:
         ticket_id: str | None = None,
         *,
         mode: str = "single",
-        run_id: Optional[str] = None,
+        run_id: str | None = None,
         dialogue: Any = None,
         ticket_titre: str | None = None,
     ) -> AsyncIterator[RunActif]:

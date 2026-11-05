@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Binary file detection for the cited-files section (ticket-462).
 
 Split out of ``validator_cited_files.py`` to keep that module small.

@@ -1,12 +1,7 @@
 """A code material source for documentation tests that run outside a git repository."""
 from pathlib import Path
 
-from tessera.services.documentation.documentation_code import (
-    DiffDeTicket,
-    FichierLivre,
-    FournisseurMatiere,
-    MatiereCode,
-)
+from tessera.services.documentation.documentation_code import DiffDeTicket, FichierLivre, FournisseurMatiere, MatiereCode
 
 
 def matiere_factice(sans_diff: tuple[str, ...] = ()) -> FournisseurMatiere:

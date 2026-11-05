@@ -8,8 +8,8 @@ signature seule prendrait celui de l'un pour celui de l'autre.
 """
 from pathlib import Path
 
-from tessera.services.supervision.attribution_processus import appartient_au_projet
 from tessera.services.projets.project_loader import load_services_config
+from tessera.services.supervision.attribution_processus import appartient_au_projet
 from tessera.services.supervision.signature_commande import commande_porte, signature
 from tessera.services.supervision.sonde_systeme import InfoProcessus
 

@@ -14,19 +14,13 @@ import pytest
 from claude_agent_sdk import AssistantMessage, ResultMessage, TextBlock
 
 import tessera.services.providers.agent_sdk as agent_sdk_module
-from tessera.models.agent import AgentConfig, AgentResult, AgentRole
-from tessera.models.ticket import Ticket, TicketStatus
+from tessera.models.agent import AgentResult, AgentRole
 from tessera.services.providers.agent_sdk import ClaudeAgentSDKProvider
 from tessera.services.providers.anthropic_api import AnthropicApiProvider
 from tessera.services.providers.base import ProviderResult
 from tests.test_agent_runner import _make_ticket as _ticket_runner
 from tests.test_agent_runner import _runner
-from tests.test_orchestrator import (
-    _make_agent_result,
-    _make_orchestrator,
-    _make_ticket,
-    _noop,
-)
+from tests.test_orchestrator import _make_agent_result, _make_orchestrator, _make_ticket, _noop
 from tests.test_providers_base import FakeProvider
 
 

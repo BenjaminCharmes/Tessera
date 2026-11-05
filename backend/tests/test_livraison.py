@@ -6,7 +6,7 @@ import httpx
 import pytest
 
 from tessera.config import settings
-from tessera.services.livraison.livraison import LivraisonService, Livraison
+from tessera.services.livraison.livraison import Livraison, LivraisonService
 
 
 class _FauxGit:

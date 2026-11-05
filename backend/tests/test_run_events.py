@@ -8,7 +8,6 @@ Acceptance criteria:
 - a ticket played in a queue returns its own events via its row's id
 """
 from pathlib import Path
-from typing import Any
 
 import pytest
 from fastapi.testclient import TestClient
@@ -227,7 +226,7 @@ async def test_run_closed_carries_db_run_id(db_path: Path) -> None:
 
     from tessera.services.noyau.event_hub import EventHub
     from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
-    from tessera.services.pipeline.run_executor import emetteur, _clore
+    from tessera.services.pipeline.run_executor import _clore, emetteur
     from tessera.services.pipeline.run_registry import RunActif
 
     await init_db(db_path)

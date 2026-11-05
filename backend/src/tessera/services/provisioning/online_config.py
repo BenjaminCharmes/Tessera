@@ -6,7 +6,7 @@ block is refused by naming the offending field.
 """
 import re
 from pathlib import Path
-from typing import Literal, Optional
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, ValidationInfo, field_validator
 
@@ -39,8 +39,8 @@ class StripeConfig(BaseModel):
 
     webhook_path: str
     events: list[str] = Field(min_length=1)
-    product: Optional[str] = None
-    price_cents: Optional[int] = Field(default=None, gt=0)
+    product: str | None = None
+    price_cents: int | None = Field(default=None, gt=0)
     #: Live mode is never implied: it must be declared.
     mode: Literal["test", "live"] = "test"
 
@@ -59,24 +59,24 @@ class OnlineConfig(BaseModel):
 
     domain: str
     resources: list[Resource] = Field(default_factory=list)
-    stripe: Optional[StripeConfig] = Field(default=None, validate_default=True)
+    stripe: StripeConfig | None = Field(default=None, validate_default=True)
     #: Secrets aléatoires à poser ; ``None`` laisse le défaut de l'étape Variables.
-    generate: Optional[list[str]] = None
+    generate: list[str] | None = None
     #: Variables calculées ; ``{domain}`` est remplacé par le domaine déclaré.
     derive: dict[str, str] = Field(default_factory=dict)
     #: Route du projet qui lit la base et rend 200 ; ``None`` : seule la racine est contrôlée.
-    health_path: Optional[str] = None
+    health_path: str | None = None
 
     @field_validator("health_path")
     @classmethod
-    def _health_path_valide(cls, valeur: Optional[str]) -> Optional[str]:
+    def _health_path_valide(cls, valeur: str | None) -> str | None:
         if valeur is not None and not valeur.startswith("/"):
             raise ValueError("must start with '/'")
         return valeur
 
     @field_validator("generate")
     @classmethod
-    def _generate_valide(cls, valeur: Optional[list[str]]) -> Optional[list[str]]:
+    def _generate_valide(cls, valeur: list[str] | None) -> list[str] | None:
         for nom in valeur or []:
             _nom_variable(nom)
         return valeur
@@ -99,8 +99,8 @@ class OnlineConfig(BaseModel):
     @field_validator("stripe")
     @classmethod
     def _stripe_declare(
-        cls, valeur: Optional[StripeConfig], info: ValidationInfo
-    ) -> Optional[StripeConfig]:
+        cls, valeur: StripeConfig | None, info: ValidationInfo
+    ) -> StripeConfig | None:
         # Les événements dépendent du code du projet : Tessera ne les devine pas.
         if valeur is None and "stripe" in info.data.get("resources", []):
             raise ValueError("required when 'stripe' is listed in resources")
@@ -129,7 +129,7 @@ def parse_online_config(bloc: object) -> OnlineConfig:
         raise OnlineConfigError(_format_errors(erreur)) from None
 
 
-def load_online_config(project_path: Path) -> Optional[OnlineConfig]:
+def load_online_config(project_path: Path) -> OnlineConfig | None:
     """Read the ``online`` block of a project, ``None`` when it declares none.
 
     A missing or unreadable ``agents.json`` means no block, like the other

@@ -4,9 +4,9 @@ Split out of `orchestrator.py` so the wire contract of a pipeline run can be
 read (and imported) without loading the pipeline engine itself.
 """
 from collections.abc import Awaitable, Callable
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -113,17 +113,17 @@ class EventType(str, Enum):
 
 class OrchestratorEvent(BaseModel):
     type: EventType
-    agent: Optional[AgentRole] = None
+    agent: AgentRole | None = None
     ticket_id: str
     data: dict[str, Any] = Field(default_factory=dict)
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
     #: De quel run vient l'événement, et sur quel projet (ticket-128). Le
     #: canal d'observation porte tous les runs à la fois : sans ces deux
     #: champs, un client ne saurait pas à quelle carte rattacher ce qu'il
     #: reçoit. Optionnels, parce que l'orchestrateur les ignore — c'est le
     #: routeur qui les renseigne au moment de publier.
-    run_id: Optional[str] = None
-    project_id: Optional[str] = None
+    run_id: str | None = None
+    project_id: str | None = None
 
 
 class PipelineResult(BaseModel):

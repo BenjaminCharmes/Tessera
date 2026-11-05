@@ -4,10 +4,9 @@ Pure plumbing, no event type: `livraison.py` cannot import the event models
 (they import `Livraison`, which would make a cycle). The announcer is a plain
 callback, posed for the duration of a delivery by `livraison_evenements`.
 """
-from collections.abc import Iterator
+from collections.abc import Awaitable, Callable, Iterator
 from contextlib import contextmanager
 from contextvars import ContextVar
-from typing import Awaitable, Callable
 
 #: Annonce une étape de la résolution d'un conflit : `(phase, fichiers, issue)`.
 #: `phase` vaut « started » ou « ended » ; `issue` n'existe qu'à « ended »

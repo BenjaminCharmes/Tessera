@@ -7,9 +7,9 @@ from fastapi.testclient import TestClient
 
 from tessera.config import settings
 from tessera.main import app
-from tessera.services.usage.agent_calls import save_agent_call
 from tessera.services.noyau.database import init_db
 from tessera.services.noyau.database_runs import create_run
+from tessera.services.usage.agent_calls import save_agent_call
 from tessera.services.usage.database_usage import get_usage_breakdown
 from tessera.services.usage.usage_stats import usage_stats
 

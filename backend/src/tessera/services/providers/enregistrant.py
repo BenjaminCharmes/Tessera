@@ -20,13 +20,8 @@ from pathlib import Path
 from typing import Any
 
 from tessera.services.noyau.cost_calculator import calculate_cost
+from tessera.services.providers.base import LLMProvider, ProviderResult, StreamCallback, ToolEventCallback
 from tessera.services.usage.agent_calls import save_agent_call
-from tessera.services.providers.base import (
-    LLMProvider,
-    ProviderResult,
-    StreamCallback,
-    ToolEventCallback,
-)
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

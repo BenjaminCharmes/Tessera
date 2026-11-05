@@ -10,34 +10,22 @@ un conflit, une CI rouge ou une CI muette l'arrêtent, et il dit pourquoi.
 """
 import asyncio
 import time
+from collections.abc import Awaitable, Callable
 from pathlib import Path
-from typing import Any, Awaitable, Callable, Protocol
+from typing import Any, Protocol
 
 from tessera.config import settings
-from tessera.services.projets.autonomie import NiveauAutonomie, lire_niveau
+from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.git_workspace import GitCommandError
-from tessera.services.livraison.livraison_apres import (
-    branche_modifiee,
-    pr_a_relire,
-    ouvrir_avec_recours,
-    sha_pousse,
-)
+from tessera.services.livraison.livraison_apres import branche_modifiee, ouvrir_avec_recours, pr_a_relire, sha_pousse
+from tessera.services.livraison.livraison_arrets import ARRET_NON_APPROUVE, arret_ci_illisible, arret_conflit, arret_niveau_commit, arret_pr_en_conflit
 from tessera.services.livraison.livraison_conflit import annoncer_fin_de_conflit, resolveur_suivi, signal_courant
-from tessera.services.livraison.livraison_arrets import (
-    ARRET_NON_APPROUVE,
-    arret_ci_illisible,
-    arret_conflit,
-    arret_pr_en_conflit,
-    arret_niveau_commit,
-)
 from tessera.services.livraison.livraison_merge import arret_de_merge, tenter_le_merge, tete_a_change
-from tessera.services.livraison.livraison_rebase import (
-    noter_ce_que_le_rebase_a_fait, retester_apres_rebase, tete_avant_rebase,
-)
+from tessera.services.livraison.livraison_rebase import noter_ce_que_le_rebase_a_fait, retester_apres_rebase, tete_avant_rebase
 from tessera.services.livraison.livraison_resultat import Livraison as Livraison
 from tessera.services.livraison.renumeroter import etape_de_numerotation
-from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.livraison.retest_apres_rebase import RetestApresRebase
+from tessera.services.projets.autonomie import NiveauAutonomie, lire_niveau
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

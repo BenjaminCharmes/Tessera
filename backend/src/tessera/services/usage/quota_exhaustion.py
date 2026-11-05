@@ -9,7 +9,7 @@ Pure on purpose: no I/O, no import of the SDK. A `ProcessError` is recognised by
 class name, so the module loads even where the SDK is absent.
 """
 import re
-from datetime import timezone
+from datetime import UTC
 
 from tessera.services.usage.quota_tracker import QuotaSnapshot
 
@@ -49,4 +49,4 @@ def resume_label(snapshot: QuotaSnapshot | None) -> str:
     """Return the resume time as `HH:MM UTC`, or `heure inconnue`."""
     if snapshot is None or snapshot.resets_at is None:
         return "heure inconnue"
-    return snapshot.resets_at.astimezone(timezone.utc).strftime("%H:%M UTC")
+    return snapshot.resets_at.astimezone(UTC).strftime("%H:%M UTC")

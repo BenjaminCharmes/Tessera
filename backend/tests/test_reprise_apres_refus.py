@@ -4,15 +4,7 @@ from pathlib import Path
 from tessera.models.agent import AgentRole
 from tessera.services.pipeline.orchestrator import EventType
 from tessera.services.pipeline.refus_precedent import Refus, refus_precedent
-from tests.test_pipeline_reprise import (
-    _VERT,
-    _FakeTestRunner,
-    _GitReprise,
-    _lancer,
-    _orchestrateur,
-    _reprises,
-    _roles,
-)
+from tests.test_pipeline_reprise import _VERT, _FakeTestRunner, _GitReprise, _lancer, _orchestrateur, _reprises, _roles
 
 _T = "ticket-001"
 _DEBUT = f"- 2026-10-19 22:11:19 UTC — [{_T}] branche {_T}-slug"

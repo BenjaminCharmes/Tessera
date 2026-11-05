@@ -18,7 +18,6 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-
 # ---------------------------------------------------------------------------
 # Import the hook module
 # ---------------------------------------------------------------------------
@@ -128,9 +127,9 @@ def test_hook_message_never_holds_a_term(
 
     monkeypatch.setattr(HOOK, "load_forbidden_terms", lambda racine, **k: ["zorglub"])
     monkeypatch.setattr(
-        HOOK, "_get_commits", lambda l, r: [CommitInfo(sha7="abc1234", message="zorglub", auteur="x")]
+        HOOK, "_get_commits", lambda ln, r: [CommitInfo(sha7="abc1234", message="zorglub", auteur="x")]
     )
-    monkeypatch.setattr(HOOK, "_get_diff_lines", lambda l, r: _diff_lines("a.py", "zorglub"))
+    monkeypatch.setattr(HOOK, "_get_diff_lines", lambda ln, r: _diff_lines("a.py", "zorglub"))
     monkeypatch.setattr(sys, "stdin", io.StringIO(f"refs/heads/x {'b' * 40} refs/heads/x {'c' * 40}\n"))
     assert HOOK.main() == 1
     assert "zorglub" not in capsys.readouterr().err

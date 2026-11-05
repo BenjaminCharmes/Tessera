@@ -8,9 +8,9 @@ handed this recorder and asks it to open a run when the caller did not.
 """
 from pathlib import Path
 
+from tessera.services.livraison.sha_approbation import noter_approbation
 from tessera.services.noyau.database_runs import create_run, finish_run
 from tessera.services.noyau.pipeline_events import PipelineResult
-from tessera.services.livraison.sha_approbation import noter_approbation
 
 #: Le statut écrit en base quand le run n'a pas rendu de résultat : la même
 #: valeur que le stream single utilise depuis ticket-079.

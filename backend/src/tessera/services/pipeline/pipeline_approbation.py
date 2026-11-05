@@ -11,9 +11,9 @@ from typing import TYPE_CHECKING
 
 from tessera.services.git_workspace import GitWorkspaceError
 from tessera.services.livraison.livraison import Livraison
+from tessera.services.noyau.pipeline_events import EventCallback, PipelineResult
 from tessera.services.pipeline.pipeline_capture import capturer_le_run
 from tessera.services.pipeline.pipeline_documentation import documenter_le_run
-from tessera.services.noyau.pipeline_events import EventCallback, PipelineResult
 from tessera.services.pipeline.pipeline_run import PipelineRun
 from tessera.utils.logger import get_logger
 

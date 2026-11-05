@@ -3,7 +3,7 @@
 Sorties de `ci_watcher.py` pour qu'il tienne sous son plafond de longueur :
 elles ne lisent aucun état du watcher.
 """
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from tessera.services.git_workspace.journal_attente import attente_vers_fichier
@@ -21,7 +21,7 @@ def ajouter_au_log(pipeline_log_path: Path | None, texte: str) -> None:
     """
     if pipeline_log_path is None:
         return
-    ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+    ts = datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S UTC")
     line = f"- {ts} — {texte}\n"
     if attente_vers_fichier(pipeline_log_path, line):
         return

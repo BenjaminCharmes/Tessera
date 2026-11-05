@@ -18,11 +18,7 @@ from tessera.config import settings
 from tessera.main import app
 from tessera.models.ticket import TicketStatus
 from tessera.services.noyau.database import init_db
-from tessera.services.noyau.pipeline_events import (
-    EventType,
-    OrchestratorEvent,
-    PipelineResult,
-)
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent, PipelineResult
 
 
 @pytest.fixture(autouse=True)
@@ -228,7 +224,7 @@ def test_l_ancienne_route_de_stream_n_existe_plus(client: TestClient) -> None:
     # middleware d'authentification (ticket-120), donc `app.routes` ne liste
     # pas les routes des routeurs — une version structurelle de ce test
     # passait au vert alors que la route existait toujours.
-    with pytest.raises(Exception):
+    with pytest.raises(Exception):  # noqa: B017
         with client.websocket_connect(
             "/api/v1/orchestrator/stream/mon-projet"
         ) as ws:

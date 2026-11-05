@@ -7,7 +7,7 @@ import sqlite3
 import subprocess
 import time
 from collections.abc import Awaitable, Callable
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -16,15 +16,15 @@ from fastapi.testclient import TestClient
 
 from tessera.config import settings
 from tessera.main import app
-from tessera.services.supervision.anomalies import detecteur as module_detecteur
-from tessera.services.supervision.anomalies import lecture_evenements
-from tessera.services.supervision.anomalies.detecteur import DetecteurDAnomalies
 from tessera.services.noyau.event_hub import EventHub
 from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.pipeline.run_registry import RunActif, RunRegistry
+from tessera.services.supervision.anomalies import detecteur as module_detecteur
+from tessera.services.supervision.anomalies import lecture_evenements
+from tessera.services.supervision.anomalies.detecteur import DetecteurDAnomalies
 from tests.anomalies_base import appel_d_agent, evenement, ligne_de_run
 
-NOW = datetime(2026, 11, 5, 12, 0, tzinfo=timezone.utc)
+NOW = datetime(2026, 11, 5, 12, 0, tzinfo=UTC)
 LOGGER = "tessera.services.supervision.anomalies.detecteur"
 
 
@@ -80,7 +80,7 @@ async def _historique_de_tests(m: Monde, duree_s: int) -> None:
     await ligne_de_run(m.db, "h", started_at=_iso(7200), finished_at=_iso(7000),
                        ticket_id="ticket-000", final_status="approved")
     for i in range(10):
-        debut = datetime(2026, 11, 4, 8, i, tzinfo=timezone.utc)
+        debut = datetime(2026, 11, 4, 8, i, tzinfo=UTC)
         await evenement(m.db, "h", "test_started", ts=debut.isoformat(), ticket_id="ticket-000")
         await evenement(m.db, "h", "test_result", ts=(debut + timedelta(seconds=duree_s)).isoformat(),
                         ticket_id="ticket-000")
@@ -347,7 +347,7 @@ async def test_passe_late_by_601s_logs_the_gap_and_late_by_600s_does_not(
         run.anomalies_vues.clear()
         signalees = await monde.detecteur.passe()
     tardives = [r for r in caplog.records if r.getMessage() == "anomalie_passe_tardive"]
-    assert len(tardives) == 1 and getattr(tardives[0], "ecart_s") == 601.0
+    assert len(tardives) == 1 and tardives[0].ecart_s == 601.0
     assert signalees, "une passe en retard émet quand même"
 
 

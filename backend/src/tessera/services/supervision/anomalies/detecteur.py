@@ -9,26 +9,20 @@ Son échec se journalise et n'atteint aucun run (ADR-037) : c'est un témoin, il
 import asyncio
 import contextlib
 from collections.abc import Callable
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
 from tessera.models.agent import AgentRole
-from tessera.services.supervision.anomalies import lecture_evenements, lecture_historique
-from tessera.services.supervision.anomalies.etapes import ETAPES_SILENCIEUSES, etapes_depuis
-from tessera.services.supervision.anomalies.modeles import Anomalie, Etape
-from tessera.services.supervision.anomalies.regles_directes import outil_repete, silence, tours_de_revue
-from tessera.services.supervision.anomalies.regles_historiques import (
-    blocages_identiques,
-    cout_budget,
-    cout_median,
-    etape_longue,
-    mediane_si_assez,
-)
 from tessera.services.noyau.event_hub import EventHub
 from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.pipeline.run_executor import emetteur
 from tessera.services.pipeline.run_registry import RunActif, RunRegistry
+from tessera.services.supervision.anomalies import lecture_evenements, lecture_historique
+from tessera.services.supervision.anomalies.etapes import ETAPES_SILENCIEUSES, etapes_depuis
+from tessera.services.supervision.anomalies.modeles import Anomalie, Etape
+from tessera.services.supervision.anomalies.regles_directes import outil_repete, silence, tours_de_revue
+from tessera.services.supervision.anomalies.regles_historiques import blocages_identiques, cout_budget, cout_median, etape_longue, mediane_si_assez
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -38,7 +32,7 @@ APPELS_RELUS = 40
 
 
 def _horloge_utc() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 class DetecteurDAnomalies:

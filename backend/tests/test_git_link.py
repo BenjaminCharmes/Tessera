@@ -1,19 +1,13 @@
 """Liaison d'un projet à un dépôt GitHub — ticket-061."""
-import json
 import asyncio
 import inspect
+import json
 from pathlib import Path
 
 import pytest
 
 from tessera.services.creation_projet import git_link
-from tessera.services.creation_projet.git_link import (
-    GitLinkError,
-    RemoteNotEmpty,
-    git_status,
-    init_repository,
-    link_remote,
-)
+from tessera.services.creation_projet.git_link import GitLinkError, RemoteNotEmpty, git_status, init_repository, link_remote
 
 
 async def _git(cwd: Path, *args: str) -> str:

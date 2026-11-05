@@ -15,7 +15,6 @@ import pytest
 
 from tessera.services.git_workspace import GitWorkspaceService
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------

@@ -8,12 +8,7 @@ tient du principal — Haiku ne doit pas recevoir le nom d'un modèle Ollama.
 from pathlib import Path
 from typing import Any
 
-from tessera.services.providers.base import (
-    LLMProvider,
-    ProviderResult,
-    StreamCallback,
-    ToolEventCallback,
-)
+from tessera.services.providers.base import LLMProvider, ProviderResult, StreamCallback, ToolEventCallback
 
 
 class ProviderRepliDirect:

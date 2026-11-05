@@ -6,9 +6,9 @@ from pathlib import Path
 import pytest
 
 from tessera.config import settings
-from tessera.services.projets.adr import ROLES_AVEC_LECONS, adr_pertinents
-from tessera.services.pipeline.assemblage_run import build_project_context
 from tessera.services.gardes.lecons import PLAFOND_OCTETS, section_lecons
+from tessera.services.pipeline.assemblage_run import build_project_context
+from tessera.services.projets.adr import ROLES_AVEC_LECONS, adr_pertinents
 
 LECON = "Quand un double de test manque, le chercher avant de relancer."
 PROPOSEE = "Quand une proposition attend, elle ne part nulle part."

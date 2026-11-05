@@ -31,7 +31,7 @@ def _set_thread_execution_state(drapeaux: int) -> None:
     """
     import ctypes
 
-    getattr(ctypes, "windll").kernel32.SetThreadExecutionState(drapeaux)
+    getattr(ctypes, "windll").kernel32.SetThreadExecutionState(drapeaux)  # noqa: B009
 
 
 def retenir() -> None:

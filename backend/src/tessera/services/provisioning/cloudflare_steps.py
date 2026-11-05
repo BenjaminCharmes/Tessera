@@ -7,15 +7,9 @@ on ``needs_human`` and writes nothing, even for the records that were missing.
 Records are public, so they may appear in a detail and in an event.
 """
 from dataclasses import dataclass
-from typing import Optional
 
 from tessera.services.provisioning.cloudflare import CloudflareClient, CloudflareZone
-from tessera.services.provisioning.steps import (
-    DnsRecord,
-    ProvisioningContext,
-    StepResult,
-    StepState,
-)
+from tessera.services.provisioning.steps import DnsRecord, ProvisioningContext, StepResult, StepState
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -97,7 +91,7 @@ class DnsStep:
         _logger.info("dns_records_created", extra={"count": len(classes.missing)})
         return StepResult(StepState.DONE, "created: " + "; ".join(map(_describe, classes.missing)))
 
-    def _shortcut(self, ctx: ProvisioningContext) -> Optional[StepResult]:
+    def _shortcut(self, ctx: ProvisioningContext) -> StepResult | None:
         """Answer without asking Cloudflare when the step is off, has no token or no work."""
         if not ctx.online.wants("dns"):
             return self._manual(ctx, "dns is not listed in online.resources")

@@ -17,11 +17,7 @@ from typing import Any
 
 import httpx
 
-from tessera.services.providers.base import (
-    ProviderResult,
-    StreamCallback,
-    ToolEventCallback,
-)
+from tessera.services.providers.base import ProviderResult, StreamCallback, ToolEventCallback
 from tessera.services.providers.duree_max import borner
 from tessera.services.providers.noms import ProviderIndisponible
 from tessera.services.providers.ollama_corps import _corps, _resultat, _verifier_statut
@@ -68,10 +64,10 @@ async def _maybe_slot(base_url: str) -> AsyncGenerator[None, None]:
     wait_s = settings.ollama_slot_wait_s
     try:
         await asyncio.wait_for(slot.acquire(), timeout=wait_s)
-    except asyncio.TimeoutError:
+    except TimeoutError:
         raise ProviderIndisponible(
             f"Ollama : créneau occupé depuis plus de {wait_s:.0f} s"
-        )
+        ) from None
     try:
         yield
     finally:

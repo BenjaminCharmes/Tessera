@@ -3,10 +3,7 @@ import asyncio
 from collections.abc import Awaitable, Callable
 
 from tessera.models.ticket import TicketStatus
-from tessera.services.livraison.attente_des_merges import (
-    apres_les_merges,
-    attendre_les_merges_en_cours,
-)
+from tessera.services.livraison.attente_des_merges import apres_les_merges, attendre_les_merges_en_cours
 from tessera.services.livraison.ci_watcher import CIWatcher
 from tessera.services.livraison.livraison import Livraison
 from tessera.services.noyau.pipeline_events import PipelineResult

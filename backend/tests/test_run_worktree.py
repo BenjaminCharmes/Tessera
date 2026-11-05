@@ -7,17 +7,9 @@ from pathlib import Path
 import pytest
 
 from tessera.config import settings
-from tessera.services.worktrees import run_worktree
 from tessera.services.git_workspace import GitCommandError
-from tessera.services.worktrees.run_worktree import (
-    BrancheDejaExtraite,
-    CheminRefuse,
-    RunWorktree,
-    TravailNonSauve,
-    WorktreeOccupe,
-    creer,
-    supprimer,
-)
+from tessera.services.worktrees import run_worktree
+from tessera.services.worktrees.run_worktree import BrancheDejaExtraite, CheminRefuse, RunWorktree, TravailNonSauve, WorktreeOccupe, creer, supprimer
 
 BRANCHE = "ticket-1-demo"
 

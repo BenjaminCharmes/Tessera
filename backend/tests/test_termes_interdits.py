@@ -6,14 +6,9 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services.github.github_workflow import GitHubWorkflowService, WorkflowError
 from tessera.services.gardes.politique_run import PolitiqueRun
-from tessera.services.gardes.termes_interdits import (
-    CommitInfo,
-    TermesInterditsService,
-    ViolationTerme,
-)
-
+from tessera.services.gardes.termes_interdits import CommitInfo, TermesInterditsService, ViolationTerme
+from tessera.services.github.github_workflow import GitHubWorkflowService, WorkflowError
 
 # ---------------------------------------------------------------------------
 # Helpers

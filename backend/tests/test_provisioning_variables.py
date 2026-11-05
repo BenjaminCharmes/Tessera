@@ -3,14 +3,7 @@ import logging
 
 import pytest
 
-from tessera.services.provisioning import (
-    OnlineConfig,
-    ProvisioningContext,
-    ProvisioningPlan,
-    StepState,
-    VercelEnvWriter,
-    VercelVariablesStep,
-)
+from tessera.services.provisioning import OnlineConfig, ProvisioningContext, ProvisioningPlan, StepState, VercelEnvWriter, VercelVariablesStep
 from tessera.services.provisioning.online_config import OnlineConfigError, parse_online_config
 from tessera.utils.secrets import SecretRegistry
 from tests.test_provisioning_vercel import FakeVercel, _client

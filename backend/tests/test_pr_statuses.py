@@ -11,18 +11,14 @@ Five acceptance criteria tested here:
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Literal
-
-import pytest
+from typing import Literal
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services.livraison import pr_status_cache
-from tessera.services.noyau.database import init_db
 from tessera.services.github.github_service import PRListEntry, PRStatus
+from tessera.services.livraison import pr_status_cache
 from tessera.services.livraison.pr_statuses import get_all_pr_statuses
-
+from tessera.services.noyau.database import init_db
 
 # ---------------------------------------------------------------------------
 # Helpers

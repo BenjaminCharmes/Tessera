@@ -4,11 +4,7 @@ from datetime import datetime, timedelta, timezone
 from tessera.config import settings
 from tessera.services.noyau.database_runs import create_run, finish_run
 from tessera.services.pipeline.run_registry import RunActif
-from tessera.services.pipeline.run_status import (
-    en_utc,
-    statut_d_un_run_vivant,
-    statut_en_base,
-)
+from tessera.services.pipeline.run_status import en_utc, statut_d_un_run_vivant, statut_en_base
 
 
 async def test_approved_single_run_lists_its_ticket_as_approved_and_done() -> None:

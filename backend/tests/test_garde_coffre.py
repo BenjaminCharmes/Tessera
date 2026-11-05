@@ -108,7 +108,7 @@ async def test_refusal_log_holds_the_tool_name_only(
 
     enregistrements = [r for r in caplog.records if r.getMessage() == "execution_coffre_refusee"]
     assert len(enregistrements) == 1
-    assert getattr(enregistrements[0], "outil") == "Bash"
+    assert enregistrements[0].outil == "Bash"
     assert "GITHUB_TOKEN" not in str(enregistrements[0].__dict__)
 
 

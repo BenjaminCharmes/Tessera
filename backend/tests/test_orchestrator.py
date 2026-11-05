@@ -5,19 +5,12 @@ import pytest
 
 from tessera.models.agent import AgentConfig, AgentResult, AgentRole
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services.pipeline.orchestrator import (
-    EventType,
-    Orchestrator,
-    OrchestratorEvent,
-    PipelineResult,
-)
-
-from tests.doubles_git import GitWorkspaceDouble
-from tests.revue_structuree import revue_depuis_texte
 from tessera.services.git_workspace import GitWorkspaceError, NotAGitRepository
+from tessera.services.pipeline.orchestrator import EventType, Orchestrator, OrchestratorEvent, PipelineResult
 from tessera.services.verdicts.security_auditor import SecurityAuditResult, SecurityIssue
 from tessera.services.verdicts.validator import ValidationResult
-
+from tests.doubles_git import GitWorkspaceDouble
+from tests.revue_structuree import revue_depuis_texte
 
 # ------------------------------------------------------------------
 # Helpers
@@ -1408,7 +1401,7 @@ async def test_audit_block_ne_demarre_ni_reviewer_ni_validateur(tmp_path: Path) 
 
 async def test_reviewer_approuve_et_validateur_refuse_donne_un_refus(tmp_path: Path) -> None:
     """The turn is refused when the reviewer approves but the validator does not."""
-    from tessera.services.verdicts.validator import ValidationResult, CriterionResult
+    from tessera.services.verdicts.validator import CriterionResult, ValidationResult
 
     class _RefusingValidator:
         async def validate(
@@ -1447,7 +1440,7 @@ async def test_double_refus_inclut_les_deux_motifs_avec_auteur(tmp_path: Path) -
     with their author label.  Two rounds are needed: round 1 produces the
     combined feedback, round 2 lets us intercept the coder context before it runs.
     """
-    from tessera.services.verdicts.validator import ValidationResult, CriterionResult
+    from tessera.services.verdicts.validator import CriterionResult, ValidationResult
 
     class _RefusingValidator:
         async def validate(

@@ -1,10 +1,7 @@
 """Interdiction du git qui modifie l'historique, cote agent — ticket-068."""
 import pytest
 
-from tessera.services.providers.git_guard import (
-    GIT_REFUS,
-    commande_git_interdite,
-)
+from tessera.services.providers.git_guard import GIT_REFUS, commande_git_interdite
 
 
 @pytest.mark.parametrize(

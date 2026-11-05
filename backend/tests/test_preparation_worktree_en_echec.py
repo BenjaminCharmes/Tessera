@@ -11,11 +11,11 @@ import pytest
 
 from tessera.config import settings
 from tessera.models.ticket import TicketStatus
-from tessera.services.pipeline.assemblage_run import build_orchestrator
-from tessera.services.noyau.database import init_db
-from tessera.services.pipeline.orchestrator import Orchestrator
-from tessera.services.noyau.pipeline_events import OrchestratorEvent, PipelineResult
 from tessera.services.gardes.politique_run import PolitiqueRun
+from tessera.services.noyau.database import init_db
+from tessera.services.noyau.pipeline_events import OrchestratorEvent, PipelineResult
+from tessera.services.pipeline.assemblage_run import build_orchestrator
+from tessera.services.pipeline.orchestrator import Orchestrator
 from tessera.services.pipeline.preparation_worktree import ResultatPreparation
 from tessera.services.pipeline.run_dans_worktree import ouvrir_worktree
 from tessera.services.worktrees.run_worktree import RunWorktree

@@ -1,7 +1,6 @@
 """The Stripe step — ADR-053, ticket-470. A fake Stripe behind MockTransport, no network."""
 import json
 import logging
-from typing import Optional
 from urllib.parse import parse_qs
 
 import httpx
@@ -97,8 +96,8 @@ def _client(fake: FakeStripe, key: str = _TEST_KEY) -> StripeClient:
 def _ctx(
     env: FakeEnv,
     mode: str = "test",
-    product: Optional[str] = None,
-    price_cents: Optional[int] = None,
+    product: str | None = None,
+    price_cents: int | None = None,
 ) -> ProvisioningContext:
     stripe = StripeConfig.model_validate({
         "webhook_path": "/api/hook", "events": _EVENTS,

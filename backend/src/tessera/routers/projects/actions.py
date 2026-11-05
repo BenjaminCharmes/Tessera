@@ -2,23 +2,16 @@
 
 from fastapi import HTTPException
 
-from tessera.services.github.github_sync import GithubSyncAgent
 from tessera.config import settings
-from tessera.models.project import (
-    AnalysisResult,
-    AnalyzeProjectRequest,
-    GithubSyncRequest,
-    GithubSyncResult,
-    PlanRequest,
-    PlanResult,
-)
+from tessera.models.project import AnalysisResult, AnalyzeProjectRequest, GithubSyncRequest, GithubSyncResult, PlanRequest, PlanResult
 from tessera.routers.projects.shared import loader, new_router, ticket_svc
-from tessera.services.github.github_service import GitHubService
-from tessera.services.projets.manifeste import lire_label_map
-from tessera.services.file.planner import PlannerService
 from tessera.services.creation_projet.project_analyzer import ProjectAnalyzerService
-from tessera.services.providers.par_role import modele_du_role, provider_pour_role
+from tessera.services.file.planner import PlannerService
+from tessera.services.github.github_service import GitHubService
+from tessera.services.github.github_sync import GithubSyncAgent
 from tessera.services.github.sync_map import SyncMapService
+from tessera.services.projets.manifeste import lire_label_map
+from tessera.services.providers.par_role import modele_du_role, provider_pour_role
 
 router = new_router()
 

@@ -4,7 +4,6 @@
 Quand le ticket change (file), le titre est lu depuis le projet et inclus dans
 l'événement `ticket_status_changed` pour les observateurs déjà connectés.
 """
-import pytest
 
 from tessera.services.noyau.event_hub import EventHub
 from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent

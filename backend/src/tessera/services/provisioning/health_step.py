@@ -7,7 +7,6 @@ Without it, only the root is checked, and the detail says the database is not.
 """
 import asyncio
 from collections.abc import Awaitable, Callable
-from typing import Optional
 
 import httpx
 
@@ -29,7 +28,7 @@ class HealthCheckStep:
 
     def __init__(
         self,
-        transport: Optional[httpx.AsyncBaseTransport] = None,
+        transport: httpx.AsyncBaseTransport | None = None,
         attempts: int = _ATTEMPTS,
         delay_s: float = _DELAY_S,
         sleep: Sleep = asyncio.sleep,

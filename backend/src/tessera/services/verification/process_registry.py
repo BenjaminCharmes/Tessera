@@ -14,21 +14,15 @@ import os
 import re
 import shlex
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from tessera.services.noyau.arret_de_service import describe_error, terminate_if_alive
-from tessera.services.noyau.groupe_de_processus import (
-    creer_groupe,
-    fermer_le_groupe,
-    rattacher,
-    rattacher_au_groupe,
-    tuer_l_arbre,
-)
+from tessera.services.noyau.groupe_de_processus import creer_groupe, fermer_le_groupe, rattacher, rattacher_au_groupe, tuer_l_arbre
+from tessera.services.noyau.lancement import essais_de_commande, options_de_lancement
 from tessera.services.providers.perimetre import racine_autorisee
 from tessera.services.verification.service_etat import ServiceEtat
-from tessera.services.noyau.lancement import essais_de_commande, options_de_lancement
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -91,7 +85,7 @@ class Service:
     pid: int | None = None
     processus: Any = None
     demarre_a: datetime = field(
-        default_factory=lambda: datetime.now(timezone.utc)
+        default_factory=lambda: datetime.now(UTC)
     )
     sortie: list[str] = field(default_factory=list)
     #: Lignes écartées par le tampon : numéros stables (ticket-769).
@@ -157,7 +151,7 @@ def verifier_la_commande(commande: str) -> list[str]:
     return args
 
 
-def resoudre_le_cwd(racine: Path, cwd: Optional[str]) -> Path:
+def resoudre_le_cwd(racine: Path, cwd: str | None) -> Path:
     """Le dossier de travail, refusé s'il sort du périmètre du projet.
 
     Même frontière qu'ADR-031 : ce que l'IDE lance ne travaille pas chez le
@@ -237,7 +231,7 @@ class ProcessRegistry:
         nom: str,
         commande: str,
         racine: Path,
-        cwd: Optional[str] = None,
+        cwd: str | None = None,
         sur_ligne: Any = None,
         sur_fin: Any = None,
     ) -> Service:
@@ -396,7 +390,7 @@ class ProcessRegistry:
             await tuer_l_arbre(processus.pid)
             terminate_if_alive(processus)
             await asyncio.wait_for(processus.wait(), timeout=DELAI_D_ARRET_S)
-        except asyncio.TimeoutError:
+        except TimeoutError:
             # Un service qui ignore `terminate` garderait son port : le tuer
             # est moins grave que de le laisser derrière soi.
             processus.kill()

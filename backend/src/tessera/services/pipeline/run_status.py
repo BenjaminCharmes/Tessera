@@ -5,7 +5,7 @@ database: the envelope row, its per-ticket children, and the last
 ``queue_progress`` event stored under it.
 """
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import aiosqlite
@@ -167,8 +167,8 @@ def en_utc(instant: datetime | str) -> str:
     """ISO 8601 in UTC; a naive instant is taken as UTC, as the database stores it."""
     valeur = datetime.fromisoformat(instant) if isinstance(instant, str) else instant
     if valeur.tzinfo is None:
-        valeur = valeur.replace(tzinfo=timezone.utc)
-    return valeur.astimezone(timezone.utc).isoformat()
+        valeur = valeur.replace(tzinfo=UTC)
+    return valeur.astimezone(UTC).isoformat()
 
 
 async def statut_en_base(db_path: Path | str, run_id: str) -> RunStatus | None:

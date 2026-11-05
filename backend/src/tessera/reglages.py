@@ -8,7 +8,7 @@ import math
 from collections.abc import Mapping
 from contextvars import ContextVar
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Literal
 
@@ -153,7 +153,7 @@ async def ecrire(db_path: Path, nom: str, valeur: object) -> ReglagesEffectifs:
     """Validate, store and cache an override, and return the new effective values."""
     posee = valider(nom, valeur)
     ancienne = du_moment()
-    maintenant = datetime.now(timezone.utc).isoformat()
+    maintenant = datetime.now(UTC).isoformat()
     async with aiosqlite.connect(str(db_path)) as db:
         await db.execute(
             "INSERT INTO reglages (nom, valeur, modifie_le) VALUES (?, ?, ?) "

@@ -144,7 +144,7 @@ def motif_de_protection(
             "`.git/` est le dépôt lui-même : un hook ou une configuration "
             "déposés là s'exécuteraient au commit, sous l'identité de l'utilisateur"
         )
-    for precedent, suivant in zip(segments, segments[1:]):
+    for precedent, suivant in zip(segments, segments[1:], strict=False):
         if precedent == ".claude" and fnmatch(suivant, _REGLAGES_CLI):
             return (
                 "`.claude/settings*.json` déclare des hooks que le CLI exécuterait "

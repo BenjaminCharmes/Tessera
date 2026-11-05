@@ -1,7 +1,7 @@
 import asyncio
-from pathlib import Path
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,21 +12,16 @@ from tessera import reglages
 from tessera.auth import HostOriginMiddleware, StaticTokenMiddleware
 from tessera.config import settings
 from tessera.config_coffre import source_effective
-from tessera.services.verification.process_registry import PROCESS_REGISTRY
-from tessera.services.noyau.shell_detection import agent_shell_ok, resolve_git_bash, warn_if_shell_missing
 from tessera.routers import (
     agent_admin,
     agents,
-    captures as captures_router,
     chat,
     fs,
     observation,
     orchestrator,
     projects,
-    provisioning as provisioning_router,
-    reglages as reglages_router,
     runs,
-    services as services_router,
+    salle_tessera,
     services_activite,
     services_running,
     signalements,
@@ -34,20 +29,25 @@ from tessera.routers import (
     tickets,
     tickets_archive,
     usage,
-    salle_tessera,
 )
-from tessera.services.supervision.anomalies.detecteur import DetecteurDAnomalies, arreter_le_detecteur
+from tessera.routers import captures as captures_router
+from tessera.routers import provisioning as provisioning_router
+from tessera.routers import reglages as reglages_router
+from tessera.routers import services as services_router
+from tessera.services.livraison.reprise_surveillance import reprendre_surveillances
+from tessera.services.livraison.surveillance_run import surveillance_de_reprise
 from tessera.services.noyau.database import init_db
 from tessera.services.noyau.database_runs import solder_les_runs_orphelins
 from tessera.services.noyau.eveil import relacher as eveil_relacher
 from tessera.services.noyau.event_hub import EVENT_HUB
-from tessera.services.pipeline.run_registry import RUN_REGISTRY
+from tessera.services.noyau.prompt_loader import MissingPromptError
+from tessera.services.noyau.shell_detection import agent_shell_ok, resolve_git_bash, warn_if_shell_missing
 from tessera.services.pipeline.reprise_orphelin import reprendre_depots_orphelins
 from tessera.services.pipeline.reprise_worktrees import reprendre_worktrees_orphelins
-from tessera.services.livraison.reprise_surveillance import reprendre_surveillances
-from tessera.services.livraison.surveillance_run import surveillance_de_reprise
+from tessera.services.pipeline.run_registry import RUN_REGISTRY
 from tessera.services.pipeline.signalements_en_attente import migrer_ancien_fichier
-from tessera.services.noyau.prompt_loader import MissingPromptError
+from tessera.services.supervision.anomalies.detecteur import DetecteurDAnomalies, arreter_le_detecteur
+from tessera.services.verification.process_registry import PROCESS_REGISTRY
 from tessera.utils.access_log_redaction import install_token_redaction
 from tessera.utils.logger import configure_file_logging, get_logger, install_asyncio_exception_handler
 

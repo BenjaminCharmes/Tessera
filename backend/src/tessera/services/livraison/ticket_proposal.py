@@ -11,22 +11,22 @@ to fifteen minutes for a CI.
 """
 import secrets
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from tessera.models.ticket import Ticket
-from tessera.services.projets.autonomie import NiveauAutonomie
-from tessera.services.livraison.ci_watcher import CI_WATCHER
-from tessera.services.noyau.event_hub import EVENT_HUB
+from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.github.github_service import GitHubService
 from tessera.services.github.github_workflow import GitHubWorkflowService, PullRequestResult
-from tessera.services.livraison.livraison import LivraisonService
-from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.github.proposal_workspace import ProposalWorkspace
+from tessera.services.livraison.ci_watcher import CI_WATCHER
+from tessera.services.livraison.livraison import LivraisonService
+from tessera.services.noyau.event_hub import EVENT_HUB
+from tessera.services.projets.autonomie import NiveauAutonomie
 from tessera.services.projets.racine_depot import GIT_ROOT_ANCESTOR
-from tessera.services.worktrees.temporary_worktree import detached_worktree, run_git
 from tessera.services.projets.ticket_service import validate_ticket
+from tessera.services.worktrees.temporary_worktree import detached_worktree, run_git
 
 
 class ProposalRefused(Exception):
@@ -74,7 +74,7 @@ def validate_batch(files: tuple[tuple[str, str], ...]) -> list[Ticket]:
 
 
 def _branch_name() -> str:
-    stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
+    stamp = datetime.now(UTC).strftime("%Y%m%d-%H%M%S")
     return f"tickets-propose-{stamp}-{secrets.token_hex(2)}"
 
 

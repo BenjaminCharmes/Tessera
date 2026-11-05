@@ -11,20 +11,14 @@ ou une commande, et la salle n'en a pas besoin pour dire « ça tourne ».
 import json
 import os
 import re
-from datetime import datetime, timezone
-from pathlib import Path
 from collections.abc import Callable
+from datetime import UTC, datetime
+from pathlib import Path
 from typing import Any
 
 import aiosqlite
 
-from tessera.models.salle_tessera import (
-    EtatOllama,
-    LigneDeJournal,
-    ProcessusDeTessera,
-    RunVivant,
-    SalleTessera,
-)
+from tessera.models.salle_tessera import EtatOllama, LigneDeJournal, ProcessusDeTessera, RunVivant, SalleTessera
 from tessera.services.supervision.arbre_de_processus import arbre, enfants_par_parent, memoire_mo
 from tessera.services.supervision.sonde_systeme import InfoProcessus, SondeSysteme
 
@@ -136,7 +130,7 @@ def fin_du_journal(chemin: Path, nombre: int = LIGNES_DU_JOURNAL) -> list[LigneD
     brutes = fin.splitlines()
     # Lu depuis le milieu du fichier, la première ligne est coupée : on l'écarte.
     lignes = [_ligne(brute) for brute in (brutes[1:] if debut > 0 else brutes)]
-    return [l for l in lignes if l is not None][-nombre:]
+    return [ln for ln in lignes if ln is not None][-nombre:]
 
 
 def taille_mo(chemin: Path) -> float:
@@ -157,7 +151,7 @@ async def runs_du_jour(base: Path, maintenant: datetime | None = None) -> int:
     Queue and autonomous envelopes are left out, as in the statistics.
     """
     instant = (maintenant or datetime.now()).astimezone()
-    minuit = instant.replace(hour=0, minute=0, second=0, microsecond=0).astimezone(timezone.utc)
+    minuit = instant.replace(hour=0, minute=0, second=0, microsecond=0).astimezone(UTC)
     try:
         async with aiosqlite.connect(base) as db:
             # mode IS NULL : lignes antérieures à la migration, traitées comme single.

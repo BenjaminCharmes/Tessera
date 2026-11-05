@@ -168,9 +168,9 @@ def test_put_logs_the_name_and_both_values(
     with caplog.at_level(logging.INFO):
         client.put(f"{_URL}/run_max_budget_usd", json={"valeur": 7.5}, headers=_VITE)
     rec = next(r for r in caplog.records if r.getMessage() == "reglage_modifie")
-    assert getattr(rec, "nom") == "run_max_budget_usd"
-    assert getattr(rec, "ancienne") == settings.run_max_budget_usd
-    assert getattr(rec, "nouvelle") == 7.5
+    assert rec.nom == "run_max_budget_usd"
+    assert rec.ancienne == settings.run_max_budget_usd
+    assert rec.nouvelle == 7.5
 
 
 def test_other_routes_keep_accepting_a_request_without_origin(

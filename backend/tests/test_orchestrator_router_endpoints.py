@@ -396,8 +396,8 @@ def test_le_livreur_passe_le_titre_et_le_corps_du_ticket(
 ) -> None:
     # Le corps de la PR se rédige depuis le ticket : passer son identifiant en
     # guise de titre donnait une PR nommée « ticket-001 — ticket-001 ».
-    from tessera.services.pipeline.livreur_run import livreur
     from tessera.services.livraison.livraison import Livraison
+    from tessera.services.pipeline.livreur_run import livreur
 
     recu: dict[str, object] = {}
 
@@ -464,8 +464,8 @@ def test_une_exception_apres_la_pr_garde_son_numero(
 ) -> None:
     # La PR #13 de curio était ouverte, mais la livraison ne le savait plus :
     # la phase 2 n'est jamais partie. (ticket-415)
-    from tessera.services.pipeline.livreur_run import livreur
     from tessera.services.livraison.livraison import LivraisonInterrompue
+    from tessera.services.pipeline.livreur_run import livreur
 
     async def _livrer(self: object, **kwargs: object) -> object:
         raise LivraisonInterrompue(13, TimeoutError())
@@ -485,8 +485,8 @@ def test_une_exception_apres_la_pr_garde_son_numero(
 def test_la_sync_en_echec_n_efface_pas_la_cause_d_une_pr_orpheline(
     workspace: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    from tessera.services.pipeline.livreur_run import livreur
     from tessera.services.livraison.livraison import LivraisonInterrompue
+    from tessera.services.pipeline.livreur_run import livreur
 
     async def _livrer(self: object, **kwargs: object) -> object:
         raise LivraisonInterrompue(13, TimeoutError())

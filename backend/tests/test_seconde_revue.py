@@ -19,12 +19,7 @@ _SCRIPTS_DIR = Path(__file__).resolve().parent.parent.parent / "scripts"
 if str(_SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(_SCRIPTS_DIR))
 
-from seconde_revue import (  # noqa: E402
-    BudgetAtteint,
-    ResultatsIncompatibles,
-    agents_json_temporaire,
-    rejouer,
-)
+from seconde_revue import BudgetAtteint, ResultatsIncompatibles, agents_json_temporaire, rejouer  # noqa: E402
 from seconde_revue_corpus import Corpus, Entree, somme_gel  # noqa: E402
 from seconde_revue_lecture import lire_resultats  # noqa: E402
 

@@ -8,7 +8,6 @@ from tessera.services.git_workspace.erreurs import GitCommandError
 from tessera.services.git_workspace.textes import _chemin_du_ticket
 from tessera.utils.logger import get_logger
 
-
 _logger = get_logger("tessera.services.git_workspace")
 
 

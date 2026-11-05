@@ -3,18 +3,8 @@ from pathlib import Path
 
 from tessera.models.agent import AgentResult, AgentRole
 from tessera.services.pipeline.pipeline_run import PipelineRun
-from tessera.services.pipeline.pipeline_tickets import (
-    problemes_nouveaux,
-    relever_etat_initial,
-    renvoyer_si_problemes,
-)
-from tests.test_orchestrator import (
-    _FakeGit,
-    _make_orchestrator,
-    _make_ticket,
-    _noop,
-    _RecordingRunner,
-)
+from tessera.services.pipeline.pipeline_tickets import problemes_nouveaux, relever_etat_initial, renvoyer_si_problemes
+from tests.test_orchestrator import _FakeGit, _make_orchestrator, _make_ticket, _noop, _RecordingRunner
 
 _FICHE = """---
 id: {id}

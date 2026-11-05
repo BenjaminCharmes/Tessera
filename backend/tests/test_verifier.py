@@ -21,6 +21,7 @@ if str(_SCRIPTS_DIR) not in sys.path:
 
 from verifier import (  # noqa: E402
     BACKEND_STEPS,
+    CONSIGNES_STEPS,
     FRONTEND_STEPS,
     STEPS,
     TYPE_STEPS,
@@ -28,7 +29,6 @@ from verifier import (  # noqa: E402
     _run_chain,
     chains_for,
     consignes_touchees,
-    CONSIGNES_STEPS,
     main,
     run_parallel,
     run_steps,

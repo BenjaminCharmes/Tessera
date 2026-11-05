@@ -17,7 +17,7 @@ from tessera.services.pipeline.orchestrator import EventType, OrchestratorEvent
 from tessera.services.verdicts.reviewer_schema import REVIEWER_SCHEMA
 from tessera.services.verdicts.verdict_reviewer import lire_verdict, rendre_revue
 from tests.revue_structuree import revue
-from tests.test_orchestrator import _make_orchestrator, _noop
+from tests.test_orchestrator import _make_orchestrator
 
 ROOT = Path(__file__).resolve().parents[2]
 PROMPT = ROOT / "agents" / "prompts" / "reviewer.md"

@@ -15,8 +15,8 @@ import httpx
 import respx
 
 from tessera.models.ticket import TicketStatus
-from tessera.services.livraison.ci_watcher import CIWatcher, ControleTete
 from tessera.services.github.github_service import GitHubService
+from tessera.services.livraison.ci_watcher import CIWatcher, ControleTete
 from tessera.services.livraison.livraison import Livraison, LivraisonService
 from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 

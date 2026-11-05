@@ -1,11 +1,11 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Literal
 
 from pydantic import BaseModel
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services.github.github_service import GitHubIssue, GitHubService
+from tessera.services.github.github_service import GitHubService
 from tessera.services.github.sync_map import SyncEntry, SyncMapService
 from tessera.services.projets.ticket_service import TicketService
 
@@ -162,7 +162,7 @@ class GithubSyncAgent:
     async def _log(self, message: str) -> None:
         log_path = self._project_path / "memory" / "github-sync-log.md"
         log_path.parent.mkdir(parents=True, exist_ok=True)
-        ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        ts = datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
         entry = f"- {ts} — {message}\n"
         with log_path.open("a", encoding="utf-8") as f:
             f.write(entry)

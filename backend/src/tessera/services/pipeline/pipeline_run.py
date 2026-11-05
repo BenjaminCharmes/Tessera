@@ -9,11 +9,7 @@ from typing import TYPE_CHECKING, Any
 
 from tessera.models.ticket import Ticket, TicketStatus
 from tessera.services.noyau.dialogue import DialogueChannel
-from tessera.services.noyau.pipeline_events import (
-    EventCallback,
-    EventType,
-    OrchestratorEvent,
-)
+from tessera.services.noyau.pipeline_events import EventCallback, EventType, OrchestratorEvent
 from tessera.utils.logger import get_logger
 
 if TYPE_CHECKING:

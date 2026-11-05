@@ -3,10 +3,8 @@
 import json
 from pathlib import Path
 
-from tests.test_providers_base import FakeProvider
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 from tessera.services.verdicts.security_auditor import SecurityAuditorService
-from tessera.services.verification.test_runner import TestResult
 from tessera.services.verdicts.security_contexte import (
     NOT_DONE_MAX_CHARS,
     AuditContext,
@@ -15,6 +13,8 @@ from tessera.services.verdicts.security_contexte import (
     describe_test_outcome,
     extract_not_done,
 )
+from tessera.services.verification.test_runner import TestResult
+from tests.test_providers_base import FakeProvider
 
 _PROMPTS = Path(__file__).resolve().parents[2] / "agents" / "prompts"
 _BODY = (

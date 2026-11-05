@@ -10,7 +10,7 @@ import json
 import logging
 import logging.handlers
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -37,7 +37,7 @@ _STANDARD_ATTRIBUTES: frozenset[str] = frozenset(
 
 
 def _horodatage(secondes: float) -> str:
-    instant = datetime.fromtimestamp(secondes, timezone.utc)
+    instant = datetime.fromtimestamp(secondes, UTC)
     return instant.strftime("%Y-%m-%dT%H:%M:%S.") + f"{instant.microsecond // 1000:03d}Z"
 
 

@@ -9,17 +9,12 @@ work uncommitted (ADR-018, ADR-020).
 from typing import TYPE_CHECKING
 
 from tessera.models.ticket import TicketStatus
-from tessera.services.noyau.dialogue import DialogueChannel
-from tessera.services.pipeline.file_vivante import fermer_si_vivante, marquer_position_si_vivante
-from tessera.services.noyau.pipeline_events import (
-    EventCallback,
-    EventType,
-    OrchestratorEvent,
-    PipelineResult,
-)
 from tessera.services.file.pipeline_file_livraison import livraison_arrete_la_file
 from tessera.services.file.pipeline_file_reprise import est_non_livre, relivrer_les_non_livres
 from tessera.services.file.pipeline_file_tour import Tour, progres
+from tessera.services.noyau.dialogue import DialogueChannel
+from tessera.services.noyau.pipeline_events import EventCallback, EventType, OrchestratorEvent, PipelineResult
+from tessera.services.pipeline.file_vivante import fermer_si_vivante, marquer_position_si_vivante
 from tessera.services.pipeline.pipeline_fin_de_file import nettoyer_apres_file
 from tessera.services.pipeline.pipeline_run import tolerant
 from tessera.services.usage.session_limit import extract_reset_time_from_arret

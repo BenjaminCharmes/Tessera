@@ -26,8 +26,9 @@ ADR-075).
 import fnmatch
 import os
 import re
+from collections.abc import Awaitable, Callable
 from pathlib import Path
-from typing import Any, Awaitable, Callable
+from typing import Any
 
 from claude_agent_sdk import HookContext, HookInput, HookJSONOutput
 

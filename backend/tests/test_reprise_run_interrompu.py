@@ -12,12 +12,7 @@ from pathlib import Path
 from tessera.services.noyau.database import init_db
 from tessera.services.noyau.database_runs import create_run, finish_run
 from tessera.services.pipeline.reprise_orphelin import reprendre_depots_orphelins
-
-from tests.test_reprise_run_orphelin import (
-    _git,
-    _make_workspace_on_ticket_branch,
-    _ticket_frontmatter,
-)
+from tests.test_reprise_run_orphelin import _git, _make_workspace_on_ticket_branch, _ticket_frontmatter
 
 _BRANCHE = "ticket-901-mon-ticket"
 

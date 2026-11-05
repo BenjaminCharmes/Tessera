@@ -5,7 +5,7 @@ fichier d'activité **et** dont l'app figure dans l'inventaire courant. Un
 service arrêté ne rend rien, même avec un fichier encore frais.
 """
 import asyncio
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends
 
@@ -22,7 +22,7 @@ router = APIRouter(prefix="/services", tags=["services"])
 
 def _activites(apps: set[tuple[str, str]]) -> list[ActiviteDeService]:
     """Lit le fichier de chaque service déclaré dont l'app (projet, nom) tourne."""
-    maintenant = datetime.now(timezone.utc)
+    maintenant = datetime.now(UTC)
     rendues: list[ActiviteDeService] = []
     for project_id in sorted({p for p, _ in apps}):
         racine = settings.ide_workspace_dir / project_id

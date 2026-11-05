@@ -5,14 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services.projets.artifacts import (
-    ArtifactMode,
-    ARTIFACT_PATHS,
-    apply_artifact_mode,
-    default_mode_for,
-    read_artifact_mode,
-    tracked_artifact_paths,
-)
+from tessera.services.projets.artifacts import ARTIFACT_PATHS, apply_artifact_mode, default_mode_for, read_artifact_mode, tracked_artifact_paths
 
 
 async def _git(cwd: Path, *args: str) -> str:

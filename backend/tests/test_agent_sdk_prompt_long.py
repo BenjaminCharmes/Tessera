@@ -8,10 +8,7 @@ import pytest
 from claude_agent_sdk import ClaudeAgentOptions, ResultMessage
 
 from tessera.services.providers import agent_sdk as agent_sdk_module
-from tessera.services.providers.agent_sdk import (
-    SYSTEM_PROMPT_FILE_THRESHOLD_BYTES,
-    ClaudeAgentSDKProvider,
-)
+from tessera.services.providers.agent_sdk import SYSTEM_PROMPT_FILE_THRESHOLD_BYTES, ClaudeAgentSDKProvider
 
 
 class _Capture:

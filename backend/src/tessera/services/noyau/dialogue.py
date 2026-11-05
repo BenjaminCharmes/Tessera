@@ -31,7 +31,7 @@ whole overnight run on questions no one could ever answer.
 import asyncio
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
-from typing import Literal, Optional
+from typing import Literal
 
 from tessera.utils.logger import get_logger
 
@@ -74,7 +74,7 @@ class DialogueChannel:
         self,
         timeout_s: float = 300.0,
         interactive: bool = True,
-        on_question: Optional[Callable[[str], Awaitable[None]]] = None,
+        on_question: Callable[[str], Awaitable[None]] | None = None,
     ) -> None:
         self._timeout_s = timeout_s
         self._interactive = interactive
@@ -116,7 +116,7 @@ class DialogueChannel:
             await self._on_question(question)
         try:
             return await asyncio.wait_for(self._answer, timeout=self._timeout_s)
-        except asyncio.TimeoutError:
+        except TimeoutError:
             _logger.info("question_sans_reponse", extra={"question": question})
             return NO_HUMAN_ANSWER
         finally:

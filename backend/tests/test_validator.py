@@ -5,21 +5,11 @@ from pathlib import Path
 
 import pytest
 
-from tests.test_providers_base import FakeProvider
-from tessera.services.verification.test_runner import EtapeTest, TestResult
-from tessera.services.verdicts.validator import (
-    CriterionResult,
-    ValidationResult,
-    ValidatorService,
-    extract_file_refs,
-)
+from tessera.services.verdicts.validator import CriterionResult, ValidationResult, ValidatorService
+from tessera.services.verdicts.validator_cited_files import CITED_FILES_MAX_CHARS as _CITED_FILES_MAX_CHARS
 from tessera.services.verdicts.validator_schema import VALIDATOR_SCHEMA
-from tessera.services.verdicts.validator_cited_files import (
-    CITED_FILES_MAX_CHARS as _CITED_FILES_MAX_CHARS,
-    CitedFilesReport,
-    build_cited_files_section,
-    format_cited_files_log,
-)
+from tessera.services.verification.test_runner import EtapeTest, TestResult
+from tests.test_providers_base import FakeProvider
 
 
 @pytest.fixture

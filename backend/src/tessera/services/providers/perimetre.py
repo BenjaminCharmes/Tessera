@@ -21,22 +21,16 @@ ce que ce module garantit. Ce qui ne se lit pas avec certitude passe, plutôt
 que de refuser une commande légitime : un faux refus coûte à l'agent son moyen
 de vérifier son travail.
 """
+from collections.abc import Awaitable, Callable
 from pathlib import Path
-from typing import Any, Awaitable, Callable
+from typing import Any
 
 from claude_agent_sdk import HookContext, HookInput, HookJSONOutput
 
 from tessera.services.projets.racine_depot import declare_ancestor, racine_ecriture_projet
-from tessera.services.providers.chemins_proteges import (
-    INTERPRETE_PROTEGE_REFUS,
-    motif_de_protection,
-    refus_de_protection,
-)
+from tessera.services.providers.chemins_proteges import INTERPRETE_PROTEGE_REFUS, motif_de_protection, refus_de_protection
+from tessera.services.providers.redirections_bash import cibles_ecrites, cibles_interpreteur_ecriture
 from tessera.services.providers.refus_garde import JournalDesRefus
-from tessera.services.providers.redirections_bash import (
-    cibles_ecrites,
-    cibles_interpreteur_ecriture,
-)
 from tessera.services.providers.script_verification import script_de_verification
 from tessera.utils.logger import get_logger
 

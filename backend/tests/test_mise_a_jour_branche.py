@@ -12,8 +12,8 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services.livraison import mise_a_jour_branche as module
 from tessera.services.git_workspace.git_runner import GitResult
+from tessera.services.livraison import mise_a_jour_branche as module
 from tessera.services.livraison.mise_a_jour_branche import MiseAJour, mettre_a_jour_branche
 from tessera.services.livraison.retest_apres_rebase import RetestApresRebase
 from tessera.services.verification.test_runner import TestResult

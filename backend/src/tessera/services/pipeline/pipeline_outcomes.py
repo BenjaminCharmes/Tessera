@@ -9,9 +9,9 @@ from typing import TYPE_CHECKING
 
 from tessera.models.ticket import TicketStatus
 from tessera.services.git_workspace import GitWorkspaceError
+from tessera.services.noyau.pipeline_events import EventType, PipelineResult
 from tessera.services.pipeline.lecons_run import proposer_lecon
 from tessera.services.pipeline.pipeline_approbation import noter_tete_approuvee
-from tessera.services.noyau.pipeline_events import EventType, PipelineResult
 from tessera.services.pipeline.pipeline_run import PipelineRun, emit, set_status
 from tessera.services.pipeline.pipeline_text import _single_line, _unapproved_commit_message
 from tessera.utils.logger import get_logger

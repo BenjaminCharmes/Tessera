@@ -13,6 +13,7 @@ from typing import Any
 
 import httpx
 import pytest
+from claude_agent_sdk import AssistantMessage, TextBlock
 
 import tessera.services.providers.agent_sdk as agent_sdk_module
 from tessera.config import settings
@@ -23,16 +24,10 @@ from tessera.services.providers.base import ProviderResult
 from tessera.services.providers.duree_max import borner
 from tessera.services.providers.enregistrant import activer_enregistrement
 from tessera.services.providers.noms import ProviderIndisponible
-from tessera.services.providers.ollama import (
-    OllamaProvider,
-    _get_slot,
-    _reset_cooldowns,
-    _reset_slots,
-)
+from tessera.services.providers.ollama import OllamaProvider, _get_slot, _reset_cooldowns, _reset_slots
 from tessera.services.providers.par_role import ROLES_TEXTE, provider_pour_role
 from tessera.services.providers.repli import ProviderAvecRepli
 from tests.test_providers_base import FakeProvider
-from claude_agent_sdk import AssistantMessage, TextBlock
 
 _BASE = "http://duree-max.test:11434"
 

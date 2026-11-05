@@ -5,10 +5,7 @@ from pathlib import Path
 import pytest
 
 import tessera.services.providers.agent_sdk as agent_sdk_module
-from tessera.services.providers.agent_sdk import (
-    _build_options,
-    claude_md_ancetres_a_exclure,
-)
+from tessera.services.providers.agent_sdk import _build_options, claude_md_ancetres_a_exclure
 
 
 def _p(chemin: Path) -> str:

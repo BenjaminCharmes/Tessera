@@ -2,15 +2,8 @@
 import pytest
 
 from tessera.services.providers.git_guard import commande_git_interdite
-from tessera.services.providers.git_guard_lectures import (
-    gh_sans_sous_commande,
-    git_sans_sous_commande,
-)
-from tessera.services.providers.git_guard_lexique import (
-    commande_opaque,
-    jetons,
-    sans_enveloppe,
-)
+from tessera.services.providers.git_guard_lectures import gh_sans_sous_commande, git_sans_sous_commande
+from tessera.services.providers.git_guard_lexique import commande_opaque, jetons, sans_enveloppe
 
 
 @pytest.mark.parametrize(

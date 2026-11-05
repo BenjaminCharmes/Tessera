@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -47,7 +47,7 @@ async def create_run(
     followed with it. Default: a fresh uuid.
     """
     run_id = run_id or str(uuid.uuid4())
-    started_at = datetime.now(timezone.utc).isoformat()
+    started_at = datetime.now(UTC).isoformat()
     async with aiosqlite.connect(str(db_path)) as db:
         await db.execute(
             "INSERT INTO pipeline_runs (id, project_id, ticket_id, started_at, mode, parent_run_id)"
@@ -66,7 +66,7 @@ async def finish_run(
     final_status: str,
     arret: str | None = None,
 ) -> None:
-    finished_at = datetime.now(timezone.utc).isoformat()
+    finished_at = datetime.now(UTC).isoformat()
     async with aiosqlite.connect(str(db_path)) as db:
         await db.execute(
             """UPDATE pipeline_runs
@@ -93,7 +93,7 @@ async def solder_les_runs_orphelins(db_path: Path | str) -> list[str]:
     montre. Le jour où deux backends partageraient une base, cette hypothèse
     tomberait : elle est ici, pas supposée ailleurs.
     """
-    maintenant = datetime.now(timezone.utc).isoformat()
+    maintenant = datetime.now(UTC).isoformat()
     async with aiosqlite.connect(str(db_path)) as db:
         async with db.execute(
             "SELECT id, rounds FROM pipeline_runs WHERE finished_at IS NULL"

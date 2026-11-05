@@ -5,7 +5,6 @@ from pydantic import BaseModel, Field
 
 from tessera.models.ticket import TicketStatus
 
-
 EffortLevel = Literal["low", "medium", "high", "xhigh", "max"]
 
 

@@ -3,13 +3,7 @@ import json
 from pathlib import Path
 
 from tessera.services.verification.captures_config import load_captures_config
-from tessera.services.verification.controle_visuel import (
-    DELAI_DEFAUT_S,
-    DELAI_MAX_S,
-    ControleVisuel,
-    controle_du,
-    lire_le_controle,
-)
+from tessera.services.verification.controle_visuel import DELAI_DEFAUT_S, DELAI_MAX_S, ControleVisuel, controle_du, lire_le_controle
 
 _CAPTURES: dict[str, object] = {
     "url": "http://localhost:{port}",

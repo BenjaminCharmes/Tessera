@@ -11,42 +11,34 @@ from fastapi import HTTPException
 from tessera import reglages
 from tessera.config import settings
 from tessera.models.ticket import TicketStatus
-from tessera.services.projets.adr import lire_contraintes
 from tessera.services.agents.agent_registry import AgentRegistryService
 from tessera.services.agents.agent_runner import OUTILS_DE_RELECTURE, AgentRunner
 from tessera.services.agents.carte_du_depot import CarteDuDepot
-from tessera.services.verification.controle_visuel import lire_le_controle
 from tessera.services.documentation.documenteur_run import documenteur
-from tessera.services.git_workspace import GitWorkspaceService
-from tessera.services.noyau.journal_pipeline import journal_vers, journaliser_mode_rapide
 from tessera.services.gardes.lecons import section_lecons
+from tessera.services.gardes.politique_run import PolitiqueRun
+from tessera.services.git_workspace import GitWorkspaceService
+from tessera.services.livraison.retest_apres_rebase import retest_du_run
+from tessera.services.livraison.surveillance_run import chercheur_pr_mergee, lecteur_etat_pr, surveillance_pour
+from tessera.services.noyau.journal_pipeline import journal_vers, journaliser_mode_rapide
 from tessera.services.pipeline.livreur_run import livreur
 from tessera.services.pipeline.orchestrator import Orchestrator
 from tessera.services.pipeline.pipeline_plan import ROLE_PLAN
-from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.pipeline.preparation_run import preparation_du_run_declaree, tests_du_run
-from tessera.services.projets.project_loader import (
-    ProjectLoader,
-    load_agents_config,
-    load_pipeline_config,
-)
+from tessera.services.pipeline.run_recorder import RunRecorder
+from tessera.services.projets.adr import lire_contraintes
+from tessera.services.projets.project_loader import ProjectLoader, load_agents_config, load_pipeline_config
+from tessera.services.projets.ticket_service import TicketService
 from tessera.services.providers.base import LLMProvider
 from tessera.services.providers.enregistrant import ProviderEnregistrant
 from tessera.services.providers.noms import ProviderInconnu
 from tessera.services.providers.par_role import modele_du_role, provider_pour_role
 from tessera.services.providers.refus_garde import JournalDesRefus
-from tessera.services.livraison.retest_apres_rebase import retest_du_run
-from tessera.services.pipeline.run_recorder import RunRecorder
-from tessera.services.worktrees.run_worktree import RunWorktree
 from tessera.services.verdicts.security_auditor import SecurityAuditorService
-from tessera.services.livraison.surveillance_run import (
-    chercheur_pr_mergee,
-    lecteur_etat_pr,
-    surveillance_pour,
-)
-from tessera.services.verification.test_runner import TestRunnerService
-from tessera.services.projets.ticket_service import TicketService
 from tessera.services.verdicts.validator import ValidatorService
+from tessera.services.verification.controle_visuel import lire_le_controle
+from tessera.services.verification.test_runner import TestRunnerService
+from tessera.services.worktrees.run_worktree import RunWorktree
 
 _OPEN_STATUSES = {
     TicketStatus.todo,

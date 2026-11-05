@@ -22,6 +22,24 @@ from claude_agent_sdk import (
 )
 from claude_agent_sdk.types import SystemPromptFile
 
+from tessera.models.agent import EffortLevel
+from tessera.services.projets.racine_depot import depot_au_dessus
+from tessera.services.providers.ask_user import ASK_USER_SERVER_NAME, ASK_USER_TOOL_NAME, build_ask_user_server
+from tessera.services.providers.base import ProviderResult, StreamCallback, ToolEventCallback
+from tessera.services.providers.consignes_ancetres import claude_md_ancetres_a_exclure
+from tessera.services.providers.duree_max import borner
+from tessera.services.providers.env_sdk import env_du_sous_processus
+from tessera.services.providers.garde_jetons import hook_refus_env_tessera
+from tessera.services.providers.git_guard import hook_refus_git
+from tessera.services.providers.messages_sdk import OUTIL_SORTIE_STRUCTUREE, _extract_stream_delta, _format_de_sortie, provider_result_du_sdk
+from tessera.services.providers.noms import ProviderIndisponible
+from tessera.services.providers.perimetre import hook_refus_hors_perimetre, racine_autorisee
+from tessera.services.providers.prompt_fichier import prompt_systeme_pour_sdk
+from tessera.services.providers.refus_cli import ReleveDesRefusCli
+from tessera.services.providers.refus_garde import JournalDesRefus
+from tessera.services.usage.quota_tracker import QuotaTracker
+from tessera.utils.logger import get_logger
+
 # Union de tous les types émis par query() — utilisé pour typer le générateur.
 _SdkMessage = (
     UserMessage
@@ -41,39 +59,6 @@ async def _sdk_gen(
     async for msg in query(prompt=prompt, options=options):
         yield msg
 
-from tessera.models.agent import EffortLevel
-from tessera.services.providers.consignes_ancetres import claude_md_ancetres_a_exclure
-from tessera.services.providers.env_sdk import env_du_sous_processus
-from tessera.services.providers.garde_jetons import hook_refus_env_tessera
-from tessera.services.providers.git_guard import hook_refus_git
-from tessera.services.providers.perimetre import (
-    hook_refus_hors_perimetre,
-    racine_autorisee,
-)
-from tessera.services.projets.racine_depot import depot_au_dessus
-from tessera.services.providers.refus_cli import ReleveDesRefusCli
-from tessera.services.providers.refus_garde import JournalDesRefus
-from tessera.services.providers.ask_user import (
-    ASK_USER_SERVER_NAME,
-    ASK_USER_TOOL_NAME,
-    build_ask_user_server,
-)
-from tessera.services.providers.base import (
-    ProviderResult,
-    StreamCallback,
-    ToolEventCallback,
-)
-from tessera.services.providers.duree_max import borner
-from tessera.services.providers.messages_sdk import (
-    OUTIL_SORTIE_STRUCTUREE,
-    _extract_stream_delta,
-    _format_de_sortie,
-    provider_result_du_sdk,
-)
-from tessera.services.providers.noms import ProviderIndisponible
-from tessera.services.providers.prompt_fichier import prompt_systeme_pour_sdk
-from tessera.services.usage.quota_tracker import QuotaTracker
-from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
 
@@ -413,7 +398,7 @@ class ClaudeAgentSDKProvider:
                     )
                     raise ProviderIndisponible(
                         f"agent silencieux depuis {self._silence_max_s:.0f} s"
-                    )
+                    ) from None
                 except StopAsyncIteration:
                     break
 

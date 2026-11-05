@@ -1,10 +1,7 @@
 """Canal de dialogue entre l'utilisateur et un run en cours — ticket-066."""
 import asyncio
 
-import pytest
-
-from tessera.services.noyau.dialogue import DialogueChannel, NO_HUMAN_ANSWER, AnswerOutcome
-
+from tessera.services.noyau.dialogue import NO_HUMAN_ANSWER, AnswerOutcome, DialogueChannel
 
 # ------------------------------------------------------------------
 # L'agent demande

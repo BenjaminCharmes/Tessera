@@ -3,7 +3,6 @@ import asyncio
 import json
 import os
 import subprocess
-from collections.abc import Callable
 from datetime import datetime
 from pathlib import Path
 
@@ -12,8 +11,8 @@ from fastapi.testclient import TestClient
 
 from tessera.config import settings
 from tessera.main import app
-from tessera.services.supervision.project_overview import clear_overview_cache
 from tessera.services.pipeline.run_registry import RUN_REGISTRY
+from tessera.services.supervision.project_overview import clear_overview_cache
 
 _BASE = "/api/v1/projects"
 
@@ -215,7 +214,9 @@ def test_overview_flags_an_active_run(
 ) -> None:
     _project(plain_workspace, "alpha")
     _project(plain_workspace, "beta")
-    occupe: Callable[[str], bool] = lambda project_id: project_id == "alpha"
+    def occupe(project_id: str) -> bool:
+        return project_id == "alpha"
+
     monkeypatch.setattr(RUN_REGISTRY, "projet_occupe", occupe)
 
     body = _overview()

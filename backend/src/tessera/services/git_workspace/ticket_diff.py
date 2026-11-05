@@ -159,7 +159,7 @@ async def _diff_par_commit(
     if not historique.ok:
         return TicketDiff(ticket_id=ticket_id)
 
-    for sha in (l.strip() for l in historique.out.splitlines() if l.strip()):
+    for sha in (ln.strip() for ln in historique.out.splitlines() if ln.strip()):
         code, diff, fichiers = await _lire(racine, "show", [sha, "--format="], specs)
         if code == 0 and diff:
             return TicketDiff(

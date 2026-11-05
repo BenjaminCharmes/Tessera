@@ -5,19 +5,13 @@ from pathlib import Path
 from typing import cast
 from unittest.mock import AsyncMock, MagicMock
 
-from tessera.services.pipeline import orchestrator as orchestrator_module
+from tessera.models.ticket import TicketStatus
 from tessera.services.livraison.livraison import Livraison
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent, PipelineResult
+from tessera.services.pipeline import orchestrator as orchestrator_module
 from tessera.services.pipeline.orchestrator import Orchestrator
 from tessera.services.pipeline.pipeline_documentation import documenter_le_run
-from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent, PipelineResult
-from tessera.services.pipeline.pipeline_fin_de_file import (
-    attendre_merge_et_syncer,
-    finaliser_livraison,
-    nettoyer_apres_file,
-    realigner_base,
-    sur_la_base,
-)
-from tessera.models.ticket import TicketStatus
+from tessera.services.pipeline.pipeline_fin_de_file import attendre_merge_et_syncer, finaliser_livraison, nettoyer_apres_file, realigner_base, sur_la_base
 
 _SERVICES = Path(orchestrator_module.__file__).parent
 

@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import asyncio
 import os
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import aiosqlite
@@ -18,7 +18,6 @@ import aiosqlite
 from tessera.services.noyau.database import init_db
 from tessera.services.noyau.database_runs import create_run, solder_les_runs_orphelins
 from tessera.services.pipeline.reprise_orphelin import reprendre_depots_orphelins
-
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -87,7 +86,7 @@ async def _setup_db_with_orphan(
     """Create a DB with one orphan run and settle it. Returns (db_path, run_ids)."""
     db = tmp_path / "t.db"
     await init_db(db)
-    run_id = await create_run(db, project_id, ticket_id)
+    await create_run(db, project_id, ticket_id)
     orphelins = await solder_les_runs_orphelins(db)
     return db, orphelins
 
@@ -224,7 +223,7 @@ async def test_erreur_git_journalisee_sans_exception(tmp_path: Path) -> None:
 
     db = tmp_path / "t.db"
     await init_db(db)
-    run_id = await create_run(db, "bad-projet", "ticket-901")
+    await create_run(db, "bad-projet", "ticket-901")
     orphelins = await solder_les_runs_orphelins(db)
 
     # Ne doit pas lever d'exception, quelle que soit l'erreur git
@@ -492,7 +491,7 @@ async def _lire_started_at(db: Path) -> datetime:
     assert row is not None, "aucun run en base"
     dt = datetime.fromisoformat(str(row[0]))
     if dt.tzinfo is None:
-        dt = dt.replace(tzinfo=timezone.utc)
+        dt = dt.replace(tzinfo=UTC)
     return dt
 
 

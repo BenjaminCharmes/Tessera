@@ -1,28 +1,23 @@
 import asyncio
 import os
 import shlex
+import time
 from collections.abc import AsyncGenerator, Awaitable, Callable, Mapping
 from contextlib import asynccontextmanager
-from typing import Any
-import time
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Any
 
+from tessera.services.noyau.lancement import essais_de_commande
 from tessera.services.verification.commande_chainee import decouper
 from tessera.services.verification.detail_du_delai import detail_du_delai
 from tessera.services.verification.erreur_de_sortie import detail_avec_erreur
 from tessera.services.verification.groupe_d_etape import GroupeDEtape
-from tessera.services.noyau.lancement import essais_de_commande
 from tessera.services.verification.limiteur_de_suites import LimiteurDeSuites
 from tessera.services.verification.minuteur_d_etape import MinuteurDEtape
 from tessera.services.verification.outil_introuvable import outil_introuvable
 from tessera.services.verification.process_registry import CommandeInvalide, resoudre_le_cwd
-from tessera.services.verification.sortie_de_test import (
-    extract_counts,
-    extract_errors,
-    extract_failure_details,
-    extract_summary_line,
-)
+from tessera.services.verification.sortie_de_test import extract_counts, extract_errors, extract_failure_details, extract_summary_line
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -343,7 +338,7 @@ class TestRunnerService:
                 stdout_bytes, stderr_bytes = await asyncio.wait_for(
                     proc.communicate(), timeout=restant
                 )
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 # Tuer le seul processus direct laissait ses petits-enfants garder
                 # les tubes ouverts, et `wait()` ne revenait plus : on tue l'arbre
                 # (ticket-507), et l'attente est bornée. `kill()` sans `wait()`

@@ -71,7 +71,7 @@ async def attendre_les_merges_en_cours(
             _attendre_chacun(surveillance, project_id, precedents),
             timeout=attente_max_s,
         )
-    except asyncio.TimeoutError:
+    except TimeoutError:
         _logger.warning(
             "livraison_attente_des_merges_depassee",
             extra={"project": project_id, "ticket": ticket_id},

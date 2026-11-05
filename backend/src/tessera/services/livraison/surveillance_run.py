@@ -4,20 +4,20 @@ from collections.abc import Awaitable, Callable
 
 from tessera.config import settings
 from tessera.services.agents.agent_runner import AgentRunner
-from tessera.services.livraison.ci_watcher import ControleTete, EstAncetre, TetePr
+from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.github.github_service import GitHubService
 from tessera.services.github.github_workflow import GitHubWorkflowService
+from tessera.services.livraison.ci_watcher import ControleTete, EstAncetre, TetePr
 from tessera.services.livraison.livraison import Livraison, LivraisonService
-from tessera.services.noyau.pipeline_events import EventCallback
-from tessera.services.gardes.politique_run import PolitiqueRun
-from tessera.services.projets.project_loader import load_project
 from tessera.services.livraison.mise_a_jour_pr import TeteAttendue, mise_a_jour_de
 from tessera.services.livraison.realignement_base import Realignement
 from tessera.services.livraison.reprise_surveillance import SurveillanceProjet
 from tessera.services.livraison.resolveur_conflit import ResolveurConflitService
-from tessera.services.worktrees.run_worktree import RunWorktree
 from tessera.services.livraison.sha_approbation import sha_pousse_du_ticket
+from tessera.services.noyau.pipeline_events import EventCallback
+from tessera.services.projets.project_loader import load_project
+from tessera.services.worktrees.run_worktree import RunWorktree
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)

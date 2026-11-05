@@ -43,7 +43,7 @@ async def attendre_merge_et_syncer(
                 ),
                 timeout=orch._attente_merge_max_s,
             )
-    except asyncio.TimeoutError:
+    except TimeoutError:
         orch._log(
             f"[{project_id}] {ticket_id} : délai d'attente du merge dépassé"
             f" ({orch._attente_merge_max_s:.0f}s) — ticket suivant sans réalignement"

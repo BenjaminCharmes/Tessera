@@ -6,59 +6,52 @@ order of the stages, and the conditions that end a run, are the part that is
 hard to get right.
 """
 import asyncio
-from pathlib import Path
 from collections.abc import Awaitable, Callable
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, Optional
 
 from tessera.models.agent import AgentConfig, AgentRole
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus
 from tessera.services.agents.agent_runner import AgentRunner
-from tessera.services.noyau.dialogue import DialogueChannel
-from tessera.services.pipeline.file_vivante import est_termine
-from tessera.services.providers.enregistrant import activer_enregistrement
-from tessera.services.noyau.journal_pipeline import ajouter_ligne
-from tessera.services.livraison.livraison import Livraison
-from tessera.services.livraison.attente_dependance import ids_termines
-from tessera.services.noyau.pipeline_events import (
-    EventCallback,
-    EventType,
-    OrchestratorEvent,
-    PipelineResult,
-)
-from tessera.services.verification.build_warning import build_warnings
-from tessera.services.projets.ticket_service import TicketService
-from tessera.utils.logger import get_logger
-
-from tessera.services.pipeline import pipeline_outcomes as outcomes
 from tessera.services.file import pipeline_file as file
+from tessera.services.livraison.attente_dependance import ids_termines
+from tessera.services.livraison.livraison import Livraison
+from tessera.services.noyau.dialogue import DialogueChannel
+from tessera.services.noyau.journal_pipeline import ajouter_ligne
+from tessera.services.noyau.pipeline_events import EventCallback, EventType, OrchestratorEvent, PipelineResult
+from tessera.services.pipeline import pipeline_branche, pipeline_controles, pipeline_production, pipeline_testeur
 from tessera.services.pipeline import pipeline_fin_de_file as fin_de_file
-from tessera.services.pipeline import pipeline_branche, pipeline_controles, pipeline_testeur
-from tessera.services.pipeline import pipeline_production
-from tessera.services.pipeline.pipeline_run import PipelineRun, set_status, tolerant
+from tessera.services.pipeline import pipeline_outcomes as outcomes
+from tessera.services.pipeline.file_vivante import est_termine
+from tessera.services.pipeline.pipeline_approbation import apres_approbation
 from tessera.services.pipeline.pipeline_contraintes import arret_contraintes_hors_proposees
 from tessera.services.pipeline.pipeline_critere_protege import arret_critere_protege
-from tessera.services.pipeline.pipeline_approbation import apres_approbation
 from tessera.services.pipeline.pipeline_livraison import livrer_le_resultat
 from tessera.services.pipeline.pipeline_plan import run_plan
-from tessera.services.pipeline.run_dans_worktree import retirer_apres_echec, retirer_en_fin_de_run
-from tessera.services.pipeline.pipeline_tickets import relever_etat_initial, renvoyer_si_problemes
-from tessera.services.pipeline.pipeline_text import _compose_feedback, _echec_de_tests, _first_line
-from tessera.services.usage.quota_exhaustion import is_quota_exhausted, resume_label
 from tessera.services.pipeline.pipeline_reprise import reprendre_sans_codeur, verifier_travail_repris
+from tessera.services.pipeline.pipeline_run import PipelineRun, set_status, tolerant
+from tessera.services.pipeline.pipeline_text import _compose_feedback, _echec_de_tests, _first_line
+from tessera.services.pipeline.pipeline_tickets import relever_etat_initial, renvoyer_si_problemes
+from tessera.services.pipeline.run_dans_worktree import retirer_apres_echec, retirer_en_fin_de_run
+from tessera.services.projets.ticket_service import TicketService
+from tessera.services.providers.enregistrant import activer_enregistrement
+from tessera.services.usage.quota_exhaustion import is_quota_exhausted, resume_label
 from tessera.services.usage.session_limit import extract_reset_time, is_session_limit
+from tessera.services.verification.build_warning import build_warnings
+from tessera.utils.logger import get_logger
 
 if TYPE_CHECKING:
-    from tessera.services.pipeline.preparation_worktree import Preparation
-    from tessera.services.providers.refus_garde import JournalDesRefus
     from tessera.services.agents.carte_du_depot import CarteDuDepot
-    from tessera.services.verification.controle_visuel import ControleVisuel
-    from tessera.services.usage.quota_tracker import QuotaTracker
-    from tessera.services.pipeline.run_recorder import RunRecorder
-    from tessera.services.worktrees.run_worktree import RunWorktree
     from tessera.services.git_workspace import GitWorkspaceService
+    from tessera.services.pipeline.preparation_worktree import Preparation
+    from tessera.services.pipeline.run_recorder import RunRecorder
+    from tessera.services.providers.refus_garde import JournalDesRefus
+    from tessera.services.usage.quota_tracker import QuotaTracker
     from tessera.services.verdicts.security_auditor import SecurityAuditorService
-    from tessera.services.verification.test_runner import TestRunnerService
     from tessera.services.verdicts.validator import ValidatorService
+    from tessera.services.verification.controle_visuel import ControleVisuel
+    from tessera.services.verification.test_runner import TestRunnerService
+    from tessera.services.worktrees.run_worktree import RunWorktree
 
 _logger = get_logger(__name__)
 
@@ -80,32 +73,30 @@ class Orchestrator:
         pipeline_log_path: Path,
         max_review_rounds: int = 3,
         test_runner: Optional["TestRunnerService"] = None,
-        test_command: Optional[str] = None,
+        test_command: str | None = None,
         security_auditor: Optional["SecurityAuditorService"] = None,
         validator: Optional["ValidatorService"] = None,
-        project_path: Optional[Path] = None,
+        project_path: Path | None = None,
         git_workspace: Optional["GitWorkspaceService"] = None,
         run_max_budget_usd: float = 0.0,
         quota_tracker: Optional["QuotaTracker"] = None,
-        livrer: Optional[Callable[[PipelineResult], Awaitable["Livraison"]]] = None,
-        documenter: Optional[Callable[[], Awaitable[Any]]] = None,
+        livrer: Callable[[PipelineResult], Awaitable["Livraison"]] | None = None,
+        documenter: Callable[[], Awaitable[Any]] | None = None,
         run_recorder: Optional["RunRecorder"] = None,
         carte_du_depot: Optional["CarteDuDepot"] = None,
-        surveiller: Optional[
-            Callable[[str, str, int, "EventCallback"], Awaitable[None]]
-        ] = None,
-        ci_watcher: Optional[Any] = None,
-        base_branch: Optional[str] = None,
+        surveiller: Callable[[str, str, int, "EventCallback"], Awaitable[None]] | None = None,
+        ci_watcher: Any | None = None,
+        base_branch: str | None = None,
         merge_without_ci: bool = False,
         attente_merge_max_s: float = 600.0,
         worktree: "RunWorktree | None" = None,
         depot: Path | None = None,
         chemins_absents: tuple[str, ...] = (),
-        preparation: "Optional[Preparation]" = None,
-        etat_pr: Optional[Callable[[int], Awaitable[str]]] = None,
+        preparation: "Preparation | None" = None,
+        etat_pr: Callable[[int], Awaitable[str]] | None = None,
         journal_refus: Optional["JournalDesRefus"] = None,
-        pr_mergee_de_branche: Optional[Callable[[str], Awaitable[int | None]]] = None,
-        controle_visuel: "Optional[ControleVisuel]" = None,
+        pr_mergee_de_branche: Callable[[str], Awaitable[int | None]] | None = None,
+        controle_visuel: "ControleVisuel | None" = None,
     ) -> None:
         # Le contrôle visuel déclaré, lu avant le premier agent comme la
         # politique : un run n'obéit pas à ce que le codeur écrirait dans
@@ -228,7 +219,7 @@ class Orchestrator:
             return False
         return self._ticket_spent_usd >= self._run_max_budget_usd
 
-    def _config_for(self, role: AgentRole) -> Optional[AgentConfig]:
+    def _config_for(self, role: AgentRole) -> AgentConfig | None:
         return next((c for c in self._agent_configs if c.role == role.value), None)
 
     async def run_pipeline(
@@ -574,7 +565,7 @@ class Orchestrator:
             self._log(f"[{run.ticket_id}] tests rouges au tour {run.round_num}")
         return tests_result
 
-    async def pick_next_ticket(self, project_id: str) -> Optional[Ticket]:
+    async def pick_next_ticket(self, project_id: str) -> Ticket | None:
         todos = await self._ticket_svc.list_tickets(status=TicketStatus.todo)
         done_ids = await ids_termines(self._ticket_svc, todos)
         eligible = [t for t in todos if all(dep in done_ids for dep in t.depends_on)]

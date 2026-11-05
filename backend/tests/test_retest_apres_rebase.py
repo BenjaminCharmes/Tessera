@@ -16,14 +16,9 @@ from unittest.mock import AsyncMock, MagicMock
 
 from tessera.models.ticket import TicketStatus
 from tessera.services.livraison.livraison import Livraison, LivraisonService
-from tessera.services.pipeline.orchestrator import Orchestrator
+from tessera.services.livraison.retest_apres_rebase import ResultatRetest, RetestApresRebase, etape_de, retest_du_run
 from tessera.services.noyau.pipeline_events import OrchestratorEvent, PipelineResult
-from tessera.services.livraison.retest_apres_rebase import (
-    RetestApresRebase,
-    ResultatRetest,
-    etape_de,
-    retest_du_run,
-)
+from tessera.services.pipeline.orchestrator import Orchestrator
 from tessera.services.verification.test_runner import TestCommandNotFound, TestResult
 
 

@@ -4,13 +4,13 @@ from collections.abc import Awaitable, Callable
 
 from tessera.config import settings
 from tessera.services.documentation.documentation import DocumentationService, ResultatDocumentation
-from tessera.services.noyau.journal_pipeline import journal_vers
+from tessera.services.documentation.roles_documentation import roles_de_documentation
 from tessera.services.gardes.politique_run import PolitiqueRun
+from tessera.services.noyau.journal_pipeline import journal_vers
 from tessera.services.projets.project_loader import load_pipeline_config
 from tessera.services.providers.base import LLMProvider
 from tessera.services.providers.enregistrant import ProviderEnregistrant
 from tessera.services.providers.par_role import modele_du_role, provider_pour_role
-from tessera.services.documentation.roles_documentation import roles_de_documentation
 from tessera.services.worktrees.run_worktree import RunWorktree
 from tessera.utils.logger import get_logger
 

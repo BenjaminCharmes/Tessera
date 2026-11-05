@@ -12,13 +12,9 @@ Le module ne lève jamais vers l'appelant : tout refus est un `MiseAJour` dont
 from dataclasses import dataclass
 from pathlib import Path
 
-from tessera.services.git_workspace.git_runner import git
 from tessera.services.git_workspace import GitCommandError
-from tessera.services.git_workspace.chemins import (
-    _JOURNAL_PIPELINE,
-    _JOURNAL_UNION_SUFFIXES,
-    _relatif_au_projet,
-)
+from tessera.services.git_workspace.chemins import _JOURNAL_PIPELINE, _JOURNAL_UNION_SUFFIXES, _relatif_au_projet
+from tessera.services.git_workspace.git_runner import git
 from tessera.services.git_workspace.textes import _union_json_lists, _union_lines
 from tessera.services.livraison.retest_apres_rebase import RetestApresRebase
 from tessera.services.worktrees.temporary_worktree import detached_worktree, run_git
@@ -123,14 +119,14 @@ async def _fusionner(
 async def _resoudre_en_union(racine: Path, prefixe: str, conflits: list[str]) -> None:
     """Union of every conflicting journal; refuses at the first file that is not one."""
     relatifs = [_relatif_au_projet(c, prefixe) for c in conflits]
-    autres = [c for c, r in zip(conflits, relatifs) if r not in _JOURNAL_UNION_SUFFIXES]
+    autres = [c for c, r in zip(conflits, relatifs, strict=True) if r not in _JOURNAL_UNION_SUFFIXES]
     if autres:
         raise _Refus(
             "Conflit hors des journaux, qui ne se résout pas sans relecture : "
             + ", ".join(autres)
         )
     # Tout se calcule avant la première écriture.
-    resolus = {c: await _union_du_fichier(racine, c, r) for c, r in zip(conflits, relatifs)}
+    resolus = {c: await _union_du_fichier(racine, c, r) for c, r in zip(conflits, relatifs, strict=True)}
     for chemin, contenu in resolus.items():
         (racine / chemin).write_bytes(contenu.encode("utf-8"))
         await run_git(racine, "add", "--", chemin)

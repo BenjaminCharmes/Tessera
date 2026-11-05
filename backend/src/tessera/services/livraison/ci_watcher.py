@@ -37,22 +37,16 @@ from pathlib import Path
 import httpx
 
 from tessera.models.ticket import TicketStatus
-from tessera.services.livraison.controle_tete import (
-    ControleTete as ControleTete,
-    EstAncetre as EstAncetre,
-    TetePr as TetePr,
-    decrire_exception as decrire_exception,
-    verifier_tete,
-)
-from tessera.services.livraison.journal_ci_watcher import (
-    ecrire_ligne_log,
-    ecrire_log_blocage,
-    ecrire_log_merge,
-)
+from tessera.services.livraison.controle_tete import ControleTete as ControleTete
+from tessera.services.livraison.controle_tete import EstAncetre as EstAncetre
+from tessera.services.livraison.controle_tete import TetePr as TetePr
+from tessera.services.livraison.controle_tete import decrire_exception as decrire_exception
+from tessera.services.livraison.controle_tete import verifier_tete
+from tessera.services.livraison.journal_ci_watcher import ecrire_ligne_log, ecrire_log_blocage, ecrire_log_merge
 from tessera.services.livraison.livraison import Livraison
 from tessera.services.livraison.mise_a_jour_pr import DELAI_MISE_A_JOUR_S, MiseAJourPr, mettre_a_jour_la_pr
-from tessera.services.noyau.pipeline_events import EventCallback, EventType, OrchestratorEvent
 from tessera.services.livraison.realignement_base import Realignement, realigner_base
+from tessera.services.noyau.pipeline_events import EventCallback, EventType, OrchestratorEvent
 from tessera.services.pipeline.run_registry import RUN_REGISTRY
 from tessera.utils.logger import get_logger
 
@@ -281,7 +275,7 @@ class CIWatcher:
                     on_event, pipeline_log_path, controle_tete, mise_a_jour,
                 )
                 return None
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 _logger.warning(
                     "ci_watcher_timeout",
                     extra={"project": project_id, "ticket": ticket_id},

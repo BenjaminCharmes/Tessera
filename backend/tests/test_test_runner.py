@@ -3,14 +3,14 @@
 import asyncio
 import os
 import sys
-from typing import Any
 from pathlib import Path
+from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from tests.conftest import requires_symlinks
-
+from tessera.services.verification.sortie_de_test import extract_failure_details as _extract_failure_details
+from tessera.services.verification.sortie_de_test import extract_summary_line as _extract_summary_line
 from tessera.services.verification.test_runner import (
     EtapeTest,
     TestCommandNotFound,
@@ -20,13 +20,7 @@ from tessera.services.verification.test_runner import (
     _parse_failed_step,
     reset_semaphore_for_tests,
 )
-from tessera.services.verification.sortie_de_test import (
-    extract_failure_details as _extract_failure_details,
-    extract_pytest_failures_section as _extract_pytest_failures_section,
-    extract_pytest_short_summary as _extract_pytest_short_summary,
-    extract_summary_line as _extract_summary_line,
-    extract_vitest_failures as _extract_vitest_failures,
-)
+from tests.conftest import requires_symlinks
 
 
 @pytest.fixture
@@ -170,7 +164,7 @@ class TestRunTests:
     ) -> None:
         mock_proc = MagicMock()
         mock_proc.kill = MagicMock()
-        mock_proc.communicate = AsyncMock(side_effect=asyncio.TimeoutError())
+        mock_proc.communicate = AsyncMock(side_effect=TimeoutError())
 
         with patch("asyncio.create_subprocess_exec", return_value=mock_proc):
             result = await service.run_tests(
@@ -189,7 +183,7 @@ class TestRunTests:
         mock_proc = MagicMock()
         mock_proc.kill = MagicMock()
         mock_proc.wait = AsyncMock()
-        mock_proc.communicate = AsyncMock(side_effect=asyncio.TimeoutError())
+        mock_proc.communicate = AsyncMock(side_effect=TimeoutError())
 
         with patch("asyncio.create_subprocess_exec", return_value=mock_proc):
             await service.run_tests(python_project, test_command="uv run pytest", timeout=1)
@@ -281,7 +275,7 @@ class TestExpired:
         mock_proc = MagicMock()
         mock_proc.kill = MagicMock()
         mock_proc.wait = AsyncMock()
-        mock_proc.communicate = AsyncMock(side_effect=asyncio.TimeoutError())
+        mock_proc.communicate = AsyncMock(side_effect=TimeoutError())
 
         with patch("asyncio.create_subprocess_exec", return_value=mock_proc):
             result = await service.run_tests(
@@ -479,7 +473,7 @@ class TestSemaphore:
         mock_ko = MagicMock()
         mock_ko.kill = MagicMock()
         mock_ko.wait = AsyncMock()
-        mock_ko.communicate = AsyncMock(side_effect=asyncio.TimeoutError())
+        mock_ko.communicate = AsyncMock(side_effect=TimeoutError())
 
         runner = TestRunnerService()
 

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Which backtick-quoted token of a criterion names a file (ticket-475)."""
 import re
 

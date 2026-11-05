@@ -3,11 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services.agents.chat_service import (
-    ChatBudgetExceeded,
-    ChatReply,
-    ChatService,
-)
+from tessera.services.agents.chat_service import ChatBudgetExceeded, ChatReply, ChatService
 from tessera.services.noyau.database_chat import ChatMessageRow
 from tessera.services.providers.base import ProviderResult
 from tests.doubles_git import GitWorkspaceDouble

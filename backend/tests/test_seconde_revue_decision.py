@@ -11,16 +11,7 @@ if str(_SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(_SCRIPTS_DIR))
 
 from seconde_revue_corpus import Corpus, Entree  # noqa: E402
-from seconde_revue_decision import (  # noqa: E402
-    DEBUT_CONCLUSION,
-    FIN_CONCLUSION,
-    Jugement,
-    Mesures,
-    decision,
-    lire_relecture,
-    mesures_depuis,
-    rapport,
-)
+from seconde_revue_decision import DEBUT_CONCLUSION, FIN_CONCLUSION, Jugement, Mesures, decision, lire_relecture, mesures_depuis, rapport  # noqa: E402
 from seconde_revue_lecture import Resultat  # noqa: E402
 
 

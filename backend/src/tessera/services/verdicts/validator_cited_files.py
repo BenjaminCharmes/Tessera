@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Files cited by acceptance criteria, joined to the validator message.
 
 Split out of ``validator.py`` (ticket-316, ticket-434): the section builder
@@ -11,13 +10,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from tessera.services.gardes.politique_run import PolitiqueRun
-from tessera.services.verdicts.validator_cited_dirs import (
-    list_folder_files,
-    looks_like_folder,
-    render_folder_entry,
-    resolve_folder,
-)
 from tessera.services.verdicts.validator_binary import is_binary_file
+from tessera.services.verdicts.validator_cited_dirs import list_folder_files, looks_like_folder, render_folder_entry, resolve_folder
 from tessera.services.verdicts.validator_file_extensions import looks_like_file
 
 # Max size of the cited-files section -- all entries combined.

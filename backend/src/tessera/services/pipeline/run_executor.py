@@ -12,9 +12,9 @@ après, il disparaissait dès que le transport mourait, et l'historique restait
 bloqué sur « en cours » (ticket-079, ticket-121).
 """
 from collections.abc import Awaitable, Callable
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Any, Optional, Protocol
+from typing import Any, Protocol
 
 from tessera import reglages
 from tessera.config import settings
@@ -22,12 +22,7 @@ from tessera.services.noyau.database_events import save_event
 from tessera.services.noyau.database_runs import create_run, finish_run
 from tessera.services.noyau.dialogue import DialogueChannel
 from tessera.services.noyau.event_hub import EventHub
-from tessera.services.noyau.pipeline_events import (
-    EventCallback,
-    EventType,
-    OrchestratorEvent,
-    PipelineResult,
-)
+from tessera.services.noyau.pipeline_events import EventCallback, EventType, OrchestratorEvent, PipelineResult
 from tessera.services.pipeline.run_registry import RunActif, RunRegistry
 from tessera.services.pipeline.run_suivi import suivre as _suivre
 from tessera.utils.logger import get_logger
@@ -61,7 +56,7 @@ def _log_pipeline(project_id: str, message: str) -> None:
     # Une ligne par entrée : un message d'exception multiligne casserait le
     # format du journal.
     resume = " ".join(message.split())[:300]
-    ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+    ts = datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S UTC")
     line = f"- {ts} — [{project_id}] file interrompue : {resume}\n"
     try:
         with log_path.open("a", encoding="utf-8") as f:
@@ -86,8 +81,8 @@ class Orchestrateur(Protocol):
 def emetteur(
     hub: EventHub,
     run: RunActif,
-    run_id_en_base: Optional[str],
-    titre_getter: Optional[TitreGetter] = None,
+    run_id_en_base: str | None,
+    titre_getter: TitreGetter | None = None,
 ) -> EventCallback:
     """Publish on the hub, then persist — in that order.
 
@@ -145,7 +140,7 @@ def dialogue_du_run(envoyer: EventCallback, run: RunActif) -> DialogueChannel:
         # L'échéance part avec la question : cinq minutes de silence se lisent
         # comme une panne tant que l'attente n'est pas bornée (ticket-186).
         # Absolue, pour qu'un client tardif sache combien il reste.
-        expire_a = datetime.now(timezone.utc) + timedelta(
+        expire_a = datetime.now(UTC) + timedelta(
             seconds=reglages.courants().dialogue_timeout_s
         )
         await envoyer(
@@ -175,10 +170,10 @@ async def executer(
     hub: EventHub,
     registry: RunRegistry,
     *,
-    ticket_ids: Optional[list[str]] = None,
+    ticket_ids: list[str] | None = None,
     max_tickets: int = 5,
-    titre_getter: Optional[TitreGetter] = None,
-    budget_usd: Optional[float] = None,
+    titre_getter: TitreGetter | None = None,
+    budget_usd: float | None = None,
 ) -> None:
     """Run the pipeline to its end, then free the project.
 

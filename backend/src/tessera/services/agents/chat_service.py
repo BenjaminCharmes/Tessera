@@ -14,19 +14,16 @@ Two constraints shape it, and both come from elsewhere in the system:
   long discussion would burn the subscription quota with nothing surfacing it,
   so the conversation carries its own ceiling.
 """
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Optional, Protocol
+from typing import Protocol
 
 from pydantic import BaseModel
 
-from tessera.services.agents.chat_suggestion import (
-    parse_pipeline_suggestion,
-    strip_suggestion_marker,
-)
-from tessera.services.noyau.database_chat import ChatMessageRow
+from tessera.services.agents.chat_suggestion import parse_pipeline_suggestion, strip_suggestion_marker
 from tessera.services.git_workspace import GitWorkspaceError, GitWorkspaceService
 from tessera.services.noyau.cost_calculator import DEFAULT_MODEL
+from tessera.services.noyau.database_chat import ChatMessageRow
 from tessera.services.noyau.prompt_loader import load_system_prompt
 from tessera.services.providers.base import LLMProvider
 from tessera.utils.logger import get_logger
@@ -99,8 +96,8 @@ class ChatService:
         history: list[ChatMessageRow],
         message: str,
         spent_usd: float = 0.0,
-        on_token: Optional[_TokenCallback] = None,
-        on_tool_use: Optional[_ToolCallback] = None,
+        on_token: _TokenCallback | None = None,
+        on_tool_use: _ToolCallback | None = None,
     ) -> ChatReply:
         """Run one conversational turn, then commit whatever it wrote."""
         if spent_usd >= self._max_conversation_usd:
@@ -173,7 +170,7 @@ class ChatService:
             if await self._git_workspace.is_clean():
                 return None, None
 
-            stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
+            stamp = datetime.now(UTC).strftime("%Y%m%d-%H%M%S")
             branch = await self._git_workspace.create_branch("chat", stamp)
             summary = " ".join(message.split())[:60]
             commit_sha = await self._git_workspace.commit_all(

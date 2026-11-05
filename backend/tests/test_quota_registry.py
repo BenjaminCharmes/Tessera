@@ -1,6 +1,6 @@
 """Relevé de quota par fenêtre, lisible hors d'un run — ticket-558."""
 from collections.abc import Iterator
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import pytest
 from fastapi.testclient import TestClient
@@ -9,7 +9,7 @@ from tessera.main import app
 from tessera.services.usage.quota_registry import QUOTA_REGISTRY, QuotaRegistry
 from tessera.services.usage.quota_tracker import QuotaSnapshot, QuotaTracker
 
-NOW = datetime(2026, 10, 24, 12, 0, tzinfo=timezone.utc)
+NOW = datetime(2026, 10, 24, 12, 0, tzinfo=UTC)
 
 
 class _Clock:
@@ -118,7 +118,7 @@ def test_none_is_ignored(registry: tuple[QuotaRegistry, _Clock]) -> None:
 
 def test_tracker_observe_feeds_the_registry(clean_global: None) -> None:
     tracker = QuotaTracker()
-    future = (datetime.now(timezone.utc) + timedelta(hours=3)).timestamp()
+    future = (datetime.now(UTC) + timedelta(hours=3)).timestamp()
 
     tracker.observe(_Info("five_hour", 0.5, future))
 
@@ -135,8 +135,8 @@ def test_endpoint_is_empty_without_reading(clean_global: None) -> None:
 
 def test_endpoint_returns_each_window(clean_global: None) -> None:
     tracker = QuotaTracker()
-    soon = (datetime.now(timezone.utc) + timedelta(hours=2)).timestamp()
-    later = (datetime.now(timezone.utc) + timedelta(days=3)).timestamp()
+    soon = (datetime.now(UTC) + timedelta(hours=2)).timestamp()
+    later = (datetime.now(UTC) + timedelta(days=3)).timestamp()
     tracker.observe(_Info("five_hour", 0.42, soon))
     tracker.observe(_Info("seven_day", 0.7, later))
 

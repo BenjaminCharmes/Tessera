@@ -7,7 +7,7 @@ pipeline se reconnaît à sa branche de tête `ticket-NNN-…` et à sa base.
 from __future__ import annotations
 
 import re
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from tessera.services.github.github_service import PrOuverte
@@ -20,7 +20,7 @@ _BRANCHE_TICKET = re.compile(r"^(ticket-\d+)-")
 
 def ecrire_log(projet: Path, texte: str) -> None:
     """Append one timestamped line to the project's pipeline log; never raises."""
-    ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+    ts = datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S UTC")
     chemin = projet / "memory" / "pipeline-log.md"
     try:
         chemin.parent.mkdir(parents=True, exist_ok=True)

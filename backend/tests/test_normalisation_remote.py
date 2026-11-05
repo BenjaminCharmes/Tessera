@@ -14,7 +14,6 @@ from tessera.services.noyau.database import init_db
 from tessera.services.projets.forge import forge_supportee, parse_remote
 from tessera.services.projets.project_loader import load_project
 
-
 # ---------------------------------------------------------------------------
 # parse_remote — critères 1 & 2
 # ---------------------------------------------------------------------------

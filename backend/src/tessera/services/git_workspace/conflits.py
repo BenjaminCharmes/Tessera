@@ -3,16 +3,12 @@
 from collections.abc import Awaitable, Callable
 from pathlib import Path
 
-from tessera.services.git_workspace.chemins import (
-    _is_orchestrator_artifact_path,
-    _relatif_au_projet,
-)
+from tessera.services.git_workspace.chemins import _is_orchestrator_artifact_path, _relatif_au_projet
 from tessera.services.git_workspace.erreurs import GitCommandError
+from tessera.services.git_workspace.prisma_conflits import fusionner_ajouts, planifier_renumerotation
 from tessera.services.git_workspace.socle import GitCore
 from tessera.services.git_workspace.textes import _MARQUEUR_CONFLIT, _union_json_lists, _union_lines
-from tessera.services.git_workspace.prisma_conflits import fusionner_ajouts, planifier_renumerotation
 from tessera.utils.logger import get_logger
-
 
 _logger = get_logger("tessera.services.git_workspace")
 

@@ -1,9 +1,5 @@
 """Outil `ask_user` expose aux agents du pipeline — ticket-066."""
-from tessera.services.providers.ask_user import (
-    ASK_USER_TOOL_NAME,
-    build_ask_user_server,
-    build_ask_user_tool,
-)
+from tessera.services.providers.ask_user import ASK_USER_TOOL_NAME, build_ask_user_server, build_ask_user_tool
 
 
 def _texte(resultat: dict[str, object]) -> str:

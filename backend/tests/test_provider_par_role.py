@@ -13,35 +13,26 @@ import aiosqlite
 import pytest
 from fastapi.testclient import TestClient
 
-from tessera.services.noyau.modeles_par_defaut import MODELE_JUGEMENT
 from tessera.config import settings
 from tessera.main import app
-from tessera.models.agent import AgentConfig, AgentRole
-from tessera.services.projets import project_loader
-from tessera.services.usage.agent_calls import save_agent_call
+from tessera.models.agent import AgentRole
+from tessera.services.creation_projet.project_analyzer import ProjectAnalyzerService
+from tessera.services.documentation.documentation import DocumentationService
+from tessera.services.file.planner import PlannerService
 from tessera.services.noyau.database import init_db
 from tessera.services.noyau.database_runs import create_run
-from tessera.services.documentation.documentation import DocumentationService
 from tessera.services.noyau.event_hub import EVENT_HUB
+from tessera.services.noyau.modeles_par_defaut import MODELE_JUGEMENT
 from tessera.services.noyau.pipeline_events import EventType
-from tessera.services.file.planner import PlannerService
-from tessera.services.creation_projet.project_analyzer import ProjectAnalyzerService
-from tessera.services.projets.project_loader import (
-    ModeleInconnu,
-    load_agents_config,
-    set_agent_model,
-    set_agent_provider,
-)
+from tessera.services.projets import project_loader
+from tessera.services.projets.project_loader import ModeleInconnu, load_agents_config, set_agent_model, set_agent_provider
 from tessera.services.providers import par_role
 from tessera.services.providers.base import ProviderResult
 from tessera.services.providers.enregistrant import activer_enregistrement
-from tessera.services.providers.noms import (
-    PROVIDERS_CONNUS,
-    ProviderInconnu,
-    ProviderIndisponible,
-)
+from tessera.services.providers.noms import PROVIDERS_CONNUS, ProviderInconnu, ProviderIndisponible
 from tessera.services.providers.par_role import modele_du_role, provider_pour_role
 from tessera.services.providers.repli import ProviderAvecRepli
+from tessera.services.usage.agent_calls import save_agent_call
 from tessera.services.verdicts.security_auditor import SecurityAuditorService
 from tessera.services.verdicts.validator import ValidatorService
 from tests.matiere_factice import matiere_factice

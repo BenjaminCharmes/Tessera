@@ -1,7 +1,6 @@
 from pathlib import Path
 
 import pytest
-
 from pydantic import ValidationError
 
 from tessera.config import Settings, load_settings

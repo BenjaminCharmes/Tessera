@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Folders cited by acceptance criteria, joined as a file list (ticket-509).
 
 A criterion such as "the mockup exists in `design/maquette/`" cannot be read

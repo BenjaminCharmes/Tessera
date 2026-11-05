@@ -2,11 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services.agents.agent_registry import (
-    AgentInfo,
-    AgentNotFoundError,
-    AgentRegistryService,
-)
+from tessera.services.agents.agent_registry import AgentNotFoundError, AgentRegistryService
 
 
 def _registry(tmp_path: Path) -> AgentRegistryService:

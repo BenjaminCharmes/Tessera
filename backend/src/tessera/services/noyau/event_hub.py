@@ -14,10 +14,8 @@ règle asymétrique : les événements de **texte** (`agent_token`,
 dégrade l'affichage ; perdre une transition le rend faux — un run resterait
 « en cours » à l'écran alors qu'il est commité depuis dix minutes.
 """
-from collections import deque
-from typing import Optional
-
 import asyncio
+from collections import deque
 
 from tessera.services.noyau.journal_du_texte import JOURNAL_DU_TEXTE
 from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
@@ -102,7 +100,7 @@ class EventHub:
     def __init__(self) -> None:
         self._abonnes: list[Abonnement] = []
 
-    def subscribe(self, taille: Optional[int] = None) -> Abonnement:
+    def subscribe(self, taille: int | None = None) -> Abonnement:
         abonnement = Abonnement(taille or TAILLE_PAR_DEFAUT, self)
         self._abonnes.append(abonnement)
         return abonnement

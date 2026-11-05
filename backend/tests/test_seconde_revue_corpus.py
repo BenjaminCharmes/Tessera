@@ -18,17 +18,7 @@ _SCRIPTS_DIR = Path(__file__).resolve().parent.parent.parent / "scripts"
 if str(_SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(_SCRIPTS_DIR))
 
-from seconde_revue_corpus import (  # noqa: E402
-    Corpus,
-    CorpusInvalide,
-    Entree,
-    charger_corpus,
-    diff_de,
-    est_sensible,
-    shas_manquants,
-    somme_gel,
-    verifier_taille,
-)
+from seconde_revue_corpus import Corpus, CorpusInvalide, Entree, charger_corpus, diff_de, est_sensible, shas_manquants, somme_gel, verifier_taille  # noqa: E402
 
 
 def _defaut(n: int, sensible: bool = False) -> Entree:

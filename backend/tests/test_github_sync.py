@@ -1,13 +1,10 @@
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock
 
-import pytest
-
-from tessera.services.github.github_sync import GithubSyncAgent, SyncResult, _extract_type
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 from tessera.services.github.github_service import GitHubIssue
+from tessera.services.github.github_sync import GithubSyncAgent, SyncResult, _extract_type
 from tessera.services.github.sync_map import SyncEntry, SyncMapService
-
 
 # ------------------------------------------------------------------
 # Helpers

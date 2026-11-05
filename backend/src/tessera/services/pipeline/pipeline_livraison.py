@@ -5,15 +5,10 @@ path a second time for a ticket whose first delivery stopped without a PR.
 """
 from typing import TYPE_CHECKING
 
-from tessera.services.pipeline import pipeline_fin_de_file as fin_de_file
 from tessera.services.livraison.livraison_evenements import evenements_de_livraison
+from tessera.services.noyau.pipeline_events import EventCallback, EventType, OrchestratorEvent, PipelineResult
+from tessera.services.pipeline import pipeline_fin_de_file as fin_de_file
 from tessera.services.pipeline.pipeline_approbation import retenir_pour_relecture
-from tessera.services.noyau.pipeline_events import (
-    EventCallback,
-    EventType,
-    OrchestratorEvent,
-    PipelineResult,
-)
 
 if TYPE_CHECKING:
     from tessera.services.pipeline.orchestrator import Orchestrator
@@ -37,7 +32,7 @@ async def livrer_le_resultat(
     assert orch._livrer is not None
     with evenements_de_livraison(on_event, ticket_id):
         livraison = retenir_pour_relecture(await orch._livrer(resultat), resultat.relecture)
-    for etape, duree_ms in zip(livraison.etapes, livraison.durees_ms):
+    for etape, duree_ms in zip(livraison.etapes, livraison.durees_ms, strict=False):
         orch._log(f"[{ticket_id}] livraison: {etape} ({duree_ms:.0f}ms)")
     if livraison.arret:
         orch._log(f"[{ticket_id}] livraison: arrêt — {livraison.arret[:100]}")

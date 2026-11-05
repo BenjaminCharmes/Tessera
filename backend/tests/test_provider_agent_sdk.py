@@ -5,22 +5,10 @@ from typing import Any
 from unittest.mock import MagicMock
 
 import pytest
-from claude_agent_sdk import (
-    AssistantMessage,
-    ResultMessage,
-    TextBlock,
-    ThinkingBlock,
-    ToolResultBlock,
-    ToolUseBlock,
-)
+from claude_agent_sdk import AssistantMessage, ResultMessage, StreamEvent, TextBlock, ThinkingBlock, ToolResultBlock, ToolUseBlock
 
 import tessera.services.providers.agent_sdk as agent_sdk_module
-from claude_agent_sdk import StreamEvent
-from tessera.services.providers.agent_sdk import (
-    ClaudeAgentSDKProvider,
-    _build_options,
-    _extract_stream_delta,
-)
+from tessera.services.providers.agent_sdk import ClaudeAgentSDKProvider, _build_options, _extract_stream_delta
 from tessera.services.providers.messages_sdk import _usage_from
 from tessera.services.providers.noms import ProviderIndisponible
 

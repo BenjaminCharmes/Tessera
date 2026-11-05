@@ -12,11 +12,7 @@ from pydantic import BaseModel
 from tessera.config import settings
 from tessera.services.noyau.database_events import get_run_events
 from tessera.services.pipeline.run_registry import RUN_REGISTRY
-from tessera.services.pipeline.run_status import (
-    RunStatus,
-    statut_d_un_run_vivant,
-    statut_en_base,
-)
+from tessera.services.pipeline.run_status import RunStatus, statut_d_un_run_vivant, statut_en_base
 
 router = APIRouter(prefix="/runs", tags=["runs"])
 

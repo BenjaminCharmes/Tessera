@@ -8,13 +8,7 @@ from tessera.models.agent import AgentConfig, AgentResult, AgentRole
 from tessera.services.agents.agent_runner import OUTILS_DE_RELECTURE
 from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.projets.ticket_service import TicketService
-from tests.test_orchestrator import (
-    _FakeGit,
-    _make_agent_result,
-    _make_orchestrator,
-    _make_ticket,
-    _noop,
-)
+from tests.test_orchestrator import _FakeGit, _make_agent_result, _make_orchestrator, _make_ticket, _noop
 
 _PLAN = "1. Lire `x.py`\n2. Ajouter `y`\n- critère 1 : couvert par l'étape 2"
 

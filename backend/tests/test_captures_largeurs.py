@@ -13,13 +13,7 @@ from fastapi.testclient import TestClient
 from tessera.config import settings
 from tessera.main import app
 from tessera.services.verification import captures
-from tessera.services.verification.captures_config import (
-    LARGEURS,
-    THEMES,
-    ConfigCaptures,
-    Ecran,
-    load_captures_config,
-)
+from tessera.services.verification.captures_config import LARGEURS, THEMES, ConfigCaptures, Ecran, load_captures_config
 
 _BASE: dict[str, object] = {
     "url": "http://localhost:5196",

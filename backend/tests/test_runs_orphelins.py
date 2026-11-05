@@ -8,15 +8,10 @@ from pathlib import Path
 
 import aiosqlite
 
-from tessera.services.usage.agent_calls import save_agent_call
 from tessera.services.noyau.database import init_db
 from tessera.services.noyau.database_events import save_event
-from tessera.services.noyau.database_runs import (
-    CAUSE_RUN_ORPHELIN,
-    create_run,
-    finish_run,
-    solder_les_runs_orphelins,
-)
+from tessera.services.noyau.database_runs import CAUSE_RUN_ORPHELIN, create_run, finish_run, solder_les_runs_orphelins
+from tessera.services.usage.agent_calls import save_agent_call
 
 
 async def _base(tmp_path: Path) -> Path:

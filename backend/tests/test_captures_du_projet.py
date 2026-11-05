@@ -15,11 +15,7 @@ from fastapi.testclient import TestClient
 from tessera.config import settings
 from tessera.main import app
 from tessera.services.verification import captures
-from tessera.services.verification.captures_config import (
-    ConfigCaptures,
-    load_captures_config,
-    nom_de_fichier,
-)
+from tessera.services.verification.captures_config import ConfigCaptures, load_captures_config, nom_de_fichier
 
 _CAPTURES = {
     "url": "http://localhost:5196",

@@ -11,11 +11,11 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services.providers import par_role
 from tessera.config import settings
 from tessera.models.project import AnalyzeProjectRequest, PlanRequest, ProjectCreate
 from tessera.routers.projects.actions import analyze_project, plan_project
 from tessera.routers.projects.creation import create_project
+from tessera.services.providers import par_role
 
 
 @pytest.fixture(autouse=True)

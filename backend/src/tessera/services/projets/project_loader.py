@@ -4,26 +4,18 @@ from pathlib import Path
 from tessera.models.agent import AgentConfig, AgentPipelineConfig
 from tessera.models.project import Project, ProjectCreate
 from tessera.services.projets.artifacts import default_mode_for
-from tessera.services.projets.extraction_claude_md import (
-    lire_readme,
-    parse_active_agents,
-    parse_description,
-    parse_name,
-    parse_stack,
-)
+from tessera.services.projets.extraction_claude_md import lire_readme, parse_active_agents, parse_description, parse_name, parse_stack
 from tessera.services.projets.forge import parse_remote
 from tessera.services.projets.gabarits_projet import default_agents_json, default_claude_md
 from tessera.services.projets.manifeste import lire_chaine, lire_liste, lire_valeur
 
 # Ré-exports : ces noms vivaient ici avant le ticket-691 et des appelants (les
 # tests, notamment) les importent encore depuis ce module.
-from tessera.services.projets.manifeste_ecriture import (
-    AgentAbsentDuProjet as AgentAbsentDuProjet,
-    ModeleInconnu as ModeleInconnu,
-    set_agent_model as set_agent_model,
-    set_agent_provider as set_agent_provider,
-    set_pipeline_settings as set_pipeline_settings,
-)
+from tessera.services.projets.manifeste_ecriture import AgentAbsentDuProjet as AgentAbsentDuProjet
+from tessera.services.projets.manifeste_ecriture import ModeleInconnu as ModeleInconnu
+from tessera.services.projets.manifeste_ecriture import set_agent_model as set_agent_model
+from tessera.services.projets.manifeste_ecriture import set_agent_provider as set_agent_provider
+from tessera.services.projets.manifeste_ecriture import set_pipeline_settings as set_pipeline_settings
 from tessera.services.providers.declaration import verifier_configs, verifier_entrees
 from tessera.services.providers.noms import PROVIDERS_CONNUS
 from tessera.utils.logger import get_logger

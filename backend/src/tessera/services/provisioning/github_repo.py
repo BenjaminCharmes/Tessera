@@ -6,7 +6,7 @@ private one the token of ``Settings`` is sent. It appears in no error: a failure
 only carries the HTTP status and the API's error code (`ServiceError`).
 """
 import re
-from typing import Optional, Protocol
+from typing import Protocol
 
 import httpx
 
@@ -23,7 +23,7 @@ _SLUG = re.compile(r"^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$")
 class RepoIdSource(Protocol):
     """Where a step reads the id of the repository ``owner/repo``."""
 
-    async def repo_id(self, repo: str) -> Optional[int]:
+    async def repo_id(self, repo: str) -> int | None:
         """Return the id, ``None`` when the repository cannot be read."""
         ...
 
@@ -31,18 +31,18 @@ class RepoIdSource(Protocol):
 class GitHubRepoLookup:
     """`RepoIdSource` over ``GET /repos/{owner}/{repo}``."""
 
-    def __init__(self, token: str = "", transport: Optional[httpx.AsyncBaseTransport] = None) -> None:
+    def __init__(self, token: str = "", transport: httpx.AsyncBaseTransport | None = None) -> None:
         self._token = token
         self._transport = transport
 
     @classmethod
     def from_settings(
-        cls, settings: Settings, transport: Optional[httpx.AsyncBaseTransport] = None
+        cls, settings: Settings, transport: httpx.AsyncBaseTransport | None = None
     ) -> "GitHubRepoLookup":
         """Build the lookup from the GitHub token of ``Settings``."""
         return cls(settings.github_token, transport)
 
-    async def repo_id(self, repo: str) -> Optional[int]:
+    async def repo_id(self, repo: str) -> int | None:
         """Return the repository id; ``None`` for a malformed slug, a 404 or no id."""
         if not _SLUG.match(repo):
             return None

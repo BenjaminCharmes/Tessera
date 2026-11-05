@@ -4,15 +4,12 @@ from pathlib import Path
 import pytest
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services.pipeline import lecons_run
 from tessera.services.gardes.lecons import lire_lecons
 from tessera.services.gardes.lecons_touchees import lignes_de_lecons
-from tessera.services.pipeline.lecons_run import proposer_lecon
-from tessera.services.pipeline.pipeline_contraintes import (
-    arret_contraintes_hors_proposees,
-    arret_lecons_modifiees,
-)
 from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.pipeline import lecons_run
+from tessera.services.pipeline.lecons_run import proposer_lecon
+from tessera.services.pipeline.pipeline_contraintes import arret_contraintes_hors_proposees, arret_lecons_modifiees
 from tessera.services.pipeline.pipeline_run import PipelineRun
 from tests.doubles_git import GitWorkspaceDouble
 from tests.test_lecons_run import LECON, PREUVE, RETOUR, _Fournisseur, _projet, _reponse

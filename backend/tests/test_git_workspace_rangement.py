@@ -117,7 +117,7 @@ async def test_nested_project_reads_paths_relative_to_project(repo: Path) -> Non
 
 
 async def test_unknown_sha_raises_so_the_caller_fails_closed(repo: Path) -> None:
-    with pytest.raises(Exception):
+    with pytest.raises(Exception):  # noqa: B017
         await GitWorkspaceService(repo).commits_hors_rangement("f" * 40)
 
 

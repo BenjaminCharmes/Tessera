@@ -26,7 +26,6 @@ from tessera.services.livraison.ci_watcher import CIWatcher, decrire_exception
 from tessera.services.livraison.livraison import Livraison
 from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------

@@ -4,12 +4,11 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services.documentation.documentation import EditionRefusee, _PLAFOND
+from tessera.services.documentation.documentation import _PLAFOND, EditionRefusee
+from tessera.services.documentation.documentation_code import DiffDeTicket, FichierLivre, MatiereCode
 from tessera.services.documentation.documentation_editions import appliquer_editions
 from tessera.services.documentation.documentation_selection import marquer_documente, tickets_a_documenter
-from tessera.services.documentation.documentation_code import DiffDeTicket, FichierLivre, MatiereCode
 from tests.matiere_factice import matiere_factice
-
 
 # ------------------------------------------------------------------
 # Le contrat de sortie : des modifications, jamais un fichier entier

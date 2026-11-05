@@ -25,7 +25,7 @@ Une erreur git est journalisée et n'empêche jamais le démarrage du backend.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import aiosqlite
@@ -33,14 +33,10 @@ import frontmatter as fm
 
 from tessera.models.ticket import TicketStatus
 from tessera.services.git_workspace.git_runner import git
-from tessera.services.projets.manifeste import lire_chaine
+from tessera.services.livraison.reprise_marqueur import lire_runs, marquer_depots_repris, runs_interrompus_a_reprendre
 from tessera.services.pipeline.pipeline_text import _unapproved_commit_message
+from tessera.services.projets.manifeste import lire_chaine
 from tessera.services.projets.racine_depot import depot_le_plus_proche
-from tessera.services.livraison.reprise_marqueur import (
-    lire_runs,
-    marquer_depots_repris,
-    runs_interrompus_a_reprendre,
-)
 from tessera.services.projets.ticket_service import TicketService
 from tessera.utils.logger import get_logger
 
@@ -144,7 +140,7 @@ async def _trouver_fichiers_nouveaux(
         if _est_dans_depot_imbrique(racine_depot, fichier):
             continue
         try:
-            mtime = datetime.fromtimestamp(fichier.stat().st_mtime, tz=timezone.utc)
+            mtime = datetime.fromtimestamp(fichier.stat().st_mtime, tz=UTC)
             if mtime > started_at:
                 fichiers.append(chemin)
         except OSError:
@@ -154,7 +150,7 @@ async def _trouver_fichiers_nouveaux(
 
 def _journaliser_approuve_non_livre(project_path: Path, ticket_id: str) -> None:
     """Appends an 'approved but undelivered' entry to memory/pipeline-log.md."""
-    ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+    ts = datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S UTC")
     ligne = (
         f"- {ts} — [{ticket_id}] approuvé mais non livré : livraison à reprendre\n"
     )
@@ -353,9 +349,9 @@ async def reprendre_depots_orphelins(
         try:
             started_at = datetime.fromisoformat(str(started_at_str))
             if started_at.tzinfo is None:
-                started_at = started_at.replace(tzinfo=timezone.utc)
+                started_at = started_at.replace(tzinfo=UTC)
         except (ValueError, TypeError):
-            started_at = datetime.now(timezone.utc)
+            started_at = datetime.now(UTC)
         await _reprendre_depot_seul(
             str(project_id), str(ticket_id), workspace_dir, started_at
         )

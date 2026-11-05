@@ -4,18 +4,9 @@ from unittest.mock import AsyncMock
 
 from tessera.models.agent import AgentResult
 from tessera.models.ticket import TicketStatus
-from tessera.services.verdicts.critere_protege import (
-    critere_demande_ecriture,
-    criteres_sur_chemins_proteges,
-)
 from tessera.services.pipeline.orchestrator import Orchestrator
-from tests.test_orchestrator import (
-    _FakeGit,
-    _RecordingRunner,
-    _make_orchestrator,
-    _make_ticket,
-    _noop,
-)
+from tessera.services.verdicts.critere_protege import critere_demande_ecriture, criteres_sur_chemins_proteges
+from tests.test_orchestrator import _FakeGit, _make_orchestrator, _make_ticket, _noop, _RecordingRunner
 
 
 def _chemin(critere: str, tmp_path: Path) -> str | None:

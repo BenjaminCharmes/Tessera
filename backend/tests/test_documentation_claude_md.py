@@ -11,8 +11,8 @@ from pathlib import Path
 import pytest
 
 from tessera.services.documentation.documentation import DocumentationService, EditionRefusee
-from tessera.services.documentation.documentation_editions import appliquer_editions
 from tessera.services.documentation.documentation_claude_md import BUDGET_CLAUDE_MD
+from tessera.services.documentation.documentation_editions import appliquer_editions
 from tessera.services.providers.base import ProviderResult
 from tests.matiere_factice import matiere_factice
 
@@ -128,7 +128,7 @@ async def test_agents_md_reaches_only_doc_technique_and_only_with_the_declaratio
         service = DocumentationService(
             _Provider("?", recus),  # type: ignore[arg-type]
             prompts,
-            fournisseur=lambda role: (_Provider(role, recus), None),  # type: ignore[arg-type,return-value]
+            fournisseur=lambda role, recus=recus: (_Provider(role, recus), None),  # type: ignore[arg-type,return-value]
             claude_md=projet / "CLAUDE.md" if declare else None,
             matiere=matiere_factice(),
         )
@@ -169,7 +169,7 @@ async def test_seul_doc_technique_recoit_le_claude_md(tmp_path: Path) -> None:
     service = DocumentationService(
         _Provider("?", recus),  # type: ignore[arg-type]
         prompts,
-        fournisseur=lambda role: (_Provider(role, recus), None),  # type: ignore[arg-type,return-value]
+        fournisseur=lambda role, recus=recus: (_Provider(role, recus), None),  # type: ignore[arg-type,return-value]
         claude_md=projet / "CLAUDE.md",
         matiere=matiere_factice(),
     )

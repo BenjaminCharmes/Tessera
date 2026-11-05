@@ -1,16 +1,10 @@
 """The ordered run of provisioning steps — ADR-053, ticket-465."""
 from collections.abc import Awaitable, Callable, Sequence
 from dataclasses import dataclass
-from typing import Optional
 
 from tessera.services.noyau.pipeline_events import EventCallback, EventType, OrchestratorEvent
 from tessera.services.provisioning.errors import ServiceError
-from tessera.services.provisioning.steps import (
-    ProvisioningContext,
-    ProvisioningStep,
-    StepResult,
-    StepState,
-)
+from tessera.services.provisioning.steps import ProvisioningContext, ProvisioningStep, StepResult, StepState
 from tessera.utils.logger import get_logger
 from tessera.utils.secrets import SECRETS, SecretRegistry
 
@@ -36,7 +30,7 @@ class ProvisioningPlan:
     def __init__(
         self,
         steps: Sequence[ProvisioningStep],
-        emit: Optional[EventCallback] = None,
+        emit: EventCallback | None = None,
         secrets: SecretRegistry = SECRETS,
     ) -> None:
         self._steps = list(steps)

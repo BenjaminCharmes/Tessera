@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import aiosqlite
@@ -36,7 +36,7 @@ async def save_chat_message(
                 role,
                 content,
                 cost_usd,
-                datetime.now(timezone.utc).isoformat(),
+                datetime.now(UTC).isoformat(),
             ),
         )
         await db.commit()

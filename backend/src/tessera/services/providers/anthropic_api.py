@@ -5,12 +5,7 @@ from typing import Any
 from anthropic import AsyncAnthropic
 from anthropic.types import TextBlockParam
 
-from tessera.services.providers.base import (
-    ProviderResult,
-    StreamCallback,
-    ToolEventCallback,
-)
-
+from tessera.services.providers.base import ProviderResult, StreamCallback, ToolEventCallback
 
 #: Le nom de l'outil unique par lequel la Messages API rend une sortie
 #: structurée : son `input_schema` est le schéma, et `tool_choice` le force.

@@ -1,8 +1,6 @@
 """Un `python -c` qui écrit un fichier protégé est refusé — ticket-326."""
 from pathlib import Path
 
-import pytest
-
 from tessera.services.providers.chemins_proteges import INTERPRETE_PROTEGE_REFUS
 from tessera.services.providers.perimetre import hook_refus_hors_perimetre
 from tessera.services.providers.redirections_bash import cibles_interpreteur_ecriture

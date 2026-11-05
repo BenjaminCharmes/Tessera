@@ -3,17 +3,17 @@
 Un fichier valide rend ses agents ; chaque cause de refus rend `[]`.
 """
 import json
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
 
 from tessera.models.agent import ServiceDeclare
+from tessera.services.projets.project_loader import load_services_config
 from tessera.services.supervision.activite_produit import lire_activite
 from tessera.services.supervision.declarations_activite import services_avec_activite
-from tessera.services.projets.project_loader import load_services_config
 
-MAINTENANT = datetime(2026, 10, 29, 10, 12, 10, tzinfo=timezone.utc)
+MAINTENANT = datetime(2026, 10, 29, 10, 12, 10, tzinfo=UTC)
 CHEMIN = "data/activite.json"
 
 
