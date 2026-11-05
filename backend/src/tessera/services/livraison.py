@@ -13,15 +13,13 @@ import time
 from pathlib import Path
 from typing import Any, Awaitable, Callable, Protocol
 
-import httpx
-
 from tessera.config import settings
 from tessera.services.autonomie import NiveauAutonomie, lire_niveau
 from tessera.services.git_workspace import GitCommandError
 from tessera.services.livraison_apres import (
     branche_modifiee,
     pr_a_relire,
-    pr_ouverte_malgre,
+    ouvrir_avec_recours,
     sha_pousse,
 )
 from tessera.services.livraison_conflit import annoncer_fin_de_conflit, resolveur_suivi, signal_courant
@@ -307,23 +305,23 @@ class LivraisonService:
         etapes: list[str],
         durees_ms: list[float],
     ) -> int:
-        """Open the PR and note it; a lost response is searched for (ticket-455)."""
+        """Open the PR and note it; a lost response or a 5xx is survived (ticket-455, 781)."""
         t0 = time.monotonic()
-        try:
-            resultat = await self._workflow.open_pull_request(
+
+        async def ouvrir() -> Any:
+            return await self._workflow.open_pull_request(
                 branch=branch,
                 ticket_id=ticket_id,
                 ticket_title=ticket_title,
                 ticket_body=ticket_body,
                 ticket_type=ticket_type,
             )
-        except httpx.TransportError as exc:
-            # La réponse a pu se perdre alors que la PR s'ouvrait (ticket-455).
-            pr_perdue = await pr_ouverte_malgre(self._workflow, branch)
-            if pr_perdue is None:
-                raise
-            raise LivraisonInterrompue(pr_perdue, exc) from exc
-        pr_number = int(resultat.pr_number)
+
+        pr_number, perdue = await ouvrir_avec_recours(
+            ouvrir, self._workflow, branch, etapes, self._dormir
+        )
+        if perdue is not None:
+            raise LivraisonInterrompue(pr_number, perdue) from perdue
         etapes.append(f"PR #{pr_number} ouverte")
         durees_ms.append((time.monotonic() - t0) * 1000)
         return pr_number

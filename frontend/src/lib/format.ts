@@ -17,7 +17,8 @@ function pad2(n: number): string {
 /** A run's length in milliseconds. Null, negative or non-finite gives a dash. */
 export function formatDurationMs(ms: number | null, notation: DurationNotation = "stats"): string {
   if (ms === null || !Number.isFinite(ms) || ms < 0) return DASH;
-  const s = Math.round(ms / 1000);
+  // La notation `run` tronque (119,6 s : « 1m 59s »), les autres arrondissent.
+  const s = notation === "run" ? Math.floor(ms / 1000) : Math.round(ms / 1000);
   const m = Math.floor(s / 60);
   if (notation === "run") return `${m}m ${pad2(s % 60)}s`;
   if (s < 60) return `${s} s`;

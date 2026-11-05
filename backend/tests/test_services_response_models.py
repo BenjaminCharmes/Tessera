@@ -56,7 +56,7 @@ def test_model_keys_match_the_front_interface() -> None:
     assert set(ServiceEtat.model_fields) == _interface_keys("ServiceActif")
 
 
-def test_list_route_json_is_unchanged_byte_for_byte() -> None:
+def test_list_route_json_is_stable_byte_for_byte() -> None:
     PROCESS_REGISTRY._services = {"mon-projet": [_service()]}
 
     resp = TestClient(app).get(_BASE)
@@ -65,7 +65,7 @@ def test_list_route_json_is_unchanged_byte_for_byte() -> None:
         b'[{"nom":"web","project_id":"mon-projet","pid":4242,'
         b'"demarre_a":"2026-10-30T08:00:00+00:00","en_cours":true,'
         b'"code_de_sortie":null,"sortie":["ready on http://localhost:5175/"],'
-        b'"arrete_a_la_main":false}]'
+        b'"lignes_ecartees":0,"arrete_a_la_main":false}]'
     )
     assert resp.status_code == 200
     assert resp.content == expected

@@ -17,6 +17,8 @@ class ServiceEtat(BaseModel):
     en_cours: bool
     code_de_sortie: int | None
     sortie: list[str]
+    #: Lines the buffer dropped before the first one in `sortie`.
+    lignes_ecartees: int = 0
     arrete_a_la_main: bool
 
 

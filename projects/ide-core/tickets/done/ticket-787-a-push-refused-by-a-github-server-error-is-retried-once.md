@@ -2,7 +2,7 @@
 id: ticket-787
 title: "A push refused by a GitHub server error is retried once"
 type: fix
-status: todo
+status: done
 pr_number: null
 priority: medium
 agent: codeur
@@ -39,8 +39,8 @@ PR, pas le push.
 
 ## Critères d'acceptation
 
-- [ ] Un test vérifie, avec un exécuteur git double, qu'un push refusé avec
+- [x] Un test vérifie, avec un exécuteur git double, qu'un push refusé avec
       « Internal Server Error » puis accepté réussit en deux appels
-- [ ] Un test vérifie que deux refus serveur de suite font remonter l'erreur, en deux appels
-- [ ] Un test vérifie qu'un refus `non-fast-forward` n'est pas rejoué
-- [ ] Un test vérifie qu'aucun appel ne porte `--force` ni `--force-with-lease`
+- [x] Un test vérifie que deux refus serveur de suite font remonter l'erreur, en deux appels
+- [x] Un test vérifie qu'un refus `non-fast-forward` n'est pas rejoué
+- [x] Un test vérifie qu'aucun appel ne porte `--force` ni `--force-with-lease`

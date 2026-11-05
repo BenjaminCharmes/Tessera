@@ -11,7 +11,9 @@ that touches neither runs nothing. GitHub CI runs everything before any merge.
 When the diff cannot be read, every chain runs.
 
 `--impact <ref>` limits pytest to the test files the change since `<ref>` can
-affect; the retest after a rebase uses it (ticket-793). The last line gives the
+affect, working tree included; `--impact base` uses the ticket's own diff. The
+tester runs with `--impact base`, and the retest after a rebase adds its own
+`--impact <sha>`, the last one winning (ticket-793). The last line gives the
 duration of every step that ran.
 
 Run from backend/ with: uv run python ../scripts/verifier.py
@@ -338,20 +340,33 @@ def fichiers_de_test_impactes(chemins: list[str], racine: Path = REPO_ROOT) -> l
 
 
 def _option_impact(argv: list[str]) -> str | None:
-    """The ref given with `--impact <ref>`, or None."""
-    if "--impact" in argv:
-        index = argv.index("--impact")
-        if index + 1 < len(argv):
-            return argv[index + 1]
-    return None
+    """The ref given with the last `--impact <ref>`, or None.
+
+    La dernière l'emporte : le retest après rebase ajoute la sienne à la
+    commande du testeur, qui peut déjà porter `--impact base`.
+    """
+    indices = [i for i, arg in enumerate(argv) if arg == "--impact" and i + 1 < len(argv)]
+    return argv[indices[-1] + 1] if indices else None
 
 
-def _pytest_impacte(ref: str) -> list[Step] | None:
-    """The pytest step limited to the tests the change since `ref` can affect; None for all."""
-    diff = _git("diff", "--name-only", ref, "HEAD")
-    if diff is None:
+def _chemins_depuis(ref: str, paths: list[str] | None) -> list[str] | None:
+    """Paths changed since `ref`, working tree included; `base` reuses the ticket's own diff."""
+    if ref == "base":
+        # Le testeur juge l'arbre de travail du codeur, pas encore commité (ticket-793).
+        return paths
+    diff = _git("diff", "--name-only", ref)
+    nouveaux = _git("ls-files", "--others", "--exclude-standard")
+    if diff is None or nouveaux is None:
         return None
-    fichiers = fichiers_de_test_impactes([p for p in diff.splitlines() if p.strip()])
+    return [p for p in (diff + nouveaux).splitlines() if p.strip()]
+
+
+def _pytest_impacte(ref: str, paths: list[str] | None = None) -> list[Step] | None:
+    """The pytest step limited to the tests the change since `ref` can affect; None for all."""
+    chemins = _chemins_depuis(ref, paths)
+    if chemins is None:
+        return None
+    fichiers = fichiers_de_test_impactes(chemins)
     if fichiers is None:
         return None
     if not fichiers:
@@ -372,8 +387,9 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     pytest_steps = BACKEND_STEPS
     if backend and ref is not None:
-        # Le retest après rebase ne relance que ce que le rebase peut toucher (ticket-793).
-        impacte = _pytest_impacte(ref)
+        # Le testeur et le retest après rebase ne relancent que ce que le
+        # changement peut toucher ; la CI rejoue toute la suite (ticket-793).
+        impacte = _pytest_impacte(ref, paths)
         pytest_steps = BACKEND_STEPS if impacte is None else impacte
     return run_parallel(
         pytest_steps if backend else [],

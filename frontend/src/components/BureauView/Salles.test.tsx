@@ -8,7 +8,7 @@ describe("SallePause", () => {
   it("shows the resume label of a run closed on an exhausted quota", () => {
     render(
       <SallePause maintenant={T0}
-        occupants={[{ projet: "alpha", pause: { motif: "quota", libelle: "Quota épuisé, reprise 14:30 UTC" } }]}
+        occupants={[{ projet: "alpha", pause: { motif: "quota", libelle: "Quota épuisé, reprise 14:30 UTC" }, postes: [{ poste: "codeur", pr: false }] }]}
       />,
     );
 
@@ -39,7 +39,7 @@ describe("SallePause", () => {
 
   it("keeps the coffee machine next to its occupants", () => {
     const { container } = render(
-      <SallePause maintenant={T0} occupants={[{ projet: "alpha", pause: { motif: "ci", libelle: "CI en cours" } }]} />,
+      <SallePause maintenant={T0} occupants={[{ projet: "alpha", pause: { motif: "ci", libelle: "CI en cours" }, postes: [{ poste: "validateur", pr: true }] }]} />,
     );
 
     expect(container.querySelector('[data-sprite="machine-a-cafe"]')).not.toBeNull();
@@ -56,14 +56,33 @@ describe("SallePause", () => {
   });
 });
 
+describe("SallePause and the run at work (ticket-791)", () => {
+  const ci = { motif: "ci" as const, libelle: "CI en cours de la PR #4" };
+
+  it("does not draw a validator the current run occupies, but keeps the CI line", () => {
+    const { container } = render(<SallePause maintenant={T0} occupants={[{ projet: "alpha", pause: ci, postes: [] }]} />);
+
+    expect(container.querySelector('[data-agent="validateur"]')).toBeNull();
+    expect(screen.getByText(/CI en cours de la PR #4/)).toBeInTheDocument();
+  });
+
+  it("draws the validator when the run does not occupy it", () => {
+    const { container } = render(
+      <SallePause maintenant={T0} occupants={[{ projet: "alpha", pause: ci, postes: [{ poste: "validateur", pr: true }] }]} />,
+    );
+
+    expect(container.querySelector('[data-agent="validateur"]')).not.toBeNull();
+  });
+});
+
 describe("SalleReunion", () => {
   it("lists the conflict files, then the PR to read", () => {
     const { rerender } = render(
-      <SalleReunion maintenant={T0} occupants={[{ projet: "alpha", reunion: { temps: "conflit", fichiers: ["a.py", "b.py"] } }]} />,
+      <SalleReunion maintenant={T0} occupants={[{ projet: "alpha", reunion: { temps: "conflit", fichiers: ["a.py", "b.py"] }, postes: ["reviewer"] }]} />,
     );
     expect(screen.getByText(/a\.py, b\.py/)).toBeInTheDocument();
 
-    rerender(<SalleReunion maintenant={T0} occupants={[{ projet: "alpha", reunion: { temps: "relecture", pr: 9 } }]} />);
+    rerender(<SalleReunion maintenant={T0} occupants={[{ projet: "alpha", reunion: { temps: "relecture", pr: 9 }, postes: [] }]} />);
 
     expect(screen.getByText("PR #9 à relire")).toBeInTheDocument();
     expect(screen.queryByText(/a\.py/)).toBeNull();
@@ -90,7 +109,7 @@ describe("SalleReunion", () => {
 
   it("places the resolver with the number of files of the conflict", () => {
     render(
-      <SalleReunion maintenant={T0} occupants={[{ projet: "alpha", reunion: { temps: "conflit", fichiers: ["a.py", "b.py"] } }]} />,
+      <SalleReunion maintenant={T0} occupants={[{ projet: "alpha", reunion: { temps: "conflit", fichiers: ["a.py", "b.py"] }, postes: ["reviewer"] }]} />,
     );
 
     const salle = screen.getByRole("complementary", { name: "Salle de réunion" });
@@ -99,14 +118,14 @@ describe("SalleReunion", () => {
   });
 
   it("draws the resolver at the table during the resolution, then PR in hand while it waits to be read (ticket-784)", () => {
-    const conflit = { projet: "alpha", reunion: { temps: "conflit" as const, fichiers: ["a.py"] } };
+    const conflit = { projet: "alpha", reunion: { temps: "conflit" as const, fichiers: ["a.py"] }, postes: ["reviewer" as const] };
     const { container, rerender } = render(<SalleReunion maintenant={T0} occupants={[conflit]} />);
 
     const resolveur = container.querySelector('[data-agent="resolveur"]');
     expect(resolveur).not.toBeNull();
     expect(resolveur?.querySelector('[data-sprite="agent-debout"]')).not.toBeNull();
 
-    rerender(<SalleReunion maintenant={T0} occupants={[{ projet: "alpha", reunion: { temps: "relecture", pr: 9 } }]} />);
+    rerender(<SalleReunion maintenant={T0} occupants={[{ projet: "alpha", reunion: { temps: "relecture", pr: 9 }, postes: [] }]} />);
     expect(container.querySelector('[data-agent="resolveur"]')?.getAttribute("data-objet")).toBe("pr");
     expect(container.querySelector('[data-agent="reviewer"]')).toBeNull();
 
@@ -115,7 +134,7 @@ describe("SalleReunion", () => {
   });
 
   it("says 'fichiers inconnus' when the conflict names none", () => {
-    render(<SalleReunion maintenant={T0} occupants={[{ projet: "alpha", reunion: { temps: "conflit", fichiers: [] } }]} />);
+    render(<SalleReunion maintenant={T0} occupants={[{ projet: "alpha", reunion: { temps: "conflit", fichiers: [] }, postes: ["reviewer"] }]} />);
 
     expect(screen.getByText(/fichiers inconnus/)).toBeInTheDocument();
   });

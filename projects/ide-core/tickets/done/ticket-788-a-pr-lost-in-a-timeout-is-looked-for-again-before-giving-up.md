@@ -2,7 +2,7 @@
 id: ticket-788
 title: "A PR lost in a timeout is looked for again before the delivery gives up"
 type: fix
-status: todo
+status: done
 pr_number: null
 priority: high
 agent: codeur
@@ -40,11 +40,11 @@ ajoute le même recours sur une erreur 5xx : il hérite de la même faiblesse.
 
 ## Critères d'acceptation
 
-- [ ] Un test vérifie, avec un double, qu'une PR absente à la première recherche puis présente
+- [x] Un test vérifie, avec un double, qu'une PR absente à la première recherche puis présente
       à la deuxième est rendue par `pr_ouverte_malgre`
-- [ ] Un test vérifie qu'après trois recherches vides `pr_ouverte_malgre` rend `None`, en trois
+- [x] Un test vérifie qu'après trois recherches vides `pr_ouverte_malgre` rend `None`, en trois
       appels exactement
-- [ ] Un test vérifie qu'une recherche qui lève puis une recherche qui trouve rendent la PR
-- [ ] Un test de `_ouvrir_la_pr` vérifie qu'un `httpx.ReadTimeout` suivi d'une PR trouvée à la
+- [x] Un test vérifie qu'une recherche qui lève puis une recherche qui trouve rendent la PR
+- [x] Un test de `_ouvrir_la_pr` vérifie qu'un `httpx.ReadTimeout` suivi d'une PR trouvée à la
       deuxième recherche lève `LivraisonInterrompue` portant ce numéro de PR, sans second appel
       à `open_pull_request`

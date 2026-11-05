@@ -565,6 +565,27 @@ def test_la_sortie_conservee_est_bornee(workspace: Path) -> None:
     assert service.sortie[-1] == f"ligne {LIGNES_CONSERVEES + 49}"
 
 
+def test_a_line_keeps_its_absolute_number_when_the_buffer_overflows() -> None:
+    # Le numéro d'une ligne = lignes_ecartees + rang : il ne glisse pas
+    # d'une relecture à l'autre quand le tampon déborde (ticket-769).
+    from tessera.services.process_registry import LIGNES_CONSERVEES, Service
+
+    service = Service(nom="api", project_id="mon-projet")
+    for i in range(LIGNES_CONSERVEES + 10):
+        service.noter(f"ligne {i}")
+    avant = service.etat()
+    numero_avant = avant.lignes_ecartees + avant.sortie.index("ligne 100") + 1
+
+    for i in range(LIGNES_CONSERVEES + 10, LIGNES_CONSERVEES + 30):
+        service.noter(f"ligne {i}")
+    apres = service.etat()
+    numero_apres = apres.lignes_ecartees + apres.sortie.index("ligne 100") + 1
+
+    assert avant.lignes_ecartees == 10
+    assert apres.lignes_ecartees == 30
+    assert numero_avant == numero_apres == 101
+
+
 def test_les_couleurs_ansi_sont_retirees_de_la_sortie() -> None:
     # Vite colore sa sortie, et les codes tombent **au milieu** de l'URL :
     #   http://localhost:\x1b[1m5175\x1b[22m/\x1b[39m

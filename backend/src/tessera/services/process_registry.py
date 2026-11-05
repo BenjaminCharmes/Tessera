@@ -94,6 +94,8 @@ class Service:
         default_factory=lambda: datetime.now(timezone.utc)
     )
     sortie: list[str] = field(default_factory=list)
+    #: Lignes écartées par le tampon : numéros stables (ticket-769).
+    lignes_ecartees: int = 0
     #: Vrai quand c'est l'utilisateur qui a demandé l'arrêt. `terminate()`
     #: produit un code non nul sur certaines plateformes : sans ce drapeau, un
     #: service qu'on vient d'arrêter s'afficherait comme ayant échoué, et
@@ -107,8 +109,9 @@ class Service:
     def noter(self, ligne: str) -> None:
         """Retient une ligne, en ne gardant que les plus récentes."""
         self.sortie.append(ligne)
-        if len(self.sortie) > LIGNES_CONSERVEES:
-            del self.sortie[: len(self.sortie) - LIGNES_CONSERVEES]
+        trop = max(0, len(self.sortie) - LIGNES_CONSERVEES)
+        del self.sortie[:trop]
+        self.lignes_ecartees += trop
 
     @property
     def en_cours(self) -> bool:
@@ -124,6 +127,7 @@ class Service:
             en_cours=self.en_cours,
             code_de_sortie=getattr(self.processus, "returncode", None),
             sortie=list(self.sortie),
+            lignes_ecartees=self.lignes_ecartees,
             arrete_a_la_main=self.arrete_a_la_main,
         )
 
