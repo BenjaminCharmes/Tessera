@@ -14,7 +14,7 @@ from tessera.services.pipeline.run_registry import RUN_REGISTRY
 from tessera.services.projets.ticket_service import TicketService
 
 _PROJET = "mon-projet"
-_IDENTITE = ["-c", "user.name=tester", "-c", "user.email=tester@example.org"]
+_IDENTITE = ["-c", "user.name=tester", "-c", "user.email=tester@example.com"]
 
 
 def _git(cwd: Path, *args: str) -> None:
