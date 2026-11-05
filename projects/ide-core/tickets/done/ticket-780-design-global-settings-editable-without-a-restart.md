@@ -5,7 +5,7 @@ depends_on:
 - ticket-754
 estimated_days: 1
 id: ticket-780
-pr_number: null
+pr_number: 914
 priority: low
 status: done
 title: Design global settings that can be changed from the interface, without a restart
