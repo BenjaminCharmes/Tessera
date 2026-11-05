@@ -7828,3 +7828,7 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-05 15:35:13 UTC — [ticket-806] livraison: tests relancés après rebase : rouges (FAILED tests/test_longueur_des_fichiers.py::test_backend_files_respect_their_ceilings !!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!! !!!!!!!!!!!! xdist.dsession.Interrupted: stopping after 1 failures !!!!!!!!!!!! 1 failed, 752 passed in 140.09s (0:02:20) dur�es : myp) (282578ms)
 - 2026-11-05 15:35:13 UTC — [ticket-806] livraison: branche remise sur 5d0654f (0ms)
 - 2026-11-05 15:35:13 UTC — [ticket-806] livraison: arrêt — Tests rouges après rebase sur develop : rien n'est poussé. La base a avancé pendant le run et le tra
+- 2026-11-05 15:40:25 UTC — [ticket-806] livraison: rebase sur develop (1532ms)
+- 2026-11-05 15:40:25 UTC — [ticket-806] livraison: tests relancés après rebase : rouges (FAILED tests/test_longueur_des_fichiers.py::test_backend_files_respect_their_ceilings !!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!! !!!!!!!!!!!! xdist.dsession.Interrupted: stopping after 1 failures !!!!!!!!!!!! 1 failed, 753 passed in 142.49s (0:02:22) dur�es : myp) (301218ms)
+- 2026-11-05 15:40:25 UTC — [ticket-806] livraison: branche remise sur 1aa4376 (0ms)
+- 2026-11-05 15:40:25 UTC — [ticket-806] livraison: arrêt — Tests rouges après rebase sur develop : rien n'est poussé. La base a avancé pendant le run et le tra
