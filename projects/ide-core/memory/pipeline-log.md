@@ -7966,3 +7966,4 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-05 21:33:46 UTC — [ticket-863] tour 1 — reviewer terminé (33468ms)
 - 2026-11-05 21:37:44 UTC — [ticket-863] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les tests passent et le code imp (271843ms)
 - 2026-11-05 21:37:44 UTC — [ticket-863] APPROVED après 1 tour(s)
+- 2026-11-05 21:44:26 UTC — [ticket-863] documentation: 1 fichier(s) (393483ms) — après tour de correction — refusé : doc-technique : docs/configuration.md : règle « preuve » — l'extrait « # [OPTIONNEL] Détecteur d'anomalies des runs (ticket-834, AD » (.env.example) n'est ni da
