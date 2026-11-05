@@ -8,6 +8,7 @@ les rend tels quels.
 
 from fastapi import HTTPException
 
+from tessera import reglages
 from tessera.config import settings
 from tessera.models.ticket import TicketStatus
 from tessera.services.adr import lire_contraintes
@@ -253,7 +254,7 @@ async def build_orchestrator(
         validator=validator,
         project_path=racine_run,
         git_workspace=git_workspace,
-        run_max_budget_usd=settings.run_max_budget_usd,
+        run_max_budget_usd=reglages.courants().run_max_budget_usd,
         # Le tracker vit sur le provider, qui est le seul à voir les
         # messages du SDK. `getattr` parce que le provider Messages API
         # n'a pas de quota d'abonnement à suivre (ticket-054).

@@ -8,6 +8,7 @@ que rien ne le dise. Un test le vérifie.
 from collections.abc import Callable
 from pathlib import Path
 
+from tessera import reglages
 from tessera.config import settings
 from tessera.models.agent import AgentConfig
 from tessera.services.project_loader import load_agents_config
@@ -129,11 +130,15 @@ def provider_pour_role(
     # (`agents.json` refuse `openai_compatible` comme repli).
     url, cle = connexion_du_role(config, nom)
 
+    # Le plafond d'un appel : celui figé à l'ouverture dans un run, le courant
+    # hors run (ADR-075).
+    plafond_appel = reglages.courants().llm_max_budget_usd
+
     def _construire(fournisseur: str) -> LLMProvider:
         principal = fournisseur == nom
         return get_provider(
             fournisseur, settings.anthropic_api_key,
-            max_turns=tours, max_budget_usd=settings.llm_max_budget_usd,
+            max_turns=tours, max_budget_usd=plafond_appel,
             allow_tools=allow_tools, tools=tools, racine_ecriture=racine_ecriture,
             skills=skills, duree_max_s=duree, effort=effort,
             base_url=url if principal else None,

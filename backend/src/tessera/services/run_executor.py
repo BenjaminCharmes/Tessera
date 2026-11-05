@@ -16,6 +16,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Optional, Protocol
 
+from tessera import reglages
 from tessera.config import settings
 from tessera.services.database_events import save_event
 from tessera.services.database_runs import create_run, finish_run
@@ -220,11 +221,10 @@ def dialogue_du_run(envoyer: EventCallback, run: RunActif) -> DialogueChannel:
 
     async def annoncer(question: str) -> None:
         # L'échéance part avec la question : cinq minutes de silence se lisent
-        # comme une panne tant que rien ne dit que l'attente est bornée
-        # (ticket-186). Absolue plutôt qu'une durée, pour qu'un client arrivé
-        # en cours de route sache combien il reste, et non combien il restait.
+        # comme une panne tant que l'attente n'est pas bornée (ticket-186).
+        # Absolue, pour qu'un client tardif sache combien il reste.
         expire_a = datetime.now(timezone.utc) + timedelta(
-            seconds=settings.dialogue_timeout_s
+            seconds=reglages.courants().dialogue_timeout_s
         )
         await envoyer(
             OrchestratorEvent(
@@ -241,7 +241,7 @@ def dialogue_du_run(envoyer: EventCallback, run: RunActif) -> DialogueChannel:
     # reprendre l'agent sur une hypothèse énoncée passé le délai, et c'est ce
     # comportement-là qu'on veut, pas une réponse immédiate.
     return DialogueChannel(
-        timeout_s=settings.dialogue_timeout_s,
+        timeout_s=reglages.courants().dialogue_timeout_s,
         interactive=run.mode != "autonomous",
         on_question=annoncer,
     )

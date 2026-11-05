@@ -16,6 +16,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Optional
 
+from tessera.reglages import ReglagesEffectifs, du_moment
 from tessera.services import eveil
 from tessera.services.file_vivante import FileVivante
 from tessera.utils.logger import get_logger
@@ -103,6 +104,10 @@ class RunActif:
     #: ``"revue"`` et ``"validation"`` peuvent coexister ; ``etape`` garde la
     #: dernière étape démarrée pour les clients qui s'en servent.
     etapes_en_cours: list[str] = field(default_factory=list)
+    #: Les réglages tels qu'ils étaient à l'ouverture : un run les garde
+    #: jusqu'à sa fin, qu'on les change ou non pendant qu'il tourne (ADR-075).
+    #: Hors de `en_dict()`.
+    reglages: ReglagesEffectifs = field(default_factory=du_moment)
     demarre_a: datetime = field(
         default_factory=lambda: datetime.now(timezone.utc)
     )
@@ -222,6 +227,7 @@ class RunRegistry:
             ticket_id=ticket_id,
             ticket_titre=ticket_titre,
             dialogue=dialogue,
+            reglages=du_moment(),
         )
         self._runs[run.run_id] = run
         if was_empty:
