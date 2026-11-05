@@ -7823,3 +7823,4 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-05 15:24:15 UTC — [ticket-806] validateur: fichiers cités joints : reglages.py, config.py (tronqué)
 - 2026-11-05 15:24:15 UTC — [ticket-806] validateur: APPROVED — Les deux critères d'acceptation sont satisfaits. Les tests existants passent, y  (217436ms)
 - 2026-11-05 15:24:15 UTC — [ticket-806] APPROVED après 2 tour(s)
+- 2026-11-05 15:30:14 UTC — [ticket-806] documentation: 3 fichier(s) (348938ms) — après tour de correction
