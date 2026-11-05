@@ -7,7 +7,7 @@ depends_on:
 - ticket-863
 estimated_days: 1
 id: ticket-864
-pr_number: null
+pr_number: 943
 priority: medium
 status: done
 title: A project review runs as a design run that writes only tickets and memory
