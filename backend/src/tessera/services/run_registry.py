@@ -16,28 +16,16 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Optional
 
+from tessera.reglages import ReglagesEffectifs, du_moment
 from tessera.services import eveil
 from tessera.services.file_vivante import FileVivante
+from tessera.services.run_occupe import RunAlreadyInProgress as RunAlreadyInProgress
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
 
 #: Combien d'anomalies un run garde en mémoire (la plus ancienne sort).
 ANOMALIES_GARDEES = 20
-
-
-class RunAlreadyInProgress(Exception):
-    """A pipeline is already running on this project."""
-
-    def __init__(self, project_id: str, ticket_id: str | None = None) -> None:
-        self.project_id = project_id
-        self.ticket_id = ticket_id
-        en_cours = f" ({ticket_id})" if ticket_id else ""
-        super().__init__(
-            f"Un pipeline tourne déjà sur le projet '{project_id}'{en_cours}. "
-            "Deux exécutions simultanées se marcheraient dessus dans le même "
-            "arbre de travail : attends la fin de celle en cours."
-        )
 
 
 @dataclass
@@ -106,6 +94,10 @@ class RunActif:
     #: ``"revue"`` et ``"validation"`` peuvent coexister ; ``etape`` garde la
     #: dernière étape démarrée pour les clients qui s'en servent.
     etapes_en_cours: list[str] = field(default_factory=list)
+    #: Les réglages tels qu'ils étaient à l'ouverture : un run les garde
+    #: jusqu'à sa fin, qu'on les change ou non pendant qu'il tourne (ADR-075).
+    #: Hors de `en_dict()`.
+    reglages: ReglagesEffectifs = field(default_factory=du_moment)
     demarre_a: datetime = field(
         default_factory=lambda: datetime.now(timezone.utc)
     )

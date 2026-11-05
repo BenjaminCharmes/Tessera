@@ -1,14 +1,15 @@
 ---
+agent: codeur
+created: 2026-11-05
+depends_on:
+- ticket-805
+estimated_days: 1
 id: ticket-806
-title: "A run keeps the budgets and the dialogue delay it opened with"
-type: feat
-status: todo
 pr_number: null
 priority: low
-agent: codeur
-depends_on: ["ticket-805"]
-estimated_days: 1
-created: 2026-11-05
+status: done
+title: A run keeps the budgets and the dialogue delay it opened with
+type: feat
 ---
 
 # ticket-806 — Un run garde les plafonds et le délai de dialogue de son ouverture

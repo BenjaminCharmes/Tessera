@@ -35,6 +35,7 @@ Toutes les variables sont dans `.env` (copie de `.env.example`) :
 | `CI_GRACE_S` | | `300` | Délai de grâce avant de conclure que les checks CI ne s'enregistreront pas (`none` → achèvement). Si des workflows sont déclarés dans le dépôt, le statut reste `pending` jusqu'à `attente_ci_max_s` (ticket-405) |
 | `IDE_DB_PATH` | | `tessera.db` | Base SQLite des runs, coûts et événements |
 | `IDE_STATE_DIR` | | `%LOCALAPPDATA%\Tessera` (Windows) ou `~/.local/state/tessera` (autres) | Répertoire pour les fichiers d'état en dehors du dépôt : signalements en attente, etc. Créé au démarrage s'il n'existe pas. |
+| `SECRETS_SOURCE` | | `auto` | Mode de lecture des neuf secrets du coffre du système : `auto` (coffre s'il répond, sinon `.env` avec avertissement), `coffre` (refus sans coffre), `env` (jamais de coffre, CI/Docker). |
 | `FORBIDDEN_TERMS` | | `""` | Termes interdits au push et en CI, virgules comme séparateurs. Correspondance insensible à la casse, accents normalisés (ADR-048, ADR-050). |
 | `VERCEL_TOKEN` | | `""` | Jeton Vercel pour déployer. Portée minimale : `read` sur les projects, `write` sur les deployments. À définir avec une date d'expiration. |
 | `VERCEL_TEAM_ID` | | `""` | Identifiant du team Vercel (trouvé dans les settings du team). Utilisé par le client Vercel pour créer ou chercher des projets. |
@@ -51,6 +52,18 @@ Toutes les variables sont dans `.env` (copie de `.env.example`) :
 | `ALLOWED_HOSTS` | | `""` | Noms de `Host` admis en plus du loopback, séparés par des virgules (voir ci-dessous). Vide : `127.0.0.1`, `localhost` et `[::1]` seuls |
 | `ALLOWED_ORIGINS` | | `""` | Origines admises en plus des défauts pour ouvrir une WebSocket, séparées par des virgules. Défauts : `localhost` et `127.0.0.1` sur les ports `5173` à `5176`, et les origines Tauri (voir ci-dessous) |
 | `KEEP_AWAKE_DURING_RUNS` | | `true` | Maintient le système éveillé tant qu'un run est ouvert (Windows uniquement — no-op ailleurs). L'écran peut s'éteindre ; seule la mise en veille du système est empêchée. Désactiver si un outil externe gère déjà la veille (ticket-394) |
+
+## Coffre du système et secrets (ADR-073)
+
+Neuf secrets — `ANTHROPIC_API_KEY`, `GITHUB_TOKEN`, `VERCEL_TOKEN`, `NEON_API_KEY`, `RESEND_API_KEY`, `STRIPE_API_KEY`, `CLOUDFLARE_API_TOKEN`, `STATIC_TOKEN`, `FORBIDDEN_TERMS` — vivent dans le coffre du système (Credential Manager Windows, Keychain macOS, Secret Service Linux) plutôt que dans `.env`. Le backend lit en cet ordre : variable d'environnement, coffre, `.env`.
+
+**Migration** : `./scripts/tessera.ps1 secrets migrer` (ou `python -m tessera.coffre_cli migrer`) transfère les secrets de `.env` au coffre et les y efface, sans jamais les laisser en clair dans un fichier temporaire. Les sous-commandes `set <NOM>`, `supprimer <NOM>` et `lister` gèrent les entrées individuellement.
+
+**Masquage** : tous les secrets sauf `FORBIDDEN_TERMS` sont masqués dans les logs (8 secrets) et vidés de l'environnement du CLI. `FORBIDDEN_TERMS` reste une liste ; elle n'est jamais masquée.
+
+**Lecture en worktree** : le hook `pre-push` lit `FORBIDDEN_TERMS` via le backend au lieu de `.env` directement, ce qui fonctionne depuis tout worktree et depuis la CI.
+
+**Agents** : aucun agent ne peut lancer les commandes qui lisent le coffre (`keyring`, `cmdkey`, `vaultcmd`, `secret-tool`, etc.). Une garde lexicale les refuse.
 
 ## Budget et limites
 

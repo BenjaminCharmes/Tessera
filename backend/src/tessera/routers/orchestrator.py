@@ -4,6 +4,7 @@ from typing import TypedDict
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field, field_validator
 
+from tessera import reglages
 from tessera.config import settings
 from tessera.services.assemblage_run import build_orchestrator
 from tessera.services.controles_depart import manques_avant_depart
@@ -94,7 +95,6 @@ class RunAutonomousRequest(BaseModel):
         return v
 
 
-
 #: Les tâches de run en vol. Sans référence forte, asyncio peut collecter
 #: une tâche en cours de route : le run s'arrêterait au milieu, sans commit,
 #: ce qu'ADR-018 interdit.
@@ -110,9 +110,7 @@ def _ticket_initial(request: RunRequest) -> str | None:
     return None
 
 
-async def _lire_titre(
-    ticket_svc: TicketService, ticket_id: str | None
-) -> str | None:
+async def _lire_titre(ticket_svc: TicketService, ticket_id: str | None) -> str | None:
     """Lit le titre d'un ticket ; renvoie None si illisible ou absent."""
     if not ticket_id:
         return None
@@ -132,9 +130,9 @@ class Limites(BaseModel):
 
 @router.get("/limits", response_model=Limites)
 async def get_limits() -> Limites:
+    c = reglages.courants()
     return Limites(
-        run_max_budget_usd=settings.run_max_budget_usd,
-        llm_max_budget_usd=settings.llm_max_budget_usd,
+        run_max_budget_usd=c.run_max_budget_usd, llm_max_budget_usd=c.llm_max_budget_usd
     )
 
 
@@ -235,6 +233,8 @@ async def run_pipeline(request: RunRequest) -> RunStarted:
         )
     except RunAlreadyInProgress as exc:
         raise HTTPException(status_code=409, detail=str(exc)) from exc
+    # Plafonds et délai figés à l'ouverture ; la tâche du run en hérite (ADR-075).
+    reglages.figer(run.reglages)
 
     # La file d'un run `queue` reste ouverte aux ajouts pendant qu'il tourne
     # (ticket-478) ; le registre la porte pour que l'endpoint la retrouve.

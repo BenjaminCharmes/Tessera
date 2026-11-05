@@ -7801,3 +7801,34 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-05 14:46:54 UTC — [ticket-805] validateur: APPROVED — Tous les critères d'acceptation sont respectés : les tests passent, le fichier r (237156ms)
 - 2026-11-05 14:46:54 UTC — [ticket-805] APPROVED après 1 tour(s)
 - 2026-11-05 14:54:31 UTC — [ticket-805] documentation: 0 fichier(s) (445687ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « jeton vérifiable » — guillemets « quand ... , ... » n'est ni dans le texte remplacé, ni dans les tickets, le diff
+- 2026-11-05 15:06:54 UTC — [ide-core] ticket-805 : base réalignée sur develop
+- 2026-11-05 15:06:54 UTC — [ide-core] ticket-805 PR #924 confiée au CIWatcher
+- 2026-11-05 14:39:48 UTC — [ide-core] ticket-830 PR #923 mergée (CI verte)
+- 2026-11-05 15:06:48 UTC — [ide-core] ticket-805 PR #924 mergée (CI verte)
+- 2026-11-05 15:07:11 UTC — [ticket-806] branche ticket-806-a-run-keeps-the-budgets-and-the-dialogue-delay-it
+- 2026-11-05 15:07:14 UTC — [ticket-806] tour 1 — codeur démarré
+- 2026-11-05 15:11:01 UTC — [ticket-806] tour 1 — codeur terminé (226983ms)
+- 2026-11-05 15:13:02 UTC — [ticket-806] testeur: 1 failed, 395 passed in 115.60s (0:01:55)
+- 2026-11-05 15:13:02 UTC — [ticket-806] tests rouges au tour 1
+- 2026-11-05 15:13:02 UTC — [ticket-806] tour 2 — codeur démarré
+- 2026-11-05 15:14:23 UTC — [ticket-806] tour 2 — codeur terminé (81406ms)
+- 2026-11-05 15:15:54 UTC — [ide-core] ticket-807 retiré de la file
+- 2026-11-05 15:15:54 UTC — [ide-core] ticket-808 retiré de la file
+- 2026-11-05 15:15:54 UTC — [ide-core] ticket-809 retiré de la file
+- 2026-11-05 15:15:54 UTC — [ide-core] ticket-810 retiré de la file
+- 2026-11-05 15:17:28 UTC — [ticket-806] testeur: dur�es : mypy 6 s, mypy-linux 9 s, pytest 182 s
+- 2026-11-05 15:20:38 UTC — [ticket-806] securite: PASS — Ticket-806 (ADR-075) implémente correctement le figement des réglages d'un run : (189375ms)
+- 2026-11-05 15:20:38 UTC — [ticket-806] tour 2 — reviewer démarré
+- 2026-11-05 15:21:04 UTC — [ticket-806] tour 2 — reviewer terminé (26078ms)
+- 2026-11-05 15:24:15 UTC — [ticket-806] validateur: fichiers cités joints : reglages.py, config.py (tronqué)
+- 2026-11-05 15:24:15 UTC — [ticket-806] validateur: APPROVED — Les deux critères d'acceptation sont satisfaits. Les tests existants passent, y  (217436ms)
+- 2026-11-05 15:24:15 UTC — [ticket-806] APPROVED après 2 tour(s)
+- 2026-11-05 15:30:14 UTC — [ticket-806] documentation: 3 fichier(s) (348938ms) — après tour de correction
+- 2026-11-05 15:35:13 UTC — [ticket-806] livraison: rebase sur develop (1203ms)
+- 2026-11-05 15:35:13 UTC — [ticket-806] livraison: tests relancés après rebase : rouges (FAILED tests/test_longueur_des_fichiers.py::test_backend_files_respect_their_ceilings !!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!! !!!!!!!!!!!! xdist.dsession.Interrupted: stopping after 1 failures !!!!!!!!!!!! 1 failed, 752 passed in 140.09s (0:02:20) dur�es : myp) (282578ms)
+- 2026-11-05 15:35:13 UTC — [ticket-806] livraison: branche remise sur 5d0654f (0ms)
+- 2026-11-05 15:35:13 UTC — [ticket-806] livraison: arrêt — Tests rouges après rebase sur develop : rien n'est poussé. La base a avancé pendant le run et le tra
+- 2026-11-05 15:40:25 UTC — [ticket-806] livraison: rebase sur develop (1532ms)
+- 2026-11-05 15:40:25 UTC — [ticket-806] livraison: tests relancés après rebase : rouges (FAILED tests/test_longueur_des_fichiers.py::test_backend_files_respect_their_ceilings !!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!! !!!!!!!!!!!! xdist.dsession.Interrupted: stopping after 1 failures !!!!!!!!!!!! 1 failed, 753 passed in 142.49s (0:02:22) dur�es : myp) (301218ms)
+- 2026-11-05 15:40:25 UTC — [ticket-806] livraison: branche remise sur 1aa4376 (0ms)
+- 2026-11-05 15:40:25 UTC — [ticket-806] livraison: arrêt — Tests rouges après rebase sur develop : rien n'est poussé. La base a avancé pendant le run et le tra

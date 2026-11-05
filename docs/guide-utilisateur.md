@@ -1898,6 +1898,21 @@ en boucle. Ne les augmente qu'en connaissance de cause.
 
 ---
 
+
+### Secrets et coffre du système
+
+Neuf secrets vivent maintenant dans le coffre de ta machine (Gestionnaire d'identification Windows, Trousseau macOS, Secret Service Linux) : ANTHROPIC_API_KEY, GITHUB_TOKEN, VERCEL_TOKEN, NEON_API_KEY, RESEND_API_KEY, STRIPE_API_KEY, CLOUDFLARE_API_TOKEN, STATIC_TOKEN et FORBIDDEN_TERMS.
+
+Par défaut (`SECRETS_SOURCE=auto`), Tessera lit le coffre d'abord, puis `.env` en repli avec un avertissement. Si le coffre ne répond pas mais qu'une ligne de `.env` dit qu'un secret y est rangé (ligne `# NOM : dans le coffre`), Tessera refuse de démarrer : un secret migré ne doit jamais rester vide en silence.
+
+Trois modes au choix :
+
+- **auto** (défaut) : coffre s'il répond, sinon `.env` avec un avertissement. Refus si un secret migré manque dans les deux.
+- **coffre** : refus sans coffre ; sur une machine sans trousseau, utilise `env`.
+- **env** : jamais de coffre, même s'il existe (CI, Docker, machines sans trousseau).
+
+Renseigne `SECRETS_SOURCE` dans `.env` ou en variable d'environnement pour déclarer le mode.
+
 ## 12. Problèmes fréquents
 
 ### « Le dossier source n'existe pas : ...\backend\"C:\..." »
