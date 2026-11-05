@@ -7789,3 +7789,14 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-05 14:26:25 UTC — [ticket-830] validateur: APPROVED — Tous les critères sont satisfaits. Les 13 ADR non citées ont bien été archivées  (54827ms)
 - 2026-11-05 14:26:25 UTC — [ticket-830] APPROVED après 2 tour(s)
 - 2026-11-05 14:31:18 UTC — [ticket-830] documentation: 1 fichier(s) (285983ms) — après tour de correction
+- 2026-11-05 14:32:23 UTC — [ide-core] ticket-830 PR #923 confiée au CIWatcher
+- 2026-11-05 14:32:28 UTC — [ticket-805] branche ticket-805-a-reglages-module-stores-five-overridable-setting
+- 2026-11-05 14:32:30 UTC — [ticket-805] tour 1 — codeur démarré
+- 2026-11-05 14:36:50 UTC — [ticket-805] tour 1 — codeur terminé (259766ms)
+- 2026-11-05 14:40:30 UTC — [ticket-805] testeur: dur�es : mypy 11 s, mypy-linux 12 s, pytest 216 s
+- 2026-11-05 14:42:57 UTC — [ticket-805] securite: PASS — Ticket-805 introduces a secure settings registry for five configurable parameter (147233ms)
+- 2026-11-05 14:42:57 UTC — [ticket-805] tour 1 — reviewer démarré
+- 2026-11-05 14:43:16 UTC — [ticket-805] tour 1 — reviewer terminé (18577ms)
+- 2026-11-05 14:46:54 UTC — [ticket-805] validateur: fichiers cités joints : reglages.py ; absents : services/
+- 2026-11-05 14:46:54 UTC — [ticket-805] validateur: APPROVED — Tous les critères d'acceptation sont respectés : les tests passent, le fichier r (237156ms)
+- 2026-11-05 14:46:54 UTC — [ticket-805] APPROVED après 1 tour(s)
