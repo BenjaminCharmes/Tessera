@@ -10,6 +10,7 @@ ou une commande, et la salle n'en a pas besoin pour dire « ça tourne ».
 """
 import json
 import os
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 from collections.abc import Callable
@@ -51,10 +52,28 @@ def _processus(
     )
 
 
+# Le premier mot de la ligne : un chemin entre guillemets, un chemin sans espace, ou un
+# chemin Windows non cité (le dossier d'installation peut en contenir).
+_EXE_DE_L_AGENT = re.compile(
+    r'^\s*(?:"[^"]*[\\/]claude(?:\.exe)?"|(?:\S*[\\/])?claude(?:\.exe)?|[A-Za-z]:\\.*?\\claude\.exe)(?:\s|$)',
+    re.IGNORECASE,
+)
+_CLI_EMBARQUE = re.compile(r'^\s*(?:\S*[\\/])?node(?:\.exe)?\s+"?\S*claude-code[\\/]cli\.js', re.IGNORECASE)
+
+
+def _est_un_agent(commande: str) -> bool:
+    """True when the executable is the agent's (`claude`, `claude.exe`) or its Node CLI.
+
+    Matching the whole line would count the shells launched for the Bash tool,
+    which source `~/.claude/shell-snapshots/…`, and the MCP servers.
+    """
+    return bool(_EXE_DE_L_AGENT.match(commande) or _CLI_EMBARQUE.match(commande))
+
+
 def agents_en_cours(moi: int, procs: dict[int, InfoProcessus]) -> int:
-    """The `claude` processes the backend launched: one per agent at work."""
+    """The agent processes the backend launched: one per agent at work."""
     descendants = arbre(moi, enfants_par_parent(procs)) - {moi}
-    return sum(1 for pid in descendants if pid in procs and "claude" in procs[pid].commande.lower())
+    return sum(1 for pid in descendants if pid in procs and _est_un_agent(procs[pid].commande))
 
 
 def processus_de_tessera(ecouteurs: dict[int, int], procs: dict[int, InfoProcessus]) -> list[ProcessusDeTessera]:

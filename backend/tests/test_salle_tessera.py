@@ -235,3 +235,17 @@ async def test_the_room_probes_processes_and_listeners_once(tmp_path: Path) -> N
     )
 
     assert (sonde.appels_processus, sonde.appels_ecouteurs) == (1, 1)
+
+
+def test_a_shell_whose_line_mentions_claude_is_not_an_agent() -> None:
+    moi = os.getpid()
+    snapshot = 'bash -c "source ~/.claude/shell-snapshots/snapshot-bash-1.sh && git status"'
+    procs = {
+        moi: _info(1, 1.0),
+        10: InfoProcessus(ppid=moi, memoire_mo=1.0, demarre_a=None, commande='"C:\outils\claude.exe" --print'),
+        11: InfoProcessus(ppid=10, memoire_mo=1.0, demarre_a=None, commande=snapshot),
+        12: InfoProcessus(ppid=10, memoire_mo=1.0, demarre_a=None, commande="node mcp-server.js --config ~/.claude/mcp.json"),
+        13: InfoProcessus(ppid=moi, memoire_mo=1.0, demarre_a=None, commande="/usr/bin/zsh -c 'claude-notes'"),
+    }
+
+    assert agents_en_cours(moi, procs) == 1

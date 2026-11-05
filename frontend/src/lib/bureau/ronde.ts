@@ -113,11 +113,17 @@ function toursDesRuns(projets: readonly ProjetPourLaColonne[]): Record<string, n
   return tours;
 }
 
-/** Le dernier ticket approuvé de chaque projet, tant que son résultat est affiché. */
+/**
+ * Le dernier ticket approuvé de chaque projet, tant que son résultat est affiché.
+ * Un projet dont le validateur n'a rien rendu n'en a pas d'actif : le directeur n'a
+ * personne à féliciter, et son poste resterait vide (ADR-058).
+ */
 function approuvesDesRuns(projets: readonly ProjetPourLaColonne[]): Record<string, string> {
   const approuves: Record<string, string> = {};
   for (const { nom, etat } of projets) {
-    if (etat.lastResult?.approved) approuves[nom] = etat.lastResult.ticket_id;
+    if (!etat.lastResult?.approved) continue;
+    const valide = postesDuRun(etat).some((p) => p.poste === "validateur" && p.etat === "fait");
+    if (valide) approuves[nom] = etat.lastResult.ticket_id;
   }
   return approuves;
 }
