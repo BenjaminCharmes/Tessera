@@ -7967,3 +7967,26 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-05 21:37:44 UTC — [ticket-863] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les tests passent et le code imp (271843ms)
 - 2026-11-05 21:37:44 UTC — [ticket-863] APPROVED après 1 tour(s)
 - 2026-11-05 21:44:26 UTC — [ticket-863] documentation: 1 fichier(s) (393483ms) — après tour de correction — refusé : doc-technique : docs/configuration.md : règle « preuve » — l'extrait « # [OPTIONNEL] Détecteur d'anomalies des runs (ticket-834, AD » (.env.example) n'est ni da
+- 2026-11-05 21:59:32 UTC — [ide-core] ticket-863 : base réalignée sur develop
+- 2026-11-05 21:59:32 UTC — [ide-core] ticket-863 PR #942 confiée au CIWatcher
+- 2026-11-05 21:59:28 UTC — [ide-core] ticket-863 PR #942 mergée (CI verte)
+- 2026-11-05 21:59:40 UTC — [ticket-864] branche ticket-864-a-project-review-runs-as-a-design-run-that-writes
+- 2026-11-05 21:59:41 UTC — [ticket-864] tour 1 — codeur démarré
+- 2026-11-05 22:20:01 UTC — [ticket-864] tour 1 — codeur terminé (1219452ms)
+- 2026-11-05 22:25:38 UTC — [ticket-864] testeur: 1 failed, 848 passed, 24 warnings in 330.69s (0:05:30)
+- 2026-11-05 22:25:38 UTC — [ticket-864] tests rouges au tour 1
+- 2026-11-05 22:25:38 UTC — [ticket-864] tour 2 — codeur démarré
+- 2026-11-05 22:25:49 UTC — [ticket-864] codeur: outil Bash refusé par le CLI
+- 2026-11-05 22:25:49 UTC — [ticket-864] tour 2 — codeur terminé (10750ms)
+- 2026-11-05 22:31:12 UTC — [ticket-864] testeur: 1 failed, 848 passed, 24 warnings in 318.68s (0:05:18)
+- 2026-11-05 22:31:12 UTC — [ticket-864] tests rouges au tour 2
+- 2026-11-05 22:31:12 UTC — [ticket-864] tour 3 — codeur démarré
+- 2026-11-05 22:31:45 UTC — [ticket-864] tour 3 — codeur terminé (33532ms)
+- 2026-11-05 22:38:25 UTC — [ticket-864] testeur: dur�es : ruff 0 s, mypy 2 s, mypy-linux 2 s, pytest 394 s
+- 2026-11-05 22:40:20 UTC — [ticket-864] securite: PASS — Le diff implémente la revue de projet (ticket-864) avec des gardes de sécurité c (115061ms)
+- 2026-11-05 22:40:20 UTC — [ticket-864] tour 3 — reviewer démarré
+- 2026-11-05 22:40:57 UTC — [ticket-864] tour 3 — reviewer terminé (36781ms)
+- 2026-11-05 22:45:20 UTC — [ticket-864] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-05 22:45:53 UTC — [ticket-864] validateur: APPROVED — Tous les critères d'acceptation sont vérifiés par le code et les tests passent ( (332375ms)
+- 2026-11-05 22:45:53 UTC — [ticket-864] APPROVED après 3 tour(s)
+- 2026-11-05 22:46:15 UTC — [ticket-864] leçons: une leçon proposée
