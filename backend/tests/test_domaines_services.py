@@ -117,7 +117,12 @@ def couverture(racine: Path, ordre: Sequence[str]) -> list[str]:
     """Check that no file sits flat in services/ and that folders and ORDRE match."""
     services = racine / "services"
     plats = sorted(f.name for f in services.iterdir() if f.is_file() and f.name != "__init__.py")
-    dossiers = {d.name for d in services.iterdir() if d.is_dir() and d.name != "__pycache__"}
+    # Un dossier sans aucun `.py` n'est pas un domaine : c'est le reste de bytecode
+    # d'un module déplacé, ignoré par git, qui ne doit pas faire échouer le test.
+    dossiers = {
+        d.name for d in services.iterdir()
+        if d.is_dir() and d.name != "__pycache__" and any(d.rglob("*.py"))
+    }
     messages = [
         f"services/{nom} : fichier à plat. Range-le dans services/<domaine>/ (ADR-076)."
         for nom in plats
@@ -136,7 +141,8 @@ def couverture(racine: Path, ordre: Sequence[str]) -> list[str]:
 def paquets(racine: Path, toleres: frozenset[str]) -> list[str]:
     """Check the top-level packages of tessera/ against the allowed ones."""
     presents = {
-        d.name for d in racine.iterdir() if d.is_dir() and d.name != "__pycache__"
+        d.name for d in racine.iterdir()
+        if d.is_dir() and d.name != "__pycache__" and any(d.rglob("*.py"))
     }
     messages = [
         f"tessera/{nom}/ : paquet de premier niveau hors models, services, routers, utils."
@@ -252,6 +258,13 @@ def test_folder_outside_the_order_fails(tmp_path: Path) -> None:
     _ecrire(tmp_path, "services/divers/x.py")
     messages = controler(tmp_path, _ORDRE, frozenset())
     assert messages == ["services/divers/ : dossier hors des domaines d'ORDRE (ADR-076)."]
+
+
+def test_folder_left_with_bytecode_only_is_not_a_domain(tmp_path: Path) -> None:
+    _arbre(tmp_path)
+    _ecrire(tmp_path, "services/ancien/__pycache__/x.cpython-311.pyc")
+    _ecrire(tmp_path, "ancien_paquet/__pycache__/y.cpython-311.pyc")
+    assert controler(tmp_path, _ORDRE, frozenset()) == []
 
 
 def test_domain_without_folder_fails(tmp_path: Path) -> None:
