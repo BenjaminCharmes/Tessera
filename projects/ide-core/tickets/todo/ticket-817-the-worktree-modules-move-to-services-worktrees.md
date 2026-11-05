@@ -1,17 +1,17 @@
 ---
-id: ticket-811
+id: ticket-817
 title: "The worktree modules move to services/worktrees"
 type: refactor
 status: todo
 pr_number: null
 priority: low
 agent: codeur
-depends_on: [ticket-810]
+depends_on: [ticket-816]
 estimated_days: 1
 created: 2026-11-05
 ---
 
-# ticket-811 — Les modules de worktree passent dans `services/worktrees/`
+# ticket-817 — Les modules de worktree passent dans `services/worktrees/`
 
 ## Objectif
 
@@ -20,7 +20,7 @@ Les huit modules du domaine `worktrees` (cycle de vie des worktrees de run) vive
 
 ## Contexte
 
-ADR-075 ; section `worktrees` de `memory/services-domaines.md`. Ces modules portent ADR-056 et
+ADR-076 ; section `worktrees` de `memory/services-domaines.md`. Ces modules portent ADR-056 et
 ADR-037 (un worktree avec du travail non commité ne se supprime pas) : aucune de ces portes ne bouge.
 
 ## Ce que le ticket fait

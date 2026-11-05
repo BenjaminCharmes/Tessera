@@ -7682,6 +7682,18 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-05 09:38:01 UTC — [ticket-758] validateur: APPROVED — Tous les critères d'acceptation sont respectés : le jeton WebSocket n'apparaît p (191219ms)
 - 2026-11-05 09:38:01 UTC — [ticket-758] APPROVED après 2 tour(s)
 - 2026-11-05 09:42:02 UTC — [ticket-758] documentation: 1 fichier(s) (232953ms)
+- 2026-11-05 09:57:06 UTC — [ide-core] ticket-758 PR #908 confiée au CIWatcher
+- 2026-11-05 09:58:18 UTC — [ticket-761] branche ticket-761-dead-code-and-stale-notes-left-by-the-30-10-refac
+- 2026-11-05 09:58:19 UTC — [ticket-761] tour 1 — codeur démarré
+- 2026-11-05 10:03:55 UTC — [ticket-761] tour 1 — codeur terminé (335358ms)
+- 2026-11-05 10:04:29 UTC — [ide-core] ticket-758 PR #908 mergée (CI verte)
+- 2026-11-05 10:07:51 UTC — [ticket-761] testeur: dur�es : mypy 5 s, mypy-linux 8 s, pytest 233 s
+- 2026-11-05 10:09:04 UTC — [ticket-761] securite: PASS — Le diff est une refactorisation mineure et sûre : suppression de code inutilisé  (73125ms)
+- 2026-11-05 10:09:04 UTC — [ticket-761] tour 1 — reviewer démarré
+- 2026-11-05 10:09:23 UTC — [ticket-761] tour 1 — reviewer terminé (18297ms)
+- 2026-11-05 10:10:48 UTC — [ticket-761] validateur: APPROVED — Les trois critères d'acceptation ont été satisfaits : le code mort a été retiré, (103093ms)
+- 2026-11-05 10:10:48 UTC — [ticket-761] APPROVED après 1 tour(s)
+- 2026-11-05 10:14:02 UTC — [ticket-761] documentation: 0 fichier(s) (187030ms) — après tour de correction
 - 2026-11-05 10:18:26 UTC — [ide-core] ticket-761 PR #909 confiée au CIWatcher
 - 2026-11-05 10:18:33 UTC — [ticket-772] branche ticket-772-design-how-tessera-keeps-its-secrets-in-the-opera
 - 2026-11-05 10:18:35 UTC — [ticket-772] tour 1 — codeur démarré
@@ -7730,3 +7742,17 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-05 11:19:05 UTC — renumérotation : ticket-803 → ticket-822 (numéro déjà pris sur origin/develop)
 - 2026-11-05 11:19:05 UTC — renumérotation : ticket-804 → ticket-823 (numéro déjà pris sur origin/develop)
 - 2026-11-05 11:19:05 UTC — renumérotation : ADR-074 → ADR-075 (numéro déjà pris sur origin/develop)
+- 2026-11-05 11:20:19 UTC — [ide-core] ticket-776 PR #913 non surveillée (livraison arrêtée)
+- 2026-11-05 11:20:24 UTC — [ticket-780] branche ticket-780-design-global-settings-that-can-be-changed-from-t
+- 2026-11-05 11:20:25 UTC — [ticket-780] tour 1 — codeur démarré
+- 2026-11-05 11:25:31 UTC — [ticket-780] tour 1 — architect terminé (305421ms)
+- 2026-11-05 11:25:43 UTC — [ticket-780] testeur: OK (exit 0)
+- 2026-11-05 11:28:41 UTC — [ticket-780] securite: PASS — Ce diff ajoute une spécification et des contraintes proposées (non injectées aux (178327ms)
+- 2026-11-05 11:28:41 UTC — [ticket-780] tour 1 — reviewer démarré
+- 2026-11-05 11:29:03 UTC — [ticket-780] tour 1 — reviewer terminé (21592ms)
+- 2026-11-05 11:33:41 UTC — [ticket-780] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-05 11:34:10 UTC — [ticket-780] validateur: fichiers cités joints : projects/ide-core/memory/decisions.md (tronqué) ; non joints (budget épuisé) : contraintes.md, projects/ide-core/tickets/todo/
+- 2026-11-05 11:34:10 UTC — [ticket-780] validateur: APPROVED — Le design de ticket-780 est complet. ADR-075 créée avec ses deux règles en contr (328094ms)
+- 2026-11-05 11:34:10 UTC — [ticket-780] APPROVED après 1 tour(s)
+- 2026-11-05 11:34:17 UTC — [ticket-780] fichiers non suivis laissés par le run : tickets/todo/ticket-805-a-reglages-module-stores-five-overridable-settings.md, tickets/todo/ticket-806-a-run-keeps-the-budgets-and-the-dialogue-delay-it-opened-with.md, tickets/todo/ticket-807-the-test-limit-and-the-stay-awake-setting-are-read-when-used.md, tickets/todo/ticket-808-a-route-reads-and-writes-the-settings-from-a-declared-origin-only.md, tickets/todo/ticket-809-the-bash-guard-refuses-network-commands-that-name-the-settings-route.md, tickets/todo/ticket-810-a-gear-button-at-the-foot-of-the-rail-opens-the-settings.md (à ignorer dans .gitignore ?)
+- 2026-11-05 11:35:07 UTC — [ticket-780] documentation: 0 fichier(s) (49983ms)

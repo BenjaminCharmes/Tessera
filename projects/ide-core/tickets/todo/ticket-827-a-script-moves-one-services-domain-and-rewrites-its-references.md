@@ -1,17 +1,17 @@
 ---
-id: ticket-821
+id: ticket-827
 title: "A script moves one services domain and rewrites its references"
 type: chore
 status: todo
 pr_number: null
 priority: medium
 agent: codeur
-depends_on: [ticket-820]
+depends_on: [ticket-826]
 estimated_days: 1
 created: 2026-11-05
 ---
 
-# ticket-821 — Un script déplace un domaine de `services/` et réécrit ses références
+# ticket-827 — Un script déplace un domaine de `services/` et réécrit ses références
 
 ## Objectif
 
@@ -20,14 +20,14 @@ sans qu'une chaîne de `monkeypatch` oubliée change un test en silence.
 
 ## Contexte
 
-ADR-075. Les tickets 803 à 818 déplacent un domaine chacun, à comportement constant. Les agents
+ADR-076. Les tickets 803 à 818 déplacent un domaine chacun, à comportement constant. Les agents
 n'émettent aucune commande git en écriture : le script déplace par renommage de fichier, git
 reconnaît la renommée à la similarité du contenu.
 
 ## Ce que le ticket fait
 
 `scripts/deplacer_domaine.py <domaine> [--dry-run]`, qui lit `scripts/domaines_services.py`
-(ticket-820) :
+(ticket-826) :
 
 - crée `services/<domaine>/` avec un `__init__.py` vide s'il manque (jamais pour `providers`,
   `provisioning`, `git_workspace`, qui existent) ;
@@ -65,5 +65,5 @@ Sur un arbre temporaire :
 
 ## Ce que ça ne fait pas
 
-Ne déplace aucun module du dépôt réel (ticket-822 et suivants). Ne corrige pas `parents[N]` : un
+Ne déplace aucun module du dépôt réel (ticket-828 et suivants). Ne corrige pas `parents[N]` : un
 chemin relatif à `__file__` se relit à la main, ticket par ticket.

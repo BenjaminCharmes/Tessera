@@ -7,7 +7,7 @@ import pytest
 
 from tessera.services.politique_run import PolitiqueRun
 from tessera.services.providers.perimetre import racine_autorisee
-from tessera.services.project_overview import find_icon
+from tessera.services.project_overview import _racine_ancestrale, find_icon
 from tessera.services.racine_depot import (
     GIT_ROOT_ANCESTOR,
     declare_ancestor,
@@ -100,6 +100,29 @@ def test_a_git_file_is_a_repository_root_everywhere(tmp_path: Path) -> None:
     assert PolitiqueRun.lire(projet).racine_ecriture(projet) == tmp_path.resolve()
     trouvee = find_icon(projet)
     assert trouvee is not None and trouvee[0].name == "favicon.svg"
+
+
+def test_racine_ancestrale_finds_a_parent_whose_git_is_a_file(tmp_path: Path) -> None:
+    _worktree_lie(tmp_path)
+    projet = _projet(tmp_path, GIT_ROOT_ANCESTOR)
+
+    assert _racine_ancestrale(projet) == tmp_path.resolve()
+
+
+def test_racine_ancestrale_returns_the_parent_not_the_projects_own_git(
+    tmp_path: Path,
+) -> None:
+    (tmp_path / ".git").mkdir()
+    projet = _projet(tmp_path, GIT_ROOT_ANCESTOR)
+    (projet / ".git").mkdir()
+
+    assert _racine_ancestrale(projet) == tmp_path.resolve()
+
+
+def test_racine_ancestrale_is_none_without_the_declaration(tmp_path: Path) -> None:
+    (tmp_path / ".git").mkdir()
+
+    assert _racine_ancestrale(_projet(tmp_path, None)) is None
 
 
 def test_racine_ecriture_projet_without_ancestor_is_the_project(tmp_path: Path) -> None:

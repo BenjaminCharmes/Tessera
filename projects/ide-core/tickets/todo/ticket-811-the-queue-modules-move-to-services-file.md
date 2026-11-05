@@ -1,17 +1,17 @@
 ---
-id: ticket-805
+id: ticket-811
 title: "The queue modules move to services/file"
 type: refactor
 status: todo
 pr_number: null
 priority: low
 agent: codeur
-depends_on: [ticket-823]
+depends_on: [ticket-829]
 estimated_days: 1
 created: 2026-11-05
 ---
 
-# ticket-805 — Les modules de la file passent dans `services/file/`
+# ticket-811 — Les modules de la file passent dans `services/file/`
 
 ## Objectif
 
@@ -20,7 +20,7 @@ Les sept modules du domaine `file` (file, mode autonome, planificateur) vivent d
 
 ## Contexte
 
-ADR-075 ; section `file` de `memory/services-domaines.md`.
+ADR-076 ; section `file` de `memory/services-domaines.md`.
 
 ## Ce que le ticket fait
 

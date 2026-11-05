@@ -1,17 +1,17 @@
 ---
-id: ticket-814
+id: ticket-820
 title: "The git modules join services/git_workspace"
 type: refactor
 status: todo
 pr_number: null
 priority: low
 agent: codeur
-depends_on: [ticket-813]
+depends_on: [ticket-819]
 estimated_days: 1
 created: 2026-11-05
 ---
 
-# ticket-814 — Les modules git à plat rejoignent `services/git_workspace/`
+# ticket-820 — Les modules git à plat rejoignent `services/git_workspace/`
 
 ## Objectif
 
@@ -21,7 +21,7 @@ comportement constant.
 
 ## Contexte
 
-ADR-075 ; section `git_workspace` de `memory/services-domaines.md`. Le dossier est déjà un domaine
+ADR-076 ; section `git_workspace` de `memory/services-domaines.md`. Le dossier est déjà un domaine
 et son `__init__.py` réexporte : celui-ci ne change pas, sauf son import de `_dossier_sans_hooks`.
 Les gardes git (ADR-067) vivent dans `providers/`, hors de ce ticket.
 

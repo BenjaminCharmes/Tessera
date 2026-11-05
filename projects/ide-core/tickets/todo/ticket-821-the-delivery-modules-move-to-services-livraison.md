@@ -1,17 +1,17 @@
 ---
-id: ticket-815
+id: ticket-821
 title: "The delivery modules move to services/livraison"
 type: refactor
 status: todo
 pr_number: null
 priority: low
 agent: codeur
-depends_on: [ticket-814]
+depends_on: [ticket-820]
 estimated_days: 1
 created: 2026-11-05
 ---
 
-# ticket-815 — Les modules de livraison passent dans `services/livraison/`
+# ticket-821 — Les modules de livraison passent dans `services/livraison/`
 
 ## Objectif
 
@@ -20,7 +20,7 @@ Les vingt-neuf modules du domaine `livraison` (rebase, PR, CI, merge, surveillan
 
 ## Contexte
 
-ADR-075 ; section `livraison` de `memory/services-domaines.md`. C'est un des deux plus gros
+ADR-076 ; section `livraison` de `memory/services-domaines.md`. C'est un des deux plus gros
 déplacements, et le plus touché par les tickets récents (781, 787, 788, 792) : il se lance quand
 aucune PR du projet n'est ouverte, sinon le rebase de la PR en cours entre en conflit avec les
 renommages. Les portes de livraison (ADR-029, 030, 033, 039, 051, 065, 069) ne bougent pas.
@@ -47,4 +47,4 @@ Aucun changement de comportement, aucune porte de livraison modifiée.
 ## Risques
 
 Le test de livraison réelle (PR, CI) ne se rejoue pas dans le run : après le merge, regarder la
-première livraison suivante avant de lancer le ticket-816.
+première livraison suivante avant de lancer le ticket-822.

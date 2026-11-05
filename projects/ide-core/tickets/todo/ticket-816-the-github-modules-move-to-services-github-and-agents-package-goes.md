@@ -1,17 +1,17 @@
 ---
-id: ticket-810
+id: ticket-816
 title: "The github modules move to services/github and the agents package goes"
 type: refactor
 status: todo
 pr_number: null
 priority: low
 agent: codeur
-depends_on: [ticket-809]
+depends_on: [ticket-815]
 estimated_days: 1
 created: 2026-11-05
 ---
 
-# ticket-810 — Les modules GitHub passent dans `services/github/`, et `tessera/agents/` disparaît
+# ticket-816 — Les modules GitHub passent dans `services/github/`, et `tessera/agents/` disparaît
 
 ## Objectif
 
@@ -20,7 +20,7 @@ Les huit modules du domaine `github` et `tessera/agents/github_sync.py` vivent d
 
 ## Contexte
 
-ADR-075 ; section `github` de `memory/services-domaines.md`. `tessera/agents/` ne porte que
+ADR-076 ; section `github` de `memory/services-domaines.md`. `tessera/agents/` ne porte que
 `github_sync.py`, qui importe `models` et `services` : il échappait au test d'architecture.
 ADR-010 (`role: github-sync` géré dans `POST /api/v1/agents/run`) ne change pas.
 

@@ -1,8 +1,8 @@
 # Classement de `backend/src/tessera/services/` par domaine
 
-Détail d'ADR-075. Photo de départ : `scripts/domaines_services.py` (ticket-820)
+Détail d'ADR-076. Photo de départ : `scripts/domaines_services.py` (ticket-826)
 en reprend la table, et c'est lui que lisent le test et le script de
-déplacement ; ce fichier se supprime au ticket-819.
+déplacement ; ce fichier se supprime au ticket-825.
 
 ## Règle de dépendance
 
@@ -145,7 +145,7 @@ ports_declares, process_registry, project_overview, salle_tessera,
 service_etat, services_sans_port, signature_commande, sonde_systeme.
 
 Total : 207 modules à plat, contre 203 dans le ticket-776 (trois tickets ont
-ajouté des modules depuis). Le test de couverture du ticket-820 est l'arbitre :
+ajouté des modules depuis). Le test de couverture du ticket-826 est l'arbitre :
 un module absent de ce fichier s'y ajoute, un module inexistant s'en retire.
 
 ## Ordre des déplacements

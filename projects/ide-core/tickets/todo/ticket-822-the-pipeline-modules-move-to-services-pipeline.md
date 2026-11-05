@@ -1,17 +1,17 @@
 ---
-id: ticket-816
+id: ticket-822
 title: "The pipeline modules move to services/pipeline"
 type: refactor
 status: todo
 pr_number: null
 priority: low
 agent: codeur
-depends_on: [ticket-815]
+depends_on: [ticket-821]
 estimated_days: 1
 created: 2026-11-05
 ---
 
-# ticket-816 — Les modules du pipeline passent dans `services/pipeline/`
+# ticket-822 — Les modules du pipeline passent dans `services/pipeline/`
 
 ## Objectif
 
@@ -20,7 +20,7 @@ Les trente et un modules du domaine `pipeline` (phases et orchestration d'un run
 
 ## Contexte
 
-ADR-075 ; section `pipeline` de `memory/services-domaines.md`. Plus gros déplacement, et le plus
+ADR-076 ; section `pipeline` de `memory/services-domaines.md`. Plus gros déplacement, et le plus
 patché par chaîne : `orchestrator`, `run_registry` et `run_lock` sont aussi touchés par
 `backend/tests/conftest.py`. ADR-008 et ADR-038 (orchestrateur sans état, `RunLock`) ne bougent pas.
 

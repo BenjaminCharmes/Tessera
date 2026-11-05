@@ -1,17 +1,17 @@
 ---
-id: ticket-809
+id: ticket-815
 title: "The verification modules move to services/verification"
 type: refactor
 status: todo
 pr_number: null
 priority: low
 agent: codeur
-depends_on: [ticket-808]
+depends_on: [ticket-814]
 estimated_days: 1
 created: 2026-11-05
 ---
 
-# ticket-809 — Les modules de vérification passent dans `services/verification/`
+# ticket-815 — Les modules de vérification passent dans `services/verification/`
 
 ## Objectif
 
@@ -20,7 +20,7 @@ dans `services/verification/`, à comportement constant.
 
 ## Contexte
 
-ADR-075 ; section `verification` de `memory/services-domaines.md`. Le ticket-773 (ruff dans la
+ADR-076 ; section `verification` de `memory/services-domaines.md`. Le ticket-773 (ruff dans la
 commande de test) touche cette zone : sa PR est mergée avant ce ticket.
 
 ## Ce que le ticket fait

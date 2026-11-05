@@ -1,17 +1,17 @@
 ---
-id: ticket-808
+id: ticket-814
 title: "The project creation modules move to services/creation_projet"
 type: refactor
 status: todo
 pr_number: null
 priority: low
 agent: codeur
-depends_on: [ticket-807]
+depends_on: [ticket-813]
 estimated_days: 1
 created: 2026-11-05
 ---
 
-# ticket-808 — Les modules de création de projet passent dans `services/creation_projet/`
+# ticket-814 — Les modules de création de projet passent dans `services/creation_projet/`
 
 ## Objectif
 
@@ -20,7 +20,7 @@ dans `services/creation_projet/`, à comportement constant.
 
 ## Contexte
 
-ADR-075 ; section `creation_projet` de `memory/services-domaines.md`. Le ticket-758 (durcissement
+ADR-076 ; section `creation_projet` de `memory/services-domaines.md`. Le ticket-758 (durcissement
 des URL de clone) touche `git_clone` : il passe avant ce ticket, ou sa PR est mergée avant lui.
 
 ## Ce que le ticket fait

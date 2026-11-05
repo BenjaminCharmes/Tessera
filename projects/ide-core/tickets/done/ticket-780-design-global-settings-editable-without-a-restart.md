@@ -1,14 +1,15 @@
 ---
-id: ticket-780
-title: "Design global settings that can be changed from the interface, without a restart"
-type: design
-status: todo
-pr_number: null
-priority: low
 agent: architect
-depends_on: ["ticket-754"]
-estimated_days: 1
 created: 2026-11-04
+depends_on:
+- ticket-754
+estimated_days: 1
+id: ticket-780
+pr_number: 914
+priority: low
+status: done
+title: Design global settings that can be changed from the interface, without a restart
+type: design
 ---
 
 # ticket-780 — Concevoir des réglages globaux modifiables depuis l'interface, sans redémarrage

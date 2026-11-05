@@ -1,17 +1,17 @@
 ---
-id: ticket-807
+id: ticket-813
 title: "The agent modules move to services/agents"
 type: refactor
 status: todo
 pr_number: null
 priority: low
 agent: codeur
-depends_on: [ticket-806]
+depends_on: [ticket-812]
 estimated_days: 1
 created: 2026-11-05
 ---
 
-# ticket-807 — Les modules d'agent passent dans `services/agents/`
+# ticket-813 — Les modules d'agent passent dans `services/agents/`
 
 ## Objectif
 
@@ -20,8 +20,8 @@ Les six modules du domaine `agents` (registre, exécution d'un agent, chat) vive
 
 ## Contexte
 
-ADR-075 ; section `agents` de `memory/services-domaines.md`. Ne pas confondre avec le paquet
-`tessera/agents/`, qui disparaît au ticket-810.
+ADR-076 ; section `agents` de `memory/services-domaines.md`. Ne pas confondre avec le paquet
+`tessera/agents/`, qui disparaît au ticket-816.
 
 ## Ce que le ticket fait
 
@@ -33,7 +33,7 @@ ADR-075 ; section `agents` de `memory/services-domaines.md`. Ne pas confondre av
 - [ ] `A_DEPLACER` n'a plus d'entrée `agents`, `ECARTS_DOMAINES` n'a grandi d'aucune ligne
 - [ ] Aucune occurrence des anciens chemins pointés ne reste dans `backend/src`, `backend/tests`,
       `scripts/`, `Makefile`
-- [ ] `tessera/agents/github_sync.py` n'est pas touché (ticket-810)
+- [ ] `tessera/agents/github_sync.py` n'est pas touché (ticket-816)
 - [ ] Le diff n'est que des renommages et des lignes d'import ou de chaîne ; la suite passe
 
 ## Ce que ça ne fait pas
@@ -42,5 +42,5 @@ Aucun changement de comportement. Le paquet `tessera/agents/` reste en place.
 
 ## Risques
 
-Les chemins `tessera.agents` et `tessera.services.agents` coexistent jusqu'au ticket-810 : le
+Les chemins `tessera.agents` et `tessera.services.agents` coexistent jusqu'au ticket-816 : le
 script ne doit réécrire que `tessera.services.<module>`.

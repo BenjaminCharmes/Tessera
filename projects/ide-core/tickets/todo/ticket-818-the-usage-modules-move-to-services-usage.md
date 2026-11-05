@@ -1,17 +1,17 @@
 ---
-id: ticket-812
+id: ticket-818
 title: "The usage modules move to services/usage"
 type: refactor
 status: todo
 pr_number: null
 priority: low
 agent: codeur
-depends_on: [ticket-811]
+depends_on: [ticket-817]
 estimated_days: 1
 created: 2026-11-05
 ---
 
-# ticket-812 — Les modules d'usage passent dans `services/usage/`
+# ticket-818 — Les modules d'usage passent dans `services/usage/`
 
 ## Objectif
 
@@ -20,7 +20,7 @@ Les huit modules du domaine `usage` (coûts, quotas, appels d'agent) vivent dans
 
 ## Contexte
 
-ADR-075 ; section `usage` de `memory/services-domaines.md`. `providers/` importe `agent_calls`,
+ADR-076 ; section `usage` de `memory/services-domaines.md`. `providers/` importe `agent_calls`,
 `cost_calculator` et `quota_tracker` : `usage` est de rang plus bas, le sens est permis.
 
 ## Ce que le ticket fait

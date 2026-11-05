@@ -1,17 +1,17 @@
 ---
-id: ticket-817
+id: ticket-823
 title: "The project modules move to services/projets"
 type: refactor
 status: todo
 pr_number: null
 priority: low
 agent: codeur
-depends_on: [ticket-816]
+depends_on: [ticket-822]
 estimated_days: 1
 created: 2026-11-05
 ---
 
-# ticket-817 — Les modules de projet passent dans `services/projets/`
+# ticket-823 — Les modules de projet passent dans `services/projets/`
 
 ## Objectif
 
@@ -20,7 +20,7 @@ de mise en ligne) vivent dans `services/projets/`, à comportement constant.
 
 ## Contexte
 
-ADR-075 ; section `projets` de `memory/services-domaines.md`. `manifeste` est le lecteur unique de
+ADR-076 ; section `projets` de `memory/services-domaines.md`. `manifeste` est le lecteur unique de
 `agents.json` (ADR-068) et `project_loader` est importé presque partout : ce déplacement réécrit le
 plus de lignes d'import, d'où sa place tardive. Le dossier et le module `manifeste` ne se
 confondent pas (`projets` / `manifeste`).
@@ -30,7 +30,7 @@ confondent pas (`projets` / `manifeste`).
 - Lance `scripts/deplacer_domaine.py projets`, relit le diff, lance la suite.
 - Réécrit `Makefile` et `scripts/tessera.ps1`, qui lancent `python -m tessera.services.ticket_check`
   (désormais `tessera.services.projets.ticket_check`), et vérifie que la commande répond.
-- Vérifie `scripts/prochain_numero.py` : il importe `numerotation`, qui bougera au ticket-818.
+- Vérifie `scripts/prochain_numero.py` : il importe `numerotation`, qui bougera au ticket-824.
 
 ## Critères d'acceptation
 

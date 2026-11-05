@@ -1,17 +1,17 @@
 ---
-id: ticket-806
+id: ticket-812
 title: "The verdict modules move to services/verdicts"
 type: refactor
 status: todo
 pr_number: null
 priority: low
 agent: codeur
-depends_on: [ticket-805]
+depends_on: [ticket-811]
 estimated_days: 1
 created: 2026-11-05
 ---
 
-# ticket-806 — Les modules de verdict passent dans `services/verdicts/`
+# ticket-812 — Les modules de verdict passent dans `services/verdicts/`
 
 ## Objectif
 
@@ -20,7 +20,7 @@ Les douze modules du domaine `verdicts` (reviewer, audit sécurité, validateur)
 
 ## Contexte
 
-ADR-075 ; section `verdicts` de `memory/services-domaines.md`. Ces modules portent des portes qui
+ADR-076 ; section `verdicts` de `memory/services-domaines.md`. Ces modules portent des portes qui
 échouent fermées (ADR-039, ADR-061) : le déplacement ne doit en changer aucune.
 
 ## Ce que le ticket fait

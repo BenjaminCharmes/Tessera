@@ -685,7 +685,26 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 
 ---
 
-## ADR-075 — Ranger `services/` par domaine, sans import vers un rang plus haut
+## ADR-074 — Les leçons d'un projet vivent dans `memory/lecons.md`
+
+**Date** : 2026-11-05
+**Décision** : après un run approuvé dont `review_feedback` n'est pas vide, le service, sans outils, écrit au plus une leçon « Quand <situation>, <action>. » sous `## Proposées` de `memory/lecons.md`, artefact d'ADR-021 et ADR-023. Un humain la déplace sous `## En vigueur`, seule section injectée, au codeur et au reviewer, sous les contraintes : 25 leçons, 4 Ko. Refus : hors forme, 200 caractères, preuve absente du retour, doublon, vérification affaiblie. Un diff de run qui touche ce fichier met le run en `blocked` (ADR-055). Une leçon dit un piège observé ; `decisions.md` dit un choix.
+**Raison** : ticket-736 a perdu trois tours sur des doubles de test ; un texte de modèle injecté sans relecture change la consigne de tous (ADR-055).
+**Alternative rejetée** : écriture directe par l'agent, ou activation automatique — la confiance accordée à un texte non relu est une décision humaine.
+
+---
+
+## ADR-075 — Cinq réglages modifiables depuis l'interface, figés par run
+
+**Date** : 2026-11-05
+**Décision** : `run_max_budget_usd`, `llm_max_budget_usd`, `dialogue_timeout_s`, `max_parallel_test_runs` et `keep_awake_during_runs` se modifient depuis l'interface, dans un registre fermé et borné ; « sans plafond » ne se pose que dans `.env`. Secrets (ADR-073), chemins, hôtes et réglages par projet n'y entrent jamais. La valeur vit en SQLite au-dessus du défaut de `.env`, que rien ne réécrit ; `reglages.courants()` est l'unique lecture. Un run fige plafonds et délai à l'ouverture ; les deux réglages de machine valent à leur prochaine lecture. Une écriture exige un `Origin` déclaré (ticket-754), sinon 403.
+**Raison** : l'API est ouverte quand `STATIC_TOKEN` est vide et un agent a `Bash` : ni lui ni une page locale ne doivent relever un plafond.
+**Alternative rejetée** : réécrire `.env` — le redémarrage coupe les runs ; appliquer à chaud — un plafond bougerait sous un run.
+**Détail** : `docs/superpowers/specs/2026-11-05-reglages-globaux-design.md`.
+
+---
+
+## ADR-076 — Ranger `services/` par domaine, sans import vers un rang plus haut
 
 **Date** : 2026-11-05
 **Décision** : `services/` se range en dix-huit domaines, du plus bas au plus haut : noyau, projets, usage, provisioning, gardes, git_workspace, worktrees, github, providers, verification, verdicts, agents, documentation, creation_projet, livraison, pipeline, file, supervision. Un module n'importe que son domaine ou un plus bas ; `test_sens_des_imports.py` le mesure, avec cliquet. `tessera/agents/` disparaît : `github_sync` rejoint `github`. Classement : `memory/services-domaines.md`. Les déplacements gardent le comportement, un domaine par ticket, chacun attendant le merge du précédent.

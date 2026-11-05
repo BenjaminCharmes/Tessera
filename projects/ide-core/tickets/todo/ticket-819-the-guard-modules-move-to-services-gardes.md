@@ -1,17 +1,17 @@
 ---
-id: ticket-813
+id: ticket-819
 title: "The guard modules move to services/gardes"
 type: refactor
 status: todo
 pr_number: null
 priority: low
 agent: codeur
-depends_on: [ticket-812]
+depends_on: [ticket-818]
 estimated_days: 1
 created: 2026-11-05
 ---
 
-# ticket-813 — Les modules de garde passent dans `services/gardes/`
+# ticket-819 — Les modules de garde passent dans `services/gardes/`
 
 ## Objectif
 
@@ -20,7 +20,7 @@ run, configuration des tests) vivent dans `services/gardes/`, à comportement co
 
 ## Contexte
 
-ADR-075 ; section `gardes` de `memory/services-domaines.md`. Ces modules échouent fermés (ADR-050,
+ADR-076 ; section `gardes` de `memory/services-domaines.md`. Ces modules échouent fermés (ADR-050,
 ADR-072). Le ticket-798 (le hook `pre-push` lit les termes interdits par le backend) touche
 `termes_interdits` : sa PR est mergée avant ce ticket. Le hook `pre-push` appelle peut-être le
 module par son chemin : le relire.

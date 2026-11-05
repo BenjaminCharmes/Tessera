@@ -286,6 +286,14 @@ def consignes_touchees(paths: list[str]) -> bool:
 _SOURCES = "backend/src/"
 _TESTS = "backend/tests/"
 
+#: Tests qui jugent tout le dépôt : toujours lancés en mode impact (ticket-793).
+TESTS_GLOBAUX = (
+    "tests/test_longueur_des_fichiers.py",
+    "tests/test_consignes_coherentes.py",
+    "tests/test_contrat_des_routes.py",
+    "tests/test_openapi_export.py",
+)
+
 
 def _module_de(chemin: str) -> str:
     """`backend/src/tessera/a/b.py` → `tessera.a.b` ; un `__init__.py` donne son paquet."""
@@ -369,6 +377,9 @@ def _pytest_impacte(ref: str, paths: list[str] | None = None) -> list[Step] | No
     fichiers = fichiers_de_test_impactes(chemins)
     if fichiers is None:
         return None
+    # Les tests globaux lisent tout le dépôt sans importer le module touché :
+    # le cliquet des longueurs a laissé passer le ticket-761 (CI rouge, PR #909).
+    fichiers = sorted({*fichiers, *(t for t in TESTS_GLOBAUX if (BACKEND_DIR / t).exists())})
     if not fichiers:
         print(f"Aucun test backend concerné depuis {ref} : pytest sauté.", file=sys.stderr)
         return []
