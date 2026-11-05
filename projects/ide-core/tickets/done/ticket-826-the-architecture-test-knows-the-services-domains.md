@@ -2,7 +2,7 @@
 id: ticket-826
 title: "The architecture test knows the services domains"
 type: test
-status: todo
+status: done
 pr_number: null
 priority: medium
 agent: codeur
@@ -63,11 +63,11 @@ Sur des arbres temporaires, comme `test_sens_des_imports.py` :
 
 ## Critères d'acceptation
 
-- [ ] `scripts/domaines_services.py` porte les dix-huit domaines dans l'ordre d'ADR-076 et un
+- [x] `scripts/domaines_services.py` porte les dix-huit domaines dans l'ordre d'ADR-076 et un
       domaine pour chaque module à plat du dossier
-- [ ] `test_real_tree_follows_the_domains` passe sur l'arbre réel
-- [ ] Un module à plat ajouté sans ligne dans `A_DEPLACER` fait échouer ce test
-- [ ] Aucun module de `services/` n'a bougé, aucun import n'a changé
+- [x] `test_real_tree_follows_the_domains` passe sur l'arbre réel
+- [x] Un module à plat ajouté sans ligne dans `A_DEPLACER` fait échouer ce test
+- [x] Aucun module de `services/` n'a bougé, aucun import n'a changé
 
 ## Ce que ça ne fait pas
 
