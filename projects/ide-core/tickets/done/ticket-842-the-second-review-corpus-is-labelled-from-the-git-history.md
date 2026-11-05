@@ -2,7 +2,7 @@
 id: ticket-842
 title: "The second-review corpus is labelled from the git history"
 type: chore
-status: todo
+status: done
 priority: low
 agent: codeur
 created: 2026-11-05
@@ -40,14 +40,14 @@ l'audit sécurité) n'est pas un défaut du reviewer : il est hors corpus.
 
 ## Critères d'acceptation
 
-- [ ] `docs/essais/seconde-revue/corpus.json` existe et `charger_corpus` le lit sans erreur
-- [ ] `verifier_taille` rend `[]` : 10 `defaut`, 10 `sain`, 4 `defaut` sensibles au moins ;
+- [x] `docs/essais/seconde-revue/corpus.json` existe et `charger_corpus` le lit sans erreur
+- [x] `verifier_taille` rend `[]` : 10 `defaut`, 10 `sain`, 4 `defaut` sensibles au moins ;
       sinon le ticket reste en `blocked` avec le compte réel
-- [ ] `shas_manquants` rend `[]` sur ce dépôt ; la sortie est citée dans la PR
-- [ ] `backend/tests/test_seconde_revue_corpus_reel.py` charge le vrai fichier et vérifie
+- [x] `shas_manquants` rend `[]` sur ce dépôt ; la sortie est citée dans la PR
+- [x] `backend/tests/test_seconde_revue_corpus_reel.py` charge le vrai fichier et vérifie
       `verifier_taille == []` et la somme de gel ; il ne teste pas l'existence des SHA, qu'un
       clone superficiel ne porte pas
-- [ ] Aucun nom de client, e-mail ou jeton dans le fichier (ADR-043)
+- [x] Aucun nom de client, e-mail ou jeton dans le fichier (ADR-043)
 
 ## Ce que ça ne fait pas
 
@@ -56,3 +56,7 @@ N'appelle aucun modèle. Ne corrige aucun des défauts listés.
 ## Dépendances
 
 ticket-841.
+
+## Écart constaté
+
+Le ticket-733 ne figure pas dans le corpus : la résolution de conflit fautive n'a jamais été mergée (reprise à la main), son diff approuvé n'existe pas dans l'historique de `develop`. Corpus final : 11 `defaut` dont 6 sensibles, 12 `sain`.
