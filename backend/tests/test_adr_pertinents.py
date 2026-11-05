@@ -129,10 +129,13 @@ _CHOIX_PASSES = {
 
 
 def test_les_choix_passes_portent_une_portee() -> None:
-    reel = Path(__file__).parent.parent.parent / "projects/ide-core/memory/decisions.md"
-    contenu = reel.read_text(encoding="utf-8")
-
-    annotes = {b.numero for b in decouper(contenu) if portee_de(b) is not None}
+    # Celles qu'aucune règle ne cite sont parties dans l'archive (ticket-830) :
+    # leur portée se lit toujours, dans l'un ou l'autre fichier.
+    memoire = Path(__file__).parent.parent.parent / "projects/ide-core/memory"
+    annotes: set[str] = set()
+    for nom in ("decisions.md", "decisions-archive.md"):
+        contenu = (memoire / nom).read_text(encoding="utf-8")
+        annotes |= {b.numero for b in decouper(contenu) if portee_de(b) is not None}
 
     assert _CHOIX_PASSES <= annotes, sorted(_CHOIX_PASSES - annotes)
 
