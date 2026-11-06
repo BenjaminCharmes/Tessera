@@ -8118,3 +8118,22 @@ error: Please commit or stash them.
 - 2026-11-06 03:31:45 UTC — [ticket-854] validateur: APPROVED — Les 9 critères sont satisfaits. Tous les tests (critères 1-8) existent et ont pa (342141ms)
 - 2026-11-06 03:31:45 UTC — [ticket-854] APPROVED après 1 tour(s)
 - 2026-11-06 03:35:18 UTC — [ticket-854] documentation: 2 fichier(s) (203812ms)
+- 2026-11-06 03:53:25 UTC — [ide-core] ticket-854 : base réalignée sur develop
+- 2026-11-06 03:53:25 UTC — [ide-core] ticket-854 PR #954 confiée au CIWatcher
+- 2026-11-06 03:53:20 UTC — [ide-core] ticket-854 PR #954 mergée (CI verte)
+- 2026-11-06 03:53:31 UTC — [ticket-855] branche ticket-855-the-supervisor-turns-a-raw-report-into-a-ticket-i
+- 2026-11-06 03:53:32 UTC — [ticket-855] tour 1 — codeur démarré
+- 2026-11-06 04:00:44 UTC — [ticket-855] tour 1 — codeur terminé (431438ms)
+- 2026-11-06 04:01:23 UTC — [ticket-855] testeur: dur�es : ruff 1 s, pytest 36 s
+- 2026-11-06 04:01:23 UTC — [ticket-855] tests rouges au tour 1
+- 2026-11-06 04:01:24 UTC — [ticket-855] tour 2 — codeur démarré
+- 2026-11-06 04:02:09 UTC — [ticket-855] tour 2 — codeur terminé (45375ms)
+- 2026-11-06 04:02:27 UTC — [ticket-855] testeur: dur�es : ruff 1 s, mypy 7 s, pytest 13 s, mypy-linux 7 s
+- 2026-11-06 04:05:11 UTC — [ticket-855] securite: PASS — Supervisor triage implementation (ticket-855, ADR-080) is secure. Multiple defen (164718ms)
+- 2026-11-06 04:05:11 UTC — [ticket-855] tour 2 — reviewer démarré
+- 2026-11-06 04:05:50 UTC — [ticket-855] tour 2 — reviewer terminé (38592ms)
+- 2026-11-06 04:10:11 UTC — [ticket-855] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-06 04:10:45 UTC — [ticket-855] validateur: APPROVED — Les 6 critères d'acceptation, tous des tests pytest, sont présents dans le diff  (333500ms)
+- 2026-11-06 04:10:45 UTC — [ticket-855] APPROVED après 2 tour(s)
+- 2026-11-06 04:11:25 UTC — [ticket-855] leçons: rien à retenir
+- 2026-11-06 04:12:56 UTC — [ticket-855] documentation: 0 fichier(s) (81609ms)

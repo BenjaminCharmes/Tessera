@@ -1,14 +1,17 @@
 ---
-id: ticket-855
-title: "The supervisor turns a raw report into a ticket in place"
-type: feat
-status: todo
-priority: high
 agent: codeur
-depends_on: [ticket-851, ticket-852, ticket-854]
-estimated_days: 1
 created: 2026-11-05
-pr_number: null
+depends_on:
+- ticket-851
+- ticket-852
+- ticket-854
+estimated_days: 1
+id: ticket-855
+pr_number: 955
+priority: high
+status: done
+title: The supervisor turns a raw report into a ticket in place
+type: feat
 ---
 
 # ticket-855 — Le superviseur réécrit un signalement brut en ticket, sur place
