@@ -8042,3 +8042,15 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-06 00:09:00 UTC — [ticket-853] APPROVED après 2 tour(s)
 - 2026-11-06 00:10:24 UTC — [ticket-853] leçons: une leçon proposée
 - 2026-11-06 00:19:51 UTC — [ticket-853] documentation: 0 fichier(s) (557735ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « jeton vérifiable » — nombre « 900 s » n'est ni dans le texte remplacé, ni dans les tickets, le diff ou les fichie — refusé : doc-fonctionnelle : docs/guide-utilisateur.md : règle « jeton vérifiable » — nombre « 5 min » n'est ni dans le texte remplacé, ni dans les tickets, le diff ou l
+- 2026-11-06 00:28:08 UTC — [ide-core] ticket-853 : base réalignée sur develop
+- 2026-11-06 00:28:08 UTC — [ide-core] ticket-853 PR #946 confiée au CIWatcher
+- 2026-11-06 00:28:04 UTC — [ide-core] ticket-853 PR #946 mergée (CI verte)
+- 2026-11-06 00:28:15 UTC — [ticket-857] branche ticket-857-the-supervisor-hands-an-unwatched-green-pr-back-t
+- 2026-11-06 00:28:17 UTC — [ticket-857] tour 1 — codeur démarré
+- 2026-11-06 00:30:43 UTC — [ticket-857] tour 1 — codeur terminé (145672ms)
+- 2026-11-06 00:31:05 UTC — [ticket-857] testeur: dur�es : ruff 0 s, mypy 7 s, pytest 15 s, mypy-linux 10 s
+- 2026-11-06 00:32:55 UTC — [ticket-857] securite: PASS — Le diff introduit `superviseur_pr.py` et son test, deux fichiers de supervision  (110264ms)
+- 2026-11-06 00:32:55 UTC — [ticket-857] tour 1 — reviewer démarré
+- 2026-11-06 00:33:24 UTC — [ticket-857] tour 1 — reviewer terminé (28453ms)
+- 2026-11-06 00:34:44 UTC — [ticket-857] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (108875ms)
+- 2026-11-06 00:34:44 UTC — [ticket-857] APPROVED après 1 tour(s)
