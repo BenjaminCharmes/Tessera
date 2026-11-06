@@ -711,6 +711,26 @@ async def test_what_a_push_publishes_is_read_from_the_commits(repo: Path) -> Non
     assert "c@example.com" in commit.auteur
 
 
+async def test_branch_diff_forces_the_a_and_b_prefixes(
+    repo: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    service = GitWorkspaceService(repo)
+    lancees: list[tuple[str, ...]] = []
+
+    async def _enregistrer(*args: str) -> str:
+        lancees.append(args)
+        return ""
+
+    monkeypatch.setattr(service, "_run", _enregistrer)
+
+    await service.diff_de_branche("develop", "ticket-030")
+
+    (commande,) = lancees
+    assert commande[0] == "diff"
+    assert "--src-prefix=a/" in commande
+    assert "--dst-prefix=b/" in commande
+
+
 # ---------------------------------------------------------------------------
 # Lockfile summarization — ticket-272
 # ---------------------------------------------------------------------------

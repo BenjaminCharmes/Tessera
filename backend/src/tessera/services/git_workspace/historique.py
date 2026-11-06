@@ -214,9 +214,13 @@ class GitHistory(GitPoussee):
 
         ``base...branch`` diffs from their merge-base, so work already on the
         base is not counted twice. A failure raises: the push check must not
-        pass on a diff it could not read.
+        pass on a diff it could not read. The prefixes are forced: a global
+        ``diff.noprefix`` would otherwise change the shape of every header the
+        secrets check reads.
         """
-        return await self._run("diff", f"{base}...{branch}")
+        return await self._run(
+            "diff", "--src-prefix=a/", "--dst-prefix=b/", f"{base}...{branch}"
+        )
 
     async def fichiers_de_branche(self, base: str, branch: str) -> list[str]:
         """Paths `branch` changes on top of `base`, relative to the project folder.
