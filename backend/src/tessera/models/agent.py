@@ -20,7 +20,6 @@ class CreateAgentConversationResponse(BaseModel):
 
 
 class AgentRole(str, Enum):
-    orchestrateur = "orchestrateur"
     codeur = "codeur"
     reviewer = "reviewer"
     architect = "architect"

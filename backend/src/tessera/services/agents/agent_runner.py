@@ -39,9 +39,6 @@ _INSTRUCTIONS: dict[str, str] = {
     AgentRole.reviewer.value: (
         "Relis le code produit et rends ta revue dans le format structuré demandé."
     ),
-    AgentRole.orchestrateur.value: (
-        "Décompose ce ticket en sous-tickets si nécessaire. Assigne les rôles appropriés."
-    ),
     AgentRole.architect.value: (
         "Analyse les implications architecturales et propose une solution détaillée."
     ),
