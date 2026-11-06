@@ -6,7 +6,7 @@ depends_on:
 estimated_days: 1
 id: ticket-878
 plan: true
-pr_number: null
+pr_number: 978
 priority: critical
 status: done
 title: The API requires a per-boot session token on every route, and the open mode
