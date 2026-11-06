@@ -109,6 +109,11 @@ class EventType(str, Enum):
     #: ADR-078). `data` est l'`Anomalie` sérialisée. Une transition, pas du
     #: texte : jamais jetable.
     RUN_ANOMALY = "run_anomaly"
+    #: Le superviseur a pris une décision (ticket-859, ADR-080). `data` porte
+    #: `action`, `cible`, `verdict` (`agir` ou `a_toi`, jamais `rien`) et `raison`.
+    #: Sans run : `run_id` reste vide, `project_id` dit le projet. Une transition,
+    #: jamais jetable.
+    SUPERVISEUR_ACTION = "superviseur_action"
 
 
 class OrchestratorEvent(BaseModel):

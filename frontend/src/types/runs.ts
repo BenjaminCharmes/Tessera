@@ -41,6 +41,7 @@ export type EventType =
   | "conflict_resolution"
   | "visual_check"
   | "run_anomaly"
+  | "superviseur_action"
   | "error";
 
 /** État du quota d'abonnement, diffusé par l'événement `quota_updated`. */
