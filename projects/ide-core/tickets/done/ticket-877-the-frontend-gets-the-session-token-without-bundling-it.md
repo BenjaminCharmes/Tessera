@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 1
 id: ticket-877
 plan: true
-pr_number: null
+pr_number: 976
 priority: critical
 status: done
 title: The frontend and the Tauri app get the API session token without bundling it
