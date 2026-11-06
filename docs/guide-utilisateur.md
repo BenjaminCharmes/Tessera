@@ -311,6 +311,15 @@ Une confirmation s'affiche sur la carte : « Lancer N tickets ? » Clique **« L
 - Si un run tourne déjà sur ce projet, le bouton est grisé et tu vois l'infobulle « Un run est en cours ».
 - Si le lancement échoue (par exemple, un autre run a démarré pendant que tu confirmais), un message d'erreur court s'affiche en rouge.
 
+
+### Lancer une revue du projet
+
+Clique sur le bouton « Revue du projet » depuis la fiche de tout projet. L'IDE affiche le coût estimé, plafonné à 3 $, et demande une confirmation. Annuler n'envoie rien.
+
+Le bouton se grise si un run occupe le projet ; le message affiche le ticket en cours.
+
+Une fois lancée, la revue s'observe dans le fil comme un run normal.
+
 ### Sélectionner un projet
 
 Clique sur une carte pour la sélectionner. La zone centrale passe au Kanban de ce projet, comme si tu l'avais choisi dans la barre latérale.

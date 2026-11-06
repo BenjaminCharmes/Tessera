@@ -1,14 +1,16 @@
 ---
-id: ticket-854
-title: "A supervision intervention is a run with one commit per action"
-type: feat
-status: todo
-priority: high
 agent: codeur
-depends_on: [ticket-850, ticket-853]
-estimated_days: 1
 created: 2026-11-05
-pr_number: null
+depends_on:
+- ticket-850
+- ticket-853
+estimated_days: 1
+id: ticket-854
+pr_number: 954
+priority: high
+status: done
+title: A supervision intervention is a run with one commit per action
+type: feat
 ---
 
 # ticket-854 — Une intervention du superviseur est un run, un commit par action

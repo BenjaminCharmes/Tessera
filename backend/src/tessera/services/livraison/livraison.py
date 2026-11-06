@@ -12,7 +12,7 @@ import asyncio
 import time
 from collections.abc import Awaitable, Callable
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Any
 
 from tessera.config import settings
 from tessera.services.gardes.politique_run import PolitiqueRun
@@ -20,7 +20,9 @@ from tessera.services.git_workspace import GitCommandError
 from tessera.services.livraison.livraison_apres import branche_modifiee, ouvrir_avec_recours, pr_a_relire, sha_pousse
 from tessera.services.livraison.livraison_arrets import ARRET_NON_APPROUVE, arret_ci_illisible, arret_conflit, arret_niveau_commit, arret_pr_en_conflit
 from tessera.services.livraison.livraison_conflit import annoncer_fin_de_conflit, resolveur_suivi, signal_courant
+from tessera.services.livraison.livraison_intervention import ControleDuDiff, livrer_intervention
 from tessera.services.livraison.livraison_merge import arret_de_merge, tenter_le_merge, tete_a_change
+from tessera.services.livraison.livraison_ports import GitLivraison, WorkflowLivraison
 from tessera.services.livraison.livraison_rebase import noter_ce_que_le_rebase_a_fait, retester_apres_rebase, tete_avant_rebase
 from tessera.services.livraison.livraison_resultat import Livraison as Livraison
 from tessera.services.livraison.renumeroter import etape_de_numerotation
@@ -47,45 +49,11 @@ class LivraisonInterrompue(Exception):
         self.cause = cause
 
 
-class _Git(Protocol):
-    async def rejouer_sur(
-        self,
-        base: str,
-        resolveur: Callable[[tuple[str, ...]], Awaitable[None]] | None = None,
-    ) -> tuple[str, ...]: ...
-    async def sync_base_depuis_distant(self, base_branch: str) -> str | None: ...
-    async def commit_bookkeeping(self) -> None: ...
-    async def commits_hors_rangement(self, depuis: str) -> list[str]: ...
-    async def sha_distant(self, branch: str) -> str | None: ...
-    async def head_sha(self) -> str: ...
-    async def remettre_sur(self, sha: str) -> None: ...
-
-
-class _Workflow(Protocol):
-    async def open_pull_request(
-        self,
-        *,
-        branch: str | None,
-        ticket_id: str,
-        ticket_title: str,
-        ticket_body: str,
-        ticket_type: str = "",
-    ) -> Any: ...
-    async def etat_ci(self, pr_number: int) -> str: ...
-    async def has_workflows(self) -> bool: ...
-    async def pr_ouverte_de(self, branch: str) -> int | None: ...
-    async def pr_state(self, pr_number: int) -> str: ...
-    async def tete_pr(self, pr_number: int) -> str | None: ...
-    async def merge_si_la_ci_est_verte(
-        self, pr_number: int, sha_attendu: str | None = None
-    ) -> bool: ...
-
-
 class LivraisonService:
     def __init__(
         self,
-        git_workspace: _Git,
-        workflow: _Workflow,
+        git_workspace: GitLivraison,
+        workflow: WorkflowLivraison,
         project_path: Path,
         base_branch: str,
         attente_ci_max_s: float = _ATTENTE_CI_MAX_S,
@@ -186,6 +154,18 @@ class LivraisonService:
             )
         except Exception as exc:  # noqa: BLE001 — relevée avec le numéro de PR
             raise LivraisonInterrompue(pr_number, exc) from exc
+
+    async def livrer_intervention(
+        self, branche: str, sha: str, *, controle: ControleDuDiff, titre: str = "supervisor intervention"
+    ) -> Livraison:
+        """Open the PR of a supervisor intervention and stop there, at any autonomy level (ticket-854).
+
+        Not a run delivery: no approval is involved, `livrer_phase_1` is untouched.
+        """
+        return await livrer_intervention(
+            self._git, self._workflow, self._base_branch, self._arret_de_niveau(branche),
+            branche, sha, controle=controle, titre=titre,
+        )
 
     def _arret_de_niveau(self, branch: str) -> Livraison | None:
         """The stop when the project declares the commit level, else None."""
