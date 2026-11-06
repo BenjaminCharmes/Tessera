@@ -649,6 +649,12 @@ limite de silence (ticket-381) qui coupe après 1200 s sans message.
 
 Les services lancés par Tessera (backends, workers déclarés par les projets) ne doivent pas arrêter le backend orchestrateur. Sous Windows, un processus enfant qui reçoit `CTRL_C_EVENT` (ex: `uvicorn --reload`) le propage à toute sa console ; partagée, elle arrête le backend et tous ses enfants. Tessera isole chaque service dans sa propre console, son groupe de processus (`CREATE_NO_WINDOW | CREATE_NEW_PROCESS_GROUP` sur Windows, `start_new_session` ailleurs). La fonction `options_de_lancement(systeme)` dans `services/noyau/lancement.py` est appelée par `ProcessRegistry._lancer()`.
 
+### Détecteur d'anomalies (ticket-839, ADR-078)
+
+Une tâche de fond `DetecteurDAnomalies` observe les runs vivants toutes les 300 secondes. Elle relit les événements depuis la base en lecture seule, applique six règles de détection, et émet une notification d'anomalie par clé — chaque clé n'est signalée qu'une seule fois. Si une série se rompt puis se reforme, c'est une nouvelle clé et une nouvelle anomalie.
+
+Le détecteur ne modifie que les champs `anomalies` du run, sans aucune action externe : c'est un témoin. Les anomalies s'affichent comme notifications dans la cloche (réglables par type, ticket-840), dans le fil du run, et marquées sur le Bureau.
+
 ### Coffre du système et gestion des secrets (ADR-073, tickets 794-798)
 
 Neuf secrets (`ANTHROPIC_API_KEY`, `GITHUB_TOKEN`, `VERCEL_TOKEN`, `NEON_API_KEY`, `RESEND_API_KEY`, `STRIPE_API_KEY`, `CLOUDFLARE_API_TOKEN`, `STATIC_TOKEN`, `FORBIDDEN_TERMS`) sont lus depuis le coffre du système (Credential Manager Windows, Keychain macOS, Secret Service Linux) plutôt que du `.env`. `SECRETS_SOURCE` choisit le mode : `auto` (défaut, coffre puis `.env`), `coffre` (refus sans coffre), `env` (CI, Docker, tests).

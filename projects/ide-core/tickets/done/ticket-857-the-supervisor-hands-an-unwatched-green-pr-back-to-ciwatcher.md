@@ -1,14 +1,15 @@
 ---
-id: ticket-857
-title: "The supervisor hands an unwatched green PR back to CIWatcher"
-type: feat
-status: todo
-priority: high
 agent: codeur
-depends_on: [ticket-851]
-estimated_days: 1
 created: 2026-11-05
+depends_on:
+- ticket-851
+estimated_days: 1
+id: ticket-857
 pr_number: null
+priority: high
+status: done
+title: The supervisor hands an unwatched green PR back to CIWatcher
+type: feat
 ---
 
 # ticket-857 — Le superviseur redonne à `CIWatcher` une PR que personne ne surveille
