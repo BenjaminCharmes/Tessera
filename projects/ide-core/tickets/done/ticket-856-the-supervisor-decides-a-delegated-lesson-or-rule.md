@@ -7,7 +7,7 @@ depends_on:
 - ticket-854
 estimated_days: 1
 id: ticket-856
-pr_number: null
+pr_number: 956
 priority: high
 status: done
 title: The supervisor decides a delegated lesson or rule
