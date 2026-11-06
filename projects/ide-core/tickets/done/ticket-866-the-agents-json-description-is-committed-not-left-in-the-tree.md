@@ -4,7 +4,7 @@ created: 2026-11-06
 depends_on: []
 estimated_days: 1
 id: ticket-866
-pr_number: null
+pr_number: 950
 priority: high
 status: done
 title: The agents.json description written by the documentation is committed, not
