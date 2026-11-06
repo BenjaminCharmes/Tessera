@@ -4,7 +4,7 @@ created: 2026-11-06
 depends_on: []
 estimated_days: 0.5
 id: ticket-886
-pr_number: null
+pr_number: 986
 priority: low
 status: done
 title: The supervision badge test renders the count with a pipeline run and a chat
