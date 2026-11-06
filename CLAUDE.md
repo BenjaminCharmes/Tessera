@@ -134,7 +134,8 @@ l'existant.
 
 **Ce qui n'existe pas**
 - Ni comptes, ni multi-utilisateur, ni déploiement cloud — hors scope.
-  `STATIC_TOKEN`, renseignée, exige un `Authorization: Bearer` partout ; vide (le
-  défaut), l'API est ouverte : à ne servir que sur une interface de confiance
+  L'API exige partout un `Authorization: Bearer` : `STATIC_TOKEN` s'il est
+  renseigné, sinon un jeton tiré à chaque démarrage, remis par un fichier que les
+  agents ne lisent pas. Il n'y a plus de mode ouvert
 - Pas de résolution de conflit sans relecture, et ce n'est pas un manque
 - Le contrôle d'écriture sur `Bash` attrape une erreur, pas une évasion (ADR-031)
