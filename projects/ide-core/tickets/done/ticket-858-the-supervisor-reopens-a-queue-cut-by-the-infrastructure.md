@@ -6,7 +6,7 @@ depends_on:
 - ticket-851
 estimated_days: 1
 id: ticket-858
-pr_number: null
+pr_number: 951
 priority: medium
 status: done
 title: The supervisor reopens a queue cut by the infrastructure
