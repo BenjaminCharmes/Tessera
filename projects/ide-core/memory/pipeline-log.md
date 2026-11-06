@@ -8041,3 +8041,4 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-06 00:09:00 UTC — [ticket-853] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (214890ms)
 - 2026-11-06 00:09:00 UTC — [ticket-853] APPROVED après 2 tour(s)
 - 2026-11-06 00:10:24 UTC — [ticket-853] leçons: une leçon proposée
+- 2026-11-06 00:19:51 UTC — [ticket-853] documentation: 0 fichier(s) (557735ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « jeton vérifiable » — nombre « 900 s » n'est ni dans le texte remplacé, ni dans les tickets, le diff ou les fichie — refusé : doc-fonctionnelle : docs/guide-utilisateur.md : règle « jeton vérifiable » — nombre « 5 min » n'est ni dans le texte remplacé, ni dans les tickets, le diff ou l
