@@ -1,12 +1,13 @@
 ---
 agent: codeur
 created: 2026-11-06
-depends_on: ["ticket-878"]
+depends_on:
+- ticket-878
 estimated_days: 0.5
 id: ticket-879
-pr_number: null
+pr_number: 980
 priority: high
-status: todo
+status: done
 title: The agent hook refuses reading the session token file like Tessera's .env
 type: feat
 ---

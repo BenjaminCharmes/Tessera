@@ -8371,3 +8371,20 @@ error: Please commit or stash them.
 - 2026-11-06 14:47:51 UTC — [ticket-882] validateur: APPROVED — Les trois critères d'acceptation ont été satisfaits. Le code implémente correcte (242389ms)
 - 2026-11-06 14:47:51 UTC — [ticket-882] APPROVED après 1 tour(s)
 - 2026-11-06 14:50:13 UTC — [ticket-882] documentation: 0 fichier(s) (135250ms)
+- 2026-11-06 14:50:32 UTC — [ide-core] ticket-882 PR #979 confiée au CIWatcher
+- 2026-11-06 14:50:38 UTC — [ticket-879] branche ticket-879-the-agent-hook-refuses-reading-the-session-token
+- 2026-11-06 14:50:39 UTC — [ticket-879] tour 1 — codeur démarré
+- 2026-11-06 14:53:25 UTC — [ticket-879] tour 1 — codeur terminé (165718ms)
+- 2026-11-06 14:54:20 UTC — [ticket-879] testeur: dur�es : ruff 0 s, pytest 52 s
+- 2026-11-06 14:54:20 UTC — [ticket-879] tests rouges au tour 1
+- 2026-11-06 14:54:20 UTC — [ticket-879] tour 2 — codeur démarré
+- 2026-11-06 14:55:06 UTC — [ticket-879] tour 2 — codeur terminé (45780ms)
+- 2026-11-06 14:55:47 UTC — [ticket-879] testeur: dur�es : ruff 0 s, mypy 22 s, pytest 36 s, mypy-linux 16 s
+- 2026-11-06 14:56:07 UTC — [ticket-879] securite: PASS — Le diff étend le hook PreToolUse pour qu'il refuse aussi la lecture du fichier d (19639ms)
+- 2026-11-06 14:56:07 UTC — [ticket-879] tour 2 — reviewer démarré
+- 2026-11-06 14:56:24 UTC — [ticket-879] tour 2 — reviewer terminé (17437ms)
+- 2026-11-06 14:59:44 UTC — [ticket-879] validateur: fichiers cités joints : backend/tests/test_garde_jetons.py
+- 2026-11-06 14:59:44 UTC — [ticket-879] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits : les tests couvrent les différe (216875ms)
+- 2026-11-06 14:59:44 UTC — [ticket-879] APPROVED après 2 tour(s)
+- 2026-11-06 15:01:20 UTC — [ticket-879] leçons: une leçon proposée
+- 2026-11-06 15:02:52 UTC — [ticket-879] documentation: 0 fichier(s) (86295ms)

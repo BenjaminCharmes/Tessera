@@ -33,6 +33,7 @@ from typing import Any
 from claude_agent_sdk import HookContext, HookInput, HookJSONOutput
 
 from tessera.config import Settings
+from tessera.services.noyau import jeton_de_session
 from tessera.services.providers.garde_coffre import COFFRE_REFUS, commande_execute_le_coffre
 from tessera.services.providers.garde_reglages import REGLAGES_REFUS, commande_vise_les_reglages
 from tessera.utils.logger import get_logger
@@ -49,6 +50,15 @@ ENV_REFUS = (
     "fichier, dis-le dans ton rapport, c'est une action de l'utilisateur."
 )
 
+#: What the agent reads when the path is the session-token file.
+JETON_REFUS = (
+    "Lecture refusée : ce fichier porte le jeton de session de l'API Tessera "
+    "(ADR-081). Aucun agent ne le lit. Ce refus repère les chemins nommés, "
+    "variables et `~` développés, rien de plus : un chemin construit en deux "
+    "étapes passe (ADR-031). Un refus de hook est définitif ; si le ticket "
+    "demande ce jeton, dis-le dans ton rapport."
+)
+
 _GIT_BASH = re.compile(r"^/([a-zA-Z])/(.*)$")
 _SEPARATEURS = re.compile(r"[\s;|&<>()=,`]+")
 _JOKERS = "*?[{"
@@ -60,7 +70,10 @@ _TOUJOURS_RECURSIFS = frozenset({"rg", "ag", "ack"})
 
 def _resoudre(brut: str, base: Path) -> Path | None:
     """Resolve a raw path against ``base``; ``None`` when it cannot be read."""
-    texte = brut.strip().strip("'\"").replace("\\", "/")
+    # Variables (`$X`, `%X%`) et `~` se développent avant `resolve()` : sinon
+    # `$LOCALAPPDATA/…` serait lu comme un chemin relatif sans rapport.
+    texte = os.path.expanduser(os.path.expandvars(brut.strip().strip("'\"")))
+    texte = texte.replace("\\", "/")
     if os.name == "nt":
         # Git Bash écrit `/c/Users/...` : le même fichier que `C:/Users/...`.
         correspondance = _GIT_BASH.match(texte)
@@ -178,16 +191,21 @@ def _outil_vise_le_env(
 
 
 def hook_refus_env_tessera(
-    cwd: Path | None, env_file: Path | None = None
+    cwd: Path | None, env_file: Path | None = None, fichier_jeton: Path | None = None
 ) -> Callable[[HookInput, str | None, HookContext], Awaitable[HookJSONOutput]]:
-    """Build the ``PreToolUse`` hook refusing reads of Tessera's ``.env``.
+    """Build the ``PreToolUse`` hook refusing reads of Tessera's secret files.
 
-    Relative paths resolve against ``cwd``, the run's working folder; without
-    one, against the process's. ``env_file`` defaults to ``Settings.env_file``
-    and is resolved once, here.
+    Two files are protected: the ``.env`` and the session-token file
+    (ticket-879). Relative paths resolve against ``cwd``, the run's working
+    folder; without one, against the process's. ``env_file`` defaults to
+    ``Settings.env_file`` and ``fichier_jeton`` to
+    ``jeton_de_session.chemin_du_fichier()``; both are resolved once, here.
     """
     base = (cwd if cwd is not None else Path.cwd()).resolve()
-    cible = (env_file if env_file is not None else Settings.env_file).resolve()
+    cibles = (
+        ((env_file if env_file is not None else Settings.env_file).resolve(), ENV_REFUS),
+        ((fichier_jeton or jeton_de_session.chemin_du_fichier()).resolve(), JETON_REFUS),
+    )
 
     async def hook(
         entree: HookInput, tool_use_id: str | None, contexte: HookContext
@@ -202,10 +220,11 @@ def hook_refus_env_tessera(
         if outil == "Bash" and commande_vise_les_reglages(str(entrees.get("command", ""))):
             _logger.warning("route_reglages_refusee", extra={"outil": str(outil)})
             return _refus(REGLAGES_REFUS)
-        if not _outil_vise_le_env(outil, entrees, base, cible):
-            return {}
-        _logger.warning("lecture_env_tessera_refusee", extra={"outil": str(outil)})
-        return _refus(ENV_REFUS)
+        for cible, message in cibles:
+            if _outil_vise_le_env(outil, entrees, base, cible):
+                _logger.warning("lecture_env_tessera_refusee", extra={"outil": str(outil)})
+                return _refus(message)
+        return {}
 
     return hook
 
