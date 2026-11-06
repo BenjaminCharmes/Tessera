@@ -46,6 +46,7 @@ from tessera.services.livraison.journal_ci_watcher import ecrire_ligne_log, ecri
 from tessera.services.livraison.livraison import Livraison
 from tessera.services.livraison.mise_a_jour_pr import DELAI_MISE_A_JOUR_S, MiseAJourPr, mettre_a_jour_la_pr
 from tessera.services.livraison.realignement_base import Realignement, realigner_base
+from tessera.services.livraison.suivi_des_merges import SuiviDesMerges, pr_mergee
 from tessera.services.noyau.pipeline_events import EventCallback, EventType, OrchestratorEvent
 from tessera.services.pipeline.run_registry import RUN_REGISTRY
 from tessera.utils.logger import get_logger
@@ -55,6 +56,9 @@ _logger = get_logger(__name__)
 #: Borne globale de la phase 2 (attente CI + merge). Supérieure à
 #: _ATTENTE_CI_MAX_S (2 100 s) pour couvrir également les appels réseau du merge.
 _TIMEOUT_PHASE2_S = 2400.0
+
+#: Marge de `attendre_merge` au-delà de deux phases 2 (ticket-874).
+_MARGE_ATTENTE_S = 60.0
 
 #: Relit l'état d'une PR : « open », « closed », « merged » ou « unknown ».
 EtatPr = Callable[[int], Awaitable[str]]
@@ -74,16 +78,10 @@ class CIWatcher:
         # Un sémaphore par projet : valeur 1 = une seule livraison active à
         # la fois. Un second appel attend derrière le premier sans le rejeter.
         self._semaphores: dict[str, asyncio.Semaphore] = {}
-        # Tickets dont la PR est ouverte et attend la CI ou le merge.
-        self._en_attente: dict[str, set[str]] = {}
+        # Tickets en attente, événements et résultats, liés à leur PR (ticket-874).
+        self._suivi = SuiviDesMerges()
         # Tâches asyncio en cours — tenues pour pouvoir les annuler à l'arrêt.
         self._taches: set[asyncio.Task[None]] = set()
-        # Événements signalés quand un ticket quitte la file d'attente.
-        # Clé : "project_id:ticket_id".
-        self._events_merge: dict[str, asyncio.Event] = {}
-        # Résultats de merge : True = mergé, False = bloqué/échoué.
-        # Clé : "project_id:ticket_id".
-        self._resultats_merge: dict[str, bool] = {}
         # Réalignement de la base demandé par surveiller (ticket-422).
         # Clé : "project_id:ticket_id".
         self._realignements: dict[str, Realignement] = {}
@@ -126,15 +124,11 @@ class CIWatcher:
         watcher follows its new head; without it the ticket stops on « à
         rebaser » (ticket-733).
         """
-        # Un résultat d'une surveillance précédente du même ticket serait relu
-        # comme celui de cette PR-ci.
-        self._resultats_merge.pop(f"{project_id}:{ticket_id}", None)
+        # Un ticket relivré remplace sa surveillance : l'ancienne tâche est
+        # annulée et finie avant que la nouvelle s'inscrive (ticket-874).
+        await self._suivi.remplacer(project_id, ticket_id)
         if realignement is not None:
             self._realignements[f"{project_id}:{ticket_id}"] = realignement
-        # Le ticket est en attente dès l'inscription, même avant que le
-        # sémaphore soit acquis : `en_attente` doit le lister pendant l'attente
-        # de CI **et** pendant l'attente du sémaphore.
-        self._en_attente.setdefault(project_id, set()).add(ticket_id)
 
         task = asyncio.create_task(
             self._surveiller_impl(
@@ -143,12 +137,20 @@ class CIWatcher:
             ),
             name=f"ci-watcher:{project_id}:{ticket_id}",
         )
+        # Le ticket est en attente dès l'inscription, même avant que le
+        # sémaphore soit acquis : `en_attente` doit le lister pendant l'attente
+        # de CI **et** pendant l'attente du sémaphore.
+        self._suivi.inscrire(project_id, ticket_id, pr_number, task)
         self._taches.add(task)
         task.add_done_callback(self._taches.discard)
 
     def en_attente(self, project_id: str) -> tuple[str, ...]:
         """Ticket ids whose PR is open and waiting for CI or merge."""
-        return tuple(self._en_attente.get(project_id, set()))
+        return self._suivi.en_attente(project_id)
+
+    def prs_en_attente(self, project_id: str) -> tuple[tuple[str, int], ...]:
+        """`(ticket id, PR number)` of the PR open and waiting for CI or merge."""
+        return self._suivi.prs_en_attente(project_id)
 
     async def attendre_merge(
         self,
@@ -156,12 +158,17 @@ class CIWatcher:
         ticket_id: str,
         pr_number: int | None = None,
         etat_pr: EtatPr | None = None,
+        timeout_s: float | None = None,
     ) -> bool:
-        """Wait until the ticket is no longer waiting for CI or merge.
+        """Wait until the PR of the ticket is no longer waiting for CI or merge.
 
-        Returns True if the ticket was merged, False if it was blocked or failed.
+        Returns True if it was merged, False if it was blocked, failed or the
+        wait went over `timeout_s` (default: two phase 2 and a margin, logged
+        as `attente_merge_expiree`). Only the outcome of `pr_number` counts —
+        without it, of the last PR watched for the ticket — never that of an
+        earlier delivery of the same ticket (ticket-874).
 
-        A ticket that is not registered and has no recorded result is unknown
+        A PR that is not being watched and has no recorded result is unknown
         to the watcher. When the caller gives its `pr_number`, the PR is re-read
         through `etat_pr` and only a ``merged`` PR counts as merged — fails
         closed (ADR-039): a missing reader, an error or an unknown state is
@@ -170,18 +177,21 @@ class CIWatcher:
         Safe to call from a queue loop: a dependent ticket suspends here until
         the background task signals completion.
         """
-        cle = f"{project_id}:{ticket_id}"
-        if ticket_id not in self._en_attente.get(project_id, set()):
-            if cle in self._resultats_merge:
-                return self._resultats_merge[cle]
-            if pr_number is None:
-                return True
-            return await self._pr_mergee(etat_pr, pr_number)
-        if cle not in self._events_merge:
-            self._events_merge[cle] = asyncio.Event()
-        await self._events_merge[cle].wait()
-        # Sans résultat enregistré, la tâche a été annulée : pas mergé.
-        return self._resultats_merge.get(cle, False)
+        pr = self._suivi.pr_visee(project_id, ticket_id, pr_number)
+        if pr is not None and self._suivi.en_cours(project_id, ticket_id, pr):
+            delai = timeout_s if timeout_s is not None else self._delai_attente_s()
+            return await self._suivi.attendre(project_id, ticket_id, pr, delai)
+        if pr is not None:
+            resultat = self._suivi.resultat(project_id, ticket_id, pr)
+            if resultat is not None:
+                return resultat
+        if pr_number is None:
+            return True
+        return await pr_mergee(etat_pr, pr_number)
+
+    def _delai_attente_s(self) -> float:
+        """Deux phases 2 (celle du sémaphore, puis la sienne) et une marge."""
+        return 2 * self._timeout_phase2_s + _MARGE_ATTENTE_S
 
     async def arreter(self) -> None:
         """Cancel all running tasks and wait for them to finish.
@@ -239,13 +249,11 @@ class CIWatcher:
                 extra={"project": project_id, "ticket": ticket_id},
             )
         finally:
-            self._en_attente.get(project_id, set()).discard(ticket_id)
-            # Signaler les éventuels appelants d'`attendre_merge`.
-            cle = f"{project_id}:{ticket_id}"
-            self._realignements.pop(cle, None)
-            evt = self._events_merge.pop(cle, None)
-            if evt is not None:
-                evt.set()
+            # Une tâche remplacée ne touche pas à l'état de celle qui la suit
+            # (ticket-874) ; sinon on signale les appelants d'`attendre_merge`.
+            if self._suivi.est_proprietaire(project_id, ticket_id, asyncio.current_task()):
+                self._realignements.pop(f"{project_id}:{ticket_id}", None)
+                self._suivi.clore(project_id, ticket_id, pr_number)
 
     async def _phase_2_avec_reprise(
         self,
@@ -284,7 +292,7 @@ class CIWatcher:
             except httpx.TransportError as exc:
                 # Une réponse perdue ne dit pas que l'action a échoué : on
                 # relit la PR avant de conclure (ticket-405).
-                if await self._pr_mergee(etat_pr, pr_number):
+                if await pr_mergee(etat_pr, pr_number):
                     await self._succes_malgre_erreur_reseau(
                         project_id, ticket_id, pr_number, exc, on_event,
                         pipeline_log_path,
@@ -332,7 +340,7 @@ class CIWatcher:
         pipeline_log_path: Path | None,
     ) -> None:
         """Emit ticket_status_changed(blocked) then ci_merge_done(merged=False)."""
-        self._resultats_merge[f"{project_id}:{ticket_id}"] = False
+        self._suivi.noter(project_id, ticket_id, pr_number, False)
         ecrire_log_blocage(pipeline_log_path, ticket_id, pr_number, arret)
         await on_event(
             OrchestratorEvent(
@@ -450,7 +458,7 @@ class CIWatcher:
 
         With a `pipeline_log_path`, the merge is also written to the log.
         """
-        self._resultats_merge[f"{project_id}:{ticket_id}"] = True
+        self._suivi.noter(project_id, ticket_id, pr_number, True)
         ecrire_log_merge(pipeline_log_path, project_id, ticket_id, pr_number)
         await on_event(
             OrchestratorEvent(
@@ -488,19 +496,6 @@ class CIWatcher:
             )
             return
         await realigner_base(cible.racine, cible.base_branch, project_id)
-
-    async def _pr_mergee(self, etat_pr: EtatPr | None, pr_number: int) -> bool:
-        """Re-read the PR; False when it cannot be read or is not merged."""
-        if etat_pr is None:
-            return False
-        try:
-            return await etat_pr(pr_number) == "merged"
-        except Exception as exc:  # noqa: BLE001 — relecture best effort
-            _logger.warning(
-                "ci_watcher_relecture_pr_echouee",
-                extra={"pr": pr_number, "erreur": decrire_exception(exc)},
-            )
-            return False
 
     async def _succes_malgre_erreur_reseau(
         self,

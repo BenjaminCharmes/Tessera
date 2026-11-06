@@ -11,7 +11,7 @@ PLAFONDS: dict[str, int] = {
     "routers/chat.py": 377,
     "routers/orchestrator.py": 311,
     "routers/tickets.py": 548,
-    "services/livraison/ci_watcher.py": 525,
+    "services/livraison/ci_watcher.py": 520,
     "services/documentation/documentation.py": 401,
     "services/github/github_service.py": 592,
     "services/github/github_workflow.py": 421,

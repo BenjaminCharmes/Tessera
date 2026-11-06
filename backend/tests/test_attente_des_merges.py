@@ -16,9 +16,10 @@ class _FausseSurveillance:
         self._en_attente = en_attente
         self._merges = merges
         self.attendus: list[str] = []
+        self.prs_attendues: list[int | None] = []
 
-    def en_attente(self, project_id: str) -> tuple[str, ...]:
-        return self._en_attente
+    def prs_en_attente(self, project_id: str) -> tuple[tuple[str, int], ...]:
+        return tuple((t, 100 + i) for i, t in enumerate(self._en_attente))
 
     async def attendre_merge(
         self,
@@ -28,6 +29,7 @@ class _FausseSurveillance:
         etat_pr: Callable[[int], Awaitable[str]] | None = None,
     ) -> bool:
         self.attendus.append(ticket_id)
+        self.prs_attendues.append(pr_number)
         return self._merges.get(ticket_id, True)
 
 
@@ -65,6 +67,14 @@ async def test_waits_for_every_earlier_ticket() -> None:
 
     assert attendus == ("ticket-0", "ticket-1")
     assert surveillance.attendus == ["ticket-0", "ticket-1"]
+
+
+async def test_each_earlier_ticket_is_waited_for_by_its_pr_number() -> None:
+    surveillance = _FausseSurveillance(("ticket-0", "ticket-1"), {})
+
+    await attendre_les_merges_en_cours(surveillance, "p", "ticket-2")
+
+    assert surveillance.prs_attendues == [100, 101]
 
 
 async def test_own_ticket_is_never_waited_for() -> None:

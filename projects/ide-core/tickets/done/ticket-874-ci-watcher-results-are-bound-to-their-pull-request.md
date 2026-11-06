@@ -4,11 +4,12 @@ created: 2026-11-06
 depends_on: []
 estimated_days: 1
 id: ticket-874
-pr_number: null
-priority: high
 plan: true
-status: todo
-title: CIWatcher merge results are bound to their pull request and a second watch replaces the first
+pr_number: 970
+priority: high
+status: done
+title: CIWatcher merge results are bound to their pull request and a second watch
+  replaces the first
 type: fix
 ---
 

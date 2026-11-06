@@ -8272,3 +8272,18 @@ error: Please commit or stash them.
 - 2026-11-06 11:43:22 UTC — [ticket-873] validateur: APPROVED — Tous les critères d'acceptation ont été satisfaits. Les tests ont été ajoutés ou (122000ms)
 - 2026-11-06 11:43:22 UTC — [ticket-873] APPROVED après 1 tour(s)
 - 2026-11-06 11:47:52 UTC — [ticket-873] documentation: 0 fichier(s) (264468ms) — après tour de correction
+- 2026-11-06 11:48:41 UTC — [ide-core] ticket-873 PR #969 confiée au CIWatcher
+- 2026-11-06 11:47:57 UTC — [ide-core] ticket-875 PR #968 mergée (CI verte)
+- 2026-11-06 11:48:46 UTC — [ticket-874] branche ticket-874-ciwatcher-merge-results-are-bound-to-their-pull-r
+- 2026-11-06 11:49:14 UTC — [ticket-874] plan rendu (26703ms)
+- 2026-11-06 11:49:14 UTC — [ticket-874] tour 1 — codeur démarré
+- 2026-11-06 11:53:41 UTC — [ticket-874] tour 1 — codeur terminé (266953ms)
+- 2026-11-06 11:55:22 UTC — [ticket-874] testeur: dur�es : ruff 0 s, mypy 10 s, mypy-linux 10 s, pytest 98 s
+- 2026-11-06 11:55:35 UTC — [ticket-874] securite: PASS — Le diff réorganise la logique interne de CIWatcher : les résultats sont rangés p (13109ms)
+- 2026-11-06 11:55:35 UTC — [ticket-874] tour 1 — reviewer démarré
+- 2026-11-06 11:56:12 UTC — [ticket-874] tour 1 — reviewer terminé (36889ms)
+- 2026-11-06 12:00:35 UTC — [ticket-874] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-06 12:01:23 UTC — [ticket-874] validateur: fichiers cités joints : backend/tests/test_ci_watcher_relivraison.py
+- 2026-11-06 12:01:23 UTC — [ticket-874] validateur: APPROVED — Tous les critères sont satisfaits. Le ticket implémente complètement le suivi de (347922ms)
+- 2026-11-06 12:01:23 UTC — [ticket-874] APPROVED après 1 tour(s)
+- 2026-11-06 12:03:21 UTC — [ticket-874] documentation: 2 fichier(s) (112453ms)
