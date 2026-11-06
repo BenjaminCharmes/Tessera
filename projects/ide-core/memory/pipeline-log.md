@@ -8174,3 +8174,5 @@ error: Please commit or stash them.
 - 2026-11-06 05:29:43 UTC — [ticket-859] validateur: APPROVED — The background supervisor loop is fully implemented with all 6 test criteria pas (327297ms)
 - 2026-11-06 05:29:43 UTC — [ticket-859] APPROVED après 2 tour(s)
 - 2026-11-06 05:31:08 UTC — [ticket-859] leçons: rien à retenir
+- 2026-11-06 05:31:17 UTC — [ticket-859] fichiers non suivis laissés par le run : tickets/todo/ticket-867-the-supervisor-loop-reads-the-inputs-of-pr-handback-and-queue-restart.md (à ignorer dans .gitignore ?)
+- 2026-11-06 05:32:37 UTC — [ticket-859] documentation: 0 fichier(s) (79297ms)
