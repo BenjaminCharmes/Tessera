@@ -98,6 +98,14 @@
       "prompt_file": "agents/prompts/lecons.md",
       "active": true,
       "provider": "agent_sdk"
+    },
+    {
+      "role": "superviseur",
+      "model": "claude-sonnet-5-5",
+      "max_tokens": 2048,
+      "prompt_file": "agents/prompts/superviseur.md",
+      "active": true,
+      "provider": "agent_sdk"
     }
   ],
   "pipeline": {
@@ -113,7 +121,12 @@
     "securite_enabled": true,
     "validateur_enabled": true,
     "doc_claude_md": true,
-    "lecons": true
+    "lecons": true,
+    "superviseur": {
+      "budget_jour_usd": 2.0,
+      "delegation": [],
+      "relance_file": false
+    }
   },
   "autonomy": "merge",
   "github_remote": "BenjaminCharmes/Tessera"
