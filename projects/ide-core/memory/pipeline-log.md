@@ -8156,3 +8156,21 @@ error: Please commit or stash them.
 - 2026-11-06 04:37:37 UTC — [ticket-856] APPROVED après 2 tour(s)
 - 2026-11-06 04:39:03 UTC — [ticket-856] leçons: rien à retenir
 - 2026-11-06 04:41:23 UTC — [ticket-856] documentation: 1 fichier(s) (132797ms)
+- 2026-11-06 04:49:12 UTC — [ide-core] ticket-856 : base réalignée sur develop
+- 2026-11-06 04:49:12 UTC — [ide-core] ticket-856 PR #956 confiée au CIWatcher
+- 2026-11-06 04:49:10 UTC — [ide-core] ticket-856 PR #956 mergée (CI verte)
+- 2026-11-06 04:49:20 UTC — [ticket-859] branche ticket-859-a-background-task-runs-the-supervisor-on-events-a
+- 2026-11-06 04:49:22 UTC — [ticket-859] tour 1 — codeur démarré
+- 2026-11-06 04:56:35 UTC — [ticket-859] tour 1 — codeur terminé (433265ms)
+- 2026-11-06 05:08:03 UTC — [ticket-859] testeur: dur�es : ruff 0 s, tsc 34 s, eslint 54 s, vitest 196 s, pytest 682 s
+- 2026-11-06 05:08:03 UTC — [ticket-859] tests rouges au tour 1
+- 2026-11-06 05:08:03 UTC — [ticket-859] tour 2 — codeur démarré
+- 2026-11-06 05:09:03 UTC — [ticket-859] tour 2 — codeur terminé (60218ms)
+- 2026-11-06 05:21:33 UTC — [ticket-859] testeur: dur�es : ruff 1 s, mypy 11 s, tsc 19 s, mypy-linux 16 s, eslint 33 s, vitest 174 s, pytest 746 s
+- 2026-11-06 05:24:15 UTC — [ticket-859] securite: PASS — The supervisor background task infrastructure (ticket-859, ADR-080) is securely  (161593ms)
+- 2026-11-06 05:24:15 UTC — [ticket-859] tour 2 — reviewer démarré
+- 2026-11-06 05:24:50 UTC — [ticket-859] tour 2 — reviewer terminé (35391ms)
+- 2026-11-06 05:29:15 UTC — [ticket-859] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-06 05:29:43 UTC — [ticket-859] validateur: APPROVED — The background supervisor loop is fully implemented with all 6 test criteria pas (327297ms)
+- 2026-11-06 05:29:43 UTC — [ticket-859] APPROVED après 2 tour(s)
+- 2026-11-06 05:31:08 UTC — [ticket-859] leçons: rien à retenir
