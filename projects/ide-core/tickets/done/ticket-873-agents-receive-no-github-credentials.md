@@ -4,7 +4,7 @@ created: 2026-11-06
 depends_on: []
 estimated_days: 0.5
 id: ticket-873
-pr_number: null
+pr_number: 969
 priority: high
 status: done
 title: Agent subprocesses receive no GitHub credentials
