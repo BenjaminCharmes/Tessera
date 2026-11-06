@@ -1,14 +1,15 @@
 ---
-id: ticket-861
-title: "The A-toi column and a recap panel show what the supervisor did"
-type: feat
-status: todo
-priority: medium
 agent: codeur
-depends_on: [ticket-860]
-estimated_days: 1
 created: 2026-11-05
-pr_number: null
+depends_on:
+- ticket-860
+estimated_days: 1
+id: ticket-861
+pr_number: 958
+priority: medium
+status: done
+title: The A-toi column and a recap panel show what the supervisor did
+type: feat
 ---
 
 # ticket-861 — La colonne « À toi » et un récap montrent ce que le superviseur a fait

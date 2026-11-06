@@ -17,6 +17,8 @@ export interface Project {
   fait_tourner_l_ide?: boolean;
   /** Les leçons proposées qui attendent d'être déplacées sous « En vigueur » (ticket-831). */
   lecons_proposees?: number;
+  /** Les cas que le superviseur a laissés à relire dans `memory/supervision.md` (ticket-861). */
+  superviseur_a_toi?: number;
 }
 
 export interface ProjectCreationResult {

@@ -8176,3 +8176,15 @@ error: Please commit or stash them.
 - 2026-11-06 05:31:08 UTC — [ticket-859] leçons: rien à retenir
 - 2026-11-06 05:31:17 UTC — [ticket-859] fichiers non suivis laissés par le run : tickets/todo/ticket-867-the-supervisor-loop-reads-the-inputs-of-pr-handback-and-queue-restart.md (à ignorer dans .gitignore ?)
 - 2026-11-06 05:32:37 UTC — [ticket-859] documentation: 0 fichier(s) (79297ms)
+- 2026-11-06 05:33:05 UTC — [ide-core] ticket-859 PR #957 confiée au CIWatcher
+- 2026-11-06 05:33:19 UTC — [ticket-861] branche ticket-861-the-a-toi-column-and-a-recap-panel-show-what-the
+- 2026-11-06 05:33:21 UTC — [ticket-861] tour 1 — codeur démarré
+- 2026-11-06 05:36:45 UTC — [ticket-861] tour 1 — codeur terminé (204109ms)
+- 2026-11-06 05:39:39 UTC — [ticket-861] testeur: dur�es : tsc 17 s, eslint 24 s, vitest 128 s
+- 2026-11-06 05:42:20 UTC — [ticket-861] securite: PASS — Frontend UI for supervisor recap is implemented securely with proper input valid (160561ms)
+- 2026-11-06 05:42:21 UTC — [ticket-861] tour 1 — reviewer démarré
+- 2026-11-06 05:42:40 UTC — [ticket-861] tour 1 — reviewer terminé (19061ms)
+- 2026-11-06 05:46:11 UTC — [ticket-861] validateur: fichiers cités joints : aToi.test.ts, ColonneAToi.test.tsx, RecapSuperviseur.test.tsx
+- 2026-11-06 05:46:11 UTC — [ticket-861] validateur: APPROVED — Tous les critères d'acceptation ont été satisfaits. Le code implémente correctem (231172ms)
+- 2026-11-06 05:46:11 UTC — [ticket-861] APPROVED après 1 tour(s)
+- 2026-11-06 05:50:03 UTC — [ticket-861] documentation: 0 fichier(s) (222969ms)

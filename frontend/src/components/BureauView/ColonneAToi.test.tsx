@@ -146,6 +146,30 @@ describe("ColonneAToi", () => {
     expect(screen.getByText("Rien n'attend ta réponse.")).toBeInTheDocument();
   });
 
+  it("shows the supervisor's open cases with the project name", () => {
+    render(
+      <BureauView
+        projets={[{ nom: "projet-a", etat: INITIAL }]}
+        envoyer={vi.fn()}
+        son={{ actif: true, regler: vi.fn() }}
+        casSuperviseur={{ "projet-a": 2, "projet-b": 0 }}
+      />,
+    );
+
+    const colonne = screen.getByRole("complementary", { name: "À toi" });
+    expect(within(colonne).getByText("projet-a")).toBeInTheDocument();
+    expect(within(colonne).getByText("2 cas du superviseur à relire")).toBeInTheDocument();
+    expect(within(colonne).queryByText("projet-b")).not.toBeInTheDocument();
+    expect(within(colonne).queryByText("Rien n'attend ta réponse.")).not.toBeInTheDocument();
+  });
+
+  it("shows no supervisor line when no project has an open case", () => {
+    rendre([{ nom: "projet-a", etat: INITIAL }]);
+
+    expect(screen.queryByText(/cas du superviseur/)).not.toBeInTheDocument();
+    expect(screen.getByText("Rien n'attend ta réponse.")).toBeInTheDocument();
+  });
+
   it("flips the sound setting through the Bureau button", () => {
     const { son } = rendre([{ nom: "projet-a", etat: INITIAL }], { actif: true, regler: vi.fn() });
 
