@@ -8055,3 +8055,5 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-06 00:34:44 UTC — [ticket-857] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (108875ms)
 - 2026-11-06 00:34:44 UTC — [ticket-857] APPROVED après 1 tour(s)
 - 2026-11-06 00:43:04 UTC — [ticket-857] documentation: 3 fichier(s) (491297ms) — après tour de correction
+- 2026-11-06 00:43:21 UTC — [ticket-857] livraison: arrêt — Rebase refusé : error: cannot rebase: You have unstaged changes.
+error: Please commit or stash them.
