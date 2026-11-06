@@ -1,6 +1,6 @@
 """A foreign `Host` or `Origin` never reaches the API, even without a token — ticket-704.
 
-Sans `STATIC_TOKEN`, le loopback est la seule barrière. Le CORS n'empêche
+Même avec le jeton de session (ticket-878), le contrôle de `Host` reste. Le CORS n'empêche
 qu'une page tierce de *lire* une réponse et ne s'applique pas aux WebSocket ;
 aucun contrôle ne portait sur `Host`, donc un rebond DNS suffisait à piloter
 l'API. Le client de test s'adresse à `testserver`, admis par `conftest.py` ;

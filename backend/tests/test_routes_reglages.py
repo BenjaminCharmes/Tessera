@@ -138,6 +138,7 @@ def test_get_without_origin_still_works(client: TestClient) -> None:
     assert client.get(_URL).status_code == 200
 
 
+@pytest.mark.sans_jeton_par_defaut
 def test_static_token_is_still_required_when_set(
     client: TestClient, monkeypatch: pytest.MonkeyPatch
 ) -> None:

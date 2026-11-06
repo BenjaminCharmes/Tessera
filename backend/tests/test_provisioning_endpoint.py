@@ -304,6 +304,7 @@ def test_get_reports_a_crashing_step_as_failed_without_leaking() -> None:
 # ------------------------------------------------------------------
 
 
+@pytest.mark.sans_jeton_par_defaut
 def test_both_routes_require_the_bearer_token_when_static_token_is_set(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

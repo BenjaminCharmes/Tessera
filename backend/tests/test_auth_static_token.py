@@ -19,6 +19,9 @@ from tessera.config import Settings, settings
 from tessera.main import app
 from tessera.services.noyau.database import init_db
 
+# Ce module teste le refus : le client de test n'y ajoute aucun en-tête (ticket-878).
+pytestmark = pytest.mark.sans_jeton_par_defaut
+
 _RACINE = Path(__file__).resolve().parents[2]
 _TOKEN = "s3cret-de-test"
 
@@ -121,12 +124,18 @@ def test_health_reste_ouvert(client: TestClient) -> None:
     assert client.get("/health").status_code == 200
 
 
-def test_sans_token_configure_tout_passe(client: TestClient, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_sans_token_configure_le_jeton_de_session_est_exige(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Plus de mode ouvert (ticket-878) : `STATIC_TOKEN` vide, le jeton tiré au
+    # démarrage fait foi, et sans lui rien ne passe.
     monkeypatch.setattr(settings, "static_token", "")
 
-    assert client.get("/api/v1/projects").status_code == 200
-    with client.websocket_connect("/api/v1/agents/stream") as ws:
-        ws.close()
+    assert client.get("/api/v1/projects").status_code == 401
+    with pytest.raises(WebSocketDisconnect) as exc:
+        with client.websocket_connect("/api/v1/agents/stream"):
+            pass
+    assert exc.value.code == 4401
 
 
 # ------------------------------------------------------------------
@@ -135,8 +144,8 @@ def test_sans_token_configure_tout_passe(client: TestClient, monkeypatch: pytest
 
 
 def test_le_makefile_ne_sert_pas_sur_toutes_les_interfaces() -> None:
-    # L'API est ouverte par défaut : sur `0.0.0.0`, tout le réseau local y
-    # accède sans token.
+    # Sur `0.0.0.0`, tout le réseau local atteindrait l'API (le jeton de session
+    # n'est qu'une barrière de plus).
     makefile = (_RACINE / "Makefile").read_text(encoding="utf-8")
 
     assert "0.0.0.0" not in makefile

@@ -182,7 +182,7 @@ class Settings(BaseSettings):
     # Fichier de log tournant (5 × 10 Mo). Ancré sur la racine du dépôt pour
     # ne pas dépendre du répertoire de lancement (ticket-330).
     ide_log_file: Path = _REPO_ROOT / "backend" / "logs" / "tessera.log"
-    static_token: str = ""  # if set, all API requests require Authorization: Bearer <token>
+    static_token: str = ""  # the session token; empty, the backend draws one per boot (ticket-878)
     # Noms de `Host` admis en plus du loopback, séparés par des virgules
     # (ticket-704). Vide : 127.0.0.1, localhost et [::1] seuls.
     allowed_hosts: str = ""

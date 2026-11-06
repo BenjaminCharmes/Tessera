@@ -8332,3 +8332,28 @@ error: Please commit or stash them.
 - 2026-11-06 13:00:30 UTC — [ticket-877] validateur: APPROVED — Tous les critères d'acceptation ont été satisfaits. Le code implémente correctem (288032ms)
 - 2026-11-06 13:00:30 UTC — [ticket-877] APPROVED après 1 tour(s)
 - 2026-11-06 13:03:25 UTC — [ticket-877] documentation: 0 fichier(s) (169764ms)
+- 2026-11-06 13:27:58 UTC — [ide-core] ticket-879 retiré de la file
+- 2026-11-06 13:27:58 UTC — [ide-core] ticket-881 retiré de la file
+- 2026-11-06 13:33:10 UTC — [ide-core] ticket-877 : base réalignée sur develop
+- 2026-11-06 13:33:10 UTC — [ide-core] ticket-877 PR #976 confiée au CIWatcher
+- 2026-11-06 12:43:58 UTC — [ide-core] ticket-880 PR #972 mergée (CI verte)
+- 2026-11-06 13:33:02 UTC — [ide-core] ticket-877 PR #976 mergée (CI verte)
+- 2026-11-06 13:33:35 UTC — [ticket-878] branche ticket-878-the-api-requires-a-per-boot-session-token-on-ever
+- 2026-11-06 13:35:15 UTC — [ticket-878] plan rendu (87030ms)
+- 2026-11-06 13:35:15 UTC — [ticket-878] tour 1 — codeur démarré
+- 2026-11-06 13:44:45 UTC — [ticket-878] tour 1 — codeur terminé (569719ms)
+- 2026-11-06 13:58:21 UTC — [ticket-878] testeur: 1 failed, 1979 passed, 64 warnings in 801.90s (0:13:21)
+- 2026-11-06 13:58:21 UTC — [ticket-878] tests rouges au tour 1
+- 2026-11-06 13:58:21 UTC — [ticket-878] tour 2 — codeur démarré
+- 2026-11-06 13:59:32 UTC — [ticket-878] tour 2 — codeur terminé (71438ms)
+- 2026-11-06 14:16:44 UTC — [ticket-878] testeur: dur�es : ruff 0 s, mypy 13 s, mypy-linux 8 s, pytest 1022 s
+- 2026-11-06 14:17:07 UTC — [ticket-878] securite: PASS — Le diff ferme le mode ouvert de l'API : sans STATIC_TOKEN, le backend tire un je (23250ms)
+- 2026-11-06 14:17:07 UTC — [ticket-878] configuration des tests modifiée : backend/tests/conftest.py
+- 2026-11-06 14:17:07 UTC — [ticket-878] tour 2 — reviewer démarré
+- 2026-11-06 14:17:43 UTC — [ticket-878] tour 2 — reviewer terminé (35625ms)
+- 2026-11-06 14:22:07 UTC — [ticket-878] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-06 14:23:06 UTC — [ticket-878] validateur: fichiers cités joints : backend/tests/test_jeton_de_session.py, backend/tests/test_invariant_routes_jeton.py, backend/tests/test_env_sdk.py, memory/decisions.md (tronqué) ; non joints (budget épuisé) : memory/contraintes.md
+- 2026-11-06 14:23:06 UTC — [ticket-878] validateur: APPROVED — All six acceptance criteria are met. The implementation creates a session token  (358264ms)
+- 2026-11-06 14:23:06 UTC — [ticket-878] APPROVED après 2 tour(s)
+- 2026-11-06 14:23:48 UTC — [ticket-878] leçons: refusée — preuve absente du retour du run
+- 2026-11-06 14:26:52 UTC — [ticket-878] documentation: 0 fichier(s) (179454ms)

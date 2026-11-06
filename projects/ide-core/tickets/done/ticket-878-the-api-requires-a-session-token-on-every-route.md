@@ -1,14 +1,16 @@
 ---
 agent: codeur
 created: 2026-11-06
-depends_on: ["ticket-877"]
+depends_on:
+- ticket-877
 estimated_days: 1
 id: ticket-878
-pr_number: null
-priority: critical
 plan: true
-status: todo
-title: The API requires a per-boot session token on every route, and the open mode disappears
+pr_number: 978
+priority: critical
+status: done
+title: The API requires a per-boot session token on every route, and the open mode
+  disappears
 type: feat
 ---
 

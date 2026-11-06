@@ -11,6 +11,8 @@ Cette section n'est injectée dans aucun appel d'agent. Une règle nouvelle
 s'écrit ici, avec son ADR ; un humain l'accepte en la déplaçant dans sa
 section. (ADR-055)
 
+- **L'API n'a pas de mode ouvert : toute requête HTTP ou WebSocket, sauf `/health` et le préflight, exige le jeton de session** — `STATIC_TOKEN`, sinon celui que le backend tire à chaque démarrage. Ce jeton n'entre ni dans l'environnement d'un agent, ni dans une ligne de commande, ni dans la base ; un test parcourt `app.routes`. (ADR-081, ADR-031)
+
 
 ## Git et périmètre d'écriture
 
