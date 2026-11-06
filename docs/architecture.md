@@ -1359,6 +1359,8 @@ Lors d'une file de tickets en parallèle, chaque run ajoute des lignes à `memor
 
 L'attribut `.gitattributes merge=union` sur ce fichier demande à Git de combiner automatiquement les deux ensembles de lignes — la bonne résolution pour un journal qui ne fait que croître. Aucune intervention manuelle n'est requise pour ce fichier.
 
+Le fichier `.gitattributes` du dépôt déclare cette stratégie pour `projects/ide-core/memory/pipeline-log.md`. Quand deux tickets livrés en parallèle (ADR-051) y ajoutent simultanément leurs lignes, git les fusionne en concaténant les deux versions — chaque contribution reste intacte. Les vrais conflits du journal (modifications discordantes du même bloc) demandent une résolution manuelle.
+
 ### Délai de grâce pour l'enregistrement des checks
 
 GitHub n'enregistre pas les checks de CI instantanément après l'ouverture 
