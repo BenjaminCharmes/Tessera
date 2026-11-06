@@ -38,7 +38,14 @@ class _Ajout:
     fichier: str
     ligne: int
     contenu: str | None  # None : en-tête d'un fichier ajouté ou modifié
+    illisible: bool = False  # en-tête `+++` dont le chemin n'a pas pu être lu
 
+
+_ENTETE_ILLISIBLE = "unreadable-diff-header"
+_ECHAPPEMENTS = {
+    "a": 7, "b": 8, "t": 9, "n": 10, "v": 11, "f": 12, "r": 13, '"': 34, "\\": 92,
+}
+_OCTAL = re.compile(r"[0-3][0-7]{2}")
 
 # Les motifs d'en-tête de clé privée sont assemblés pour que ce fichier ne se
 # reconnaisse pas lui-même quand il traverse le contrôle.
@@ -90,12 +97,45 @@ def _types_dans_ligne(contenu: str) -> list[str]:
     return types
 
 
+def _decoder_chemin_cite(cite: str) -> str | None:
+    """Decode a path git quoted (``"b/na\\303\\257f.py"``), or None if malformed."""
+    corps = cite[1:-1]
+    octets = bytearray()
+    i = 0
+    while i < len(corps):
+        c = corps[i]
+        if c == '"':
+            return None
+        if c != "\\":
+            octets += c.encode("utf-8")
+            i += 1
+        elif _OCTAL.fullmatch(corps[i + 1:i + 4]):
+            octets.append(int(corps[i + 1:i + 4], 8))
+            i += 4
+        elif corps[i + 1:i + 2] in _ECHAPPEMENTS:
+            octets.append(_ECHAPPEMENTS[corps[i + 1]])
+            i += 2
+        else:
+            return None
+    return octets.decode("utf-8", errors="replace")
+
+
+def _fichier_de_l_entete(cible: str) -> str | None:
+    """The new-file path of a ``+++`` target, or None when it cannot be read."""
+    if len(cible) >= 2 and cible[0] == cible[-1] == '"':  # noqa: PLR2004
+        decode = _decoder_chemin_cite(cible)
+        cible = decode if decode is not None else ""
+    return cible[2:] if cible.startswith("b/") and len(cible) > 2 else None  # noqa: PLR2004
+
+
 def _parcourir(diff: str) -> Iterator[_Ajout]:
     """Walk a unified diff and yield file headers and added lines.
 
     The line number is the one in the new file. Inside a hunk, a line that
     begins with ``+++`` is content, not a header: only ``diff --git`` leaves
-    the hunk.
+    the hunk. A ``+++`` header other than ``/dev/null`` whose path cannot be
+    read is yielded as unreadable: its added lines would be skipped, so the
+    caller refuses the diff instead.
     """
     fichier: str | None = None
     ligne = 0
@@ -105,9 +145,11 @@ def _parcourir(diff: str) -> Iterator[_Ajout]:
             fichier, dans_hunk = None, False
         elif not dans_hunk and brut.startswith("+++ "):
             cible = brut[4:].strip()
-            fichier = cible[2:] if cible.startswith("b/") else None
+            fichier = _fichier_de_l_entete(cible)
             if fichier:
                 yield _Ajout(fichier, 1, None)
+            elif cible != "/dev/null":
+                yield _Ajout(cible, 1, None, illisible=True)
         elif (entete := _ENTETE_HUNK.match(brut)) is not None:
             dans_hunk, ligne = True, int(entete.group(1))
         elif dans_hunk and fichier and brut.startswith("+"):
@@ -121,10 +163,15 @@ def chercher_secrets(diff: str) -> list[ViolationSecret]:
     """Return the secret-shaped additions found in a unified diff.
 
     Only added lines count: a removed line, or a context line, is ignored.
-    A `.env`, `*.pem` or `id_rsa` file header is reported on line 1.
+    A `.env`, `*.pem` or `id_rsa` file header is reported on line 1, and so is
+    a `+++` header whose path cannot be read (type `unreadable-diff-header`):
+    the gate fails closed (ADR-039).
     """
     violations: list[ViolationSecret] = []
     for ajout in _parcourir(diff):
+        if ajout.illisible:
+            violations.append(ViolationSecret(ajout.fichier, 1, _ENTETE_ILLISIBLE))
+            continue
         if ajout.contenu is None:
             type_fichier = _type_de_fichier(ajout.fichier)
             if type_fichier is not None:
