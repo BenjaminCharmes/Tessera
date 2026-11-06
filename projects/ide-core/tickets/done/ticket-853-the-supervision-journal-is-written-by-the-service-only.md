@@ -5,7 +5,7 @@ depends_on:
 - ticket-851
 estimated_days: 1
 id: ticket-853
-pr_number: null
+pr_number: 946
 priority: high
 status: done
 title: The supervision journal is written by the service only
