@@ -5,6 +5,7 @@ from pydantic import BaseModel, field_validator
 
 from tessera.config import settings
 from tessera.services.agents.agent_registry import AgentNotFoundError, AgentRegistryService
+from tessera.services.pipeline.run_registry import RUN_REGISTRY
 
 _ROLE_RE = re.compile(r"^[a-z][a-z0-9-]*$")
 
@@ -60,6 +61,20 @@ class AgentRegistryResponse(BaseModel):
 # ---------------------------------------------------------------------------
 # Dependency
 # ---------------------------------------------------------------------------
+
+
+def refuser_pendant_un_run() -> None:
+    """409 tant qu'un run vit : un prompt de rôle est une porte du pipeline (ticket-880).
+
+    Entre deux runs aucun processus d'agent n'existe ; refuser pendant un run
+    ferme la fenêtre où un agent pourrait réécrire son propre rôle.
+    """
+    if RUN_REGISTRY.vivants():
+        raise HTTPException(
+            status_code=409,
+            detail="Un run est en cours : les rôles ne se modifient pas pendant un run. "
+            "Attends la fin de la file ou arrête-la.",
+        )
 
 
 def get_registry() -> AgentRegistryService:
@@ -127,7 +142,9 @@ class UpdateAgentRequest(BaseModel):
     system_prompt: str
 
 
-@router.put("/{role}", response_model=AgentDetailResponse)
+@router.put(
+    "/{role}", response_model=AgentDetailResponse, dependencies=[Depends(refuser_pendant_un_run)]
+)
 async def update_agent(
     role: str,
     body: UpdateAgentRequest,
@@ -149,7 +166,9 @@ async def update_agent(
     )
 
 
-@router.post("", response_model=AgentInfo, status_code=201)
+@router.post(
+    "", response_model=AgentInfo, status_code=201, dependencies=[Depends(refuser_pendant_un_run)]
+)
 async def create_agent(
     body: CreateAgentRequest,
     registry: AgentRegistryService = Depends(get_registry),
@@ -166,7 +185,7 @@ async def create_agent(
     )
 
 
-@router.delete("/{role}", status_code=204)
+@router.delete("/{role}", status_code=204, dependencies=[Depends(refuser_pendant_un_run)])
 async def delete_agent(
     role: str,
     registry: AgentRegistryService = Depends(get_registry),
