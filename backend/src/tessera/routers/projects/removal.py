@@ -1,9 +1,10 @@
 """Removing a project from the IDE — ticket-063, ticket-689."""
 
-from fastapi import HTTPException, Query
+from fastapi import Depends, HTTPException, Query
 from pydantic import BaseModel
 
 from tessera.config import settings
+from tessera.routers.agent_admin import refuser_pendant_un_run
 from tessera.routers.projects.shared import new_router, require_project_path
 from tessera.services.creation_projet.project_removal import RemovalError, delete_project, describe_removal, detach_project
 
@@ -37,7 +38,11 @@ async def get_removal_plan(project_id: str) -> RemovalPlanResponse:
     )
 
 
-@router.post("/{project_id}/detach", response_model=DetachResponse)
+@router.post(
+    "/{project_id}/detach",
+    response_model=DetachResponse,
+    dependencies=[Depends(refuser_pendant_un_run)],
+)
 async def detach(project_id: str) -> DetachResponse:
     """Retire le projet de l'IDE. Les fichiers restent."""
     try:
@@ -47,7 +52,9 @@ async def detach(project_id: str) -> DetachResponse:
     return DetachResponse(detached=True, moved_to=moved_to)
 
 
-@router.delete("/{project_id}", status_code=204)
+@router.delete(
+    "/{project_id}", status_code=204, dependencies=[Depends(refuser_pendant_un_run)]
+)
 async def delete(project_id: str, confirmed: bool = Query(default=False)) -> None:
     """Efface définitivement un projet. Ne franchit jamais un lien symbolique."""
     project_path = require_project_path(project_id)
