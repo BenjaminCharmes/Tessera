@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 1
 id: ticket-874
 plan: true
-pr_number: null
+pr_number: 970
 priority: high
 status: done
 title: CIWatcher merge results are bound to their pull request and a second watch
