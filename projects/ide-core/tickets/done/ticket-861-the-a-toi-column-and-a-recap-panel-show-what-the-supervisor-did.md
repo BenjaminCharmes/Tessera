@@ -5,7 +5,7 @@ depends_on:
 - ticket-860
 estimated_days: 1
 id: ticket-861
-pr_number: null
+pr_number: 958
 priority: medium
 status: done
 title: The A-toi column and a recap panel show what the supervisor did
