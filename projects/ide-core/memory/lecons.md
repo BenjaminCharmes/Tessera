@@ -3,9 +3,6 @@
 Pièges observés sur ce projet, une ligne chacun. Le service écrit sous `## Proposées` ; un humain déplace une leçon sous `## En vigueur` pour qu'elle atteigne le codeur et le reviewer.
 
 ## Proposées
-- Quand une validation ignore un pattern de ligne (comme `+++`), ajouter un préfixe pour le contourner crée une dépendance tacite qui se brisera si ce détail change. (source : ticket-862, 2026-11-05)
-- Quand tu modifies un modèle Pydantic d'endpoint FastAPI, régénère et commite le schéma OpenAPI. (source : ticket-864, 2026-11-05)
-- Quand on doit corriger en urgence les erreurs du pipeline, prendre le temps de relire le code modifié avant de resubmitter. (source : ticket-853, 2026-11-06)
-- Quand on ajoute une route API, regénérer et commiter `docs/openapi.json`. (source : ticket-860, 2026-11-06)
 
 ## En vigueur
+- Quand tu ajoutes ou modifies une route ou un modèle de réponse FastAPI, régénère et commite `docs/openapi.json`, et range la route dans `frontend/src/test/contrat/perimetre.ts` (couverte ou hors périmètre). (source : ticket-860, ticket-864, 2026-11-06)
