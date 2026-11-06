@@ -62,6 +62,9 @@ class GitWorkspaceDouble:
     async def est_ancetre(self, ancetre: str, descendant: str) -> bool | None:
         return None
 
+    async def est_modifie(self, chemin: str) -> bool:
+        return False
+
     async def initialiser_base_ref(
         self, base_branch: str | None = None, *, exiger_distant: bool = False
     ) -> str | None:
@@ -92,6 +95,9 @@ class GitWorkspaceDouble:
         return None
 
     async def sha_distant(self, branch: str) -> str | None:
+        return None
+
+    async def stager_chemins(self, chemins: list[str]) -> None:
         return None
 
     async def sync_base_depuis_distant(self, base_branch: str) -> str | None:

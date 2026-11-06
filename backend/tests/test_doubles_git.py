@@ -24,6 +24,7 @@ APPELEES_PAR_L_ORCHESTRATEUR = [
     "diff_depuis_base",
     "dirty_files",
     "est_ancetre",
+    "est_modifie",
     "initialiser_base_ref",
     "is_clean",
     "lire_ticket_sur_la_base",
@@ -32,6 +33,7 @@ APPELEES_PAR_L_ORCHESTRATEUR = [
     "restaurer_ticket_depuis_base",
     "retourner_sur_base",
     "sha_distant",
+    "stager_chemins",
     "sync_base_depuis_distant",
 ]
 
