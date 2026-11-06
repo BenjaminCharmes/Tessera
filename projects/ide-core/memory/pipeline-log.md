@@ -8229,3 +8229,16 @@ error: Please commit or stash them.
 - 2026-11-06 09:29:29 UTC — [ticket-870] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente la fonction  (122780ms)
 - 2026-11-06 09:29:29 UTC — [ticket-870] APPROVED après 1 tour(s)
 - 2026-11-06 09:31:24 UTC — [ticket-870] documentation: 0 fichier(s) (110422ms)
+- 2026-11-06 09:42:30 UTC — [ide-core] ticket-870 PR #964 confiée au CIWatcher
+- 2026-11-06 10:00:33 UTC — [ide-core] ticket-870 PR #964 mergée (CI verte)
+- 2026-11-06 10:49:15 UTC — [ticket-872] branche ticket-872-an-approved-run-whose-approved-sha-could-not-be-r
+- 2026-11-06 10:49:16 UTC — [ticket-872] tour 1 — codeur démarré
+- 2026-11-06 11:04:05 UTC — [ticket-872] tour 1 — codeur terminé (888327ms)
+- 2026-11-06 11:09:26 UTC — [ticket-872] testeur: dur�es : ruff 0 s, mypy 14 s, mypy-linux 13 s, pytest 317 s
+- 2026-11-06 11:09:38 UTC — [ticket-872] securite: PASS — Le diff renforce la porte de livraison : un run approuvé sans approved_sha lisib (12640ms)
+- 2026-11-06 11:09:38 UTC — [ticket-872] tour 1 — reviewer démarré
+- 2026-11-06 11:09:57 UTC — [ticket-872] tour 1 — reviewer terminé (18750ms)
+- 2026-11-06 11:14:21 UTC — [ticket-872] validateur: fichiers cités joints : backend/tests/test_livraison_sha_approuve.py, pipeline_approbation.py
+- 2026-11-06 11:14:21 UTC — [ticket-872] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (282968ms)
+- 2026-11-06 11:14:21 UTC — [ticket-872] APPROVED après 1 tour(s)
+- 2026-11-06 11:15:59 UTC — [ticket-872] documentation: 0 fichier(s) (92063ms)

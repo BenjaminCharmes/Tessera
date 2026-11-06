@@ -251,7 +251,7 @@ async def _livrer(clone: Path, git_faux: _FauxGit, wf: _FauxWorkflow) -> Livrais
     )
     return await service.livrer_phase_1(
         ticket_id="ticket-570", ticket_title="Conception", ticket_body="",
-        branch="ticket-570-conception", approuve=True,
+        branch="ticket-570-conception", approuve=True, approved_sha="a1" * 20,
     )
 
 

@@ -149,6 +149,7 @@ class _Banc:
             ticket_body="",
             branch="ticket-001-slug",
             approuve=True,
+            approved_sha="a1" * 20,
         )
 
 

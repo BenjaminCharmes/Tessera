@@ -8,6 +8,8 @@ import pytest
 from tessera.config import settings
 from tessera.services.livraison.livraison import Livraison, LivraisonService
 
+_APPROUVE = "a1" * 20
+
 
 class _FauxGit:
     def __init__(
@@ -31,6 +33,9 @@ class _FauxGit:
 
     async def commit_bookkeeping(self) -> None:
         pass
+
+    async def commits_hors_rangement(self, depuis: str) -> list[str]:
+        return []
 
 
 class _FauxWorkflow:
@@ -114,6 +119,7 @@ async def _livrer(svc: LivraisonService, approuve: bool = True) -> Livraison:
         ticket_body="",
         branch="ticket-001-x",
         approuve=approuve,
+        approved_sha=_APPROUVE,
     )
 
 
@@ -181,6 +187,7 @@ async def test_livraison_transmet_le_type_du_ticket(tmp_path: Path) -> None:
         ticket_type="feat",
         branch="ticket-001-x",
         approuve=True,
+        approved_sha=_APPROUVE,
     )
 
     assert len(workflow.ouvertures) == 1
@@ -528,6 +535,7 @@ async def _phase_1(svc: LivraisonService, approuve: bool = True) -> Livraison:
         ticket_body="",
         branch="ticket-001-x",
         approuve=approuve,
+        approved_sha=_APPROUVE,
     )
 
 

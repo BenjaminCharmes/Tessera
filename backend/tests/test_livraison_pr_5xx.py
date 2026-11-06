@@ -18,6 +18,9 @@ class _FauxGit:
     async def commit_bookkeeping(self) -> None:
         pass
 
+    async def commits_hors_rangement(self, depuis: str) -> list[str]:
+        return []
+
     async def sha_distant(self, branch: str) -> str | None:
         return None
 
@@ -72,6 +75,7 @@ async def _livrer(tmp_path: Path, workflow: _Workflow) -> Livraison:
     return await svc.livrer_phase_1(
         ticket_id="ticket-001", ticket_title="T", ticket_body="",
         branch="ticket-001-x", approuve=True,
+        approved_sha="a1" * 20,
     )
 
 

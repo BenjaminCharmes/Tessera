@@ -2,9 +2,9 @@
 
 `finish_approved` records the head of the run's branch; the documentation step,
 which the pipeline runs itself between the approval and the delivery, may move
-it. Everything here fails soft: an unreadable SHA never undoes an approval, it
-leaves the result without one, and the delivery then refuses to go further than
-it can prove.
+it. An unreadable SHA never undoes an approval, it leaves the result without
+one; the delivery then refuses: an approved run with no readable approved SHA
+ends blocked, with no push and no PR (ticket-872, ADR-039).
 """
 from dataclasses import replace
 from typing import TYPE_CHECKING

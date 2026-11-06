@@ -56,6 +56,24 @@ async def branche_modifiee(git: _GitApres, approved_sha: str) -> Livraison | Non
     )
 
 
+#: Une approbation que rien ne lie à un commit ne prouve pas ce qui part (ADR-039).
+ARRET_SANS_SHA_APPROUVE = (
+    "l'approbation n'est liée à aucun commit lisible : aucun SHA approuvé "
+    "lisible, rien n'est poussé"
+)
+
+
+async def controler_approbation(git: _GitApres, approved_sha: str | None) -> Livraison | None:
+    """The stop when the approval cannot be proven against the branch, else None.
+
+    Called for an approved run only: without a readable approved SHA the
+    delivery refuses (ticket-872); with one, the branch must not have moved.
+    """
+    if approved_sha is None:
+        return Livraison(branche_modifiee=True, arret=ARRET_SANS_SHA_APPROUVE)
+    return await branche_modifiee(git, approved_sha)
+
+
 async def sha_pousse(git: _GitApres, branch: str) -> str | None:
     """The head of `branch` on the remote; None when it cannot be read."""
     try:

@@ -77,6 +77,7 @@ async def _livrer_avec_resolveur(root: Path, ecrit: str) -> list[OrchestratorEve
             await service.livrer_phase_1(
                 ticket_id="ticket-005", ticket_title="T", ticket_body="",
                 branch="ticket-005-x", approuve=True,
+                approved_sha=await GitWorkspaceService(root).head_sha(),
             )
         except AssertionError:
             pass  # le rebase a abouti : seule l'ouverture de la PR n'est pas simulée

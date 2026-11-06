@@ -167,7 +167,7 @@ async def test_delivery_on_reduced_refspec_records_pushed_sha(
 
     livraison: Livraison = await service.livrer_phase_1(
         ticket_id="ticket-001", ticket_title="Du travail", ticket_body="",
-        branch=_BRANCHE, approuve=True,
+        branch=_BRANCHE, approuve=True, approved_sha=tete,
     )
 
     assert livraison.pr_number == 7

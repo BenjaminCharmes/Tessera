@@ -17,7 +17,7 @@ from typing import Any
 from tessera.config import settings
 from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.git_workspace import GitCommandError
-from tessera.services.livraison.livraison_apres import branche_modifiee, ouvrir_avec_recours, pr_a_relire, sha_pousse
+from tessera.services.livraison.livraison_apres import controler_approbation, ouvrir_avec_recours, pr_a_relire, sha_pousse
 from tessera.services.livraison.livraison_arrets import ARRET_NON_APPROUVE, arret_ci_illisible, arret_conflit, arret_niveau_commit, arret_pr_en_conflit
 from tessera.services.livraison.livraison_conflit import annoncer_fin_de_conflit, resolveur_suivi, signal_courant
 from tessera.services.livraison.livraison_intervention import ControleDuDiff, livrer_intervention
@@ -107,10 +107,10 @@ class LivraisonService:
         anything prevents opening the PR (unapproved, commit level, conflict).
         The CI wait and merge are handled by livrer_phase_2.
 
-        With an `approved_sha`, every commit added since the approval must be
-        the pipeline's own bookkeeping; otherwise nothing is pushed
-        (ticket-492). The check runs before the rebase, which rewrites the
-        commits the approval was given on.
+        An approved run needs a readable `approved_sha` (ticket-872), and every
+        commit added since must be the pipeline's own bookkeeping; otherwise
+        nothing is pushed (ticket-492). The check runs before the rebase, which
+        rewrites the commits the approval was given on.
         """
         if not approuve:
             return Livraison(arret=ARRET_NON_APPROUVE)
@@ -192,10 +192,10 @@ class LivraisonService:
         # chemins pour ne pas bloquer le ticket suivant (ticket-303).
         await self._git.commit_bookkeeping()
 
-        if approved_sha is not None:
-            changee = await branche_modifiee(self._git, approved_sha)
-            if changee is not None:
-                return changee
+        # Toujours appelée pour un run approuvé : sans SHA lisible, refus (ticket-872).
+        arret_approbation = await controler_approbation(self._git, approved_sha)
+        if arret_approbation is not None:
+            return arret_approbation
 
         # Après le contrôle de l'approbation, qui refuserait ce commit de code,
         # et avant le rebase, qui n'a pas à rejouer des numéros déjà pris.
@@ -418,11 +418,11 @@ class LivraisonService:
         ticket_type: str = "",
         branch: str | None,
         approuve: bool,
+        approved_sha: str | None = None,
     ) -> Livraison:
         """Porte le travail du ticket jusqu'où le projet le permet.
 
         Chains livrer_phase_1 (rebase, push, PR) and livrer_phase_2 (CI, merge).
-        Existing callers use this method unchanged.
         """
         phase1 = await self.livrer_phase_1(
             ticket_id=ticket_id,
@@ -431,11 +431,11 @@ class LivraisonService:
             ticket_type=ticket_type,
             branch=branch,
             approuve=approuve,
+            approved_sha=approved_sha,
         )
         # Stop here if phase 1 did not open a PR, or if it stopped on a conflict.
         if phase1.pr_number is None or phase1.arret is not None:
             return phase1
-
         phase2 = await self.livrer_phase_2(phase1.pr_number, ticket_id=ticket_id)
 
         # Merge the two phases: etapes and durees from both, other fields from phase2.
