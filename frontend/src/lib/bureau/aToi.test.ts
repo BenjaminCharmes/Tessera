@@ -75,6 +75,16 @@ describe("contenuAToi", () => {
     expect(contenuAToi([{ nom: "a", etat: INITIAL }], T0).lecons).toEqual([]);
   });
 
+  it("writes a supervisor line for a project with open cases, none at zero", () => {
+    const contenu = contenuAToi([{ nom: "a", etat: INITIAL }], T0, {}, { a: 2, b: 0, c: 1 });
+
+    expect(contenu.superviseur).toEqual([
+      { projet: "a", nombre: 2, ligne: "2 cas du superviseur à relire" },
+      { projet: "c", nombre: 1, ligne: "1 cas du superviseur à relire" },
+    ]);
+    expect(contenuAToi([{ nom: "a", etat: INITIAL }], T0).superviseur).toEqual([]);
+  });
+
   it("never lists a closed run as frozen", () => {
     const clos = rejouer(ev("agent_started"), ev("run_closed"));
     expect(contenuAToi([{ nom: "a", etat: clos }], T0 + 900_000).figes).toEqual([]);
