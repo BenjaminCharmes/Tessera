@@ -8287,3 +8287,15 @@ error: Please commit or stash them.
 - 2026-11-06 12:01:23 UTC — [ticket-874] validateur: APPROVED — Tous les critères sont satisfaits. Le ticket implémente complètement le suivi de (347922ms)
 - 2026-11-06 12:01:23 UTC — [ticket-874] APPROVED après 1 tour(s)
 - 2026-11-06 12:03:21 UTC — [ticket-874] documentation: 2 fichier(s) (112453ms)
+- 2026-11-06 12:05:08 UTC — [ide-core] ticket-874 PR #970 confiée au CIWatcher
+- 2026-11-06 11:57:06 UTC — [ide-core] ticket-873 PR #969 mergée (CI verte)
+- 2026-11-06 12:05:12 UTC — [ticket-876] branche ticket-876-the-agentrole-enum-only-names-roles-the-registry
+- 2026-11-06 12:05:13 UTC — [ticket-876] tour 1 — codeur démarré
+- 2026-11-06 12:06:29 UTC — [ticket-876] tour 1 — codeur terminé (75688ms)
+- 2026-11-06 12:11:51 UTC — [ticket-876] testeur: dur�es : ruff 0 s, mypy 12 s, mypy-linux 13 s, pytest 319 s
+- 2026-11-06 12:11:56 UTC — [ticket-876] securite: PASS — Le diff retire le rôle `orchestrateur`, qui n'a pas de prompt, de l'enum `AgentR (5219ms)
+- 2026-11-06 12:11:56 UTC — [ticket-876] tour 1 — reviewer démarré
+- 2026-11-06 12:12:21 UTC — [ticket-876] tour 1 — reviewer terminé (24250ms)
+- 2026-11-06 12:13:38 UTC — [ticket-876] validateur: fichiers cités joints : backend/src/tessera/models/agent.py, backend/src/tessera/services/agents/agent_runner.py, backend/tests/test_agent_role_registre.py
+- 2026-11-06 12:13:38 UTC — [ticket-876] validateur: APPROVED — Les trois critères d'acceptation ont été respectés. Le rôle 'orchestrateur' a ét (101218ms)
+- 2026-11-06 12:13:38 UTC — [ticket-876] APPROVED après 1 tour(s)
