@@ -8406,3 +8406,15 @@ error: Please commit or stash them.
 - 2026-11-06 15:15:41 UTC — [ticket-881] APPROVED après 2 tour(s)
 - 2026-11-06 15:16:36 UTC — [ticket-881] leçons: rien à retenir
 - 2026-11-06 15:19:21 UTC — [ticket-881] documentation: 0 fichier(s) (159937ms)
+- 2026-11-06 15:20:20 UTC — [ide-core] ticket-881 PR #981 confiée au CIWatcher
+- 2026-11-06 15:15:14 UTC — [ide-core] ticket-879 PR #980 mergée (CI verte)
+- 2026-11-06 15:20:25 UTC — [ticket-883] branche ticket-883-a-capture-run-that-times-out-kills-its-node-proce
+- 2026-11-06 15:20:27 UTC — [ticket-883] tour 1 — codeur démarré
+- 2026-11-06 15:22:15 UTC — [ticket-883] tour 1 — codeur terminé (107655ms)
+- 2026-11-06 15:22:48 UTC — [ticket-883] testeur: dur�es : ruff 0 s, mypy 11 s, mypy-linux 16 s, pytest 29 s
+- 2026-11-06 15:22:57 UTC — [ticket-883] securite: PASS — Pas de faille de sécurité dans ce diff : verdict PASS. Il ajoute un try/except a (8875ms)
+- 2026-11-06 15:22:57 UTC — [ticket-883] tour 1 — reviewer démarré
+- 2026-11-06 15:23:16 UTC — [ticket-883] tour 1 — reviewer terminé (18610ms)
+- 2026-11-06 15:24:35 UTC — [ticket-883] validateur: fichiers cités joints : backend/tests/test_captures_delai.py
+- 2026-11-06 15:24:35 UTC — [ticket-883] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le code modifie `_lancer_le_sc (97500ms)
+- 2026-11-06 15:24:35 UTC — [ticket-883] APPROVED après 1 tour(s)
