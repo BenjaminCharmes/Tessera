@@ -135,7 +135,13 @@ async def _lancer_le_script(
         stdout=asyncio.subprocess.DEVNULL,
         stderr=asyncio.subprocess.PIPE,
     )
-    _, erreurs = await processus.communicate(_charge(config, jeton))
+    try:
+        _, erreurs = await processus.communicate(_charge(config, jeton))
+    except asyncio.CancelledError:
+        # Le délai de `capturer` annule ici : sans cela, node et Chromium survivent.
+        processus.kill()
+        await processus.wait()
+        raise
     texte = erreurs.decode("utf-8", "replace").strip()
     if jeton:
         texte = texte.replace(jeton, "***")

@@ -1,14 +1,14 @@
 ---
-id: ticket-883
-title: "A capture run that times out kills its node process"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-11-06
 depends_on: []
 estimated_days: 0.5
-created: 2026-11-06
+id: ticket-883
+pr_number: 982
+priority: medium
+status: done
+title: A capture run that times out kills its node process
+type: fix
 ---
 
 # ticket-883 — A capture run that times out kills its node process
