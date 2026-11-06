@@ -1,13 +1,15 @@
 ---
 agent: codeur
 created: 2026-11-06
-depends_on: ["ticket-880"]
+depends_on:
+- ticket-880
 estimated_days: 0.5
 id: ticket-881
-pr_number: null
+pr_number: 981
 priority: high
-status: todo
-title: A role's model cannot be changed and a project cannot be removed while any run is live
+status: done
+title: A role's model cannot be changed and a project cannot be removed while any
+  run is live
 type: feat
 ---
 

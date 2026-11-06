@@ -1,16 +1,19 @@
 """Agents declared by a project and their model — ticket-080, ticket-188, ticket-689."""
 
-from fastapi import HTTPException
+from fastapi import Depends, HTTPException
 from pydantic import BaseModel
 
 from tessera.config import settings
 from tessera.models.agent import FallbackConfig
+from tessera.routers.agent_admin import refuser_pendant_un_run
 from tessera.routers.projects.shared import new_router
 from tessera.services.noyau.cost_calculator import modeles_connus
 from tessera.services.projets.manifeste_ecriture import AgentAbsentDuProjet, ModeleInconnu, set_agent_model, set_agent_provider
 from tessera.services.projets.project_loader import load_agents_config
 from tessera.services.providers.noms import PROVIDERS_ANTHROPIC, PROVIDERS_CONNUS, ProviderInconnu
+from tessera.utils.logger import get_logger
 
+_logger = get_logger(__name__)
 router = new_router()
 
 
@@ -68,7 +71,11 @@ async def get_project_agents(project_id: str) -> ProjectAgentsResponse:
     )
 
 
-@router.put("/{project_id}/agents/{role}", response_model=ProjectAgentsResponse)
+@router.put(
+    "/{project_id}/agents/{role}",
+    response_model=ProjectAgentsResponse,
+    dependencies=[Depends(refuser_pendant_un_run)],
+)
 async def set_project_agent_model(
     project_id: str, role: str, body: SetModelRequest
 ) -> ProjectAgentsResponse:
@@ -94,4 +101,15 @@ async def set_project_agent_model(
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     except AgentAbsentDuProjet as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
+    # Un modèle plus faible sur `securite` ou `reviewer` abaisse une porte :
+    # le changement accepté laisse une trace (ticket-881).
+    _logger.warning(
+        "porte_abaissee",
+        extra={
+            "project_id": project_id,
+            "role": role,
+            "model": body.model,
+            "provider": body.provider,
+        },
+    )
     return await get_project_agents(project_id)
