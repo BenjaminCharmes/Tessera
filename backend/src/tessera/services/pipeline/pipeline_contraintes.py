@@ -11,6 +11,8 @@ from tessera.models.ticket import TicketStatus
 from tessera.services.gardes.contraintes_touchees import lignes_hors_proposees
 from tessera.services.gardes.lecons_touchees import lignes_de_lecons
 from tessera.services.noyau.pipeline_events import EventType, PipelineResult
+from tessera.services.pipeline.pipeline_journal import CODE_JOURNAL_MODIFIE, raison_journal_modifie
+from tessera.services.pipeline.pipeline_journal import RESUME as RESUME_JOURNAL
 from tessera.services.pipeline.pipeline_outcomes import commit_ou_bloquer
 from tessera.services.pipeline.pipeline_revue import RESUME as RESUME_REVUE
 from tessera.services.pipeline.pipeline_revue import raison_revue_hors_perimetre
@@ -42,12 +44,15 @@ async def arret_contraintes_hors_proposees(
     """Block the run after the coder's turn when it wrote a rule outside the proposals.
 
     Le même point d'arrêt garde `memory/lecons.md` (ticket-804) : le contrôle
-    des leçons passe juste après, sur le même diff, puis celui du périmètre
-    d'une revue de projet (ticket-864).
+    des leçons passe juste après, sur le même diff, puis celui du journal du
+    superviseur (ticket-853), puis celui du périmètre d'une revue de projet
+    (ticket-864).
     """
     raison = raison_contraintes_hors_proposees(orch, run)
     if raison is None:
         arret = await arret_lecons_modifiees(orch, run)
+        if arret is None:
+            arret = await arret_journal_modifie(orch, run)
         return arret if arret is not None else await arret_revue_hors_perimetre(orch, run)
     return await bloquer(
         orch, run, "constraints_outside_proposed", raison,
@@ -80,6 +85,16 @@ async def arret_lecons_modifiees(
     return await bloquer(
         orch, run, "lessons_file_modified", raison, "lecons.md changed by an agent"
     )
+
+
+async def arret_journal_modifie(
+    orch: "Orchestrator", run: PipelineRun
+) -> PipelineResult | None:
+    """Block the run when its diff touches the supervision journal, unless it is a supervision run."""
+    raison = raison_journal_modifie(run)
+    if raison is None:
+        return None
+    return await bloquer(orch, run, CODE_JOURNAL_MODIFIE, raison, RESUME_JOURNAL)
 
 
 async def arret_revue_hors_perimetre(

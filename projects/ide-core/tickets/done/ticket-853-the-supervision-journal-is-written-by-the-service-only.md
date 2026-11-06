@@ -1,14 +1,15 @@
 ---
-id: ticket-853
-title: "The supervision journal is written by the service only"
-type: feat
-status: todo
-priority: high
 agent: codeur
-depends_on: [ticket-851]
-estimated_days: 1
 created: 2026-11-05
-pr_number: null
+depends_on:
+- ticket-851
+estimated_days: 1
+id: ticket-853
+pr_number: 946
+priority: high
+status: done
+title: The supervision journal is written by the service only
+type: feat
 ---
 
 # ticket-853 — Le journal `memory/supervision.md`, écrit par le service seul
