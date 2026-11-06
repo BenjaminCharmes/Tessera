@@ -278,7 +278,9 @@ def chains_for(paths: list[str] | None) -> tuple[bool, bool]:
     if paths is None:
         return True, True
     backend = any(p.startswith(("backend/", "scripts/")) for p in paths)
-    frontend = any(p.startswith("frontend/") for p in paths)
+    # Le test de contrat du front lit docs/openapi.json : une route ajoutée côté
+    # backend le casse sans qu'aucun fichier de frontend/ change (ticket-860).
+    frontend = any(p.startswith("frontend/") or p == "docs/openapi.json" for p in paths)
     return backend, frontend
 
 
