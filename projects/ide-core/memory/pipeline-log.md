@@ -8024,3 +8024,20 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-05 23:44:27 UTC — [ticket-852] documentation: 0 fichier(s) (444358ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « jeton vérifiable » — nombre « 80 % » n'est ni dans le texte remplacé, ni dans les tickets, le diff ou les fichier — refusé : doc-fonctionnelle : docs/guide-utilisateur.md : règle « preuve » — l'extrait « # ANOMALIE_OUTIL_REPETE=4
 # ANOMALIE_SILENCE_S=900
 # ANOMALI » (.env.example) n'e
+- 2026-11-05 23:54:16 UTC — [ide-core] ticket-852 : base réalignée sur develop
+- 2026-11-05 23:54:16 UTC — [ide-core] ticket-852 PR #945 confiée au CIWatcher
+- 2026-11-05 23:54:12 UTC — [ide-core] ticket-852 PR #945 mergée (CI verte)
+- 2026-11-05 23:54:23 UTC — [ticket-853] branche ticket-853-the-supervision-journal-is-written-by-the-service
+- 2026-11-05 23:54:25 UTC — [ticket-853] tour 1 — codeur démarré
+- 2026-11-05 23:56:41 UTC — [ticket-853] tour 1 — codeur terminé (136030ms)
+- 2026-11-05 23:58:53 UTC — [ticket-853] testeur: dur�es : ruff 0 s, pytest 123 s
+- 2026-11-05 23:58:53 UTC — [ticket-853] tests rouges au tour 1
+- 2026-11-05 23:58:53 UTC — [ticket-853] tour 2 — codeur démarré
+- 2026-11-05 23:59:33 UTC — [ticket-853] tour 2 — codeur terminé (40375ms)
+- 2026-11-06 00:01:57 UTC — [ticket-853] testeur: dur�es : ruff 0 s, mypy 8 s, mypy-linux 9 s, pytest 140 s
+- 2026-11-06 00:05:25 UTC — [ticket-853] securite: PASS — Le ticket introduit l'infrastructure de lecture/écriture et de garde du journal  (207953ms)
+- 2026-11-06 00:05:25 UTC — [ticket-853] tour 2 — reviewer démarré
+- 2026-11-06 00:05:43 UTC — [ticket-853] tour 2 — reviewer terminé (18155ms)
+- 2026-11-06 00:09:00 UTC — [ticket-853] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (214890ms)
+- 2026-11-06 00:09:00 UTC — [ticket-853] APPROVED après 2 tour(s)
+- 2026-11-06 00:10:24 UTC — [ticket-853] leçons: une leçon proposée
