@@ -1,14 +1,14 @@
 ---
-id: ticket-885
-title: "The phase-1 delivery test proves the steps and durations in merge mode"
-type: test
-status: todo
-pr_number: null
-priority: low
 agent: codeur
+created: 2026-11-06
 depends_on: []
 estimated_days: 0.5
-created: 2026-11-06
+id: ticket-885
+pr_number: 984
+priority: low
+status: done
+title: The phase-1 delivery test proves the steps and durations in merge mode
+type: test
 ---
 
 # ticket-885 — The phase-1 delivery test proves the steps and durations in merge mode

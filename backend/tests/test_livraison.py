@@ -542,15 +542,19 @@ async def _phase_1(svc: LivraisonService, approuve: bool = True) -> Livraison:
 async def test_phase_1_produit_memes_etapes_et_durees_que_livrer_jusqu_a_la_pr(
     tmp_path: Path,
 ) -> None:
-    """livrer_phase_1 rend les mêmes étapes que livrer() jusqu'à l'ouverture de la PR."""
-    svc_phase, _g1, _w1 = _service(tmp_path / "phase", "pr")
-    svc_livrer, _g2, _w2 = _service(tmp_path / "livrer", "pr")
+    """livrer_phase_1 rend le début des étapes de livrer(), en autonomie merge."""
+    svc_phase, _g1, _w1 = _service(tmp_path / "phase", "merge")
+    svc_livrer, _g2, _w2 = _service(tmp_path / "livrer", "merge")
 
     phase1 = await _phase_1(svc_phase)
     livraison = await _livrer(svc_livrer)
 
-    # Les étapes jusqu'à la PR sont identiques.
-    assert phase1.etapes == livraison.etapes
+    # En merge, livrer() ajoute la CI et le merge : la phase 1 n'en est que le début.
+    assert phase1.etapes == livraison.etapes[: len(phase1.etapes)]
+    assert len(phase1.etapes) < len(livraison.etapes)
+    # Chaque étape porte sa durée, et la phase 1 en compte moins que livrer().
+    assert len(phase1.durees_ms) == len(phase1.etapes)
+    assert len(phase1.durees_ms) < len(livraison.durees_ms)
     assert phase1.pr_number == livraison.pr_number
     assert phase1.arret is None
 

@@ -8432,3 +8432,16 @@ error: Please commit or stash them.
 - 2026-11-06 15:33:47 UTC — [ticket-884] validateur: APPROVED — Les deux critères d'acceptation ont été satisfaits. Un test a été ajouté dans `t (139125ms)
 - 2026-11-06 15:33:47 UTC — [ticket-884] APPROVED après 1 tour(s)
 - 2026-11-06 15:36:02 UTC — [ticket-884] documentation: 0 fichier(s) (129875ms)
+- 2026-11-06 15:38:02 UTC — [ide-core] ticket-884 PR #983 confiée au CIWatcher
+- 2026-11-06 15:37:27 UTC — [ide-core] ticket-883 PR #982 mergée (CI verte)
+- 2026-11-06 15:38:07 UTC — [ticket-885] branche ticket-885-the-phase-1-delivery-test-proves-the-steps-and-du
+- 2026-11-06 15:38:09 UTC — [ticket-885] tour 1 — codeur démarré
+- 2026-11-06 15:39:02 UTC — [ticket-885] tour 1 — codeur terminé (53454ms)
+- 2026-11-06 15:39:31 UTC — [ticket-885] testeur: dur�es : ruff 0 s, mypy 5 s, mypy-linux 11 s, pytest 25 s
+- 2026-11-06 15:39:37 UTC — [ticket-885] securite: PASS — Le diff ne modifie qu'un test (backend/tests/test_livraison.py). Il passe l'auto (5905ms)
+- 2026-11-06 15:39:37 UTC — [ticket-885] tour 1 — reviewer démarré
+- 2026-11-06 15:39:47 UTC — [ticket-885] tour 1 — reviewer terminé (10327ms)
+- 2026-11-06 15:42:19 UTC — [ticket-885] validateur: fichiers cités joints : backend/tests/test_livraison.py (tronqué)
+- 2026-11-06 15:42:19 UTC — [ticket-885] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le test a été mis à jour pour  (161594ms)
+- 2026-11-06 15:42:19 UTC — [ticket-885] APPROVED après 1 tour(s)
+- 2026-11-06 15:43:59 UTC — [ticket-885] documentation: 0 fichier(s) (92109ms) — après tour de correction
