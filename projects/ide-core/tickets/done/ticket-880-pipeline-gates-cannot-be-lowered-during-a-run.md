@@ -4,7 +4,7 @@ created: 2026-11-06
 depends_on: []
 estimated_days: 0.5
 id: ticket-880
-pr_number: null
+pr_number: 972
 priority: high
 status: done
 title: A pipeline gate cannot be lowered while any run is live, and every lowering
