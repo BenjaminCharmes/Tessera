@@ -2,7 +2,7 @@
 id: ticket-846
 title: "The second-review trial is run, read by a human and concluded"
 type: chore
-status: todo
+status: done
 priority: low
 agent: codeur
 created: 2026-11-05
