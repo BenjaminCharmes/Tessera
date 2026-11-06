@@ -74,7 +74,8 @@ class RunWorktree:
     branche: str
 
 
-_TICKET_ID_RE = re.compile(r"ticket-[0-9]+")
+# Un ticket, ou une intervention du superviseur (ticket-854) : `supervision-AAAAMMJJ-HHMMSS`.
+_TICKET_ID_RE = re.compile(r"ticket-[0-9]+|supervision-[0-9]{8}-[0-9]{6}")
 
 
 def _sous_le_dossier(racine: Path) -> Path:

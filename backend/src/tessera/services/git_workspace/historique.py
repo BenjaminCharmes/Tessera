@@ -1,5 +1,7 @@
 """Branch position, push and commit history reads."""
 
+import posixpath
+
 from tessera.services.gardes.termes_interdits import CommitInfo
 from tessera.services.git_workspace.chemins import _JOURNAL_PIPELINE, _is_orchestrator_artifact_path, _relatif_au_projet
 from tessera.services.git_workspace.erreurs import GitCommandError
@@ -215,3 +217,39 @@ class GitHistory(GitPoussee):
         pass on a diff it could not read.
         """
         return await self._run("diff", f"{base}...{branch}")
+
+    async def fichiers_de_branche(self, base: str, branch: str) -> list[str]:
+        """Paths `branch` changes on top of `base`, relative to the project folder.
+
+        A path outside the project folder comes back as `../…`, so a caller that
+        only admits paths inside it refuses it. Renames count as a deletion and
+        an addition. A failure raises: a delivery gate must not pass on a diff it
+        could not read (ticket-854).
+        """
+        sortie = await self._run("diff", "--name-only", "--no-renames", "-z", f"{base}...{branch}")
+        return await self._relatifs_au_projet([nom for nom in sortie.split("\0") if nom])
+
+    async def fichiers_modifies(self) -> list[str]:
+        """Paths the working tree changes against HEAD, untracked ones included (ticket-854).
+
+        Relative to the project folder, `../…` outside it; both ends of a rename.
+        """
+        sortie = await self._run("status", "--porcelain", "-z", "--untracked-files=all")
+        entrees = sortie.split("\0")
+        noms: list[str] = []
+        i = 0
+        while i < len(entrees):
+            entree = entrees[i]
+            i += 1
+            if len(entree) < 4:
+                continue
+            noms.append(entree[3:])
+            if entree[0] in "RC" or entree[1] in "RC":
+                noms.extend(n for n in entrees[i:i + 1] if n)
+                i += 1
+        return await self._relatifs_au_projet(noms)
+
+    async def _relatifs_au_projet(self, noms: list[str]) -> list[str]:
+        """`noms` (relative to the repository root) re-expressed from the project folder."""
+        prefixe = (await self._run("rev-parse", "--show-prefix")).strip().rstrip("/")
+        return [posixpath.relpath(nom, prefixe or ".") for nom in noms]
