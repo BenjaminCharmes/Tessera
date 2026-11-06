@@ -12,12 +12,27 @@ async function messageDeLErreur(res: Response): Promise<string> {
   }
 }
 
+let rappelJetonManquant: (() => void) | null = null;
+
 /**
- * The one door to the backend: adds the Bearer when a token is set and turns a
- * non-2xx answer into `API <code>: <text>`. `path` is relative to `/api/v1`.
+ * Registers the callback run on a 401 answer (the session token is missing or
+ * wrong). Returns a function that unregisters it.
+ */
+export function onJetonManquant(rappel: () => void): () => void {
+  rappelJetonManquant = rappel;
+  return () => {
+    if (rappelJetonManquant === rappel) rappelJetonManquant = null;
+  };
+}
+
+/**
+ * The one door to the backend: adds the Bearer when a token is set, tells
+ * `onJetonManquant` about a 401, and turns a non-2xx answer into
+ * `API <code>: <text>`. `path` is relative to `/api/v1`.
  */
 export async function send(path: string, options?: RequestInit): Promise<Response> {
   const res = await fetch(`${BASE}${path}`, authorized(options));
+  if (res.status === 401) rappelJetonManquant?.();
   if (!res.ok) throw new Error(`API ${res.status}: ${await messageDeLErreur(res)}`);
   return res;
 }

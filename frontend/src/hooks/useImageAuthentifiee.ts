@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { staticToken } from "../lib/auth";
+import { jetonEnCache } from "../lib/auth";
 import { BASE, send } from "../lib/http";
 
 export interface ImageChargee {
@@ -12,13 +12,13 @@ export interface ImageChargee {
 /**
  * Adresse affichable d'une image servie par l'API (`chemin` relatif à `/api/v1`).
  *
- * Sans jeton, l'adresse directe suffit. Avec `STATIC_TOKEN`, un `<img>` ne peut
- * pas porter d'en-tête et le backend refuse `?token=` hors WebSocket : l'image
- * passe par le client HTTP commun (Bearer), puis par une URL objet révoquée au
- * démontage ou au changement de chemin.
+ * Sans jeton, l'adresse directe suffit. Avec un jeton de session, un `<img>` ne
+ * peut pas porter d'en-tête et le backend refuse `?token=` hors WebSocket :
+ * l'image passe par le client HTTP commun (Bearer), puis par une URL objet
+ * révoquée au démontage ou au changement de chemin.
  */
 export function useImageAuthentifiee(chemin: string | null): ImageChargee {
-  const jeton = staticToken();
+  const jeton = jetonEnCache();
   const [objet, setObjet] = useState<{ chemin: string; url: string } | null>(null);
   const [echoue, setEchoue] = useState<string | null>(null);
 

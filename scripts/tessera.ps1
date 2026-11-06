@@ -202,6 +202,13 @@ switch ($Task) {
         Write-Host ''
         Write-Host '-> Backend  : http://localhost:8100/docs'
         Write-Host '-> Frontend : http://localhost:5173'
+        # Le jeton de session est ecrit par le backend dans le dossier d'etat, jamais
+        # dans le code servi par Vite : il voyage dans le fragment de l'URL.
+        $FichierJeton = Join-Path $env:LOCALAPPDATA 'Tessera\jeton-de-session'
+        if (Test-Path -LiteralPath $FichierJeton) {
+            $Jeton = (Get-Content -LiteralPath $FichierJeton -Raw).Trim()
+            Write-Host "-> Avec jeton : http://localhost:5173/#jeton=$Jeton"
+        }
         Write-Host '-> Arreter  : .\scripts\tessera.ps1 stop'
     }
     'test' {

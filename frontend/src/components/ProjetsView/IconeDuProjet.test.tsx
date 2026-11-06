@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
+import { oublierJeton, saisirJeton } from "../../lib/auth";
 import IconeDuProjet from "./IconeDuProjet";
 
 const AVEC_ICONE = { id: "serpent", name: "Serpent", icon: true };
@@ -8,7 +9,7 @@ let fetchSimule: ReturnType<typeof vi.fn<typeof fetch>>;
 let revoquer: ReturnType<typeof vi.fn<(url: string) => void>>;
 
 beforeEach(() => {
-  vi.stubEnv("VITE_STATIC_TOKEN", "secret-de-test");
+  saisirJeton("secret-de-test");
   fetchSimule = vi.fn<typeof fetch>(async () => new Response(new Uint8Array([137, 80, 78, 71])));
   vi.stubGlobal("fetch", fetchSimule);
   revoquer = vi.fn<(url: string) => void>();
@@ -17,7 +18,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  vi.unstubAllEnvs();
+  oublierJeton();
   vi.unstubAllGlobals();
   URL.createObjectURL = originaux.creer;
   URL.revokeObjectURL = originaux.revoquer;
