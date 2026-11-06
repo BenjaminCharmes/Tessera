@@ -102,6 +102,28 @@ class GitCommits(GitState):
         await self._run("commit", "-m", message)
         return True
 
+    async def est_modifie(self, chemin: str) -> bool:
+        """True when the tracked file `chemin` (project-relative) differs from HEAD.
+
+        Untracked files are not reported: a file git does not know yet has no
+        earlier state to protect (ticket-866).
+        """
+        statut = await self._run(
+            "status", "--porcelain", "--untracked-files=no", "--", chemin
+        )
+        return bool(statut.strip())
+
+    async def stager_chemins(self, chemins: list[str]) -> None:
+        """Stage exactly `chemins` (project-relative), without committing.
+
+        The next `commit_all` commits what is staged, run-policy files included:
+        naming a file here is the explicit decision that `commit_all` refuses to
+        take on its own. An ignored path is skipped, as in `commit_chemins`.
+        """
+        retenus = [c for c in chemins if not await self._is_ignored(c)]
+        if retenus:
+            await self._run("add", "-A", "--", *retenus)
+
     async def _list_tracked_ticket_basenames(self) -> frozenset[str]:
         """Return the basenames of tracked files under ``tickets/`` at call time.
 

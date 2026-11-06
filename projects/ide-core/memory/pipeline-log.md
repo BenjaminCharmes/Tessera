@@ -8057,3 +8057,15 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-06 00:43:04 UTC — [ticket-857] documentation: 3 fichier(s) (491297ms) — après tour de correction
 - 2026-11-06 00:43:21 UTC — [ticket-857] livraison: arrêt — Rebase refusé : error: cannot rebase: You have unstaged changes.
 error: Please commit or stash them.
+- 2026-11-06 01:10:07 UTC — [ticket-866] branche ticket-866-the-agents-json-description-written-by-the-docume
+- 2026-11-06 01:10:08 UTC — [ticket-866] tour 1 — codeur démarré
+- 2026-11-06 01:17:11 UTC — [ticket-866] tour 1 — codeur terminé (422328ms)
+- 2026-11-06 01:32:11 UTC — [ticket-866] testeur: dur�es : ruff 0 s, mypy 7 s, mypy-linux 11 s, pytest 896 s
+- 2026-11-06 01:34:32 UTC — [ticket-866] securite: PASS — Le diff introduit deux méthodes git (`est_modifie`, `stager_chemins`) et une log (140686ms)
+- 2026-11-06 01:34:32 UTC — [ticket-866] tour 1 — reviewer démarré
+- 2026-11-06 01:35:04 UTC — [ticket-866] tour 1 — reviewer terminé (32297ms)
+- 2026-11-06 01:36:56 UTC — [ticket-866] validateur: fichiers cités joints : agents.json
+- 2026-11-06 01:36:56 UTC — [ticket-866] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits : un test vérifie qu'une descri (144187ms)
+- 2026-11-06 01:36:56 UTC — [ticket-866] APPROVED après 1 tour(s)
+- 2026-11-06 01:38:28 UTC — [ticket-866] documentation: 0 fichier(s) (84313ms)
+- 2026-11-06 01:38:28 UTC — [ticket-847] documentation: pas de diff retrouvable, non documenté

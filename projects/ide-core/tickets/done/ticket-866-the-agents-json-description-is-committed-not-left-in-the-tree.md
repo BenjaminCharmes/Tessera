@@ -1,14 +1,15 @@
 ---
-id: ticket-866
-title: "The agents.json description written by the documentation is committed, not left in the tree"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-11-06
 depends_on: []
 estimated_days: 1
-created: 2026-11-06
+id: ticket-866
+pr_number: 950
+priority: high
+status: done
+title: The agents.json description written by the documentation is committed, not
+  left in the tree
+type: fix
 ---
 
 # ticket-866 — La description d'`agents.json` écrite par la documentation est commitée
