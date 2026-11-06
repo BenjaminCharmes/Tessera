@@ -18,6 +18,8 @@ from tessera.config import settings
 from tessera.main import app
 from tessera.models.ticket import TicketStatus
 from tessera.services.noyau.database import init_db
+from tessera.services.noyau.event_hub import EVENT_HUB
+from tessera.services.noyau.journal_du_texte import JOURNAL_DU_TEXTE
 from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent, PipelineResult
 
 
@@ -296,6 +298,40 @@ def test_un_abonne_recoit_les_tokens_de_son_run(
             if message.get("type") == "pipeline_done":
                 break
         assert "pipeline_done" in vus
+
+
+def test_un_abonne_tardif_recoit_le_texte_publie_avant_lui_dans_l_ordre(
+    client: TestClient,
+) -> None:
+    # Ticket-185 : le texte publié avant l'abonnement ne doit pas se perdre.
+    # Le journal seul est testé ailleurs ; ici, la chaîne entière — publication
+    # par le hub, relecture par le routeur à `{"subscribe": run_id}`.
+    run_id = "run-texte-tardif"
+    assert client.portal is not None
+
+    try:
+        for texte in ("premier ", "second"):
+            client.portal.call(
+                EVENT_HUB.publish,
+                OrchestratorEvent(
+                    type=EventType.AGENT_TOKEN,
+                    ticket_id="ticket-001",
+                    run_id=run_id,
+                    data={"text": texte},
+                ),
+            )
+
+        with client.websocket_connect("/api/v1/orchestrator/observe") as observateur:
+            assert observateur.receive_json()["type"] == "snapshot"
+            observateur.send_json({"subscribe": run_id})
+
+            rejoues = [observateur.receive_json() for _ in range(2)]
+
+        assert [m["type"] for m in rejoues] == ["agent_token", "agent_token"]
+        assert [m["data"]["text"] for m in rejoues] == ["premier ", "second"]
+        assert {m["run_id"] for m in rejoues} == {run_id}
+    finally:
+        JOURNAL_DU_TEXTE.oublier(run_id)
 
 
 def test_une_reponse_atteint_le_run_qu_elle_nomme(
