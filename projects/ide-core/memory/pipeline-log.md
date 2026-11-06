@@ -8300,3 +8300,21 @@ error: Please commit or stash them.
 - 2026-11-06 12:13:38 UTC — [ticket-876] validateur: APPROVED — Les trois critères d'acceptation ont été respectés. Le rôle 'orchestrateur' a ét (101218ms)
 - 2026-11-06 12:13:38 UTC — [ticket-876] APPROVED après 1 tour(s)
 - 2026-11-06 12:14:37 UTC — [ticket-876] documentation: 0 fichier(s) (54625ms)
+- 2026-11-06 12:20:00 UTC — [ide-core] ticket-876 PR #971 confiée au CIWatcher
+- 2026-11-06 12:12:44 UTC — [ide-core] ticket-874 PR #970 mergée (CI verte)
+- 2026-11-06 12:20:05 UTC — [ticket-880] branche ticket-880-a-pipeline-gate-cannot-be-lowered-while-any-run-i
+- 2026-11-06 12:20:06 UTC — [ticket-880] tour 1 — codeur démarré
+- 2026-11-06 12:22:31 UTC — [ticket-880] tour 1 — codeur terminé (144172ms)
+- 2026-11-06 12:23:07 UTC — [ticket-880] testeur: dur�es : ruff 0 s, pytest 33 s
+- 2026-11-06 12:23:07 UTC — [ticket-880] tests rouges au tour 1
+- 2026-11-06 12:23:07 UTC — [ticket-880] tour 2 — codeur démarré
+- 2026-11-06 12:23:28 UTC — [ticket-880] tour 2 — codeur terminé (21688ms)
+- 2026-11-06 12:23:56 UTC — [ticket-880] testeur: dur�es : ruff 0 s, mypy 13 s, pytest 15 s, mypy-linux 12 s
+- 2026-11-06 12:24:11 UTC — [ticket-880] securite: PASS — Le diff ne fait que durcir le pipeline. Pendant un run, il refuse 409 sur deux t (14718ms)
+- 2026-11-06 12:24:11 UTC — [ticket-880] tour 2 — reviewer démarré
+- 2026-11-06 12:24:37 UTC — [ticket-880] tour 2 — reviewer terminé (25686ms)
+- 2026-11-06 12:26:15 UTC — [ticket-880] validateur: fichiers cités joints : backend/tests/test_pipeline_portes.py, agent_admin.py
+- 2026-11-06 12:26:15 UTC — [ticket-880] validateur: APPROVED — Tous les critères d'acceptation ont été vérifiés : un test couvre `abaisse_une_p (124031ms)
+- 2026-11-06 12:26:15 UTC — [ticket-880] APPROVED après 2 tour(s)
+- 2026-11-06 12:27:41 UTC — [ticket-880] leçons: une leçon proposée
+- 2026-11-06 12:30:09 UTC — [ticket-880] documentation: 0 fichier(s) (143375ms)

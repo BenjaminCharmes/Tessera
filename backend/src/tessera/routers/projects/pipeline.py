@@ -7,11 +7,14 @@ from pydantic import BaseModel
 
 from tessera.routers.projects.shared import new_router, require_project_path
 from tessera.services.gardes.politique_run import PolitiqueRun
+from tessera.services.gardes.portes_pipeline import abaisse_une_porte
 from tessera.services.pipeline.run_registry import RUN_REGISTRY
 from tessera.services.projets.manifeste_ecriture import AgentAbsentDuProjet, set_pipeline_settings
 from tessera.services.projets.project_loader import load_pipeline_config
+from tessera.utils.logger import get_logger
 
 router = new_router()
+_logger = get_logger(__name__)
 
 
 class PipelineReglages(BaseModel):
@@ -57,6 +60,27 @@ def _reglages(project_path: Path) -> PipelineReglages:
     )
 
 
+def _refuser_ou_noter_abaissement(
+    project_id: str, actuel: PipelineReglages, recus: dict[str, object]
+) -> None:
+    """409 si la demande abaisse une porte alors qu'un run vit, où que ce soit.
+
+    Entre deux runs aucun processus d'agent n'existe : refuser pendant un run
+    ferme la fenêtre où un agent pourrait baisser sa propre porte. Un
+    abaissement accepté laisse une trace (ticket-880).
+    """
+    champs = abaisse_une_porte(actuel.model_dump(), recus)
+    if not champs:
+        return
+    if RUN_REGISTRY.vivants():
+        raise HTTPException(
+            status_code=409,
+            detail="Un run est en cours : une porte du pipeline ne s'abaisse pas "
+            f"pendant un run ({', '.join(champs)}). Attends la fin de la file ou arrête-la.",
+        )
+    _logger.warning("porte_abaissee", extra={"project_id": project_id, "champs": champs})
+
+
 @router.get("/{project_id}/pipeline", response_model=PipelineReglages)
 async def get_pipeline_settings(project_id: str) -> PipelineReglages:
     """Ce que le pipeline de ce projet fait, défauts appliqués."""
@@ -99,6 +123,7 @@ async def set_pipeline_settings_route(
             detail="testeur_enabled exige une test_command : sans elle, l'absence "
             "de tests se lirait comme des tests verts.",
         )
+    _refuser_ou_noter_abaissement(project_id, actuel, recus)
     pipeline = {k: v for k, v in recus.items() if k not in ("autonomy", "merge_without_ci")}
     racine = {k: v for k, v in recus.items() if k in ("autonomy", "merge_without_ci")}
     retirer: tuple[str, ...] = ()
