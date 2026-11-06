@@ -6,13 +6,15 @@ Couverture :
 - une branche qui ne peut pas être comparée → refus (échec fermé, ADR-039) ;
 - que du rangement après l'approbation → la PR s'ouvre, `pushed_sha` est noté ;
 - un rebase du pipeline qui change la tête → `pushed_sha` est la tête rebasée ;
-- sans `approved_sha`, aucune comparaison (comportement d'avant).
+- un run approuvé sans `approved_sha` lisible → refus, ni rebase ni PR (ticket-872) ;
+- un run non approuvé garde son arrêt d'avant.
 """
 import json
 from pathlib import Path
 
 from tessera.services.git_workspace import GitCommandError
 from tessera.services.livraison.livraison import Livraison, LivraisonService
+from tessera.services.livraison.livraison_arrets import ARRET_NON_APPROUVE
 
 _APPROUVE = "a1" * 20
 _INTRUS = "bad0" * 10
@@ -151,10 +153,35 @@ async def test_pipeline_rebase_updates_pushed_sha(tmp_path: Path) -> None:
     assert livraison.pushed_sha != _APPROUVE
 
 
-async def test_without_approved_sha_nothing_is_compared(tmp_path: Path) -> None:
-    git, wf = _FauxGit(intrus=[_INTRUS]), _FauxWorkflow()
+async def test_approved_run_without_readable_sha_blocks_without_push(tmp_path: Path) -> None:
+    git, wf = _FauxGit(intrus=[]), _FauxWorkflow()
 
     livraison = await _livrer(_service(tmp_path, git, wf), None)
 
+    assert livraison.arret
+    assert "aucun SHA approuvé lisible" in livraison.arret
+    assert livraison.pr_number is None
+    assert livraison.branche_modifiee is True
+    assert livraison.bloque_le_ticket is True
     assert "comparaison" not in git.appels
-    assert livraison.pr_number == 7
+    assert "rebase" not in git.appels
+    assert wf.ouvertes == 0
+
+
+async def test_unapproved_run_keeps_its_behaviour(tmp_path: Path) -> None:
+    git, wf = _FauxGit(intrus=[]), _FauxWorkflow()
+
+    livraison = await _service(tmp_path, git, wf).livrer_phase_1(
+        ticket_id="ticket-001",
+        ticket_title="Du travail",
+        ticket_body="",
+        branch="ticket-001-slug",
+        approuve=False,
+        approved_sha=None,
+    )
+
+    assert livraison.arret == ARRET_NON_APPROUVE
+    assert livraison.branche_modifiee is False
+    assert livraison.pr_number is None
+    assert git.appels == []
+    assert wf.ouvertes == 0

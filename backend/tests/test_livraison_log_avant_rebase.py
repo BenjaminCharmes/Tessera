@@ -135,6 +135,7 @@ async def test_seul_journal_modifie_rebase_sans_erreur(repo: Path) -> None:
         ticket_body="",
         branch="ticket-001-slug",
         approuve=True,
+        approved_sha=await git.head_sha(),
     )
 
     assert resultat.arret is None, (
@@ -167,6 +168,7 @@ async def test_lignes_de_journal_commitees_avant_rebase(repo: Path) -> None:
         ticket_body="",
         branch="ticket-001-slug",
         approuve=True,
+        approved_sha=await git.head_sha(),
     )
 
     # Après la livraison, le commit de tenue de livres doit figurer dans le log.
@@ -203,6 +205,7 @@ async def test_fichier_de_code_modifie_bloque_la_livraison(repo: Path) -> None:
         ticket_body="",
         branch="ticket-001-slug",
         approuve=True,
+        approved_sha=await git.head_sha(),
     )
 
     assert resultat.arret is not None, (

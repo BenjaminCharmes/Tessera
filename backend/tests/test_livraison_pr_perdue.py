@@ -26,6 +26,9 @@ class _FauxGit:
     async def commit_bookkeeping(self) -> None:
         pass
 
+    async def commits_hors_rangement(self, depuis: str) -> list[str]:
+        return []
+
 
 class _WorkflowAReponsePerdue:
     """Opening the PR times out; the search answers as configured."""
@@ -75,6 +78,7 @@ async def _phase_1(svc: LivraisonService) -> object:
         ticket_body="",
         branch=_BRANCH,
         approuve=True,
+        approved_sha="a1" * 20,
     )
 
 

@@ -77,6 +77,7 @@ async def _livrer(root: Path, resolveur: object | None) -> tuple[Livraison, _Wor
         ticket_body="",
         branch="ticket-005-x",
         approuve=True,
+        approved_sha=await GitWorkspaceService(root).head_sha(),
     )
     return livraison, workflow
 
