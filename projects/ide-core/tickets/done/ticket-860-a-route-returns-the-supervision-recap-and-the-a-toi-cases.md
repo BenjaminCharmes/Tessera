@@ -5,7 +5,7 @@ depends_on:
 - ticket-853
 estimated_days: 1
 id: ticket-860
-pr_number: null
+pr_number: 952
 priority: medium
 status: done
 title: A route returns the supervision recap and the A-toi cases
