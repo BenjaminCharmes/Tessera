@@ -8,7 +8,7 @@ depends_on:
 - ticket-858
 estimated_days: 1
 id: ticket-859
-pr_number: null
+pr_number: 957
 priority: high
 status: done
 title: A background task runs the supervisor on events and every 15 minutes
