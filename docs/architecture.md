@@ -1190,6 +1190,10 @@ Le module `services/documentation/documentation_code.py` (ticket-540) produit ce
 
 La fonction accepte une base explicite (commit ou branche) pour le diff, ce qui permet au run d'extraire les changements depuis le commit de la branche de travail — utile si la branche n'a pas encore été rebasée sur `main`. Les appelants existants gardent leur comportement (diff contre `main` par défaut).
 
+### Protection de la configuration lors de la documentation (ticket-866)
+
+La documentation réécrit la clé `description` d'`agents.json` pour enregistrer la description du produit. Deux protections garantissent l'arbre propre (ADR-018) : (1) une modification préexistante de l'interface pendant le run ne doit pas partir avec le commit de doc ; (2) `commit_all()` exclut normalement ce fichier de politique du run (ticket-296), donc la description stagée nommément pour la reprendre. Le mécanisme lit l'état de `agents.json` avant le lot et décide après coup si la description s'ajoute au commit ou se refuse.
+
 ## Livraison (ADR-029, ADR-030, ADR-051)
 
 Après approbation du pipeline, la livraison s'enchaîne automatiquement — rebase 
