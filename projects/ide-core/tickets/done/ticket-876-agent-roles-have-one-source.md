@@ -4,7 +4,7 @@ created: 2026-11-06
 depends_on: []
 estimated_days: 0.5
 id: ticket-876
-pr_number: null
+pr_number: 971
 priority: medium
 status: done
 title: The AgentRole enum only names roles the registry knows, checked by a test
