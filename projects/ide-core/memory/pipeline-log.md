@@ -8357,3 +8357,16 @@ error: Please commit or stash them.
 - 2026-11-06 14:23:06 UTC — [ticket-878] APPROVED après 2 tour(s)
 - 2026-11-06 14:23:48 UTC — [ticket-878] leçons: refusée — preuve absente du retour du run
 - 2026-11-06 14:26:52 UTC — [ticket-878] documentation: 0 fichier(s) (179454ms)
+- 2026-11-06 14:35:25 UTC — [ide-core] ticket-878 : base réalignée sur develop
+- 2026-11-06 14:35:25 UTC — [ide-core] ticket-878 PR #978 confiée au CIWatcher
+- 2026-11-06 14:35:22 UTC — [ide-core] ticket-878 PR #978 mergée (CI verte)
+- 2026-11-06 14:35:30 UTC — [ticket-882] branche ticket-882-the-secrets-check-scans-added-lines-even-when-the
+- 2026-11-06 14:35:31 UTC — [ticket-882] tour 1 — codeur démarré
+- 2026-11-06 14:41:06 UTC — [ticket-882] tour 1 — codeur terminé (334500ms)
+- 2026-11-06 14:43:31 UTC — [ticket-882] testeur: dur�es : ruff 1 s, mypy 19 s, mypy-linux 24 s, pytest 141 s
+- 2026-11-06 14:43:49 UTC — [ticket-882] securite: PASS — Le diff renforce la porte des secrets. Un en-tête `+++` illisible ou sans préfix (17922ms)
+- 2026-11-06 14:43:49 UTC — [ticket-882] tour 1 — reviewer démarré
+- 2026-11-06 14:44:13 UTC — [ticket-882] tour 1 — reviewer terminé (24000ms)
+- 2026-11-06 14:47:51 UTC — [ticket-882] validateur: fichiers cités joints : backend/tests/test_secrets_diff.py ; absents : dossier/naïf.py
+- 2026-11-06 14:47:51 UTC — [ticket-882] validateur: APPROVED — Les trois critères d'acceptation ont été satisfaits. Le code implémente correcte (242389ms)
+- 2026-11-06 14:47:51 UTC — [ticket-882] APPROVED après 1 tour(s)
