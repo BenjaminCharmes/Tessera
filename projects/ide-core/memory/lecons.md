@@ -6,6 +6,7 @@ Pièges observés sur ce projet, une ligne chacun. Le service écrit sous `## Pr
 - Quand on abaisse le plafond de longueur d'un fichier lors d'une refactorisation, mesurer le bilan net en lignes avant de soumettre — l'extraction seule peut ne pas suffire. (source : ticket-875, 2026-11-06)
 - Quand on ajoute du logging via `get_logger()`, vérifier d'abord que ce log sera visible aux tests avant de les écrire. (source : ticket-880, 2026-11-06)
 - Quand on protège un chemin sans développer les variables d'environnement et le ~, la protection peut être contournée. (source : ticket-879, 2026-11-06)
+- Quand on centralise une fonction et l'importe partout, vérifier que chaque fichier reste sous 300 lignes. (source : ticket-888, 2026-11-06)
 
 ## En vigueur
 - Quand tu ajoutes ou modifies une route ou un modèle de réponse FastAPI, régénère et commite `docs/openapi.json`, et range la route dans `frontend/src/test/contrat/perimetre.ts` (couverte ou hors périmètre). (source : ticket-860, ticket-864, 2026-11-06)

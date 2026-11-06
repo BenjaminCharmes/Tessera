@@ -837,9 +837,10 @@ class TestEnvironnementDeclare:
 
         assert result.passed is True
 
-    async def test_without_env_the_process_gets_no_environment_argument(
-        self, tmp_path: Path
+    async def test_without_env_the_process_gets_the_inherited_environment(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
+        monkeypatch.setenv("TESSERA_888_ORDINAIRE", "herite")
         proc = MagicMock()
         proc.returncode = 0
         proc.communicate = AsyncMock(return_value=(b"1 passed", b""))
@@ -847,4 +848,4 @@ class TestEnvironnementDeclare:
         with patch("asyncio.create_subprocess_exec", return_value=proc) as lance:
             await TestRunnerService().run_tests(tmp_path, test_command="make test")
 
-        assert lance.call_args.kwargs["env"] is None
+        assert lance.call_args.kwargs["env"]["TESSERA_888_ORDINAIRE"] == "herite"

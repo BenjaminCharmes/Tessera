@@ -22,6 +22,7 @@ from tessera.services.noyau.arret_de_service import describe_error, terminate_if
 from tessera.services.noyau.groupe_de_processus import creer_groupe, fermer_le_groupe, rattacher, rattacher_au_groupe, tuer_l_arbre
 from tessera.services.noyau.lancement import essais_de_commande, options_de_lancement
 from tessera.services.providers.perimetre import racine_autorisee
+from tessera.services.verification.env_du_code_de_projet import env_du_code_de_projet
 from tessera.services.verification.service_etat import ServiceEtat
 from tessera.utils.logger import get_logger
 
@@ -296,14 +297,13 @@ class ProcessRegistry:
         d'une copie, et le testeur, qui ne l'avait pas, rendait `blocked` des
         tickets dont le code était juste (ticket-143, ticket-157).
         """
-        essais = essais_de_commande(args)
-
         derniere: FileNotFoundError | None = None
-        for tentative in essais:
+        for tentative in essais_de_commande(args):
             try:
                 return await asyncio.create_subprocess_exec(
                     *tentative,
                     cwd=str(dossier),
+                    env=env_du_code_de_projet(),
                     stdout=asyncio.subprocess.PIPE,
                     stderr=asyncio.subprocess.STDOUT,
                     **options_de_lancement(os.name),

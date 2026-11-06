@@ -19,6 +19,7 @@ from tessera.services.noyau.lancement import essais_de_commande, options_de_lanc
 from tessera.services.verification.captures import app_repond
 from tessera.services.verification.captures_config import ConfigCaptures
 from tessera.services.verification.controle_visuel import JETON_PORT, Demarrage
+from tessera.services.verification.env_du_code_de_projet import env_du_code_de_projet
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -83,6 +84,7 @@ async def demarrer_processus(args: list[str], cwd: Path) -> AppLancee:
             processus = await asyncio.create_subprocess_exec(
                 *tentative,
                 cwd=str(cwd),
+                env=env_du_code_de_projet(),
                 stdin=asyncio.subprocess.DEVNULL,
                 stdout=asyncio.subprocess.DEVNULL,
                 stderr=asyncio.subprocess.DEVNULL,

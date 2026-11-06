@@ -16,6 +16,7 @@ from urllib.parse import urlsplit
 from tessera.config import settings
 from tessera.services.noyau.lancement import essais_de_commande
 from tessera.services.verification.captures_config import ConfigCaptures
+from tessera.services.verification.env_du_code_de_projet import env_du_code_de_projet
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -131,6 +132,7 @@ async def _lancer_le_script(
     processus = await asyncio.create_subprocess_exec(
         *commande,
         str(sortie),
+        env=env_du_code_de_projet(),
         stdin=asyncio.subprocess.PIPE,
         stdout=asyncio.subprocess.DEVNULL,
         stderr=asyncio.subprocess.PIPE,

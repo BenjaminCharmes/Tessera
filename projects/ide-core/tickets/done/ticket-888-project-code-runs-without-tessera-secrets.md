@@ -4,10 +4,11 @@ created: 2026-11-06
 depends_on: []
 estimated_days: 0.5
 id: ticket-888
-pr_number: null
+pr_number: 988
 priority: high
-status: todo
-title: Every process that runs project code gets an environment without Tessera's secrets
+status: done
+title: Every process that runs project code gets an environment without Tessera's
+  secrets
 type: fix
 ---
 
