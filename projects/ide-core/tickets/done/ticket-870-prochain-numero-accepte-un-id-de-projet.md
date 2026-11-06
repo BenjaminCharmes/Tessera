@@ -5,7 +5,7 @@ depends_on:
 - ticket-869
 estimated_days: 0.5
 id: ticket-870
-pr_number: null
+pr_number: 964
 priority: medium
 status: done
 title: prochain_numero.py accepts a project id and refuses a missing folder
