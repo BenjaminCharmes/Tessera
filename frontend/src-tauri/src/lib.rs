@@ -42,6 +42,27 @@ fn spawn_backend() -> Option<Child> {
     }
 }
 
+// Session token written by the backend at each start, read here so the webview never
+// holds it in its bundle. Same location as `default_state_dir` in the backend's config.
+fn token_path() -> Result<std::path::PathBuf, String> {
+    let (var, tail) = if cfg!(windows) {
+        ("LOCALAPPDATA", "Tessera/jeton-de-session")
+    } else {
+        ("HOME", ".local/state/tessera/jeton-de-session")
+    };
+    let base = std::env::var_os(var).ok_or_else(|| format!("{var} is not set"))?;
+    Ok(std::path::PathBuf::from(base).join(tail))
+}
+
+// No `fs` plugin (ADR-040): one command, one file.
+#[tauri::command]
+fn jeton_de_session() -> Result<String, String> {
+    let path = token_path()?;
+    std::fs::read_to_string(&path)
+        .map(|content| content.trim().to_owned())
+        .map_err(|err| format!("{}: {err}", path.display()))
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     // In dev mode (debug build) the user starts the backend with `make dev` or `make run`.
@@ -56,6 +77,7 @@ pub fn run() {
         // System notifications when a run needs someone (ticket-200). Its only
         // capability is `notification:default`; nothing reaches the disk.
         .plugin(tauri_plugin_notification::init())
+        .invoke_handler(tauri::generate_handler![jeton_de_session])
         .setup(|app| {
             if cfg!(debug_assertions) {
                 app.handle().plugin(

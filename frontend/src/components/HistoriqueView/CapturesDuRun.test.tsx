@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import DetailDuRun from "./DetailDuRun";
+import { oublierJeton, saisirJeton } from "../../lib/auth";
 import { _viderCacheResource } from "../../hooks/useResource";
 import type { PipelineRun, Project } from "../../types/api";
 
@@ -94,13 +95,13 @@ describe("DetailDuRun — captures du run (ticket-620)", () => {
     const revoquer = URL.revokeObjectURL;
 
     afterEach(() => {
-      vi.unstubAllEnvs();
+      oublierJeton();
       URL.createObjectURL = creer;
       URL.revokeObjectURL = revoquer;
     });
 
     it("loads each image with the Authorization header, shows an object URL, and revokes it on unmount", async () => {
-      vi.stubEnv("VITE_STATIC_TOKEN", "secret-de-test");
+      saisirJeton("secret-de-test");
       const revoque = vi.fn<(url: string) => void>();
       URL.createObjectURL = vi.fn(() => "blob:http://localhost/capture");
       URL.revokeObjectURL = revoque;

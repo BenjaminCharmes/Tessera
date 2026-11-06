@@ -8318,3 +8318,17 @@ error: Please commit or stash them.
 - 2026-11-06 12:26:15 UTC — [ticket-880] APPROVED après 2 tour(s)
 - 2026-11-06 12:27:41 UTC — [ticket-880] leçons: une leçon proposée
 - 2026-11-06 12:30:09 UTC — [ticket-880] documentation: 0 fichier(s) (143375ms)
+- 2026-11-06 12:36:04 UTC — [ide-core] ticket-880 PR #972 confiée au CIWatcher
+- 2026-11-06 12:35:26 UTC — [ide-core] ticket-876 PR #971 mergée (CI verte)
+- 2026-11-06 12:36:09 UTC — [ticket-877] branche ticket-877-the-frontend-and-the-tauri-app-get-the-api-sessio
+- 2026-11-06 12:36:58 UTC — [ticket-877] plan rendu (47327ms)
+- 2026-11-06 12:36:58 UTC — [ticket-877] tour 1 — codeur démarré
+- 2026-11-06 12:42:27 UTC — [ticket-877] tour 1 — codeur terminé (329360ms)
+- 2026-11-06 12:55:15 UTC — [ticket-877] testeur: dur�es : ruff 0 s, mypy 9 s, mypy-linux 13 s, tsc 28 s, eslint 55 s, vitest 231 s, pytest 764 s
+- 2026-11-06 12:55:42 UTC — [ticket-877] securite: PASS — Ce diff retire VITE_STATIC_TOKEN, qui était inscrit dans le bundle. Le jeton vie (26875ms)
+- 2026-11-06 12:55:42 UTC — [ticket-877] tour 1 — reviewer démarré
+- 2026-11-06 12:56:21 UTC — [ticket-877] tour 1 — reviewer terminé (39109ms)
+- 2026-11-06 13:00:30 UTC — [ticket-877] validateur: fichiers cités joints : frontend/src/lib/auth.test.ts, auth.test.ts, frontend/src/lib/http.test.ts, frontend/src/lib/ws.test.ts, frontend/src/ (dossier, 8 fichiers), frontend/src-tauri/src/lib.rs
+- 2026-11-06 13:00:30 UTC — [ticket-877] validateur: APPROVED — Tous les critères d'acceptation ont été satisfaits. Le code implémente correctem (288032ms)
+- 2026-11-06 13:00:30 UTC — [ticket-877] APPROVED après 1 tour(s)
+- 2026-11-06 13:03:25 UTC — [ticket-877] documentation: 0 fichier(s) (169764ms)

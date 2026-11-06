@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 // Every access goes through the backend: the desktop shell has no file
 // commands of its own (ticket-124).
+import { oublierJeton, saisirJeton } from "./auth";
 import { readFile, listEntries } from "./fs";
 
 const mockFetch = vi.fn();
@@ -11,7 +12,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  vi.unstubAllEnvs();
+  oublierJeton();
 });
 
 describe("readFile (web mode)", () => {
@@ -67,14 +68,14 @@ describe("listEntries", () => {
 
 // ticket-120 : le mode web de fs.ts parle au même backend que api.ts, avec le
 // même 401 si le Bearer manque.
-describe("fs et STATIC_TOKEN (web mode)", () => {
+describe("fs et jeton de session (web mode)", () => {
   function authorizationOf(call: number): string | null {
     const [, init] = mockFetch.mock.calls[call] as [string, RequestInit];
     return new Headers(init.headers).get("Authorization");
   }
 
   it("pose le Bearer sur readFile et listEntries", async () => {
-    vi.stubEnv("VITE_STATIC_TOKEN", "s3cret");
+    saisirJeton("s3cret");
     mockFetch.mockResolvedValue({
       ok: true,
       text: () => Promise.resolve(""),
@@ -89,7 +90,6 @@ describe("fs et STATIC_TOKEN (web mode)", () => {
   });
 
   it("n'envoie aucun Authorization sans token", async () => {
-    vi.stubEnv("VITE_STATIC_TOKEN", "");
     mockFetch.mockResolvedValue({ ok: true, text: () => Promise.resolve("") });
 
     await readFile("/a.md");

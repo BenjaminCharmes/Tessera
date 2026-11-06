@@ -4,10 +4,10 @@ created: 2026-11-06
 depends_on: []
 estimated_days: 1
 id: ticket-877
-pr_number: null
-priority: critical
 plan: true
-status: todo
+pr_number: 976
+priority: critical
+status: done
 title: The frontend and the Tauri app get the API session token without bundling it
 type: feat
 ---

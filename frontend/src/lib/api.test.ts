@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { api } from "./api";
+import { oublierJeton, saisirJeton } from "./auth";
 
 const mockFetch = vi.fn();
 vi.stubGlobal("fetch", mockFetch);
@@ -9,7 +10,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  vi.unstubAllEnvs();
+  oublierJeton();
 });
 
 describe("api.projects.list", () => {
@@ -292,9 +293,9 @@ describe("api.tickets.batch", () => {
 // ticket-120 : renseigner STATIC_TOKEN côté backend mettait toute l'UI en 401,
 // parce que rien ici ne posait le Bearer. Le token se lit à l'appel, pas au
 // chargement du module, pour que les deux cas soient testables côte à côte.
-describe("api et STATIC_TOKEN", () => {
-  it("pose Authorization: Bearer quand VITE_STATIC_TOKEN est défini", async () => {
-    vi.stubEnv("VITE_STATIC_TOKEN", "s3cret");
+describe("api et jeton de session", () => {
+  it("pose Authorization: Bearer quand un jeton est défini", async () => {
+    saisirJeton("s3cret");
     mockFetch.mockResolvedValue({ ok: true, json: () => Promise.resolve([]) });
 
     await api.projects.list();
@@ -307,7 +308,7 @@ describe("api et STATIC_TOKEN", () => {
   });
 
   it("garde les en-têtes existants en ajoutant le Bearer", async () => {
-    vi.stubEnv("VITE_STATIC_TOKEN", "s3cret");
+    saisirJeton("s3cret");
     mockFetch.mockResolvedValue({ ok: true, json: () => Promise.resolve({}) });
 
     await api.projects.create("app", "desc");
@@ -320,7 +321,6 @@ describe("api et STATIC_TOKEN", () => {
   });
 
   it("n'envoie aucun Authorization sans token", async () => {
-    vi.stubEnv("VITE_STATIC_TOKEN", "");
     mockFetch.mockResolvedValue({ ok: true, json: () => Promise.resolve([]) });
 
     await api.projects.list();
@@ -329,7 +329,7 @@ describe("api et STATIC_TOKEN", () => {
   });
 
   it("pose le Bearer aussi sur DELETE", async () => {
-    vi.stubEnv("VITE_STATIC_TOKEN", "s3cret");
+    saisirJeton("s3cret");
     mockFetch.mockResolvedValue({ ok: true });
 
     await api.agents.remove("coder");

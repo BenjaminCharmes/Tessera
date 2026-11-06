@@ -1,11 +1,12 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { api } from "./api";
-import { request, requestText, send } from "./http";
+import { oublierJeton, saisirJeton } from "./auth";
+import { onJetonManquant, request, requestText, send } from "./http";
 import { statutsDuRun } from "./statutDuRun";
 
 afterEach(() => {
   vi.unstubAllGlobals();
-  vi.unstubAllEnvs();
+  oublierJeton();
 });
 
 type AppelDeFetch = (url: string, init?: RequestInit) => Promise<Response>;
@@ -25,7 +26,7 @@ describe("send", () => {
   });
 
   it("adds the Bearer token when one is set", async () => {
-    vi.stubEnv("VITE_STATIC_TOKEN", "secret");
+    saisirJeton("secret");
     const fetchSimule = vi.fn<AppelDeFetch>(async () => reponse("{}"));
     vi.stubGlobal("fetch", fetchSimule);
 
@@ -39,6 +40,32 @@ describe("send", () => {
     vi.stubGlobal("fetch", vi.fn(async () => reponse("down", 503)));
 
     await expect(send("/x")).rejects.toThrow("API 503: down");
+  });
+
+  it("calls onJetonManquant on a 401, then carries the typed token on the next request", async () => {
+    const fetchSimule = vi.fn<AppelDeFetch>(async () => reponse("non", 401));
+    vi.stubGlobal("fetch", fetchSimule);
+    const rappel = vi.fn(() => saisirJeton("saisi"));
+    const retirer = onJetonManquant(rappel);
+
+    await expect(send("/projects")).rejects.toThrow("API 401: non");
+    fetchSimule.mockImplementation(async () => reponse("{}"));
+    await send("/projects");
+    retirer();
+
+    expect(rappel).toHaveBeenCalledTimes(1);
+    const init = (fetchSimule.mock.calls[1] as [string, RequestInit | undefined])[1];
+    expect(new Headers(init?.headers).get("Authorization")).toBe("Bearer saisi");
+  });
+
+  it("stops calling onJetonManquant once it is unregistered", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => reponse("non", 401)));
+    const rappel = vi.fn();
+    onJetonManquant(rappel)();
+
+    await send("/projects").catch(() => undefined);
+
+    expect(rappel).not.toHaveBeenCalled();
   });
 
   it("falls back to the status text when the body cannot be read", async () => {
