@@ -8188,3 +8188,14 @@ error: Please commit or stash them.
 - 2026-11-06 05:46:11 UTC — [ticket-861] validateur: APPROVED — Tous les critères d'acceptation ont été satisfaits. Le code implémente correctem (231172ms)
 - 2026-11-06 05:46:11 UTC — [ticket-861] APPROVED après 1 tour(s)
 - 2026-11-06 05:50:03 UTC — [ticket-861] documentation: 0 fichier(s) (222969ms)
+- 2026-11-06 05:53:32 UTC — [ide-core] ticket-861 PR #958 confiée au CIWatcher
+- 2026-11-06 05:40:46 UTC — [ide-core] ticket-859 PR #957 mergée (CI verte)
+- 2026-11-06 05:53:44 UTC — [ticket-867] branche ticket-867-the-supervisor-loop-reads-the-inputs-of-the-pr-ha
+- 2026-11-06 05:53:46 UTC — [ticket-867] tour 1 — codeur démarré
+- 2026-11-06 06:01:34 UTC — [ticket-867] tour 1 — codeur terminé (467907ms)
+- 2026-11-06 06:04:03 UTC — [ticket-867] testeur: dur�es : ruff 1 s, mypy 10 s, mypy-linux 13 s, pytest 145 s
+- 2026-11-06 06:06:22 UTC — [ticket-867] securite: PASS — Audit of ticket-867 superviseur orchestration code shows no CRITICAL or HIGH sec (138375ms)
+- 2026-11-06 06:06:22 UTC — [ticket-867] tour 1 — reviewer démarré
+- 2026-11-06 06:06:58 UTC — [ticket-867] tour 1 — reviewer terminé (36561ms)
+- 2026-11-06 06:09:52 UTC — [ticket-867] validateur: APPROVED — Tous les critères d'acceptation ont été satisfaits. Les tests associés confirmen (209906ms)
+- 2026-11-06 06:09:52 UTC — [ticket-867] APPROVED après 1 tour(s)
