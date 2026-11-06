@@ -48,6 +48,7 @@ from tessera.services.pipeline.reprise_worktrees import reprendre_worktrees_orph
 from tessera.services.pipeline.run_registry import RUN_REGISTRY
 from tessera.services.pipeline.signalements_en_attente import migrer_ancien_fichier
 from tessera.services.supervision.anomalies.detecteur import DetecteurDAnomalies, arreter_le_detecteur
+from tessera.services.supervision.superviseur_collecte import boucle_du_superviseur
 from tessera.services.verification.process_registry import PROCESS_REGISTRY
 from tessera.utils.access_log_redaction import install_token_redaction
 from tessera.utils.logger import configure_file_logging, get_logger, install_asyncio_exception_handler
@@ -117,7 +118,10 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         if settings.anomalies_actives
         else None
     )
+    # Le superviseur (ADR-080) : ne démarre que si un projet déclare le rôle actif.
+    superviseur = asyncio.create_task(boucle_du_superviseur().boucle())
     yield
+    await arreter_le_detecteur(superviseur)
     await arreter_le_detecteur(detecteur)
     # Les services lancés pour un projet sont des enfants de ce process et
     # s'arrêtent avec lui (ADR-042). Les terminer explicitement rend l'arrêt

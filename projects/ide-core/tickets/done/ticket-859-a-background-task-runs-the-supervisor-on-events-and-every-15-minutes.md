@@ -1,14 +1,18 @@
 ---
-id: ticket-859
-title: "A background task runs the supervisor on events and every 15 minutes"
-type: feat
-status: todo
-priority: high
 agent: codeur
-depends_on: [ticket-855, ticket-856, ticket-857, ticket-858]
-estimated_days: 1
 created: 2026-11-05
-pr_number: null
+depends_on:
+- ticket-855
+- ticket-856
+- ticket-857
+- ticket-858
+estimated_days: 1
+id: ticket-859
+pr_number: 957
+priority: high
+status: done
+title: A background task runs the supervisor on events and every 15 minutes
+type: feat
 ---
 
 # ticket-859 — La tâche de fond du superviseur : événements et balayage de 15 minutes
