@@ -52,6 +52,7 @@ COUPLES: list[tuple[str, str]] = [
     ("GET", "/api/v1/services/running"),
     ("GET", "/api/v1/services/running/activite"),
     ("GET", "/api/v1/services/running/avertissements"),
+    ("GET", "/api/v1/supervision/recap"),
     ("GET", "/api/v1/tessera/salle"),
     ("GET", "/api/v1/usage/quota"),
     ("GET", "/api/v1/usage/recent-runs"),
