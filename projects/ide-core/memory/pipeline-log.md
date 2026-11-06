@@ -8259,3 +8259,16 @@ error: Please commit or stash them.
 - 2026-11-06 11:34:02 UTC — [ticket-875] APPROVED après 2 tour(s)
 - 2026-11-06 11:35:05 UTC — [ticket-875] leçons: une leçon proposée
 - 2026-11-06 11:37:17 UTC — [ticket-875] documentation: 0 fichier(s) (126952ms)
+- 2026-11-06 11:39:31 UTC — [ide-core] ticket-875 PR #968 confiée au CIWatcher
+- 2026-11-06 11:28:08 UTC — [ide-core] ticket-872 PR #967 mergée (CI verte)
+- 2026-11-06 11:39:35 UTC — [ticket-873] branche ticket-873-agent-subprocesses-receive-no-github-credentials
+- 2026-11-06 11:39:37 UTC — [ticket-873] tour 1 — codeur démarré
+- 2026-11-06 11:40:35 UTC — [ticket-873] tour 1 — codeur terminé (58375ms)
+- 2026-11-06 11:41:07 UTC — [ticket-873] testeur: dur�es : ruff 0 s, mypy 6 s, mypy-linux 9 s, pytest 28 s
+- 2026-11-06 11:41:20 UTC — [ticket-873] securite: PASS — Le diff durcit la sécurité : il retire les identifiants GitHub (jetons, session  (13093ms)
+- 2026-11-06 11:41:20 UTC — [ticket-873] tour 1 — reviewer démarré
+- 2026-11-06 11:41:40 UTC — [ticket-873] tour 1 — reviewer terminé (19952ms)
+- 2026-11-06 11:43:22 UTC — [ticket-873] validateur: fichiers cités joints : backend/tests/test_env_sdk.py, env_sdk.py
+- 2026-11-06 11:43:22 UTC — [ticket-873] validateur: APPROVED — Tous les critères d'acceptation ont été satisfaits. Les tests ont été ajoutés ou (122000ms)
+- 2026-11-06 11:43:22 UTC — [ticket-873] APPROVED après 1 tour(s)
+- 2026-11-06 11:47:52 UTC — [ticket-873] documentation: 0 fichier(s) (264468ms) — après tour de correction
