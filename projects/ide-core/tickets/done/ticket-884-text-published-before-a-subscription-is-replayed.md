@@ -4,7 +4,7 @@ created: 2026-11-06
 depends_on: []
 estimated_days: 0.5
 id: ticket-884
-pr_number: null
+pr_number: 983
 priority: medium
 status: done
 title: Text published before a subscription is replayed on the observation socket,
