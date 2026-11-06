@@ -8199,3 +8199,5 @@ error: Please commit or stash them.
 - 2026-11-06 06:06:58 UTC — [ticket-867] tour 1 — reviewer terminé (36561ms)
 - 2026-11-06 06:09:52 UTC — [ticket-867] validateur: APPROVED — Tous les critères d'acceptation ont été satisfaits. Les tests associés confirmen (209906ms)
 - 2026-11-06 06:09:52 UTC — [ticket-867] APPROVED après 1 tour(s)
+- 2026-11-06 06:10:01 UTC — [ticket-867] fichiers non suivis laissés par le run : tickets/todo/ticket-868-the-supervisor-writes-its-a-toi-cases-to-its-journal.md (à ignorer dans .gitignore ?)
+- 2026-11-06 06:14:01 UTC — [ticket-867] documentation: 0 fichier(s) (239625ms) — après tour de correction
