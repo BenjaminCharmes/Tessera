@@ -4,27 +4,21 @@ Two of the four actions find their input in the project folder alone: the
 triage of a raw ticket (`trier`, ticket-855) and the decision on a proposed
 lesson or rule (`decider`, ticket-856). Both call a model, so the daily budget
 holds them back. The hand-back of a PR and the reopening of a queue
-(`reconfier_pr`, `relancer_file`) are model-free; their inputs (the delivered
-runs, the interrupted queues) are not read yet, so they offer no candidate.
+(`reconfier_pr`, `relancer_file`) are model-free; their candidates come from
+`superviseur_collecte_livraison` (ticket-867), which also builds the loop.
 
 Each candidate carries the idempotence `sha` of the exact state it acts on: a
 raw ticket's body, the set of proposed blocks. A state that changes is a new key.
 """
 import hashlib
 from collections.abc import Awaitable, Callable
-from datetime import UTC, datetime
 from pathlib import Path
 
-from tessera.config import settings
 from tessera.models.ticket import Ticket, TicketStatus
-from tessera.services.noyau.event_hub import EVENT_HUB, EventHub
-from tessera.services.pipeline.run_registry import RUN_REGISTRY, RunRegistry
 from tessera.services.projets.ticket_service import TicketService
 from tessera.services.supervision.intervention import Application, Resultat, intervenir
 from tessera.services.supervision.superviseur_actions import Action, Decision
-from tessera.services.supervision.superviseur_boucle import SuperviseurBoucle
-from tessera.services.supervision.superviseur_boucle_etat import NOM_FICHIER, EtatIdempotence
-from tessera.services.supervision.superviseur_boucle_ports import Candidat, depense_du_jour, projets_supervises
+from tessera.services.supervision.superviseur_boucle_ports import Candidat
 from tessera.services.supervision.superviseur_decision_blocs import Genre, blocs_proposes
 from tessera.services.supervision.superviseur_decision_ecriture import FICHIERS
 from tessera.services.supervision.superviseur_tri import Intervenir, SuperviseurTri, TicketBrut, lister_bruts
@@ -126,19 +120,3 @@ async def collecter(project_id: str, project_path: Path) -> list[Candidat]:
     except Exception as exc:  # noqa: BLE001 — idem dans l'autre sens
         _logger.warning("superviseur_collecte_decision_en_echec", extra={"project": project_id, "erreur": decrire_exception(exc)})
     return candidats
-
-
-def boucle_du_superviseur(registre: RunRegistry = RUN_REGISTRY, hub: EventHub = EVENT_HUB) -> SuperviseurBoucle:
-    """The production loop: the workspace's declared projects, the usage base, the state file."""
-
-    async def depense() -> float:
-        return await depense_du_jour(settings.ide_db_path, datetime.now(UTC))
-
-    return SuperviseurBoucle(
-        registre,
-        hub,
-        lambda: projets_supervises(settings.ide_workspace_dir),
-        collecter,
-        depense,
-        EtatIdempotence(settings.ide_state_dir / NOM_FICHIER),
-    )

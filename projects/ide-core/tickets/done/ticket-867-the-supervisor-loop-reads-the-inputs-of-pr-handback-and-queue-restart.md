@@ -1,14 +1,15 @@
 ---
-id: ticket-867
-title: "The supervisor loop reads the inputs of the PR hand-back and the queue restart"
-type: feat
-status: todo
-priority: medium
 agent: codeur
-depends_on: [ticket-859]
-estimated_days: 1
 created: 2026-11-06
-pr_number: null
+depends_on:
+- ticket-859
+estimated_days: 1
+id: ticket-867
+pr_number: 959
+priority: medium
+status: done
+title: The supervisor loop reads the inputs of the PR hand-back and the queue restart
+type: feat
 ---
 
 # ticket-867 — La boucle du superviseur lit les entrées de `reconfier_pr` et `relancer_file`

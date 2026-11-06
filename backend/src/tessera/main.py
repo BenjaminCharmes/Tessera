@@ -12,6 +12,7 @@ from tessera import reglages
 from tessera.auth import HostOriginMiddleware, StaticTokenMiddleware
 from tessera.config import settings
 from tessera.config_coffre import source_effective
+from tessera.models.run_request import RunRequest
 from tessera.routers import (
     agent_admin,
     agents,
@@ -48,7 +49,7 @@ from tessera.services.pipeline.reprise_worktrees import reprendre_worktrees_orph
 from tessera.services.pipeline.run_registry import RUN_REGISTRY
 from tessera.services.pipeline.signalements_en_attente import migrer_ancien_fichier
 from tessera.services.supervision.anomalies.detecteur import DetecteurDAnomalies, arreter_le_detecteur
-from tessera.services.supervision.superviseur_collecte import boucle_du_superviseur
+from tessera.services.supervision.superviseur_collecte_livraison import boucle_du_superviseur
 from tessera.services.verification.process_registry import PROCESS_REGISTRY
 from tessera.utils.access_log_redaction import install_token_redaction
 from tessera.utils.logger import configure_file_logging, get_logger, install_asyncio_exception_handler
@@ -80,6 +81,12 @@ async def _reprendre_les_surveillances() -> None:
         )
     except Exception:  # noqa: BLE001 — la reprise est un filet, pas une condition
         _logger.exception("reprise_surveillances_echec")
+
+
+async def _rouvrir_une_file(project_id: str, ticket_ids: list[str]) -> str:
+    """Open a queue on the remaining tickets by the entry that starts one (ADR-041, ticket-867)."""
+    demarre = await orchestrator.run_pipeline(RunRequest(project_id=project_id, mode="queue", ticket_ids=ticket_ids))
+    return demarre.run_id
 
 
 @asynccontextmanager
@@ -119,7 +126,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         else None
     )
     # Le superviseur (ADR-080) : ne démarre que si un projet déclare le rôle actif.
-    superviseur = asyncio.create_task(boucle_du_superviseur().boucle())
+    superviseur = asyncio.create_task(boucle_du_superviseur(rouvrir=_rouvrir_une_file).boucle())
     yield
     await arreter_le_detecteur(superviseur)
     await arreter_le_detecteur(detecteur)
