@@ -6,3 +6,4 @@ Pièges observés sur ce projet, une ligne chacun. Le service écrit sous `## Pr
 
 ## En vigueur
 - Quand tu ajoutes ou modifies une route ou un modèle de réponse FastAPI, régénère et commite `docs/openapi.json`, et range la route dans `frontend/src/test/contrat/perimetre.ts` (couverte ou hors périmètre). (source : ticket-860, ticket-864, 2026-11-06)
+- Quand un ticket ferme une voie d'attaque ou une porte (route, commande, chemin), liste dans le diff ou le ticket toutes les routes, commandes et chemins de la même classe et ferme-les ou dis pourquoi ils restent ouverts : une faille corrigée sur une seule route laisse sa voisine ouverte. (source : ticket-808 vs PATCH /pipeline, audit externe, 2026-11-06)

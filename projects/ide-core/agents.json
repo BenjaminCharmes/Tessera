@@ -45,7 +45,7 @@
     },
     {
       "role": "securite",
-      "model": "claude-haiku-4-5",
+      "model": "claude-opus-5-5",
       "max_tokens": 4096,
       "prompt_file": "agents/prompts/securite.md",
       "active": true,
