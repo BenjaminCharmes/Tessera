@@ -8370,3 +8370,4 @@ error: Please commit or stash them.
 - 2026-11-06 14:47:51 UTC — [ticket-882] validateur: fichiers cités joints : backend/tests/test_secrets_diff.py ; absents : dossier/naïf.py
 - 2026-11-06 14:47:51 UTC — [ticket-882] validateur: APPROVED — Les trois critères d'acceptation ont été satisfaits. Le code implémente correcte (242389ms)
 - 2026-11-06 14:47:51 UTC — [ticket-882] APPROVED après 1 tour(s)
+- 2026-11-06 14:50:13 UTC — [ticket-882] documentation: 0 fichier(s) (135250ms)
