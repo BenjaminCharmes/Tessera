@@ -11,6 +11,7 @@ from typing import Any
 from tessera.services.noyau.lancement import essais_de_commande
 from tessera.services.verification.commande_chainee import decouper
 from tessera.services.verification.detail_du_delai import detail_du_delai
+from tessera.services.verification.env_du_code_de_projet import env_du_code_de_projet
 from tessera.services.verification.erreur_de_sortie import detail_avec_erreur
 from tessera.services.verification.groupe_d_etape import GroupeDEtape
 from tessera.services.verification.limiteur_de_suites import LimiteurDeSuites
@@ -151,7 +152,7 @@ class TestRunnerService:
 
         ``env`` est fusionné par-dessus l'environnement hérité, à chaque
         étape : c'est ainsi qu'un worktree pointe `PYTHONPATH` sur ses sources
-        (ticket-524). Sans lui, l'environnement hérité passe tel quel.
+        (ticket-524). Sans lui, l'environnement hérité passe, sans secrets (ticket-888).
         """
         self._cwd = cwd
         self._timeout = timeout if timeout is not None else _DEFAULT_TIMEOUT
@@ -188,8 +189,7 @@ class TestRunnerService:
                 return await asyncio.create_subprocess_exec(
                     *tentative,
                     cwd=dossier,
-                    # `None` : le processus hérite de l'environnement du backend.
-                    env={**os.environ, **self._env} if self._env else None,
+                    env=env_du_code_de_projet(self._env),  # sans secrets (ticket-888)
                     # Entrée fermée : une commande de test n'est jamais
                     # interactive, et l'entrée héritée du backend (console
                     # Windows) laissait un postinstall attendre une saisie
