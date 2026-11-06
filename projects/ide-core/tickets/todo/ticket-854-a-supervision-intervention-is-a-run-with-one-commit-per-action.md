@@ -33,8 +33,18 @@ avec commit).
   passé lequel elle abandonne en journalisant, sans rien écrire.
 - Le run `supervision` suit le chemin d'un run : worktree, branche `supervision-<horodatage>`,
   un commit par action (message `chore(supervision): <action> <cible>`, anglais), puis
-  la livraison phase 1 au niveau d'autonomie du projet. `refus_de_chemin` (ticket-851) est
-  appliqué au diff avant le commit : un fichier hors liste annule tout.
+  la livraison phase 1 (rebase, push, PR). `refus_de_chemin` (ticket-851) est appliqué au
+  diff avant le commit : un fichier hors liste annule tout.
+- **La livraison d'une intervention ne passe pas par l'approbation d'un run.** Aucun
+  `PipelineResult(approved=True)` n'est fabriqué : le 06/11, une première implémentation le
+  faisait et l'audit sécurité l'a bloquée (CRITICAL, « approbation fictive »). `Livraison`
+  gagne une méthode dédiée, `livrer_intervention(branche, sha)`, qui :
+  - relit elle-même le diff de la branche depuis la base et le soumet à `refus_de_chemin`
+    (ticket-851) ; un fichier hors liste, une branche qui ne commence pas par `supervision-`
+    ou une tête différente de `sha` : rien n'est poussé ;
+  - ouvre la PR et s'arrête là, **quel que soit le niveau d'autonomie** : jamais de merge,
+    jamais de remise à `CIWatcher` ;
+  - laisse `livrer_phase_1` inchangée : un run non approuvé ne se livre toujours pas (ADR-030).
 - Le commit alimente `ajouter_ligne` (ticket-853) avec son SHA.
 - Exception, refus de chemin ou commit raté : `blocked` avec commit, jamais d'arbre sale.
 
@@ -46,6 +56,10 @@ avec commit).
 - [ ] `test_intervention.py::test_forbidden_path_in_diff_cancels_everything`
 - [ ] `test_intervention.py::test_one_action_makes_one_commit_and_one_journal_line`
 - [ ] `test_intervention.py::test_exception_ends_blocked_with_a_commit`
+- [ ] `test_intervention_livraison.py::test_delivery_rereads_the_diff_and_refuses_a_forbidden_path`
+- [ ] `test_intervention_livraison.py::test_delivery_opens_a_pr_and_never_merges_even_in_merge_autonomy`
+- [ ] Le diff ne construit aucun `PipelineResult` avec `approved=True` hors de `services/pipeline/`
+      et ne modifie pas la garde `if not approuve` de `livrer_phase_1` (`livraison.py`)
 
 ## Ce que ça ne fait pas
 
