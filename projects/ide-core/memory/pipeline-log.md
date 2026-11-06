@@ -8419,3 +8419,16 @@ error: Please commit or stash them.
 - 2026-11-06 15:24:35 UTC — [ticket-883] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le code modifie `_lancer_le_sc (97500ms)
 - 2026-11-06 15:24:35 UTC — [ticket-883] APPROVED après 1 tour(s)
 - 2026-11-06 15:26:15 UTC — [ticket-883] documentation: 0 fichier(s) (94796ms)
+- 2026-11-06 15:29:34 UTC — [ide-core] ticket-883 PR #982 confiée au CIWatcher
+- 2026-11-06 15:28:31 UTC — [ide-core] ticket-881 PR #981 mergée (CI verte)
+- 2026-11-06 15:29:40 UTC — [ticket-884] branche ticket-884-text-published-before-a-subscription-is-replayed
+- 2026-11-06 15:29:42 UTC — [ticket-884] tour 1 — codeur démarré
+- 2026-11-06 15:31:02 UTC — [ticket-884] tour 1 — codeur terminé (80125ms)
+- 2026-11-06 15:31:23 UTC — [ticket-884] testeur: dur�es : ruff 0 s, mypy 8 s, mypy-linux 8 s, pytest 18 s
+- 2026-11-06 15:31:28 UTC — [ticket-884] securite: PASS — Le diff n'ajoute que deux tests. Le premier vérifie qu'un observateur qui s'abon (5296ms)
+- 2026-11-06 15:31:28 UTC — [ticket-884] tour 1 — reviewer démarré
+- 2026-11-06 15:31:45 UTC — [ticket-884] tour 1 — reviewer terminé (16782ms)
+- 2026-11-06 15:33:47 UTC — [ticket-884] validateur: fichiers cités joints : backend/tests/test_canal_d_observation.py
+- 2026-11-06 15:33:47 UTC — [ticket-884] validateur: APPROVED — Les deux critères d'acceptation ont été satisfaits. Un test a été ajouté dans `t (139125ms)
+- 2026-11-06 15:33:47 UTC — [ticket-884] APPROVED après 1 tour(s)
+- 2026-11-06 15:36:02 UTC — [ticket-884] documentation: 0 fichier(s) (129875ms)

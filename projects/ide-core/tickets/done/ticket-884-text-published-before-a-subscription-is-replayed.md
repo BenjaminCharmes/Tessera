@@ -1,14 +1,15 @@
 ---
-id: ticket-884
-title: "Text published before a subscription is replayed on the observation socket, and a test proves it"
-type: test
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-11-06
 depends_on: []
 estimated_days: 0.5
-created: 2026-11-06
+id: ticket-884
+pr_number: 983
+priority: medium
+status: done
+title: Text published before a subscription is replayed on the observation socket,
+  and a test proves it
+type: test
 ---
 
 # ticket-884 — Text published before a subscription is replayed on the observation socket, and a test proves it

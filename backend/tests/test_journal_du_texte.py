@@ -1,5 +1,8 @@
 """What a late observer gets back — ticket-185."""
-from tessera.services.noyau.journal_du_texte import JournalDuTexte
+import asyncio
+
+from tessera.services.noyau.event_hub import EventHub
+from tessera.services.noyau.journal_du_texte import JOURNAL_DU_TEXTE, JournalDuTexte
 from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 
 
@@ -87,3 +90,25 @@ def test_a_closed_run_is_forgotten() -> None:
 
     assert journal.relire("run-a") == []
     assert journal.runs_suivis == 0
+
+
+def test_the_hub_journals_text_even_when_a_subscriber_queue_is_full() -> None:
+    """Une file saturée jette le texte ; le journal, lui, doit le garder."""
+    run_id = "run-hub-file-pleine"
+    hub = EventHub()
+    abonne = hub.subscribe(taille=1)
+
+    async def publier() -> None:
+        for contenu in ("un ", "deux ", "trois"):
+            await hub.publish(_texte(run_id, contenu))
+
+    try:
+        asyncio.run(publier())
+
+        # La file d'une seule place a bien jeté du texte : sans cela, le test
+        # ne prouverait rien sur le cas qu'il nomme.
+        assert abonne.perdus == 2
+        relu = [e.data["content"] for e in JOURNAL_DU_TEXTE.relire(run_id)]
+        assert relu == ["un ", "deux ", "trois"]
+    finally:
+        JOURNAL_DU_TEXTE.oublier(run_id)
