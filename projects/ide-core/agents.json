@@ -53,15 +53,11 @@
     },
     {
       "role": "validateur",
-      "model": "qwen3-coder:30b",
+      "model": "claude-haiku-4-5",
       "max_tokens": 4096,
       "prompt_file": "agents/prompts/validateur.md",
       "active": true,
-      "provider": "ollama",
-      "fallback": {
-        "provider": "agent_sdk",
-        "model": "claude-haiku-4-5"
-      }
+      "provider": "agent_sdk"
     },
     {
       "role": "doc-technique",
@@ -81,15 +77,11 @@
     },
     {
       "role": "project-analyzer",
-      "model": "qwen3-coder:30b",
+      "model": "claude-sonnet-5-5",
       "max_tokens": 4096,
       "prompt_file": "agents/prompts/project-analyzer.md",
       "active": true,
-      "provider": "ollama",
-      "fallback": {
-        "provider": "agent_sdk",
-        "model": "claude-sonnet-5-5"
-      }
+      "provider": "agent_sdk"
     },
     {
       "role": "lecons",

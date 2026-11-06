@@ -546,20 +546,18 @@ async def test_delai_depasse_message_contient_delai_depasse(
         )
 
 
-def test_les_manifestes_du_depot_declarent_les_roles_locaux() -> None:
+def test_ide_core_manifest_declares_no_local_role() -> None:
     racine = Path(__file__).resolve().parents[2] / "projects"
-    # La doc est sortie d'Ollama : à ~6 tokens/s elle retenait chaque run
-    # quatre minutes, pour des éditions sur un texte qui n'existait pas.
-    attendus = {"validateur", "project-analyzer"}
-    # Seul `ide-core` est versionné ici ; `demineur` est un dépôt à part, et
-    # son manifeste se met à jour dans ce dépôt-là.
-    for nom in ("ide-core",):
-        configs = {c.role: c for c in load_agents_config(racine / nom)}
-        assert attendus <= set(configs), nom
-        for role in attendus:
-            assert configs[role].provider == "ollama", (nom, role)
-            assert configs[role].fallback is not None, (nom, role)
-            assert configs[role].fallback.provider == "agent_sdk", (nom, role)
-        # L'audit sécurité reste sur Claude : rejoué sur une traversée de
-        # chemin réelle, le modèle local rendait PASS (ticket-212).
-        assert configs["securite"].provider == "agent_sdk", nom
+    # Ollama est retiré le 06/11 : l'essai de seconde revue (ticket-846) a
+    # trouvé 0 remarque fondée sur 5 chez qwen3-coder, et plus de la moitié
+    # des validations partaient déjà en repli sur Haiku. Le provider reste
+    # dans le code pour des essais ; aucun rôle du dépôt ne l'utilise.
+    # Seul `ide-core` est versionné ici ; les autres projets sont des dépôts
+    # à part, et leur manifeste se met à jour dans ces dépôts-là.
+    configs = {c.role: c for c in load_agents_config(racine / "ide-core")}
+    assert {"validateur", "project-analyzer"} <= set(configs)
+    for role, config in configs.items():
+        assert config.provider != "ollama", role
+    # L'audit sécurité reste sur Claude : rejoué sur une traversée de
+    # chemin réelle, le modèle local rendait PASS (ticket-212).
+    assert configs["securite"].provider == "agent_sdk"
