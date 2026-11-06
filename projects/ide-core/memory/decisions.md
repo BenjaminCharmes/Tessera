@@ -585,3 +585,13 @@ Une ADR qu'aucune règle de `contraintes.md` ni aucun `CLAUDE.md` ne cite part d
 **Détail** : spec 2026-11-05-superviseur-design.md.
 
 ---
+
+## ADR-081 — L'API exige un jeton de session sur toute route
+
+**Date** : 2026-11-06
+**Décision** : `STATIC_TOKEN`, sinon un jeton tiré à chaque démarrage (`noyau/jeton_de_session.py`), gardé en mémoire et écrit dans `ide_state_dir/jeton-de-session`, supprimé à l'arrêt. `StaticTokenMiddleware` l'exige sur toute requête HTTP et WebSocket sauf `/health` et `OPTIONS` ; sans jeton, il refuse. Jamais dans l'environnement d'un agent. Un test parcourt `app.routes`.
+**Raison** : audit du 06/11 — `STATIC_TOKEN` vide, tout passait : depuis `Bash`, `curl -X PATCH …/pipeline` baissait les portes d'un projet.
+**Alternatives rejetées** : injection par le proxy Vite (Tauri n'en a pas) ; vérifier le processus pair (un agent est un enfant du backend) ; `Origin` (se forge).
+**Limite** : le fichier du jeton reste lisible par un agent (ticket-879).
+
+---

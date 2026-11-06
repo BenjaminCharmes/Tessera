@@ -38,6 +38,7 @@ from tessera.routers import reglages as reglages_router
 from tessera.routers import services as services_router
 from tessera.services.livraison.reprise_surveillance import reprendre_surveillances
 from tessera.services.livraison.surveillance_run import surveillance_de_reprise
+from tessera.services.noyau import jeton_de_session
 from tessera.services.noyau.database import init_db
 from tessera.services.noyau.database_runs import solder_les_runs_orphelins
 from tessera.services.noyau.eveil import relacher as eveil_relacher
@@ -91,6 +92,8 @@ async def _rouvrir_une_file(project_id: str, ticket_ids: list[str]) -> str:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    # Avant toute requête : sans jeton, l'API refuse tout (ticket-878).
+    jeton_de_session.demarrer()
     # Le chemin peut venir de l'environnement : il reste sous backend/logs.
     configure_file_logging(
         settings.ide_log_file, racine=Path(__file__).resolve().parents[2] / "logs"
@@ -140,6 +143,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     # Filet de sécurité : relâche la demande de veille au cas où un run
     # n'aurait pas été fermé proprement avant l'arrêt (ticket-394).
     eveil_relacher()
+    jeton_de_session.arreter()
 
 
 app = FastAPI(title="Tessera", version="0.1.0", lifespan=lifespan)
@@ -167,9 +171,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Toujours installé : il lit `settings.static_token` à chaque requête et laisse
-# tout passer quand elle est vide. L'installer sous condition figeait le choix
-# au démarrage et rendait le comportement intestable (ticket-120).
+# Toujours installé : il lit le jeton de session à chaque requête, et refuse
+# tout sans lui, `STATIC_TOKEN` vide compris (ticket-878). L'installer sous
+# condition figeait le choix au démarrage (ticket-120).
 app.add_middleware(StaticTokenMiddleware)
 # Ajouté en dernier donc le plus externe : un `Host` ou un `Origin` étranger est
 # refusé avant tout le reste, token compris (ticket-704).

@@ -54,3 +54,18 @@ def test_subprocess_env_keeps_the_git_bash_path() -> None:
 
     assert env["CLAUDE_CODE_GIT_BASH_PATH"] == "C:/outils/bash.exe"
     assert "CLAUDE_CODE_GIT_BASH_PATH" not in env_du_sous_processus(None)
+
+
+def test_subprocess_env_never_holds_the_session_token(monkeypatch: pytest.MonkeyPatch) -> None:
+    # Ni le jeton tiré au démarrage ni un `STATIC_TOKEN` ne passent à l'agent (ticket-878).
+    from tessera.services.noyau import jeton_de_session
+
+    jeton_de_session.demarrer()
+    try:
+        genere = jeton_de_session.courant()
+        assert genere
+        assert genere not in env_du_sous_processus(None).values()
+    finally:
+        jeton_de_session.arreter()
+    monkeypatch.setattr(settings, "static_token", "jeton-statique-de-test")
+    assert "jeton-statique-de-test" not in env_du_sous_processus(None).values()

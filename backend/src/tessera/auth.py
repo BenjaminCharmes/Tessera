@@ -1,4 +1,7 @@
-"""Static bearer-token protection for every route, HTTP and WebSocket alike.
+"""Session bearer-token protection for every route, HTTP and WebSocket alike.
+
+The token is `STATIC_TOKEN` when set, else one drawn at startup (ticket-878):
+an empty `STATIC_TOKEN` no longer opens the API.
 
 Pure ASGI middleware, deliberately not a `BaseHTTPMiddleware`: that base class
 only calls `dispatch` for `http` scopes and lets every other scope through
@@ -12,6 +15,7 @@ from starlette.responses import JSONResponse
 from starlette.types import ASGIApp, Receive, Scope, Send
 
 from tessera.config import settings
+from tessera.services.noyau import jeton_de_session
 
 #: Code de fermeture WebSocket dans la plage applicative (4000-4999), calqué
 #: sur le 401 HTTP pour que le client comprenne la cause sans texte.
@@ -46,11 +50,13 @@ def _presented_token(scope: Scope) -> str:
     return ""
 
 
-def _is_authorized(scope: Scope, expected: str) -> bool:
+def _is_authorized(scope: Scope, expected: str | None) -> bool:
     if scope["path"] in _OPEN_PATHS:
         return True
     if scope["type"] == "http" and scope["method"] == "OPTIONS":
         return True
+    if expected is None:
+        return False
     # Comparaison en temps constant : `!=` s'arrête au premier octet différent
     # et laisse mesurer combien de caractères du token sont justes.
     return hmac.compare_digest(_presented_token(scope).encode(), expected.encode())
@@ -154,9 +160,8 @@ class HostOriginMiddleware:
     """Refuses a foreign `Host` (DNS rebinding) and a foreign `Origin` (ticket-704).
 
     CORS only stops a third-party page from *reading* a response, and does not
-    apply to WebSockets. With `STATIC_TOKEN` empty the loopback is the only
-    barrier, so a page the user visits must not reach it by rebinding a name to
-    127.0.0.1 or by opening a WebSocket. Pure ASGI, like `StaticTokenMiddleware`,
+    apply to WebSockets. A page the user visits must not reach the API by
+    rebinding a name to 127.0.0.1 or by opening a WebSocket, token or not. Pure ASGI, like `StaticTokenMiddleware`,
     for the same reason: `BaseHTTPMiddleware` never sees WebSocket scopes.
     """
 
@@ -175,21 +180,21 @@ class HostOriginMiddleware:
 
 
 class StaticTokenMiddleware:
-    """Requires `STATIC_TOKEN` on every HTTP request and WebSocket handshake.
+    """Requires the session token on every HTTP request and WebSocket handshake.
 
-    The token is read from `settings` on each call, not captured at startup,
-    so an empty value keeps the API open and a configured one protects every
-    route without the application having to be rebuilt.
+    The token is read from `jeton_de_session.courant()` on each call, not
+    captured at startup. No token at all (neither `STATIC_TOKEN` nor a drawn
+    one) refuses every route but `/health`: there is no open mode (ticket-878).
     """
 
     def __init__(self, app: ASGIApp) -> None:
         self._app = app
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
-        expected = settings.static_token
-        if not expected or scope["type"] not in ("http", "websocket"):
+        if scope["type"] not in ("http", "websocket"):
             await self._app(scope, receive, send)
             return
+        expected = jeton_de_session.courant()
         if _is_authorized(scope, expected):
             await self._app(scope, receive, send)
             return

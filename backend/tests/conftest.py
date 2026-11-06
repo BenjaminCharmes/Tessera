@@ -5,7 +5,9 @@ import shutil
 import tempfile
 from collections.abc import Iterator
 from pathlib import Path
+from typing import Any
 
+import httpx
 import pytest
 
 # Avant tout import de `tessera` : `settings` se construit à l'import et lirait
@@ -122,6 +124,49 @@ def _hote_du_client_de_test(monkeypatch: pytest.MonkeyPatch) -> None:
     from tessera.config import settings
 
     monkeypatch.setattr(settings, "allowed_hosts", "testserver")
+
+
+def pytest_configure(config: pytest.Config) -> None:
+    config.addinivalue_line(
+        "markers",
+        "sans_jeton_par_defaut: le TestClient n'ajoute pas `Authorization` (tests du refus 401)",
+    )
+
+
+#: Le jeton de session des tests : `lifespan` ne tourne que dans un `with TestClient`.
+JETON_DE_TEST = "jeton-de-session-de-test"
+
+
+@pytest.fixture(autouse=True)
+def _jeton_de_session_de_test(
+    monkeypatch: pytest.MonkeyPatch, request: pytest.FixtureRequest
+) -> None:
+    """Give the suite a session token and let `TestClient` present it — ticket-878.
+
+    L'API n'a plus de mode ouvert : sans cette fixture, chacun des tests qui
+    construisent un `TestClient(app)` recevrait 401. Le jeton est posé à la main,
+    car `demarrer()` ne tourne que dans un `with TestClient`. Le client en joint
+    l'en-tête quand la requête n'en porte pas ; un en-tête explicite l'emporte,
+    et `@pytest.mark.sans_jeton_par_defaut` retire l'ajout pour tester le refus.
+    """
+    from starlette.testclient import TestClient
+
+    from tessera.services.noyau import jeton_de_session
+
+    monkeypatch.setattr(jeton_de_session._ETAT, "genere", JETON_DE_TEST)
+    if request.node.get_closest_marker("sans_jeton_par_defaut"):
+        return
+    envoyer = TestClient.send
+
+    def send_avec_jeton(self: TestClient, requete: httpx.Request, **options: Any) -> httpx.Response:
+        from tessera.main import app
+
+        jeton = jeton_de_session.courant()
+        if self.app is app and jeton and "authorization" not in requete.headers:
+            requete.headers["Authorization"] = f"Bearer {jeton}"
+        return envoyer(self, requete, **options)
+
+    monkeypatch.setattr(TestClient, "send", send_avec_jeton)
 
 
 @pytest.fixture(autouse=True)
