@@ -6,7 +6,7 @@ from typing import Any, cast
 import pytest
 from claude_agent_sdk import HookContext, HookInput, HookJSONOutput
 
-from tessera.services.providers.garde_jetons import ENV_REFUS, hook_refus_env_tessera
+from tessera.services.providers.garde_jetons import ENV_REFUS, JETON_REFUS, hook_refus_env_tessera
 
 
 class _Depot:
@@ -254,6 +254,96 @@ async def test_without_a_cwd_an_absolute_path_is_still_refused(depot: _Depot) ->
     entree = cast(HookInput, {"tool_name": "Read", "tool_input": {"file_path": str(depot.env)}})
 
     assert _refuse(await hook(entree, None, cast(HookContext, None)))
+
+
+# ------------------------------------------------------------------
+# Fichier de jeton de session (ticket-879)
+# ------------------------------------------------------------------
+
+
+@pytest.fixture
+def jeton(depot: _Depot, monkeypatch: pytest.MonkeyPatch) -> Path:
+    """A session-token file under `<LOCALAPPDATA>/Tessera`, outside the project."""
+    local = depot.racine / "local"
+    dossier = local / "Tessera"
+    dossier.mkdir(parents=True)
+    fichier = dossier / "jeton-de-session"
+    fichier.write_text("secret", encoding="utf-8")
+    monkeypatch.setenv("LOCALAPPDATA", str(local))
+    return fichier
+
+
+async def _appeler_jeton(
+    depot: _Depot, jeton: Path, outil: str, **entrees: Any
+) -> HookJSONOutput:
+    hook = hook_refus_env_tessera(depot.projet, env_file=depot.env, fichier_jeton=jeton)
+    entree = cast(HookInput, {"tool_name": outil, "tool_input": entrees})
+    return await hook(entree, None, cast(HookContext, None))
+
+
+@pytest.mark.parametrize(
+    "commande",
+    [
+        "cat {abs}",
+        'python -c "open(\'{abs}\')"',
+        "Get-Content $LOCALAPPDATA/Tessera/jeton-de-session",
+        "cat ${{LOCALAPPDATA}}/Tessera/jeton-de-session",
+    ],
+)
+async def test_bash_refuses_a_command_reading_the_token_file(
+    depot: _Depot, jeton: Path, commande: str
+) -> None:
+    sortie = await _appeler_jeton(
+        depot, jeton, "Bash", command=commande.format(abs=jeton.as_posix())
+    )
+
+    assert _refuse(sortie)
+    reponse = cast(dict[str, Any], sortie)["hookSpecificOutput"]
+    assert reponse["permissionDecisionReason"] == JETON_REFUS
+
+
+@pytest.mark.skipif(os.name != "nt", reason="%VAR% is only expanded on Windows")
+async def test_bash_refuses_a_percent_variable_spelling(depot: _Depot, jeton: Path) -> None:
+    commande = "type %LOCALAPPDATA%\\Tessera\\jeton-de-session"
+
+    assert _refuse(await _appeler_jeton(depot, jeton, "Bash", command=commande))
+
+
+async def test_bash_refuses_a_tilde_spelling(
+    depot: _Depot, jeton: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("HOME", str(jeton.parent))
+    monkeypatch.setenv("USERPROFILE", str(jeton.parent))
+
+    assert _refuse(await _appeler_jeton(depot, jeton, "Bash", command="cat ~/jeton-de-session"))
+
+
+async def test_read_and_grep_refuse_the_token_file(depot: _Depot, jeton: Path) -> None:
+    assert _refuse(await _appeler_jeton(depot, jeton, "Read", file_path=str(jeton)))
+    assert _refuse(await _appeler_jeton(depot, jeton, "Grep", pattern="x", path=str(jeton)))
+    assert _refuse(
+        await _appeler_jeton(depot, jeton, "Grep", pattern="x", path=str(jeton.parent))
+    )
+    assert _refuse(
+        await _appeler_jeton(depot, jeton, "Glob", pattern="jeton-de-session", path=str(jeton.parent))
+    )
+
+
+async def test_a_file_of_the_same_name_in_the_project_passes(depot: _Depot, jeton: Path) -> None:
+    (depot.projet / "jeton-de-session").write_text("x", encoding="utf-8")
+
+    assert not _refuse(
+        await _appeler_jeton(depot, jeton, "Bash", command="cat ./jeton-de-session")
+    )
+    assert not _refuse(
+        await _appeler_jeton(depot, jeton, "Read", file_path="jeton-de-session")
+    )
+
+
+async def test_the_env_is_still_refused_with_its_own_message(depot: _Depot, jeton: Path) -> None:
+    sortie = await _appeler_jeton(depot, jeton, "Read", file_path=str(depot.env))
+
+    assert cast(dict[str, Any], sortie)["hookSpecificOutput"]["permissionDecisionReason"] == ENV_REFUS
 
 
 def test_the_hook_is_installed_on_every_agent_call(tmp_path: Path) -> None:
