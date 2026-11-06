@@ -579,7 +579,7 @@ Une ADR qu'aucune règle de `contraintes.md` ni aucun `CLAUDE.md` ne cite part d
 ## ADR-080 — Un superviseur agit par actions fermées, dans des bornes déclarées
 
 **Date** : 2026-11-05
-**Décision** : `superviseur`, sans outil, choisit parmi quatre actions : trier un signalement, décider une leçon ou règle déléguée, reconfier une PR verte à `CIWatcher`, relancer une file coupée par l'infrastructure. Le code les exécute, une par commit, sous `RunLock`, jamais pendant une file. Jamais : argent, suppression, secrets, projet `professional`, `agents.json`, `.github/`, `CLAUDE.md`, règle qui le borne. Délégation déclarée dans `agents.json`, sinon rien (amende ADR-055, ADR-074). Tout agent outillé a `signaler`, borné ; la revue de projet est un run `design` sans code. Un numéro rendu est pris.
+**Décision** : `superviseur`, sans outil, choisit parmi quatre actions : trier un signalement, décider une leçon ou règle déléguée, reconfier une PR verte à `CIWatcher`, relancer une file coupée par l'infrastructure. Le code les exécute, une par commit, sous `RunLock`, jamais pendant une file, livrées en PR et jamais mergées par lui. Jamais : argent, suppression, secrets, projet `professional`, `agents.json`, `.github/`, `CLAUDE.md`, règle qui le borne. Délégation déclarée dans `agents.json`, sinon rien (amende ADR-055, ADR-074). Tout agent outillé a `signaler`, borné ; la revue de projet est un run `design` sans code. Un numéro rendu est pris.
 **Raison** : le 05/11, ADR-074 et tickets 801-804 renumérotés après coup, file coupée sur « ticket-847 introuvable », PR #913 sans surveillance.
 **Alternative rejetée** : un agent avec `Bash` — rien ne borne ses effets.
 **Détail** : spec 2026-11-05-superviseur-design.md.
