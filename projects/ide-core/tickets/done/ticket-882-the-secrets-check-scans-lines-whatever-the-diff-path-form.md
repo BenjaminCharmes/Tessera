@@ -4,7 +4,7 @@ created: 2026-11-06
 depends_on: []
 estimated_days: 0.5
 id: ticket-882
-pr_number: null
+pr_number: 979
 priority: high
 status: done
 title: The secrets check scans added lines even when the diff path is quoted or unprefixed
