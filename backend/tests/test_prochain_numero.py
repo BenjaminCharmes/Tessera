@@ -7,6 +7,8 @@ Couverture :
 - l'arbre non commité et `origin/develop` comptent ;
 - un dépôt sans remote répond avec son seul arbre ;
 - la ligne de commande imprime le numéro ;
+- ticket-870 : `resoudre_projet` garde un dossier existant et résout un id par
+  `dossier_du_projet` ; un projet introuvable ou sans `tickets/` sort avec 2 ;
 - ticket-848 : `reserver` ne rend jamais deux fois un numéro, partage la réservation
   entre worktrees d'un projet, sépare deux dépôts, ne crée rien avec `--sans-reserver`
   et met de côté un fichier illisible.
@@ -24,7 +26,7 @@ from tests.depot_numerotation import creer_depot, ecrire, fiche, git, pousser_un
 _SCRIPTS = Path(__file__).resolve().parent.parent.parent / "scripts"
 sys.path.insert(0, str(_SCRIPTS))
 
-from prochain_numero import main  # noqa: E402
+from prochain_numero import main, resoudre_projet  # noqa: E402
 
 
 def test_ticket_number_only_on_a_ticket_branch_is_counted(tmp_path: Path) -> None:
@@ -183,3 +185,54 @@ def test_reservation_round_trip_and_lock(tmp_path: Path) -> None:
 
     assert reservation.lire(fichier) == {"d": {"ticket": 5}}
     assert not fichier.with_name(fichier.name + ".tmp").exists()
+
+
+def test_existing_folder_is_kept_as_is(tmp_path: Path) -> None:
+    assert resoudre_projet(tmp_path) == tmp_path
+
+
+def test_project_id_is_resolved_by_dossier_du_projet(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    demandes: list[str] = []
+
+    def faux(project_id: str) -> Path | None:
+        demandes.append(project_id)
+        return tmp_path
+
+    monkeypatch.setattr("tessera.services.projets.ticket_check.dossier_du_projet", faux)
+    monkeypatch.chdir(tmp_path)
+
+    assert resoudre_projet(Path("ide-core")) == tmp_path
+    assert demandes == ["ide-core"]
+
+
+def test_path_with_a_separator_is_never_taken_for_an_id(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(
+        "tessera.services.projets.ticket_check.dossier_du_projet",
+        lambda project_id: tmp_path,
+    )
+
+    assert resoudre_projet(tmp_path / "absent" / "x") is None
+
+
+def test_unknown_project_exits_2_and_names_the_value(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(
+        "tessera.services.projets.ticket_check.dossier_du_projet",
+        lambda project_id: None,
+    )
+    monkeypatch.chdir(tmp_path)
+
+    assert main(["ticket", "--projet", "absent", "--sans-reserver"]) == 2
+    assert "absent" in capsys.readouterr().err
+
+
+def test_folder_without_tickets_exits_2(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    assert main(["ticket", "--projet", str(tmp_path), "--sans-reserver"]) == 2
+    assert "tickets/" in capsys.readouterr().err
