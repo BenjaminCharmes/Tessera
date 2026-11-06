@@ -8117,3 +8117,4 @@ error: Please commit or stash them.
 - 2026-11-06 03:31:45 UTC — [ticket-854] validateur: fichiers cités joints : livraison.py (tronqué) ; absents : services/pipeline/
 - 2026-11-06 03:31:45 UTC — [ticket-854] validateur: APPROVED — Les 9 critères sont satisfaits. Tous les tests (critères 1-8) existent et ont pa (342141ms)
 - 2026-11-06 03:31:45 UTC — [ticket-854] APPROVED après 1 tour(s)
+- 2026-11-06 03:35:18 UTC — [ticket-854] documentation: 2 fichier(s) (203812ms)
