@@ -972,6 +972,12 @@ La notification apparaît comme une alerte de type « anomalie ». Sur le Bureau
 
 Si tu veux désactiver ce détecteur, mets `ANOMALIES_ACTIVES=false` dans `.env`.
 
+Le détecteur observe tes runs toutes les cinq minutes et signale les situations anormales : silence prolongé, séries d'appels d'outils identiques, tours de revue qui dépassent le seuil, étapes ou coûts anormalement élevés. Une anomalie n'arrête pas le run — c'est un témoin, il te prévient sans intervenir.
+
+Tu reçois une notification quand le détecteur détecte quelque chose : cloche, son, notification système, selon tes réglages. Si tu ignores la notification, tu la retrouves dans le fil du run, en ambre, avec le message du détecteur. La même anomalie sur le même run n'est signalée qu'une fois : s'il s'arrête et reprend, tu la reverras.
+
+Tu peux désactiver les notifications d'anomalie dans la cloche, sans arrêter l'observation du run. L'anomalie reste visible dans le fil. Si le détecteur ralentit ton IDE ou te gêne, tu peux le désactiver complètement : mets `ANOMALIES_ACTIVES=false` dans `.env`.
+
 ## 5 bis. Se repérer dans l'écran
 
 Tessera n'essaie pas d'être un éditeur. Monaco est là pour **lire**, pas pour
@@ -1119,6 +1125,8 @@ Une file affiche les tickets en quatre groupes :
 - **Courant** : le ticket en traitement
 
 Si un ticket est arrêté, son motif te guide pour le corriger et le relancer.
+
+Chaque anomalie détectée apparaît comme une ligne dans le fil, avec son libellé (la règle qui l'a déclenchée) et son message explicatif. Elle est marquée en ambre pour la distinguer des verdicts de l'agent.
 
 ### Runs récents — chercher et afficher plus
 
