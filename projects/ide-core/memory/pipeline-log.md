@@ -8155,3 +8155,4 @@ error: Please commit or stash them.
 - 2026-11-06 04:37:37 UTC — [ticket-856] validateur: APPROVED — Tous les 6 tests d'acceptation du superviseur sont implémentés et passent (exit  (339766ms)
 - 2026-11-06 04:37:37 UTC — [ticket-856] APPROVED après 2 tour(s)
 - 2026-11-06 04:39:03 UTC — [ticket-856] leçons: rien à retenir
+- 2026-11-06 04:41:23 UTC — [ticket-856] documentation: 1 fichier(s) (132797ms)
