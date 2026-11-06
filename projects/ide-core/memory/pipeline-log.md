@@ -8136,3 +8136,4 @@ error: Please commit or stash them.
 - 2026-11-06 04:10:45 UTC — [ticket-855] validateur: APPROVED — Les 6 critères d'acceptation, tous des tests pytest, sont présents dans le diff  (333500ms)
 - 2026-11-06 04:10:45 UTC — [ticket-855] APPROVED après 2 tour(s)
 - 2026-11-06 04:11:25 UTC — [ticket-855] leçons: rien à retenir
+- 2026-11-06 04:12:56 UTC — [ticket-855] documentation: 0 fichier(s) (81609ms)
