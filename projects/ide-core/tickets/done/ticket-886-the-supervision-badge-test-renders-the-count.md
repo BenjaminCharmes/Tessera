@@ -1,14 +1,14 @@
 ---
-id: ticket-886
-title: "The supervision badge test renders the count with a pipeline run and a chat"
-type: test
-status: todo
-pr_number: null
-priority: low
 agent: codeur
+created: 2026-11-06
 depends_on: []
 estimated_days: 0.5
-created: 2026-11-06
+id: ticket-886
+pr_number: 986
+priority: low
+status: done
+title: The supervision badge test renders the count with a pipeline run and a chat
+type: test
 ---
 
 # ticket-886 — The supervision badge test renders the count with a pipeline run and a chat
