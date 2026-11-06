@@ -6,5 +6,6 @@ Pièges observés sur ce projet, une ligne chacun. Le service écrit sous `## Pr
 - Quand une validation ignore un pattern de ligne (comme `+++`), ajouter un préfixe pour le contourner crée une dépendance tacite qui se brisera si ce détail change. (source : ticket-862, 2026-11-05)
 - Quand tu modifies un modèle Pydantic d'endpoint FastAPI, régénère et commite le schéma OpenAPI. (source : ticket-864, 2026-11-05)
 - Quand on doit corriger en urgence les erreurs du pipeline, prendre le temps de relire le code modifié avant de resubmitter. (source : ticket-853, 2026-11-06)
+- Quand on ajoute une route API, regénérer et commiter `docs/openapi.json`. (source : ticket-860, 2026-11-06)
 
 ## En vigueur

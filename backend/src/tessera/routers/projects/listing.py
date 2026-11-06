@@ -14,6 +14,7 @@ from tessera.services.pipeline.run_registry import RUN_REGISTRY
 from tessera.services.projets.adr import lire_contraintes
 from tessera.services.projets.project_loader import fait_tourner_l_ide, load_agents_config, load_services_config
 from tessera.services.supervision.project_overview import ProjectOverview, build_overview, find_icon
+from tessera.services.supervision.superviseur_journal import cas_a_toi_ouverts, lire_journal
 from tessera.services.verification.process_registry import PROCESS_REGISTRY
 
 router = new_router()
@@ -26,7 +27,12 @@ async def list_projects() -> list[Project]:
     projets = await loader().list_projects()
     # Une copie par projet : l'objet du cache du chargeur ne porte pas ce compte.
     return [
-        p.model_copy(update={"lecons_proposees": nombre_proposees(p.path / "memory")})
+        p.model_copy(
+            update={
+                "lecons_proposees": nombre_proposees(p.path / "memory"),
+                "superviseur_a_toi": len(cas_a_toi_ouverts(lire_journal(p.path / "memory"))),
+            }
+        )
         for p in projets
     ]
 

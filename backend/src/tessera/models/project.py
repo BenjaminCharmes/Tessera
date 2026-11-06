@@ -38,6 +38,10 @@ class Project(BaseModel):
     #: `## En vigueur` (ticket-831, ADR-074). Rempli par la liste des projets,
     #: à chaque lecture : le chargeur met le projet en cache, pas ce compte.
     lecons_proposees: int = 0
+    #: Les cas « À toi » que le superviseur a laissés ouverts dans
+    #: `memory/supervision.md` (ticket-860, ADR-080). 0 sans fichier. Rempli
+    #: comme `lecons_proposees`, à chaque lecture.
+    superviseur_a_toi: int = 0
 
 
 def _verifier_project_id(v: str | None) -> str | None:

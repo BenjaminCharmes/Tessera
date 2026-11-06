@@ -1,14 +1,15 @@
 ---
-id: ticket-860
-title: "A route returns the supervision recap and the A-toi cases"
-type: feat
-status: todo
-priority: medium
 agent: codeur
-depends_on: [ticket-853]
-estimated_days: 1
 created: 2026-11-05
-pr_number: null
+depends_on:
+- ticket-853
+estimated_days: 1
+id: ticket-860
+pr_number: 952
+priority: medium
+status: done
+title: A route returns the supervision recap and the A-toi cases
+type: feat
 ---
 
 # ticket-860 — Une route rend le récap du superviseur et ses cas « À toi »

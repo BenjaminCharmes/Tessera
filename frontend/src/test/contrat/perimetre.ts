@@ -31,6 +31,7 @@ export const HORS_PERIMETRE: string[] = [
   "GET /api/v1/projects/usage/breakdown", // même schéma que la route d'un projet, aucun appel du front
   "GET /api/v1/services/running/avertissements",
   "GET /api/v1/usage/recent-runs",
+  "GET /api/v1/supervision/recap", // lue par le panneau de récap (ticket-861), pas encore appelée
   "GET /health",
   "GET /api/v1/projects/{project_id}/context",
   "GET /api/v1/projects/{project_id}/removal-plan",

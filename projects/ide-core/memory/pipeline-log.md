@@ -8080,3 +8080,26 @@ error: Please commit or stash them.
 - 2026-11-06 02:05:34 UTC — [ticket-858] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (178625ms)
 - 2026-11-06 02:05:34 UTC — [ticket-858] APPROVED après 1 tour(s)
 - 2026-11-06 02:09:38 UTC — [ticket-858] documentation: 1 fichier(s) (233875ms) — après tour de correction
+- 2026-11-06 02:24:13 UTC — [ide-core] ticket-858 : base réalignée sur develop
+- 2026-11-06 02:24:13 UTC — [ide-core] ticket-858 PR #951 confiée au CIWatcher
+- 2026-11-06 02:07:53 UTC — [ide-core] ticket-866 PR #950 mergée (CI verte)
+- 2026-11-06 02:24:11 UTC — [ide-core] ticket-858 PR #951 mergée (CI verte)
+- 2026-11-06 02:24:24 UTC — [ticket-860] branche ticket-860-a-route-returns-the-supervision-recap-and-the-a-t
+- 2026-11-06 02:24:26 UTC — [ticket-860] tour 1 — codeur démarré
+- 2026-11-06 02:26:19 UTC — [ticket-860] tour 1 — codeur terminé (113000ms)
+- 2026-11-06 02:28:22 UTC — [ticket-860] testeur: 2 failed, 870 passed in 116.77s (0:01:56)
+- 2026-11-06 02:28:22 UTC — [ticket-860] tests rouges au tour 1
+- 2026-11-06 02:28:22 UTC — [ticket-860] tour 2 — codeur démarré
+- 2026-11-06 02:29:01 UTC — [ticket-860] tour 2 — codeur terminé (38827ms)
+- 2026-11-06 02:31:43 UTC — [ticket-860] testeur: dur�es : ruff 0 s, pytest 156 s
+- 2026-11-06 02:31:43 UTC — [ticket-860] tests rouges au tour 2
+- 2026-11-06 02:31:43 UTC — [ticket-860] tour 3 — codeur démarré
+- 2026-11-06 02:32:23 UTC — [ticket-860] tour 3 — codeur terminé (39280ms)
+- 2026-11-06 02:35:10 UTC — [ticket-860] testeur: dur�es : ruff 0 s, mypy 7 s, mypy-linux 9 s, pytest 163 s
+- 2026-11-06 02:36:46 UTC — [ticket-860] securite: PASS — Diff sûr : nouvelle route read-only sur le journal de supervision (ticket-860, A (95467ms)
+- 2026-11-06 02:36:46 UTC — [ticket-860] tour 3 — reviewer démarré
+- 2026-11-06 02:37:03 UTC — [ticket-860] tour 3 — reviewer terminé (16828ms)
+- 2026-11-06 02:41:18 UTC — [ticket-860] validateur: APPROVED — Tous les critères d'acceptation ont été satisfaits. Le code implémente correctem (272452ms)
+- 2026-11-06 02:41:18 UTC — [ticket-860] APPROVED après 3 tour(s)
+- 2026-11-06 02:42:02 UTC — [ticket-860] leçons: une leçon proposée
+- 2026-11-06 02:46:48 UTC — [ticket-860] documentation: 0 fichier(s) (277985ms) — après tour de correction
