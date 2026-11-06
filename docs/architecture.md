@@ -1560,6 +1560,72 @@ sur `origin/<base>` et alloue les numéros libres suivants. Elle réécrit les f
 pour les agents qui créent des tickets — architecte et codeur l'utilisent avant d'écrire
 une fiche pour garantir que le numéro n'est pris ni sur l'arbre, ni sur `origin/<base>`, ni sur d'autres branches `origin/ticket-*` en cours.
 
+## Supervision des runs (ADR-080)
+
+Entre deux runs — quand un run approuvé s'achève ou qu'une coupure infrastructure
+laisse une PR sans surveillance — le superviseur veille sur le projet. Il n'a ni
+outils ni shell : il **choisit** une action parmi un registre fermé
+(`superviseur_actions.py`), et le code, après ses propres vérifications, l'exécute
+ou la refuse.
+
+### Registre du superviseur (superviseur_actions.py)
+
+Quatre actions fermées :
+- `trier` : catégoriser les signalements bruts (tickets attendant d'être écrits).
+- `decider` : accepter ou rejeter une règle ou leçon proposée.
+- `reconfier_pr` : rendre une PR à `CIWatcher` quand elle a été abandonnée.
+- `relancer_file` : relancer une file coupée par une interruption infrastructure.
+
+Chaque action a ses gardes :
+- **Gardes de chemin** : `trier` peut écrire dans `tickets/**` ; `decider` dans
+  `memory/lecons.md`, `memory/contraintes.md`, `memory/supervision.md`. Jamais
+  `agents.json`, `.github/`, `CLAUDE.md`, `.claude/settings*`, `.git/`,
+  `memory/decisions.md`.
+- **Gardes de sensibilité** : une règle ou leçon qui nomme une porte d'ADR-080
+  (ADR-027, 031, 037, 039, 053, 055, 067, 073, 080) ou un mot interdit (`secret`,
+  `jeton`, `budget`, `quota`, `suppress`, `professionnel`, `force`, `superviseur`)
+  ne peut être décidée par le superviseur : verdict `a_toi` (escalade à l'humain).
+- **Déplacement pur** : pour `decider` sur une règle, le bloc doit passer de
+  `## Proposées` à la cible sans aucune autre ligne changée.
+
+Le modèle reçoit **une** cible (un signalement, une règle, une PR, une file) et
+rend un `Decision` JSON : action, cible, verdict (`agir` / `a_toi` / `rien`),
+raison. Toute réponse hors schéma est refusée — le superviseur ne fait rien.
+
+### Journal du superviseur (superviseur_journal.py)
+
+Chaque action laisse une ligne dans `memory/supervision.md`, format
+`- AAAA-MM-JJ | action | cible | sha | résumé`. Le service en est seul écrivain :
+un diff de run qui touche ce fichier met le run en `blocked`, sauf s'il s'agit
+d'une intervention du superviseur elle-même (type de run `mode == "supervision"`).
+
+Semblable à `memory/lecons.md` (ADR-074) : lecture sans lever (absent = vide),
+une seule source d'écriture.
+
+### Registre des files (run_registry.py)
+
+`RunRegistry.projet_tenu_par_file(project_id)` dit si une file ou un run autonome
+tient le projet, y compris **pendant le court instant** entre la fin d'un ticket
+et le début du suivant. ADR-034 : s'appuyer sur ce que le registre sait déjà —
+pas de structure parallèle. Le verrou `RunLock` n'est pas modifié (ADR-038).
+
+### Reprise de PR après coupure (superviseur_pr.py)
+
+Quand une coupure infrastructure (réseau, git, veille du système) arrête la
+livraison, la PR reste ouverte et `CIWatcher` l'ignore. Le superviseur la
+repère — approuvée, infrastructure stop, pas CI rouge, pas conflit-resolver — et
+la redonne à `CIWatcher` pour suite normale (vérif CI, merge si vert).
+
+Garde : la tête de la PR doit être `pushed_sha` (le SHA approuvé) ; sinon
+escalade en `a_toi`. Une par `(PR, sha)` — idempotence sur retentative.
+
+### Rôle superviseur
+
+Sans outils ni shell. Son prompt le dit clairement : il ne fait que choisir. Les
+portes sensibles d'ADR-080 (argent, suppression, secrets, `agents.json`, `.github/`,
+`CLAUDE.md`, `.claude/settings*`, `.git/`) restent fermées — pas de modèle ne
+les ouvre, même si la consigne y invite.
+
 ## Caching des statuts GitHub (ticket-364)
 
 L'endpoint `/projects/{id}/tickets/{id}/pr-status` affichait le statut de chaque PR en interrogeant GitHub, sans cache. Chaque appel lancait deux requêtes GitHub (la PR, puis ses check-runs). Avec 139 tickets portant un `pr_number` dans ide-core, ouvrir le projet provoquait 139 appels à l'endpoint, soit ~280 requêtes GitHub — consommant 5,6 % du quota horaire (5 000 requêtes).

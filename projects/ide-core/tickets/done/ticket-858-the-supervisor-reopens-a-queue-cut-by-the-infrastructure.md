@@ -1,14 +1,16 @@
 ---
-id: ticket-858
-title: "The supervisor reopens a queue cut by the infrastructure"
-type: feat
-status: todo
-priority: medium
 agent: codeur
-depends_on: [ticket-850, ticket-851]
-estimated_days: 1
 created: 2026-11-05
-pr_number: null
+depends_on:
+- ticket-850
+- ticket-851
+estimated_days: 1
+id: ticket-858
+pr_number: 951
+priority: medium
+status: done
+title: The supervisor reopens a queue cut by the infrastructure
+type: feat
 ---
 
 # ticket-858 — Le superviseur rouvre une file coupée par l'infrastructure

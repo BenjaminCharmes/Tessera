@@ -8069,3 +8069,14 @@ error: Please commit or stash them.
 - 2026-11-06 01:36:56 UTC — [ticket-866] APPROVED après 1 tour(s)
 - 2026-11-06 01:38:28 UTC — [ticket-866] documentation: 0 fichier(s) (84313ms)
 - 2026-11-06 01:38:28 UTC — [ticket-847] documentation: pas de diff retrouvable, non documenté
+- 2026-11-06 01:54:22 UTC — [ide-core] ticket-866 PR #950 confiée au CIWatcher
+- 2026-11-06 01:54:29 UTC — [ticket-858] branche ticket-858-the-supervisor-reopens-a-queue-cut-by-the-infrast
+- 2026-11-06 01:54:31 UTC — [ticket-858] tour 1 — codeur démarré
+- 2026-11-06 01:58:19 UTC — [ticket-858] tour 1 — codeur terminé (228062ms)
+- 2026-11-06 01:59:23 UTC — [ticket-858] testeur: dur�es : ruff 0 s, mypy 9 s, mypy-linux 9 s, pytest 60 s
+- 2026-11-06 02:02:36 UTC — [ticket-858] securite: PASS — No security vulnérabilities (injection, secrets, auth, XSS) detected. Two valida (192797ms)
+- 2026-11-06 02:02:36 UTC — [ticket-858] tour 1 — reviewer démarré
+- 2026-11-06 02:02:55 UTC — [ticket-858] tour 1 — reviewer terminé (19155ms)
+- 2026-11-06 02:05:34 UTC — [ticket-858] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (178625ms)
+- 2026-11-06 02:05:34 UTC — [ticket-858] APPROVED après 1 tour(s)
+- 2026-11-06 02:09:38 UTC — [ticket-858] documentation: 1 fichier(s) (233875ms) — après tour de correction
