@@ -1,14 +1,15 @@
 ---
-id: ticket-869
-title: "ticket_check finds the project in the repository's projects/ when the workspace has none"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-11-06
 depends_on: []
 estimated_days: 0.5
-created: 2026-11-06
+id: ticket-869
+pr_number: 962
+priority: medium
+status: done
+title: ticket_check finds the project in the repository's projects/ when the workspace
+  has none
+type: fix
 ---
 
 # ticket-869 — `ticket_check` trouve le projet dans `projects/` du dépôt

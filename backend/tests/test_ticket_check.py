@@ -4,6 +4,7 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
+from tessera import config
 from tessera.config import settings
 from tessera.main import app
 from tessera.services.projets import ticket_check
@@ -141,6 +142,59 @@ def test_cli_refuses_a_missing_project(
     monkeypatch.setattr(settings, "ide_workspace_dir", project.parent)
     assert ticket_check.main(["absent"]) == 2
     assert ticket_check.main([]) == 2
+
+
+def test_dossier_du_projet_prefers_the_declared_workspace(
+    project: Path, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    repo = tmp_path / "repo"
+    (repo / "projects" / "mon-projet").mkdir(parents=True)
+    monkeypatch.setattr(settings, "ide_workspace_dir", project.parent)
+    monkeypatch.setattr(config, "_REPO_ROOT", repo)
+    assert ticket_check.dossier_du_projet("mon-projet") == project.parent / "mon-projet"
+
+
+def test_dossier_du_projet_falls_back_to_the_repository_projects(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repo = tmp_path / "repo"
+    (repo / "projects" / "mon-projet").mkdir(parents=True)
+    monkeypatch.setattr(settings, "ide_workspace_dir", tmp_path / "vide")
+    monkeypatch.setattr(config, "_REPO_ROOT", repo)
+    assert ticket_check.dossier_du_projet("mon-projet") == repo / "projects" / "mon-projet"
+
+
+def test_dossier_du_projet_returns_none_when_no_folder_exists(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(settings, "ide_workspace_dir", tmp_path / "vide")
+    monkeypatch.setattr(config, "_REPO_ROOT", tmp_path / "repo")
+    assert ticket_check.dossier_du_projet("absent") is None
+
+
+def test_cli_error_names_both_paths_tried(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    workspace = tmp_path / "vide"
+    repo = tmp_path / "repo"
+    monkeypatch.setattr(settings, "ide_workspace_dir", workspace)
+    monkeypatch.setattr(config, "_REPO_ROOT", repo)
+    assert ticket_check.main(["absent"]) == 2
+    err = capsys.readouterr().err
+    assert str(workspace / "absent") in err
+    assert str(repo / "projects" / "absent") in err
+
+
+def test_cli_finds_the_project_in_the_repository_projects(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repo = tmp_path / "repo"
+    racine = repo / "projects" / "mon-projet"
+    racine.mkdir(parents=True)
+    _write(racine, "todo", "ticket-001-a")
+    monkeypatch.setattr(settings, "ide_workspace_dir", tmp_path / "vide")
+    monkeypatch.setattr(config, "_REPO_ROOT", repo)
+    assert ticket_check.main(["mon-projet"]) == 0
 
 
 def test_endpoint_returns_an_empty_list_on_a_sound_project(

@@ -8201,3 +8201,17 @@ error: Please commit or stash them.
 - 2026-11-06 06:09:52 UTC — [ticket-867] APPROVED après 1 tour(s)
 - 2026-11-06 06:10:01 UTC — [ticket-867] fichiers non suivis laissés par le run : tickets/todo/ticket-868-the-supervisor-writes-its-a-toi-cases-to-its-journal.md (à ignorer dans .gitignore ?)
 - 2026-11-06 06:14:01 UTC — [ticket-867] documentation: 0 fichier(s) (239625ms) — après tour de correction
+- 2026-11-06 06:09:38 UTC — [ticket-861] livraison: arrêt — PR #958 non mergée : Fin de l'attente : la CI de la PR #958 n'a pas rendu de verdict. La PR reste ouverte.
+- 2026-11-06 06:17:16 UTC — [ide-core] ticket-867 PR #959 confiée au CIWatcher
+- 2026-11-06 06:24:39 UTC — [ide-core] ticket-867 PR #959 mergée (CI verte)
+- 2026-11-06 08:57:45 UTC — [ticket-869] branche ticket-869-ticket-check-finds-the-project-in-the-repository
+- 2026-11-06 08:57:46 UTC — [ticket-869] tour 1 — codeur démarré
+- 2026-11-06 08:58:46 UTC — [ticket-869] tour 1 — codeur terminé (60422ms)
+- 2026-11-06 08:59:12 UTC — [ticket-869] testeur: dur�es : ruff 0 s, pytest 10 s, mypy 13 s, mypy-linux 10 s
+- 2026-11-06 09:00:57 UTC — [ticket-869] securite: PASS — Audit de sécurité du diff ticket-869 : ajout de localisation multi-emplacements  (104766ms)
+- 2026-11-06 09:00:57 UTC — [ticket-869] tour 1 — reviewer démarré
+- 2026-11-06 09:01:13 UTC — [ticket-869] tour 1 — reviewer terminé (16422ms)
+- 2026-11-06 09:04:02 UTC — [ticket-869] validateur: fichiers cités joints : ticket_check.py, backend/tests/test_ticket_check.py, backend/src/tessera/config.py (tronqué)
+- 2026-11-06 09:04:02 UTC — [ticket-869] validateur: APPROVED — Tous les critères d'acceptation ont été respectés. Le code a été mis à jour pour (184844ms)
+- 2026-11-06 09:04:02 UTC — [ticket-869] APPROVED après 1 tour(s)
+- 2026-11-06 09:05:09 UTC — [ticket-869] documentation: 0 fichier(s) (61922ms)

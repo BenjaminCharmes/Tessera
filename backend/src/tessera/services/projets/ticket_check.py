@@ -134,17 +134,39 @@ def verifier_tickets(racine_projet: Path) -> list[Probleme]:
     return problems + _duplicate_problems(paths_by_id)
 
 
+def _chemins_candidats(project_id: str) -> tuple[Path, Path]:
+    """The two places a project is looked for: the declared workspace, then the repository."""
+    from tessera import config
+
+    return (
+        config.settings.ide_workspace_dir / project_id,
+        config._REPO_ROOT / "projects" / project_id,
+    )
+
+
+def dossier_du_projet(project_id: str) -> Path | None:
+    """Locate a project folder, or None when neither candidate exists.
+
+    The declared workspace wins; the repository's ``projects/`` folder is the
+    fallback for a worktree, which has no ``.env`` to point the workspace at it.
+    """
+    for candidat in _chemins_candidats(project_id):
+        if candidat.is_dir():
+            return candidat
+    return None
+
+
 def main(argv: list[str]) -> int:
     """Print the problems of project `argv[0]` and return the exit code."""
-    from tessera.config import settings
     from tessera.utils.project_id import validate_project_id
 
     if len(argv) != 1 or not validate_project_id(argv[0]):
         sys.stderr.write("usage : python -m tessera.services.projets.ticket_check <project_id>\n")
         return 2
-    racine = settings.ide_workspace_dir / argv[0]
-    if not racine.is_dir():
-        sys.stderr.write(f"projet introuvable : {racine}\n")
+    racine = dossier_du_projet(argv[0])
+    if racine is None:
+        essayes = " ; ".join(str(c) for c in _chemins_candidats(argv[0]))
+        sys.stderr.write(f"projet introuvable : {essayes}\n")
         return 2
     problems = verifier_tickets(racine)
     for p in problems:
