@@ -8242,3 +8242,20 @@ error: Please commit or stash them.
 - 2026-11-06 11:14:21 UTC — [ticket-872] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (282968ms)
 - 2026-11-06 11:14:21 UTC — [ticket-872] APPROVED après 1 tour(s)
 - 2026-11-06 11:15:59 UTC — [ticket-872] documentation: 0 fichier(s) (92063ms)
+- 2026-11-06 11:21:20 UTC — [ide-core] ticket-872 PR #967 confiée au CIWatcher
+- 2026-11-06 11:21:24 UTC — [ticket-875] branche ticket-875-an-interrupted-run-is-marked-recovered-only-after
+- 2026-11-06 11:21:26 UTC — [ticket-875] tour 1 — codeur démarré
+- 2026-11-06 11:24:37 UTC — [ticket-875] tour 1 — codeur terminé (190484ms)
+- 2026-11-06 11:26:25 UTC — [ticket-875] testeur: 1 failed, 599 passed in 104.54s (0:01:44)
+- 2026-11-06 11:26:25 UTC — [ticket-875] tests rouges au tour 1
+- 2026-11-06 11:26:25 UTC — [ticket-875] tour 2 — codeur démarré
+- 2026-11-06 11:28:28 UTC — [ticket-875] tour 2 — codeur terminé (123765ms)
+- 2026-11-06 11:30:25 UTC — [ticket-875] testeur: dur�es : ruff 0 s, mypy 6 s, mypy-linux 9 s, pytest 114 s
+- 2026-11-06 11:30:35 UTC — [ticket-875] securite: PASS — Verdict PASS : le diff ne contient aucune vulnérabilité. Il déplace la fonction  (9984ms)
+- 2026-11-06 11:30:35 UTC — [ticket-875] tour 2 — reviewer démarré
+- 2026-11-06 11:30:54 UTC — [ticket-875] tour 2 — reviewer terminé (18375ms)
+- 2026-11-06 11:34:02 UTC — [ticket-875] validateur: fichiers cités joints : backend/tests/test_reprise_orphelin_echec.py
+- 2026-11-06 11:34:02 UTC — [ticket-875] validateur: APPROVED — Tous les critères d'acceptation ont été implémentés et vérifiés : un test valide (206452ms)
+- 2026-11-06 11:34:02 UTC — [ticket-875] APPROVED après 2 tour(s)
+- 2026-11-06 11:35:05 UTC — [ticket-875] leçons: une leçon proposée
+- 2026-11-06 11:37:17 UTC — [ticket-875] documentation: 0 fichier(s) (126952ms)

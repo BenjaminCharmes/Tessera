@@ -4,9 +4,9 @@ created: 2026-11-06
 depends_on: []
 estimated_days: 0.5
 id: ticket-875
-pr_number: null
+pr_number: 968
 priority: high
-status: todo
+status: done
 title: An interrupted run is marked recovered only after its recovery succeeded
 type: fix
 ---
