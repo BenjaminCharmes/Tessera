@@ -8103,3 +8103,17 @@ error: Please commit or stash them.
 - 2026-11-06 02:41:18 UTC — [ticket-860] APPROVED après 3 tour(s)
 - 2026-11-06 02:42:02 UTC — [ticket-860] leçons: une leçon proposée
 - 2026-11-06 02:46:48 UTC — [ticket-860] documentation: 0 fichier(s) (277985ms) — après tour de correction
+- 2026-11-06 02:59:57 UTC — [ide-core] ticket-861 sauté : dépend de ticket-860, non mergé
+- 2026-11-06 02:59:57 UTC — [ide-core] ticket-860 PR #952 confiée au CIWatcher
+- 2026-11-06 02:59:57 UTC — [ticket-860] livraison: arrêt — PR #952 non mergée : la tête de la PR #952 n'est plus le commit poussé : 871e039 au lieu de e57a3d0. La PR reste ouverte.
+- 2026-11-06 03:00:07 UTC — [ticket-854] branche ticket-854-a-supervision-intervention-is-a-run-with-one-comm
+- 2026-11-06 03:00:08 UTC — [ticket-854] tour 1 — codeur démarré
+- 2026-11-06 03:12:44 UTC — [ticket-854] tour 1 — codeur terminé (756188ms)
+- 2026-11-06 03:23:10 UTC — [ticket-854] testeur: dur�es : ruff 0 s, mypy 10 s, mypy-linux 14 s, pytest 621 s
+- 2026-11-06 03:26:03 UTC — [ticket-854] securite: PASS — Ce diff implémente les interventions du superviseur (ticket-854) avec protection (173266ms)
+- 2026-11-06 03:26:03 UTC — [ticket-854] tour 1 — reviewer démarré
+- 2026-11-06 03:26:34 UTC — [ticket-854] tour 1 — reviewer terminé (31141ms)
+- 2026-11-06 03:31:03 UTC — [ticket-854] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-06 03:31:45 UTC — [ticket-854] validateur: fichiers cités joints : livraison.py (tronqué) ; absents : services/pipeline/
+- 2026-11-06 03:31:45 UTC — [ticket-854] validateur: APPROVED — Les 9 critères sont satisfaits. Tous les tests (critères 1-8) existent et ont pa (342141ms)
+- 2026-11-06 03:31:45 UTC — [ticket-854] APPROVED après 1 tour(s)
