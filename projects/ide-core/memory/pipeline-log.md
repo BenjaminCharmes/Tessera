@@ -8388,3 +8388,20 @@ error: Please commit or stash them.
 - 2026-11-06 14:59:44 UTC — [ticket-879] APPROVED après 2 tour(s)
 - 2026-11-06 15:01:20 UTC — [ticket-879] leçons: une leçon proposée
 - 2026-11-06 15:02:52 UTC — [ticket-879] documentation: 0 fichier(s) (86295ms)
+- 2026-11-06 15:08:00 UTC — [ide-core] ticket-879 PR #980 confiée au CIWatcher
+- 2026-11-06 15:07:02 UTC — [ide-core] ticket-882 PR #979 mergée (CI verte)
+- 2026-11-06 15:08:06 UTC — [ticket-881] branche ticket-881-a-role-s-model-cannot-be-changed-and-a-project-ca
+- 2026-11-06 15:08:08 UTC — [ticket-881] tour 1 — codeur démarré
+- 2026-11-06 15:09:33 UTC — [ticket-881] tour 1 — codeur terminé (85155ms)
+- 2026-11-06 15:09:55 UTC — [ticket-881] testeur: dur�es : ruff 0 s, pytest 19 s
+- 2026-11-06 15:09:55 UTC — [ticket-881] tests rouges au tour 1
+- 2026-11-06 15:09:55 UTC — [ticket-881] tour 2 — codeur démarré
+- 2026-11-06 15:10:17 UTC — [ticket-881] tour 2 — codeur terminé (22390ms)
+- 2026-11-06 15:10:47 UTC — [ticket-881] testeur: dur�es : ruff 0 s, mypy 13 s, pytest 23 s, mypy-linux 13 s
+- 2026-11-06 15:10:58 UTC — [ticket-881] securite: PASS — Le diff ne fait qu'ajouter des protections : un 409 pendant tout run vivant sur  (11280ms)
+- 2026-11-06 15:10:58 UTC — [ticket-881] tour 2 — reviewer démarré
+- 2026-11-06 15:11:15 UTC — [ticket-881] tour 2 — reviewer terminé (16827ms)
+- 2026-11-06 15:15:41 UTC — [ticket-881] validateur: fichiers cités joints : backend/tests/test_portes_voisines.py, backend/src/tessera/routers/projects/agents.py, backend/src/tessera/routers/projects/removal.py
+- 2026-11-06 15:15:41 UTC — [ticket-881] validateur: APPROVED — Les quatre critères d'acceptation sont satisfaits : les tests vérifient les comp (282828ms)
+- 2026-11-06 15:15:41 UTC — [ticket-881] APPROVED après 2 tour(s)
+- 2026-11-06 15:16:36 UTC — [ticket-881] leçons: rien à retenir
