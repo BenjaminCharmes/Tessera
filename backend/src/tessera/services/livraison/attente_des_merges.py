@@ -34,7 +34,7 @@ _ATTENTE_MAX_S = 2700.0
 class _Surveillance(Protocol):
     """Ce que la livraison lit du `CIWatcher`."""
 
-    def en_attente(self, project_id: str) -> tuple[str, ...]: ...
+    def prs_en_attente(self, project_id: str) -> tuple[tuple[str, int], ...]: ...
 
     async def attendre_merge(
         self,
@@ -57,9 +57,10 @@ async def attendre_les_merges_en_cours(
     empty when nothing was pending. A timeout is logged and ends the wait: it
     never raises, the delivery then goes on as it did before ticket-533.
     """
-    precedents = tuple(
-        t for t in surveillance.en_attente(project_id) if t != ticket_id
+    prs = tuple(
+        (t, pr) for t, pr in surveillance.prs_en_attente(project_id) if t != ticket_id
     )
+    precedents = tuple(t for t, _ in prs)
     if not precedents:
         return ()
     _logger.info(
@@ -68,7 +69,7 @@ async def attendre_les_merges_en_cours(
     )
     try:
         await asyncio.wait_for(
-            _attendre_chacun(surveillance, project_id, precedents),
+            _attendre_chacun(surveillance, project_id, prs),
             timeout=attente_max_s,
         )
     except TimeoutError:
@@ -80,10 +81,11 @@ async def attendre_les_merges_en_cours(
 
 
 async def _attendre_chacun(
-    surveillance: _Surveillance, project_id: str, tickets: tuple[str, ...]
+    surveillance: _Surveillance, project_id: str, prs: tuple[tuple[str, int], ...]
 ) -> None:
-    for precedent in tickets:
-        await surveillance.attendre_merge(project_id, precedent)
+    """Wait for each earlier PR, by its number: never another delivery's outcome."""
+    for precedent, pr_number in prs:
+        await surveillance.attendre_merge(project_id, precedent, pr_number=pr_number)
 
 
 def apres_les_merges(

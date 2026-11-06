@@ -284,7 +284,7 @@ async def test_surveiller_purge_le_resultat_d_une_surveillance_precedente() -> N
         await gate.wait()
         return Livraison(pr_number=pr_number, merged=False, arret="CI rouge")
 
-    watcher._resultats_merge["proj:ticket-001"] = True
+    watcher._suivi.noter("proj", "ticket-001", 2, True)
     await watcher.surveiller("proj", "ticket-001", 2, phase2_bloquante, _rien)
     gate.set()
 
