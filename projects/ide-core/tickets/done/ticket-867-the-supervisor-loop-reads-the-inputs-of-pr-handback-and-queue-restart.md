@@ -5,7 +5,7 @@ depends_on:
 - ticket-859
 estimated_days: 1
 id: ticket-867
-pr_number: null
+pr_number: 959
 priority: medium
 status: done
 title: The supervisor loop reads the inputs of the PR hand-back and the queue restart
