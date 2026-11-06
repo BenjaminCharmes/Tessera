@@ -8445,3 +8445,14 @@ error: Please commit or stash them.
 - 2026-11-06 15:42:19 UTC — [ticket-885] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le test a été mis à jour pour  (161594ms)
 - 2026-11-06 15:42:19 UTC — [ticket-885] APPROVED après 1 tour(s)
 - 2026-11-06 15:43:59 UTC — [ticket-885] documentation: 0 fichier(s) (92109ms) — après tour de correction
+- 2026-11-06 15:47:35 UTC — [ide-core] ticket-885 PR #984 confiée au CIWatcher
+- 2026-11-06 15:46:47 UTC — [ide-core] ticket-884 PR #983 mergée (CI verte)
+- 2026-11-06 15:47:40 UTC — [ticket-886] branche ticket-886-the-supervision-badge-test-renders-the-count-with
+- 2026-11-06 15:47:42 UTC — [ticket-886] tour 1 — codeur démarré
+- 2026-11-06 15:48:30 UTC — [ticket-886] tour 1 — codeur terminé (47561ms)
+- 2026-11-06 15:52:10 UTC — [ticket-886] testeur: dur�es : tsc 18 s, eslint 37 s, vitest 163 s
+- 2026-11-06 15:52:15 UTC — [ticket-886] securite: PASS — Le diff ne modifie qu'un test Vitest : il rend `ListeView` avec des fixtures inv (5359ms)
+- 2026-11-06 15:52:15 UTC — [ticket-886] tour 1 — reviewer démarré
+- 2026-11-06 15:52:28 UTC — [ticket-886] tour 1 — reviewer terminé (12483ms)
+- 2026-11-06 15:53:46 UTC — [ticket-886] validateur: APPROVED — Les deux critères d'acceptation sont respectés. Le test a été modifié pour rendr (90297ms)
+- 2026-11-06 15:53:46 UTC — [ticket-886] APPROVED après 1 tour(s)
