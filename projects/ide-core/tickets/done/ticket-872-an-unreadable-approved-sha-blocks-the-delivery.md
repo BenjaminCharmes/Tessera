@@ -4,7 +4,7 @@ created: 2026-11-06
 depends_on: []
 estimated_days: 0.5
 id: ticket-872
-pr_number: null
+pr_number: 967
 priority: critical
 status: done
 title: An approved run whose approved SHA could not be read is blocked, never pushed
