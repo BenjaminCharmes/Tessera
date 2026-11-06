@@ -8457,3 +8457,26 @@ error: Please commit or stash them.
 - 2026-11-06 15:53:46 UTC — [ticket-886] validateur: APPROVED — Les deux critères d'acceptation sont respectés. Le test a été modifié pour rendr (90297ms)
 - 2026-11-06 15:53:46 UTC — [ticket-886] APPROVED après 1 tour(s)
 - 2026-11-06 15:55:10 UTC — [ticket-886] documentation: 0 fichier(s) (76795ms)
+- 2026-11-06 15:54:44 UTC — [ide-core] ticket-885 PR #984 mergée (CI verte)
+- 2026-11-06 15:59:43 UTC — [ide-core] ticket-886 PR #986 confiée au CIWatcher
+- 2026-11-06 16:08:45 UTC — [ide-core] ticket-886 PR #986 mergée (CI verte)
+- 2026-11-06 17:39:36 UTC — [ticket-888] branche ticket-888-every-process-that-runs-project-code-gets-an-envi
+- 2026-11-06 17:39:38 UTC — [ticket-888] tour 1 — codeur démarré
+- 2026-11-06 17:41:25 UTC — [ticket-888] tour 1 — codeur terminé (106563ms)
+- 2026-11-06 17:44:37 UTC — [ticket-888] testeur: 1 failed, 1009 passed, 72 warnings in 187.64s (0:03:07)
+- 2026-11-06 17:44:37 UTC — [ticket-888] tests rouges au tour 1
+- 2026-11-06 17:44:37 UTC — [ticket-888] tour 2 — codeur démarré
+- 2026-11-06 17:47:08 UTC — [ticket-888] tour 2 — codeur terminé (151000ms)
+- 2026-11-06 17:54:04 UTC — [ticket-888] testeur: dur�es : ruff 2 s, pytest 402 s
+- 2026-11-06 17:54:04 UTC — [ticket-888] tests rouges au tour 2
+- 2026-11-06 17:54:04 UTC — [ticket-888] tour 3 — codeur démarré
+- 2026-11-06 17:54:47 UTC — [ticket-888] tour 3 — codeur terminé (43030ms)
+- 2026-11-06 17:59:01 UTC — [ticket-888] testeur: dur�es : ruff 0 s, mypy 20 s, mypy-linux 16 s, pytest 244 s
+- 2026-11-06 17:59:15 UTC — [ticket-888] securite: PASS — Ce diff renforce la sécurité. Les tests, les services, l'app du contrôle visuel  (14016ms)
+- 2026-11-06 17:59:15 UTC — [ticket-888] tour 3 — reviewer démarré
+- 2026-11-06 17:59:33 UTC — [ticket-888] tour 3 — reviewer terminé (18171ms)
+- 2026-11-06 18:04:15 UTC — [ticket-888] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-06 18:05:13 UTC — [ticket-888] validateur: fichiers cités joints : backend/tests/test_env_du_code_de_projet.py, test_runner.py (tronqué) ; non joints (budget épuisé) : process_registry.py, app_du_run.py, captures.py, groupe_d_etape.py
+- 2026-11-06 18:05:13 UTC — [ticket-888] validateur: APPROVED — Tous les critères sont satisfaits. La fonction env_du_code_de_projet filtre corr (357672ms)
+- 2026-11-06 18:05:13 UTC — [ticket-888] APPROVED après 3 tour(s)
+- 2026-11-06 18:06:18 UTC — [ticket-888] leçons: une leçon proposée
