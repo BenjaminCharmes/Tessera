@@ -30,7 +30,7 @@ Trois choix le distinguent d'un assistant de code classique :
   au commit, ouvrir la PR, ou merger — et seulement si la CI est verte.
 - **Les fichiers sensibles restent protégés.** Les agents ne peuvent pas
   modifier les règles de votre IDE (`CLAUDE.md`, `agents.json`, `.github/workflows/`,
-  `.git/`) ni sa configuration locale (`.claude/`). Ils ne peuvent pas non plus
+  `.git/`) ni les fichiers de configuration de développement (`.claude/settings*.json`, `.claude/skills/`, `.claude/commands/`, `.claude/agents/`). Ils ne peuvent pas non plus
   modifier les contraintes communes (`memory/contraintes.md`) directement : les
   nouvelles règles y sont proposées d'abord, en attente d'acceptation. Le script
   de vérification (celui de `test_command`) est aussi protégé : un codeur ne peut

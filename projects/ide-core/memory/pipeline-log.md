@@ -8137,3 +8137,22 @@ error: Please commit or stash them.
 - 2026-11-06 04:10:45 UTC — [ticket-855] APPROVED après 2 tour(s)
 - 2026-11-06 04:11:25 UTC — [ticket-855] leçons: rien à retenir
 - 2026-11-06 04:12:56 UTC — [ticket-855] documentation: 0 fichier(s) (81609ms)
+- 2026-11-06 04:21:04 UTC — [ide-core] ticket-855 : base réalignée sur develop
+- 2026-11-06 04:21:04 UTC — [ide-core] ticket-855 PR #955 confiée au CIWatcher
+- 2026-11-06 04:21:00 UTC — [ide-core] ticket-855 PR #955 mergée (CI verte)
+- 2026-11-06 04:21:16 UTC — [ticket-856] branche ticket-856-the-supervisor-decides-a-delegated-lesson-or-rule
+- 2026-11-06 04:21:18 UTC — [ticket-856] tour 1 — codeur démarré
+- 2026-11-06 04:28:11 UTC — [ticket-856] tour 1 — codeur terminé (412672ms)
+- 2026-11-06 04:28:28 UTC — [ticket-856] testeur: dur�es : ruff 0 s, pytest 10 s
+- 2026-11-06 04:28:28 UTC — [ticket-856] tests rouges au tour 1
+- 2026-11-06 04:28:28 UTC — [ticket-856] tour 2 — codeur démarré
+- 2026-11-06 04:29:17 UTC — [ticket-856] tour 2 — codeur terminé (49609ms)
+- 2026-11-06 04:29:37 UTC — [ticket-856] testeur: dur�es : ruff 0 s, mypy 6 s, pytest 15 s, mypy-linux 10 s
+- 2026-11-06 04:31:57 UTC — [ticket-856] securite: PASS — The supervisor decision system (ticket-856) implements robust security controls  (140281ms)
+- 2026-11-06 04:31:57 UTC — [ticket-856] tour 2 — reviewer démarré
+- 2026-11-06 04:32:23 UTC — [ticket-856] tour 2 — reviewer terminé (25717ms)
+- 2026-11-06 04:36:57 UTC — [ticket-856] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-06 04:37:37 UTC — [ticket-856] validateur: APPROVED — Tous les 6 tests d'acceptation du superviseur sont implémentés et passent (exit  (339766ms)
+- 2026-11-06 04:37:37 UTC — [ticket-856] APPROVED après 2 tour(s)
+- 2026-11-06 04:39:03 UTC — [ticket-856] leçons: rien à retenir
+- 2026-11-06 04:41:23 UTC — [ticket-856] documentation: 1 fichier(s) (132797ms)
