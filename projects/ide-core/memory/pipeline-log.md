@@ -8444,3 +8444,4 @@ error: Please commit or stash them.
 - 2026-11-06 15:42:19 UTC — [ticket-885] validateur: fichiers cités joints : backend/tests/test_livraison.py (tronqué)
 - 2026-11-06 15:42:19 UTC — [ticket-885] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le test a été mis à jour pour  (161594ms)
 - 2026-11-06 15:42:19 UTC — [ticket-885] APPROVED après 1 tour(s)
+- 2026-11-06 15:43:59 UTC — [ticket-885] documentation: 0 fichier(s) (92109ms) — après tour de correction
