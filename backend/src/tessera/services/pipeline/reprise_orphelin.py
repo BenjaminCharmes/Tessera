@@ -35,6 +35,7 @@ from tessera.models.ticket import TicketStatus
 from tessera.services.git_workspace.git_runner import git
 from tessera.services.livraison.reprise_marqueur import lire_runs, marquer_depots_repris, runs_interrompus_a_reprendre
 from tessera.services.pipeline.pipeline_text import _unapproved_commit_message
+from tessera.services.pipeline.reprise_journal import journaliser_approuve_non_livre
 from tessera.services.projets.manifeste import lire_chaine
 from tessera.services.projets.racine_depot import depot_le_plus_proche
 from tessera.services.projets.ticket_service import TicketService
@@ -148,28 +149,6 @@ async def _trouver_fichiers_nouveaux(
     return fichiers
 
 
-def _journaliser_approuve_non_livre(project_path: Path, ticket_id: str) -> None:
-    """Appends an 'approved but undelivered' entry to memory/pipeline-log.md."""
-    ts = datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S UTC")
-    ligne = (
-        f"- {ts} — [{ticket_id}] approuvé mais non livré : livraison à reprendre\n"
-    )
-    log_path = project_path / "memory" / "pipeline-log.md"
-    try:
-        log_path.parent.mkdir(parents=True, exist_ok=True)
-        with log_path.open("a", encoding="utf-8") as f:
-            f.write(ligne)
-    except Exception as exc:
-        _logger.warning(
-            "reprise_journal_echec",
-            extra={
-                "project_path": str(project_path),
-                "ticket_id": ticket_id,
-                "error": str(exc),
-            },
-        )
-
-
 async def _gerer_fiche_ticket(
     project_path: Path,
     project_id: str,
@@ -233,11 +212,13 @@ async def _reprendre_depot_seul(
     ticket_id: str,
     workspace_dir: Path,
     started_at: datetime,
-) -> None:
+) -> bool:
     """Remet d'aplomb le dépôt d'un seul run orphelin.
 
-    Ne fait rien si la copie de travail n'est pas sur la branche du ticket.
-    Toute erreur git est journalisée sans remonter.
+    Rend True quand il n'y a plus rien à reprendre : dépôt remis d'aplomb,
+    copie de travail hors de la branche du ticket, ou projet introuvable
+    (aucune reprise possible, inutile de retenter). Rend False sur une erreur
+    git : elle est journalisée sans remonter, et le run reste à reprendre.
     """
     project_path = workspace_dir / project_id
     if not project_path.is_dir():
@@ -245,7 +226,7 @@ async def _reprendre_depot_seul(
             "reprise_projet_introuvable",
             extra={"project_id": project_id, "ticket_id": ticket_id},
         )
-        return
+        return True
 
     try:
         current_branch = await _git(
@@ -256,7 +237,7 @@ async def _reprendre_depot_seul(
             "reprise_erreur_git",
             extra={"project_id": project_id, "ticket_id": ticket_id, "error": str(exc)},
         )
-        return
+        return False
 
     # N'agit que si la copie de travail est sur la branche du ticket.
     expected_prefix = ticket_id + "-"
@@ -269,7 +250,7 @@ async def _reprendre_depot_seul(
                 "current_branch": current_branch,
             },
         )
-        return
+        return True
 
     try:
         ticket_svc = TicketService(project_path, project_id)
@@ -319,13 +300,15 @@ async def _reprendre_depot_seul(
         #    le fichier reste sur le disque sans jamais être commité ni supprimé
         #    par le retour sur la branche de base.
         if ticket_approuve:
-            _journaliser_approuve_non_livre(project_path, ticket_id)
+            journaliser_approuve_non_livre(project_path, ticket_id)
 
     except Exception as exc:
         _logger.warning(
             "reprise_erreur_git",
             extra={"project_id": project_id, "ticket_id": ticket_id, "error": str(exc)},
         )
+        return False
+    return True
 
 
 async def reprendre_depots_orphelins(
@@ -337,21 +320,27 @@ async def reprendre_depots_orphelins(
 
     Appelée dans le lifespan après `solder_les_runs_orphelins`. Les `run_ids`
     sont ceux du solde (processus tué net) ; s'y ajoutent les runs `interrupted`
-    (arrêt propre) au dépôt pas encore repris, puis marqués : une seule fois
-    (ticket-665). `project_id`, `ticket_id` et `started_at` sont lus en base.
+    (arrêt propre) au dépôt pas encore repris. Un run interrompu n'est marqué
+    repris qu'une fois sa reprise réussie : un échec le laisse à reprendre au
+    démarrage suivant (ticket-665, ticket-875). `project_id`, `ticket_id` et
+    `started_at` sont lus en base.
     """
     async with aiosqlite.connect(str(db_path)) as db:
         interrompus = await runs_interrompus_a_reprendre(db)
         rows = await lire_runs(db, [*run_ids, *interrompus])
-        await marquer_depots_repris(db, interrompus)
 
-    for project_id, ticket_id, started_at_str in rows:
-        try:
-            started_at = datetime.fromisoformat(str(started_at_str))
-            if started_at.tzinfo is None:
-                started_at = started_at.replace(tzinfo=UTC)
-        except (ValueError, TypeError):
-            started_at = datetime.now(UTC)
-        await _reprendre_depot_seul(
-            str(project_id), str(ticket_id), workspace_dir, started_at
-        )
+        reussis: list[str] = []
+        for run_id, project_id, ticket_id, started_at_str in rows:
+            started_at = _lire_started_at(started_at_str)
+            if await _reprendre_depot_seul(project_id, ticket_id, workspace_dir, started_at):
+                reussis.append(run_id)
+        await marquer_depots_repris(db, [r for r in reussis if r in interrompus])
+
+
+def _lire_started_at(valeur: str) -> datetime:
+    """Parse `started_at` as an aware datetime; now when it is unreadable."""
+    try:
+        started_at = datetime.fromisoformat(valeur)
+    except (ValueError, TypeError):
+        return datetime.now(UTC)
+    return started_at if started_at.tzinfo is not None else started_at.replace(tzinfo=UTC)

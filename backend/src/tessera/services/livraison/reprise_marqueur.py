@@ -23,21 +23,25 @@ async def runs_interrompus_a_reprendre(db: aiosqlite.Connection) -> list[str]:
 
 async def lire_runs(
     db: aiosqlite.Connection, run_ids: list[str]
-) -> list[tuple[str, str, str]]:
-    """Reads `(project_id, ticket_id, started_at)` of the given runs, oldest first."""
+) -> list[tuple[str, str, str, str]]:
+    """Reads `(run_id, project_id, ticket_id, started_at)` of the given runs, oldest first."""
     if not run_ids:
         return []
     placeholders = ",".join("?" * len(run_ids))
     async with db.execute(
-        f"SELECT project_id, ticket_id, started_at"
+        f"SELECT id, project_id, ticket_id, started_at"
         f" FROM pipeline_runs WHERE id IN ({placeholders}) ORDER BY started_at",
         run_ids,
     ) as cursor:
-        return [(str(p), str(t), str(s)) for p, t, s in await cursor.fetchall()]
+        return [(str(i), str(p), str(t), str(s)) for i, p, t, s in await cursor.fetchall()]
 
 
 async def marquer_depots_repris(db: aiosqlite.Connection, run_ids: list[str]) -> None:
-    """Marks the runs as recovered, so a later restart leaves them alone."""
+    """Marks the runs as recovered, so a later restart leaves them alone.
+
+    Call it only for runs whose recovery succeeded: a run left unmarked is
+    retried at the next startup.
+    """
     if not run_ids:
         return
     placeholders = ",".join("?" * len(run_ids))
