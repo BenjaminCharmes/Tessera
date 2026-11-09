@@ -8550,3 +8550,28 @@ error: Please commit or stash them.
 - 2026-11-09 11:51:18 UTC — [ticket-893] APPROVED après 3 tour(s)
 - 2026-11-09 11:51:50 UTC — [ticket-893] leçons: une leçon proposée
 - 2026-11-09 11:52:58 UTC — [ticket-893] documentation: 0 fichier(s) (62968ms)
+- 2026-11-09 12:12:19 UTC — [ide-core] ticket-893 : base réalignée sur develop
+- 2026-11-09 12:12:19 UTC — [ide-core] ticket-893 PR #995 confiée au CIWatcher
+- 2026-11-09 11:16:18 UTC — [ide-core] ticket-868 PR #994 mergée (CI verte)
+- 2026-11-09 12:12:17 UTC — [ide-core] ticket-893 PR #995 mergée (CI verte)
+- 2026-11-09 12:12:24 UTC — [ticket-890] branche ticket-890-project-services-come-back-after-a-backend-restar
+- 2026-11-09 12:13:04 UTC — [ticket-890] plan rendu (37561ms)
+- 2026-11-09 12:13:04 UTC — [ticket-890] tour 1 — codeur démarré
+- 2026-11-09 12:18:17 UTC — [ticket-890] tour 1 — codeur terminé (312906ms)
+- 2026-11-09 12:20:09 UTC — [ticket-890] testeur: 2 failed, 597 passed in 104.77s (0:01:44)
+- 2026-11-09 12:20:09 UTC — [ticket-890] tests rouges au tour 1
+- 2026-11-09 12:20:09 UTC — [ticket-890] tour 2 — codeur démarré
+- 2026-11-09 12:20:53 UTC — [ticket-890] tour 2 — codeur terminé (44000ms)
+- 2026-11-09 12:23:33 UTC — [ticket-890] testeur: dur�es : ruff 0 s, pytest 156 s
+- 2026-11-09 12:23:33 UTC — [ticket-890] tests rouges au tour 2
+- 2026-11-09 12:23:33 UTC — [ticket-890] tour 3 — codeur démarré
+- 2026-11-09 12:23:49 UTC — [ticket-890] tour 3 — codeur terminé (16735ms)
+- 2026-11-09 12:27:41 UTC — [ticket-890] testeur: dur�es : ruff 0 s, mypy 11 s, mypy-linux 10 s, pytest 228 s
+- 2026-11-09 12:28:02 UTC — [ticket-890] securite: PASS — PASS : aucune faille CRITICAL ou HIGH introduite. La route `start` reste authent (21686ms)
+- 2026-11-09 12:28:02 UTC — [ticket-890] tour 3 — reviewer démarré
+- 2026-11-09 12:28:28 UTC — [ticket-890] tour 3 — reviewer terminé (26030ms)
+- 2026-11-09 12:28:31 UTC — [ticket-890] validateur: fichiers cités joints : memory/decisions.md (tronqué)
+- 2026-11-09 12:28:31 UTC — [ticket-890] validateur: APPROVED — Tous les critères sont satisfaits. Le code implémente correctement la reprise de (28610ms)
+- 2026-11-09 12:28:31 UTC — [ticket-890] APPROVED après 3 tour(s)
+- 2026-11-09 12:29:40 UTC — [ticket-890] leçons: refusée — preuve absente du retour du run
+- 2026-11-09 12:33:11 UTC — [ticket-890] documentation: 0 fichier(s) (206985ms) — après tour de correction

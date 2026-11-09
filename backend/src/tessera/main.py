@@ -36,6 +36,8 @@ from tessera.routers import captures as captures_router
 from tessera.routers import provisioning as provisioning_router
 from tessera.routers import reglages as reglages_router
 from tessera.routers import services as services_router
+from tessera.routers.services_reprise import reprendre_les_services
+from tessera.routers.services_running import get_sonde
 from tessera.services.livraison.reprise_surveillance import reprendre_surveillances
 from tessera.services.livraison.surveillance_run import surveillance_de_reprise
 from tessera.services.noyau import jeton_de_session
@@ -120,6 +122,8 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         settings.ide_workspace_dir, settings.ide_worktrees_dir
     )
     await _reprendre_les_surveillances()
+    # Les services que l'utilisateur avait lancés (ticket-890, ADR-082).
+    await reprendre_les_services(settings.ide_db_path, get_sonde(), PROCESS_REGISTRY)
     # Le témoin des runs (ADR-078) : une tâche de fond, qui n'agit sur rien.
     detecteur = (
         asyncio.create_task(

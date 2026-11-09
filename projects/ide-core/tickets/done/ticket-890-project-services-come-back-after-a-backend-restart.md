@@ -1,15 +1,15 @@
 ---
-id: ticket-890
-title: "Project services come back after a backend restart"
-type: feat
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-11-09
 depends_on: []
 estimated_days: 1
-created: 2026-11-09
+id: ticket-890
 plan: true
+pr_number: 996
+priority: high
+status: done
+title: Project services come back after a backend restart
+type: feat
 ---
 
 # ticket-890 — Les services d'un projet reviennent après un redémarrage du backend
