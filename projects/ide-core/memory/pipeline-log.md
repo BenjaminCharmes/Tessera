@@ -8679,3 +8679,26 @@ error: Please commit or stash them.
 - 2026-11-09 17:02:21 UTC — [ticket-894] APPROVED après 2 tour(s)
 - 2026-11-09 17:02:45 UTC — [ticket-894] leçons: une leçon proposée
 - 2026-11-09 17:04:30 UTC — [ticket-894] documentation: 0 fichier(s) (99125ms)
+- 2026-11-09 17:12:24 UTC — [ide-core] ticket-894 : base réalignée sur develop
+- 2026-11-09 17:12:24 UTC — [ide-core] ticket-894 PR #1001 confiée au CIWatcher
+- 2026-11-09 17:12:22 UTC — [ide-core] ticket-894 PR #1001 mergée (CI verte)
+- 2026-11-09 17:12:30 UTC — [ticket-895] branche ticket-895-worktrees-grant-the-agent-account-exactly-what-a
+- 2026-11-09 17:12:31 UTC — [ticket-895] tour 1 — codeur démarré
+- 2026-11-09 17:15:21 UTC — [ticket-895] tour 1 — codeur terminé (170062ms)
+- 2026-11-09 17:20:25 UTC — [ticket-895] testeur: dur�es : ruff 0 s, mypy 12 s, mypy-linux 11 s, pytest 300 s ; impact depuis base : 66 fichier(s) de test
+- 2026-11-09 17:20:59 UTC — [ticket-895] securite: PASS — Le diff pose les ACL du compte agent avec `icacls`, appelé par `create_subproces (34484ms)
+- 2026-11-09 17:20:59 UTC — [ticket-895] tour 1 — reviewer démarré
+- 2026-11-09 17:21:32 UTC — [ticket-895] validateur: fichiers cités joints : agents.json, CLAUDE.md, chemins_proteges.py
+- 2026-11-09 17:21:32 UTC — [ticket-895] validateur: APPROVED — La solution implémente correctement les trois règles de droits Windows via `icac (32358ms)
+- 2026-11-09 17:21:47 UTC — [ticket-895] tour 1 — reviewer terminé (47500ms)
+- 2026-11-09 17:21:47 UTC — [ticket-895] CHANGES_REQUESTED tour 1: Reviewer : 1. Les droits sont posés avant `peupler`. `ouvrir_worktree` appelle `accorder_droits_agent` (ligne 64) puis `peupler` (ligne 67). Une entrée `copy` de `populate` ajoute des fichiers après l
+- 2026-11-09 17:21:47 UTC — [ticket-895] tour 2 — codeur démarré
+- 2026-11-09 17:24:18 UTC — [ticket-895] tour 2 — codeur terminé (151187ms)
+- 2026-11-09 17:28:03 UTC — [ticket-895] testeur: dur�es : ruff 0 s, mypy 10 s, mypy-linux 9 s, pytest 222 s ; impact depuis base : 66 fichier(s) de test
+- 2026-11-09 17:28:54 UTC — [ticket-895] securite: PASS — Le diff ajoute des restrictions d'ACL pour le compte agent et ne retire aucun co (50968ms)
+- 2026-11-09 17:28:55 UTC — [ticket-895] tour 2 — reviewer démarré
+- 2026-11-09 17:29:23 UTC — [ticket-895] tour 2 — reviewer terminé (28438ms)
+- 2026-11-09 17:29:49 UTC — [ticket-895] validateur: fichiers cités joints : agents.json, CLAUDE.md, chemins_proteges.py
+- 2026-11-09 17:29:49 UTC — [ticket-895] validateur: APPROVED — Les cinq critères sont satisfaits. La solution implémente correctement les trois (55014ms)
+- 2026-11-09 17:29:49 UTC — [ticket-895] APPROVED après 2 tour(s)
+- 2026-11-09 17:30:25 UTC — [ticket-895] leçons: une leçon proposée
