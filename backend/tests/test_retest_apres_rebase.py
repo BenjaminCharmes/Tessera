@@ -494,3 +494,22 @@ class _OrchestrateurDouble(Orchestrator):
 
     async def _run_pipeline(self, *args: Any, **kwargs: Any) -> PipelineResult:
         return self._resultat
+
+
+async def test_retest_journals_the_impact_ref_and_the_number_of_test_files(tmp_path: Path) -> None:
+    fork = "c3" * 20
+    runner = MagicMock()
+    runner.run_tests = AsyncMock(return_value=TestResult(
+        passed=True, total=5, failed=0, output_summary="durées : pytest 4 s, vitest 9 s ; impact depuis abc : 5 fichier(s) de test",
+    ))
+    retest = retest_du_run(
+        _GitAvecFork(fork), False, runner, _projet_avec_verifier(tmp_path), "python scripts/verifier.py"
+    )
+    assert retest is not None
+    await retest.base_a_avance("main")
+
+    jugement = await retest.juger("main")
+
+    assert jugement is not None
+    assert runner.run_tests.await_args.kwargs["test_command"].endswith(f"--impact {fork}")
+    assert f"--impact {fork[:12]} : 5 fichier(s) de test" in jugement.etape

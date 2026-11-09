@@ -187,6 +187,7 @@ def run_parallel(
     backend_steps: list[Step],
     frontend_steps: list[Step],
     type_steps: list[Step] | None = None,
+    impact: str = "",
 ) -> int:
     """Run the chains concurrently; return non-zero if any fails.
 
@@ -204,16 +205,18 @@ def run_parallel(
     for failure in all_failures:
         print(f"{failure.step_name} :\n{failure.excerpt}", file=sys.stderr)
     if durees:
-        print(ligne_des_durees(durees), file=sys.stderr)
+        print(ligne_des_durees(durees, impact), file=sys.stderr)
 
     return all_failures[0].returncode if all_failures else 0
 
 
-def ligne_des_durees(durees: dict[str, float]) -> str:
+def ligne_des_durees(durees: dict[str, float], impact: str = "") -> str:
     """One line with the duration of every step that ran, in run order of the chains."""
     # On ne savait pas laquelle des étapes coûtait : le retest après rebase
     # prenait 12 à 17 minutes sans dire pourquoi (ticket-793).
-    return "durées : " + ", ".join(f"{nom} {secondes:.0f} s" for nom, secondes in durees.items())
+    ligne = "durées : " + ", ".join(f"{nom} {secondes:.0f} s" for nom, secondes in durees.items())
+    # Cette ligne est celle que le testeur garde comme résumé : l'impact y voyage.
+    return f"{ligne} ; {impact}" if impact else ligne
 
 
 def run_steps(steps: list[Step]) -> int:
@@ -378,7 +381,13 @@ def _chemins_depuis(ref: str, paths: list[str] | None) -> list[str] | None:
     nouveaux = _git("ls-files", "--others", "--exclude-standard")
     if diff is None or nouveaux is None:
         return None
-    return [p for p in (diff + nouveaux).splitlines() if p.strip()]
+    depuis_ref = [p for p in (diff + nouveaux).splitlines() if p.strip()]
+    if paths is None:
+        return depuis_ref
+    # Après un rebase, `git diff <fork>` ramène aussi tout ce que la base a reçu :
+    # seul ce que la branche touche est le sien (ticket-892).
+    propres = set(paths)
+    return [p for p in depuis_ref if p in propres]
 
 
 def _pytest_impacte(ref: str, paths: list[str] | None = None) -> list[Step] | None:
@@ -398,6 +407,14 @@ def _pytest_impacte(ref: str, paths: list[str] | None = None) -> list[Step] | No
     return [Step(name="pytest", cmd=pytest_command() + fichiers, cwd=BACKEND_DIR)]
 
 
+def _note_impact(ref: str, etapes: list[Step] | None) -> str:
+    """The journal note: how many test files the impact mode kept, or the whole suite."""
+    if etapes is None:
+        return f"impact depuis {ref} : suite complète"
+    nombre = len(etapes[0].cmd) - len(pytest_command()) if etapes else 0
+    return f"impact depuis {ref} : {nombre} fichier(s) de test"
+
+
 def main(argv: list[str] | None = None) -> int:
     """Entry point."""
     ref = _option_impact(sys.argv[1:] if argv is None else argv)
@@ -409,15 +426,18 @@ def main(argv: list[str] | None = None) -> int:
         print("Aucun fichier de backend/ ni de frontend/ modifié : rien à tester.", file=sys.stderr)
         return 0
     pytest_steps = BACKEND_STEPS
+    impact = ""
     if backend and ref is not None:
         # Le testeur et le retest après rebase ne relancent que ce que le
         # changement peut toucher ; la CI rejoue toute la suite (ticket-793).
         impacte = _pytest_impacte(ref, paths)
         pytest_steps = BACKEND_STEPS if impacte is None else impacte
+        impact = _note_impact(ref, impacte)
     return run_parallel(
         pytest_steps if backend else [],
         FRONTEND_STEPS if frontend else [],
         TYPE_STEPS if backend else [],
+        impact=impact,
     )
 
 

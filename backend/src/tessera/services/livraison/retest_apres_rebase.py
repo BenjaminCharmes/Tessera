@@ -163,6 +163,7 @@ class RetestApresRebase:
         etape = etape_de(resultat)
         if resultat.vert and premier is not resultat:
             etape = etape_au_second_essai(resultat, premier)
+        etape += impact_journalise(resultat, self._depart if self._lancer_impact else None)
         return Jugement(
             etape=etape,
             duree_ms=(time.monotonic() - t0) * 1000,
@@ -226,6 +227,18 @@ def _porte_un_verifier(project_path: Path, test_cwd: str | None) -> bool:
     except (CommandeInvalide, OSError):
         # Sans verifier lisible, on retombe sur « la base a avancé → retest ».
         return False
+
+
+_IMPACT = re.compile(r"impact depuis \S+ : (\d+ fichier\(s\) de test|suite complète)")
+
+
+def impact_journalise(resultat: ResultatRetest, depart: str | None) -> str:
+    """The journal suffix naming the `--impact` ref and the number of test files run."""
+    if depart is None:
+        return ""
+    trouve = _IMPACT.search(f"{resultat.resume} {resultat.details}")
+    nombre = trouve.group(1) if trouve else "nombre inconnu"
+    return f" ; --impact {depart[:12]} : {nombre}"
 
 
 def etape_de(resultat: ResultatRetest) -> str:
