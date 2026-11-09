@@ -8602,3 +8602,18 @@ error: Please commit or stash them.
 - 2026-11-09 13:16:38 UTC — [ticket-892] APPROVED après 3 tour(s)
 - 2026-11-09 13:18:08 UTC — [ticket-892] leçons: une leçon proposée
 - 2026-11-09 13:19:12 UTC — [ticket-892] documentation: 0 fichier(s) (58905ms)
+- 2026-11-09 15:41:37 UTC — [ticket-899] branche ticket-899-agents-cannot-kill-processes-by-name-nor-by-a-pid
+- 2026-11-09 15:41:38 UTC — [ticket-899] tour 1 — codeur démarré
+- 2026-11-09 15:43:30 UTC — [ticket-899] tour 1 — codeur terminé (112062ms)
+- 2026-11-09 15:44:20 UTC — [ticket-899] testeur: 1 failed, 814 passed in 44.86s
+- 2026-11-09 15:44:20 UTC — [ticket-899] tests rouges au tour 1
+- 2026-11-09 15:44:20 UTC — [ticket-899] tour 2 — codeur démarré
+- 2026-11-09 15:45:28 UTC — [ticket-899] tour 2 — codeur terminé (67795ms)
+- 2026-11-09 15:46:31 UTC — [ticket-899] testeur: dur�es : ruff 0 s, mypy 11 s, mypy-linux 10 s, pytest 60 s ; impact depuis base : 69 fichier(s) de test
+- 2026-11-09 15:46:48 UTC — [ticket-899] securite: PASS — Le diff ajoute un hook PreToolUse qui interdit à un agent de tuer des processus  (16734ms)
+- 2026-11-09 15:46:48 UTC — [ticket-899] tour 2 — reviewer démarré
+- 2026-11-09 15:47:13 UTC — [ticket-899] tour 2 — reviewer terminé (24875ms)
+- 2026-11-09 15:47:31 UTC — [ticket-899] validateur: fichiers cités joints : kill_guard.py, backend/src/tessera/services/providers/ (dossier, 36 fichiers), agent_sdk.py (tronqué)
+- 2026-11-09 15:47:31 UTC — [ticket-899] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le fichier `kill_guard.py` exis (42375ms)
+- 2026-11-09 15:47:31 UTC — [ticket-899] APPROVED après 2 tour(s)
+- 2026-11-09 15:48:16 UTC — [ticket-899] leçons: une leçon proposée
