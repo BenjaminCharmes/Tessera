@@ -8505,3 +8505,15 @@ error: Please commit or stash them.
 - 2026-11-09 10:35:16 UTC — [ticket-891] validateur: APPROVED — Tous les critères sont satisfaits. La route `PUT /api/v1/fs/write` refuse correc (31922ms)
 - 2026-11-09 10:35:16 UTC — [ticket-891] APPROVED après 1 tour(s)
 - 2026-11-09 10:38:45 UTC — [ticket-891] documentation: 0 fichier(s) (203625ms) — après tour de correction
+- 2026-11-09 10:59:41 UTC — [ide-core] ticket-891 PR #992 confiée au CIWatcher
+- 2026-11-09 10:53:53 UTC — [ide-core] ticket-889 PR #991 mergée (CI verte)
+- 2026-11-09 10:59:48 UTC — [ticket-868] branche ticket-868-the-supervisor-writes-its-a-toi-cases-to-its-jour
+- 2026-11-09 10:59:51 UTC — [ticket-868] tour 1 — codeur démarré
+- 2026-11-09 11:03:31 UTC — [ticket-868] tour 1 — codeur terminé (219452ms)
+- 2026-11-09 11:05:41 UTC — [ticket-868] testeur: dur�es : ruff 0 s, mypy 11 s, mypy-linux 11 s, pytest 127 s
+- 2026-11-09 11:05:57 UTC — [ticket-868] securite: PASS — PASS : rien de CRITICAL ni de HIGH dans ce diff. Le nouveau chemin « À toi » est (16016ms)
+- 2026-11-09 11:05:57 UTC — [ticket-868] tour 1 — reviewer démarré
+- 2026-11-09 11:06:18 UTC — [ticket-868] tour 1 — reviewer terminé (20938ms)
+- 2026-11-09 11:06:46 UTC — [ticket-868] validateur: fichiers cités joints : aucun ; absents : memory/supervision.md
+- 2026-11-09 11:06:46 UTC — [ticket-868] validateur: APPROVED — Toutes les fonctionnalités demandées sont implémentées et testées. Le code ajout (48172ms)
+- 2026-11-09 11:06:46 UTC — [ticket-868] APPROVED après 1 tour(s)
