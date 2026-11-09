@@ -4,7 +4,7 @@ created: 2026-11-09
 depends_on: []
 estimated_days: 1
 id: ticket-899
-pr_number: null
+pr_number: 1000
 priority: high
 status: done
 title: Agents cannot kill processes by name, nor by a PID they did not start
