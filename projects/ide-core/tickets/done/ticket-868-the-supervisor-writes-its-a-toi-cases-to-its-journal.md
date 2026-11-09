@@ -1,14 +1,15 @@
 ---
-id: ticket-868
-title: "The supervisor writes its a_toi cases to its journal"
-type: feat
-status: todo
-priority: medium
 agent: codeur
-depends_on: [ticket-867]
-estimated_days: 1
 created: 2026-11-06
-pr_number: null
+depends_on:
+- ticket-867
+estimated_days: 1
+id: ticket-868
+pr_number: 994
+priority: medium
+status: done
+title: The supervisor writes its a_toi cases to its journal
+type: feat
 ---
 
 # ticket-868 — Le superviseur journalise ses cas « À toi » dans `memory/supervision.md`

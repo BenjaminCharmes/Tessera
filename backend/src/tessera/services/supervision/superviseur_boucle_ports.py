@@ -16,6 +16,7 @@ from tessera.services.projets.manifeste import lire_chaine
 from tessera.services.projets.project_loader import load_agents_config
 from tessera.services.projets.superviseur_declaration import load_config_superviseur
 from tessera.services.supervision.anomalies.lecture_base import ouvrir_en_lecture
+from tessera.services.supervision.intervention import Resultat
 from tessera.services.supervision.superviseur_actions import Action, Decision
 from tessera.utils.logger import get_logger
 
@@ -57,6 +58,8 @@ class Candidat:
 #: Lists what the supervisor could do on a project, now.
 Collecter = Callable[[str, Path], Awaitable[list[Candidat]]]
 ProjetsSupervises = Callable[[], list[ProjetSupervise]]
+#: Writes the journal line of the « À toi » decisions of one key (ticket-868); `None` if none to write.
+Journaliser = Callable[[str, list[Decision]], Awaitable[Resultat | None]]
 DepenseDuJour = Callable[[], Awaitable[float]]
 
 
