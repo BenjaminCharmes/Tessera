@@ -17,7 +17,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Position = 0)]
-    [ValidateSet('help', 'setup', 'doctor', 'run', 'dev', 'dev-frontend', 'stop', 'test', 'lint', 'verify', 'check-tickets', 'secrets')]
+    [ValidateSet('help', 'setup', 'doctor', 'run', 'dev', 'dev-frontend', 'stop', 'test', 'lint', 'verify', 'check-tickets', 'secrets', 'agent')]
     [string]$Task = 'help',
 
     # Identifiant du projet, pour `check-tickets` ; sous-verbe, pour `secrets`.
@@ -47,6 +47,9 @@ function Show-Help {
     Write-Host '  .\scripts\tessera.ps1 secrets lister      Dit ou vit chaque secret (coffre, .env, absent)'
     Write-Host '  .\scripts\tessera.ps1 secrets set <NOM>   Range un secret, saisi masque'
     Write-Host '  .\scripts\tessera.ps1 secrets supprimer <NOM>  Retire un secret du coffre'
+    Write-Host '  .\scripts\tessera.ps1 agent setup         Installe le compte agent (voir docs/agent-isolation.md)'
+    Write-Host '  .\scripts\tessera.ps1 agent jeton         Change le jeton d abonnement de l agent'
+    Write-Host '  .\scripts\tessera.ps1 agent doctor        Verifie le compte agent, son coffre et son CLI'
     Write-Host ''
 }
 
@@ -93,6 +96,61 @@ function Invoke-Secrets([string]$SousVerbe, [string]$NomSecret) {
         }
     } finally { Pop-Location }
     exit $LASTEXITCODE
+}
+
+function Invoke-Agent([string]$SousVerbe) {
+    # ticket-896 : installation et controle du compte agent (AGENT_USER).
+    switch ($SousVerbe) {
+        'setup' { & (Join-Path $PSScriptRoot 'agent-setup.ps1') }
+        'jeton' { & (Join-Path $PSScriptRoot 'agent-setup.ps1') -Jeton }
+        'doctor' { Invoke-AgentDoctor }
+        default {
+            Write-Host 'usage : .\scripts\tessera.ps1 agent setup|jeton|doctor' -ForegroundColor Red
+            exit 2
+        }
+    }
+    exit $LASTEXITCODE
+}
+
+function Test-Etape([string]$Libelle, [bool]$Ok, [string]$Remede) {
+    if ($Ok) { Write-Host "[ok]    $Libelle" }
+    else { Write-Host "[echec] $Libelle -> $Remede" -ForegroundColor Red; $script:AgentEchecs++ }
+}
+
+function Get-SecretsAgent([string]$PyVenv) {
+    # `coffre_cli lister` ne montre aucune valeur : seulement coffre, .env ou absent.
+    if (-not (Test-Path $PyVenv)) { return @() }
+    Push-Location (Join-Path $Root 'backend')
+    try { return @(& $PyVenv -m tessera.coffre_cli lister 2>$null) } finally { Pop-Location }
+}
+
+function Get-VersionCli([string]$Chemin) {
+    if (-not (Test-Path -LiteralPath $Chemin)) { return '' }
+    return ([string](& $Chemin --version 2>$null)).Trim()
+}
+
+function Invoke-AgentDoctor {
+    $script:AgentEchecs = 0
+    $compte = 'tessera-agent'
+    $partage = 'C:\ProgramData\Tessera\bin\claude.exe'
+    $pyVenv = Join-Path $Root 'backend\.venv\Scripts\python.exe'
+    $embarque = Join-Path $Root 'backend\.venv\Lib\site-packages\claude_agent_sdk\_bundled\claude.exe'
+    $admin = 'fenetre administrateur : .\scripts\agent-setup-admin.ps1 -Proprietaire <ton compte>'
+    $secrets = Get-SecretsAgent $pyVenv
+    Test-Etape "compte $compte present" ([bool](Get-LocalUser -Name $compte -ErrorAction SilentlyContinue)) $admin
+    Test-Etape 'mot de passe dans le coffre (AGENT_LOGON_PASSWORD)' ($secrets -contains 'AGENT_LOGON_PASSWORD : coffre') '.\scripts\tessera.ps1 agent setup'
+    Test-Etape 'jeton dans le coffre (AGENT_OAUTH_TOKEN)' ($secrets -contains 'AGENT_OAUTH_TOKEN : coffre') '.\scripts\tessera.ps1 agent jeton'
+    $partagee = Get-VersionCli $partage
+    $sdk = Get-VersionCli $embarque
+    Test-Etape "CLI partage present ($partage)" ($partagee -ne '') '.\scripts\tessera.ps1 agent setup'
+    $recopie = "Copy-Item '$embarque' '$partage' -Force (ou agent setup)"
+    Test-Etape "CLI partage de la version du SDK (partage '$partagee', SDK '$sdk')" (($partagee -ne '') -and ($partagee -eq $sdk)) $recopie
+    foreach ($outil in 'uv', 'node') {
+        Test-Etape "$outil trouve sur ce poste" ([bool](Get-Command $outil -ErrorAction SilentlyContinue)) "installer $outil, puis agent setup (droits RX)"
+    }
+    if ($script:AgentEchecs -gt 0) { exit 1 }
+    Write-Host 'Compte agent pret.' -ForegroundColor Green
+    exit 0
 }
 
 function Get-ProcessusTessera {
@@ -209,6 +267,7 @@ switch ($Task) {
     'setup' { Invoke-Setup }
     'doctor' { Invoke-Doctor }
     'secrets' { Invoke-Secrets $Projet $Nom }
+    'agent' { Invoke-Agent $Projet }
     'stop' { Stop-Tessera }
     'dev' { Start-Backend; Write-Host '-> http://localhost:8100/docs' }
     'dev-frontend' { Start-Frontend; Write-Host '-> http://localhost:5173' }
