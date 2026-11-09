@@ -8636,3 +8636,4 @@ error: Please commit or stash them.
 - 2026-11-09 14:16:05 UTC — [ticket-894] testeur: 1 error in 166.37s (0:02:46)
 - 2026-11-09 14:16:05 UTC — [ticket-894] tests rouges au tour 3
 - 2026-11-09 14:16:05 UTC — [ticket-894] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-09 14:16:10 UTC — [ide-core] file interrompue : ticket-894 non approuvé
