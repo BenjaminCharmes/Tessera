@@ -609,9 +609,9 @@ Une ADR qu'aucune règle de `contraintes.md` ni aucun `CLAUDE.md` ne cite part d
 ## ADR-083 — Le CLI d'un agent tourne sous un compte Windows dédié
 
 **Date** : 2026-11-09
-**Décision** : `AGENT_USER` (vide : rien ne change). Renseigné, le CLI part sous ce compte par `TransportCompteAgent`, sous-classe de `SubprocessCLITransport` passée à `query(transport=…)` : hooks, MCP et `resume` restent au protocole du SDK. Lanceur derrière un `Protocol`, en `ctypes` sur `CreateProcessWithLogonW` (pas de pywin32 : une DLL de plus pour WDAC). `cli_path` : copie partagée `C:\ProgramData\Tesserain\claude.exe`.
+**Décision** : `AGENT_USER` (vide : rien ne change). Renseigné, le CLI part sous ce compte par `TransportCompteAgent`, sous-classe de `SubprocessCLITransport` passée à `query(transport=…)` : hooks, MCP et `resume` restent au protocole du SDK. Lanceur derrière un `Protocol`, en `ctypes` sur `CreateProcessWithLogonW` (pas de pywin32 : une DLL de plus pour WDAC). `cli_path` : copie partagée `C:\ProgramData\Tessera\bin\claude.exe`.
 **Environnement** : bâti de zéro, liste blanche, profil du compte, `CLAUDE_CODE_OAUTH_TOKEN` ; jamais le mot de passe. Les deux secrets rejoignent `NOMS_SECRETS`. Échec fermé : `ProviderIndisponible`, jamais de repli (ADR-037).
 **Ferme** : lecture des secrets, du `.env`, de la session Claude ; écriture des fichiers de politique.
-**Ne ferme pas** : le réseau ; le jeton OAuth, lisible par l'agent, voulu ; les droits des worktrees.
+**Ne ferme pas** : le réseau ; le jeton OAuth, lisible par l'agent, voulu ; les droits des worktrees ; l'authentification, qui dépend du jeton longue durée tiré par `claude setup-token`.
 
 ---
