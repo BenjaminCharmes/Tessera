@@ -15,6 +15,7 @@ from tessera.services.git_workspace import GitWorkspaceError, _branch_name, jour
 from tessera.services.noyau.pipeline_events import EventCallback, EventType, OrchestratorEvent, PipelineResult
 from tessera.services.pipeline.pipeline_run import PipelineRun, emit, set_status
 from tessera.services.pipeline.preparation_worktree import preparer_le_worktree
+from tessera.services.providers.droits_worktree import accorder_droits_agent
 from tessera.services.worktrees.run_worktree import LienPersistant, RunWorktree, TravailNonSauve, creer, supprimer
 from tessera.services.worktrees.run_worktree_populate import peupler
 from tessera.utils.logger import get_logger
@@ -60,9 +61,12 @@ async def ouvrir_worktree(
             project_path, project_path, project_id, ticket_id,
             _branch_name(ticket_id, titre), base_du_projet(politique),
         )
+        absents = await peupler(wt, project_path, config)
+        # Après `populate` : un fichier copié (`.claude/settings.local.json`) reçoit son refus aussi.
+        await accorder_droits_agent(wt, politique.test_command)
     except GitWorkspaceError as exc:
         raise OrchestrateurRefuse(str(exc)) from exc
-    return wt, await peupler(wt, project_path, config)
+    return wt, absents
 
 
 async def retirer_apres_echec(wt: RunWorktree, depot: Path) -> None:

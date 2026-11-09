@@ -11,6 +11,7 @@ Pièges observés sur ce projet, une ligne chacun. Le service écrit sous `## Pr
 - Quand une fonction n'est appelée que sous condition, la tester en franchissant cette condition, jamais en l'appelant isolément. (source : ticket-892, 2026-11-09)
 - Quand les gardes de permission se multiplient dans agent_sdk.py, créer une fonction qui agrège les hooks pour respecter le plafond. (source : ticket-899, 2026-11-09)
 - Quand une revue identifie une erreur dans un ADR ou decisions.md (chemin corrompu, caractère binaire), la corriger dans le même diff que le code. (source : ticket-894, 2026-11-09)
+- Quand les restrictions d'accès sont posées avant un peuplement, les reposer après pour qu'elles s'appliquent à chaque fichier. (source : ticket-895, 2026-11-09)
 
 ## En vigueur
 - Quand tu ajoutes ou modifies une route ou un modèle de réponse FastAPI, régénère et commite `docs/openapi.json`, et range la route dans `frontend/src/test/contrat/perimetre.ts` (couverte ou hors périmètre). (source : ticket-860, ticket-864, 2026-11-06)
