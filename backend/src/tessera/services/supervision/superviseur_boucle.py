@@ -10,7 +10,11 @@ Each pass asks `collecter` what could be done, then, for each candidate:
   an `a_toi` verdict;
 - once the day's spend of the `superviseur` role reaches `budget_jour_usd`, only
   the actions that call no model go on; the others wait for the next day;
-- each decision other than `rien` is announced once, as `superviseur_action`.
+- each decision other than `rien` is announced once, as `superviseur_action`;
+- a key handed to « À toi » (by the model or by two failures) leaves its line in
+  `memory/supervision.md` once, through `journaliser` (ticket-868): the key is
+  already marked done and announced, so a later sweep never writes it again. A
+  journal write that fails is logged and not retried: the announcement stands.
 
 The task never interrupts a run (`intervenir` waits for the project) and its
 failure reaches no run (ADR-037): every error is logged and swallowed. A close
@@ -27,7 +31,7 @@ from tessera.services.pipeline.run_registry import RunRegistry
 from tessera.services.providers.enregistrant import activer_enregistrement
 from tessera.services.supervision.superviseur_actions import RAISON_MAX, Decision
 from tessera.services.supervision.superviseur_boucle_etat import EtatIdempotence
-from tessera.services.supervision.superviseur_boucle_ports import Candidat, Collecter, DepenseDuJour, ProjetsSupervises, ProjetSupervise
+from tessera.services.supervision.superviseur_boucle_ports import Candidat, Collecter, DepenseDuJour, Journaliser, ProjetsSupervises, ProjetSupervise
 from tessera.utils.exceptions import decrire_exception
 from tessera.utils.logger import get_logger
 
@@ -53,7 +57,9 @@ class SuperviseurBoucle:
         *,
         intervalle_s: float = INTERVALLE_S,
         decalage_s: float = DECALAGE_S,
+        journaliser: Journaliser | None = None,
     ) -> None:
+        self._journaliser_cas = journaliser
         self._registre = registre
         self._hub = hub
         self._projets = projets
@@ -173,6 +179,7 @@ class SuperviseurBoucle:
             self._etat.marquer_faite(candidat.cle)
             for decision in retenues:
                 await self._annoncer(candidat.project_id, decision)
+            await self._journaliser(candidat.project_id, retenues)
             return retenues
         if decisions and not candidat.sans_modele:
             return await self._echec(candidat, decisions[0].raison)
@@ -188,7 +195,24 @@ class SuperviseurBoucle:
         decision = Decision(candidat.action, candidat.cible, "a_toi", texte[:RAISON_MAX])
         self._etat.marquer_faite(candidat.cle)
         await self._annoncer(candidat.project_id, decision)
+        await self._journaliser(candidat.project_id, [decision])
         return [decision]
+
+    async def _journaliser(self, project_id: str, decisions: list[Decision]) -> None:
+        """Leave the journal line of the « À toi » decisions; a failure is logged, never raised."""
+        cas = [d for d in decisions if d.verdict == "a_toi"]
+        if not cas or self._journaliser_cas is None:
+            return
+        try:
+            resultat = await self._journaliser_cas(project_id, cas)
+        except Exception as exc:  # noqa: BLE001 — le journal n'est pas l'action, et l'annonce est faite
+            _logger.warning("superviseur_journal_a_toi_en_echec", extra={"project": project_id, "erreur": decrire_exception(exc)})
+            return
+        if resultat is not None and resultat.statut in ("abandonne", "blocked"):
+            _logger.warning(
+                "superviseur_journal_a_toi_non_ecrit",
+                extra={"project": project_id, "statut": resultat.statut, "raison": (resultat.raison or "")[:200]},
+            )
 
     async def _annoncer(self, project_id: str, decision: Decision) -> None:
         """Publish `superviseur_action` (bell, history); a failed publish is logged, never raised."""

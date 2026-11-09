@@ -66,19 +66,19 @@ class Resultat:
     raison: str | None = None
 
 
-def _ligne(texte: str, limite: int = 100) -> str:
+def ligne_unique(texte: str, limite: int = 100) -> str:
     """`texte` on one line, cut at `limite`: fit for a commit subject."""
     return re.sub(r"\s+", " ", texte).strip()[:limite]
 
 
-async def _bloquer(
+async def bloquer(
     chantier: Chantier, action: Action, branche: str, raison: str, chemins: list[str] | None = None
 ) -> Resultat:
     """Commit what the tree holds under a `blocked` subject; never raises, never pushes."""
     try:
         restants = chemins if chemins is not None else await chantier.fichiers_modifies()
         if restants:
-            await chantier.commiter(f"chore(supervision): {action.value} blocked — {_ligne(raison)}", restants)
+            await chantier.commiter(f"chore(supervision): {action.value} blocked — {ligne_unique(raison)}", restants)
     except Exception as exc:  # noqa: BLE001 — l'arbre reste, le worktree se conserve
         _logger.warning("intervention_blocage_non_commite", extra={"erreur": decrire_exception(exc)})
     return Resultat("blocked", action, branche=branche, raison=raison)
@@ -88,7 +88,7 @@ async def _commiter_et_journaliser(
     chantier: Chantier, projet: Path, action: Action, application: Application, chemins: list[str], jour: datetime
 ) -> tuple[str, str]:
     """Commit the action, then its journal line with its SHA; return (action SHA, branch head)."""
-    sha = await chantier.commiter(f"chore(supervision): {action.value} {_ligne(application.cible)}", chemins)
+    sha = await chantier.commiter(f"chore(supervision): {action.value} {ligne_unique(application.cible)}", chemins)
     if sha is None:
         raise RuntimeError("le commit de l'action n'a rien commité")
     court = sha[:_SHA_COURT]
@@ -109,9 +109,9 @@ async def _ecrire_et_livrer(
         return Resultat("rien", action, cible=application.cible, branche=branche)
     refus = refus_avant_commit(modifies, action)
     if refus is not None:
-        return await _bloquer(chantier, action, branche, refus, modifies)
+        return await bloquer(chantier, action, branche, refus, modifies)
     sha, tete = await _commiter_et_journaliser(chantier, projet, action, application, modifies, jour)
-    livraison = await chantier.livrer(branche, tete, controle_de(action), f"{action.value} {_ligne(application.cible)}")
+    livraison = await chantier.livrer(branche, tete, controle_de(action), f"{action.value} {ligne_unique(application.cible)}")
     statut: Statut = "livre" if livraison.pr_number is not None else "local"
     return Resultat(statut, action, application.cible, branche, sha, livraison.pr_number, livraison.arret)
 
@@ -130,7 +130,7 @@ async def _sous_verrou(
         return await _ecrire_et_livrer(chantier, projet, action, appliquer, branche, jour)
     except Exception as exc:  # noqa: BLE001 — toute exception finit en `blocked` avec commit (ADR-037)
         _logger.warning("intervention_echouee", extra={"project": project_id, "erreur": decrire_exception(exc)})
-        return await _bloquer(chantier, action, branche, decrire_exception(exc))
+        return await bloquer(chantier, action, branche, decrire_exception(exc))
     finally:
         await chantier.fermer()
 

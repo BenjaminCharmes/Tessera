@@ -26,6 +26,14 @@ def refus_avant_commit(modifies: Iterable[str], action: Action) -> str | None:
     return refus_de_chemin(chemins, action)
 
 
+def controle_du_journal_seul(chemins: list[str]) -> str | None:
+    """The check of a branch that only carries the journal line of an « À toi » case."""
+    autres = [chemin for chemin in chemins if not _est_le_journal(chemin)]
+    if autres:
+        return f"{autres[0]} : une branche « À toi » ne porte que {JOURNAL}"
+    return None
+
+
 def controle_de(action: Action) -> ControleDuDiff:
     """The check the delivery applies to the diff of an `action` branch: its paths, plus the journal."""
 

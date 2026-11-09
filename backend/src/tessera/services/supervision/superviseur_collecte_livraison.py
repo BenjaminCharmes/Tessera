@@ -31,6 +31,7 @@ from tessera.services.pipeline.run_registry import RUN_REGISTRY, RunRegistry
 from tessera.services.projets.autonomie import NiveauAutonomie
 from tessera.services.projets.superviseur_declaration import load_config_superviseur
 from tessera.services.projets.ticket_service import TicketService
+from tessera.services.supervision.intervention_a_toi import journaliser_a_toi
 from tessera.services.supervision.superviseur_boucle import SuperviseurBoucle
 from tessera.services.supervision.superviseur_boucle_etat import NOM_FICHIER, EtatIdempotence
 from tessera.services.supervision.superviseur_boucle_ports import Candidat, depense_du_jour, projets_supervises
@@ -146,4 +147,5 @@ def boucle_du_superviseur(
         Collecteur(rouvrir, hub),
         _depense,
         EtatIdempotence(settings.ide_state_dir / NOM_FICHIER),
+        journaliser=journaliser_a_toi,
     )
