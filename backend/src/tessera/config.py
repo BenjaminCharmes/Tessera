@@ -56,7 +56,7 @@ class Settings(BaseSettings):
     # Le `.env` de Tessera, que le hook de lecture refuse aux agents (ADR-053).
     env_file: ClassVar[Path] = Path(_ENV_FILE)
 
-    # Où lire les neuf secrets (ADR-073) : `auto` (coffre s'il répond, sinon
+    # Où lire les onze secrets (ADR-073) : `auto` (coffre s'il répond, sinon
     # `.env` avec un avertissement), `coffre` (refus sans lui), `env` (CI,
     # Docker, tests). Lu avant le reste par `config_coffre`.
     secrets_source: Literal["auto", "coffre", "env"] = "auto"
@@ -83,6 +83,11 @@ class Settings(BaseSettings):
     resend_api_key: SecretStr = SecretStr("")
     stripe_api_key: SecretStr = SecretStr("")
     cloudflare_api_token: SecretStr = SecretStr("")
+    # Compte dédié des agents (ADR-083) : vide, le CLI part sous le compte du
+    # backend, comme avant. Mot de passe et jeton OAuth vivent au coffre.
+    agent_user: str = ""
+    agent_logon_password: SecretStr = SecretStr("")
+    agent_oauth_token: SecretStr = SecretStr("")
     # Identifiant d'équipe Vercel : pas un secret.
     vercel_team_id: str = ""
     # Identifiant d'organisation Neon : pas un secret. Vide, le client le lit
@@ -245,7 +250,7 @@ class Settings(BaseSettings):
     anomalie_part_budget: float = 0.8
 
     def valeurs_des_secrets(self) -> list[str]:
-        """Return the non-empty values of the eight secrets (ADR-073).
+        """Return the non-empty values of the secrets (ADR-073).
 
         Every name of ``NOMS_SECRETS`` but ``FORBIDDEN_TERMS``: that one is the
         list the push gate already applies, not a value to mask.

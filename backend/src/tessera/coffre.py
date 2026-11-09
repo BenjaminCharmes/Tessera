@@ -14,7 +14,7 @@ from keyring.errors import NoKeyringError, PasswordDeleteError
 
 SERVICE: Final = "tessera"
 
-#: Les neuf secrets rangés au coffre (design §1) : tout le reste reste dans `.env`.
+#: Les onze secrets rangés au coffre (design §1) : tout le reste reste dans `.env`.
 NOMS_SECRETS: Final[tuple[str, ...]] = (
     "ANTHROPIC_API_KEY",
     "GITHUB_TOKEN",
@@ -25,6 +25,8 @@ NOMS_SECRETS: Final[tuple[str, ...]] = (
     "CLOUDFLARE_API_TOKEN",
     "STATIC_TOKEN",
     "FORBIDDEN_TERMS",
+    "AGENT_LOGON_PASSWORD",
+    "AGENT_OAUTH_TOKEN",
 )
 
 

@@ -69,7 +69,7 @@ def poser_backend() -> Iterator[object]:
     keyring.core._keyring_backend = precedent
 
 
-def test_noms_secrets_lists_the_nine_names() -> None:
+def test_noms_secrets_lists_the_eleven_names() -> None:
     assert coffre.NOMS_SECRETS == (
         "ANTHROPIC_API_KEY",
         "GITHUB_TOKEN",
@@ -80,6 +80,8 @@ def test_noms_secrets_lists_the_nine_names() -> None:
         "CLOUDFLARE_API_TOKEN",
         "STATIC_TOKEN",
         "FORBIDDEN_TERMS",
+        "AGENT_LOGON_PASSWORD",
+        "AGENT_OAUTH_TOKEN",
     )
     assert coffre.SERVICE == "tessera"
 
