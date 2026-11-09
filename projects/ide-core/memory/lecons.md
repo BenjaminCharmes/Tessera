@@ -7,6 +7,7 @@ Pièges observés sur ce projet, une ligne chacun. Le service écrit sous `## Pr
 - Quand on ajoute du logging via `get_logger()`, vérifier d'abord que ce log sera visible aux tests avant de les écrire. (source : ticket-880, 2026-11-06)
 - Quand on protège un chemin sans développer les variables d'environnement et le ~, la protection peut être contournée. (source : ticket-879, 2026-11-06)
 - Quand on centralise une fonction et l'importe partout, vérifier que chaque fichier reste sous 300 lignes. (source : ticket-888, 2026-11-06)
+- Quand une mise à jour SDK est corrigée après rejet, soumettre avec le lockfile complet et le rapport d'API, pas l'un sans l'autre. (source : ticket-893, 2026-11-09)
 
 ## En vigueur
 - Quand tu ajoutes ou modifies une route ou un modèle de réponse FastAPI, régénère et commite `docs/openapi.json`, et range la route dans `frontend/src/test/contrat/perimetre.ts` (couverte ou hors périmètre). (source : ticket-860, ticket-864, 2026-11-06)

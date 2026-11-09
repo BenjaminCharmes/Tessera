@@ -1,14 +1,14 @@
 ---
-id: ticket-893
-title: "The Agent SDK moves to 0.2.179, which ships a Windows wheel again"
-type: chore
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-11-09
 depends_on: []
 estimated_days: 0.5
-created: 2026-11-09
+id: ticket-893
+pr_number: 995
+priority: medium
+status: done
+title: The Agent SDK moves to 0.2.179, which ships a Windows wheel again
+type: chore
 ---
 
 # ticket-893 — Le SDK Agent passe en 0.2.179, qui publie de nouveau un wheel Windows
@@ -68,3 +68,28 @@ recopier dans `C:\ProgramData\Tessera\bin`.
 
 - Ne monte pas le SDK d'Affût ni de Vigie : un ticket par projet, après celui-ci.
 - Ne change aucun modèle d'`agents.json`.
+## Rapport du codeur : changements d'API entre 0.2.159 et 0.2.179
+
+Source : `CHANGELOG.md` du dépôt du SDK, de 0.2.159 à 0.2.178 (il n'a pas de
+section 0.2.179). Aucun changement ne touche un appel de Tessera
+(`ClaudeAgentOptions`, hooks `PreToolUse`, `resume`, serveurs MCP en
+processus) : aucun code n'a été adapté.
+
+- 0.2.160 : correctif, les tours de suite n'échouent plus après des
+  sous-agents en arrière-plan avec hooks, `can_use_tool` ou serveurs MCP.
+- 0.2.166 : ajouts de types (sorties de hooks, `SystemInitData`) ; le type de
+  `SandboxSettings.ignoreViolations` devient `dict[str, list[str]]`, que
+  Tessera n'utilise pas.
+- 0.2.170 : correctif de `get_session_messages` pour les appels d'outils
+  parallèles.
+- 0.2.177 : option `on_failure` de `HookMatcher`, défaut `"continue"`, donc
+  comportement inchangé pour les hooks de Tessera.
+- Autres versions : seul le CLI embarqué monte (2.1.281 vers 2.1.318).
+## Rapport du codeur : périmètre du diff de `backend/uv.lock`
+
+`git diff --numstat` : 8 lignes ajoutées, 8 retirées. Ce sont, dans le bloc
+`claude-agent-sdk`, la ligne `version` (0.2.159 vers 0.2.179), la ligne
+`sdist`, cinq lignes de wheels (macOS arm64 et x86_64, deux manylinux,
+`win_amd64`), et le `specifier` de `tessera` (`>=0.2.159` vers `>=0.2.179`).
+Aucune autre ligne `version` n'a bougé : aucun autre paquet n'est touché, et
+les dépendances du SDK (`anyio`, `jsonschema`, `mcp`, `sniffio`) sont les mêmes.
