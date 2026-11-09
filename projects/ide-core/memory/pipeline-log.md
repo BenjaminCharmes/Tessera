@@ -8575,3 +8575,30 @@ error: Please commit or stash them.
 - 2026-11-09 12:28:31 UTC — [ticket-890] APPROVED après 3 tour(s)
 - 2026-11-09 12:29:40 UTC — [ticket-890] leçons: refusée — preuve absente du retour du run
 - 2026-11-09 12:33:11 UTC — [ticket-890] documentation: 0 fichier(s) (206985ms) — après tour de correction
+- 2026-11-09 12:33:30 UTC — [ide-core] ticket-890 PR #996 confiée au CIWatcher
+- 2026-11-09 12:33:35 UTC — [ticket-892] branche ticket-892-the-retest-after-a-rebase-only-runs-the-tests-the
+- 2026-11-09 12:34:28 UTC — [ticket-892] plan rendu (51078ms)
+- 2026-11-09 12:34:28 UTC — [ticket-892] tour 1 — codeur démarré
+- 2026-11-09 12:35:49 UTC — [ticket-892] tour 1 — codeur terminé (81531ms)
+- 2026-11-09 12:47:18 UTC — [ticket-892] testeur: dur�es : ruff 0 s, mypy 14 s, mypy-linux 17 s, pytest 685 s
+- 2026-11-09 12:47:34 UTC — [ticket-892] securite: PASS — Le diff ne fait qu'ajouter de la journalisation : le SHA du fork, tronqué, et le (16296ms)
+- 2026-11-09 12:47:38 UTC — [ticket-892] tour 1 — reviewer démarré
+- 2026-11-09 12:48:26 UTC — [ticket-892] tour 1 — reviewer terminé (47859ms)
+- 2026-11-09 12:49:03 UTC — [ticket-892] validateur: fichiers cités joints : verifier.py, frontend/ (dossier, 17 fichiers), retest_apres_rebase.py (tronqué) ; non joints (budget épuisé) : conftest.py, package.json
+- 2026-11-09 12:49:03 UTC — [ticket-892] validateur: APPROVED — Les quatre critères sont satisfaits. Le code ajoute une logique pour détecter le (88186ms)
+- 2026-11-09 12:49:03 UTC — [ticket-892] CHANGES_REQUESTED tour 1: Reviewer : 1. Le nouveau court-circuit de `_chemins_depuis` ne s'exécute jamais en production. Il ne joue que si `paths` ne contient ni `backend/` ni `scripts/`. Or `main()` n'appelle `_pytest_impacte
+- 2026-11-09 12:49:03 UTC — [ticket-892] tour 2 — codeur démarré
+- 2026-11-09 12:51:27 UTC — [ticket-892] tour 2 — codeur terminé (143719ms)
+- 2026-11-09 13:03:25 UTC — [ticket-892] testeur: 1 failed, 5885 passed, 72 warnings in 714.46s (0:11:54)
+- 2026-11-09 13:03:25 UTC — [ticket-892] tests rouges au tour 2
+- 2026-11-09 13:03:25 UTC — [ticket-892] tour 3 — codeur démarré
+- 2026-11-09 13:03:54 UTC — [ticket-892] tour 3 — codeur terminé (28750ms)
+- 2026-11-09 13:15:04 UTC — [ticket-892] testeur: dur�es : ruff 0 s, mypy 4 s, mypy-linux 3 s, pytest 666 s ; impact depuis base : suite compl�te
+- 2026-11-09 13:15:12 UTC — [ticket-892] securite: PASS — Le diff touche le journal et la sélection des tests. Dans `retest_apres_rebase.p (7936ms)
+- 2026-11-09 13:15:17 UTC — [ticket-892] tour 3 — reviewer démarré
+- 2026-11-09 13:16:08 UTC — [ticket-892] tour 3 — reviewer terminé (50515ms)
+- 2026-11-09 13:16:38 UTC — [ticket-892] validateur: fichiers cités joints : verifier.py, frontend/ (dossier, 17 fichiers), retest_apres_rebase.py (tronqué) ; non joints (budget épuisé) : conftest.py, package.json
+- 2026-11-09 13:16:38 UTC — [ticket-892] validateur: APPROVED — Les quatre critères d'acceptation sont satisfaits. Le code ajoute une journalisa (86578ms)
+- 2026-11-09 13:16:38 UTC — [ticket-892] APPROVED après 3 tour(s)
+- 2026-11-09 13:18:08 UTC — [ticket-892] leçons: une leçon proposée
+- 2026-11-09 13:19:12 UTC — [ticket-892] documentation: 0 fichier(s) (58905ms)

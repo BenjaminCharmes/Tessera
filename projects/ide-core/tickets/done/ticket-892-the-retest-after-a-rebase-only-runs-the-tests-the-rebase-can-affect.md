@@ -1,15 +1,15 @@
 ---
-id: ticket-892
-title: "The retest after a rebase only runs the tests the rebase can affect"
-type: chore
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-11-09
 depends_on: []
 estimated_days: 1
-created: 2026-11-09
+id: ticket-892
 plan: true
+pr_number: 997
+priority: medium
+status: done
+title: The retest after a rebase only runs the tests the rebase can affect
+type: chore
 ---
 
 # ticket-892 — Le retest après rebase ne lance que les tests que le rebase peut toucher

@@ -105,7 +105,7 @@ def test_impact_base_selects_from_the_ticket_diff_without_asking_git() -> None:
 
 
 def test_the_last_impact_option_wins() -> None:
-    with patch("verifier.changed_paths", return_value=["backend/src/tessera/x.py"]), \
+    with patch("verifier.changed_paths", return_value=["backend/src/tessera/x.py", "backend/src/tessera/y.py"]), \
          patch("verifier._git", return_value="backend/src/tessera/y.py\n"), \
          patch("verifier.fichiers_de_test_impactes", return_value=["tests/test_y.py"]) as choix, \
          patch("verifier.run_parallel", return_value=0):
@@ -116,3 +116,26 @@ def test_the_last_impact_option_wins() -> None:
 def test_professional_trace_scan_is_a_global_test() -> None:
     """The scan of every tracked file runs in impact mode too: ticket-849 passed its tester and failed the CI on it."""
     assert "tests/test_aucune_trace_professionnelle.py" in TESTS_GLOBAUX
+
+
+def test_a_sha_impact_keeps_only_the_paths_the_branch_touches() -> None:
+    # develop a reçu du backend depuis le fork : il ne doit pas entrer dans la sélection.
+    def git(*args: str) -> str:
+        if args[0] != "diff":
+            return ""
+        return "backend/src/tessera/de_develop.py\nbackend/src/tessera/a_moi.py\n"
+
+    paths = ["backend/src/tessera/a_moi.py", "frontend/x.ts"]
+    with patch("verifier.changed_paths", return_value=paths), \
+         patch("verifier._git", side_effect=git), \
+         patch("verifier.fichiers_de_test_impactes", return_value=[]) as choix, \
+         patch("verifier.run_parallel", return_value=0) as run:
+        assert main(["--impact", "base", "--impact", "c3" * 20]) == 0
+    choix.assert_called_once_with(["backend/src/tessera/a_moi.py"])
+    attendu = f"impact depuis {'c3' * 20} : {len(TESTS_GLOBAUX)} fichier(s) de test"
+    assert run.call_args.kwargs["impact"] == attendu
+
+
+def test_the_impact_note_travels_on_the_durations_line() -> None:
+    ligne = ligne_des_durees({"pytest": 4.0}, "impact depuis abc : 3 fichier(s) de test")
+    assert ligne == "durées : pytest 4 s ; impact depuis abc : 3 fichier(s) de test"
