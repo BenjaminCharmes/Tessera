@@ -8518,3 +8518,34 @@ error: Please commit or stash them.
 - 2026-11-09 11:06:46 UTC — [ticket-868] validateur: APPROVED — Toutes les fonctionnalités demandées sont implémentées et testées. Le code ajout (48172ms)
 - 2026-11-09 11:06:46 UTC — [ticket-868] APPROVED après 1 tour(s)
 - 2026-11-09 11:08:29 UTC — [ticket-868] documentation: 0 fichier(s) (81452ms)
+- 2026-11-09 11:10:47 UTC — [ide-core] ticket-868 PR #994 confiée au CIWatcher
+- 2026-11-09 11:06:32 UTC — [ide-core] ticket-891 PR #992 mergée (CI verte)
+- 2026-11-09 11:10:52 UTC — [ticket-893] branche ticket-893-the-agent-sdk-moves-to-0-2-179-which-ships-a-wind
+- 2026-11-09 11:10:53 UTC — [ticket-893] tour 1 — codeur démarré
+- 2026-11-09 11:11:33 UTC — [ticket-893] tour 1 — codeur terminé (39390ms)
+- 2026-11-09 11:23:56 UTC — [ticket-893] testeur: dur�es : ruff 1 s, mypy 17 s, mypy-linux 23 s, pytest 733 s
+- 2026-11-09 11:24:02 UTC — [ticket-893] securite: PASS — Le diff relève le plancher de claude-agent-sdk de 0.2.159 à 0.2.179 et met à jou (5609ms)
+- 2026-11-09 11:24:02 UTC — [ticket-893] tour 1 — reviewer démarré
+- 2026-11-09 11:24:18 UTC — [ticket-893] tour 1 — reviewer terminé (15781ms)
+- 2026-11-09 11:24:39 UTC — [ticket-893] validateur: fichiers cités joints : backend/pyproject.toml, backend/uv.lock (tronqué) ; non joints (budget épuisé) : test_agent_sdk_windows_wheel.py
+- 2026-11-09 11:24:39 UTC — [ticket-893] validateur: CHANGES_REQUESTED — Trois critères sur quatre sont satisfaits. Le pyproject.toml porte bien la versi (36780ms)
+- 2026-11-09 11:24:39 UTC — [ticket-893] CHANGES_REQUESTED tour 1: Validateur : Trois critères sur quatre sont satisfaits. Le pyproject.toml porte bien la version 0.2.179, le uv.lock a été mis à jour (confirmé par les tests passants qui incluent test_agent_sdk_window
+- 2026-11-09 11:24:39 UTC — [ticket-893] tour 2 — codeur démarré
+- 2026-11-09 11:25:00 UTC — [ticket-893] tour 2 — codeur terminé (20702ms)
+- 2026-11-09 11:36:22 UTC — [ticket-893] testeur: dur�es : ruff 0 s, mypy 2 s, mypy-linux 2 s, pytest 679 s
+- 2026-11-09 11:36:27 UTC — [ticket-893] securite: PASS — Le diff ne fait que relever la version minimale de claude-agent-sdk de 0.2.159 à (4984ms)
+- 2026-11-09 11:36:27 UTC — [ticket-893] tour 2 — reviewer démarré
+- 2026-11-09 11:36:41 UTC — [ticket-893] tour 2 — reviewer terminé (14625ms)
+- 2026-11-09 11:38:09 UTC — [ticket-893] validateur: fichiers cités joints : backend/pyproject.toml, backend/uv.lock (tronqué) ; non joints (budget épuisé) : test_agent_sdk_windows_wheel.py
+- 2026-11-09 11:38:09 UTC — [ticket-893] validateur: CHANGES_REQUESTED — Trois critères sur quatre sont satisfaits. Le pyproject.toml porte bien 0.2.179, (101875ms)
+- 2026-11-09 11:38:09 UTC — [ticket-893] CHANGES_REQUESTED tour 2: Validateur : Trois critères sur quatre sont satisfaits. Le pyproject.toml porte bien 0.2.179, les tests passent (incluant le test du wheel Windows), et le rapport du codeur est présent et complet. Seu
+- 2026-11-09 11:38:09 UTC — [ticket-893] tour 3 — codeur démarré
+- 2026-11-09 11:38:49 UTC — [ticket-893] tour 3 — codeur terminé (40702ms)
+- 2026-11-09 11:50:14 UTC — [ticket-893] testeur: dur�es : ruff 1 s, mypy 6 s, mypy-linux 3 s, pytest 672 s
+- 2026-11-09 11:50:20 UTC — [ticket-893] securite: PASS — Le diff relève seulement la version minimale de claude-agent-sdk, de 0.2.159 à 0 (6375ms)
+- 2026-11-09 11:50:20 UTC — [ticket-893] tour 3 — reviewer démarré
+- 2026-11-09 11:50:34 UTC — [ticket-893] tour 3 — reviewer terminé (13500ms)
+- 2026-11-09 11:51:18 UTC — [ticket-893] validateur: fichiers cités joints : backend/pyproject.toml, backend/uv.lock (tronqué) ; non joints (budget épuisé) : test_agent_sdk_windows_wheel.py
+- 2026-11-09 11:51:18 UTC — [ticket-893] validateur: APPROVED — Tous les critères sont satisfaits. Le pyproject.toml exige bien 0.2.179, le uv.l (57936ms)
+- 2026-11-09 11:51:18 UTC — [ticket-893] APPROVED après 3 tour(s)
+- 2026-11-09 11:51:50 UTC — [ticket-893] leçons: une leçon proposée
