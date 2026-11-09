@@ -595,3 +595,13 @@ Une ADR qu'aucune règle de `contraintes.md` ni aucun `CLAUDE.md` ne cite part d
 **Limite** : le fichier du jeton reste lisible par un agent (ticket-879).
 
 ---
+
+## ADR-082 — L'intention de lancer les services d'un projet survit au backend
+
+**Date** : 2026-11-09
+**Décision** : amende ADR-042. `services/start` inscrit le projet dans `services_demandes`, `stop` l'en retire. Au démarrage, `reprendre_les_services` relance chaque projet inscrit par le chemin de `start`, un `try` par projet. Un échec, dont le 409 « déjà lancé hors de Tessera », est journalisé (`services_non_repris`) et retire le projet : pas de boucle de plantage. L'arrêt du backend ne retire rien.
+**Persisté** : l'intention. **Non persisté** : les processus, enfants du backend, sans reprise d'orphelin.
+**Raison** : le 09/11, un redémarrage a tué les services d'Affût et de Kadoomi.
+**Placement** : table dans `noyau`, reprise dans `routers/` (ADR-076).
+
+---

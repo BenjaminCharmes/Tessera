@@ -136,6 +136,12 @@ UPDATE pipeline_runs SET depot_repris_at = COALESCE(finished_at, started_at)
     # (le détecteur d'anomalies, ADR-078) ; sans cet index, chaque lecture
     # parcourrait toute la table, tokens compris.
     "CREATE INDEX IF NOT EXISTS idx_ae_type_id ON agent_events (type, id);",
+    # 13 — ticket-890 : l'intention « les services de ce projet doivent tourner »,
+    # relue au démarrage (ADR-082). Les processus, eux, ne se persistent pas.
+    """CREATE TABLE IF NOT EXISTS services_demandes (
+    project_id TEXT PRIMARY KEY,
+    demande_le TEXT NOT NULL
+);""",
 ]
 
 

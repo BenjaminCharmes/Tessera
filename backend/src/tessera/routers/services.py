@@ -13,10 +13,11 @@ from tessera.routers.dependencies import require_valid_project_id
 from tessera.routers.services_running import get_sonde
 from tessera.services.noyau.event_hub import EVENT_HUB
 from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.noyau.services_demandes import demander, retirer
 from tessera.services.projets.project_loader import load_services_config
 from tessera.services.supervision.inventaire_apps import inventaire
 from tessera.services.supervision.sonde_systeme import SondeSysteme
-from tessera.services.verification.process_registry import PROCESS_REGISTRY, CommandeInvalide, Service, ServiceDejaEnCours
+from tessera.services.verification.process_registry import PROCESS_REGISTRY, CommandeInvalide, ProcessRegistry, Service, ServiceDejaEnCours
 from tessera.services.verification.service_etat import ServiceEtat, ServicesArretes, ServicesDemarres
 from tessera.utils.logger import get_logger
 
@@ -90,10 +91,13 @@ async def _refuser_si_deja_lance_hors_de_tessera(
             )
 
 
-@router.post("/{project_id}/services/start", response_model=ServicesDemarres)
-async def demarrer(
-    project_id: str, sonde: SondeSysteme = Depends(get_sonde)
+async def lancer_les_services(
+    project_id: str, sonde: SondeSysteme, registre: ProcessRegistry = PROCESS_REGISTRY
 ) -> ServicesDemarres:
+    """Launch every declared service of a project; raise HTTPException on refusal.
+
+    Shared by the `start` route and the resume at backend startup (ticket-890).
+    """
     racine = _racine(project_id)
     declares = load_services_config(racine)
     if not declares:
@@ -112,7 +116,7 @@ async def demarrer(
     demarres: list[ServiceEtat] = []
     try:
         for declare in declares:
-            service = await PROCESS_REGISTRY.demarrer(
+            service = await registre.demarrer(
                 project_id,
                 declare["nom"],
                 declare["commande"],
@@ -128,10 +132,10 @@ async def demarrer(
     except CommandeInvalide as exc:
         # Ce qui a déjà démarré s'arrête : un lancement à moitié fait laisse
         # un serveur seul, sans le reste dont il dépend.
-        await PROCESS_REGISTRY.arreter(project_id)
+        await registre.arreter(project_id)
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     except OSError as exc:
-        await PROCESS_REGISTRY.arreter(project_id)
+        await registre.arreter(project_id)
         raise HTTPException(
             status_code=422, detail=f"Lancement impossible : {exc}"
         ) from exc
@@ -139,9 +143,20 @@ async def demarrer(
     return ServicesDemarres(services=demarres)
 
 
+@router.post("/{project_id}/services/start", response_model=ServicesDemarres)
+async def demarrer(
+    project_id: str, sonde: SondeSysteme = Depends(get_sonde)
+) -> ServicesDemarres:
+    demarres = await lancer_les_services(project_id, sonde)
+    # Après un lancement réussi seulement : l'intention n'existe que si ça tourne.
+    await demander(settings.ide_db_path, project_id)
+    return demarres
+
+
 @router.post("/{project_id}/services/stop", response_model=ServicesArretes)
 async def arreter(project_id: str) -> ServicesArretes:
     _racine(project_id)
+    await retirer(settings.ide_db_path, project_id)
     return ServicesArretes(arretes=await PROCESS_REGISTRY.arreter(project_id))
 
 
