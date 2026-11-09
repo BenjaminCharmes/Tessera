@@ -8727,3 +8727,4 @@ error: Please commit or stash them.
 - 2026-11-09 17:34:23 UTC — [ticket-896] tour 1 — codeur terminé (125139ms)
 - 2026-11-09 17:44:34 UTC — [ticket-896] testeur: dur�es : ruff 0 s, mypy 7 s, mypy-linux 13 s, pytest 608 s ; impact depuis base : suite compl�te
 - 2026-11-09 17:45:23 UTC — [ticket-896] securite: BLOCK — BLOCK : le dossier partagé C:\ProgramData\Tessera\bin hérite du droit de créatio (48937ms)
+- 2026-11-09 17:45:28 UTC — [ide-core] file interrompue : ticket-896 non approuvé
