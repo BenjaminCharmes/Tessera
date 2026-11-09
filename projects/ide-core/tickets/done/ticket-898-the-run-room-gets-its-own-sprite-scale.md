@@ -2,8 +2,8 @@
 id: ticket-898
 title: "The run room gets its own sprite scale, larger than the top rooms on a laptop"
 type: fix
-status: in-progress
-pr_number: null
+status: done
+pr_number: 993
 priority: medium
 agent: codeur
 depends_on: []
