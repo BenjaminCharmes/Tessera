@@ -8549,3 +8549,4 @@ error: Please commit or stash them.
 - 2026-11-09 11:51:18 UTC — [ticket-893] validateur: APPROVED — Tous les critères sont satisfaits. Le pyproject.toml exige bien 0.2.179, le uv.l (57936ms)
 - 2026-11-09 11:51:18 UTC — [ticket-893] APPROVED après 3 tour(s)
 - 2026-11-09 11:51:50 UTC — [ticket-893] leçons: une leçon proposée
+- 2026-11-09 11:52:58 UTC — [ticket-893] documentation: 0 fichier(s) (62968ms)
