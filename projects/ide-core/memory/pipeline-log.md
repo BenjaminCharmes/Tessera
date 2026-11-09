@@ -8493,3 +8493,15 @@ error: Please commit or stash them.
 - 2026-11-09 10:28:11 UTC — [ticket-889] validateur: APPROVED — Tous les critères sont satisfaits. La fonction `demarrer()` supprime le fichier  (19109ms)
 - 2026-11-09 10:28:11 UTC — [ticket-889] APPROVED après 1 tour(s)
 - 2026-11-09 10:30:35 UTC — [ticket-889] documentation: 0 fichier(s) (139811ms)
+- 2026-11-09 10:30:54 UTC — [ide-core] ticket-889 PR #991 confiée au CIWatcher
+- 2026-11-09 10:30:59 UTC — [ticket-891] branche ticket-891-the-editor-write-route-refuses-policy-files-witho
+- 2026-11-09 10:31:00 UTC — [ticket-891] tour 1 — codeur démarré
+- 2026-11-09 10:32:14 UTC — [ticket-891] tour 1 — codeur terminé (73719ms)
+- 2026-11-09 10:34:27 UTC — [ticket-891] testeur: dur�es : ruff 0 s, mypy 7 s, mypy-linux 10 s, pytest 130 s
+- 2026-11-09 10:34:44 UTC — [ticket-891] securite: PASS — PASS : le diff durcit la route : `PUT /fs/write` refuse désormais les fichiers d (16796ms)
+- 2026-11-09 10:34:46 UTC — [ticket-891] tour 1 — reviewer démarré
+- 2026-11-09 10:35:12 UTC — [ticket-891] tour 1 — reviewer terminé (25530ms)
+- 2026-11-09 10:35:16 UTC — [ticket-891] validateur: fichiers cités joints : agents.json, CLAUDE.md, .github/workflows/ (dossier, 2 fichiers), .claude/skills/ (dossier, 0 fichiers), .git/HEAD, .claude/settings.json, fs.py, chemins_proteges.py (tronqué) ; absents : src/x.py
+- 2026-11-09 10:35:16 UTC — [ticket-891] validateur: APPROVED — Tous les critères sont satisfaits. La route `PUT /api/v1/fs/write` refuse correc (31922ms)
+- 2026-11-09 10:35:16 UTC — [ticket-891] APPROVED après 1 tour(s)
+- 2026-11-09 10:38:45 UTC — [ticket-891] documentation: 0 fichier(s) (203625ms) — après tour de correction

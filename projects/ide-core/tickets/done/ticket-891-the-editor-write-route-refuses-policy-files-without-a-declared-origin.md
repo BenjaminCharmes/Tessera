@@ -1,14 +1,14 @@
 ---
-id: ticket-891
-title: "The editor write route refuses policy files without a declared origin"
-type: chore
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-11-09
 depends_on: []
 estimated_days: 0.5
-created: 2026-11-09
+id: ticket-891
+pr_number: 992
+priority: high
+status: done
+title: The editor write route refuses policy files without a declared origin
+type: chore
 ---
 
 # ticket-891 — La route d'écriture de l'éditeur refuse les fichiers de politique sans `Origin` déclaré
