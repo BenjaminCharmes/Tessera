@@ -30,6 +30,7 @@ from tessera.services.providers.duree_max import borner
 from tessera.services.providers.env_sdk import env_du_sous_processus
 from tessera.services.providers.garde_jetons import hook_refus_env_tessera
 from tessera.services.providers.git_guard import hook_refus_git
+from tessera.services.providers.kill_guard import hook_refus_kill
 from tessera.services.providers.messages_sdk import OUTIL_SORTIE_STRUCTUREE, _extract_stream_delta, _format_de_sortie, provider_result_du_sdk
 from tessera.services.providers.noms import ProviderIndisponible
 from tessera.services.providers.perimetre import hook_refus_hors_perimetre, racine_autorisee
@@ -199,12 +200,11 @@ def _build_options(
         plugins=plugins,
         # Les agents n'écrivent pas dans l'historique git : le pipeline crée la
         # branche et commite lui-même (ADR-018), et ne merge jamais (ADR-022).
-        # Le refus est posé ici, en `PreToolUse`, parce qu'une entrée de
-        # `allowed_tools` couvrant `Bash` l'auto-approuverait avant tout
-        # callback de permission — le garde serait inerte (ticket-068).
+        # Posé en `PreToolUse` : `allowed_tools` auto-approuverait `Bash` avant
+        # tout callback de permission (ticket-068). Même hook : pas de kill (899).
         hooks={
             "PreToolUse": [
-                HookMatcher(matcher="Bash", hooks=[hook_refus_git]),
+                HookMatcher(matcher="Bash", hooks=[hook_refus_git, hook_refus_kill]),
                 # Le `.env` de Tessera porte les jetons de mise en ligne, et
                 # ADR-031 laisse lire hors du projet (ADR-053, ticket-464).
                 HookMatcher(
