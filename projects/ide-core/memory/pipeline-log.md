@@ -8619,3 +8619,63 @@ error: Please commit or stash them.
 - 2026-11-09 15:48:16 UTC — [ticket-899] leçons: une leçon proposée
 - 2026-11-09 15:50:18 UTC — [ticket-899] documentation: 0 fichier(s) (111780ms) — après tour de correction
 - 2026-11-09 15:50:18 UTC — [ticket-899] documentation: pas de diff retrouvable, non documenté
+- 2026-11-09 13:51:51 UTC — [ide-core] ticket-897 PR #998 non surveillée (livraison arrêtée)
+- 2026-11-09 13:37:39 UTC — [ide-core] ticket-892 PR #997 mergée (CI verte)
+- 2026-11-09 13:51:56 UTC — [ticket-894] branche ticket-894-the-agent-cli-runs-under-the-dedicated-agent-acco
+- 2026-11-09 13:52:52 UTC — [ticket-894] plan rendu (53719ms)
+- 2026-11-09 13:52:52 UTC — [ticket-894] tour 1 — codeur démarré
+- 2026-11-09 14:01:30 UTC — [ticket-894] tour 1 — codeur terminé (518813ms)
+- 2026-11-09 14:03:57 UTC — [ticket-894] testeur: 3 failed, 939 passed, 3 skipped, 8 warnings in 143.13s (0:02:23)
+- 2026-11-09 14:03:57 UTC — [ticket-894] tests rouges au tour 1
+- 2026-11-09 14:03:57 UTC — [ticket-894] tour 2 — codeur démarré
+- 2026-11-09 14:05:37 UTC — [ticket-894] tour 2 — codeur terminé (99030ms)
+- 2026-11-09 14:11:47 UTC — [ticket-894] testeur: 1 failed, 1937 passed, 3 skipped, 8 warnings in 365.77s (0:06:05)
+- 2026-11-09 14:11:47 UTC — [ticket-894] tests rouges au tour 2
+- 2026-11-09 14:11:47 UTC — [ticket-894] tour 3 — codeur démarré
+- 2026-11-09 14:13:12 UTC — [ticket-894] tour 3 — codeur terminé (85266ms)
+- 2026-11-09 14:16:05 UTC — [ticket-894] testeur: 1 error in 166.37s (0:02:46)
+- 2026-11-09 14:16:05 UTC — [ticket-894] tests rouges au tour 3
+- 2026-11-09 14:16:05 UTC — [ticket-894] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-09 14:16:10 UTC — [ide-core] file interrompue : ticket-894 non approuvé
+- 2026-11-09 15:50:37 UTC — [ide-core] ticket-899 PR #1000 confiée au CIWatcher
+- 2026-11-09 15:50:55 UTC — [ticket-894] branche ticket-894-the-agent-cli-runs-under-the-dedicated-agent-acco
+- 2026-11-09 15:52:19 UTC — [ticket-894] plan rendu (74670ms)
+- 2026-11-09 15:52:19 UTC — [ticket-894] branche reprise (3 commit(s)) — refus précédent : revue, codeur en premier
+- 2026-11-09 15:52:19 UTC — [ticket-894] tour 1 — codeur démarré
+- 2026-11-09 15:52:58 UTC — [ticket-894] tour 1 — codeur terminé (39655ms)
+- 2026-11-09 15:55:46 UTC — [ticket-894] testeur: 1 error in 152.85s (0:02:32)
+- 2026-11-09 15:55:46 UTC — [ticket-894] tests rouges au tour 1
+- 2026-11-09 15:55:46 UTC — [ticket-894] tour 2 — codeur démarré
+- 2026-11-09 15:56:57 UTC — [ticket-894] tour 2 — codeur terminé (70485ms)
+- 2026-11-09 16:07:14 UTC — [ticket-894] testeur: 1 failed, 3782 passed, 3 skipped, 8 warnings in 612.15s (0:10:12)
+- 2026-11-09 16:07:14 UTC — [ticket-894] tests rouges au tour 2
+- 2026-11-09 16:07:14 UTC — [ticket-894] tour 3 — codeur démarré
+- 2026-11-09 16:07:47 UTC — [ticket-894] tour 3 — codeur terminé (33860ms)
+- 2026-11-09 16:17:13 UTC — [ticket-894] testeur: dur�es : ruff 0 s, mypy 2 s, mypy-linux 20 s, pytest 563 s ; impact depuis base : 268 fichier(s) de test
+- 2026-11-09 16:17:13 UTC — [ticket-894] tests rouges au tour 3
+- 2026-11-09 16:17:13 UTC — [ticket-894] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-09 16:17:18 UTC — [ide-core] file interrompue : ticket-894 non approuvé
+- 2026-11-09 15:56:14 UTC — [ide-core] ticket-899 PR #1000 mergée (CI verte)
+- 2026-11-09 16:36:16 UTC — [ticket-894] branche ticket-894-the-agent-cli-runs-under-the-dedicated-agent-acco
+- 2026-11-09 16:36:57 UTC — [ticket-894] plan rendu (38516ms)
+- 2026-11-09 16:36:57 UTC — [ticket-894] branche reprise (7 commit(s)) — refus précédent : revue, codeur en premier
+- 2026-11-09 16:36:57 UTC — [ticket-894] tour 1 — codeur démarré
+- 2026-11-09 16:37:23 UTC — [ticket-894] tour 1 — codeur terminé (25938ms)
+- 2026-11-09 16:46:35 UTC — [ticket-894] testeur: dur�es : ruff 0 s, mypy 8 s, mypy-linux 23 s, pytest 549 s ; impact depuis base : 269 fichier(s) de test
+- 2026-11-09 16:47:09 UTC — [ticket-894] securite: PASS — Le diff ne contient aucune faille CRITICAL ou HIGH. L'environnement de l'agent p (34483ms)
+- 2026-11-09 16:47:09 UTC — [ticket-894] tour 1 — reviewer démarré
+- 2026-11-09 16:47:39 UTC — [ticket-894] tour 1 — reviewer terminé (30061ms)
+- 2026-11-09 16:47:44 UTC — [ticket-894] validateur: fichiers cités joints : .env, memory/decisions.md (tronqué)
+- 2026-11-09 16:47:44 UTC — [ticket-894] validateur: APPROVED — Les 7 critères d'acceptation sont satisfaits. La fondation technique est en plac (35187ms)
+- 2026-11-09 16:47:44 UTC — [ticket-894] CHANGES_REQUESTED tour 1: Reviewer : 1. Dans l'ADR-083, le chemin du CLI partagé contient un caractère de contrôle à la place de `\b`. `\bin` a été écrit comme un retour arrière (0x08), puis `in`. Une recherche `Tessera\x08in`
+- 2026-11-09 16:47:44 UTC — [ticket-894] tour 2 — codeur démarré
+- 2026-11-09 16:48:08 UTC — [ticket-894] tour 2 — codeur terminé (23671ms)
+- 2026-11-09 17:00:46 UTC — [ticket-894] testeur: dur�es : ruff 0 s, mypy 3 s, mypy-linux 4 s, pytest 754 s ; impact depuis base : 269 fichier(s) de test
+- 2026-11-09 17:01:12 UTC — [ticket-894] securite: PASS — PASS : aucune faille CRITICAL ou HIGH introduite par ce diff. Le compte dédié ne (25968ms)
+- 2026-11-09 17:01:12 UTC — [ticket-894] tour 2 — reviewer démarré
+- 2026-11-09 17:01:36 UTC — [ticket-894] tour 2 — reviewer terminé (23406ms)
+- 2026-11-09 17:02:21 UTC — [ticket-894] validateur: fichiers cités joints : .env, memory/decisions.md (tronqué)
+- 2026-11-09 17:02:21 UTC — [ticket-894] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le diff implémente le compte dé (68796ms)
+- 2026-11-09 17:02:21 UTC — [ticket-894] APPROVED après 2 tour(s)
+- 2026-11-09 17:02:45 UTC — [ticket-894] leçons: une leçon proposée
+- 2026-11-09 17:04:30 UTC — [ticket-894] documentation: 0 fichier(s) (99125ms)
