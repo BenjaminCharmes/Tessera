@@ -4,7 +4,7 @@ created: 2026-11-09
 depends_on: []
 estimated_days: 0.5
 id: ticket-897
-pr_number: null
+pr_number: 998
 priority: medium
 status: done
 title: The interface remembers the session token across tabs and restarts
