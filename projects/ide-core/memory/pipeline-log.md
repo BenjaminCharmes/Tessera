@@ -8574,3 +8574,4 @@ error: Please commit or stash them.
 - 2026-11-09 12:28:31 UTC — [ticket-890] validateur: APPROVED — Tous les critères sont satisfaits. Le code implémente correctement la reprise de (28610ms)
 - 2026-11-09 12:28:31 UTC — [ticket-890] APPROVED après 3 tour(s)
 - 2026-11-09 12:29:40 UTC — [ticket-890] leçons: refusée — preuve absente du retour du run
+- 2026-11-09 12:33:11 UTC — [ticket-890] documentation: 0 fichier(s) (206985ms) — après tour de correction
