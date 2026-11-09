@@ -8637,3 +8637,20 @@ error: Please commit or stash them.
 - 2026-11-09 14:16:05 UTC — [ticket-894] tests rouges au tour 3
 - 2026-11-09 14:16:05 UTC — [ticket-894] BLOCKED après 3 tour(s) sans approbation
 - 2026-11-09 14:16:10 UTC — [ide-core] file interrompue : ticket-894 non approuvé
+- 2026-11-09 15:50:37 UTC — [ide-core] ticket-899 PR #1000 confiée au CIWatcher
+- 2026-11-09 15:50:55 UTC — [ticket-894] branche ticket-894-the-agent-cli-runs-under-the-dedicated-agent-acco
+- 2026-11-09 15:52:19 UTC — [ticket-894] plan rendu (74670ms)
+- 2026-11-09 15:52:19 UTC — [ticket-894] branche reprise (3 commit(s)) — refus précédent : revue, codeur en premier
+- 2026-11-09 15:52:19 UTC — [ticket-894] tour 1 — codeur démarré
+- 2026-11-09 15:52:58 UTC — [ticket-894] tour 1 — codeur terminé (39655ms)
+- 2026-11-09 15:55:46 UTC — [ticket-894] testeur: 1 error in 152.85s (0:02:32)
+- 2026-11-09 15:55:46 UTC — [ticket-894] tests rouges au tour 1
+- 2026-11-09 15:55:46 UTC — [ticket-894] tour 2 — codeur démarré
+- 2026-11-09 15:56:57 UTC — [ticket-894] tour 2 — codeur terminé (70485ms)
+- 2026-11-09 16:07:14 UTC — [ticket-894] testeur: 1 failed, 3782 passed, 3 skipped, 8 warnings in 612.15s (0:10:12)
+- 2026-11-09 16:07:14 UTC — [ticket-894] tests rouges au tour 2
+- 2026-11-09 16:07:14 UTC — [ticket-894] tour 3 — codeur démarré
+- 2026-11-09 16:07:47 UTC — [ticket-894] tour 3 — codeur terminé (33860ms)
+- 2026-11-09 16:17:13 UTC — [ticket-894] testeur: dur�es : ruff 0 s, mypy 2 s, mypy-linux 20 s, pytest 563 s ; impact depuis base : 268 fichier(s) de test
+- 2026-11-09 16:17:13 UTC — [ticket-894] tests rouges au tour 3
+- 2026-11-09 16:17:13 UTC — [ticket-894] BLOCKED après 3 tour(s) sans approbation
