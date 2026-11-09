@@ -5,18 +5,22 @@ Control. Le compte, son mot de passe et l'environnement sont donnés tels
 quels ; rien n'est hérité du backend.
 """
 import ctypes
-import msvcrt
+import importlib
 import os
 import subprocess
 from collections.abc import Mapping, Sequence
 from ctypes import wintypes
-from typing import BinaryIO, cast
+from typing import Any, BinaryIO, cast
 
 import anyio
 from anyio.abc import Process
 
 from tessera.services.providers.noms import ProviderIndisponible
 from tessera.services.providers.process_agent import ProcessAgent
+
+# `WinDLL`, `get_last_error` et `msvcrt` n'existent que sous Windows : lus
+# dynamiquement, le module s'importe et se type aussi sous Linux (CI, mypy-linux).
+_CTYPES: Any = ctypes
 
 _LOGON_WITH_PROFILE = 0x1
 _CREATE_UNICODE_ENVIRONMENT = 0x400
@@ -73,7 +77,7 @@ def bloc_d_environnement(env: Mapping[str, str]) -> "ctypes.Array[ctypes.c_wchar
     return ctypes.create_unicode_buffer(texte, len(texte))
 
 
-def _tuyau(k32: ctypes.WinDLL, parent_lit: bool) -> tuple[int, int]:
+def _tuyau(k32: Any, parent_lit: bool) -> tuple[int, int]:
     """Makes a pipe; returns (child end, parent end) with only the child end inheritable."""
     lecture, ecriture = wintypes.HANDLE(), wintypes.HANDLE()
     attrs = _Attributs(ctypes.sizeof(_Attributs), None, True)
@@ -84,7 +88,7 @@ def _tuyau(k32: ctypes.WinDLL, parent_lit: bool) -> tuple[int, int]:
     return cast(int, enfant.value), cast(int, parent.value)
 
 
-def _nul(k32: ctypes.WinDLL) -> int:
+def _nul(k32: Any) -> int:
     attrs = _Attributs(ctypes.sizeof(_Attributs), None, True)
     k32.CreateFileW.restype = wintypes.HANDLE
     h = k32.CreateFileW("NUL", _GENERIC_WRITE, _FILE_SHARE_RW, ctypes.byref(attrs), _OPEN_EXISTING, 0, None)
@@ -93,7 +97,8 @@ def _nul(k32: ctypes.WinDLL) -> int:
 
 def _fichier(handle: int, mode: str) -> BinaryIO:
     flags = os.O_RDONLY if mode == "rb" else os.O_WRONLY
-    return cast(BinaryIO, os.fdopen(msvcrt.open_osfhandle(handle, flags), mode, buffering=0))
+    descripteur = importlib.import_module("msvcrt").open_osfhandle(handle, flags)
+    return cast(BinaryIO, os.fdopen(descripteur, mode, buffering=0))
 
 
 class LanceurWindows:
@@ -111,8 +116,8 @@ class LanceurWindows:
         self, commande: Sequence[str], compte: str, mot_de_passe: str,
         env: Mapping[str, str], cwd: str | None, avec_stderr: bool,
     ) -> Process:
-        k32 = ctypes.WinDLL("kernel32", use_last_error=True)
-        adv = ctypes.WinDLL("advapi32", use_last_error=True)
+        k32 = _CTYPES.WinDLL("kernel32", use_last_error=True)
+        adv = _CTYPES.WinDLL("advapi32", use_last_error=True)
         in_enfant, in_parent = _tuyau(k32, parent_lit=False)
         out_enfant, out_parent = _tuyau(k32, parent_lit=True)
         err_enfant, err_parent = _tuyau(k32, True) if avec_stderr else (_nul(k32), 0)
@@ -127,7 +132,7 @@ class LanceurWindows:
             _CREATE_UNICODE_ENVIRONMENT | _CREATE_NO_WINDOW, bloc_d_environnement(env),
             cwd, ctypes.byref(si), ctypes.byref(info),
         )
-        code = ctypes.get_last_error()
+        code = _CTYPES.get_last_error()
         for h in (in_enfant, out_enfant, err_enfant):
             k32.CloseHandle(h)
         if not ok:
@@ -139,7 +144,7 @@ class LanceurWindows:
         return self._process(k32, info, in_parent, out_parent, err_parent)
 
     @staticmethod
-    def _process(k32: ctypes.WinDLL, info: _ProcessInfo, i: int, o: int, e: int) -> Process:
+    def _process(k32: Any, info: _ProcessInfo, i: int, o: int, e: int) -> Process:
         proc = info.hProcess
 
         def attendre() -> int:
@@ -158,7 +163,7 @@ class LanceurWindows:
         )
 
 
-def _code(k32: ctypes.WinDLL, proc: wintypes.HANDLE) -> int:
+def _code(k32: Any, proc: wintypes.HANDLE) -> int:
     code = wintypes.DWORD()
     k32.GetExitCodeProcess(proc, ctypes.byref(code))
     return int(code.value)
