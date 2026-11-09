@@ -119,6 +119,14 @@ def _is_declared_origin(origin: str) -> bool:
     return origin.strip().lower() in _declared_origins()
 
 
+def is_declared_origin(origin: str) -> bool:
+    """Whether an `Origin` header value is one the interface declares (ADR-075).
+
+    An empty value is never declared: a script that omits the header is refused.
+    """
+    return _is_declared_origin(origin)
+
+
 #: Préfixe des réglages : une écriture y exige un `Origin` déclaré (ticket-808).
 _REGLAGES_PREFIX = "/api/v1/reglages"
 

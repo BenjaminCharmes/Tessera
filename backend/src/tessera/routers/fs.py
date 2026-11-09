@@ -13,12 +13,14 @@ dropped inside the workspace from pointing out of it.
 """
 from pathlib import Path
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Request
 from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel
 
+from tessera.auth import is_declared_origin
 from tessera.config import settings
 from tessera.services.creation_projet.project_importer import is_too_broad
+from tessera.services.providers.chemins_proteges import motif_de_protection
 from tessera.utils.logger import get_logger
 from tessera.utils.noms_windows import normaliser_segments
 
@@ -147,8 +149,33 @@ async def read_file(path: str = Query(...)) -> str:
         ) from exc
 
 
+def _project_root_of(resolved: Path) -> Path:
+    """Le dossier du projet qui contient `resolved`, pour juger ses fichiers de politique.
+
+    Un projet lié en symlink est sa propre racine ; sinon c'est le premier
+    dossier sous le workspace.
+    """
+    roots = _workspace_roots()
+    for root in roots[1:]:
+        if resolved == root or root in resolved.parents:
+            return root
+    workspace = roots[0]
+    relative = resolved.relative_to(workspace)
+    return workspace / relative.parts[0] if relative.parts else workspace
+
+
+def _est_un_fichier_de_politique(resolved: Path) -> bool:
+    """Say whether a file governs the agents of its project.
+
+    Délègue à `motif_de_protection` : une seule liste de ce que protège le garde
+    de périmètre des runs (ADR-027), pas une seconde ici.
+    """
+    project = _project_root_of(resolved)
+    return motif_de_protection(str(resolved), project, project) is not None
+
+
 @router.put("/write", status_code=204)
-async def write_file(body: WriteRequest) -> None:
+async def write_file(body: WriteRequest, request: Request) -> None:
     resolved = _resolve_inside_workspace(body.path)
 
     if _is_self_executing(resolved):
@@ -158,6 +185,20 @@ async def write_file(body: WriteRequest) -> None:
             detail=(
                 "Ce fichier s'exécute sans action de ta part (hook git, réglage du CLI) : "
                 "l'éditeur refuse de l'écrire."
+            ),
+        )
+
+    # Un agent qui détient le jeton ne doit pas réécrire sa propre politique par
+    # cette route : seule l'interface, qui déclare son `Origin`, le peut (ADR-075).
+    if not is_declared_origin(request.headers.get("origin", "")) and _est_un_fichier_de_politique(
+        resolved
+    ):
+        _logger.warning("fs_write_policy_refused", extra={"path": str(resolved)})
+        raise HTTPException(
+            status_code=403,
+            detail=(
+                "Ce fichier porte les règles des agents du projet : seule l'interface "
+                "de Tessera, qui déclare son origine, peut l'écrire."
             ),
         )
 
