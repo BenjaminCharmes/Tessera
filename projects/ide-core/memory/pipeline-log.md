@@ -8481,3 +8481,14 @@ error: Please commit or stash them.
 - 2026-11-06 18:05:13 UTC — [ticket-888] APPROVED après 3 tour(s)
 - 2026-11-06 18:06:18 UTC — [ticket-888] leçons: une leçon proposée
 - 2026-11-06 18:09:14 UTC — [ticket-888] documentation: 0 fichier(s) (171671ms) — après tour de correction
+- 2026-11-06 18:13:14 UTC — [ide-core] ticket-888 PR #988 confiée au CIWatcher
+- 2026-11-06 18:20:36 UTC — [ide-core] ticket-888 PR #988 mergée (CI verte)
+- 2026-11-09 10:25:08 UTC — [ticket-889] branche ticket-889-a-fixed-token-leaves-no-stale-session-token-file
+- 2026-11-09 10:25:10 UTC — [ticket-889] tour 1 — codeur démarré
+- 2026-11-09 10:25:52 UTC — [ticket-889] tour 1 — codeur terminé (42015ms)
+- 2026-11-09 10:27:45 UTC — [ticket-889] testeur: dur�es : ruff 3 s, mypy 11 s, mypy-linux 9 s, pytest 110 s
+- 2026-11-09 10:27:52 UTC — [ticket-889] securite: PASS — Le diff ne fait qu'une chose : quand `STATIC_TOKEN` est défini, le démarrage sup (6360ms)
+- 2026-11-09 10:27:52 UTC — [ticket-889] tour 1 — reviewer démarré
+- 2026-11-09 10:28:05 UTC — [ticket-889] tour 1 — reviewer terminé (12985ms)
+- 2026-11-09 10:28:11 UTC — [ticket-889] validateur: APPROVED — Tous les critères sont satisfaits. La fonction `demarrer()` supprime le fichier  (19109ms)
+- 2026-11-09 10:28:11 UTC — [ticket-889] APPROVED après 1 tour(s)
