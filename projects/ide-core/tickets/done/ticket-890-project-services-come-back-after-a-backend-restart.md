@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 1
 id: ticket-890
 plan: true
-pr_number: null
+pr_number: 996
 priority: high
 status: done
 title: Project services come back after a backend restart
