@@ -126,7 +126,8 @@ describe("Piece end of run", () => {
     const tous = agents(container);
     expect(tous).toHaveLength(5);
     for (const agent of tous) {
-      expect(agent.style.transform).toContain(`translate(${PORTE_X + 9}px`);
+      // 9 px réglés à l'échelle 1,5, rendus à l'échelle plafond 1,3 (ticket-898).
+      expect(agent.style.transform).toContain(`translate(${PORTE_X + 7.8}px`);
       expect(agent.style.opacity).toBe("0");
     }
   });
