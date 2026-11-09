@@ -8619,3 +8619,20 @@ error: Please commit or stash them.
 - 2026-11-09 15:48:16 UTC — [ticket-899] leçons: une leçon proposée
 - 2026-11-09 15:50:18 UTC — [ticket-899] documentation: 0 fichier(s) (111780ms) — après tour de correction
 - 2026-11-09 15:50:18 UTC — [ticket-899] documentation: pas de diff retrouvable, non documenté
+- 2026-11-09 13:51:51 UTC — [ide-core] ticket-897 PR #998 non surveillée (livraison arrêtée)
+- 2026-11-09 13:37:39 UTC — [ide-core] ticket-892 PR #997 mergée (CI verte)
+- 2026-11-09 13:51:56 UTC — [ticket-894] branche ticket-894-the-agent-cli-runs-under-the-dedicated-agent-acco
+- 2026-11-09 13:52:52 UTC — [ticket-894] plan rendu (53719ms)
+- 2026-11-09 13:52:52 UTC — [ticket-894] tour 1 — codeur démarré
+- 2026-11-09 14:01:30 UTC — [ticket-894] tour 1 — codeur terminé (518813ms)
+- 2026-11-09 14:03:57 UTC — [ticket-894] testeur: 3 failed, 939 passed, 3 skipped, 8 warnings in 143.13s (0:02:23)
+- 2026-11-09 14:03:57 UTC — [ticket-894] tests rouges au tour 1
+- 2026-11-09 14:03:57 UTC — [ticket-894] tour 2 — codeur démarré
+- 2026-11-09 14:05:37 UTC — [ticket-894] tour 2 — codeur terminé (99030ms)
+- 2026-11-09 14:11:47 UTC — [ticket-894] testeur: 1 failed, 1937 passed, 3 skipped, 8 warnings in 365.77s (0:06:05)
+- 2026-11-09 14:11:47 UTC — [ticket-894] tests rouges au tour 2
+- 2026-11-09 14:11:47 UTC — [ticket-894] tour 3 — codeur démarré
+- 2026-11-09 14:13:12 UTC — [ticket-894] tour 3 — codeur terminé (85266ms)
+- 2026-11-09 14:16:05 UTC — [ticket-894] testeur: 1 error in 166.37s (0:02:46)
+- 2026-11-09 14:16:05 UTC — [ticket-894] tests rouges au tour 3
+- 2026-11-09 14:16:05 UTC — [ticket-894] BLOCKED après 3 tour(s) sans approbation
