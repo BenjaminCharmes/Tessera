@@ -8654,3 +8654,4 @@ error: Please commit or stash them.
 - 2026-11-09 16:17:13 UTC — [ticket-894] testeur: dur�es : ruff 0 s, mypy 2 s, mypy-linux 20 s, pytest 563 s ; impact depuis base : 268 fichier(s) de test
 - 2026-11-09 16:17:13 UTC — [ticket-894] tests rouges au tour 3
 - 2026-11-09 16:17:13 UTC — [ticket-894] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-09 16:17:18 UTC — [ide-core] file interrompue : ticket-894 non approuvé
