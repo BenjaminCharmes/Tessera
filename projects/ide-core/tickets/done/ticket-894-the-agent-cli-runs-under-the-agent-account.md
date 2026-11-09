@@ -6,7 +6,7 @@ depends_on:
 estimated_days: 2
 id: ticket-894
 plan: true
-pr_number: null
+pr_number: 1001
 priority: high
 status: done
 title: The agent CLI runs under the dedicated agent account
