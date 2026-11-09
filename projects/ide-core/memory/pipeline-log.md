@@ -8617,3 +8617,5 @@ error: Please commit or stash them.
 - 2026-11-09 15:47:31 UTC — [ticket-899] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le fichier `kill_guard.py` exis (42375ms)
 - 2026-11-09 15:47:31 UTC — [ticket-899] APPROVED après 2 tour(s)
 - 2026-11-09 15:48:16 UTC — [ticket-899] leçons: une leçon proposée
+- 2026-11-09 15:50:18 UTC — [ticket-899] documentation: 0 fichier(s) (111780ms) — après tour de correction
+- 2026-11-09 15:50:18 UTC — [ticket-899] documentation: pas de diff retrouvable, non documenté
