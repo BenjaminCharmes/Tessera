@@ -8655,3 +8655,26 @@ error: Please commit or stash them.
 - 2026-11-09 16:17:13 UTC — [ticket-894] tests rouges au tour 3
 - 2026-11-09 16:17:13 UTC — [ticket-894] BLOCKED après 3 tour(s) sans approbation
 - 2026-11-09 16:17:18 UTC — [ide-core] file interrompue : ticket-894 non approuvé
+- 2026-11-09 15:56:14 UTC — [ide-core] ticket-899 PR #1000 mergée (CI verte)
+- 2026-11-09 16:36:16 UTC — [ticket-894] branche ticket-894-the-agent-cli-runs-under-the-dedicated-agent-acco
+- 2026-11-09 16:36:57 UTC — [ticket-894] plan rendu (38516ms)
+- 2026-11-09 16:36:57 UTC — [ticket-894] branche reprise (7 commit(s)) — refus précédent : revue, codeur en premier
+- 2026-11-09 16:36:57 UTC — [ticket-894] tour 1 — codeur démarré
+- 2026-11-09 16:37:23 UTC — [ticket-894] tour 1 — codeur terminé (25938ms)
+- 2026-11-09 16:46:35 UTC — [ticket-894] testeur: dur�es : ruff 0 s, mypy 8 s, mypy-linux 23 s, pytest 549 s ; impact depuis base : 269 fichier(s) de test
+- 2026-11-09 16:47:09 UTC — [ticket-894] securite: PASS — Le diff ne contient aucune faille CRITICAL ou HIGH. L'environnement de l'agent p (34483ms)
+- 2026-11-09 16:47:09 UTC — [ticket-894] tour 1 — reviewer démarré
+- 2026-11-09 16:47:39 UTC — [ticket-894] tour 1 — reviewer terminé (30061ms)
+- 2026-11-09 16:47:44 UTC — [ticket-894] validateur: fichiers cités joints : .env, memory/decisions.md (tronqué)
+- 2026-11-09 16:47:44 UTC — [ticket-894] validateur: APPROVED — Les 7 critères d'acceptation sont satisfaits. La fondation technique est en plac (35187ms)
+- 2026-11-09 16:47:44 UTC — [ticket-894] CHANGES_REQUESTED tour 1: Reviewer : 1. Dans l'ADR-083, le chemin du CLI partagé contient un caractère de contrôle à la place de `\b`. `\bin` a été écrit comme un retour arrière (0x08), puis `in`. Une recherche `Tessera\x08in`
+- 2026-11-09 16:47:44 UTC — [ticket-894] tour 2 — codeur démarré
+- 2026-11-09 16:48:08 UTC — [ticket-894] tour 2 — codeur terminé (23671ms)
+- 2026-11-09 17:00:46 UTC — [ticket-894] testeur: dur�es : ruff 0 s, mypy 3 s, mypy-linux 4 s, pytest 754 s ; impact depuis base : 269 fichier(s) de test
+- 2026-11-09 17:01:12 UTC — [ticket-894] securite: PASS — PASS : aucune faille CRITICAL ou HIGH introduite par ce diff. Le compte dédié ne (25968ms)
+- 2026-11-09 17:01:12 UTC — [ticket-894] tour 2 — reviewer démarré
+- 2026-11-09 17:01:36 UTC — [ticket-894] tour 2 — reviewer terminé (23406ms)
+- 2026-11-09 17:02:21 UTC — [ticket-894] validateur: fichiers cités joints : .env, memory/decisions.md (tronqué)
+- 2026-11-09 17:02:21 UTC — [ticket-894] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le diff implémente le compte dé (68796ms)
+- 2026-11-09 17:02:21 UTC — [ticket-894] APPROVED après 2 tour(s)
+- 2026-11-09 17:02:45 UTC — [ticket-894] leçons: une leçon proposée
