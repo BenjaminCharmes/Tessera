@@ -4,8 +4,9 @@ from pathlib import Path
 
 import pytest
 
-import tessera.services.providers.agent_sdk as agent_sdk_module
-from tessera.services.providers.agent_sdk import _build_options, claude_md_ancetres_a_exclure
+import tessera.services.providers.reglages_ancetres as reglages_module
+from tessera.services.providers.agent_sdk import _build_options
+from tessera.services.providers.consignes_ancetres import claude_md_ancetres_a_exclure
 
 
 def _p(chemin: Path) -> str:
@@ -53,7 +54,7 @@ def test_paths_use_forward_slashes(tmp_path: Path) -> None:
 
 @pytest.fixture
 def depot(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
-    monkeypatch.setattr(agent_sdk_module, "_REPO_ROOT", tmp_path)
+    monkeypatch.setattr(reglages_module, "_REPO_ROOT", tmp_path)
     return tmp_path
 
 
@@ -103,7 +104,7 @@ def _worktree_hors_depot(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Pat
     """The project folder inside a linked worktree that lies outside `_REPO_ROOT`."""
     depot = tmp_path / "depot"
     depot.mkdir()
-    monkeypatch.setattr(agent_sdk_module, "_REPO_ROOT", depot)
+    monkeypatch.setattr(reglages_module, "_REPO_ROOT", depot)
     racine = tmp_path / "worktrees" / "curio" / "ticket-1"
     projet = racine / "projects" / "curio"
     projet.mkdir(parents=True)
