@@ -4,7 +4,7 @@ created: 2026-11-09
 depends_on: []
 estimated_days: 0.5
 id: ticket-893
-pr_number: null
+pr_number: 995
 priority: medium
 status: done
 title: The Agent SDK moves to 0.2.179, which ships a Windows wheel again
