@@ -96,6 +96,27 @@ def test_a_generated_token_is_written_during_the_lifespan_and_removed_after(etat
     assert jeton_de_session.courant() is None
 
 
+def test_a_static_token_deletes_the_stale_file_of_a_previous_start(
+    etat: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    etat.parent.mkdir(parents=True)
+    etat.write_text("perime", encoding="utf-8")
+    monkeypatch.setattr(settings, "static_token", "fixe")
+
+    jeton_de_session.demarrer()
+
+    assert not etat.exists()
+    assert jeton_de_session.courant() == "fixe"
+
+
+def test_without_static_token_start_still_writes_the_drawn_token(etat: Path) -> None:
+    jeton_de_session.demarrer()
+    try:
+        assert etat.read_text(encoding="utf-8") == jeton_de_session.courant()
+    finally:
+        jeton_de_session.arreter()
+
+
 def test_each_start_draws_a_new_token(etat: Path) -> None:
     jeton_de_session.demarrer()
     premier = jeton_de_session.courant()
