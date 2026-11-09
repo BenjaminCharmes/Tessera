@@ -8602,3 +8602,20 @@ error: Please commit or stash them.
 - 2026-11-09 13:16:38 UTC — [ticket-892] APPROVED après 3 tour(s)
 - 2026-11-09 13:18:08 UTC — [ticket-892] leçons: une leçon proposée
 - 2026-11-09 13:19:12 UTC — [ticket-892] documentation: 0 fichier(s) (58905ms)
+- 2026-11-09 13:30:30 UTC — [ide-core] ticket-892 PR #997 confiée au CIWatcher
+- 2026-11-09 12:39:55 UTC — [ide-core] ticket-890 PR #996 mergée (CI verte)
+- 2026-11-09 13:30:37 UTC — [ticket-897] branche ticket-897-the-interface-remembers-the-session-token-across
+- 2026-11-09 13:30:39 UTC — [ticket-897] tour 1 — codeur démarré
+- 2026-11-09 13:31:21 UTC — [ticket-897] tour 1 — codeur terminé (41937ms)
+- 2026-11-09 13:34:43 UTC — [ticket-897] testeur: dur�es : tsc 16 s, eslint 38 s, vitest 144 s
+- 2026-11-09 13:34:43 UTC — [ticket-897] tests rouges au tour 1
+- 2026-11-09 13:34:43 UTC — [ticket-897] tour 2 — codeur démarré
+- 2026-11-09 13:37:09 UTC — [ticket-897] tour 2 — codeur terminé (145968ms)
+- 2026-11-09 13:40:44 UTC — [ticket-897] testeur: dur�es : tsc 15 s, eslint 43 s, vitest 154 s
+- 2026-11-09 13:41:01 UTC — [ticket-897] securite: PASS — Le diff persiste le jeton Bearer en localStorage au lieu de sessionStorage : c'e (17686ms)
+- 2026-11-09 13:41:03 UTC — [ticket-897] tour 2 — reviewer démarré
+- 2026-11-09 13:41:28 UTC — [ticket-897] tour 2 — reviewer terminé (25155ms)
+- 2026-11-09 13:41:40 UTC — [ticket-897] validateur: fichiers cités joints : auth.ts, auth.test.ts ; absents : import.meta.env
+- 2026-11-09 13:41:40 UTC — [ticket-897] validateur: APPROVED — Tous les critères sont satisfaits. Le jeton est maintenant stocké en `localStora (39016ms)
+- 2026-11-09 13:41:40 UTC — [ticket-897] APPROVED après 2 tour(s)
+- 2026-11-09 13:43:35 UTC — [ticket-897] leçons: une leçon proposée
