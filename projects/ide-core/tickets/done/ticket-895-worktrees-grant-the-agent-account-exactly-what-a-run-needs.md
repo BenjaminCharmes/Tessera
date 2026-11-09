@@ -4,7 +4,7 @@ created: 2026-11-09
 depends_on: []
 estimated_days: 1
 id: ticket-895
-pr_number: null
+pr_number: 1002
 priority: high
 status: done
 title: Worktrees grant the agent account exactly what a run needs
