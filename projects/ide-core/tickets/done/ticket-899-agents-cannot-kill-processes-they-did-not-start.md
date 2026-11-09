@@ -1,14 +1,14 @@
 ---
-id: ticket-899
-title: "Agents cannot kill processes by name, nor by a PID they did not start"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-11-09
 depends_on: []
 estimated_days: 1
-created: 2026-11-09
+id: ticket-899
+pr_number: 1000
+priority: high
+status: done
+title: Agents cannot kill processes by name, nor by a PID they did not start
+type: fix
 ---
 
 # ticket-899 — Un agent ne tue pas les processus de la machine
