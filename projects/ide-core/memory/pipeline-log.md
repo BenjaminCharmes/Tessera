@@ -8721,3 +8721,9 @@ error: Please commit or stash them.
 - 2026-11-09 17:29:49 UTC — [ticket-895] APPROVED après 2 tour(s)
 - 2026-11-09 17:30:25 UTC — [ticket-895] leçons: une leçon proposée
 - 2026-11-09 17:31:51 UTC — [ticket-895] documentation: 0 fichier(s) (80546ms)
+- 2026-11-09 17:32:11 UTC — [ide-core] ticket-895 PR #1002 confiée au CIWatcher
+- 2026-11-09 17:32:16 UTC — [ticket-896] branche ticket-896-a-setup-script-recreates-the-agent-account-on-any
+- 2026-11-09 17:32:18 UTC — [ticket-896] tour 1 — codeur démarré
+- 2026-11-09 17:34:23 UTC — [ticket-896] tour 1 — codeur terminé (125139ms)
+- 2026-11-09 17:44:34 UTC — [ticket-896] testeur: dur�es : ruff 0 s, mypy 7 s, mypy-linux 13 s, pytest 608 s ; impact depuis base : suite compl�te
+- 2026-11-09 17:45:23 UTC — [ticket-896] securite: BLOCK — BLOCK : le dossier partagé C:\ProgramData\Tessera\bin hérite du droit de créatio (48937ms)
