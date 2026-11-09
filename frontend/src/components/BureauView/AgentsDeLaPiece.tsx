@@ -10,7 +10,7 @@ import type { PosteId, RoleAffiche } from "../../lib/bureau/postesDuRun";
 import type { RedacteurPlace } from "../../lib/bureau/redaction";
 import DirecteurEnVisite from "./DirecteurEnVisite";
 import { useEchelleDesSprites } from "../../hooks/useEchelleDesSprites";
-import { ECHELLE_LARGE } from "../../lib/bureau/echelleDesSprites";
+import { ECHELLE_DES_DECALAGES } from "../../lib/bureau/echelleDesSprites";
 import { useEtirementDuSol, useMarcheActive } from "../../hooks/useEtirementDuSol";
 
 interface AgentsDeLaPieceProps {
@@ -77,7 +77,7 @@ function AgentMarcheur({ projet, id, agent, role, bavarde, choisir }: AgentMarch
     if (e.target === e.currentTarget && e.propertyName === "transform") setEnMarche(enCours);
   };
   // Les décalages sont comptés pour l'échelle large : ils suivent l'échelle courante.
-  const decalage = (agent.decalage * useEchelleDesSprites()) / ECHELLE_LARGE;
+  const decalage = (agent.decalage * useEchelleDesSprites()) / ECHELLE_DES_DECALAGES;
   const style = {
     bottom: BAS_DE_LA_RANGEE,
     transform: `translate(${agent.x * etirement + decalage}px, ${monte}px)`,

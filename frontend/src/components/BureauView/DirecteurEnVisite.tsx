@@ -3,7 +3,7 @@ import AgentDebout from "../../design/bureau/AgentDebout";
 import { useEchelleDesSprites } from "../../hooks/useEchelleDesSprites";
 import { useEtirementDuSol, useMarcheActive } from "../../hooks/useEtirementDuSol";
 import { DECALAGE_A_COTE, centreDuPoste } from "../../lib/bureau/activites";
-import { ECHELLE_LARGE } from "../../lib/bureau/echelleDesSprites";
+import { ECHELLE_DES_DECALAGES } from "../../lib/bureau/echelleDesSprites";
 import { NOM_DU_DIRECTEUR } from "../../lib/bureau/noms";
 import type { PosteId } from "../../lib/bureau/postesDuRun";
 import type { MotifDeVisite } from "../../lib/bureau/ronde";
@@ -36,7 +36,7 @@ interface DirecteurEnVisiteProps {
 export default function DirecteurEnVisite({ projet, poste, motif = "demande" }: DirecteurEnVisiteProps) {
   const etirement = useEtirementDuSol();
   const marche = useMarcheActive();
-  const decalage = (DECALAGE_A_COTE * useEchelleDesSprites()) / ECHELLE_LARGE;
+  const decalage = (DECALAGE_A_COTE * useEchelleDesSprites()) / ECHELLE_DES_DECALAGES;
   const libelle = `${NOM_DU_DIRECTEUR}, directeur, ${RAISON[motif]} chez ${projet}`;
   return (
     <span
