@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 1
 id: ticket-892
 plan: true
-pr_number: null
+pr_number: 997
 priority: medium
 status: done
 title: The retest after a rebase only runs the tests the rebase can affect
