@@ -9,6 +9,7 @@ Pièges observés sur ce projet, une ligne chacun. Le service écrit sous `## Pr
 - Quand on centralise une fonction et l'importe partout, vérifier que chaque fichier reste sous 300 lignes. (source : ticket-888, 2026-11-06)
 - Quand une mise à jour SDK est corrigée après rejet, soumettre avec le lockfile complet et le rapport d'API, pas l'un sans l'autre. (source : ticket-893, 2026-11-09)
 - Quand une fonction n'est appelée que sous condition, la tester en franchissant cette condition, jamais en l'appelant isolément. (source : ticket-892, 2026-11-09)
+- Quand le jeton change après qu'une ressource aie échoué en 401, vérifier que l'état d'échec se réinitialise pour permettre une nouvelle tentative avec le nouveau jeton. (source : ticket-897, 2026-11-09)
 
 ## En vigueur
 - Quand tu ajoutes ou modifies une route ou un modèle de réponse FastAPI, régénère et commite `docs/openapi.json`, et range la route dans `frontend/src/test/contrat/perimetre.ts` (couverte ou hors périmètre). (source : ticket-860, ticket-864, 2026-11-06)

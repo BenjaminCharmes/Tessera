@@ -43,6 +43,8 @@ export function useImageAuthentifiee(chemin: string | null): ImageChargee {
   }, [chemin, jeton]);
 
   if (chemin === null) return { src: null, echec: false };
+  // Un 401 efface le jeton rangé : l'échec reste l'échec, pas de repli sur l'adresse directe.
+  if (echoue === chemin) return { src: null, echec: true };
   if (!jeton) return { src: `${BASE}${chemin}`, echec: false };
   return { src: objet?.chemin === chemin ? objet.url : null, echec: echoue === chemin };
 }

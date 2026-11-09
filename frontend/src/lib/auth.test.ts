@@ -18,6 +18,7 @@ beforeEach(async () => {
   invokeSimule.mockReset();
   window.history.replaceState(null, "", "/");
   window.sessionStorage.clear();
+  window.localStorage.clear();
   auth = await charger();
 });
 
@@ -27,20 +28,27 @@ afterEach(() => {
 });
 
 describe("jetonDeSession", () => {
-  it("takes the token from the URL fragment, keeps it in sessionStorage and clears the fragment", async () => {
+  it("takes the token from the URL fragment, keeps it in localStorage and clears the fragment", async () => {
     window.history.replaceState(null, "", "/#jeton=abc");
 
     await expect(auth.jetonDeSession()).resolves.toBe("abc");
 
-    expect(window.sessionStorage.getItem("tessera.jeton")).toBe("abc");
+    expect(window.localStorage.getItem("tessera.jeton")).toBe("abc");
     expect(window.location.hash).toBe("");
   });
 
-  it("reads sessionStorage before anything else", async () => {
-    window.sessionStorage.setItem("tessera.jeton", "stocke");
+  it("reads localStorage before anything else", async () => {
+    window.localStorage.setItem("tessera.jeton", "stocke");
 
     await expect(auth.jetonDeSession()).resolves.toBe("stocke");
     expect(invokeSimule).not.toHaveBeenCalled();
+  });
+
+  it("migrates a token found only in sessionStorage to localStorage", async () => {
+    window.sessionStorage.setItem("tessera.jeton", "ancien");
+
+    await expect(auth.jetonDeSession()).resolves.toBe("ancien");
+    expect(window.localStorage.getItem("tessera.jeton")).toBe("ancien");
   });
 
   it("calls the Tauri command once for two reads", async () => {
@@ -73,11 +81,12 @@ describe("jetonEnCache, saisirJeton and oublierJeton", () => {
     auth.saisirJeton("  tape  ");
 
     expect(auth.jetonEnCache()).toBe("tape");
-    expect(window.sessionStorage.getItem("tessera.jeton")).toBe("tape");
+    expect(window.localStorage.getItem("tessera.jeton")).toBe("tape");
 
     auth.oublierJeton();
 
     expect(auth.jetonEnCache()).toBe("");
+    expect(window.localStorage.getItem("tessera.jeton")).toBeNull();
   });
 });
 
