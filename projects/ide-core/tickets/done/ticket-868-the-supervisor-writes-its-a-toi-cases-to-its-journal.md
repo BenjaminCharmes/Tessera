@@ -5,7 +5,7 @@ depends_on:
 - ticket-867
 estimated_days: 1
 id: ticket-868
-pr_number: null
+pr_number: 994
 priority: medium
 status: done
 title: The supervisor writes its a_toi cases to its journal
