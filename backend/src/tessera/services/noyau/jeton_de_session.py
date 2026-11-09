@@ -4,7 +4,9 @@
 random one at startup and keeps it in memory: there is no open mode. A freshly
 drawn token is also written to `ide_state_dir / "jeton-de-session"` so that the
 interface can read it, and the file goes away at shutdown. A `STATIC_TOKEN`
-written by the user is never copied to disk by this module.
+written by the user is never copied to disk by this module, and starting with
+one deletes the file a previous start left behind (a killed process never ran
+`arreter()`), so that nothing reads a stale token.
 """
 import secrets
 from pathlib import Path
@@ -41,10 +43,16 @@ def courant() -> str | None:
 
 
 def demarrer() -> None:
-    """Fix the effective token: `STATIC_TOKEN` if set, else a fresh random one."""
+    """Fix the effective token: `STATIC_TOKEN` if set, else a fresh random one.
+
+    A fixed token also deletes the file left by an earlier start.
+    """
     if settings.static_token:
         _ETAT.genere = ""
         SECRETS.register(settings.static_token)
+        # Le fichier d'un démarrage antérieur (processus tué, `arreter()` non
+        # exécuté) porte un jeton tiré qui ne vaut plus rien.
+        chemin_du_fichier().unlink(missing_ok=True)
         return
     _ETAT.genere = secrets.token_urlsafe(32)
     SECRETS.register(_ETAT.genere)

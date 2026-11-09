@@ -1,14 +1,14 @@
 ---
-id: ticket-889
-title: "A fixed token leaves no stale session token file behind"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-11-09
 depends_on: []
 estimated_days: 0.5
-created: 2026-11-09
+id: ticket-889
+pr_number: 991
+priority: medium
+status: done
+title: A fixed token leaves no stale session token file behind
+type: fix
 ---
 
 # ticket-889 — Un jeton fixe ne laisse aucun fichier de session périmé derrière lui
