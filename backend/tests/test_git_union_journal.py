@@ -186,6 +186,46 @@ async def test_conflict_on_another_file_still_stops_and_leaves_branch_intact(
     assert await service.is_clean()
 
 
+async def _commiter_lecons(repo: Path, contenu: str) -> None:
+    chemin = repo / "memory" / "lecons.md"
+    chemin.parent.mkdir(exist_ok=True)
+    chemin.write_text(contenu, encoding="utf-8")
+    await _git(repo, "add", "--", "memory/lecons.md")
+    await _git(repo, "commit", "-q", "-m", "chore: lessons")
+
+
+async def test_lessons_conflict_at_rebase_keeps_base_plus_branch_additions(repo: Path) -> None:
+    ancetre = "# L\n\n## En vigueur\n\n## Proposées\n\n- a\n- b\n"
+    await _commiter_lecons(repo, ancetre)
+    triee = "# L\n\n## En vigueur\n\n- a\n- b\n\n## Proposées\n"
+    service, base, _ = await _brancher_fichier(
+        repo, "memory/lecons.md", ancetre + "- neuve\n", triee
+    )
+
+    conflits = await service.rejouer_sur(base)
+
+    assert conflits == ()
+    texte = (repo / "memory" / "lecons.md").read_text(encoding="utf-8")
+    assert texte.replace("\r\n", "\n") == triee + "- neuve\n"
+    assert await service.is_clean()
+
+
+async def test_lessons_conflict_at_rebase_with_a_removed_line_is_not_auto_resolved(
+    repo: Path,
+) -> None:
+    await _commiter_lecons(repo, "# L\n\n## Proposées\n\n- a\n- b\n")
+    service, base, _ = await _brancher_fichier(
+        repo,
+        "memory/lecons.md",
+        "# L\n\n## Proposées\n\n- b\n",
+        "# L\n\n## Proposées\n\n- a\n- c\n",
+    )
+
+    conflits = await service.rejouer_sur(base)
+
+    assert conflits == ("memory/lecons.md",)
+
+
 # --- unit: the id-list union ------------------------------------------------
 
 

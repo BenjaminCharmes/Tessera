@@ -5,6 +5,7 @@ from collections.abc import Awaitable, Callable
 from pathlib import Path
 
 from tessera.services.git_workspace.chemins import _JOURNAL_UNION_SUFFIXES, _is_orchestrator_artifact_path, _relatif_au_projet
+from tessera.services.git_workspace.conflits_lecons import GitConflictsLecons
 from tessera.services.git_workspace.conflits_regles import GitConflictsRegles
 from tessera.services.git_workspace.erreurs import BaseIntrouvable, GitCommandError
 from tessera.services.git_workspace.textes import _extraire_fichiers_bloques
@@ -13,7 +14,7 @@ from tessera.utils.logger import get_logger
 _logger = get_logger("tessera.services.git_workspace")
 
 
-class GitRebase(GitConflictsRegles):
+class GitRebase(GitConflictsRegles, GitConflictsLecons):
     """Replaying a branch on its base, with abort and recovery."""
 
     async def rejouer_sur(
@@ -90,6 +91,10 @@ class GitRebase(GitConflictsRegles):
         if all(r is not None and r in _JOURNAL_UNION_SUFFIXES for r in relatifs):
             if await self._resoudre_conflits_journal_en_union(conflits):
                 return ()
+
+        # Leçons triées par un humain : la base, plus les seuls ajouts du run (ticket-907).
+        if await self._resoudre_lecons_au_rebase(conflits, prefixe):
+            return ()
 
         # Si tous les conflits sont des artefacts Tessera, les résoudre
         # automatiquement en faveur de la branche (ticket-300, ADR-033).

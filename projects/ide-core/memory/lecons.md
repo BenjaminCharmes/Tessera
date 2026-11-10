@@ -5,6 +5,7 @@ Pièges observés sur ce projet, une ligne chacun. Le service écrit sous `## Pr
 ## Proposées
 - Quand on rattrape les exceptions d'une bibliothèque de parsing, ajouter explicitement les types d'exception réellement levés au lieu de supposer qu'ils héritent de ValueError. (source : ticket-902, 2026-11-10)
 - Quand on crée plusieurs variantes d'un modèle de test, tous les champs requis doivent être passés sur chaque variante, pas seulement celle qui l'utilise logiquement. (source : ticket-906, 2026-11-10)
+- Quand on ajoute un héritage qui gère des exceptions, nettoyer les imports inutiles des exceptions maintenant gérées par le parent. (source : ticket-907, 2026-11-10)
 
 ## En vigueur
 - Quand tu ajoutes ou modifies une route ou un modèle de réponse FastAPI, régénère et commite `docs/openapi.json`, et range la route dans `frontend/src/test/contrat/perimetre.ts` (couverte ou hors périmètre). (source : ticket-860, ticket-864, 2026-11-06)

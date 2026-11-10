@@ -22,7 +22,9 @@ _BRANCHE = "ticket-732-merge"
 _BASE = "develop"
 _DOC = "memory/documentation.json"
 _LOG = "memory/pipeline-log.md"
-_SEED = {_DOC: '["a"]\n', _LOG: "l1\n", "src/app.py": "v0\n"}
+_LECONS = "memory/lecons.md"
+_LECONS_SEED = "# L\n\n## En vigueur\n\n## Proposées\n\n- a\n- b\n"
+_SEED = {_DOC: '["a"]\n', _LOG: "l1\n", "src/app.py": "v0\n", _LECONS: _LECONS_SEED}
 
 
 def _sync(cwd: Path, *args: str) -> str:
@@ -157,6 +159,28 @@ async def test_a_pipeline_log_conflict_puts_the_base_first(tmp_path: Path) -> No
     resultat = await _mettre_a_jour(monde)
     assert resultat.sha is not None, resultat.arret
     assert _fichier(monde, resultat.sha, _LOG) == "l1\nbase\nbranche"
+
+
+_TRIEE = "# L\n\n## En vigueur\n\n- a\n- b\n\n## Proposées\n"
+
+
+async def test_a_lessons_conflict_keeps_the_base_plus_the_run_additions(tmp_path: Path) -> None:
+    branche = _LECONS_SEED.replace("- b\n", "- b\n- neuve\n")
+    monde = _monde(tmp_path, {_LECONS: branche}, {_LECONS: _TRIEE})
+    resultat = await _mettre_a_jour(monde)
+    assert resultat.sha is not None, resultat.arret
+    lignes = _fichier(monde, resultat.sha, _LECONS).splitlines()
+    # `_sync` décode en cp1252 : on compare les lignes, pas l'accent de « Proposées ».
+    assert lignes[-2:][1] == "- neuve" and lignes.count("- a") == 1 and lignes.count("- b") == 1
+    assert lignes.index("- a") < len(lignes) - 3
+
+
+async def test_a_lessons_conflict_where_the_branch_removed_a_line_refuses(tmp_path: Path) -> None:
+    monde = _monde(tmp_path, {_LECONS: _LECONS_SEED.replace("- a\n", "")}, {_LECONS: _TRIEE})
+    resultat = await _mettre_a_jour(monde)
+    assert resultat.sha is None
+    assert resultat.arret is not None and _LECONS in resultat.arret
+    assert monde.distante(_BRANCHE) == monde.tete
 
 
 async def test_a_code_conflict_refuses_and_pushes_nothing(tmp_path: Path) -> None:
