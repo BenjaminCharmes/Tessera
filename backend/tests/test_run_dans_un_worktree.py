@@ -313,3 +313,22 @@ async def test_the_worktree_is_removed_when_the_run_raises(depot: Path) -> None:
 
     assert not wt.racine.exists()
     assert git(depot, "branch", "--show-current") == "develop"
+
+
+async def test_agent_rights_are_set_after_populate(
+    depot: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    ordre: list[str] = []
+    from tessera.services.worktrees.run_worktree_populate import peupler as peupler_reel
+
+    async def peupler_note(*args: object, **kwargs: object) -> list[str]:
+        ordre.append("peupler")
+        return await peupler_reel(*args, **kwargs)  # type: ignore[arg-type]
+
+    async def droits_notes(wt: RunWorktree, commande: str | None) -> None:
+        ordre.append("droits")
+
+    monkeypatch.setattr(run_dans_worktree, "peupler", peupler_note)
+    monkeypatch.setattr(run_dans_worktree, "accorder_droits_agent", droits_notes)
+    await _ouvrir(depot)
+    assert ordre == ["peupler", "droits"]

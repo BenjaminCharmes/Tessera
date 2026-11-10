@@ -1,14 +1,14 @@
 ---
-id: ticket-895
-title: "Worktrees grant the agent account exactly what a run needs"
-type: feat
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-11-09
 depends_on: []
 estimated_days: 1
-created: 2026-11-09
+id: ticket-895
+pr_number: 1002
+priority: high
+status: done
+title: Worktrees grant the agent account exactly what a run needs
+type: feat
 ---
 
 # ticket-895 — Un worktree accorde au compte agent exactement ce qu'un run demande
