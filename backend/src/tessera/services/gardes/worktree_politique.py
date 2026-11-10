@@ -61,9 +61,16 @@ def _valider(declaration: object, racine_depot: Path) -> ConfigWorktree | None:
     if preparation is not None and not isinstance(preparation, str):
         _mal_type("setup")
         return None
+    delai = declaration.get("setup_timeout_s")
+    if delai is not None and (
+        isinstance(delai, bool) or not isinstance(delai, int) or delai <= 0
+    ):
+        _mal_type("setup_timeout_s")
+        return None
     entrees = tuple(e for e in (_entree(b, racine_depot) for b in brutes) if e is not None)
     return ConfigWorktree(
-        populate=entrees, env=dict(env), test_command=commande, setup=preparation
+        populate=entrees, env=dict(env), test_command=commande, setup=preparation,
+        setup_timeout_s=delai,
     )
 
 

@@ -10,6 +10,13 @@ from tessera.services.verification.commande_effective import PlaceholderInconnu,
 from tessera.services.worktrees.run_worktree import RunWorktree
 
 
+def delai_du_setup(politique: PolitiqueRun, test_timeout_s: int | None) -> int | None:
+    """The setup timeout: `worktree.setup_timeout_s` when declared, else the tests' one."""
+    if politique.worktree is not None and politique.worktree.setup_timeout_s is not None:
+        return politique.worktree.setup_timeout_s
+    return test_timeout_s
+
+
 def preparation_du_run_declaree(
     politique: PolitiqueRun,
     wt: RunWorktree | None,
@@ -20,7 +27,8 @@ def preparation_du_run_declaree(
     """The declared `worktree.setup` of the run; an unknown placeholder refuses it (422)."""
     try:
         return preparation_du_run(
-            politique, wt.racine if wt is not None else None, project_path, env, timeout
+            politique, wt.racine if wt is not None else None, project_path, env,
+            delai_du_setup(politique, timeout),
         )
     except PlaceholderInconnu as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
