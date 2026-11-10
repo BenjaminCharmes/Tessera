@@ -8779,3 +8779,4 @@ error: Please commit or stash them.
 - 2026-11-10 09:36:20 UTC — [ticket-902] testeur: dur�es : ruff 0 s, mypy 16 s, tsc 34 s, mypy-linux 18 s, eslint 70 s, vitest 299 s, pytest 451 s ; impact depuis base : 126 fichier(s) de test
 - 2026-11-10 09:36:20 UTC — [ticket-902] tests rouges au tour 3
 - 2026-11-10 09:36:20 UTC — [ticket-902] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-10 09:36:41 UTC — [ide-core] file interrompue : ticket-902 non approuvé
