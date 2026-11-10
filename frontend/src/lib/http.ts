@@ -1,4 +1,4 @@
-import { authorized } from "./auth";
+import { authorized, oublierJeton } from "./auth";
 import { API_ORIGIN } from "./config";
 
 /** Racine de l'API : les chemins que prennent `send` et `request` en partent. */
@@ -32,7 +32,10 @@ export function onJetonManquant(rappel: () => void): () => void {
  */
 export async function send(path: string, options?: RequestInit): Promise<Response> {
   const res = await fetch(`${BASE}${path}`, authorized(options));
-  if (res.status === 401) rappelJetonManquant?.();
+  if (res.status === 401) {
+    oublierJeton(); // le jeton rangé est périmé
+    rappelJetonManquant?.();
+  }
   if (!res.ok) throw new Error(`API ${res.status}: ${await messageDeLErreur(res)}`);
   return res;
 }

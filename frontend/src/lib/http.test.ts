@@ -58,6 +58,15 @@ describe("send", () => {
     expect(new Headers(init?.headers).get("Authorization")).toBe("Bearer saisi");
   });
 
+  it("erases the stored token on a 401", async () => {
+    saisirJeton("perime");
+    vi.stubGlobal("fetch", vi.fn(async () => reponse("non", 401)));
+
+    await send("/projects").catch(() => undefined);
+
+    expect(window.localStorage.getItem("tessera.jeton")).toBeNull();
+  });
+
   it("stops calling onJetonManquant once it is unregistered", async () => {
     vi.stubGlobal("fetch", vi.fn(async () => reponse("non", 401)));
     const rappel = vi.fn();

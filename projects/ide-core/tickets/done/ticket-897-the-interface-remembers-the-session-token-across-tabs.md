@@ -1,14 +1,14 @@
 ---
-id: ticket-897
-title: "The interface remembers the session token across tabs and restarts"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-11-09
 depends_on: []
 estimated_days: 0.5
-created: 2026-11-09
+id: ticket-897
+pr_number: 998
+priority: medium
+status: done
+title: The interface remembers the session token across tabs and restarts
+type: fix
 ---
 
 # ticket-897 — L'interface se souvient du jeton de session d'un onglet à l'autre

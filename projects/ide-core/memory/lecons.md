@@ -9,6 +9,7 @@ Pièges observés sur ce projet, une ligne chacun. Le service écrit sous `## Pr
 - Quand on centralise une fonction et l'importe partout, vérifier que chaque fichier reste sous 300 lignes. (source : ticket-888, 2026-11-06)
 - Quand une mise à jour SDK est corrigée après rejet, soumettre avec le lockfile complet et le rapport d'API, pas l'un sans l'autre. (source : ticket-893, 2026-11-09)
 - Quand une fonction n'est appelée que sous condition, la tester en franchissant cette condition, jamais en l'appelant isolément. (source : ticket-892, 2026-11-09)
+- Quand le jeton change après qu'une ressource aie échoué en 401, vérifier que l'état d'échec se réinitialise pour permettre une nouvelle tentative avec le nouveau jeton. (source : ticket-897, 2026-11-09)
 - Quand les gardes de permission se multiplient dans agent_sdk.py, créer une fonction qui agrège les hooks pour respecter le plafond. (source : ticket-899, 2026-11-09)
 - Quand une revue identifie une erreur dans un ADR ou decisions.md (chemin corrompu, caractère binaire), la corriger dans le même diff que le code. (source : ticket-894, 2026-11-09)
 - Quand les restrictions d'accès sont posées avant un peuplement, les reposer après pour qu'elles s'appliquent à chaque fichier. (source : ticket-895, 2026-11-09)

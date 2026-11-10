@@ -4,7 +4,7 @@
  * Le backend exige `Authorization: Bearer <jeton>` sur toute requête HTTP et
  * `?token=<jeton>` sur toute WebSocket — un navigateur ne peut pas poser
  * d'en-tête sur `new WebSocket(url)`. Le jeton n'est jamais inscrit dans le
- * code servi par Vite : il vient de la mémoire, de `sessionStorage`, du
+ * code servi par Vite : il vient de la mémoire, de `localStorage`, du
  * fragment `#jeton=<t>` de l'URL, ou de la commande Tauri `jeton_de_session`.
  * Il se lit à chaque appel plutôt qu'au chargement du module.
  */
@@ -16,23 +16,28 @@ const PARAMETRE_FRAGMENT = "jeton";
 let enMemoire = "";
 let lectureTauri: Promise<string> | null = null;
 
-function lireStockage(): string {
-  try {
-    return window.sessionStorage.getItem(CLE_STOCKAGE) ?? "";
-  } catch {
-    return "";
-  }
-}
-
 function ecrireStockage(jeton: string): void {
   try {
-    window.sessionStorage.setItem(CLE_STOCKAGE, jeton);
+    window.localStorage.setItem(CLE_STOCKAGE, jeton);
   } catch {
     // Stockage refusé : le jeton reste en mémoire pour cette session.
   }
 }
 
-/** Prend le jeton du fragment, le range en `sessionStorage` et efface le fragment. */
+/** Lit `localStorage`, puis l'ancienne valeur de `sessionStorage`, qu'il recopie. */
+function lireStockage(): string {
+  try {
+    const partage = window.localStorage.getItem(CLE_STOCKAGE);
+    if (partage) return partage;
+    const ancien = window.sessionStorage.getItem(CLE_STOCKAGE) ?? "";
+    if (ancien) ecrireStockage(ancien);
+    return ancien;
+  } catch {
+    return "";
+  }
+}
+
+/** Prend le jeton du fragment, le range en `localStorage` et efface le fragment. */
 function lireFragment(): string {
   const parametres = new URLSearchParams(window.location.hash.replace(/^#/, ""));
   const jeton = parametres.get(PARAMETRE_FRAGMENT) ?? "";
@@ -43,7 +48,7 @@ function lireFragment(): string {
   return jeton;
 }
 
-/** Jeton déjà connu, sans attente : mémoire, `sessionStorage`, puis fragment. */
+/** Jeton déjà connu, sans attente : mémoire, stockage, puis fragment. */
 export function jetonEnCache(): string {
   return enMemoire || lireStockage() || lireFragment();
 }
@@ -75,18 +80,19 @@ export async function jetonDeSession(): Promise<string> {
   return jeton;
 }
 
-/** Jeton saisi à la main : rangé en `sessionStorage`, servi à la requête suivante. */
+/** Jeton saisi à la main : rangé en `localStorage`, servi à la requête suivante. */
 export function saisirJeton(jeton: string): void {
   const propre = jeton.trim();
   enMemoire = propre;
   if (propre) ecrireStockage(propre);
 }
 
-/** Oublie le jeton en mémoire et en `sessionStorage` (changement de session, tests). */
+/** Oublie le jeton en mémoire et dans les stockages (jeton périmé, tests). */
 export function oublierJeton(): void {
   enMemoire = "";
   lectureTauri = null;
   try {
+    window.localStorage.removeItem(CLE_STOCKAGE);
     window.sessionStorage.removeItem(CLE_STOCKAGE);
   } catch {
     // Rien à retirer si le stockage est inaccessible.
