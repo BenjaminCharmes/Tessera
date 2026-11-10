@@ -5,7 +5,7 @@ depends_on:
 - ticket-894
 estimated_days: 1
 id: ticket-896
-pr_number: null
+pr_number: 1004
 priority: medium
 status: done
 title: A setup script recreates the agent account on any PC, admin part kept minimal
