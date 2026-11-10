@@ -3,8 +3,9 @@
 A fresh worktree has no `node_modules`: `populate` links none on purpose (a
 junction emptied one on 14/10), and only the tester installed them. The coder
 could not read library types and invented an API. A project now declares
-`worktree.setup`; it runs once in the worktree, with `worktree.env`, under the
-tester's timeout. A failure ends the run `blocked` before any agent is called
+`worktree.setup`; it runs once in the worktree, with `worktree.env`, under
+`worktree.setup_timeout_s` (the tester's timeout without it), and is retried
+once when it timed out. A failure ends the run `blocked` before any agent is called
 (ADR-037).
 """
 from collections.abc import Awaitable, Callable
@@ -83,6 +84,11 @@ def preparation_du_run(
         # La racine du worktree, pas le dossier du projet : le gestionnaire de paquets
         # y cherche son fichier de verrou.
         resultat = await lanceur.run_tests(racine, test_command=commande)
+        if not resultat.passed and resultat.expiree:
+            # Un délai passager (charge d'un autre worktree) passe souvent au second
+            # essai ; un code de sortie non nul, lui, ne se relance pas.
+            _logger.warning("worktree_setup_relance", extra={"commande": commande})
+            resultat = await lanceur.run_tests(racine, test_command=commande)
         code = resultat.etapes[-1].code if resultat.etapes else None
         if resultat.passed:
             return ResultatPreparation(commande, resultat.duration_ms, code, None)
