@@ -1,14 +1,14 @@
 ---
-id: ticket-909
-title: "BureauView tests pay the cold render once, outside any test"
-type: test
-status: todo
-pr_number: null
-priority: low
 agent: codeur
+created: 2026-11-10
 depends_on: []
 estimated_days: 0.25
-created: 2026-11-10
+id: ticket-909
+pr_number: 1022
+priority: low
+status: done
+title: BureauView tests pay the cold render once, outside any test
+type: test
 ---
 
 # ticket-909 — Les tests de BureauView paient le premier rendu une fois, hors de tout test

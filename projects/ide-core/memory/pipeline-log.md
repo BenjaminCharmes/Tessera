@@ -8904,3 +8904,15 @@ error: Please commit or stash them.
 - 2026-11-10 13:25:34 UTC — [ticket-908] tour 1 — reviewer terminé (24328ms)
 - 2026-11-10 13:25:34 UTC — [ticket-908] APPROVED après 1 tour(s)
 - 2026-11-10 13:29:48 UTC — [ticket-908] documentation: 0 fichier(s) (249485ms) — après tour de correction
+- 2026-11-10 13:30:07 UTC — [ide-core] ticket-908 PR #1021 confiée au CIWatcher
+- 2026-11-10 13:30:11 UTC — [ticket-909] branche ticket-909-bureauview-tests-pay-the-cold-render-once-outside
+- 2026-11-10 13:30:13 UTC — [ticket-909] tour 1 — codeur démarré
+- 2026-11-10 13:30:30 UTC — [ticket-909] tour 1 — codeur terminé (17077ms)
+- 2026-11-10 13:33:47 UTC — [ticket-909] testeur: dur�es : tsc 17 s, eslint 32 s, vitest 144 s
+- 2026-11-10 13:33:52 UTC — [ticket-909] securite: PASS — Le diff ne touche qu'un fichier de test frontend. Il regroupe les doubles d'API  (5828ms)
+- 2026-11-10 13:33:53 UTC — [ticket-909] tour 1 — reviewer démarré
+- 2026-11-10 13:34:06 UTC — [ticket-909] tour 1 — reviewer terminé (13202ms)
+- 2026-11-10 13:34:11 UTC — [ticket-909] validateur: fichiers cités joints : frontend/src/components/BureauView/BureauView.test.tsx, BureauView.test.tsx, memory/pipeline-log.md (tronqué) ; non joints (budget épuisé) : vite.config.ts
+- 2026-11-10 13:34:11 UTC — [ticket-909] validateur: APPROVED — Le diff satisfait les 3 critères : un `beforeAll` paye le rendu à froid une seul (18937ms)
+- 2026-11-10 13:34:11 UTC — [ticket-909] APPROVED après 1 tour(s)
+- 2026-11-10 13:35:12 UTC — [ticket-909] documentation: 0 fichier(s) (55562ms)
