@@ -1,5 +1,4 @@
 import asyncio
-import json
 from collections.abc import AsyncGenerator, Awaitable, Callable
 from contextlib import aclosing
 from pathlib import Path
@@ -20,23 +19,27 @@ from claude_agent_sdk import (
     UserMessage,
     query,
 )
+from claude_agent_sdk._internal.transport import Transport
 from claude_agent_sdk.types import SystemPromptFile
 
+from tessera.config import settings
 from tessera.models.agent import EffortLevel
-from tessera.services.projets.racine_depot import depot_au_dessus
 from tessera.services.providers.base import ProviderResult, StreamCallback, ToolEventCallback
-from tessera.services.providers.consignes_ancetres import claude_md_ancetres_a_exclure
 from tessera.services.providers.duree_max import borner
+from tessera.services.providers.env_agent import CLI_PARTAGE, env_de_l_agent
 from tessera.services.providers.env_sdk import env_du_sous_processus
 from tessera.services.providers.garde_jetons import hook_refus_env_tessera
 from tessera.services.providers.git_guard import hook_refus_git
+from tessera.services.providers.kill_guard import hook_refus_kill
 from tessera.services.providers.messages_sdk import OUTIL_SORTIE_STRUCTUREE, _extract_stream_delta, _format_de_sortie, provider_result_du_sdk
 from tessera.services.providers.noms import ProviderIndisponible
-from tessera.services.providers.perimetre import hook_refus_hors_perimetre, racine_autorisee
+from tessera.services.providers.perimetre import hook_refus_hors_perimetre
 from tessera.services.providers.prompt_fichier import prompt_systeme_pour_sdk
 from tessera.services.providers.refus_cli import ReleveDesRefusCli
 from tessera.services.providers.refus_garde import JournalDesRefus
+from tessera.services.providers.reglages_ancetres import reglages_sans_consignes_ancetres
 from tessera.services.providers.signaler import ContexteSignal, serveur_tessera
+from tessera.services.providers.transport_agent import transport_du_compte
 from tessera.services.usage.quota_tracker import QuotaTracker
 from tessera.utils.logger import get_logger
 
@@ -53,10 +56,13 @@ _SdkMessage = (
 
 
 async def _sdk_gen(
-    prompt: str, options: ClaudeAgentOptions
+    prompt: str, options: ClaudeAgentOptions, transport: Transport | None = None
 ) -> AsyncGenerator[_SdkMessage, None]:
     """Wraps query() as a typed AsyncGenerator so it exposes aclose()."""
-    async for msg in query(prompt=prompt, options=options):
+    # Sans transport maison, l'appel reste celui d'avant (ADR-083).
+    flux = (query(prompt=prompt, options=options) if transport is None
+            else query(prompt=prompt, options=options, transport=transport))
+    async for msg in flux:
         yield msg
 
 
@@ -74,41 +80,6 @@ _TESSERA_PLUGIN_PATH: Path = _REPO_ROOT / "agents" / "plugin"
 # Octets UTF-8 au-delà desquels le prompt système part par fichier : la ligne
 # de commande Windows tient dans ~32 Ko et porte aussi réglages et outils.
 SYSTEM_PROMPT_FILE_THRESHOLD_BYTES = 24_000
-
-
-def _depart_des_consignes(cwd: Path, racine_ecriture: Path) -> Path:
-    """The folder from which ancestor CLAUDE files are excluded.
-
-    Le dépôt de l'IDE pour un projet qui y vit. Un worktree de run est hors de
-    ce dépôt (ADR-056) : le départ est alors la racine de son propre checkout,
-    le premier ancêtre qui porte un ``.git`` (un fichier, pour un worktree lié),
-    et à défaut la racine d'écriture reçue, qui n'exclut rien.
-    """
-    projet = cwd.resolve()
-    if projet.is_relative_to(_REPO_ROOT.resolve()):
-        return _REPO_ROOT
-    depot = depot_au_dessus(projet)
-    return depot if depot is not None else racine_ecriture
-
-
-def _reglages_sans_consignes_ancetres(
-    cwd: Path | None, racine_ecriture: Path | None
-) -> str | None:
-    """The ``settings`` JSON excluding Tessera's CLAUDE files, or ``None``.
-
-    Un projet est « ancestor » quand sa racine d'écriture n'est pas son propre
-    dossier : on réutilise donc celle que le run a figée (ticket-119).
-    """
-    if cwd is None:
-        return None
-    racine = racine_ecriture if racine_ecriture is not None else racine_autorisee(cwd)
-    ancestor = racine.resolve() != cwd.resolve()
-    exclus = claude_md_ancetres_a_exclure(
-        cwd, _depart_des_consignes(cwd, racine), ancestor
-    )
-    if not exclus:
-        return None
-    return json.dumps({"claudeMdExcludes": exclus})
 
 
 def _build_options(
@@ -172,10 +143,14 @@ def _build_options(
     mcp_servers, noms_mcp = serveur_tessera(ask_user, signaler, outille=allowed_tools != [])
     effective_tools = [*effective_tools, *noms_mcp]
 
-    env = env_du_sous_processus(git_bash_path)
+    # Compte dédié (ADR-083) : environnement bâti de zéro et CLI partagé ; vide,
+    # rien ne change. Le jeton absent lève `ProviderIndisponible`.
+    compte = settings.agent_user
+    env = env_de_l_agent(compte, git_bash_path) if compte else env_du_sous_processus(git_bash_path)
 
     return ClaudeAgentOptions(
         env=env,
+        cli_path=CLI_PARTAGE if compte else None,
         # Chemin long obligatoire : un chemin court Windows 8.3 fait refuser
         # les écritures.
         cwd=str(cwd.resolve()) if cwd is not None else None,
@@ -187,7 +162,7 @@ def _build_options(
         allowed_tools=effective_tools,
         setting_sources=["project"],
         # Un projet hébergé ne lit pas les CLAUDE.md de Tessera (ticket-414).
-        settings=_reglages_sans_consignes_ancetres(cwd, racine_ecriture),
+        settings=reglages_sans_consignes_ancetres(cwd, racine_ecriture),
         include_partial_messages=True,
         max_turns=max_turns,
         max_budget_usd=max_budget_usd,
@@ -199,12 +174,11 @@ def _build_options(
         plugins=plugins,
         # Les agents n'écrivent pas dans l'historique git : le pipeline crée la
         # branche et commite lui-même (ADR-018), et ne merge jamais (ADR-022).
-        # Le refus est posé ici, en `PreToolUse`, parce qu'une entrée de
-        # `allowed_tools` couvrant `Bash` l'auto-approuverait avant tout
-        # callback de permission — le garde serait inerte (ticket-068).
+        # Posé en `PreToolUse` : `allowed_tools` auto-approuverait `Bash` avant
+        # tout callback de permission (ticket-068). Même hook : pas de kill (899).
         hooks={
             "PreToolUse": [
-                HookMatcher(matcher="Bash", hooks=[hook_refus_git]),
+                HookMatcher(matcher="Bash", hooks=[hook_refus_git, hook_refus_kill]),
                 # Le `.env` de Tessera porte les jetons de mise en ligne, et
                 # ADR-031 laisse lire hors du projet (ADR-053, ticket-464).
                 HookMatcher(
@@ -271,7 +245,6 @@ class ClaudeAgentSDKProvider:
         if silence_max_s is not None:
             self._silence_max_s = silence_max_s
         else:
-            from tessera.config import settings
             self._silence_max_s = settings.agent_silence_max_s
 
     async def complete(
@@ -375,13 +348,17 @@ class ClaudeAgentSDKProvider:
             journal_refus=self._journal_refus, effort=self._effort,
             schema=schema,
         )
+        # Sous le compte dédié, le CLI part par le transport maison (ADR-083).
+        transport = transport_du_compte(user, options)
         chunks: list[str] = []
         result: ResultMessage | None = None
         refus_cli = ReleveDesRefusCli()
         # None → pas de borne (0 ou négatif désactive également).
         silence_timeout: float | None = self._silence_max_s if self._silence_max_s > 0 else None
 
-        async with aclosing(_sdk_gen(prompt=user, options=options)) as gen:
+        flux = (_sdk_gen(prompt=user, options=options) if transport is None
+                else _sdk_gen(prompt=user, options=options, transport=transport))
+        async with aclosing(flux) as gen:
             while True:
                 try:
                     # `asyncio.timeout` plutôt que `wait_for` : sous Python 3.11,

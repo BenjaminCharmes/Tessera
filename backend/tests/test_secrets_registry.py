@@ -13,11 +13,11 @@ def _reglages() -> Settings:
     return Settings(_env_file=None, **champs)  # type: ignore[arg-type]
 
 
-def test_all_eight_secrets_are_registered_at_startup() -> None:
+def test_all_ten_secrets_are_registered_at_startup() -> None:
     inscrire_les_secrets(_reglages())
 
     attendus = {v for nom, v in _FACTICES.items() if nom != "FORBIDDEN_TERMS"}
-    assert len(attendus) == 8
+    assert len(attendus) == 10
     assert attendus <= SECRETS.valeurs()
 
 

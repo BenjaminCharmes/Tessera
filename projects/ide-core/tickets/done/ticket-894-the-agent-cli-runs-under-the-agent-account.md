@@ -1,15 +1,16 @@
 ---
-id: ticket-894
-title: "The agent CLI runs under the dedicated agent account"
-type: feat
-status: todo
-pr_number: null
-priority: high
 agent: codeur
-depends_on: [ticket-893]
-estimated_days: 2
 created: 2026-11-09
+depends_on:
+- ticket-893
+estimated_days: 2
+id: ticket-894
 plan: true
+pr_number: 1001
+priority: high
+status: done
+title: The agent CLI runs under the dedicated agent account
+type: feat
 ---
 
 # ticket-894 — Le CLI d'un agent tourne sous le compte dédié `tessera-agent`
