@@ -1,14 +1,15 @@
 ---
-id: ticket-896
-title: "A setup script recreates the agent account on any PC, admin part kept minimal"
-type: chore
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
-depends_on: [ticket-894]
-estimated_days: 1
 created: 2026-11-09
+depends_on:
+- ticket-894
+estimated_days: 1
+id: ticket-896
+pr_number: 1004
+priority: medium
+status: done
+title: A setup script recreates the agent account on any PC, admin part kept minimal
+type: chore
 ---
 
 # ticket-896 — Un script recrée le compte agent sur n'importe quel PC, avec une partie admin minimale
