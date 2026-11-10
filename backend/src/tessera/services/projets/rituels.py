@@ -1,11 +1,12 @@
 """Recurring rituals read from `rituels.md` at the repository root — ticket-902.
 
-The list follows the repository; the done/postponed state stays in the local
-database (`rituels_etat`) and never leaves the PC.
+The list follows the repository; the done/postponed state lives in the local
+database (`rituels_etat`); `github/rituels_sync` shares it between PCs.
 """
 import logging
 from datetime import datetime, timedelta
 from pathlib import Path
+from typing import Literal
 
 import aiosqlite
 import frontmatter
@@ -39,6 +40,7 @@ class RituelVu(RituelDefini, Echeances):
 class ListeRituels(BaseModel):
     rituels: list[RituelVu]
     erreur: str | None = None
+    synchro: Literal["github", "locale"] = "locale"
 
 
 def lire_definitions(chemin: Path | None = None) -> tuple[list[RituelDefini], str | None]:
@@ -56,7 +58,7 @@ def lire_definitions(chemin: Path | None = None) -> tuple[list[RituelDefini], st
         return [], f"rituels.md is invalid: {exc}"
 
 
-async def _etats(db_path: Path | str) -> dict[str, tuple[datetime | None, datetime | None]]:
+async def lire_etats(db_path: Path | str) -> dict[str, tuple[datetime | None, datetime | None]]:
     async with aiosqlite.connect(db_path) as db:
         async with db.execute("SELECT id, fait_le, reporte_jusqua FROM rituels_etat") as cur:
             lignes = await cur.fetchall()
@@ -80,7 +82,7 @@ async def lister(
 ) -> ListeRituels:
     """Every ritual with its status, late ones first."""
     definitions, erreur = lire_definitions(chemin)
-    etats = await _etats(db_path)
+    etats = await lire_etats(db_path)
     vus: list[RituelVu] = []
     for d in definitions:
         fait_le, reporte = etats.get(d.id, (None, None))
@@ -105,6 +107,25 @@ async def _ecrire(
                 reporte.isoformat() if reporte else None,
             ),
         )
+        await db.commit()
+
+
+async def ecrire_etats(
+    db_path: Path | str, etats: dict[str, tuple[datetime | None, datetime | None]]
+) -> None:
+    """Replace the state of every given ritual with the merged one (ticket-905)."""
+    async with aiosqlite.connect(db_path) as db:
+        for identifiant, (fait_le, reporte) in etats.items():
+            await db.execute(
+                "INSERT INTO rituels_etat (id, fait_le, reporte_jusqua) VALUES (?, ?, ?) "
+                "ON CONFLICT(id) DO UPDATE SET fait_le = excluded.fait_le, "
+                "reporte_jusqua = excluded.reporte_jusqua",
+                (
+                    identifiant,
+                    fait_le.isoformat() if fait_le else None,
+                    reporte.isoformat() if reporte else None,
+                ),
+            )
         await db.commit()
 
 

@@ -4,6 +4,7 @@ from datetime import datetime
 from fastapi import APIRouter, HTTPException
 
 from tessera.config import settings
+from tessera.services.github import rituels_sync
 from tessera.services.projets import rituels as service
 
 router = APIRouter(prefix="/rituels", tags=["rituels"])
@@ -18,7 +19,9 @@ def _verifier(identifiant: str) -> None:
 @router.get("", response_model=service.ListeRituels)
 async def get_rituels() -> service.ListeRituels:
     """Rituals of `rituels.md` with their status at the PC's local time."""
-    return await service.lister(settings.ide_db_path, datetime.now())
+    synchro = await rituels_sync.tirer(settings.ide_db_path)
+    liste = await service.lister(settings.ide_db_path, datetime.now())
+    return liste.model_copy(update={"synchro": synchro})
 
 
 @router.post("/{identifiant}/fait", status_code=204)
@@ -26,6 +29,7 @@ async def post_fait(identifiant: str) -> None:
     """Mark a ritual done now."""
     _verifier(identifiant)
     await service.marquer_fait(settings.ide_db_path, identifiant, datetime.now())
+    await rituels_sync.pousser(settings.ide_db_path)
 
 
 @router.post("/{identifiant}/reporter", status_code=204)
@@ -33,3 +37,4 @@ async def post_reporter(identifiant: str) -> None:
     """Postpone a ritual by 24 hours."""
     _verifier(identifiant)
     await service.reporter(settings.ide_db_path, identifiant, datetime.now())
+    await rituels_sync.pousser(settings.ide_db_path)

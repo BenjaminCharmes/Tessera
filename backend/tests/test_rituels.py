@@ -6,6 +6,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from tessera.main import app
+from tessera.services.github import rituels_sync
 from tessera.services.projets import rituels as service
 from tessera.services.projets.rituels_echeances import Hebdo, Mensuel, Unique, calculer_echeances
 
@@ -107,6 +108,8 @@ def test_routes_done_then_list_and_unknown_404(
     fichier = tmp_path / "rituels.md"
     fichier.write_text(FICHIER, encoding="utf-8")
     monkeypatch.setattr(service, "FICHIER", fichier)
+    monkeypatch.setattr(rituels_sync, "creer_service", lambda: None)
+    rituels_sync.reinitialiser()
     with TestClient(app) as client:
         avant = client.get("/api/v1/rituels").json()
         assert avant["erreur"] is None
