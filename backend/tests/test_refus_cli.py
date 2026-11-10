@@ -53,7 +53,7 @@ def _retour(identifiant: str, contenu: Any, erreur: bool | None = True) -> UserM
 
 
 def _patch_query(monkeypatch: pytest.MonkeyPatch, messages: list[Any]) -> None:
-    async def fake_query(*, prompt: str, options: Any) -> AsyncIterator[Any]:
+    async def fake_query(*, prompt: str, options: Any, **_: Any) -> AsyncIterator[Any]:
         for message in messages:
             yield message
 
@@ -102,7 +102,7 @@ async def test_un_tour_repris_garde_cwd_outils_et_mode_de_permission(
 ) -> None:
     captures: list[Any] = []
 
-    async def fake_query(*, prompt: str, options: Any) -> AsyncIterator[Any]:
+    async def fake_query(*, prompt: str, options: Any, **_: Any) -> AsyncIterator[Any]:
         captures.append(options)
         yield _resultat()
 

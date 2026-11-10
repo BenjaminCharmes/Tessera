@@ -41,7 +41,7 @@ def _resultat_sdk(subtype: str = "success", structured: Any = None) -> ResultMes
 def _patch_query(
     monkeypatch: pytest.MonkeyPatch, messages: list[Any], vues: list[Any] | None = None
 ) -> None:
-    async def fake_query(*, prompt: str, options: Any) -> AsyncIterator[Any]:
+    async def fake_query(*, prompt: str, options: Any, **_: Any) -> AsyncIterator[Any]:
         if vues is not None:
             vues.append(options)
         for message in messages:

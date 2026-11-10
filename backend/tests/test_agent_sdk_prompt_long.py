@@ -20,7 +20,7 @@ class _Capture:
         self.fail = fail
 
     async def gen(
-        self, prompt: str, options: ClaudeAgentOptions
+        self, prompt: str, options: ClaudeAgentOptions, **_: Any
     ) -> AsyncGenerator[ResultMessage, None]:
         self.system_prompt = options.system_prompt
         if isinstance(self.system_prompt, dict):

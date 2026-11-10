@@ -68,7 +68,7 @@ async def test_get_provider_allow_tools_false_desactive_reellement_les_outils(
 
     captured: dict[str, object] = {}
 
-    async def fake_query(*, prompt: str, options: Any) -> AsyncIterator[Any]:
+    async def fake_query(*, prompt: str, options: Any, **_: Any) -> AsyncIterator[Any]:
         captured["tools"] = options.tools
         captured["allowed_tools"] = options.allowed_tools
         yield ResultMessage(
