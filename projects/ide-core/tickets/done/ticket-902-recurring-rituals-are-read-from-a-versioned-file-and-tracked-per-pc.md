@@ -1,14 +1,15 @@
 ---
-id: ticket-902
-title: "Recurring rituals are read from a versioned file, their done state kept per PC"
-type: feat
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-11-10
 depends_on: []
 estimated_days: 1
-created: 2026-11-10
+id: ticket-902
+pr_number: 1011
+priority: high
+status: done
+title: Recurring rituals are read from a versioned file, their done state kept per
+  PC
+type: feat
 ---
 
 # ticket-902 — Les rituels se lisent dans un fichier versionné, leur état « fait » reste sur chaque PC

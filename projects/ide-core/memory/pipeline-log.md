@@ -8784,3 +8784,43 @@ error: Please commit or stash them.
 - 2026-11-10 10:30:56 UTC — [ticket-906] APPROVED après 2 tour(s)
 - 2026-11-10 10:32:40 UTC — [ticket-906] leçons: une leçon proposée
 - 2026-11-10 10:37:03 UTC — [ticket-906] documentation: 0 fichier(s) (257500ms)
+- 2026-11-10 08:56:13 UTC — [ide-core] ticket-896 PR #1004 mergée (CI verte)
+- 2026-11-10 09:10:14 UTC — [ide-core] ticket-900 PR #1007 confiée au CIWatcher
+- 2026-11-10 09:14:12 UTC — [ticket-902] branche ticket-902-recurring-rituals-are-read-from-a-versioned-file
+- 2026-11-10 09:14:14 UTC — [ticket-902] tour 1 — codeur démarré
+- 2026-11-10 09:16:59 UTC — [ticket-902] tour 1 — codeur terminé (165234ms)
+- 2026-11-10 09:21:46 UTC — [ticket-902] testeur: 1 failed, 736 passed in 260.51s (0:04:20)
+- 2026-11-10 09:21:46 UTC — [ticket-902] tests rouges au tour 1
+- 2026-11-10 09:21:46 UTC — [ticket-902] tour 2 — codeur démarré
+- 2026-11-10 09:22:56 UTC — [ticket-902] tour 2 — codeur terminé (70125ms)
+- 2026-11-10 09:28:22 UTC — [ticket-902] testeur: dur�es : ruff 0 s, tsc 33 s, eslint 53 s, vitest 197 s, pytest 321 s ; impact depuis base : 126 fichier(s) de test
+- 2026-11-10 09:28:22 UTC — [ticket-902] tests rouges au tour 2
+- 2026-11-10 09:28:22 UTC — [ticket-902] tour 3 — codeur démarré
+- 2026-11-10 09:28:43 UTC — [ticket-902] tour 3 — codeur terminé (20235ms)
+- 2026-11-10 09:36:20 UTC — [ticket-902] testeur: dur�es : ruff 0 s, mypy 16 s, tsc 34 s, mypy-linux 18 s, eslint 70 s, vitest 299 s, pytest 451 s ; impact depuis base : 126 fichier(s) de test
+- 2026-11-10 09:36:20 UTC — [ticket-902] tests rouges au tour 3
+- 2026-11-10 09:36:20 UTC — [ticket-902] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-10 09:36:41 UTC — [ide-core] file interrompue : ticket-902 non approuvé
+- 2026-11-10 09:16:33 UTC — [ide-core] ticket-900 PR #1007 mergée (CI verte)
+- 2026-11-10 09:39:34 UTC — [ticket-902] branche ticket-902-recurring-rituals-are-read-from-a-versioned-file
+- 2026-11-10 09:39:36 UTC — [ticket-902] branche reprise (3 commit(s)) — refus précédent : revue, codeur en premier
+- 2026-11-10 09:39:36 UTC — [ticket-902] tour 1 — codeur démarré
+- 2026-11-10 09:53:13 UTC — [ticket-902] tour 1 — codeur terminé (816843ms)
+- 2026-11-10 09:59:51 UTC — [ticket-902] testeur: dur�es : ruff 0 s, mypy 16 s, mypy-linux 16 s, tsc 35 s, eslint 106 s, vitest 218 s, pytest 394 s ; impact depuis base : 126 fichier(s) de test
+- 2026-11-10 10:00:08 UTC — [ticket-902] securite: PASS — Le diff ajoute trois routes pour les rituels. Elles sont couvertes par le jeton  (16562ms)
+- 2026-11-10 10:00:08 UTC — [ticket-902] tour 1 — reviewer démarré
+- 2026-11-10 10:00:47 UTC — [ticket-902] tour 1 — reviewer terminé (39282ms)
+- 2026-11-10 10:00:56 UTC — [ticket-902] validateur: fichiers cités joints : backend/src/tessera/services/projets/rituels.py, rituels.md, backend/src/tessera/services/noyau/database.py
+- 2026-11-10 10:00:56 UTC — [ticket-902] validateur: APPROVED — Le code implémente complètement la lecture de `rituels.md` avec validation Pydan (48327ms)
+- 2026-11-10 10:00:56 UTC — [ticket-902] CHANGES_REQUESTED tour 1: Reviewer : 1. Le `except (ValidationError, ValueError, OSError)` de `lire_definitions` ne rattrape pas les erreurs de syntaxe YAML. `frontmatter.loads` lève alors `yaml.YAMLError` (ScannerError, Parse
+- 2026-11-10 10:00:56 UTC — [ticket-902] tour 2 — codeur démarré
+- 2026-11-10 10:01:59 UTC — [ticket-902] tour 2 — codeur terminé (62264ms)
+- 2026-11-10 10:10:04 UTC — [ticket-902] testeur: dur�es : ruff 0 s, mypy 12 s, mypy-linux 11 s, tsc 26 s, eslint 82 s, vitest 249 s, pytest 482 s ; impact depuis base : 126 fichier(s) de test
+- 2026-11-10 10:10:21 UTC — [ticket-902] securite: PASS — Le diff ajoute trois routes de rituels. Elles sont protégées par le StaticTokenM (16610ms)
+- 2026-11-10 10:10:21 UTC — [ticket-902] tour 2 — reviewer démarré
+- 2026-11-10 10:10:43 UTC — [ticket-902] tour 2 — reviewer terminé (22125ms)
+- 2026-11-10 10:11:08 UTC — [ticket-902] validateur: fichiers cités joints : backend/src/tessera/services/projets/rituels.py, rituels.md, backend/src/tessera/services/noyau/database.py
+- 2026-11-10 10:11:08 UTC — [ticket-902] validateur: APPROVED — Le code implémente complètement les rituels récurrents : lecture de `rituels.md` (47187ms)
+- 2026-11-10 10:11:08 UTC — [ticket-902] APPROVED après 2 tour(s)
+- 2026-11-10 10:12:05 UTC — [ticket-902] leçons: une leçon proposée
+- 2026-11-10 10:14:39 UTC — [ticket-902] documentation: 0 fichier(s) (148796ms)
