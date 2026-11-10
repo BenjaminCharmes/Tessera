@@ -8837,3 +8837,23 @@ error: Please commit or stash them.
 - 2026-11-10 10:47:22 UTC — [ticket-903] validateur: APPROVED — Tous les critères sont satisfaits. Le diff ajoute la vue Rituels et le hook useR (31891ms)
 - 2026-11-10 10:47:22 UTC — [ticket-903] APPROVED après 1 tour(s)
 - 2026-11-10 10:52:56 UTC — [ticket-903] documentation: 4 fichier(s) (328141ms)
+- 2026-11-10 10:58:17 UTC — [ide-core] ticket-903 PR #1015 confiée au CIWatcher
+- 2026-11-10 10:58:25 UTC — [ticket-905] branche ticket-905-ritual-done-state-follows-the-user-from-pc-to-pc
+- 2026-11-10 10:58:28 UTC — [ticket-905] tour 1 — codeur démarré
+- 2026-11-10 11:01:41 UTC — [ticket-905] tour 1 — codeur terminé (192921ms)
+- 2026-11-10 11:06:20 UTC — [ticket-905] testeur: dur�es : ruff 0 s, tsc 22 s, eslint 43 s, pytest 266 s, vitest 209 s ; impact depuis base : 92 fichier(s) de test
+- 2026-11-10 11:06:20 UTC — [ticket-905] tests rouges au tour 1
+- 2026-11-10 11:06:20 UTC — [ticket-905] tour 2 — codeur démarré
+- 2026-11-10 11:07:02 UTC — [ticket-905] tour 2 — codeur terminé (42047ms)
+- 2026-11-10 11:13:03 UTC — [ticket-905] testeur: 1 failed, 1162 passed in 331.89s (0:05:31)
+- 2026-11-10 11:13:03 UTC — [ticket-905] tests rouges au tour 2
+- 2026-11-10 11:13:03 UTC — [ticket-905] tour 3 — codeur démarré
+- 2026-11-10 11:14:00 UTC — [ticket-905] tour 3 — codeur terminé (57312ms)
+- 2026-11-10 11:19:54 UTC — [ticket-905] testeur: dur�es : ruff 0 s, mypy 5 s, mypy-linux 5 s, tsc 32 s, eslint 56 s, vitest 251 s, pytest 350 s ; impact depuis base : 92 fichier(s) de test
+- 2026-11-10 11:20:17 UTC — [ticket-905] securite: PASS — Le chemin du fichier (`CHEMIN`), la branche (`BRANCHE`) et le dépôt sont constan (22656ms)
+- 2026-11-10 11:20:17 UTC — [ticket-905] tour 3 — reviewer démarré
+- 2026-11-10 11:20:53 UTC — [ticket-905] tour 3 — reviewer terminé (36139ms)
+- 2026-11-10 11:21:15 UTC — [ticket-905] validateur: fichiers cités joints : rituels.md ; absents : rituels-etat.json
+- 2026-11-10 11:21:15 UTC — [ticket-905] validateur: APPROVED — All six acceptance criteria are satisfied. The implementation correctly merges r (57764ms)
+- 2026-11-10 11:21:15 UTC — [ticket-905] APPROVED après 3 tour(s)
+- 2026-11-10 11:22:45 UTC — [ticket-905] leçons: refusée — preuve absente du retour du run
