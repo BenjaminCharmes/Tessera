@@ -86,6 +86,15 @@ describe("RituelsView", () => {
     expect(onOpenProject).toHaveBeenCalledWith(projet);
   });
 
+  it("says the state stays on this PC when the sync is local, and nothing for github", () => {
+    const { rerender } = render(
+      <RituelsView rituels={{ ...etat([]), synchro: "locale" }} projets={[]} />,
+    );
+    expect(screen.getByText(/sur ce PC seulement/)).toBeInTheDocument();
+    rerender(<RituelsView rituels={{ ...etat([]), synchro: "github" }} projets={[]} />);
+    expect(screen.queryByText(/sur ce PC seulement/)).toBeNull();
+  });
+
   it("shows an overdue ritual in red", () => {
     render(<RituelsView rituels={etat([rituel({ depasse: true })])} projets={[]} />);
     expect(screen.getByText(/Dépassé/).className).toMatch(/text-red-/);
@@ -109,7 +118,7 @@ describe("useRituels", () => {
 
   it("posts to /fait then reads the list again", async () => {
     const appels: string[] = [];
-    const liste = { rituels: [rituel({ id: "abc" })], erreur: null };
+    const liste = { rituels: [rituel({ id: "abc" })], erreur: null, synchro: "github" };
     vi.stubGlobal(
       "fetch",
       vi.fn(async (url: string, init?: RequestInit) => {

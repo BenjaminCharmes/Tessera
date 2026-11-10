@@ -12,11 +12,13 @@ export interface UseRituelsResult {
   enRetard: number;
   /** L'erreur du backend (lecture de `rituels.md`) ou de la requête. */
   erreur: string | null;
+  /** Où l'état est gardé ; absent tant que rien n'est lu. */
+  synchro?: ListeRituels["synchro"];
   fait: (id: string) => Promise<void>;
   reporter: (id: string) => Promise<void>;
 }
 
-const VIDE: ListeRituels = { rituels: [], erreur: null };
+const VIDE: ListeRituels = { rituels: [], erreur: null, synchro: "github" };
 
 const message = (e: unknown): string => (e instanceof Error ? e.message : String(e));
 
@@ -53,6 +55,7 @@ export function useRituels(): UseRituelsResult {
     rituels: liste.rituels,
     enRetard: liste.rituels.filter((r) => r.statut === "en_retard").length,
     erreur: liste.erreur ?? echec,
+    synchro: liste.synchro,
     fait: (id) => agir(marquerFait, id),
     reporter: (id) => agir(reporterRituel, id),
   };

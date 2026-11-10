@@ -35,7 +35,7 @@ const parDate = (cle: "prochaine" | "fait_le", sens: 1 | -1) => (a: Rituel, b: R
 
 /** La vue Rituels : ce qui est en retard, ce qui vient, ce qui est fait (ticket-903). */
 export default function RituelsView({ rituels, projets, onOpenProject }: RituelsViewProps) {
-  const { rituels: liste, erreur, fait, reporter } = rituels;
+  const { rituels: liste, erreur, synchro, fait, reporter } = rituels;
   const aFaire = liste.filter((r) => r.statut === "en_retard");
   const aVenir = liste.filter((r) => r.statut === "a_venir").sort(parDate("prochaine", 1));
   const faits = liste.filter((r) => r.statut === "fait").sort(parDate("fait_le", -1));
@@ -43,6 +43,11 @@ export default function RituelsView({ rituels, projets, onOpenProject }: Rituels
   return (
     <div className="h-full overflow-y-auto p-6">
       <h1 className="mb-4 text-lg font-medium text-zinc-100">Rituels</h1>
+      {synchro === "locale" ? (
+        <p className="-mt-3 mb-4 text-xs text-zinc-500">
+          État gardé sur ce PC seulement : la synchronisation GitHub n'est pas active.
+        </p>
+      ) : null}
       {erreur ? (
         <p role="alert" className="mb-4 rounded-md border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-200">
           {erreur}

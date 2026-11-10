@@ -27,6 +27,8 @@ export interface Rituel {
 export interface ListeRituels {
   rituels: Rituel[];
   erreur: string | null;
+  /** `locale` : l'état n'est gardé que sur ce PC, la synchro GitHub est inactive. */
+  synchro: "github" | "locale";
 }
 
 export function lireRituels(): Promise<ListeRituels> {
