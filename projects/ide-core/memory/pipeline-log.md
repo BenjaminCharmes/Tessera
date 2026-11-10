@@ -8763,3 +8763,23 @@ error: Please commit or stash them.
 - 2026-11-10 09:03:33 UTC — [ticket-900] APPROVED après 3 tour(s)
 - 2026-11-10 09:04:02 UTC — [ticket-900] leçons: une leçon proposée
 - 2026-11-10 09:08:35 UTC — [ticket-900] documentation: 1 fichier(s) (265906ms)
+- 2026-11-10 10:21:17 UTC — [ide-core] ticket-903 sauté : dépend de ticket-902, non mergé
+- 2026-11-10 10:21:17 UTC — [ide-core] ticket-904 sauté : dépend de ticket-903, sauté
+- 2026-11-10 10:21:17 UTC — [ide-core] ticket-905 sauté : dépend de ticket-902, non mergé
+- 2026-11-10 10:21:17 UTC — [ide-core] ticket-902 PR #1011 non surveillée (livraison arrêtée)
+- 2026-11-10 10:21:31 UTC — [ticket-906] branche ticket-906-the-worktree-setup-has-its-own-timeout-and-one-re
+- 2026-11-10 10:22:38 UTC — [ticket-906] plan rendu (61250ms)
+- 2026-11-10 10:22:38 UTC — [ticket-906] tour 1 — codeur démarré
+- 2026-11-10 10:23:54 UTC — [ticket-906] tour 1 — codeur terminé (75233ms)
+- 2026-11-10 10:26:33 UTC — [ticket-906] testeur: dur�es : ruff 0 s, pytest 156 s ; impact depuis base : 71 fichier(s) de test
+- 2026-11-10 10:26:33 UTC — [ticket-906] tests rouges au tour 1
+- 2026-11-10 10:26:33 UTC — [ticket-906] tour 2 — codeur démarré
+- 2026-11-10 10:27:23 UTC — [ticket-906] tour 2 — codeur terminé (49360ms)
+- 2026-11-10 10:30:05 UTC — [ticket-906] testeur: dur�es : ruff 0 s, mypy 15 s, mypy-linux 12 s, pytest 159 s ; impact depuis base : 71 fichier(s) de test
+- 2026-11-10 10:30:14 UTC — [ticket-906] securite: PASS — Verdict PASS : le diff ajoute un délai propre au setup, validé comme entier stri (9266ms)
+- 2026-11-10 10:30:15 UTC — [ticket-906] tour 2 — reviewer démarré
+- 2026-11-10 10:30:33 UTC — [ticket-906] tour 2 — reviewer terminé (18280ms)
+- 2026-11-10 10:30:56 UTC — [ticket-906] validateur: fichiers cités joints : worktree_politique.py
+- 2026-11-10 10:30:56 UTC — [ticket-906] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code lit et valide correctem (41781ms)
+- 2026-11-10 10:30:56 UTC — [ticket-906] APPROVED après 2 tour(s)
+- 2026-11-10 10:32:40 UTC — [ticket-906] leçons: une leçon proposée
