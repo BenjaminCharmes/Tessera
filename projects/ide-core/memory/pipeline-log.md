@@ -8728,3 +8728,16 @@ error: Please commit or stash them.
 - 2026-11-09 17:44:34 UTC — [ticket-896] testeur: dur�es : ruff 0 s, mypy 7 s, mypy-linux 13 s, pytest 608 s ; impact depuis base : suite compl�te
 - 2026-11-09 17:45:23 UTC — [ticket-896] securite: BLOCK — BLOCK : le dossier partagé C:\ProgramData\Tessera\bin hérite du droit de créatio (48937ms)
 - 2026-11-09 17:45:28 UTC — [ide-core] file interrompue : ticket-896 non approuvé
+- 2026-11-09 17:38:40 UTC — [ticket-895] livraison: arrêt — PR #1002 non mergée : CI failing : la PR #1002 reste ouverte.
+- 2026-11-10 08:18:51 UTC — [ticket-896] branche ticket-896-a-setup-script-recreates-the-agent-account-on-any
+- 2026-11-10 08:18:54 UTC — [ticket-896] branche reprise (4 commit(s)) — refus précédent : securite, codeur en premier
+- 2026-11-10 08:18:54 UTC — [ticket-896] tour 1 — codeur démarré
+- 2026-11-10 08:19:50 UTC — [ticket-896] tour 1 — codeur terminé (55516ms)
+- 2026-11-10 08:30:04 UTC — [ticket-896] testeur: dur�es : ruff 1 s, mypy 9 s, mypy-linux 15 s, pytest 612 s ; impact depuis base : suite compl�te
+- 2026-11-10 08:30:42 UTC — [ticket-896] securite: PASS — Le diff n'introduit aucune faille CRITICAL ou HIGH : mot de passe tiré d'un géné (37358ms)
+- 2026-11-10 08:30:42 UTC — [ticket-896] tour 1 — reviewer démarré
+- 2026-11-10 08:31:15 UTC — [ticket-896] tour 1 — reviewer terminé (33516ms)
+- 2026-11-10 08:31:20 UTC — [ticket-896] validateur: fichiers cités joints : scripts/agent-setup-admin.ps1, scripts/agent-setup.ps1, scripts/tessera.ps1 (tronqué) ; absents : scripts/agent-setup*.ps1 ; non joints (budget épuisé) : docs/
+- 2026-11-10 08:31:20 UTC — [ticket-896] validateur: APPROVED — Tous les critères sont satisfaits. Le diff introduit deux nouveaux scripts Power (38343ms)
+- 2026-11-10 08:31:20 UTC — [ticket-896] APPROVED après 1 tour(s)
+- 2026-11-10 08:32:14 UTC — [ticket-896] leçons: refusée — preuve absente du retour du run
