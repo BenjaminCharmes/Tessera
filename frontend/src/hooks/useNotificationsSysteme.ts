@@ -6,6 +6,9 @@ import {
   sendNotification,
 } from "@tauri-apps/plugin-notification";
 import type { EntreeHistorique } from "../lib/historiqueNotifications";
+import { notificationsRituels } from "../lib/notifRituels";
+import type { Rituel } from "../lib/apiRituels";
+import type { SidebarPanel } from "../components/Sidebar/panels";
 import {
   masqueeParToast,
   notificationsPour,
@@ -85,7 +88,7 @@ export function etatDesNotifications(active: boolean): EtatDesNotifications {
   return "actives";
 }
 
-async function envoyer(n: Notif, ouvrir: (projectId: string) => void): Promise<void> {
+async function envoyer(n: Notif, ouvrir: (n: Notif) => void): Promise<void> {
   if (dansTauri()) {
     if (!(await isPermissionGranted())) return;
     sendNotification({ title: n.titre, body: n.corps });
@@ -95,7 +98,7 @@ async function envoyer(n: Notif, ouvrir: (projectId: string) => void): Promise<v
   const notif = new Notification(n.titre, { body: n.corps, tag: n.titre });
   notif.onclick = () => {
     window.focus();
-    ouvrir(n.projectId);
+    ouvrir(n);
     notif.close();
   };
 }
@@ -108,12 +111,16 @@ export interface DonneesDeLaCloche {
   reglages: ReglagesParType;
   setReglage: (type: TypeNotif, champ: keyof ReglageDuType, valeur: boolean) => void;
   ouvrir: (projectId: string) => void;
+  /** Ouvre un panneau du rail : la cible d'une entrée de type `rituel`. */
+  ouvrirPanneau?: (panneau: SidebarPanel) => void;
 }
 
 export function useNotificationsSysteme(
   supervision: Pick<UseSupervisionResult, "runs" | "etatDe">,
   projetActif: string | null,
   ouvrir: (projectId: string) => void,
+  rituels: Rituel[] = [],
+  ouvrirPanneau?: (panneau: SidebarPanel) => void,
 ): {
   active: boolean;
   setActive: (v: boolean) => void;
@@ -146,6 +153,24 @@ export function useNotificationsSysteme(
   // La santé dépend du temps : sans tick, un agent muet ne changerait jamais d'état.
   const maintenant = useMaintenant();
   const quota = useQuotaLu(maintenant);
+  const rituelsAvant = useRef<Rituel[]>([]);
+
+  // Une notification de rituel ouvre la vue Rituels, les autres leur projet.
+  const ouvrirNotif = useCallback(
+    (n: Notif) => (n.type === "rituel" ? ouvrirPanneau?.("rituels") : ouvrir(n.projectId)),
+    [ouvrir, ouvrirPanneau],
+  );
+
+  useEffect(() => {
+    const avant = rituelsAvant.current;
+    rituelsAvant.current = rituels;
+    const notifs = notificationsRituels(avant, rituels);
+    if (notifs.length === 0) return;
+    enregistrer(notifs);
+    if (!active || !supportees() || !reglages.rituel.systeme) return;
+    for (const n of notifs) void envoyer(n, ouvrirNotif).catch(() => undefined);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- seule une nouvelle lecture des rituels notifie
+  }, [rituels]);
 
   useEffect(() => {
     const etats: Record<string, ReturnType<typeof etatDe>> = {};
@@ -176,14 +201,14 @@ export function useNotificationsSysteme(
     for (const n of notifs) {
       if (!reglages[n.type].systeme || masqueeParToast(n, vue)) continue;
       // Une notification qui ne part pas ne casse rien.
-      void envoyer(n, ouvrir).catch(() => undefined);
+      void envoyer(n, ouvrirNotif).catch(() => undefined);
     }
-  }, [runs, etatDe, maintenant, quota, active, projetActif, ouvrir, reglages, enregistrer]);
+  }, [runs, etatDe, maintenant, quota, active, projetActif, ouvrirNotif, reglages, enregistrer]);
 
   return {
     active,
     setActive,
     etat: etatDesNotifications(active),
-    cloche: { historique, nonLus, toutMarquerLu, reglages, setReglage, ouvrir },
+    cloche: { historique, nonLus, toutMarquerLu, reglages, setReglage, ouvrir, ouvrirPanneau },
   };
 }

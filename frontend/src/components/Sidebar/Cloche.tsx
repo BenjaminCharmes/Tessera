@@ -92,8 +92,9 @@ export default function Cloche({ cloche, notifications }: ClocheProps) {
               historique={cloche.historique}
               nonLus={nonLus}
               onTout={cloche.toutMarquerLu}
-              onOuvrir={(id) => {
-                cloche.ouvrir(id);
+              onOuvrir={(entree) => {
+                if (entree.type === "rituel") cloche.ouvrirPanneau?.("rituels");
+                else cloche.ouvrir(entree.projectId);
                 fermer();
               }}
             />
