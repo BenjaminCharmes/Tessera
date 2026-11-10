@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, render, screen } from "@testing-library/react";
 import BureauView from "./index";
 import type { ProjetDuBureau } from "./index";
@@ -32,16 +32,29 @@ function DixPieces() {
   );
 }
 
+/** Les doubles d'API : rien de réseau dans ces tests. */
+function poserLesDoublesDApi(): void {
+  vi.spyOn(api.services, "list").mockResolvedValue([]);
+  vi.spyOn(api.github, "getPrStatuses").mockResolvedValue([]);
+  vi.spyOn(api.runs, "list").mockResolvedValue([]);
+  // Le tableau du jour lit la dépense et le quota.
+  vi.spyOn(api.usage, "stats").mockResolvedValue({
+    daily: [],
+  } as unknown as UsageStats);
+  vi.spyOn(apiQuota, "fenetres").mockResolvedValue({ windows: {} });
+}
+
 describe("BureauView", () => {
+  // Le rendu à froid (jsdom, React, tous les sprites) se paie ici, une fois, hors de tout test.
+  beforeAll(() => {
+    poserLesDoublesDApi();
+    const { unmount } = render(<DixPieces />);
+    unmount();
+    vi.restoreAllMocks();
+  }, 60_000);
+
   beforeEach(() => {
-    vi.spyOn(api.services, "list").mockResolvedValue([]);
-    vi.spyOn(api.github, "getPrStatuses").mockResolvedValue([]);
-    vi.spyOn(api.runs, "list").mockResolvedValue([]);
-    // Le tableau du jour lit la dépense et le quota : rien de réseau dans ces tests.
-    vi.spyOn(api.usage, "stats").mockResolvedValue({
-      daily: [],
-    } as unknown as UsageStats);
-    vi.spyOn(apiQuota, "fenetres").mockResolvedValue({ windows: {} });
+    poserLesDoublesDApi();
     vi.useFakeTimers();
     vi.setSystemTime(T0 + 5_000);
   });
