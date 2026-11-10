@@ -1,14 +1,15 @@
 ---
-id: ticket-905
-title: "Ritual done state follows the user from PC to PC through GitHub"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
-depends_on: [ticket-902]
-estimated_days: 1
 created: 2026-11-10
+depends_on:
+- ticket-902
+estimated_days: 1
+id: ticket-905
+pr_number: 1016
+priority: medium
+status: done
+title: Ritual done state follows the user from PC to PC through GitHub
+type: feat
 ---
 
 # ticket-905 — L'état « fait » d'un rituel suit Benjamin d'un PC à l'autre, par GitHub
