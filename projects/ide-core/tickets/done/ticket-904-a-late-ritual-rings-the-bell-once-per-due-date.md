@@ -1,14 +1,15 @@
 ---
-id: ticket-904
-title: "A late ritual rings the bell once per due date"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
-depends_on: [ticket-903]
-estimated_days: 0.5
 created: 2026-11-10
+depends_on:
+- ticket-903
+estimated_days: 0.5
+id: ticket-904
+pr_number: 1019
+priority: medium
+status: done
+title: A late ritual rings the bell once per due date
+type: feat
 ---
 
 # ticket-904 — Un rituel en retard sonne la cloche une fois par échéance

@@ -27,6 +27,7 @@ export const TYPES_NOTIF = [
   "ci_rouge",
   "quota_bas",
   "anomalie",
+  "rituel",
 ] as const;
 
 /** Le genre d'événement : c'est lui que les réglages de la cloche choisissent (ticket-554). */

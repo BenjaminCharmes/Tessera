@@ -41,6 +41,30 @@ function Branchee({ ouvrir }: { ouvrir: (id: string) => void }) {
 describe("Cloche", () => {
   beforeEach(() => window.localStorage.clear());
 
+  it("opens the rituels panel when a ritual entry is clicked", async () => {
+    const maintenant = new Date();
+    ecrireHistorique(
+      ajouter(
+        historiqueVide(maintenant),
+        [{ projectId: "", type: "rituel", titre: "Point revenus", corps: "En retard depuis 18:30." }],
+        maintenant,
+      ),
+    );
+    const ouvrir = vi.fn();
+    const ouvrirPanneau = vi.fn();
+    function AvecRituel() {
+      const h = useHistoriqueNotifications();
+      return (
+        <Cloche cloche={donnees({ historique: h.historique, nonLus: h.nonLus, ouvrir, ouvrirPanneau })} />
+      );
+    }
+    render(<AvecRituel />);
+    await userEvent.click(screen.getByRole("button", { name: /Notifications/ }));
+    await userEvent.click(screen.getByRole("button", { name: /Point revenus/ }));
+    expect(ouvrirPanneau).toHaveBeenCalledWith("rituels");
+    expect(ouvrir).not.toHaveBeenCalled();
+  });
+
   function semer(): void {
     const maintenant = new Date();
     const h = ajouter(
@@ -124,7 +148,7 @@ describe("Cloche", () => {
     await userEvent.click(screen.getByRole("button", { name: "Notifications" }));
     await userEvent.click(screen.getByRole("tab", { name: "Réglages" }));
 
-    expect(screen.getAllByRole("checkbox")).toHaveLength(16);
+    expect(screen.getAllByRole("checkbox")).toHaveLength(18);
     const systeme = screen.getByLabelText("Question d'un agent : système");
     const son = screen.getByLabelText("Question d'un agent : son");
     expect(systeme).toBeChecked();

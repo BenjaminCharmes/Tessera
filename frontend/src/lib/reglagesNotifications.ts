@@ -22,7 +22,7 @@ export type ReglagesParType = Record<TypeNotif, ReglageDuType>;
  */
 export type ReglagesMemorises = Partial<ReglagesParType>;
 
-const TYPES_AJOUTES_APRES: readonly TypeNotif[] = ["anomalie"];
+const TYPES_AJOUTES_APRES: readonly TypeNotif[] = ["anomalie", "rituel"];
 
 export const CLE_REGLAGES_PAR_TYPE = "notifications.types";
 
@@ -35,6 +35,7 @@ export const LIBELLES_TYPE: Record<TypeNotif, string> = {
   ci_rouge: "CI rouge ou merge refusé",
   quota_bas: "Quota bas",
   anomalie: "Anomalie d'un run",
+  rituel: "Rituel en retard",
 };
 
 const AVEC_SON: readonly TypeNotif[] = ["question", "ci_rouge"];

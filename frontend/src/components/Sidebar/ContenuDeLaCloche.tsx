@@ -12,7 +12,7 @@ interface AujourdhuiProps {
   historique: EntreeHistorique[];
   nonLus: number;
   onTout: () => void;
-  onOuvrir: (projectId: string) => void;
+  onOuvrir: (entree: EntreeHistorique) => void;
 }
 
 export function PanneauAujourdhui({ historique, nonLus, onTout, onOuvrir }: AujourdhuiProps) {
@@ -36,7 +36,7 @@ export function PanneauAujourdhui({ historique, nonLus, onTout, onOuvrir }: Aujo
           <li key={e.id}>
             <button
               type="button"
-              onClick={() => onOuvrir(e.projectId)}
+              onClick={() => onOuvrir(e)}
               className="flex w-full flex-col gap-0.5 px-3 py-2 text-left hover:bg-zinc-800/60"
             >
               <span className="flex justify-between gap-2 text-micro">
