@@ -219,6 +219,8 @@ def test_only_the_run_wiring_imports_run_worktree() -> None:
         "services/pipeline/pipeline_branche.py",
         "services/pipeline/preparation_run.py",
         "services/pipeline/run_dans_worktree.py",
+        # Les droits du compte agent sur un worktree (ticket-895) ne lisent que son type.
+        "services/providers/droits_worktree.py",
         # Le chantier d'une intervention du superviseur (ticket-854) ouvre son worktree, hors run de ticket.
         "services/supervision/intervention_chantier.py",
     ]
