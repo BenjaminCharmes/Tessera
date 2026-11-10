@@ -54,3 +54,8 @@ comme référence.
 - **Notifications** (ticket-554) : `Notifications.dc.html` — la cloche du
   rail, historique du jour et réglages par événement (système, son) —
   https://claude.ai/artifact/WMqxQRWx8ndc7Jm2RWMPaE
+- **Rituels** (tickets 902, 903) : `Rituels.dc.html` — vue des actions
+  récurrentes : à faire (en retard, avec Fait, Reporter à demain, la phrase à
+  dire à Claude et l'app à ouvrir), à venir, faits récemment ;
+  `Rituels-Alerte.dc.html` — la pastille ambre de l'onglet, qui reste jusqu'au
+  « Fait », et l'entrée « rituel » de la cloche. Pas de bandeau.
