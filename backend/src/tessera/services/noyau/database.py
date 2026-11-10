@@ -142,6 +142,12 @@ UPDATE pipeline_runs SET depot_repris_at = COALESCE(finished_at, started_at)
     project_id TEXT PRIMARY KEY,
     demande_le TEXT NOT NULL
 );""",
+    # 14 — ticket-902 : l'état « fait » ou « reporté » des rituels, propre à ce PC.
+    """CREATE TABLE IF NOT EXISTS rituels_etat (
+    id             TEXT PRIMARY KEY,
+    fait_le        TEXT,
+    reporte_jusqua TEXT
+);""",
 ]
 
 

@@ -35,6 +35,7 @@ from tessera.routers import (
 from tessera.routers import captures as captures_router
 from tessera.routers import provisioning as provisioning_router
 from tessera.routers import reglages as reglages_router
+from tessera.routers import rituels as rituels_router
 from tessera.routers import services as services_router
 from tessera.routers.services_reprise import reprendre_les_services
 from tessera.routers.services_running import get_sonde
@@ -201,6 +202,7 @@ app.include_router(fs.router, prefix="/api/v1")
 app.include_router(usage.router, prefix="/api/v1")
 app.include_router(runs.router, prefix="/api/v1")
 app.include_router(reglages_router.router, prefix="/api/v1")
+app.include_router(rituels_router.router, prefix="/api/v1")
 app.include_router(signalements.router, prefix="/api/v1")
 app.include_router(salle_tessera.router, prefix="/api/v1")
 app.include_router(supervision_recap.router, prefix="/api/v1")
