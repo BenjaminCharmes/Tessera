@@ -10,6 +10,7 @@ import {
   IconActivity,
   IconChart,
   IconChat,
+  IconClock,
   IconFolder,
   IconHistory,
   IconLayers,
@@ -42,6 +43,8 @@ interface NavRailProps {
   runsActifs?: number;
   /** Combien d'apps de projet tournent sur la machine (ticket-417). */
   appsEnCours?: number;
+  /** Combien de rituels sont en retard : pastille ambre, absente à zéro (ticket-903). */
+  rituelsEnRetard?: number;
   /** Ce qui mérite d'être vu avant le reste, quand c'est le cas. */
   alerte?: AlerteDeSupervision;
   /** Le réglage global des notifications système, en tête des réglages de la cloche (ticket-779). */
@@ -80,6 +83,7 @@ const GROUPES: Groupe[] = [
         label: "Supervision",
         icon: <IconRadar size={20} />,
       },
+      { panel: "rituels", label: "Rituels", icon: <IconClock size={20} /> },
     ],
   },
   {
@@ -109,6 +113,7 @@ export default function NavRail({
   onChangePanel,
   runsActifs = 0,
   appsEnCours = 0,
+  rituelsEnRetard = 0,
   alerte = null,
   notifications,
   cloche,
@@ -170,6 +175,14 @@ export default function NavRail({
                       ) : null}
                       {panel === "supervision" ? (
                         <Pastille nombre={runsActifs} alerte={alerte} />
+                      ) : null}
+                      {panel === "rituels" ? (
+                        <Pastille
+                          nombre={rituelsEnRetard}
+                          alerte="attente"
+                          unite="rituel"
+                          titre={`${rituelsEnRetard} en retard`}
+                        />
                       ) : null}
                       {panel === "running" ? (
                         <Pastille nombre={appsEnCours} unite="app" />

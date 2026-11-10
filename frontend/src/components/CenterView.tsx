@@ -16,6 +16,8 @@ import type { VueCentre } from "../vueDuCentre";
 import AgentDetail from "./AgentDetail";
 import SupervisionView from "./SupervisionView";
 import type { ReglageSon } from "./BureauView/ColonneAToi";
+import RituelsView from "./RituelsView";
+import type { UseRituelsResult } from "../hooks/useRituels";
 import RunView from "./RunView";
 import KanbanView from "./KanbanView";
 import ProjetsView from "./ProjetsView";
@@ -48,6 +50,8 @@ interface CenterViewProps {
   ticket: Ticket | null;
   conversationId: string;
   supervision: ReturnType<typeof useSupervision>;
+  /** Les rituels, lus au niveau du cockpit pour que la pastille du rail les voie aussi (ticket-903). */
+  rituels?: UseRituelsResult;
   /** Le réglage « Son » de la question, pour le Bureau de Supervision (ticket-567). */
   son?: ReglageSon;
   servicesDuProjet: ServiceActif[];
@@ -127,6 +131,7 @@ export default function CenterView({
   ticket,
   conversationId,
   supervision,
+  rituels,
   son,
   servicesDuProjet,
   appsEnCours,
@@ -180,6 +185,10 @@ export default function CenterView({
         onOpenProject={onOpenProject}
       />
     );
+  } else if (panel === "rituels") {
+    content = rituels ? (
+      <RituelsView rituels={rituels} projets={projets} onOpenProject={onOpenProject} />
+    ) : null;
   } else if (panel === "running") {
     content = <EnCoursView appsEnCours={appsEnCours} runs={supervision.runs} />;
   } else if (panel === "projects") {

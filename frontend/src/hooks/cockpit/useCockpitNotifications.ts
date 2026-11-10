@@ -1,3 +1,4 @@
+import { useRituels } from "../useRituels";
 import { useNotificationsSysteme } from "../useNotificationsSysteme";
 import type { CockpitActions } from "./useCockpitActions";
 import type { CockpitNoyau } from "./useCockpitNoyau";
@@ -14,6 +15,8 @@ export function useCockpitNotifications(n: CockpitNoyau, a: CockpitActions) {
     a.ouvrirProjet,
   );
 
+  const rituels = useRituels();
+
   // Ce que la pastille doit dire avant tout le reste : un agent qui attend
   // bloque un humain, un run bloqué demande une décision. L'activité est le
   // cas nominal, donc le dernier à mériter la couleur.
@@ -25,9 +28,11 @@ export function useCockpitNotifications(n: CockpitNoyau, a: CockpitActions) {
       : null;
 
   return {
+    rituels,
     navRail: {
       runsActifs: supervision.runs.length,
       appsEnCours: appsEnCours.apps?.length ?? 0,
+      rituelsEnRetard: rituels.enRetard,
       alerte: alerteDeSupervision,
       notifications: { active: notifications.active, etat: notifications.etat, onChange: notifications.setActive },
       cloche: notifications.cloche,
