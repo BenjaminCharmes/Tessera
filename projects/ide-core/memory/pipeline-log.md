@@ -8890,3 +8890,16 @@ error: Please commit or stash them.
 - 2026-11-10 12:33:08 UTC — [ticket-904] tour 1 — reviewer terminé (26764ms)
 - 2026-11-10 12:33:08 UTC — [ticket-904] APPROVED après 1 tour(s)
 - 2026-11-10 12:36:45 UTC — [ticket-904] documentation: 0 fichier(s) (211250ms) — après tour de correction
+- 2026-11-10 12:30:30 UTC — [ide-core] ticket-907 PR #1017 mergée (CI verte)
+- 2026-11-10 12:40:21 UTC — [ide-core] ticket-904 PR #1019 confiée au CIWatcher
+- 2026-11-10 12:49:55 UTC — [ide-core] ticket-904 PR #1019 mergée (CI verte)
+- 2026-11-10 13:19:39 UTC — [ticket-908] branche ticket-908-ritual-sync-finds-its-repository-without-a-settin
+- 2026-11-10 13:19:41 UTC — [ticket-908] tour 1 — codeur démarré
+- 2026-11-10 13:21:41 UTC — [ticket-908] tour 1 — codeur terminé (120125ms)
+- 2026-11-10 13:24:55 UTC — [ticket-908] testeur: dur�es : ruff 0 s, mypy 8 s, mypy-linux 10 s, tsc 20 s, eslint 32 s, pytest 63 s, vitest 139 s ; impact depuis base : 7 fichier(s) de test
+- 2026-11-10 13:25:05 UTC — [ticket-908] securite: PASS — Le diff lit l'origin avec `subprocess.run` : liste d'arguments fixe, sans shell, (9639ms)
+- 2026-11-10 13:25:09 UTC — [ticket-908] tour 1 — reviewer démarré
+- 2026-11-10 13:25:34 UTC — [ticket-908] validateur: fichiers cités joints : frontend/src/lib/apiRituels.ts, rituels.md, backend/src/tessera/config.py ; absents : BenjaminCharmes/Tessera, https://github.com/BenjaminCharmes/Tessera.git, git@github.com:BenjaminCharmes/Tessera.git, https://gitlab.com/o/r.git
+- 2026-11-10 13:25:34 UTC — [ticket-908] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le diff implémente correctement (28546ms)
+- 2026-11-10 13:25:34 UTC — [ticket-908] tour 1 — reviewer terminé (24328ms)
+- 2026-11-10 13:25:34 UTC — [ticket-908] APPROVED après 1 tour(s)
