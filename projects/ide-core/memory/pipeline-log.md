@@ -8763,3 +8763,19 @@ error: Please commit or stash them.
 - 2026-11-10 09:03:33 UTC — [ticket-900] APPROVED après 3 tour(s)
 - 2026-11-10 09:04:02 UTC — [ticket-900] leçons: une leçon proposée
 - 2026-11-10 09:08:35 UTC — [ticket-900] documentation: 1 fichier(s) (265906ms)
+- 2026-11-10 08:56:13 UTC — [ide-core] ticket-896 PR #1004 mergée (CI verte)
+- 2026-11-10 09:10:14 UTC — [ide-core] ticket-900 PR #1007 confiée au CIWatcher
+- 2026-11-10 09:14:12 UTC — [ticket-902] branche ticket-902-recurring-rituals-are-read-from-a-versioned-file
+- 2026-11-10 09:14:14 UTC — [ticket-902] tour 1 — codeur démarré
+- 2026-11-10 09:16:59 UTC — [ticket-902] tour 1 — codeur terminé (165234ms)
+- 2026-11-10 09:21:46 UTC — [ticket-902] testeur: 1 failed, 736 passed in 260.51s (0:04:20)
+- 2026-11-10 09:21:46 UTC — [ticket-902] tests rouges au tour 1
+- 2026-11-10 09:21:46 UTC — [ticket-902] tour 2 — codeur démarré
+- 2026-11-10 09:22:56 UTC — [ticket-902] tour 2 — codeur terminé (70125ms)
+- 2026-11-10 09:28:22 UTC — [ticket-902] testeur: dur�es : ruff 0 s, tsc 33 s, eslint 53 s, vitest 197 s, pytest 321 s ; impact depuis base : 126 fichier(s) de test
+- 2026-11-10 09:28:22 UTC — [ticket-902] tests rouges au tour 2
+- 2026-11-10 09:28:22 UTC — [ticket-902] tour 3 — codeur démarré
+- 2026-11-10 09:28:43 UTC — [ticket-902] tour 3 — codeur terminé (20235ms)
+- 2026-11-10 09:36:20 UTC — [ticket-902] testeur: dur�es : ruff 0 s, mypy 16 s, tsc 34 s, mypy-linux 18 s, eslint 70 s, vitest 299 s, pytest 451 s ; impact depuis base : 126 fichier(s) de test
+- 2026-11-10 09:36:20 UTC — [ticket-902] tests rouges au tour 3
+- 2026-11-10 09:36:20 UTC — [ticket-902] BLOCKED après 3 tour(s) sans approbation
