@@ -8877,3 +8877,15 @@ error: Please commit or stash them.
 - 2026-11-10 12:11:17 UTC — [ticket-907] APPROVED après 2 tour(s)
 - 2026-11-10 12:12:58 UTC — [ticket-907] leçons: une leçon proposée
 - 2026-11-10 12:14:53 UTC — [ticket-907] documentation: 0 fichier(s) (109547ms)
+- 2026-11-10 11:44:20 UTC — [ide-core] ticket-905 PR #1016 mergée (CI verte)
+- 2026-11-10 12:24:10 UTC — [ide-core] ticket-907 PR #1017 confiée au CIWatcher
+- 2026-11-10 12:25:41 UTC — [ticket-904] branche ticket-904-a-late-ritual-rings-the-bell-once-per-due-date
+- 2026-11-10 12:25:42 UTC — [ticket-904] tour 1 — codeur démarré
+- 2026-11-10 12:28:37 UTC — [ticket-904] tour 1 — codeur terminé (175250ms)
+- 2026-11-10 12:32:32 UTC — [ticket-904] testeur: dur�es : tsc 19 s, eslint 40 s, vitest 172 s
+- 2026-11-10 12:32:42 UTC — [ticket-904] securite: PASS — Je n'ai trouvé aucune vulnérabilité dans ce diff, d'où le PASS. Le diff ne touch (9764ms)
+- 2026-11-10 12:32:42 UTC — [ticket-904] tour 1 — reviewer démarré
+- 2026-11-10 12:33:03 UTC — [ticket-904] validateur: fichiers cités joints : frontend/src/lib/notifications.ts, frontend/src/lib/reglagesNotifications.ts
+- 2026-11-10 12:33:03 UTC — [ticket-904] validateur: APPROVED — Le ticket-904 est complètement satisfait. Un type `rituel` est ajouté à la cloch (21266ms)
+- 2026-11-10 12:33:08 UTC — [ticket-904] tour 1 — reviewer terminé (26764ms)
+- 2026-11-10 12:33:08 UTC — [ticket-904] APPROVED après 1 tour(s)
