@@ -5,7 +5,7 @@ depends_on:
 - ticket-903
 estimated_days: 0.5
 id: ticket-904
-pr_number: null
+pr_number: 1019
 priority: medium
 status: done
 title: A late ritual rings the bell once per due date
