@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 1
 id: ticket-906
 plan: true
-pr_number: null
+pr_number: 1012
 priority: medium
 status: done
 title: The worktree setup has its own timeout, and one retry when it times out
