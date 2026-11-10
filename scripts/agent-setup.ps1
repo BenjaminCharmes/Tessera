@@ -48,7 +48,11 @@ function Copy-AgentCli {
     Copy-Item $source "$Partage\bin\claude.exe" -Force
     Write-Host "-> CLI copie dans $Partage\bin"
     foreach ($d in @("$Moi\scoop\apps", "$Moi\AppData\Roaming\uv\python", "$Moi\.local\bin")) {
-        if (Test-Path $d) { icacls $d /grant "${Compte}:(OI)(CI)RX" /Q | Out-Null; Write-Host "-> lecture seule : $d" }
+        if (Test-Path $d) {
+            icacls $d /grant "${Compte}:(OI)(CI)RX" /Q | Out-Null
+            if ($LASTEXITCODE -ne 0) { throw "icacls a echoue ($LASTEXITCODE) sur $d" }
+            Write-Host "-> lecture seule : $d"
+        }
     }
 }
 

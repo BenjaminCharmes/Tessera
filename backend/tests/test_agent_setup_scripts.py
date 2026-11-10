@@ -59,3 +59,23 @@ def test_install_page_covers_the_non_administrator_case() -> None:
     page = (_RACINE / "docs" / "agent-isolation.md").read_text(encoding="utf-8")
     assert "pas** administrateur" in page
     assert "agent-setup-admin.ps1" in page
+
+
+def test_admin_script_cuts_programdata_inheritance_on_the_shared_folder() -> None:
+    # Hérité de C:\ProgramData, BUILTIN\Users peut créer des fichiers : l'agent
+    # déposerait une DLL à côté de claude.exe.
+    texte = _ADMIN.read_text(encoding="ascii")
+    assert "Invoke-Icacls $Partage /inheritance:r" in texte
+    assert r'"$Partage\bin" /reset /T' in texte
+
+
+def test_admin_script_locks_the_password_file_before_writing_it() -> None:
+    texte = _ADMIN.read_text(encoding="ascii")
+    verrou = texte.index("Invoke-Icacls $Remise /inheritance:r")
+    assert verrou < texte.index("Set-Content -LiteralPath $Remise")
+
+
+def test_admin_script_stops_on_a_failed_icacls() -> None:
+    texte = _ADMIN.read_text(encoding="ascii")
+    assert "$LASTEXITCODE -ne 0" in texte
+    assert "icacls $" not in texte  # tout passe par Invoke-Icacls

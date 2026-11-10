@@ -41,17 +41,35 @@ New-Item -Path $cle -Force | Out-Null
 New-ItemProperty -Path $cle -Name $Compte -Value 0 -PropertyType DWord -Force | Out-Null
 Write-Host '-> compte masque de l ecran de connexion'
 
-# 4. Dossier partage : l'utilisateur y copie le CLI, l'agent le lit et l'execute.
-New-Item -ItemType Directory -Force -Path "$Partage\bin" | Out-Null
-icacls $Partage /grant "${Proprietaire}:(OI)(CI)M" /Q | Out-Null
-icacls $Partage /grant "${Compte}:(OI)(CI)RX" /Q | Out-Null
-Write-Host "-> $Partage pret ($Proprietaire : modifier, $Compte : lecture)"
+# Un icacls qui echoue arrete le script : un droit mal pose ne se decouvre pas
+# apres coup.
+function Invoke-Icacls {
+    & icacls @args /Q | Out-Null
+    if ($LASTEXITCODE -ne 0) { throw "icacls a echoue ($LASTEXITCODE) : $($args -join ' ')" }
+}
 
-# 5. Remise du mot de passe : fichier sans heritage, lisible et supprimable par
-#    l'utilisateur seul (plus SYSTEM et les administrateurs).
+# 4. Dossier partage : l'utilisateur y copie le CLI, l'agent le lit et l'execute.
+#    Heritage coupe : C:\ProgramData donne a BUILTIN\Users le droit de creer des
+#    fichiers, et tessera-agent en fait partie. Herite, ce droit lui laisserait
+#    deposer une DLL a cote de claude.exe, chargee ensuite sous le compte de
+#    l'utilisateur (`agent doctor`). Restent SYSTEM, les administrateurs, le
+#    proprietaire (modifier) et l'agent (lecture).
+New-Item -ItemType Directory -Force -Path "$Partage\bin" | Out-Null
+Invoke-Icacls $Partage /grant:r "*S-1-5-18:(OI)(CI)F" "*S-1-5-32-544:(OI)(CI)F" `
+    "${Proprietaire}:(OI)(CI)M" "${Compte}:(OI)(CI)RX"
+Invoke-Icacls $Partage /inheritance:r
+Invoke-Icacls "$Partage\bin" /reset /T
+Write-Host "-> $Partage pret ($Proprietaire : modifier, $Compte : lecture, heritage coupe)"
+
+# 5. Remise du mot de passe : le fichier est cree vide et verrouille AVANT d'y
+#    ecrire, pour n'etre jamais lisible par un autre compte, meme un instant.
+#    Ensuite lisible et supprimable par l'utilisateur seul (plus SYSTEM et les
+#    administrateurs).
+New-Item -ItemType File -Force -Path $Remise | Out-Null
+Invoke-Icacls $Remise /inheritance:r
+Invoke-Icacls $Remise /grant:r "*S-1-5-18:(F)" "*S-1-5-32-544:(F)"
 Set-Content -LiteralPath $Remise -Value $mdp -NoNewline -Encoding ASCII
 $mdp = $null
-icacls $Remise /inheritance:r /Q | Out-Null
-icacls $Remise /grant:r "${Proprietaire}:(R,D)" "*S-1-5-18:(F)" "*S-1-5-32-544:(F)" /Q | Out-Null
+Invoke-Icacls $Remise /grant:r "${Proprietaire}:(R,D)"
 Write-Host "-> mot de passe remis a $Proprietaire (fichier lu puis efface par agent-setup.ps1)"
 Write-Host '-> Partie admin terminee. Ferme cette fenetre et lance agent-setup.ps1 depuis ta fenetre normale.'
