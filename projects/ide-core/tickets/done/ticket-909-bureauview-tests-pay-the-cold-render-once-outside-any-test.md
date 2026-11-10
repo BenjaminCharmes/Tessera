@@ -4,7 +4,7 @@ created: 2026-11-10
 depends_on: []
 estimated_days: 0.25
 id: ticket-909
-pr_number: null
+pr_number: 1022
 priority: low
 status: done
 title: BureauView tests pay the cold render once, outside any test
