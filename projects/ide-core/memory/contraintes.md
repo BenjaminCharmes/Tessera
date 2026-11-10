@@ -11,10 +11,7 @@ Cette section n'est injectée dans aucun appel d'agent. Une règle nouvelle
 s'écrit ici, avec son ADR ; un humain l'accepte en la déplaçant dans sa
 section. (ADR-055)
 
-- **L'API n'a pas de mode ouvert : toute requête HTTP ou WebSocket, sauf `/health` et le préflight, exige le jeton de session** — `STATIC_TOKEN`, sinon celui que le backend tire à chaque démarrage. Ce jeton n'entre ni dans l'environnement d'un agent, ni dans une ligne de commande, ni dans la base ; un test parcourt `app.routes`. (ADR-081, ADR-031)
-- **Avec `AGENT_USER`, le CLI d'un agent part sous ce compte, dans un environnement bâti de zéro** ; mot de passe ou jeton absent, logon refusé → `ProviderIndisponible`, jamais de repli sous le compte du backend. (ADR-083, ADR-037)
-- **Seule l'intention de lancer les services d'un projet survit au backend** : `start` l'inscrit, `stop` ou un échec de reprise la retire, et le démarrage relance les projets inscrits, un `try` chacun. Les processus restent des enfants du backend. (ADR-082, ADR-042)
-
+- **Sous `AGENT_USER`, le CLI d'un agent part sous ce compte, environnement bâti de zéro** ; tout échec → `ProviderIndisponible`, jamais de repli sous le compte du backend. (ADR-083, ADR-037) — *à accepter quand `AGENT_USER` sera renseigné sur un projet : d'ici là, aucun agent ne la rencontre.*
 
 ## Git et périmètre d'écriture
 
@@ -31,8 +28,8 @@ section. (ADR-055)
   redirections Bash simples. Lire hors du projet reste permis, sauf le `.env`
   de Tessera. (ADR-031, ADR-053)
 - **Le service de documentation n'écrit dans `agents.json` que la clé
-  `description`**, proposée par doc-technique et contrôlée (preuve, 220
-  caractères, une ligne). (ADR-068, ADR-027, ADR-057)
+  `description`**, proposée par doc-technique et contrôlée. (ADR-068,
+  ADR-027, ADR-057)
 - **Ne jamais émettre une commande git ou `gh` en écriture.** Le hook
   `PreToolUse` n'admet que des lectures nommées (liste blanche). `agents.json`, `.git/`,
   `.claude/settings*.json` et `.github/workflows/` se refusent en écriture.
@@ -67,7 +64,7 @@ section. (ADR-055)
   commits de rangement (`tickets/**`, `memory/pipeline-log.md`) peuvent suivre
   `approved_sha`, sinon `blocked` sans push. `CIWatcher` ne merge qu'une PR dont
   la tête relue est encore `pushed_sha`, merge lié à ce SHA ; sinon `blocked`,
-  PR ouverte. (ticket-492, ADR-039)
+  PR ouverte. (ADR-039)
 - **Un run non approuvé ne se livre jamais.** Les exceptions de livraison
   restent dans `Livraison.arret` et ne font pas échouer le run. (ADR-030)
 - **Sur un conflit de rebase, `resolveur-conflit` tente.** Une résolution
@@ -127,7 +124,8 @@ section. (ADR-055)
   ceux d'un projet créé par l'IDE sont versionnés** ; un autre mode se déclare.
   (ADR-023)
 - **Les services d'un projet se déclarent dans `agents.json`
-  (`services: [{nom, commande}]`)** ; sans déclaration, pas de bouton. (ADR-042)
+  (`services: [{nom, commande}]`)** ; sans déclaration, pas de bouton. Leur
+  lancement survit au redémarrage. (ADR-042, ADR-082)
 - **Un run ne lance ni serveur ni capture sans `pipeline.controle_visuel`
   déclaré.** L'app part du worktree du run, sur un port libre, sans tuer de
   processus ; les captures restent hors du dépôt.
@@ -181,13 +179,13 @@ section. (ADR-055)
   `FORBIDDEN_TERMS`** ; `"confidentiality": "professional"` en exempte un
   projet. (ADR-048)
 - **Un secret de Tessera se lit : environnement, coffre du système, puis
-  `.env`** (`SECRETS_SOURCE` : `auto`, `coffre` strict, `env` pour CI et
-  Docker). Ni exporté à un sous-processus, ni affiché, ni passé en argument, ni
+  `.env`**. Ni exporté à un sous-processus, ni affiché, ni passé en argument, ni
   donné à un agent ; seule une action de l'utilisateur crée une
   ressource en ligne. Aucun agent n'exécute le coffre (`keyring`, `cmdkey`,
   `coffre_cli`). (ADR-073, ADR-053)
 - **Les termes interdits s'arrêtent à trois portes** (push du pipeline, hook
   `pre-push`, CI de chaque PR) ; une porte qui ne peut juger refuse. (ADR-050)
+- **Toute requête HTTP ou WebSocket, sauf `/health` et le préflight, exige le jeton de session** (`STATIC_TOKEN` ou tiré au démarrage). (ADR-081, ADR-031)
 
 ## Interface et design
 
