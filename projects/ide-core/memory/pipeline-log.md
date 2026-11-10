@@ -8836,3 +8836,4 @@ error: Please commit or stash them.
 - 2026-11-10 10:47:22 UTC — [ticket-903] validateur: fichiers cités joints : frontend/src/components/Sidebar/panels.ts, rituels.md, backend/ (dossier, 6 fichiers)
 - 2026-11-10 10:47:22 UTC — [ticket-903] validateur: APPROVED — Tous les critères sont satisfaits. Le diff ajoute la vue Rituels et le hook useR (31891ms)
 - 2026-11-10 10:47:22 UTC — [ticket-903] APPROVED après 1 tour(s)
+- 2026-11-10 10:52:56 UTC — [ticket-903] documentation: 4 fichier(s) (328141ms)
