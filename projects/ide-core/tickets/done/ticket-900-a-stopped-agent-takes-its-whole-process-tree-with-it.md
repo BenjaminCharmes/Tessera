@@ -6,7 +6,7 @@ depends_on:
 estimated_days: 1
 id: ticket-900
 plan: true
-pr_number: null
+pr_number: 1007
 priority: high
 status: done
 title: A stopped agent takes its whole process tree with it
