@@ -101,6 +101,26 @@ L'endpoint accepte un signalement (bug ou idée) sur Tessera. Il crée automatiq
 - **Projet `ide-core` libre** (aucun run en cours) : le signalement est écrit immédiatement dans `tickets/todo/`. Réponse `201 Created`.
 - **Un run `ide-core` actif** : le signalement attend dans une file en dehors du dépôt (répertoire `IDE_STATE_DIR`, fichier `signalements_en_attente.json`). Réponse `202 Accepted` avec `{ "en_attente": true, "position": n }`. Une fois le run fusionné, les signalements en attente sont écrits en ordre d'arrivée.
 
+### Rituels
+
+| Méthode | Endpoint | Description |
+|---------|----------|-------------|
+| `GET` | `/api/v1/rituels` | List Rituels |
+| `POST` | `/api/v1/rituels/{id}/fait` | Mark Ritual Done |
+| `POST` | `/api/v1/rituels/{id}/reporter` | Postpone Ritual |
+
+#### `GET /api/v1/rituels`
+
+Retourne la liste des rituels du jour. Chaque rituel porte les champs `id`, `titre`, `depuis_quand`, `rythme`, `duree`, `detail`, `phrase`, `projets` (liste avec `id` et `nom`), `en_retard` (booléen), `a_venir` (booléen), `prochaine` (date), et `erreur` (message si applicable).
+
+#### `POST /api/v1/rituels/{id}/fait`
+
+Marque un rituel comme exécuté, réinitialise son compteur et le retire de la liste des retards.
+
+#### `POST /api/v1/rituels/{id}/reporter`
+
+Reporte le rituel à demain sans le marquer comme fait.
+
 ### Chat
 
 | Méthode | Endpoint | Description |
