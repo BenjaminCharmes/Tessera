@@ -1,14 +1,15 @@
 ---
-id: ticket-908
-title: "Ritual sync finds its repository without a setting, and the view says when it stays local"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-11-10
 depends_on: []
 estimated_days: 0.5
-created: 2026-11-10
+id: ticket-908
+pr_number: 1021
+priority: medium
+status: done
+title: Ritual sync finds its repository without a setting, and the view says when
+  it stays local
+type: feat
 ---
 
 # ticket-908 — La synchro des rituels trouve son dépôt sans réglage, et la vue dit quand elle reste locale

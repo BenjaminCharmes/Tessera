@@ -6,6 +6,8 @@ and the latest `reporte_jusqua` win. Without token, network or rights, the
 local state stands and the answer says `locale`.
 """
 import json
+import re
+import subprocess
 import time
 from datetime import datetime
 from pathlib import Path
@@ -14,7 +16,7 @@ from typing import Literal, Protocol
 import httpx
 from pydantic import BaseModel, ValidationError
 
-from tessera.config import settings
+from tessera.config import _REPO_ROOT, settings
 from tessera.services.github.github_contents import ConflitContenu, ErreurContenu, FichierDistant, GitHubContents
 from tessera.services.projets import rituels as local
 from tessera.utils.logger import get_logger
@@ -47,11 +49,59 @@ class Distant(Protocol):
     async def creer_branche(self, branche: str) -> None: ...
 
 
-def creer_service() -> Distant | None:
-    """The GitHub client, or None without token or repository."""
-    if not settings.github_token or not settings.github_repo:
+_URL_GITHUB = re.compile(
+    r"^(?:https://github\.com/|git@github\.com:)([\w.-]+)/([\w.-]+?)(?:\.git)?/?$"
+)
+# Mémoire de l'origin : lu une seule fois, `None` compris.
+_origin: tuple[str | None] | None = None
+_avertis: set[str] = set()
+
+
+def depot_de_l_url(url: str) -> str | None:
+    """`owner/repo` of a GitHub HTTPS or SSH URL, None for any other form."""
+    trouve = _URL_GITHUB.match(url.strip())
+    return f"{trouve.group(1)}/{trouve.group(2)}" if trouve else None
+
+
+def lire_origin() -> str | None:
+    """URL of `origin` in the Tessera repository; None when git or the remote is missing."""
+    try:
+        sortie = subprocess.run(
+            ["git", "remote", "get-url", "origin"],
+            cwd=_REPO_ROOT, capture_output=True, text=True, timeout=10, check=False,
+        )
+    except (OSError, subprocess.SubprocessError):
         return None
-    return GitHubContents(settings.github_token, settings.github_repo)
+    return sortie.stdout.strip() if sortie.returncode == 0 else None
+
+
+def _depot() -> str | None:
+    """The configured repository, else the one of `origin`, read once."""
+    global _origin
+    if settings.github_repo:
+        return settings.github_repo
+    if _origin is None:
+        url = lire_origin()
+        _origin = (depot_de_l_url(url) if url else None,)
+    return _origin[0]
+
+
+def _avertir_une_fois(raison: str) -> None:
+    if raison not in _avertis:
+        _avertis.add(raison)
+        _logger.warning("rituels_synchro_inactive", extra={"raison": raison})
+
+
+def creer_service() -> Distant | None:
+    """The GitHub client, or None without token or repository (warned once)."""
+    if not settings.github_token:
+        _avertir_une_fois("sans_jeton")
+        return None
+    depot = _depot()
+    if depot is None:
+        _avertir_une_fois("sans_depot")
+        return None
+    return GitHubContents(settings.github_token, depot)
 
 
 def _plus_recent(a: datetime | None, b: datetime | None) -> datetime | None:
@@ -119,6 +169,13 @@ def reinitialiser() -> None:
     """Forget the last pull (tests, and after a push)."""
     global _memo
     _memo = None
+
+
+def oublier_depot() -> None:
+    """Forget the origin read and the warnings already given (tests)."""
+    global _origin
+    _origin = None
+    _avertis.clear()
 
 
 async def tirer(db_path: Path | str) -> Synchro:

@@ -163,3 +163,51 @@ def test_create_service_needs_token_and_repo(monkeypatch: pytest.MonkeyPatch) ->
     monkeypatch.setattr(settings, "github_token", "t")
     monkeypatch.setattr(settings, "github_repo", "o/r")
     assert rituels_sync.creer_service() is not None
+
+
+class TestDepotParDefaut:
+    """The repository comes from `origin` when `GITHUB_REPO` is empty — ticket-908."""
+
+    @pytest.fixture(autouse=True)
+    def _etat(self) -> None:
+        rituels_sync.oublier_depot()
+
+    def test_depot_de_l_url_reads_github_forms_only(self) -> None:
+        attendu = "BenjaminCharmes/Tessera"
+        assert rituels_sync.depot_de_l_url("https://github.com/BenjaminCharmes/Tessera.git") == attendu
+        assert rituels_sync.depot_de_l_url("git@github.com:BenjaminCharmes/Tessera.git") == attendu
+        assert rituels_sync.depot_de_l_url("https://gitlab.com/o/r.git") is None
+
+    def test_creer_service_uses_the_origin(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.setattr(rituels_sync.settings, "github_repo", "")
+        monkeypatch.setattr(rituels_sync.settings, "github_token", "jeton")
+        monkeypatch.setattr(rituels_sync, "lire_origin", lambda: "git@github.com:o/r.git")
+        svc = rituels_sync.creer_service()
+        assert isinstance(svc, rituels_sync.GitHubContents)
+        assert svc._repo == "o/r"
+
+    def test_setting_wins_over_origin(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.setattr(rituels_sync.settings, "github_repo", "x/y")
+        monkeypatch.setattr(rituels_sync.settings, "github_token", "jeton")
+
+        def interdit() -> str | None:
+            raise AssertionError("origin must not be read")
+
+        monkeypatch.setattr(rituels_sync, "lire_origin", interdit)
+        svc = rituels_sync.creer_service()
+        assert isinstance(svc, rituels_sync.GitHubContents)
+        assert svc._repo == "x/y"
+
+    def test_without_repository_stays_local_and_warns_once(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.setattr(rituels_sync.settings, "github_repo", "")
+        monkeypatch.setattr(rituels_sync.settings, "github_token", "jeton")
+        monkeypatch.setattr(rituels_sync, "lire_origin", lambda: None)
+        avertissements: list[str] = []
+        monkeypatch.setattr(
+            rituels_sync._logger, "warning", lambda msg, **_: avertissements.append(msg)
+        )
+        assert rituels_sync.creer_service() is None
+        assert rituels_sync.creer_service() is None
+        assert avertissements == ["rituels_synchro_inactive"]
