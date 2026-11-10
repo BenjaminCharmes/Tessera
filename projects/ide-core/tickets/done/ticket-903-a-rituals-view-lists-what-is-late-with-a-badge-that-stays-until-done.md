@@ -1,14 +1,15 @@
 ---
-id: ticket-903
-title: "A Rituals view lists what is late, with a rail badge that stays until done"
-type: feat
-status: todo
-pr_number: null
-priority: high
 agent: codeur
-depends_on: [ticket-902]
-estimated_days: 1
 created: 2026-11-10
+depends_on:
+- ticket-902
+estimated_days: 1
+id: ticket-903
+pr_number: 1015
+priority: high
+status: done
+title: A Rituals view lists what is late, with a rail badge that stays until done
+type: feat
 ---
 
 # ticket-903 — Une vue Rituels montre ce qui est en retard, avec une pastille qui reste jusqu'au « Fait »

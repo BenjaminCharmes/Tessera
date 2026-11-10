@@ -44,4 +44,5 @@ export const PANNEAUX_SANS_COLONNE: readonly string[] = [
   "supervision",
   "running",
   "projects",
+  "rituels",
 ];

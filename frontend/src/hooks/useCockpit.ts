@@ -28,7 +28,7 @@ export {
 export function useCockpit() {
   const noyau = useCockpitNoyau();
   const actions = useCockpitActions(noyau);
-  const { navRail, son } = useCockpitNotifications(noyau, actions);
+  const { navRail, son, rituels } = useCockpitNotifications(noyau, actions);
   const agent = useCockpitAgent(noyau);
 
   return {
@@ -37,7 +37,7 @@ export function useCockpit() {
     ouvrirTicket: actions.ouvrirTicket,
     navRail,
     sidebar: useCockpitSidebar(noyau, actions, agent),
-    centre: useCockpitCentre(noyau, actions, agent, son),
+    centre: { ...useCockpitCentre(noyau, actions, agent, son), rituels },
     bottomPanel: useCockpitBottomPanel(noyau),
     toasts: noyau.toasts,
     fermerToast: noyau.removeToast,

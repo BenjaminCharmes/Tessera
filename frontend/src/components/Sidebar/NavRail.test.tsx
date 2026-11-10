@@ -21,10 +21,10 @@ describe("NavRail", () => {
     expect(nom.className).not.toMatch(/text-violet-/);
   });
 
-  it("rend les neuf destinations sans regression", () => {
+  it("rend les dix destinations sans regression", () => {
     render(<NavRail activePanel="projects" onChangePanel={() => {}} />);
     const tabs = screen.getAllByRole("tab");
-    expect(tabs).toHaveLength(9);
+    expect(tabs).toHaveLength(10);
   });
 
   it("place En cours juste apres Projets", () => {
@@ -34,13 +34,14 @@ describe("NavRail", () => {
     expect(noms[1]).toMatch(/En cours/);
   });
 
-  it("ordonne les neuf destinations par groupe", () => {
+  it("ordonne les dix destinations par groupe", () => {
     render(<NavRail activePanel="projects" onChangePanel={() => {}} />);
     const noms = screen.getAllByRole("tab").map((t) => t.textContent ?? "");
     const attendu = [
       "Projets",
       "En cours",
       "Supervision",
+      "Rituels",
       "Tickets",
       "Fichiers",
       "Historique",
@@ -57,7 +58,7 @@ describe("NavRail", () => {
     const ordre = (a: Node, b: Node): boolean =>
       Boolean(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
     const groupes: Array<[string, RegExp, RegExp]> = [
-      ["Pilotage", /Projets/, /Supervision/],
+      ["Pilotage", /Projets/, /Rituels/],
       ["Projet", /Tickets/, /Historique/],
       ["Outils", /Agents/, /Chat/],
     ];
@@ -75,7 +76,7 @@ describe("NavRail", () => {
   it("nomme chaque groupe comme une liste a part", () => {
     render(<NavRail activePanel="projects" onChangePanel={() => {}} />);
     for (const [titre, nombre] of [
-      ["Pilotage", 3],
+      ["Pilotage", 4],
       ["Projet", 3],
       ["Outils", 3],
     ] as const) {
@@ -239,7 +240,7 @@ describe("NavRail — la cloche porte aussi le réglage global des notifications
     const cloc = screen.getByRole("button", { name: "Notifications" });
     expect(cloc.compareDocumentPosition(reglages) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(screen.getByRole("tablist", { name: "Navigation principale" })).not.toContainElement(reglages);
-    expect(screen.getAllByRole("tab")).toHaveLength(9);
+    expect(screen.getAllByRole("tab")).toHaveLength(10);
   });
 
   it("shows the global switch at the top of the bell's Réglages tab", async () => {
@@ -284,12 +285,24 @@ describe("NavRail — la cloche porte aussi le réglage global des notifications
 
     expect(screen.getByRole("button", { name: "Notifications, 4 non lues" })).toBeInTheDocument();
     expect(screen.getByText("4")).toBeInTheDocument();
-    expect(screen.getAllByRole("tab")).toHaveLength(9);
+    expect(screen.getAllByRole("tab")).toHaveLength(10);
   });
 
   it("shows no bell without notification data", () => {
     render(<NavRail activePanel="projects" onChangePanel={() => {}} />);
     expect(screen.queryByRole("button", { name: /^Notifications/ })).not.toBeInTheDocument();
   });
-});
 
+  it("montre sur Rituels le nombre de rituels en retard", () => {
+    render(<NavRail activePanel="projects" onChangePanel={() => {}} rituelsEnRetard={2} />);
+    const onglet = screen.getByRole("tab", { name: /Rituels/ });
+    expect(within(onglet).getByText("2")).toBeInTheDocument();
+  });
+
+  it("n'affiche aucune pastille sur Rituels quand rien n'est en retard", () => {
+    render(<NavRail activePanel="projects" onChangePanel={() => {}} rituelsEnRetard={0} />);
+    const onglet = screen.getByRole("tab", { name: /Rituels/ });
+    expect(within(onglet).queryByText("0")).not.toBeInTheDocument();
+    expect(onglet.querySelector("span[title]")).toBeNull();
+  });
+});

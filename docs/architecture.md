@@ -1632,6 +1632,18 @@ portes sensibles d'ADR-080 (argent, suppression, secrets, `agents.json`, `.githu
 `CLAUDE.md`, `.claude/settings*`, `.git/`) restent fermées — pas de modèle ne
 les ouvre, même si la consigne y invite.
 
+## Vue Rituels du Bureau
+
+Les rituels sont des tâches récurrentes affichées dans la rail de navigation et organisées par statut. Chaque rituel porte un titre, un rythme de répétition, et un statut (`en_retard`, `a_venir` ou récemment exécuté).
+
+### Intégration au cockpit
+
+Dans la rail de navigation (`NavRail`), le panneau **Rituels** rejoint le groupe Pilotage (après Supervision). Une pastille ambre portant le nombre de rituels `en_retard` s'affiche, absente si ce nombre est zéro (ADR-026 : l'ambre pour une attente).
+
+### Polling et actions
+
+Le hook `useRituels` lit `GET /api/v1/rituels` par `usePolling` (intervalle de 5 minutes et à l'ouverture du panneau). Il expose la liste des rituels et un compteur `enRetard`, plus deux actions : `fait(id)` et `reporter(id)`, qui appellent les routes correspondantes (`POST /api/v1/rituels/{id}/fait` et `POST /api/v1/rituels/{id}/reporter`) puis relisent la liste.
+
 ## Caching des statuts GitHub (ticket-364)
 
 L'endpoint `/projects/{id}/tickets/{id}/pr-status` affichait le statut de chaque PR en interrogeant GitHub, sans cache. Chaque appel lancait deux requêtes GitHub (la PR, puis ses check-runs). Avec 139 tickets portant un `pr_number` dans ide-core, ouvrir le projet provoquait 139 appels à l'endpoint, soit ~280 requêtes GitHub — consommant 5,6 % du quota horaire (5 000 requêtes).

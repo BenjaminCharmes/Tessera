@@ -8824,3 +8824,16 @@ error: Please commit or stash them.
 - 2026-11-10 10:11:08 UTC — [ticket-902] APPROVED après 2 tour(s)
 - 2026-11-10 10:12:05 UTC — [ticket-902] leçons: une leçon proposée
 - 2026-11-10 10:14:39 UTC — [ticket-902] documentation: 0 fichier(s) (148796ms)
+- 2026-11-10 10:37:30 UTC — [ide-core] ticket-906 PR #1012 confiée au CIWatcher
+- 2026-11-10 10:39:22 UTC — [ticket-906] livraison: arrêt — PR #1012 non mergée : mise à jour refusée : Conflit hors des journaux, qui ne se résout pas sans relecture : projects/ide-core/memory/lecons.md
+- 2026-11-10 10:39:42 UTC — [ticket-903] branche ticket-903-a-rituals-view-lists-what-is-late-with-a-rail-bad
+- 2026-11-10 10:39:46 UTC — [ticket-903] tour 1 — codeur démarré
+- 2026-11-10 10:42:59 UTC — [ticket-903] tour 1 — codeur terminé (192797ms)
+- 2026-11-10 10:46:34 UTC — [ticket-903] testeur: dur�es : tsc 16 s, eslint 26 s, vitest 170 s
+- 2026-11-10 10:46:51 UTC — [ticket-903] securite: PASS — Ce diff ne touche que le frontend : une vue Rituels, un hook qui interroge l'API (16750ms)
+- 2026-11-10 10:46:51 UTC — [ticket-903] tour 1 — reviewer démarré
+- 2026-11-10 10:47:15 UTC — [ticket-903] tour 1 — reviewer terminé (24780ms)
+- 2026-11-10 10:47:22 UTC — [ticket-903] validateur: fichiers cités joints : frontend/src/components/Sidebar/panels.ts, rituels.md, backend/ (dossier, 6 fichiers)
+- 2026-11-10 10:47:22 UTC — [ticket-903] validateur: APPROVED — Tous les critères sont satisfaits. Le diff ajoute la vue Rituels et le hook useR (31891ms)
+- 2026-11-10 10:47:22 UTC — [ticket-903] APPROVED après 1 tour(s)
+- 2026-11-10 10:52:56 UTC — [ticket-903] documentation: 4 fichier(s) (328141ms)

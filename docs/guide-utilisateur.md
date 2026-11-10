@@ -538,6 +538,65 @@ Si un port déclaré par le projet est occupé par un processus **étranger** �
 
 Le projet qui fait tourner l'IDE lui-même n'a jamais d'app externe dans son inventaire.
 
+## 2 quater. Rituels : suivi des actions récurrentes
+
+### Accéder à la vue
+
+Clique sur « Rituels » dans le groupe Pilotage de la barre latérale. Si un ou plusieurs rituels sont en retard, une pastille ambre s'affiche avec le nombre ; elle disparaît quand tout est à jour.
+
+### Ce que tu vois
+
+La vue affiche trois sections :
+
+- **À faire** : rituels en retard sous forme de cartes, avec le titre, le temps écoulé (en rouge si urgent), le rythme et la durée, et une phrase à dire à Claude.
+- **À venir** : une ligne par rituel, avec sa prochaine échéance.
+- **Faits récemment** : les rituels que tu viens de marquer comme faits.
+
+Une erreur de l'API, s'il y en a une, s'affiche en haut.
+
+### Marquer comme fait
+
+Clique sur « Fait » dans une carte. Le rituel part dans « Faits récemment » et la pastille se met à jour en direct.
+
+### Reporter à demain
+
+Clique sur « Reporter à demain ». Le rituel sort de « À faire » et repasse « À venir » avec une nouvelle échéance.
+
+### Copier la phrase
+
+Dans une carte, clique sur « Copier » pour mettre la phrase suggérée dans ton presse-papiers. Utile pour la coller dans le chat avec un agent.
+
+### Ouvrir un projet
+
+Si le rituel est lié à un projet, un bouton « Ouvrir <projet> » bascule vers ce projet dans la barre latérale.
+
+### Mise à jour
+
+La liste des rituels se relit toutes les 5 minutes. Si tu marques un rituel ailleurs (autre machine, API externe), la vue se met à jour au prochain refresh.
+
+### Ce que ça ne fait pas
+
+Tu ne peux pas créer ou modifier des rituels depuis l'IDE. Ils sont déclarés dans une configuration du projet.
+
+## 2 quart. Les Rituels
+
+### Accéder à la vue Rituels
+
+Dans la rail de navigation à gauche, groupe **Pilotage**, clique sur **Rituels** (icône d'horloge). Une pastille ambre portant le nombre apparaît si des rituels sont en retard — elle disparaît quand tous les rituels sont à jour.
+
+### Actions dans la vue
+
+Pour chaque rituel en retard :
+
+- **Fait** : marque le rituel exécuté et met à jour son compteur
+- **Reporter à demain** : repousse la date limite sans marquer le rituel comme exécuté
+- **Copier** : envoie une phrase préremplie au presse-papiers, prête à donner à Claude
+- **Ouvrir <projet>** : sélectionne un projet lié au rituel dans Tessera
+
+### Rafraîchissement
+
+La vue se met à jour toutes les 5 minutes et chaque fois que tu l'ouvres.
+
 ## 3. Écrire des tickets
 
 Un ticket est un **fichier Markdown**. Pas de base de données propriétaire : tu peux

@@ -43,6 +43,7 @@ export default function App() {
           onChangePanel={cockpit.setPanel}
           runsActifs={cockpit.navRail.runsActifs}
           appsEnCours={cockpit.navRail.appsEnCours}
+          rituelsEnRetard={cockpit.navRail.rituelsEnRetard}
           alerte={cockpit.navRail.alerte}
           notifications={cockpit.navRail.notifications}
           cloche={cockpit.navRail.cloche}

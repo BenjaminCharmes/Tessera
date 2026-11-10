@@ -11,11 +11,14 @@ export default function Pastille({
   nombre,
   alerte = null,
   unite = "run",
+  titre: titreImpose,
 }: {
   nombre: number;
   alerte?: AlerteDeSupervision;
   /** Ce que la pastille compte : « run » pour la supervision, « app » pour En cours. */
   unite?: string;
+  /** Remplace le libellé par défaut (ex. un retard, qui n'est pas une question). */
+  titre?: string;
 }) {
   if (nombre === 0) return null;
   const couleur =
@@ -25,12 +28,13 @@ export default function Pastille({
         ? "bg-amber-500/20 text-amber-200"
         : "bg-blue-500/20 text-blue-200";
   const noms = `${nombre} ${unite}${nombre > 1 ? "s" : ""}`;
-  const titre =
+  const titreParDefaut =
     alerte === "bloque"
       ? `${noms}, dont un bloqué`
       : alerte === "attente"
         ? `${noms}, dont un attend une réponse`
         : `${noms} en cours`;
+  const titre = titreImpose ?? titreParDefaut;
   return (
     <span
       title={titre}
