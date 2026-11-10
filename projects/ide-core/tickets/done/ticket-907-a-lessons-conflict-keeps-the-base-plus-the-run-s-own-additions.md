@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 1
 id: ticket-907
 plan: true
-pr_number: null
+pr_number: 1017
 priority: medium
 status: done
 title: A lessons conflict keeps the base plus the run's own additions
