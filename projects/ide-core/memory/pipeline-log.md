@@ -8741,3 +8741,4 @@ error: Please commit or stash them.
 - 2026-11-10 08:31:20 UTC — [ticket-896] validateur: APPROVED — Tous les critères sont satisfaits. Le diff introduit deux nouveaux scripts Power (38343ms)
 - 2026-11-10 08:31:20 UTC — [ticket-896] APPROVED après 1 tour(s)
 - 2026-11-10 08:32:14 UTC — [ticket-896] leçons: refusée — preuve absente du retour du run
+- 2026-11-10 08:39:22 UTC — [ticket-896] documentation: 0 fichier(s) (423157ms) — après tour de correction — refusé : doc-fonctionnelle : docs/agent-isolation.md : règle « preuve » — l'extrait « sur le PC de Benjamin, son compte n'est **pas** administrate » (projects/ide-core/t
