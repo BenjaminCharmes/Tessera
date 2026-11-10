@@ -8,6 +8,8 @@
 export const SANS_SCHEMA: string[] = [
   "POST /api/v1/services/running/{pid}/stop", // `dict[str, object]` : le front type `{ pid, arretes }` à la main
   "POST /api/v1/orchestrator/run",
+  "POST /api/v1/rituels/{identifiant}/fait", // 204, sans corps
+  "POST /api/v1/rituels/{identifiant}/reporter", // 204, sans corps
   "POST /api/v1/projects",
   "POST /api/v1/projects/clone",
   "POST /api/v1/projects/from-template",
@@ -31,6 +33,7 @@ export const HORS_PERIMETRE: string[] = [
   "GET /api/v1/projects/usage/breakdown", // même schéma que la route d'un projet, aucun appel du front
   "GET /api/v1/services/running/avertissements",
   "GET /api/v1/usage/recent-runs",
+  "GET /api/v1/rituels", // lue par l'écran du ticket-903, pas encore appelée
   "GET /api/v1/supervision/recap", // lue par le panneau de récap (ticket-861), pas encore appelée
   "GET /health",
   "GET /api/v1/projects/{project_id}/context",
