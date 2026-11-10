@@ -157,14 +157,34 @@ function Start-Backend {
     #  3. `Start-Process` rattache le backend a la console qui le lance : il
     #     meurt avec elle (ticket-667). `Win32_Process.Create` (WMI) le demarre
     #     hors de cette console, puis on attend /health avant de rendre la main.
+    #  4. Sans fenetre (ticket-901) : la sortie va dans un journal.
     $uv = (Get-Command uv -ErrorAction Stop).Source
     $commande = "`"$uv`" run python -m uvicorn tessera.main:app --host 127.0.0.1 --port 8100"
+    $backendPid = Start-Cache -Commande $commande -Dossier (Join-Path $Root 'backend') -Journal 'backend-console.log'
+    Wait-Health -Url 'http://127.0.0.1:8100/health' -BackendPid $backendPid
+}
+
+function Get-DossierJournaux {
+    # Hors du depot : le dossier d'etat de Tessera, comme le jeton de session.
+    $dossier = Join-Path $env:LOCALAPPDATA 'Tessera\logs'
+    New-Item -ItemType Directory -Force -Path $dossier | Out-Null
+    return $dossier
+}
+
+function Start-Cache([string]$Commande, [string]$Dossier, [string]$Journal) {
+    # `Win32_Process.Create` detache le processus de la console qui le lance
+    # (ticket-667) ; `ShowWindow = 0` lui retire sa fenetre (ticket-901). La
+    # sortie, qu'aucune fenetre ne montre plus, est ecrite dans le journal,
+    # ecrase a chaque lancement.
+    $chemin = Join-Path (Get-DossierJournaux) $Journal
+    $demarrage = New-CimInstance -ClassName Win32_ProcessStartup -ClientOnly -Property @{ ShowWindow = [uint16]0 }
     $resultat = Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{
-        CommandLine      = $commande
-        CurrentDirectory = (Join-Path $Root 'backend')
+        CommandLine               = "cmd.exe /d /c `"$Commande > `"$chemin`" 2>&1`""
+        CurrentDirectory          = $Dossier
+        ProcessStartupInformation = $demarrage
     }
     if ($resultat.ReturnValue -ne 0) { throw "Win32_Process.Create a echoue (code $($resultat.ReturnValue))" }
-    Wait-Health -Url 'http://127.0.0.1:8100/health' -BackendPid $resultat.ProcessId
+    return [int]$resultat.ProcessId
 }
 
 function Wait-Health([string]$Url, [int]$BackendPid, [int]$TimeoutSec = 90) {
@@ -176,12 +196,12 @@ function Wait-Health([string]$Url, [int]$BackendPid, [int]$TimeoutSec = 90) {
             if ($reponse.StatusCode -eq 200) { Write-Host "-> backend pret (PID $BackendPid)"; return }
         } catch { Start-Sleep -Milliseconds 500 }
     }
-    throw "Le backend ne repond pas sur $Url apres $TimeoutSec s (PID $BackendPid)."
+    $journal = Join-Path (Get-DossierJournaux) 'backend-console.log'
+    throw "Le backend ne repond pas sur $Url apres $TimeoutSec s (PID $BackendPid). Journal : $journal"
 }
 
 function Start-Frontend {
-    Start-Process -FilePath 'npm.cmd' -ArgumentList 'run', 'dev' `
-        -WorkingDirectory (Join-Path $Root 'frontend')
+    Start-Cache -Commande 'npm.cmd run dev' -Dossier (Join-Path $Root 'frontend') -Journal 'vite.log' | Out-Null
 }
 
 switch ($Task) {
@@ -209,6 +229,7 @@ switch ($Task) {
             $Jeton = (Get-Content -LiteralPath $FichierJeton -Raw).Trim()
             Write-Host "-> Avec jeton : http://localhost:5173/#jeton=$Jeton"
         }
+        Write-Host "-> Journaux : $(Get-DossierJournaux) (sans fenetre de console)"
         Write-Host '-> Arreter  : .\scripts\tessera.ps1 stop'
     }
     'test' {
