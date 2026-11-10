@@ -8,8 +8,8 @@ import pytest
 from claude_agent_sdk import AssistantMessage, ResultMessage, StreamEvent, TextBlock, ThinkingBlock, ToolResultBlock, ToolUseBlock
 
 import tessera.services.providers.agent_sdk as agent_sdk_module
-from tessera.services.providers.agent_sdk import ClaudeAgentSDKProvider, _build_options, _extract_stream_delta
-from tessera.services.providers.messages_sdk import _usage_from
+from tessera.services.providers.agent_sdk import ClaudeAgentSDKProvider, _build_options
+from tessera.services.providers.messages_sdk import _extract_stream_delta, _usage_from
 from tessera.services.providers.noms import ProviderIndisponible
 
 
@@ -106,7 +106,7 @@ async def test_run_transmet_allowed_tools_personnalise_aux_options(
 ) -> None:
     captured_options: dict[str, Any] = {}
 
-    async def fake_query(*, prompt: str, options: Any) -> AsyncIterator[Any]:
+    async def fake_query(*, prompt: str, options: Any, **_: Any) -> AsyncIterator[Any]:
         captured_options["allowed_tools"] = options.allowed_tools
         yield _make_result_message(usage=None, total_cost_usd=None)
 
@@ -162,7 +162,7 @@ def _patch_query(monkeypatch: pytest.MonkeyPatch, messages: list[Any]) -> None:
     """Replaces claude_agent_sdk.query (as imported in agent_sdk) with a
     fake async generator, so the test runs without a network call."""
 
-    async def fake_query(*, prompt: str, options: Any) -> AsyncIterator[Any]:
+    async def fake_query(*, prompt: str, options: Any, **_: Any) -> AsyncIterator[Any]:
         for message in messages:
             yield message
 
@@ -277,7 +277,7 @@ async def test_complete_resout_le_cwd(
     projet.mkdir()
     captured_options: dict[str, Any] = {}
 
-    async def fake_query(*, prompt: str, options: Any) -> AsyncIterator[Any]:
+    async def fake_query(*, prompt: str, options: Any, **_: Any) -> AsyncIterator[Any]:
         captured_options["cwd"] = options.cwd
         yield _make_result_message(usage=None, total_cost_usd=None)
 
@@ -459,7 +459,7 @@ async def test_run_leve_provider_indisponible_apres_silence(
 ) -> None:
     """A stream that goes silent after one message raises ProviderIndisponible."""
 
-    async def fake_query(*, prompt: str, options: Any) -> AsyncIterator[Any]:
+    async def fake_query(*, prompt: str, options: Any, **_: Any) -> AsyncIterator[Any]:
         yield AssistantMessage(content=[TextBlock(text="début")], model="m")
         await asyncio.sleep(9999)
         yield _make_result_message(usage=None, total_cost_usd=None)
@@ -500,7 +500,7 @@ async def test_run_ferme_le_flux_apres_silence(
 
     # Patch _sdk_gen so that aclosing() wraps gen_instance directly;
     # aclosing() guarantees aclose() is called when the context exits.
-    def fake_sdk_gen(*, prompt: str, options: Any) -> SilentGen:
+    def fake_sdk_gen(*, prompt: str, options: Any, **_: Any) -> SilentGen:
         return gen_instance
 
     monkeypatch.setattr(agent_sdk_module, "_sdk_gen", fake_sdk_gen)
@@ -523,7 +523,7 @@ async def test_run_aboutit_si_messages_plus_frequents_que_le_silence(
     # échouait au hasard, ce qui arrêtait la livraison d'un ticket (30/10).
     silence_max_s = 1.0
 
-    async def fake_query(*, prompt: str, options: Any) -> AsyncIterator[Any]:
+    async def fake_query(*, prompt: str, options: Any, **_: Any) -> AsyncIterator[Any]:
         for _ in range(5):
             yield AssistantMessage(content=[TextBlock(text="y")], model="m")
             await asyncio.sleep(0.25)

@@ -19,7 +19,7 @@ PLAFONDS: dict[str, int] = {
     "services/pipeline/orchestrator.py": 618,
     "services/pipeline/pipeline_outcomes.py": 490,
     "services/verification/process_registry.py": 403,
-    "services/providers/agent_sdk.py": 414,
+    "services/providers/agent_sdk.py": 413,
     "services/pipeline/reprise_orphelin.py": 346,
     "services/pipeline/run_executor.py": 331,
     "services/verification/test_runner.py": 519,

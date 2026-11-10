@@ -6,6 +6,7 @@ seulement le démarrage du processus. `query(transport=…)` laisse hooks, MCP
 et `ask_user` au protocole de contrôle, branché sur ce transport.
 """
 import sys
+from collections.abc import Callable
 
 from anyio.abc import Process
 from anyio.streams.text import TextReceiveStream, TextSendStream
@@ -30,14 +31,39 @@ def fabriquer_lanceur() -> LanceurAgent:
     return LanceurWindows()
 
 
+def _annoncer_le_pid(rappel: Callable[[int], None] | None, pid: int | None) -> None:
+    """Tells the caller which process is the CLI, so it can be put in a group."""
+    if rappel is not None and pid is not None:
+        rappel(pid)
+
+
+class TransportSuivi(SubprocessCLITransport):
+    """The SDK's own transport, which reports the CLI's pid once it runs."""
+
+    def __init__(
+        self, prompt: str, options: ClaudeAgentOptions, *,
+        au_demarrage: Callable[[int], None] | None = None,
+    ) -> None:
+        super().__init__(prompt=prompt, options=options)
+        self._au_demarrage = au_demarrage
+
+    async def connect(self) -> None:
+        if self._process:
+            return
+        await super().connect()
+        _annoncer_le_pid(self._au_demarrage, self._process.pid if self._process else None)
+
+
 class TransportCompteAgent(SubprocessCLITransport):
     """Starts the CLI through a ``LanceurAgent`` instead of ``open_process``."""
 
     def __init__(
         self, prompt: str, options: ClaudeAgentOptions, *,
         lanceur: LanceurAgent, compte: str, mot_de_passe: str,
+        au_demarrage: Callable[[int], None] | None = None,
     ) -> None:
         super().__init__(prompt=prompt, options=options)
+        self._au_demarrage = au_demarrage
         self._lanceur = lanceur
         self._compte = compte
         self._mot_de_passe = mot_de_passe
@@ -64,6 +90,7 @@ class TransportCompteAgent(SubprocessCLITransport):
             env=env, cwd=self._cwd, avec_stderr=self._options.stderr is not None,
         )
         self._brancher(process)
+        _annoncer_le_pid(self._au_demarrage, process.pid)
 
     def _brancher(self, process: Process) -> None:
         """Wires the streams as the parent class does after its own spawn."""
@@ -79,7 +106,8 @@ class TransportCompteAgent(SubprocessCLITransport):
 
 
 def transport_du_compte(
-    prompt: str, options: ClaudeAgentOptions, lanceur: LanceurAgent | None = None
+    prompt: str, options: ClaudeAgentOptions, lanceur: LanceurAgent | None = None,
+    au_demarrage: Callable[[int], None] | None = None,
 ) -> TransportCompteAgent | None:
     """Returns the transport for ``AGENT_USER``, or ``None`` when it is empty.
 
@@ -94,5 +122,5 @@ def transport_du_compte(
         raise ProviderIndisponible("AGENT_LOGON_PASSWORD absent : l'agent ne peut pas démarrer")
     return TransportCompteAgent(
         prompt, options, lanceur=lanceur or fabriquer_lanceur(),
-        compte=compte, mot_de_passe=mot_de_passe,
+        compte=compte, mot_de_passe=mot_de_passe, au_demarrage=au_demarrage,
     )

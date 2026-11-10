@@ -1,15 +1,16 @@
 ---
-id: ticket-900
-title: "A stopped agent takes its whole process tree with it"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
-depends_on: ["ticket-894"]
-estimated_days: 1
 created: 2026-11-09
+depends_on:
+- ticket-894
+estimated_days: 1
+id: ticket-900
 plan: true
+pr_number: 1007
+priority: high
+status: done
+title: A stopped agent takes its whole process tree with it
+type: fix
 ---
 
 # ticket-900 — Un agent arrêté emporte tout son arbre de processus

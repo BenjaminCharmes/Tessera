@@ -8742,3 +8742,24 @@ error: Please commit or stash them.
 - 2026-11-10 08:31:20 UTC — [ticket-896] APPROVED après 1 tour(s)
 - 2026-11-10 08:32:14 UTC — [ticket-896] leçons: refusée — preuve absente du retour du run
 - 2026-11-10 08:39:22 UTC — [ticket-896] documentation: 0 fichier(s) (423157ms) — après tour de correction — refusé : doc-fonctionnelle : docs/agent-isolation.md : règle « preuve » — l'extrait « sur le PC de Benjamin, son compte n'est **pas** administrate » (projects/ide-core/t
+- 2026-11-10 08:49:22 UTC — [ide-core] ticket-896 PR #1004 confiée au CIWatcher
+- 2026-11-10 08:49:26 UTC — [ticket-900] branche ticket-900-a-stopped-agent-takes-its-whole-process-tree-with
+- 2026-11-10 08:50:13 UTC — [ticket-900] plan rendu (45218ms)
+- 2026-11-10 08:50:13 UTC — [ticket-900] tour 1 — codeur démarré
+- 2026-11-10 08:52:55 UTC — [ticket-900] tour 1 — codeur terminé (162093ms)
+- 2026-11-10 08:55:10 UTC — [ticket-900] testeur: 1 failed, 903 passed, 3 skipped, 8 warnings in 129.26s (0:02:09)
+- 2026-11-10 08:55:10 UTC — [ticket-900] tests rouges au tour 1
+- 2026-11-10 08:55:10 UTC — [ticket-900] tour 2 — codeur démarré
+- 2026-11-10 08:57:37 UTC — [ticket-900] tour 2 — codeur terminé (147421ms)
+- 2026-11-10 08:59:54 UTC — [ticket-900] testeur: dur�es : ruff 0 s, pytest 132 s ; impact depuis base : 74 fichier(s) de test
+- 2026-11-10 08:59:54 UTC — [ticket-900] tests rouges au tour 2
+- 2026-11-10 08:59:54 UTC — [ticket-900] tour 3 — codeur démarré
+- 2026-11-10 09:00:40 UTC — [ticket-900] tour 3 — codeur terminé (46250ms)
+- 2026-11-10 09:02:16 UTC — [ticket-900] testeur: dur�es : ruff 1 s, mypy 23 s, mypy-linux 16 s, pytest 90 s ; impact depuis base : 74 fichier(s) de test
+- 2026-11-10 09:02:57 UTC — [ticket-900] securite: PASS — Le diff met le CLI de l'agent dans un job Windows qui se ferme à la fin de l'app (41375ms)
+- 2026-11-10 09:02:57 UTC — [ticket-900] tour 3 — reviewer démarré
+- 2026-11-10 09:03:23 UTC — [ticket-900] tour 3 — reviewer terminé (25640ms)
+- 2026-11-10 09:03:33 UTC — [ticket-900] validateur: APPROVED — Les quatre critères d'acceptation sont pleinement satisfaits. Le code implémente (35733ms)
+- 2026-11-10 09:03:33 UTC — [ticket-900] APPROVED après 3 tour(s)
+- 2026-11-10 09:04:02 UTC — [ticket-900] leçons: une leçon proposée
+- 2026-11-10 09:08:35 UTC — [ticket-900] documentation: 1 fichier(s) (265906ms)

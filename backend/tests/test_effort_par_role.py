@@ -82,7 +82,7 @@ def test_provider_hands_its_effort_to_the_sdk_options(
         vus.append(options)
         return options
 
-    async def vide(prompt: str, options: Any) -> Any:
+    async def vide(prompt: str, options: Any, **_: Any) -> Any:
         return
         yield  # pragma: no cover — fait de la fonction un générateur
 

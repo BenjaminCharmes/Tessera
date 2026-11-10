@@ -133,7 +133,7 @@ async def test_un_appel_agent_sdk_qui_emet_sans_fin_leve_provider_indisponible(
 ) -> None:
     # Un message toutes les 10 ms : le silence maximal (1 s) ne se déclenche
     # jamais, seule la durée totale peut couper.
-    async def fake_query(*, prompt: str, options: Any) -> AsyncIterator[Any]:
+    async def fake_query(*, prompt: str, options: Any, **_: Any) -> AsyncIterator[Any]:
         while True:
             yield AssistantMessage(content=[TextBlock(text="x")], model="m")
             await asyncio.sleep(0.01)

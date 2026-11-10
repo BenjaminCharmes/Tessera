@@ -14,8 +14,6 @@ from claude_agent_sdk import (
     SdkPluginConfig,
     StreamEvent,
     SystemMessage,
-    TextBlock,
-    ToolUseBlock,
     UserMessage,
     query,
 )
@@ -24,6 +22,7 @@ from claude_agent_sdk.types import SystemPromptFile
 
 from tessera.config import settings
 from tessera.models.agent import EffortLevel
+from tessera.services.noyau.groupe_de_processus import creer_groupe, fermer_le_groupe, rattacher_au_groupe
 from tessera.services.providers.base import ProviderResult, StreamCallback, ToolEventCallback
 from tessera.services.providers.duree_max import borner
 from tessera.services.providers.env_agent import CLI_PARTAGE, env_de_l_agent
@@ -31,7 +30,7 @@ from tessera.services.providers.env_sdk import env_du_sous_processus
 from tessera.services.providers.garde_jetons import hook_refus_env_tessera
 from tessera.services.providers.git_guard import hook_refus_git
 from tessera.services.providers.kill_guard import hook_refus_kill
-from tessera.services.providers.messages_sdk import OUTIL_SORTIE_STRUCTUREE, _extract_stream_delta, _format_de_sortie, provider_result_du_sdk
+from tessera.services.providers.messages_sdk import _format_de_sortie, provider_result_du_sdk
 from tessera.services.providers.noms import ProviderIndisponible
 from tessera.services.providers.perimetre import hook_refus_hors_perimetre
 from tessera.services.providers.prompt_fichier import prompt_systeme_pour_sdk
@@ -39,7 +38,8 @@ from tessera.services.providers.refus_cli import ReleveDesRefusCli
 from tessera.services.providers.refus_garde import JournalDesRefus
 from tessera.services.providers.reglages_ancetres import reglages_sans_consignes_ancetres
 from tessera.services.providers.signaler import ContexteSignal, serveur_tessera
-from tessera.services.providers.transport_agent import transport_du_compte
+from tessera.services.providers.traitement_messages import traiter_message
+from tessera.services.providers.transport_agent import TransportSuivi, transport_du_compte
 from tessera.services.usage.quota_tracker import QuotaTracker
 from tessera.utils.logger import get_logger
 
@@ -67,6 +67,17 @@ async def _sdk_gen(
 
 
 _logger = get_logger(__name__)
+
+
+def _rappel_de_rattachement(groupe: Any | None) -> Callable[[int], None]:
+    """Returns the callback that puts the CLI's pid in ``groupe`` (ticket-900)."""
+
+    def rattacher(pid: int) -> None:
+        if groupe is not None and not rattacher_au_groupe(groupe, pid):
+            _logger.warning("agent_non_rattache", extra={"pid": pid})
+
+    return rattacher
+
 
 _ALLOWED_TOOLS = ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
 
@@ -349,62 +360,50 @@ class ClaudeAgentSDKProvider:
             schema=schema,
         )
         # Sous le compte dédié, le CLI part par le transport maison (ADR-083).
-        transport = transport_du_compte(user, options)
+        groupe = creer_groupe()
+        if groupe is None:
+            _logger.warning("agent_sans_groupe", extra={"model": model})
+        rappel = _rappel_de_rattachement(groupe)
+        # Le PID du CLI ne se voit que dans le transport : toujours un transport maison.
+        transport = (transport_du_compte(user, options, au_demarrage=rappel)
+                     or TransportSuivi(prompt=user, options=options, au_demarrage=rappel))
         chunks: list[str] = []
         result: ResultMessage | None = None
         refus_cli = ReleveDesRefusCli()
         # None → pas de borne (0 ou négatif désactive également).
         silence_timeout: float | None = self._silence_max_s if self._silence_max_s > 0 else None
 
-        flux = (_sdk_gen(prompt=user, options=options) if transport is None
-                else _sdk_gen(prompt=user, options=options, transport=transport))
-        async with aclosing(flux) as gen:
-            while True:
-                try:
-                    # `asyncio.timeout` plutôt que `wait_for` : sous Python 3.11,
-                    # `wait_for` rend le résultat et avale l'annulation quand
-                    # son tâche interne vient de finir. Avec un flux qui émet
-                    # sans cesse, la durée maximale était alors perdue et
-                    # l'appel ne finissait jamais (ticket-518).
-                    async with asyncio.timeout(silence_timeout):
-                        message = await gen.__anext__()
-                except TimeoutError:
-                    _logger.warning(
-                        "agent_silencieux_arrete",
-                        extra={"model": model, "silence_s": self._silence_max_s},
-                    )
-                    raise ProviderIndisponible(
-                        f"agent silencieux depuis {self._silence_max_s:.0f} s"
-                    ) from None
-                except StopAsyncIteration:
-                    break
+        flux = _sdk_gen(prompt=user, options=options, transport=transport)
+        try:
+            async with aclosing(flux) as gen:
+                while True:
+                    try:
+                        # `asyncio.timeout` plutôt que `wait_for` : sous Python 3.11,
+                        # `wait_for` rend le résultat et avale l'annulation quand
+                        # son tâche interne vient de finir. Avec un flux qui émet
+                        # sans cesse, la durée maximale était alors perdue et
+                        # l'appel ne finissait jamais (ticket-518).
+                        async with asyncio.timeout(silence_timeout):
+                            message = await gen.__anext__()
+                    except TimeoutError:
+                        _logger.warning(
+                            "agent_silencieux_arrete",
+                            extra={"model": model, "silence_s": self._silence_max_s},
+                        )
+                        raise ProviderIndisponible(
+                            f"agent silencieux depuis {self._silence_max_s:.0f} s"
+                        ) from None
+                    except StopAsyncIteration:
+                        break
 
-                refus_cli.observer(message)
-                if isinstance(message, RateLimitEvent):
-                    # L'état du quota d'abonnement : la seule mesure de la
-                    # ressource réellement finie en mode abonnement. Un provider
-                    # qui n'en émet pas laisse le tracker vide, et rien ne casse.
-                    self.quota.observe(getattr(message, "rate_limit_info", None))
-                elif isinstance(message, ResultMessage):
-                    result = message
-                elif isinstance(message, StreamEvent):
-                    # Forwarded live for display only — the authoritative record
-                    # of content is the buffered TextBlock below, so this must
-                    # never also be appended to `chunks` (would double the text).
-                    if on_token is not None:
-                        delta = _extract_stream_delta(message.event)
-                        if delta:
-                            await on_token(delta)
-                elif isinstance(message, AssistantMessage):
-                    for block in message.content:
-                        # isinstance plutôt que comparaison de type().__name__ :
-                        # robuste et vérifiable statiquement (finding 2, revue ticket-044).
-                        if isinstance(block, TextBlock):
-                            chunks.append(block.text)
-                        # La sortie structurée n'est pas une action de l'agent.
-                        elif (isinstance(block, ToolUseBlock) and on_tool_use is not None
-                              and block.name != OUTIL_SORTIE_STRUCTUREE):
-                            await on_tool_use(block.name, dict(block.input))
+                    refus_cli.observer(message)
+                    final = await traiter_message(
+                        message, chunks=chunks, quota=self.quota,
+                        on_token=on_token, on_tool_use=on_tool_use,
+                    )
+                    result = final or result
+        finally:
+            fermer_le_groupe(groupe)
 
         if result is None:
             raise RuntimeError("Agent SDK: aucun ResultMessage reçu")
