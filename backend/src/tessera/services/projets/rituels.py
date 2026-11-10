@@ -9,6 +9,7 @@ from pathlib import Path
 
 import aiosqlite
 import frontmatter
+import yaml  # type: ignore[import-untyped]
 from pydantic import BaseModel, ValidationError
 
 from tessera.config import _REPO_ROOT
@@ -50,7 +51,7 @@ def lire_definitions(chemin: Path | None = None) -> tuple[list[RituelDefini], st
         if not isinstance(brut, list):
             return [], "rituels: a list is expected"
         return [RituelDefini.model_validate(entree) for entree in brut], None
-    except (ValidationError, ValueError, OSError) as exc:
+    except (ValidationError, ValueError, OSError, yaml.YAMLError) as exc:
         _logger.warning("rituels_illisibles", extra={"erreur": str(exc)})
         return [], f"rituels.md is invalid: {exc}"
 

@@ -27,6 +27,14 @@ corps
 """
 
 
+MAL_FORME = """---
+rituels:
+  - id: a
+    rythme: { type: hebdo
+---
+"""
+
+
 def test_missing_file_gives_empty_list(tmp_path: Path) -> None:
     assert service.lire_definitions(tmp_path / "absent.md") == ([], None)
 
@@ -34,6 +42,14 @@ def test_missing_file_gives_empty_list(tmp_path: Path) -> None:
 def test_unknown_rhythm_type_gives_error(tmp_path: Path) -> None:
     fichier = tmp_path / "rituels.md"
     fichier.write_text(FICHIER.replace("type: hebdo", "type: annuel"), encoding="utf-8")
+    definitions, erreur = service.lire_definitions(fichier)
+    assert definitions == []
+    assert erreur
+
+
+def test_malformed_yaml_gives_error(tmp_path: Path) -> None:
+    fichier = tmp_path / "rituels.md"
+    fichier.write_text(MAL_FORME, encoding="utf-8")
     definitions, erreur = service.lire_definitions(fichier)
     assert definitions == []
     assert erreur
