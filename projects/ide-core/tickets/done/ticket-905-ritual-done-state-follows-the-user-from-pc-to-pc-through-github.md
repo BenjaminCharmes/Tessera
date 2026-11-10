@@ -5,7 +5,7 @@ depends_on:
 - ticket-902
 estimated_days: 1
 id: ticket-905
-pr_number: null
+pr_number: 1016
 priority: medium
 status: done
 title: Ritual done state follows the user from PC to PC through GitHub
