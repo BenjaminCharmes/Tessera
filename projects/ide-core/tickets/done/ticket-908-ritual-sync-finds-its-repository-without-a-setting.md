@@ -4,7 +4,7 @@ created: 2026-11-10
 depends_on: []
 estimated_days: 0.5
 id: ticket-908
-pr_number: null
+pr_number: 1021
 priority: medium
 status: done
 title: Ritual sync finds its repository without a setting, and the view says when
