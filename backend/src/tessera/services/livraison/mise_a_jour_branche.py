@@ -13,9 +13,9 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from tessera.services.git_workspace import GitCommandError
-from tessera.services.git_workspace.chemins import _JOURNAL_PIPELINE, _JOURNAL_UNION_SUFFIXES, _relatif_au_projet
+from tessera.services.git_workspace.chemins import _JOURNAL_PIPELINE, _JOURNAL_UNION_SUFFIXES, _LECONS, _relatif_au_projet
 from tessera.services.git_workspace.git_runner import git
-from tessera.services.git_workspace.textes import _union_json_lists, _union_lines
+from tessera.services.git_workspace.textes import _resoudre_lecons, _union_json_lists, _union_lines
 from tessera.services.livraison.retest_apres_rebase import RetestApresRebase
 from tessera.services.worktrees.temporary_worktree import detached_worktree, run_git
 from tessera.utils.logger import get_logger
@@ -113,13 +113,13 @@ async def _fusionner(
         raise _Refus(f"Le merge de {cible} a échoué sans conflit : {fusion.err.strip()}")
     await _resoudre_en_union(racine, prefixe, conflits)
     await run_git(racine, "commit", "-m", message)
-    etapes.append(f"{cible} fusionné dans {branche}, journaux résolus en union")
+    etapes.append(f"{cible} fusionné dans {branche}, journaux et leçons résolus")
 
 
 async def _resoudre_en_union(racine: Path, prefixe: str, conflits: list[str]) -> None:
     """Union of every conflicting journal; refuses at the first file that is not one."""
     relatifs = [_relatif_au_projet(c, prefixe) for c in conflits]
-    autres = [c for c, r in zip(conflits, relatifs, strict=True) if r not in _JOURNAL_UNION_SUFFIXES]
+    autres = [c for c, r in zip(conflits, relatifs, strict=True) if r not in _JOURNAL_UNION_SUFFIXES and r != _LECONS]
     if autres:
         raise _Refus(
             "Conflit hors des journaux, qui ne se résout pas sans relecture : "
@@ -141,6 +141,12 @@ async def _union_du_fichier(racine: Path, chemin: str, relatif: str | None) -> s
     base = await git(racine, "show", f":3:{chemin}")
     if not (branche.ok and base.ok):
         raise _Refus(f"{chemin} est supprimé d'un côté : conflit hors union.")
+    if relatif == _LECONS:
+        ancetre = await git(racine, "show", f":1:{chemin}")
+        resolu = _resoudre_lecons(ancetre.out if ancetre.ok else "", base.out, branche.out)
+        if resolu is None:
+            raise _Refus(f"{chemin} : la branche a retiré ou modifié une leçon, ou la base n'a pas de « Proposées ».")
+        return resolu
     if relatif == _JOURNAL_PIPELINE:
         return _union_lines(base.out, branche.out)
     union = _union_json_lists(base.out, branche.out)

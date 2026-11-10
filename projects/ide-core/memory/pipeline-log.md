@@ -8858,3 +8858,22 @@ error: Please commit or stash them.
 - 2026-11-10 11:21:15 UTC — [ticket-905] APPROVED après 3 tour(s)
 - 2026-11-10 11:22:45 UTC — [ticket-905] leçons: refusée — preuve absente du retour du run
 - 2026-11-10 11:25:14 UTC — [ticket-905] documentation: 0 fichier(s) (141093ms)
+- 2026-11-10 11:37:09 UTC — [ide-core] ticket-905 PR #1016 confiée au CIWatcher
+- 2026-11-10 11:05:33 UTC — [ide-core] ticket-903 PR #1015 mergée (CI verte)
+- 2026-11-10 11:37:14 UTC — [ticket-907] branche ticket-907-a-lessons-conflict-keeps-the-base-plus-the-run-s
+- 2026-11-10 11:38:10 UTC — [ticket-907] plan rendu (54389ms)
+- 2026-11-10 11:38:10 UTC — [ticket-907] tour 1 — codeur démarré
+- 2026-11-10 11:48:54 UTC — [ticket-907] tour 1 — codeur terminé (643641ms)
+- 2026-11-10 11:57:55 UTC — [ticket-907] testeur: dur�es : ruff 0 s, pytest 538 s ; impact depuis base : 73 fichier(s) de test
+- 2026-11-10 11:57:55 UTC — [ticket-907] tests rouges au tour 1
+- 2026-11-10 11:57:55 UTC — [ticket-907] tour 2 — codeur démarré
+- 2026-11-10 12:00:11 UTC — [ticket-907] tour 2 — codeur terminé (135766ms)
+- 2026-11-10 12:10:05 UTC — [ticket-907] testeur: dur�es : ruff 0 s, mypy 18 s, mypy-linux 17 s, pytest 591 s ; impact depuis base : 73 fichier(s) de test
+- 2026-11-10 12:10:39 UTC — [ticket-907] securite: PASS — Je n'ai trouvé aucune faille CRITICAL ou HIGH. Le diff résout automatiquement un (34110ms)
+- 2026-11-10 12:10:39 UTC — [ticket-907] tour 2 — reviewer démarré
+- 2026-11-10 12:11:07 UTC — [ticket-907] tour 2 — reviewer terminé (27562ms)
+- 2026-11-10 12:11:17 UTC — [ticket-907] validateur: fichiers cités joints : textes.py, lecons.md, mise_a_jour_branche.py, memory/lecons.md
+- 2026-11-10 12:11:17 UTC — [ticket-907] validateur: APPROVED — Tous les critères sont satisfaits. La fonction `_resoudre_lecons` implémente cor (37921ms)
+- 2026-11-10 12:11:17 UTC — [ticket-907] APPROVED après 2 tour(s)
+- 2026-11-10 12:12:58 UTC — [ticket-907] leçons: une leçon proposée
+- 2026-11-10 12:14:53 UTC — [ticket-907] documentation: 0 fichier(s) (109547ms)

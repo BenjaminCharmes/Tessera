@@ -1,15 +1,15 @@
 ---
-id: ticket-907
-title: "A lessons conflict keeps the base plus the run's own additions"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-11-10
 depends_on: []
 estimated_days: 1
+id: ticket-907
 plan: true
-created: 2026-11-10
+pr_number: 1017
+priority: medium
+status: done
+title: A lessons conflict keeps the base plus the run's own additions
+type: fix
 ---
 
 # ticket-907 — Un conflit sur les leçons garde la base et les seuls ajouts du run

@@ -21,6 +21,9 @@ _ORCHESTRATOR_ARTIFACT_PATHS: tuple[str, ...] = ("tickets/", "memory/pipeline-lo
 #: Journal du pipeline, relatif au dossier du projet.
 _JOURNAL_PIPELINE = "memory/pipeline-log.md"
 
+#: Leçons du projet : un humain les trie, une union y est fausse (ticket-907).
+_LECONS = "memory/lecons.md"
+
 
 # The same paths, without the `:(exclude)` magic, used to stage and commit
 # them separately from the ticket's own code changes (see `commit_all`).
