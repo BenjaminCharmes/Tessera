@@ -9136,6 +9136,19 @@ error: Please commit or stash them.
 - 2026-11-11 13:27:03 UTC — [ticket-917] APPROVED après 1 tour(s)
 - 2026-11-11 13:31:22 UTC — [ticket-917] documentation: 1 fichier(s) (255172ms)
 - 2026-11-11 13:31:22 UTC — [ticket-926] documentation: pas de diff retrouvable, non documenté
+- 2026-11-11 13:35:14 UTC — [ide-core] ticket-917 PR #1041 confiée au CIWatcher
+- 2026-11-11 13:35:20 UTC — [ticket-918] branche ticket-918-view-titles-go-through-regiontitle-and-modal-titl
+- 2026-11-11 13:35:22 UTC — [ticket-918] tour 1 — codeur démarré
+- 2026-11-11 13:37:12 UTC — [ticket-918] tour 1 — codeur terminé (109891ms)
+- 2026-11-11 13:41:11 UTC — [ticket-918] testeur: dur�es : tsc 15 s, eslint 19 s, vitest 202 s
+- 2026-11-11 13:41:18 UTC — [ticket-918] securite: PASS — Le diff ne change que la présentation : un composant `TitreDeModale` (un `<h2>`  (7125ms)
+- 2026-11-11 13:41:18 UTC — [ticket-918] tour 1 — reviewer démarré
+- 2026-11-11 13:41:36 UTC — [ticket-918] tour 1 — reviewer terminé (17514ms)
+- 2026-11-11 13:41:55 UTC — [ticket-918] validateur: fichiers cités joints : components/RituelsView/index.tsx, components/HistoriqueView/DetailDuRun.tsx, design/ui/Modale.tsx, design/ui/Modale.test.tsx, components/StatsView/RecentRuns.tsx (tronqué) ; non joints (budget épuisé) : components/StatsView/index.tsx
+- 2026-11-11 13:41:55 UTC — [ticket-918] validateur: APPROVED — Tous les critères sont satisfaits. Le diff montre le refactoring complet : Regio (36375ms)
+- 2026-11-11 13:41:55 UTC — [ticket-918] APPROVED après 1 tour(s)
+- 2026-11-11 13:43:41 UTC — [ticket-918] documentation: 0 fichier(s) (101421ms)
+- 2026-11-11 13:47:08 UTC — [ide-core] ticket-912 retiré de la file
 - 2026-11-11 14:30:26 UTC — [ide-core] ticket-929 sauté : dépend de ticket-928, non mergé
 - 2026-11-11 14:30:26 UTC — [ide-core] ticket-928 PR #1046 confiée au CIWatcher
 - 2026-11-11 14:16:28 UTC — [ticket-919] livraison: arrêt — PR #1045 non mergée : CI failing : la PR #1045 reste ouverte.

@@ -1,6 +1,7 @@
 import type { Rituel } from "../../lib/apiRituels";
 import type { Project } from "../../types/api";
 import type { UseRituelsResult } from "../../hooks/useRituels";
+import RegionTitle from "../../design/RegionTitle";
 import CarteRituel from "./CarteRituel";
 import { libelleDeDate, libelleDuRythme } from "./format";
 
@@ -13,7 +14,9 @@ interface RituelsViewProps {
 function Section({ titre, children }: { titre: string; children: React.ReactNode }) {
   return (
     <section aria-label={titre} className="mb-6">
-      <h2 className="mb-2 text-xs uppercase tracking-wider text-zinc-500">{titre}</h2>
+      <h2 className="mb-2">
+        <RegionTitle taille="sm">{titre}</RegionTitle>
+      </h2>
       {children}
     </section>
   );
@@ -42,7 +45,9 @@ export default function RituelsView({ rituels, projets, onOpenProject }: Rituels
 
   return (
     <div className="h-full overflow-y-auto p-6">
-      <h1 className="mb-4 text-lg font-medium text-zinc-100">Rituels</h1>
+      <h2 className="mb-4">
+        <RegionTitle>Rituels</RegionTitle>
+      </h2>
       {synchro === "locale" ? (
         <p className="-mt-3 mb-4 text-xs text-zinc-500">
           État gardé sur ce PC seulement : la synchronisation GitHub n'est pas active.

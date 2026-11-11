@@ -4,10 +4,10 @@ created: 2026-11-11
 depends_on: []
 estimated_days: 0.5
 id: ticket-918
-pr_number: null
+pr_number: 1044
 priority: low
-status: todo
-title: "View titles go through RegionTitle and modal titles through one shared title"
+status: done
+title: View titles go through RegionTitle and modal titles through one shared title
 type: refactor
 ---
 

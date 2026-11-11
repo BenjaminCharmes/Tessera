@@ -143,7 +143,7 @@ function Dashboard({ data, onSelectRun }: DashboardProps) {
             empty="Aucun token sur la période."
           />
         </Card>
-        <Card title="Issue des runs">
+        <Card title="Résultat des runs">
           <QualityCard quality={data.quality} />
         </Card>
       </div>

@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { api } from "../../lib/api";
-import Modale from "../../design/ui/Modale";
+import Modale, { TitreDeModale } from "../../design/ui/Modale";
 import type { ConversationMessage } from "../../types/api";
 
 interface AgentCreatorModalProps {
@@ -56,7 +56,7 @@ export default function AgentCreatorModal({
   return (
     <Modale onFermer={onClose} aria-label="Créer un agent">
       <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-6 w-full max-w-lg shadow-xl flex flex-col gap-4">
-        <h2 className="text-zinc-100 text-base font-semibold">Nouvel agent</h2>
+        <TitreDeModale>Nouvel agent</TitreDeModale>
 
         {hasMessages && (
           <div className="flex flex-col gap-3 max-h-64 overflow-y-auto">

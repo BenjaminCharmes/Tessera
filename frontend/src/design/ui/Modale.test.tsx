@@ -2,7 +2,7 @@ import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import Modale from "./Modale";
+import Modale, { TitreDeModale } from "./Modale";
 
 describe("Modale", () => {
   it("renders its content in a modal dialog with the given label", () => {
@@ -241,5 +241,11 @@ describe("Modale", () => {
     );
 
     expect(screen.getByRole("dialog").className).toContain("bg-zinc-950/70");
+  });
+
+  it("renders TitreDeModale as a level 2 heading", () => {
+    render(<TitreDeModale>Mon titre</TitreDeModale>);
+
+    expect(screen.getByRole("heading", { level: 2, name: "Mon titre" })).toBeInTheDocument();
   });
 });
