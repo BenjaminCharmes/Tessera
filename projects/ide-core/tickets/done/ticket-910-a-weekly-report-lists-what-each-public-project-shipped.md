@@ -4,7 +4,7 @@ created: 2026-11-10
 depends_on: []
 estimated_days: 1
 id: ticket-910
-pr_number: null
+pr_number: 1027
 priority: medium
 status: done
 title: A weekly report lists what each public project shipped, read from its own files
