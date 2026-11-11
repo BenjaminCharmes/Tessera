@@ -4,7 +4,7 @@ created: 2026-11-11
 depends_on: []
 estimated_days: 0.5
 id: ticket-919
-pr_number: null
+pr_number: 1045
 priority: low
 status: done
 title: Filter chips, counter badges and the focus ring each share one style
