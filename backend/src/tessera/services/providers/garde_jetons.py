@@ -59,6 +59,18 @@ JETON_REFUS = (
     "demande ce jeton, dis-le dans ton rapport."
 )
 
+#: What the agent reads when the path is a local env file of the frontend.
+ENV_LOCAL_REFUS = (
+    "Lecture refusée : ce fichier d'environnement local du frontend de Tessera "
+    "peut porter le jeton de l'API. Aucun agent ne le lit (ADR-081). Ce refus "
+    "repère les chemins nommés, rien de plus : il attrape une erreur, pas une "
+    "évasion (ADR-031). Un refus de hook est définitif ; si le ticket demande "
+    "ce jeton, dis-le dans ton rapport."
+)
+
+# Les fichiers que Vite charge en local, à la racine du frontend de Tessera.
+_ENV_LOCAUX = (".env.local", ".env.development.local", ".env.production.local")
+
 _GIT_BASH = re.compile(r"^/([a-zA-Z])/(.*)$")
 _SEPARATEURS = re.compile(r"[\s;|&<>()=,`]+")
 _JOKERS = "*?[{"
@@ -195,16 +207,21 @@ def hook_refus_env_tessera(
 ) -> Callable[[HookInput, str | None, HookContext], Awaitable[HookJSONOutput]]:
     """Build the ``PreToolUse`` hook refusing reads of Tessera's secret files.
 
-    Two files are protected: the ``.env`` and the session-token file
-    (ticket-879). Relative paths resolve against ``cwd``, the run's working
+    Protected: the ``.env``, the session-token file (ticket-879) and the
+    frontend's ``.env*.local`` files (ticket-922). Relative paths resolve against ``cwd``, the run's working
     folder; without one, against the process's. ``env_file`` defaults to
     ``Settings.env_file`` and ``fichier_jeton`` to
     ``jeton_de_session.chemin_du_fichier()``; both are resolved once, here.
     """
     base = (cwd if cwd is not None else Path.cwd()).resolve()
+    env_tessera = (env_file if env_file is not None else Settings.env_file).resolve()
     cibles = (
-        ((env_file if env_file is not None else Settings.env_file).resolve(), ENV_REFUS),
+        (env_tessera, ENV_REFUS),
         ((fichier_jeton or jeton_de_session.chemin_du_fichier()).resolve(), JETON_REFUS),
+        *(
+            ((env_tessera.parent / "frontend" / nom).resolve(), ENV_LOCAL_REFUS)
+            for nom in _ENV_LOCAUX
+        ),
     )
 
     async def hook(

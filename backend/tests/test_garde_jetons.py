@@ -6,7 +6,7 @@ from typing import Any, cast
 import pytest
 from claude_agent_sdk import HookContext, HookInput, HookJSONOutput
 
-from tessera.services.providers.garde_jetons import ENV_REFUS, JETON_REFUS, hook_refus_env_tessera
+from tessera.services.providers.garde_jetons import ENV_LOCAL_REFUS, ENV_REFUS, JETON_REFUS, hook_refus_env_tessera
 
 
 class _Depot:
@@ -344,6 +344,55 @@ async def test_the_env_is_still_refused_with_its_own_message(depot: _Depot, jeto
     sortie = await _appeler_jeton(depot, jeton, "Read", file_path=str(depot.env))
 
     assert cast(dict[str, Any], sortie)["hookSpecificOutput"]["permissionDecisionReason"] == ENV_REFUS
+
+
+# ------------------------------------------------------------------
+# `.env*.local` du frontend (ticket-922)
+# ------------------------------------------------------------------
+
+
+async def _appeler_racine(depot: _Depot, outil: str, **entrees: Any) -> HookJSONOutput:
+    hook = hook_refus_env_tessera(depot.racine, env_file=depot.env)
+    entree = cast(HookInput, {"tool_name": outil, "tool_input": entrees})
+    return await hook(entree, None, cast(HookContext, None))
+
+
+def _motif(sortie: HookJSONOutput) -> object:
+    return cast(dict[str, Any], sortie)["hookSpecificOutput"]["permissionDecisionReason"]
+
+
+async def test_read_refuses_the_frontend_env_local_with_its_message(depot: _Depot) -> None:
+    sortie = await _appeler_racine(depot, "Read", file_path="frontend/.env.local")
+
+    assert _refuse(sortie)
+    assert _motif(sortie) == ENV_LOCAL_REFUS
+
+
+@pytest.mark.parametrize(
+    "commande", ["cat frontend/.env.local", "grep -r TOKEN frontend", "cat frontend/.env.*"]
+)
+async def test_bash_refuses_reading_the_frontend_env_local(
+    depot: _Depot, commande: str
+) -> None:
+    assert _refuse(await _appeler_racine(depot, "Bash", command=commande))
+
+
+@pytest.mark.parametrize("nom", [".env.development.local", ".env.production.local"])
+async def test_the_mode_specific_local_files_are_refused(depot: _Depot, nom: str) -> None:
+    assert _refuse(await _appeler_racine(depot, "Read", file_path=f"frontend/{nom}"))
+    assert _refuse(await _appeler_racine(depot, "Bash", command=f"type frontend/{nom}"))
+    assert _refuse(await _appeler_racine(depot, "Grep", pattern="x", path="frontend"))
+
+
+async def test_a_project_env_local_passes(depot: _Depot) -> None:
+    (depot.projet / ".env.local").write_text("X=1\n", encoding="utf-8")
+
+    assert not _refuse(
+        await _appeler_racine(depot, "Read", file_path="projects/client/.env.local")
+    )
+    assert not _refuse(
+        await _appeler_racine(depot, "Bash", command="cat projects/client/.env.local")
+    )
 
 
 def test_the_hook_is_installed_on_every_agent_call(tmp_path: Path) -> None:
