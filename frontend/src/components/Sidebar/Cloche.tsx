@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import { IconBell } from "../../design/icons";
+import Compteur from "../../design/ui/Compteur";
 import ReglageNotifications, { type ReglageDesNotifications } from "./ReglageNotifications";
 import type { DonneesDeLaCloche } from "../../hooks/useNotificationsSysteme";
 import { PanneauAujourdhui, PanneauReglagesDesTypes } from "./ContenuDeLaCloche";
@@ -53,12 +54,9 @@ export default function Cloche({ cloche, notifications }: ClocheProps) {
         <span data-testid="cloche-icone" className="relative inline-flex">
           <IconBell size={20} />
           {nonLus > 0 ? (
-            <span
-              aria-hidden="true"
-              className="absolute -right-2 -top-2 min-w-4 rounded-full bg-violet-500 px-1 text-micro font-medium leading-4 text-zinc-50"
-            >
+            <Compteur ton="violet" aria-hidden="true" position="absolute -right-2 -top-2">
               {nonLus}
-            </span>
+            </Compteur>
           ) : null}
         </span>
       </button>

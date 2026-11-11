@@ -1,3 +1,4 @@
+import Compteur, { type TonCompteur } from "../../design/ui/Compteur";
 import type { AlerteDeSupervision } from "./panels";
 
 /**
@@ -21,12 +22,12 @@ export default function Pastille({
   titre?: string;
 }) {
   if (nombre === 0) return null;
-  const couleur =
+  const ton: TonCompteur =
     alerte === "bloque"
-      ? "bg-red-500/20 text-red-200"
+      ? "red"
       : alerte === "attente"
-        ? "bg-amber-500/20 text-amber-200"
-        : "bg-blue-500/20 text-blue-200";
+        ? "amber"
+        : "blue";
   const noms = `${nombre} ${unite}${nombre > 1 ? "s" : ""}`;
   const titreParDefaut =
     alerte === "bloque"
@@ -36,12 +37,8 @@ export default function Pastille({
         : `${noms} en cours`;
   const titre = titreImpose ?? titreParDefaut;
   return (
-    <span
-      title={titre}
-      aria-label={titre}
-      className={`absolute right-0.5 top-0.5 min-w-4 rounded-full px-1 text-micro font-medium leading-4 ${couleur}`}
-    >
+    <Compteur ton={ton} title={titre} aria-label={titre} position="absolute right-0.5 top-0.5">
       {nombre}
-    </span>
+    </Compteur>
   );
 }

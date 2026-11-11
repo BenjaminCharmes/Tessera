@@ -3,6 +3,7 @@ import Dossier from "../../design/bureau/Dossier";
 import type { StreamState } from "../../hooks/streamState";
 import { useRestants } from "../../hooks/useRestants";
 import { useTickets } from "../../hooks/useTickets";
+import Compteur from "../../design/ui/Compteur";
 import AvecInfobulle from "./AvecInfobulle";
 
 interface DossiersProps {
@@ -88,13 +89,14 @@ function Pile({ projet, restants, onActiver }: PileProps) {
           ))}
         </div>
       </Agrandi>
-      <span
+      <Compteur
+        ton="zinc"
         aria-hidden="true"
         data-badge="restants"
-        className="absolute -right-2 -top-2 min-w-4 rounded-full bg-zinc-700 px-1 text-center text-micro leading-4 text-zinc-100"
+        position="absolute -right-2 -top-2"
       >
         {restants.length}
-      </span>
+      </Compteur>
     </AvecInfobulle>
   );
 }

@@ -74,7 +74,7 @@ export default function PosteDeTravail({
         title={libelle}
         onClick={choisir}
         tabIndex={absent ? -1 : undefined}
-        className={`relative rounded-md p-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-500 ${choisir ? "cursor-pointer" : ""}`}
+        className={`relative rounded-md p-0.5 focus-violet ${choisir ? "cursor-pointer" : ""}`}
       >
         <Agrandi>
           <Poste

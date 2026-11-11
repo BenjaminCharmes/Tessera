@@ -117,7 +117,7 @@ export default function SalleTessera({ nom, lueA }: SalleTesseraProps) {
             ))}
             <AvecInfobulle
               label={`Ollama : ${refroidi ? "en refroidissement" : "aucun refroidissement"}`}
-              className="rounded-sm focus-visible:outline-2 focus-visible:outline-violet-500"
+              className="rounded-sm focus-violet"
               infobulle={
                 <>
                   <p className="font-semibold text-zinc-100">Ollama · {salle.ollama.url}</p>
