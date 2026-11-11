@@ -3,6 +3,7 @@
 Pièges observés sur ce projet, une ligne chacun. Le service écrit sous `## Proposées` ; un humain déplace une leçon sous `## En vigueur` pour qu'elle atteigne le codeur et le reviewer.
 
 ## Proposées
+- Quand on raccourcit les commentaires pour loger du code nouveau, c'est qu'on ajoute trop ; refactoriser l'architecture au lieu d'éroder la doc. (source : ticket-915, 2026-11-11)
 
 ## En vigueur
 - Quand on rattrape les exceptions d'une bibliothèque de parsing, ajouter explicitement les types d'exception réellement levés au lieu de supposer qu'ils héritent de ValueError. (source : ticket-902, 2026-11-10)

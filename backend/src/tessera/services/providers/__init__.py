@@ -36,6 +36,7 @@ def get_provider(
     effort: EffortLevel | None = None,
     base_url: str | None = None,
     endpoint_key: str = "",
+    compte_agent: bool = False,
 ) -> LLMProvider:
     """Builds the configured LLM provider. Defaults to the subscription-backed SDK.
 
@@ -76,6 +77,9 @@ def get_provider(
     ``base_url`` and ``endpoint_key`` are the endpoint of an
     ``openai_compatible`` role and the key its ``api_key_env`` names
     (ticket-669). ``api_key`` stays the Anthropic one: the two never mix.
+
+    ``compte_agent`` runs the SDK provider under the dedicated agent account
+    (ticket-915); only the SDK provider has one.
     """
     resolved = name or "agent_sdk"
     if resolved == "agent_sdk":
@@ -94,6 +98,8 @@ def get_provider(
             kwargs["duree_max_s"] = duree_max_s
         if effort is not None:
             kwargs["effort"] = effort
+        if compte_agent:
+            kwargs["compte_agent"] = True
         if tools is not None:
             kwargs["allowed_tools"] = list(tools)
         elif not allow_tools:

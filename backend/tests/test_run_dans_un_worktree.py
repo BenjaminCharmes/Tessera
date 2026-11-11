@@ -330,5 +330,46 @@ async def test_agent_rights_are_set_after_populate(
 
     monkeypatch.setattr(run_dans_worktree, "peupler", peupler_note)
     monkeypatch.setattr(run_dans_worktree, "accorder_droits_agent", droits_notes)
+    _declarer_compte_agent(depot, True)
     await _ouvrir(depot)
     assert ordre == ["peupler", "droits"]
+
+
+def _declarer_compte_agent(depot: Path, valeur: bool) -> None:
+    declaration = {**DECLARATION, "worktree": {**DECLARATION["worktree"], "compte_agent": valeur}}
+    (depot / "agents.json").write_text(json.dumps(declaration), encoding="utf-8")
+
+
+async def test_agent_rights_are_not_set_without_compte_agent(
+    depot: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    appels: list[str] = []
+
+    async def droits_notes(wt: RunWorktree, commande: str | None) -> None:
+        appels.append("droits")
+
+    monkeypatch.setattr(run_dans_worktree, "accorder_droits_agent", droits_notes)
+    await _ouvrir(depot)
+    assert appels == []
+
+
+async def test_the_run_providers_receive_compte_agent(
+    depot: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from tessera.services.pipeline import assemblage_run
+
+    recus: list[bool] = []
+    reel = assemblage_run.provider_pour_role
+
+    def espion(*args: object, **kwargs: object) -> object:
+        recus.append(bool(kwargs.get("compte_agent")))
+        return reel(*args, **kwargs)  # type: ignore[arg-type]
+
+    monkeypatch.setattr(assemblage_run, "provider_pour_role", espion)
+    _declarer_compte_agent(depot, True)
+    await _orchestrateur(depot)
+    assert recus and all(recus)
+    recus.clear()
+    _declarer_compte_agent(depot, False)
+    await build_orchestrator(PROJET)
+    assert recus and not any(recus)

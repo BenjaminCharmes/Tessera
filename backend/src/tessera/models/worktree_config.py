@@ -33,3 +33,6 @@ class ConfigWorktree(BaseModel):
     setup: str | None = None
     #: Délai propre au setup (ticket-906), en secondes ; sans lui, celui des tests.
     setup_timeout_s: int | None = None
+    #: Les agents du projet tournent sous le compte dédié (ticket-915, ADR-083) ;
+    #: sans effet tant qu'`AGENT_USER` est vide.
+    compte_agent: bool = False
