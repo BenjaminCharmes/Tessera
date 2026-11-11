@@ -9311,3 +9311,10 @@ error: Please commit or stash them.
 - 2026-11-11 17:22:33 UTC — [ticket-936] CHANGES_REQUESTED tour 3: Reviewer : 1. `phrases_interdites` ne retient la première phrase du CLAUDE.md de Tessera que si `racine not in projet.parents`. Or les projets hébergés vivent dans le dépôt Tessera : `tessera/projects
 - 2026-11-11 17:22:33 UTC — [ticket-936] BLOCKED après 3 tour(s) sans approbation
 - 2026-11-11 17:22:38 UTC — [ide-core] file interrompue : ticket-936 non approuvé
+- 2026-11-11 17:16:30 UTC — [ide-core] ticket-929 PR #1054 mergée (CI verte)
+- 2026-11-11 17:23:54 UTC — [ticket-912] branche ticket-912-old-pipeline-log-months-move-to-a-monthly-archive
+- 2026-11-11 17:24:40 UTC — [ticket-912] plan rendu (44516ms)
+- 2026-11-11 17:24:41 UTC — [ticket-912] tour 1 — codeur démarré
+- 2026-11-11 17:26:34 UTC — [ticket-912] tour 1 — codeur terminé (111641ms)
+- 2026-11-11 17:37:03 UTC — [ticket-912] testeur: 1 failed, 4870 passed, 3 skipped, 88 warnings in 624.57s (0:10:24)
+- 2026-11-11 17:37:03 UTC — [ticket-912] BLOCKED — fichier protégé modifié pendant un appel d'agent : .git/config
