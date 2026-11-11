@@ -9148,3 +9148,4 @@ error: Please commit or stash them.
 - 2026-11-11 13:41:55 UTC — [ticket-918] validateur: APPROVED — Tous les critères sont satisfaits. Le diff montre le refactoring complet : Regio (36375ms)
 - 2026-11-11 13:41:55 UTC — [ticket-918] APPROVED après 1 tour(s)
 - 2026-11-11 13:43:41 UTC — [ticket-918] documentation: 0 fichier(s) (101421ms)
+- 2026-11-11 13:47:08 UTC — [ide-core] ticket-912 retiré de la file
