@@ -9311,3 +9311,25 @@ error: Please commit or stash them.
 - 2026-11-11 17:22:33 UTC — [ticket-936] CHANGES_REQUESTED tour 3: Reviewer : 1. `phrases_interdites` ne retient la première phrase du CLAUDE.md de Tessera que si `racine not in projet.parents`. Or les projets hébergés vivent dans le dépôt Tessera : `tessera/projects
 - 2026-11-11 17:22:33 UTC — [ticket-936] BLOCKED après 3 tour(s) sans approbation
 - 2026-11-11 17:22:38 UTC — [ide-core] file interrompue : ticket-936 non approuvé
+- 2026-11-11 17:16:30 UTC — [ide-core] ticket-929 PR #1054 mergée (CI verte)
+- 2026-11-11 17:23:54 UTC — [ticket-912] branche ticket-912-old-pipeline-log-months-move-to-a-monthly-archive
+- 2026-11-11 17:24:40 UTC — [ticket-912] plan rendu (44516ms)
+- 2026-11-11 17:24:41 UTC — [ticket-912] tour 1 — codeur démarré
+- 2026-11-11 17:26:34 UTC — [ticket-912] tour 1 — codeur terminé (111641ms)
+- 2026-11-11 17:37:03 UTC — [ticket-912] testeur: 1 failed, 4870 passed, 3 skipped, 88 warnings in 624.57s (0:10:24)
+- 2026-11-11 17:37:03 UTC — [ticket-912] BLOCKED — fichier protégé modifié pendant un appel d'agent : .git/config
+- 2026-11-11 17:46:45 UTC — [ticket-912] branche ticket-912-old-pipeline-log-months-move-to-a-monthly-archive
+- 2026-11-11 17:47:18 UTC — [ticket-912] plan rendu (31328ms)
+- 2026-11-11 17:56:39 UTC — [ticket-912] testeur: 1 failed, 4842 passed, 3 skipped, 88 warnings in 559.62s (0:09:19)
+- 2026-11-11 17:56:39 UTC — [ticket-912] branche reprise (2 commit(s)) — tests red, codeur en premier
+- 2026-11-11 17:56:39 UTC — [ticket-912] tour 1 — codeur démarré
+- 2026-11-11 17:57:06 UTC — [ticket-912] tour 1 — codeur terminé (27172ms)
+- 2026-11-11 18:08:01 UTC — [ticket-912] testeur: dur�es : ruff 0 s, mypy 20 s, mypy-linux 33 s, pytest 650 s ; impact depuis base : suite compl�te
+- 2026-11-11 18:08:25 UTC — [ticket-912] securite: PASS — Verdict PASS. Le diff ajoute un script local qui déplace les vieilles lignes du  (23312ms)
+- 2026-11-11 18:08:25 UTC — [ticket-912] tour 1 — reviewer démarré
+- 2026-11-11 18:08:44 UTC — [ticket-912] tour 1 — reviewer terminé (19421ms)
+- 2026-11-11 18:08:58 UTC — [ticket-912] validateur: fichiers cités joints : git_workspace/chemins.py, scripts/archiver_journal.py ; absents : memory/journal/
+- 2026-11-11 18:08:58 UTC — [ticket-912] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le module `archive_journal.py`  (33157ms)
+- 2026-11-11 18:08:58 UTC — [ticket-912] APPROVED après 1 tour(s)
+- 2026-11-11 18:09:50 UTC — [ticket-912] leçons: refusée — preuve absente du retour du run
+- 2026-11-11 18:13:41 UTC — [ticket-912] documentation: 0 fichier(s) (225062ms) — après tour de correction
