@@ -166,7 +166,14 @@ jobs:
       # que sur Linux, et le passer ailleurs fait echouer l'etape.
       - name: Install Playwright browsers (Linux)
         if: runner.os == 'Linux'
-        run: cd frontend && npx playwright install --with-deps chromium
+        # Un miroir apt en panne ne fait pas tomber l'E2E : l'image Ubuntu de
+        # GitHub porte déjà les bibliothèques de Chromium (ticket-935).
+        run: |
+          cd frontend
+          npx playwright install --with-deps chromium || {
+            echo "::warning::apt indisponible : navigateur installé sans ses dépendances système"
+            npx playwright install chromium
+          }
 
       - name: Install Playwright browsers
         if: runner.os != 'Linux'
