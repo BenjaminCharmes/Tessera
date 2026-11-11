@@ -8,7 +8,7 @@ holds them back. The hand-back of a PR and the reopening of a queue
 `superviseur_collecte_livraison` (ticket-867), which also builds the loop.
 
 Each candidate carries the idempotence `sha` of the exact state it acts on: a
-raw ticket's body, the set of proposed blocks. A state that changes is a new key.
+raw ticket's body, the text of one proposed block. A state that changes is a new key.
 """
 import hashlib
 from collections.abc import Awaitable, Callable
@@ -19,6 +19,7 @@ from tessera.services.projets.ticket_service import TicketService
 from tessera.services.supervision.intervention import Application, Resultat, intervenir
 from tessera.services.supervision.superviseur_actions import Action, Decision
 from tessera.services.supervision.superviseur_boucle_ports import Candidat
+from tessera.services.supervision.superviseur_decision import Passe, SuperviseurDecision
 from tessera.services.supervision.superviseur_decision_blocs import Genre, blocs_proposes
 from tessera.services.supervision.superviseur_decision_ecriture import FICHIERS
 from tessera.services.supervision.superviseur_tri import Intervenir, SuperviseurTri, TicketBrut, lister_bruts
@@ -87,16 +88,25 @@ def _lire(chemin: Path) -> str:
 
 
 def _candidats_decision(project_id: str, project_path: Path) -> list[Candidat]:
+    """One candidate per proposed block: a block already decided is not submitted again."""
     memoire = project_path / "memory"
-    textes = [b.texte for g in _GENRES for b in blocs_proposes(_lire(memoire / FICHIERS[g]), g)]
-    if not textes:
+    blocs = [b for g in _GENRES for b in blocs_proposes(_lire(memoire / FICHIERS[g]), g)]
+    if not blocs:
         return []
     decision = superviseur_decision_pour(project_id, project_path, _intervenir_pour(project_id))
+    passe = Passe()  # partagée : le plafond et l'arrêt sur projet tenu valent pour tout le balayage
+    return [
+        Candidat(project_id, Action.DECIDER, bloc.cible, _empreinte(bloc.texte), False, _decider(decision, project_id, project_path, bloc.cible, passe))
+        for bloc in blocs
+    ]
+
+
+def _decider(decision: SuperviseurDecision, project_id: str, project_path: Path, cible: str, passe: Passe) -> Callable[[], Awaitable[list[Decision]]]:
+    """The execution of the decision on one block, with `cible` bound to it."""
 
     async def executer() -> list[Decision]:
-        resultats = await decision.decider(project_id, project_path)
         decisions: list[Decision] = []
-        for resultat in resultats:
+        for resultat in await decision.decider_bloc(project_id, project_path, cible, passe):
             if resultat.intervention is not None and resultat.intervention.statut == "blocked":
                 raison = f"intervention bloquée : {resultat.intervention.raison}"
                 decisions.append(Decision(Action.DECIDER, resultat.bloc.cible, "a_toi", raison[:300]))
@@ -105,7 +115,7 @@ def _candidats_decision(project_id: str, project_path: Path) -> list[Candidat]:
             decisions.append(resultat.decision)
         return decisions
 
-    return [Candidat(project_id, Action.DECIDER, project_id, _empreinte(*textes), False, executer)]
+    return executer
 
 
 async def collecter(project_id: str, project_path: Path) -> list[Candidat]:

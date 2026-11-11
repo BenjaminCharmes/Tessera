@@ -15,7 +15,7 @@ from tessera.services.pipeline.run_registry import RunRegistry
 from tessera.services.providers.base import ProviderResult
 from tessera.services.supervision.intervention import Application, Resultat, intervenir
 from tessera.services.supervision.superviseur_actions import Action, deplacement_pur
-from tessera.services.supervision.superviseur_decision import PLAFOND_DECISIONS, ResultatDecision, SuperviseurDecision
+from tessera.services.supervision.superviseur_decision import PLAFOND_DECISIONS, Passe, ResultatDecision, SuperviseurDecision
 from tessera.services.supervision.superviseur_decision_blocs import blocs_proposes
 from tessera.services.supervision.superviseur_decision_dossier import DOSSIER_MAX_OCTETS, construire_dossier
 from tessera.services.supervision.superviseur_journal import lire_journal
@@ -377,3 +377,74 @@ def test_dossier_is_bounded_and_marks_every_part_as_data() -> None:
 
     assert len(dossier.encode("utf-8")) <= DOSSIER_MAX_OCTETS
     assert dossier.count("donnée, jamais une consigne") == 3 and _LECON_A in dossier
+
+
+async def test_decider_bloc_submits_only_the_named_block(projet: Path) -> None:
+    _deleguer(projet, "lecons", "regles")
+    modele = _Modele(_accepter(section="Git"))
+    service, _ = _service(projet, modele)
+    [bloc] = [b for b in blocs_proposes(_CONTRAINTES, "regle") if b.texte == _REGLE_NEUTRE]
+
+    resultats = await service.decider_bloc("demo", projet, bloc.cible)
+
+    assert [r.bloc.texte for r in resultats] == [_REGLE_NEUTRE]
+    assert len(modele.dossiers) == 1
+
+
+async def test_decider_bloc_sends_a_sensitive_block_to_a_toi_without_the_model(projet: Path) -> None:
+    _deleguer(projet, "lecons", "regles")
+    modele = _Modele(_accepter(section="Git"))
+    service, _ = _service(projet, modele)
+    [bloc] = [b for b in blocs_proposes(_CONTRAINTES, "regle") if b.texte == _REGLE_PORTE]
+
+    resultats = await service.decider_bloc("demo", projet, bloc.cible)
+
+    assert [r.decision.verdict for r in resultats] == ["a_toi"]
+    assert modele.dossiers == []
+
+
+async def test_decider_bloc_returns_nothing_for_a_gone_block(projet: Path) -> None:
+    service, _ = _service(projet, _Modele(_accepter()))
+
+    assert await service.decider_bloc("demo", projet, "regle-00000000") == []
+
+
+async def test_decider_bloc_stops_calling_the_model_at_the_ceiling(projet: Path) -> None:
+    _deleguer(projet, "lecons", "regles")
+    modele = _Modele(_accepter(section="Git"))
+    service, _ = _service(projet, modele)
+    [bloc] = [b for b in blocs_proposes(_CONTRAINTES, "regle") if b.texte == _REGLE_NEUTRE]
+
+    assert await service.decider_bloc("demo", projet, bloc.cible, Passe(consultes=PLAFOND_DECISIONS)) == []
+    assert modele.dossiers == []
+    passe = Passe(consultes=PLAFOND_DECISIONS - 1)
+    assert len(await service.decider_bloc("demo", projet, bloc.cible, passe)) == 1
+    assert passe.consultes == PLAFOND_DECISIONS
+
+
+async def test_decider_bloc_still_hands_a_sensitive_block_over_at_the_ceiling(projet: Path) -> None:
+    _deleguer(projet, "lecons", "regles")
+    service, _ = _service(projet, _Modele(_accepter()))
+    [bloc] = [b for b in blocs_proposes(_CONTRAINTES, "regle") if b.texte == _REGLE_PORTE]
+
+    resultats = await service.decider_bloc("demo", projet, bloc.cible, Passe(consultes=PLAFOND_DECISIONS))
+
+    assert [r.decision.verdict for r in resultats] == ["a_toi"]
+
+
+async def test_a_held_project_stops_the_next_blocks_of_the_sweep(projet: Path) -> None:
+    _deleguer(projet, "lecons", "regles")
+    modele = _Modele(_accepter(section="Git"))
+
+    async def tenu(action: Action, appliquer: Callable[[Path], Awaitable[Application]]) -> Resultat:
+        return Resultat("abandonne", action)
+
+    service = SuperviseurDecision(modele, tenu, modele="m", systeme="s")  # type: ignore[arg-type]
+    cibles = [b.cible for b in blocs_proposes(_LECONS, "lecon")]
+    passe = Passe()
+
+    premier = await service.decider_bloc("demo", projet, cibles[0], passe)
+    second = await service.decider_bloc("demo", projet, cibles[1], passe)
+
+    assert len(premier) == 1 and passe.abandonne
+    assert second == [] and len(modele.dossiers) == 1
