@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 1
 id: ticket-923
 plan: true
-pr_number: null
+pr_number: 1033
 priority: high
 status: done
 title: A run finds tickets merged on the remote base of a project without worktree
