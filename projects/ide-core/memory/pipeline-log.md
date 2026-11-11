@@ -9029,3 +9029,27 @@ error: Please commit or stash them.
 - 2026-11-11 10:58:26 UTC — [ticket-923] APPROVED après 3 tour(s)
 - 2026-11-11 10:59:09 UTC — [ticket-923] leçons: refusée — preuve absente du retour du run
 - 2026-11-11 11:02:22 UTC — [ticket-923] documentation: 0 fichier(s) (187516ms) — après tour de correction
+- 2026-11-11 10:47:11 UTC — [ide-core] ticket-922 PR #1031 mergée (CI verte)
+- 2026-11-11 11:06:21 UTC — [ide-core] ticket-923 PR #1033 confiée au CIWatcher
+- 2026-11-11 11:12:02 UTC — [ticket-923] livraison: arrêt — PR #1033 non mergée : CI failing : la PR #1033 reste ouverte.
+- 2026-11-11 11:40:58 UTC — [ticket-925] branche ticket-925-the-bash-write-guard-skips-heredoc-bodies-and-res
+- 2026-11-11 11:41:00 UTC — [ticket-925] tour 1 — codeur démarré
+- 2026-11-11 11:46:00 UTC — [ticket-925] tour 1 — codeur terminé (299953ms)
+- 2026-11-11 11:46:02 UTC — [ticket-925] testeur: en attente d'un créneau de test
+- 2026-11-11 11:49:07 UTC — [ticket-925] testeur: dur�es : ruff 1 s, pytest 48 s, mypy 81 s, mypy-linux 55 s ; impact depuis base : 14 fichier(s) de test
+- 2026-11-11 11:49:42 UTC — [ticket-925] securite: PASS — Le diff ne contient ni injection ni secret. Le `cd` en tête rend en général la g (35233ms)
+- 2026-11-11 11:49:43 UTC — [ticket-925] tour 1 — reviewer démarré
+- 2026-11-11 11:50:35 UTC — [ticket-925] tour 1 — reviewer terminé (52358ms)
+- 2026-11-11 11:50:48 UTC — [ticket-925] validateur: fichiers cités joints : services/providers/perimetre.py, backend/ (dossier, 8 fichiers) ; absents : backend/app/y.py
+- 2026-11-11 11:50:48 UTC — [ticket-925] validateur: APPROVED — Les cinq critères d'acceptation sont satisfaits. Le nouveau fichier `test_redire (65592ms)
+- 2026-11-11 11:50:48 UTC — [ticket-925] CHANGES_REQUESTED tour 1: Reviewer : 1. `_dossier_de_tete` applique le dossier du premier `cd` à toutes les cibles qui suivent, même quand un autre `cd`, `pushd` ou `popd` change le dossier courant plus loin dans la chaîne. Le
+- 2026-11-11 11:50:48 UTC — [ticket-925] tour 2 — codeur démarré
+- 2026-11-11 11:51:18 UTC — [ticket-925] tour 2 — codeur terminé (30280ms)
+- 2026-11-11 11:51:51 UTC — [ticket-925] testeur: dur�es : ruff 0 s, mypy 18 s, pytest 29 s, mypy-linux 12 s ; impact depuis base : 14 fichier(s) de test
+- 2026-11-11 11:52:16 UTC — [ticket-925] securite: PASS — Le préfixe `cd` relativise correctement les cibles. La garde finale (perimetre.p (24719ms)
+- 2026-11-11 11:52:16 UTC — [ticket-925] tour 2 — reviewer démarré
+- 2026-11-11 11:52:45 UTC — [ticket-925] tour 2 — reviewer terminé (28735ms)
+- 2026-11-11 11:53:20 UTC — [ticket-925] validateur: fichiers cités joints : services/providers/perimetre.py, backend/ (dossier, 6 fichiers) ; absents : backend/app/y.py
+- 2026-11-11 11:53:20 UTC — [ticket-925] validateur: APPROVED — Les cinq critères d'acceptation sont tous satisfaits. Le code introduit trois no (63780ms)
+- 2026-11-11 11:53:20 UTC — [ticket-925] APPROVED après 2 tour(s)
+- 2026-11-11 11:54:44 UTC — [ticket-925] leçons: rien à retenir
