@@ -4,7 +4,7 @@ created: 2026-11-11
 depends_on: []
 estimated_days: 0.5
 id: ticket-922
-pr_number: null
+pr_number: 1031
 priority: high
 status: done
 title: Agents cannot read the frontend's local env files of Tessera
