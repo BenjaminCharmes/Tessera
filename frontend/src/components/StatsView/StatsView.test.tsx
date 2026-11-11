@@ -71,7 +71,7 @@ describe("StatsView", () => {
 
     expect(document.querySelector("[data-squelette='kpi']")).not.toBeNull();
     expect(document.querySelector("[data-squelette='cartes']")).not.toBeNull();
-    expect(screen.getByRole("status")).toHaveTextContent("Chargement…");
+    expect(screen.getByRole("status")).toHaveAccessibleName("Chargement");
   });
 
   it("calls the api with the days prop it receives", async () => {

@@ -6,6 +6,7 @@ import type { OrchestratorEvent, RunEvent } from "../../types/api";
 import RegionTitle from "../../design/RegionTitle";
 import { IconHistory } from "../../design/icons";
 import { BAND } from "../../design/layout";
+import { Chargement, Erreur, Vide } from "../../design/ui/ViewState";
 import FilDuRun from "../FilDuRun";
 import PipelineSummary from "../AgentPanel/PipelineSummary";
 
@@ -68,6 +69,7 @@ export default function RunHistorique({
   // chargement sans `setState` synchrone dans l'effet, que la règle
   // `react-hooks/set-state-in-effect` refuse.
   const [resultat, setResultat] = useState<{ runId: string; phase: Phase } | null>(null);
+  const [essai, setEssai] = useState(0);
   const phase: Phase =
     resultat !== null && resultat.runId === runId ? resultat.phase : { kind: "loading" };
 
@@ -88,7 +90,7 @@ export default function RunHistorique({
     return () => {
       abandonne = true;
     };
-  }, [runId]);
+  }, [runId, essai]);
 
   return (
     <div className="flex h-full flex-col bg-zinc-900">
@@ -106,23 +108,25 @@ export default function RunHistorique({
       )}
 
       <div className="min-h-0 flex-1 overflow-y-auto py-3">
-        {phase.kind === "loading" && (
-          <p className="px-4 text-xs text-zinc-500">Chargement…</p>
-        )}
+        {phase.kind === "loading" && <Chargement />}
         {phase.kind === "error" && (
-          <p
-            className="px-4 text-xs text-red-400"
-            data-testid="run-historique-erreur"
-          >
-            {phase.message}
-          </p>
+          <div data-testid="run-historique-erreur">
+            <Erreur
+              message={phase.message}
+              onRetry={() => {
+                setResultat(null);
+                setEssai((n) => n + 1);
+              }}
+            />
+          </div>
         )}
         {phase.kind === "done" && (
           <>
             {phase.stream.entries.length === 0 && (
-              <p className="px-4 text-xs text-zinc-500">
-                Aucun agent enregistré pour ce run.
-              </p>
+              <Vide
+                titre="Aucun agent enregistré pour ce run."
+                phrase="Ce run n'a laissé aucun événement à rejouer."
+              />
             )}
             <FilDuRun entries={phase.stream.entries} />
             {phase.stream.lastResult && (

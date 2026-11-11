@@ -1,4 +1,5 @@
 import { cheminAbsolu, cheminRelatif } from "../../lib/indexFichiers";
+import { Vide } from "../../design/ui/ViewState";
 import type { FichierDiff } from "../DiffView/parse";
 
 const TITRE = "mb-2 text-mini uppercase tracking-wider text-zinc-500";
@@ -14,7 +15,7 @@ interface ResultatsProps {
 /** Les fichiers qui correspondent à la recherche. */
 export function Resultats({ racine, chemins, onOpen }: ResultatsProps) {
   if (chemins.length === 0) {
-    return <p className="text-xs text-zinc-500">Aucun fichier ne correspond.</p>;
+    return <Vide titre="Aucun fichier ne correspond." phrase="Essaie un autre nom ou un autre morceau de chemin." />;
   }
   return (
     <ul aria-label="Résultats de la recherche" className="flex flex-col">
@@ -55,7 +56,7 @@ export function SectionTouches({
         Touchés par le dernier run{ticketId ? ` — ${ticketId}` : ""}
       </h2>
       {ticketId === null && (
-        <p className="text-xs text-zinc-500">Aucun ticket terminé pour l'instant.</p>
+        <Vide titre="Aucun ticket terminé pour l'instant." phrase="Les fichiers touchés apparaîtront après un premier run." />
       )}
       {erreur && <p className="text-xs text-red-400">Diff indisponible : {erreur}</p>}
       {fichiers.length > 0 && (
@@ -93,7 +94,7 @@ export function SectionRecents({ racine, chemins, onOpen }: RecentsProps) {
     <section aria-label="Ouverts récemment">
       <h2 className={TITRE}>Ouverts récemment</h2>
       {chemins.length === 0 ? (
-        <p className="text-xs text-zinc-500">Aucun fichier ouvert dans ce projet.</p>
+        <Vide titre="Aucun fichier ouvert dans ce projet." phrase="Les fichiers que tu ouvres s'afficheront ici." />
       ) : (
         <ul className="flex flex-col">
           {chemins.map((chemin) => (

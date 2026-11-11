@@ -664,6 +664,10 @@ La file n'attend pas — elle s'arrête. Si le ticket A (que B dépend de) écho
 
 Résolvez A (conflit, rebase, relance manuelle) avant de relancer la file.
 
+#### Passation au planificateur
+
+Optionnel : ajoute `plan: true` dans le frontmatter pour faire passer ton ticket par un tour de planification (lecture seule) avant que le codeur ne le prenne. C'est un appel supplémentaire au modèle, à réserver aux tickets dont l'approche n'est pas évidente.
+
 ### Critères d'acceptation obligatoires pour le code
 
 Pour tout ticket `feat`, `fix` ou `refactor`, tu dois ajouter une section `## Critères d'acceptation`. C'est là que tu énumères les comportements ou résultats que le validateur vérifiera.
