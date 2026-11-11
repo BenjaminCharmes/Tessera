@@ -5,10 +5,11 @@ depends_on: []
 estimated_days: 1
 id: ticket-914
 plan: true
-pr_number: null
+pr_number: 1037
 priority: medium
-status: todo
-title: "The supervisor decides each proposed block once, not again whenever another block appears"
+status: done
+title: The supervisor decides each proposed block once, not again whenever another
+  block appears
 type: fix
 ---
 

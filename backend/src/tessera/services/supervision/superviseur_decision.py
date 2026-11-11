@@ -50,6 +50,17 @@ SCHEMA_DECISION_BLOC: dict[str, Any] = {
 }
 
 
+@dataclass
+class Passe:
+    """What one sweep has spent: the blocks that reached the model, and whether the project turned out held."""
+
+    consultes: int = 0
+    abandonne: bool = False
+
+    def permet(self) -> bool:
+        return not self.abandonne and self.consultes < PLAFOND_DECISIONS
+
+
 @dataclass(frozen=True)
 class ResultatDecision:
     """The decision on one proposed block, and the intervention when something was written."""
@@ -128,6 +139,34 @@ class SuperviseurDecision:
                     break  # le projet reste tenu : les suivants attendraient aussi pour rien
         _logger.info("superviseur_decision_balayage", extra={"project": project_id, "blocs": len(resultats)})
         return resultats
+
+    async def decider_bloc(
+        self, project_id: str, project_path: Path, cible: str, passe: Passe | None = None
+    ) -> list[ResultatDecision]:
+        """Decide the one block named `cible`, with the same guards as the sweep; `[]` if gone or not delegated.
+
+        `passe` is shared by the blocks of one sweep: once it holds `PLAFOND_DECISIONS` model calls, or the
+        project is held, the model is not called and the block waits for the next sweep.
+        """
+        delegation = load_config_superviseur(project_path).delegation
+        memoire = project_path / "memory"
+        adrs = _adrs(memoire)
+        for bloc in self._blocs(memoire):
+            if bloc.cible != cible:
+                continue
+            raison = raison_sensible(bloc, adrs)
+            if raison is not None:
+                return [ResultatDecision(_decision(bloc, "a_toi", raison), bloc)]
+            if _DELEGATION[bloc.genre] not in delegation or (passe is not None and not passe.permet()):
+                break
+            if passe is not None:
+                passe.consultes += 1
+            resultat = await self.decider_un(bloc, memoire, adrs)
+            if passe is not None and resultat.intervention is not None and resultat.intervention.statut == "abandonne":
+                passe.abandonne = True
+            return [resultat]
+        _logger.info("superviseur_decision_bloc", extra={"project": project_id, "cible": cible})
+        return []
 
     @staticmethod
     def _blocs(memoire: Path) -> list[BlocPropose]:
