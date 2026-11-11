@@ -9287,3 +9287,4 @@ error: Please commit or stash them.
 - 2026-11-11 17:04:15 UTC — [ticket-929] validateur: APPROVED — Les cinq critères sont satisfaits. Le diff ajoute un nouveau module `garde_compt (35094ms)
 - 2026-11-11 17:04:15 UTC — [ticket-929] APPROVED après 2 tour(s)
 - 2026-11-11 17:06:21 UTC — [ticket-929] leçons: refusée — preuve absente du retour du run
+- 2026-11-11 17:09:32 UTC — [ticket-929] documentation: 0 fichier(s) (185157ms) — après tour de correction
