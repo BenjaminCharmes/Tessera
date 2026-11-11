@@ -9310,3 +9310,4 @@ error: Please commit or stash them.
 - 2026-11-11 17:22:33 UTC — [ticket-936] validateur: APPROVED — Les quatre critères d'acceptation sont satisfaits. Le codeur a implémenté un nou (84155ms)
 - 2026-11-11 17:22:33 UTC — [ticket-936] CHANGES_REQUESTED tour 3: Reviewer : 1. `phrases_interdites` ne retient la première phrase du CLAUDE.md de Tessera que si `racine not in projet.parents`. Or les projets hébergés vivent dans le dépôt Tessera : `tessera/projects
 - 2026-11-11 17:22:33 UTC — [ticket-936] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-11 17:22:38 UTC — [ide-core] file interrompue : ticket-936 non approuvé
