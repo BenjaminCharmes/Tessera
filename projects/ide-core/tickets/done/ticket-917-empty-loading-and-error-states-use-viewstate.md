@@ -4,7 +4,7 @@ created: 2026-11-11
 depends_on: []
 estimated_days: 0.5
 id: ticket-917
-pr_number: null
+pr_number: 1041
 priority: low
 status: done
 title: Empty, loading and error states use the shared ViewState components
