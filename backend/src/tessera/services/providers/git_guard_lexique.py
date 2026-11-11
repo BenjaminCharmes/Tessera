@@ -77,6 +77,11 @@ _OPTIONS_A_VALEUR: dict[str, frozenset[str]] = {
 _JETON_D_ENVELOPPE = re.compile(r"^(-|[A-Za-z_][A-Za-z0-9_]*=|\d+(\.\d+)?[smhd]?$)")
 
 
+#: Un mot : morceaux entre guillemets et morceaux nus collés, comme le shell
+#: (`'g'it` est un seul mot). Les antislashs restent, pour les chemins Windows.
+_MOT = re.compile(r"""(?:'[^']*'|"[^"]*"|[^\s'"])+""")
+
+
 def segments(commande: str) -> list[str]:
     """Les commandes élémentaires d'une ligne, séparateurs compris."""
     return [s.strip() for s in _SEPARATEURS.split(commande) if s and s.strip()]
@@ -91,7 +96,9 @@ def jetons(segment: str) -> list[str]:
     ligne `git push` intacte.
     """
     try:
-        bruts = shlex.split(segment, posix=False)
+        bruts = _MOT.findall(segment)
+        if "".join("".join(bruts).split()) != "".join(segment.split()):
+            raise ValueError("guillemet non fermé")
     except ValueError:
         bruts = segment.split()
     return [_sans_guillemets(j) for j in bruts]
@@ -103,10 +110,43 @@ def _sans_guillemets(jeton: str) -> str:
     return jeton
 
 
-def nom_de_commande(jeton: str) -> str:
-    """`/usr/bin/git`, `C:\\...\\git.exe`, `GIT` → `git`."""
-    nom = re.split(r"[\\/]", jeton)[-1].lower()
+#: Les noms que les gardes (git, kill) savent juger : si une seule des deux
+#: lectures d'un jeton en désigne un, c'est celle-là qui compte.
+NOMS_SURVEILLES = (
+    SHELLS | ENVELOPPES
+    | {"eval", "git", "gh", "kill", "pkill", "killall", "taskkill", "tskill",
+       "stop-process", "spps", "wmic"}
+)
+
+
+def _sans_extension(nom: str) -> str:
+    nom = nom.lower()
     return nom[:-4] if nom.endswith(".exe") else nom
+
+
+def _lecture_posix(jeton: str) -> str | None:
+    """Le jeton comme bash le lit : `g''it` et `g\\it` donnent `git`."""
+    try:
+        mots = shlex.split(jeton, posix=True)
+    except ValueError:
+        return None
+    if len(mots) != 1:
+        return None
+    return _sans_extension(mots[0].split("/")[-1])
+
+
+def nom_de_commande(jeton: str) -> str:
+    """`/usr/bin/git`, `C:\\...\\git.exe`, `GIT`, `g''it` → `git`.
+
+    Deux lectures : celle d'un chemin Windows (coupé sur `\\` et `/`) et celle
+    de bash (guillemets concaténés, antislash d'échappement retirés). La
+    lecture surveillée l'emporte : un faux refus vaut mieux qu'un passage.
+    """
+    nom = _sans_extension(re.split(r"[\\/]", jeton)[-1])
+    if nom in NOMS_SURVEILLES:
+        return nom
+    posix = _lecture_posix(jeton)
+    return posix if posix in NOMS_SURVEILLES and posix is not None else nom
 
 
 def sans_enveloppe(jetons_: list[str]) -> list[str]:

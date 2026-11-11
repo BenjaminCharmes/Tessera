@@ -9231,3 +9231,16 @@ error: Please commit or stash them.
 - 2026-11-11 14:43:25 UTC — [ticket-931] APPROVED après 2 tour(s)
 - 2026-11-11 14:45:37 UTC — [ticket-931] leçons: une leçon proposée
 - 2026-11-11 14:46:43 UTC — [ticket-931] documentation: 0 fichier(s) (61046ms)
+- 2026-11-11 15:49:33 UTC — [ide-core] ticket-933 PR #1050 confiée au CIWatcher
+- 2026-11-11 15:18:27 UTC — [ticket-931] livraison: arrêt — PR #1048 non mergée : CI failing : la PR #1048 reste ouverte.
+- 2026-11-11 15:49:37 UTC — [ticket-932] branche ticket-932-the-git-guard-reads-a-command-name-the-way-the-sh
+- 2026-11-11 15:49:38 UTC — [ticket-932] tour 1 — codeur démarré
+- 2026-11-11 15:51:53 UTC — [ticket-932] tour 1 — codeur terminé (134702ms)
+- 2026-11-11 15:52:11 UTC — [ticket-932] testeur: dur�es : ruff 0 s, mypy 9 s, pytest 12 s, mypy-linux 6 s ; impact depuis base : 9 fichier(s) de test
+- 2026-11-11 15:52:33 UTC — [ticket-932] securite: PASS — Le diff durcit la garde git/gh et ne crée aucun passage nouveau. `nom_de_command (22280ms)
+- 2026-11-11 15:52:34 UTC — [ticket-932] tour 1 — reviewer démarré
+- 2026-11-11 15:52:52 UTC — [ticket-932] validateur: fichiers cités joints : backend/tests/test_git_guard.py
+- 2026-11-11 15:52:52 UTC — [ticket-932] validateur: APPROVED — Tous les 5 critères sont satisfaits : les tests couvrent les variantes quotes/ba (18546ms)
+- 2026-11-11 15:53:12 UTC — [ticket-932] tour 1 — reviewer terminé (37453ms)
+- 2026-11-11 15:53:12 UTC — [ticket-932] APPROVED après 1 tour(s)
+- 2026-11-11 15:56:21 UTC — [ticket-932] documentation: 0 fichier(s) (184641ms) — après tour de correction

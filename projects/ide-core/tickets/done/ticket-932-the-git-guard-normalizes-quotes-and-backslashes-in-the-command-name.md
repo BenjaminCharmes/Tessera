@@ -1,14 +1,15 @@
 ---
-id: ticket-932
-title: "The git guard reads a command name the way the shell does, empty quotes and backslashes removed"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-11-11
 depends_on: []
 estimated_days: 0.5
-created: 2026-11-11
+id: ticket-932
+pr_number: 1051
+priority: medium
+status: done
+title: The git guard reads a command name the way the shell does, empty quotes and
+  backslashes removed
+type: fix
 ---
 
 # ticket-932 — La garde git lit le nom de commande comme le shell, guillemets vides et antislashs retirés

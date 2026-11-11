@@ -369,3 +369,16 @@ def test_gh_unlisted_subcommand_is_refused(commande: str) -> None:
 )
 def test_allowlist_keeps_status_diff_log_show(commande: str) -> None:
     assert commande_git_interdite(commande) is False
+
+
+@pytest.mark.parametrize(
+    "commande",
+    ["g''it push", "g\\it push", "g''h pr merge 1", "e''nv git push", "'g'it push", 'g"i"t push'],
+)
+def test_quoted_or_escaped_command_name_is_read_like_the_shell(commande: str) -> None:
+    assert commande_git_interdite(commande) is True
+
+
+def test_windows_path_to_git_is_still_a_read() -> None:
+    assert commande_git_interdite("C:\\Git\\bin\\git.exe status") is False
+    assert commande_git_interdite("C:\\Git\\bin\\git.exe push") is True
