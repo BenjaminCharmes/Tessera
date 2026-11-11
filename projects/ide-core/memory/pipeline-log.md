@@ -9230,3 +9230,4 @@ error: Please commit or stash them.
 - 2026-11-11 15:52:52 UTC — [ticket-932] validateur: APPROVED — Tous les 5 critères sont satisfaits : les tests couvrent les variantes quotes/ba (18546ms)
 - 2026-11-11 15:53:12 UTC — [ticket-932] tour 1 — reviewer terminé (37453ms)
 - 2026-11-11 15:53:12 UTC — [ticket-932] APPROVED après 1 tour(s)
+- 2026-11-11 15:56:21 UTC — [ticket-932] documentation: 0 fichier(s) (184641ms) — après tour de correction
