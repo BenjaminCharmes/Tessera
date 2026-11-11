@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 1
 id: ticket-912
 plan: true
-pr_number: null
+pr_number: 1062
 priority: low
 status: done
 title: Old pipeline-log months move to a monthly archive
