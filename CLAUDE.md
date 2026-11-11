@@ -91,7 +91,8 @@ lue. Un skill ajouté en session n'est visible qu'à la suivante.
 
 Skills disponibles : `brainstorming`, `writing-plans`,
 `test-driven-development`, `code-review`, `verification-before-completion`,
-`new-ticket`, `ticket-workflow`, `write-adr`, `run-tessera`, `ship`.
+`new-ticket`, `ticket-workflow`, `write-adr`, `run-tessera`, `ship`,
+`portfolio-hebdo`, `menage-mensuel`.
 
 Ces skills servent au développeur. Un agent du produit ne voit que ceux que son
 rôle déclare dans `agents.json` (ticket-242). Les plugins installés restent une

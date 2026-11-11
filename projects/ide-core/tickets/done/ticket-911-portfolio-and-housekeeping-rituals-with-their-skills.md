@@ -6,7 +6,7 @@ estimated_days: 0.5
 id: ticket-911
 pr_number: null
 priority: medium
-status: todo
+status: done
 title: Portfolio and housekeeping rituals, with the skills that run them
 type: chore
 ---
@@ -48,11 +48,11 @@ qu'aucun agent ne peut écrire.
 
 ## Critères d'acceptation
 
-- [ ] `rituels.md` déclare `portfolio-hebdo` et `menage-mensuel` avec les
+- [x] `rituels.md` déclare `portfolio-hebdo` et `menage-mensuel` avec les
       rythmes ci-dessus, et la vue Rituels les affiche.
-- [ ] `.claude/skills/portfolio-hebdo/SKILL.md` et
+- [x] `.claude/skills/portfolio-hebdo/SKILL.md` et
       `.claude/skills/menage-mensuel/SKILL.md` existent.
-- [ ] La liste des skills de `CLAUDE.md` les nomme, et
+- [x] La liste des skills de `CLAUDE.md` les nomme, et
       `test_consignes_coherentes.py` passe.
 
 ## Dépendances

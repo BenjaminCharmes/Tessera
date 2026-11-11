@@ -40,6 +40,22 @@ rituels:
     detail: Rédiger le rapport du mois, à rendre avant le 22.
     projets: [carriere]
 
+  - id: portfolio-hebdo
+    titre: Portfolio de la semaine
+    rythme: { type: hebdo, jour: vendredi, heure: "17:00" }
+    duree_min: 45
+    phrase: portfolio hebdo
+    detail: Relevé de la semaine, pages projets à jour, un article seulement si la semaine a un sujet.
+    projets: [portfolio]
+
+  - id: menage-mensuel
+    titre: Ménage des mémoires
+    rythme: { type: mensuel, jour: 1, heure: "10:00" }
+    duree_min: 30
+    phrase: ménage
+    detail: Relevé de ménage, archive des journaux, tri proposé en PR, aucune suppression sans accord.
+    projets: [ide-core]
+
   - id: passe-black-friday-2026
     titre: Passe Black Friday
     rythme: { type: unique, du: "2026-11-23", au: "2026-11-27" }
