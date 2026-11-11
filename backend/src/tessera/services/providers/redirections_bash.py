@@ -211,6 +211,8 @@ _NOMS_PROTEGES_INLINE: tuple[str, ...] = (
     ".claude/",
     ".github/workflows/",
     ".git/",
+    ".mcp.json",
+    "termes_interdits_ci.py",
 )
 
 #: Les motifs d'écriture d'un code inline : `open` en mode positionnel ou nommé

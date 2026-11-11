@@ -37,6 +37,10 @@ PROTECTION_REFUS = (
 _MANIFESTE = "agents.json"
 #: Les hooks git versionnés du dépôt, sous sa racine (ADR-050).
 _HOOKS_DU_DEPOT = Path("scripts") / "hooks"
+#: Le script de la CI qui applique les termes interdits (ADR-050).
+_SCRIPT_TERMES_CI = Path("scripts") / "termes_interdits_ci.py"
+#: Les serveurs MCP du projet, lus par le CLI, en forme normalisée.
+_FICHIER_MCP = ".mcp.json"
 #: Le motif de fichier de réglages du CLI, sous `.claude/`.
 _REGLAGES_CLI = "settings*.json"
 #: Les consignes que le CLI charge dans chaque session (ticket-240), en forme
@@ -93,6 +97,11 @@ def _motif_du_depot(cible: Path, racine: Path) -> str | None:
             "`scripts/hooks/` porte le hook `pre-push`, l'une des portes des "
             "termes interdits (ADR-050)"
         )
+    if cible == (racine / _SCRIPT_TERMES_CI).resolve():
+        return (
+            "`scripts/termes_interdits_ci.py` est exécuté par la CI : c'est l'une "
+            "des portes des termes interdits (ADR-050)"
+        )
     return None
 
 
@@ -139,6 +148,9 @@ def motif_de_protection(
             "change la consigne de tous les agents suivants"
         )
 
+    if segments[-1] == _FICHIER_MCP:
+        return "`.mcp.json` déclare des serveurs MCP que le CLI lance dans les sessions suivantes"
+
     if ".git" in segments:
         return (
             "`.git/` est le dépôt lui-même : un hook ou une configuration "
@@ -154,6 +166,11 @@ def motif_de_protection(
             return (
                 f"`.claude/{suivant}/` porte des consignes que le CLI charge à la "
                 "demande dans les sessions suivantes"
+            )
+        if precedent == ".claude" and suivant == "hooks":
+            return (
+                "`.claude/hooks/` porte les scripts que les hooks du CLI exécutent "
+                "au run suivant"
             )
         if precedent == ".github" and suivant == "workflows":
             return (

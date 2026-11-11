@@ -33,6 +33,8 @@ def _projet(tmp_path: Path, nom: str = "client") -> Path:
         ".git/config",
         ".claude/settings.local.json",
         ".github/workflows/ci.yml",
+        ".mcp.json",
+        ".claude/hooks/x.py",
     ],
 )
 async def test_le_hook_refuse_les_chemins_qui_portent_la_politique(
@@ -331,6 +333,30 @@ async def test_the_pre_push_hook_script_is_refused(depot_ancestor: Path) -> None
     assert isinstance(decision, dict)
     assert decision["permissionDecision"] == "deny"
     assert "pre-push" in decision["permissionDecisionReason"]
+
+
+async def test_the_ci_forbidden_terms_script_is_refused(depot_ancestor: Path) -> None:
+    cible = str(depot_ancestor / "scripts" / "termes_interdits_ci.py")
+
+    sortie = await _outil(depot_ancestor, "Write", {"file_path": cible})
+
+    decision = sortie["hookSpecificOutput"]
+    assert isinstance(decision, dict)
+    assert decision["permissionDecision"] == "deny"
+    assert "termes_interdits_ci" in decision["permissionDecisionReason"]
+
+
+async def test_a_claude_notes_file_still_passes(tmp_path: Path) -> None:
+    projet = _projet(tmp_path)
+    hook = hook_refus_hors_perimetre(projet)
+
+    sortie = await hook(
+        {"tool_name": "Write", "tool_input": {"file_path": str(projet / ".claude" / "notes.md")}},
+        None,
+        None,
+    )
+
+    assert sortie == {}
 
 
 @pytest.mark.parametrize(

@@ -1,14 +1,15 @@
 ---
-id: ticket-930
-title: "The project MCP config, CLI hook scripts and the CI forbidden-terms script are write-protected"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-11-11
 depends_on: []
 estimated_days: 0.5
-created: 2026-11-11
+id: ticket-930
+pr_number: 1047
+priority: high
+status: done
+title: The project MCP config, CLI hook scripts and the CI forbidden-terms script
+  are write-protected
+type: fix
 ---
 
 # ticket-930 — `.mcp.json`, `.claude/hooks/` et le script CI des termes interdits se refusent en écriture
