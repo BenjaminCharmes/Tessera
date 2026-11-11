@@ -4,9 +4,9 @@ created: 2026-11-10
 depends_on: []
 estimated_days: 1
 id: ticket-913
-pr_number: null
+pr_number: 1030
 priority: medium
-status: todo
+status: done
 title: A monthly housekeeping report points at what grew or went stale
 type: feat
 ---
