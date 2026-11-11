@@ -1,10 +1,7 @@
 import subprocess
 from pathlib import Path
 
-from tessera.services.git_workspace.chemins import (
-    _ORCHESTRATOR_ARTIFACT_EXCLUDE_PATHSPECS,
-    _is_orchestrator_artifact_path,
-)
+from tessera.services.git_workspace.chemins import _ORCHESTRATOR_ARTIFACT_EXCLUDE_PATHSPECS, _is_orchestrator_artifact_path
 from tessera.services.projets.artifacts import apply_artifact_mode
 
 

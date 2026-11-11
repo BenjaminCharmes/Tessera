@@ -55,7 +55,7 @@ def test_lines_are_identical_before_and_after(tmp_path: Path) -> None:
     archiver_journal(projet, 2, _JOUR)
     textes = [_lire(projet / "memory" / "pipeline-log.md")]
     textes += [_lire(p) for p in (projet / "memory" / "journal").iterdir()]
-    apres = Counter(l for t in textes for l in t.splitlines(keepends=True))
+    apres = Counter(ligne for t in textes for ligne in t.splitlines(keepends=True))
     assert apres == Counter(_JOURNAL.splitlines(keepends=True))
 
 
