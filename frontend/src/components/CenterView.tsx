@@ -1,3 +1,4 @@
+import { Chargement } from "../design/ui/ViewState";
 import { lazy, Suspense } from "react";
 import type { useSupervision } from "../hooks/useSupervision";
 import type { useRunActif } from "../hooks/useRunActif";
@@ -116,11 +117,7 @@ const VUES_DE_PROJET: Partial<Record<SidebarPanel, string>> = {
 };
 
 function FallbackChargement() {
-  return (
-    <div className="flex h-full items-center justify-center text-zinc-500 text-sm">
-      Chargement…
-    </div>
-  );
+  return <Chargement />;
 }
 
 export default function CenterView({

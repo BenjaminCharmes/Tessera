@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import RegionTitle from "../../design/RegionTitle";
 import { BAND } from "../../design/layout";
+import { Chargement, Vide } from "../../design/ui/ViewState";
 import ViewSwitcher, { type OptionVue } from "../../design/ui/ViewSwitcher";
 import EtatVide from "./EtatVide";
 import { ticketDuDernierRun } from "./touches";
@@ -94,20 +95,20 @@ export default function FichiersView({
         )}
         <ViewSwitcher options={MODES} valeur={mode} onChange={setMode} />
       </div>
-      <Suspense
-        fallback={<p className="px-4 py-3 text-xs text-zinc-500">Chargement…</p>}
-      >
+      <Suspense fallback={<Chargement />}>
         {project === null ? (
-          <p className="px-4 py-3 text-xs text-zinc-500">
-            Sélectionne un projet pour parcourir ses fichiers.
-          </p>
+          <Vide
+            titre="Aucun projet sélectionné"
+            phrase="Sélectionne un projet pour parcourir ses fichiers."
+          />
         ) : mode === "diff" ? (
           ticket ? (
             <DiffView projectId={project.id} ticketId={ticket.id} />
           ) : (
-            <p className="px-4 py-3 text-xs text-zinc-500">
-              Sélectionne un ticket pour voir son diff
-            </p>
+            <Vide
+              titre="Sélectionne un ticket pour voir son diff"
+              phrase="Le diff d'un ticket s'affiche une fois le ticket choisi."
+            />
           )
         ) : openFilePath ? (
           <div className="min-h-0 flex-1">
