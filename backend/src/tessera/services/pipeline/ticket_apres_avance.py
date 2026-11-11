@@ -11,7 +11,6 @@ from tessera.models.ticket import Ticket, TicketStatus
 from tessera.services.git_workspace import journal_attente, journal_en_attente
 from tessera.services.noyau.pipeline_events import PipelineResult
 from tessera.services.pipeline import pipeline_branche
-from tessera.services.worktrees.run_worktree import RunWorktree
 from tessera.utils.logger import get_logger
 
 if TYPE_CHECKING:
@@ -40,7 +39,7 @@ async def lire_apres_avance(
     Sans workspace git, ou dans un worktree de run (qui part déjà de
     `origin/<base>`), rien n'est tenté : `None`.
     """
-    if orch._git_workspace is None or isinstance(getattr(orch, "_worktree", None), RunWorktree):
+    if orch._git_workspace is None or getattr(orch, "_worktree", None) is not None:
         return None
     raison = await _avancer(orch)
     ticket = await orch._ticket_svc.get_ticket(ticket_id)
