@@ -9096,3 +9096,29 @@ error: Please commit or stash them.
 - 2026-11-11 12:44:06 UTC — [ticket-914] APPROVED après 2 tour(s)
 - 2026-11-11 12:45:46 UTC — [ticket-914] leçons: rien à retenir
 - 2026-11-11 12:48:06 UTC — [ticket-914] documentation: 0 fichier(s) (134530ms)
+- 2026-11-11 12:50:20 UTC — [ide-core] ticket-914 PR #1037 confiée au CIWatcher
+- 2026-11-11 12:38:28 UTC — [ide-core] ticket-915 PR #1036 mergée (CI verte)
+- 2026-11-11 12:50:38 UTC — [ticket-916] branche ticket-916-hand-made-buttons-move-to-the-shared-button-compo
+- 2026-11-11 12:50:40 UTC — [ticket-916] tour 1 — codeur démarré
+- 2026-11-11 12:52:47 UTC — [ticket-916] tour 1 — codeur terminé (126766ms)
+- 2026-11-11 12:56:28 UTC — [ticket-916] testeur: dur�es : tsc 9 s, eslint 25 s, vitest 185 s
+- 2026-11-11 12:56:45 UTC — [ticket-916] securite: PASS — Ce diff remplace seulement des `<button>` stylés à la main par le composant part (17125ms)
+- 2026-11-11 12:56:46 UTC — [ticket-916] tour 1 — reviewer démarré
+- 2026-11-11 12:57:12 UTC — [ticket-916] tour 1 — reviewer terminé (26578ms)
+- 2026-11-11 12:58:06 UTC — [ticket-916] validateur: fichiers cités joints : CarteRituel.tsx ; absents : components/
+- 2026-11-11 12:58:06 UTC — [ticket-916] validateur: CHANGES_REQUESTED — Les 6 fichiers visibles du diff sont bien refactorisés : usage cohérent de `<But (80844ms)
+- 2026-11-11 12:58:06 UTC — [ticket-916] CHANGES_REQUESTED tour 1: Validateur : Les 6 fichiers visibles du diff sont bien refactorisés : usage cohérent de `<Button>` avec variantes et tailles, suppression de la constante `BOUTON`, pas d'ajout de classes couleur. Les 
+- 2026-11-11 12:58:06 UTC — [ticket-916] tour 2 — codeur démarré
+- 2026-11-11 12:58:32 UTC — [ticket-916] tour 2 — codeur terminé (25453ms)
+- 2026-11-11 13:04:08 UTC — [ticket-916] testeur: dur�es : tsc 23 s, eslint 45 s, vitest 264 s
+- 2026-11-11 13:04:26 UTC — [ticket-916] securite: PASS — J'ai lu le composant partagé : frontend/src/design/ui/Button.tsx:35 met `type="b (18750ms)
+- 2026-11-11 13:04:26 UTC — [ticket-916] tour 2 — reviewer démarré
+- 2026-11-11 13:05:09 UTC — [ticket-916] tour 2 — reviewer terminé (42125ms)
+- 2026-11-11 13:06:34 UTC — [ticket-916] validateur: fichiers cités joints : CarteRituel.tsx ; absents : components/
+- 2026-11-11 13:06:34 UTC — [ticket-916] validateur: CHANGES_REQUESTED — The refactoring successfully migrates 6 of 8 cited bordé files and all 3 pleins  (127657ms)
+- 2026-11-11 13:06:34 UTC — [ticket-916] CHANGES_REQUESTED tour 2: Validateur : The refactoring successfully migrates 6 of 8 cited bordé files and all 3 pleins to the shared `Button` component, with correct variantes and sizes. No violet color classes are added, the 
+- 2026-11-11 13:06:34 UTC — [ticket-916] tour 3 — codeur démarré
+- 2026-11-11 13:08:23 UTC — [ticket-916] tour 3 — codeur terminé (108468ms)
+- 2026-11-11 13:08:39 UTC — [ticket-916] testeur: src/components/SupervisionView/RunCard.tsx(240,25): error TS7006: Parameter 'e' implicitly has an 'any' type.
+- 2026-11-11 13:08:39 UTC — [ticket-916] tests rouges au tour 3
+- 2026-11-11 13:08:39 UTC — [ticket-916] BLOCKED après 3 tour(s) sans approbation
