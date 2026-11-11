@@ -9072,3 +9072,26 @@ error: Please commit or stash them.
 - 2026-11-11 12:20:11 UTC — [ticket-915] APPROVED après 2 tour(s)
 - 2026-11-11 12:21:12 UTC — [ticket-915] leçons: une leçon proposée
 - 2026-11-11 12:23:10 UTC — [ticket-915] documentation: 0 fichier(s) (113125ms)
+- 2026-11-11 12:33:31 UTC — [ide-core] ticket-915 PR #1036 confiée au CIWatcher
+- 2026-11-11 12:02:32 UTC — [ide-core] ticket-925 PR #1035 mergée (CI verte)
+- 2026-11-11 12:33:36 UTC — [ticket-914] branche ticket-914-the-supervisor-decides-each-proposed-block-once-n
+- 2026-11-11 12:34:17 UTC — [ticket-914] plan rendu (39391ms)
+- 2026-11-11 12:34:17 UTC — [ticket-914] tour 1 — codeur démarré
+- 2026-11-11 12:35:55 UTC — [ticket-914] tour 1 — codeur terminé (97280ms)
+- 2026-11-11 12:37:46 UTC — [ticket-914] testeur: dur�es : ruff 0 s, mypy 15 s, mypy-linux 16 s, pytest 109 s ; impact depuis base : 96 fichier(s) de test
+- 2026-11-11 12:37:59 UTC — [ticket-914] securite: PASS — Ce diff remplace la décision groupée par une décision bloc par bloc. `decider_bl (13719ms)
+- 2026-11-11 12:37:59 UTC — [ticket-914] tour 1 — reviewer démarré
+- 2026-11-11 12:38:29 UTC — [ticket-914] tour 1 — reviewer terminé (29796ms)
+- 2026-11-11 12:38:36 UTC — [ticket-914] validateur: fichiers cités joints : intervention.py, superviseur_actions.py
+- 2026-11-11 12:38:36 UTC — [ticket-914] validateur: APPROVED — Les quatre critères sont satisfaits. La refactorisation introduit une décision p (36625ms)
+- 2026-11-11 12:38:36 UTC — [ticket-914] CHANGES_REQUESTED tour 1: Reviewer : 1. Le plafond `PLAFOND_DECISIONS` (5 appels au modèle par passe) ne s'applique plus en production, et l'arrêt sur intervention `abandonne` a disparu avec lui. `_candidats_decision` émet un 
+- 2026-11-11 12:38:36 UTC — [ticket-914] tour 2 — codeur démarré
+- 2026-11-11 12:39:26 UTC — [ticket-914] tour 2 — codeur terminé (49687ms)
+- 2026-11-11 12:41:17 UTC — [ticket-914] testeur: dur�es : ruff 0 s, mypy 9 s, mypy-linux 10 s, pytest 108 s ; impact depuis base : 96 fichier(s) de test
+- 2026-11-11 12:41:32 UTC — [ticket-914] securite: PASS — PASS : ce diff ne retire aucune garde. `decider_bloc` (superviseur_decision.py:1 (14453ms)
+- 2026-11-11 12:41:32 UTC — [ticket-914] tour 2 — reviewer démarré
+- 2026-11-11 12:41:56 UTC — [ticket-914] tour 2 — reviewer terminé (24093ms)
+- 2026-11-11 12:44:06 UTC — [ticket-914] validateur: fichiers cités joints : intervention.py, superviseur_actions.py
+- 2026-11-11 12:44:06 UTC — [ticket-914] validateur: APPROVED — Les quatre critères sont satisfaits. La refactorisation remplace la décision gro (154483ms)
+- 2026-11-11 12:44:06 UTC — [ticket-914] APPROVED après 2 tour(s)
+- 2026-11-11 12:45:46 UTC — [ticket-914] leçons: rien à retenir
