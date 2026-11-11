@@ -7,3 +7,7 @@ Une ligne par action : `- date | action | cible | sha | résumé`. Le service se
 - 2026-11-10 | a_toi | regle-24456281 |  | decider : le bloc touche une porte, un mot sensible ou le superviseur
 - 2026-11-10 | a_toi | regle-04ca96e2 |  | decider : ADR-042 cité touche une porte ou un mot sensible
 - 2026-11-10 | a_toi | regle-d2a98cda |  | decider : le bloc touche une porte, un mot sensible ou le superviseur
+- 2026-11-11 | a_toi | lecon-b4c49f71 |  | decider : le bloc touche une porte, un mot sensible ou le superviseur
+- 2026-11-11 | a_toi | lecon-499623ec |  | decider : le bloc touche une porte, un mot sensible ou le superviseur
+- 2026-11-11 | a_toi | regle-99c9f54c |  | decider : le bloc touche une porte, un mot sensible ou le superviseur
+- 2026-11-11 | a_toi | regle-cce7e4aa |  | decider : le bloc touche une porte, un mot sensible ou le superviseur
