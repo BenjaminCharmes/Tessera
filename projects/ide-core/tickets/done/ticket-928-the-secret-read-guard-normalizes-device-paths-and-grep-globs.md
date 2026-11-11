@@ -4,7 +4,7 @@ created: 2026-11-11
 depends_on: []
 estimated_days: 1
 id: ticket-928
-pr_number: null
+pr_number: 1046
 priority: high
 status: done
 title: The secret read guard sees through device and UNC paths and refuses a Grep
