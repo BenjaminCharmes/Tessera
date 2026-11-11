@@ -46,7 +46,7 @@ export default function ChoixDuProjet({ vue, projets, onSelectProject }: ChoixDu
               <button
                 type="button"
                 onClick={() => onSelectProject(p)}
-                className="flex h-full w-full items-start gap-3 rounded-xl border border-zinc-800/80 bg-zinc-900/70 p-4 text-left shadow-sm shadow-black/30 hover:border-zinc-700 hover:bg-zinc-800/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-500"
+                className="flex h-full w-full items-start gap-3 rounded-xl border border-zinc-800/80 bg-zinc-900/70 p-4 text-left shadow-sm shadow-black/30 hover:border-zinc-700 hover:bg-zinc-800/60 focus-violet"
               >
                 <IconeDuProjet projet={{ id: p.id, name: p.name, icon: iconeDe(p.id) }} taille="tuile" />
                 <span className="flex min-w-0 flex-col gap-1">

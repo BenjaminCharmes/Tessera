@@ -89,7 +89,7 @@ export default function AgentsDeProduit({ projectId, agents, aUnJournal, onOuvri
             </div>
             <AvecInfobulle
               label={`${prenom}, ${agent.nom}, ${actif ? "au travail" : "au repos"}`}
-              className="rounded-md p-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-500"
+              className="rounded-md p-0.5 focus-violet"
               onActiver={journal ? () => onOuvrirService(service) : undefined}
               infobulle={
                 <>

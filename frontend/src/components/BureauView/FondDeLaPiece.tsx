@@ -197,7 +197,7 @@ export default function FondDeLaPiece({
             type="button"
             aria-label={`Ouvrir le projet ${projet}`}
             onClick={onOpenProject}
-            className="block cursor-pointer rounded-sm focus-visible:outline-2 focus-visible:outline-violet-500"
+            className="block cursor-pointer rounded-sm focus-violet"
           >
             <Agrandi relatif={ECHELLE_DE_LA_PORTE}>
               <Porte />

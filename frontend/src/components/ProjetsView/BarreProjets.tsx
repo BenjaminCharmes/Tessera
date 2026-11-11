@@ -1,3 +1,4 @@
+import PuceFiltre from "../../design/ui/PuceFiltre";
 import {
   TRIS,
   type FiltresProjets,
@@ -34,18 +35,9 @@ function Pastille({
 }) {
   // Sélection = interaction : fond violet, jamais texte violet (ADR-026).
   return (
-    <button
-      type="button"
-      aria-pressed={active}
-      onClick={onClick}
-      className={`rounded-full px-2.5 py-0.5 text-micro transition-colors ${
-        active
-          ? "bg-violet-500/20 text-zinc-100"
-          : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
-      }`}
-    >
+    <PuceFiltre active={active} onClick={onClick}>
       {libelle} <span className="font-medium">{nombre}</span>
-    </button>
+    </PuceFiltre>
   );
 }
 

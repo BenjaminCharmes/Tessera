@@ -17,7 +17,7 @@ export default function BoutonLumiere({ salle, allume, onBasculer }: BoutonLumie
       aria-label={`${allume ? "Éteindre" : "Allumer"} la lumière : ${salle}`}
       title={allume ? "Éteindre la lumière" : "Allumer la lumière"}
       onClick={onBasculer}
-      className="block cursor-pointer rounded-sm focus-visible:outline-2 focus-visible:outline-violet-500"
+      className="block cursor-pointer rounded-sm focus-violet"
     >
       <Agrandi>
         <Interrupteur allume={allume} />
