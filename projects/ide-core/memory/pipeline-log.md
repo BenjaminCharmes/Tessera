@@ -8999,3 +8999,33 @@ error: Please commit or stash them.
 - 2026-11-11 10:34:36 UTC — [ticket-922] APPROVED après 2 tour(s)
 - 2026-11-11 10:36:31 UTC — [ticket-922] leçons: refusée — plus de 200 caractères
 - 2026-11-11 10:38:14 UTC — [ticket-922] documentation: 0 fichier(s) (97593ms)
+- 2026-11-11 10:39:49 UTC — [ide-core] ticket-922 PR #1031 confiée au CIWatcher
+- 2026-11-11 10:36:12 UTC — [ide-core] ticket-913 PR #1030 mergée (CI verte)
+- 2026-11-11 10:39:55 UTC — [ticket-923] branche ticket-923-a-run-finds-tickets-merged-on-the-remote-base-of
+- 2026-11-11 10:40:33 UTC — [ide-core] ticket-915 retiré de la file
+- 2026-11-11 10:40:33 UTC — [ide-core] ticket-914 retiré de la file
+- 2026-11-11 10:40:33 UTC — [ide-core] ticket-916 retiré de la file
+- 2026-11-11 10:40:33 UTC — [ide-core] ticket-917 retiré de la file
+- 2026-11-11 10:40:33 UTC — [ide-core] ticket-918 retiré de la file
+- 2026-11-11 10:40:33 UTC — [ide-core] ticket-919 retiré de la file
+- 2026-11-11 10:40:33 UTC — [ide-core] ticket-912 retiré de la file
+- 2026-11-11 10:40:33 UTC — [ticket-923] plan rendu (36125ms)
+- 2026-11-11 10:40:33 UTC — [ticket-923] tour 1 — codeur démarré
+- 2026-11-11 10:43:08 UTC — [ticket-923] tour 1 — codeur terminé (154891ms)
+- 2026-11-11 10:46:05 UTC — [ticket-923] testeur: 1 failed, 570 passed, 32 warnings in 172.09s (0:02:52)
+- 2026-11-11 10:46:05 UTC — [ticket-923] tests rouges au tour 1
+- 2026-11-11 10:46:05 UTC — [ticket-923] tour 2 — codeur démarré
+- 2026-11-11 10:48:12 UTC — [ticket-923] tour 2 — codeur terminé (126655ms)
+- 2026-11-11 10:51:51 UTC — [ticket-923] testeur: dur�es : ruff 0 s, pytest 216 s ; impact depuis base : 89 fichier(s) de test
+- 2026-11-11 10:51:51 UTC — [ticket-923] tests rouges au tour 2
+- 2026-11-11 10:51:51 UTC — [ticket-923] tour 3 — codeur démarré
+- 2026-11-11 10:53:07 UTC — [ticket-923] tour 3 — codeur terminé (76250ms)
+- 2026-11-11 10:57:37 UTC — [ticket-923] testeur: dur�es : ruff 0 s, mypy 13 s, mypy-linux 13 s, pytest 266 s ; impact depuis base : 89 fichier(s) de test
+- 2026-11-11 10:57:50 UTC — [ticket-923] securite: PASS — PASS : rien de dangereux dans ce diff. Les identifiants de ticket envoyés par l' (13655ms)
+- 2026-11-11 10:57:50 UTC — [ticket-923] tour 3 — reviewer démarré
+- 2026-11-11 10:58:25 UTC — [ticket-923] validateur: fichiers cités joints : backend/tests/test_file_preflight.py
+- 2026-11-11 10:58:25 UTC — [ticket-923] validateur: APPROVED — Les cinq critères d'acceptation sont couverts par des tests fonctionnels présent (34483ms)
+- 2026-11-11 10:58:26 UTC — [ticket-923] tour 3 — reviewer terminé (35858ms)
+- 2026-11-11 10:58:26 UTC — [ticket-923] APPROVED après 3 tour(s)
+- 2026-11-11 10:59:09 UTC — [ticket-923] leçons: refusée — preuve absente du retour du run
+- 2026-11-11 11:02:22 UTC — [ticket-923] documentation: 0 fichier(s) (187516ms) — après tour de correction

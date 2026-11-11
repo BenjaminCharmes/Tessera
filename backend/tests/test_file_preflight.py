@@ -1,5 +1,6 @@
 """A queue refuses, before it opens, a ticket missing from where its runs start — ticket-849."""
 import json
+import shutil
 import subprocess
 from collections.abc import Iterator
 from pathlib import Path
@@ -9,7 +10,10 @@ from fastapi.testclient import TestClient
 
 from tessera.config import settings
 from tessera.main import app
+from tessera.services.gardes.politique_run import PolitiqueRun
+from tessera.services.git_workspace import GitWorkspaceService
 from tessera.services.pipeline.controle_base import absents_de_la_base, refus_avant_ouverture, refuser_absents_de_la_base
+from tessera.services.pipeline.file_vivante import FileVivante, lecteur_sur_la_base, trier_ajouts
 from tessera.services.pipeline.run_registry import RUN_REGISTRY
 from tessera.services.projets.ticket_service import TicketService
 
@@ -161,3 +165,72 @@ async def test_append_refuses_a_ticket_absent_from_the_base(
 
     assert acceptes == ["ticket-001"]
     assert list(refuses) == ["ticket-002"]
+
+
+def _projet_ticket_sur_la_base_seulement(
+    workspace: Path, tmp_path: Path, avec_remote: bool = True
+) -> Path:
+    """A project without worktree: ticket-001 only on origin/develop, not in the tree."""
+    projet = _projet_sans_git(workspace)
+    (projet / "agents.json").write_text(json.dumps({"base_branch": "develop"}), encoding="utf-8")
+    _ecrire_ticket(projet, "ticket-001")
+    _git(projet, "init", "-b", "develop")
+    _git(projet, "add", "CLAUDE.md", "agents.json", "tickets")
+    _git(projet, "commit", "-m", "chore: seed")
+    if avec_remote:
+        origine = tmp_path / "origine.git"
+        subprocess.run(["git", "init", "--bare", str(origine)], check=True, capture_output=True)
+        _git(projet, "remote", "add", "origin", str(origine))
+        _git(projet, "push", "origin", "develop")
+    shutil.rmtree(projet / "tickets")  # absent de l'arbre, présent sur la base
+    return projet
+
+
+async def test_no_worktree_ticket_only_on_the_base_is_not_refused(
+    workspace: Path, tmp_path: Path
+) -> None:
+    projet = _projet_ticket_sur_la_base_seulement(workspace, tmp_path)
+
+    refus = await refus_avant_ouverture(projet, TicketService(projet, _PROJET), ["ticket-001"])
+
+    assert refus is None
+
+
+async def test_no_worktree_ticket_absent_everywhere_is_still_refused(
+    workspace: Path, tmp_path: Path
+) -> None:
+    projet = _projet_ticket_sur_la_base_seulement(workspace, tmp_path)
+
+    refus = await refus_avant_ouverture(
+        projet, TicketService(projet, _PROJET), ["ticket-001", "ticket-009"]
+    )
+
+    assert refus is not None and "introuvable" in refus
+    assert "ticket-009" in refus and "ticket-001" not in refus
+
+
+async def test_no_worktree_unreachable_remote_keeps_the_tree_rule(
+    workspace: Path, tmp_path: Path
+) -> None:
+    projet = _projet_ticket_sur_la_base_seulement(workspace, tmp_path, avec_remote=False)
+
+    refus = await refus_avant_ouverture(projet, TicketService(projet, _PROJET), ["ticket-001"])
+
+    assert refus is not None and "introuvable" in refus
+
+
+async def test_append_accepts_a_base_only_ticket_without_worktree(
+    workspace: Path, tmp_path: Path
+) -> None:
+    projet = _projet_ticket_sur_la_base_seulement(workspace, tmp_path)
+    repli = lecteur_sur_la_base(
+        GitWorkspaceService(projet, politique=PolitiqueRun.lire(projet)), _PROJET
+    )
+
+    acceptes, _, refuses = await trier_ajouts(
+        FileVivante(), TicketService(projet, _PROJET), ["ticket-001"], repli
+    )
+    await refuser_absents_de_la_base(projet, acceptes, refuses)
+
+    assert acceptes == ["ticket-001"]
+    assert refuses == {}
