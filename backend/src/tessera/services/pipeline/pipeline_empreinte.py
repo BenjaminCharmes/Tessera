@@ -12,6 +12,7 @@ La liste ne copie pas `chemins_proteges.py` : on énumère des candidats bornés
 """
 import asyncio
 import hashlib
+import re
 from collections.abc import Awaitable
 from pathlib import Path
 from typing import TYPE_CHECKING, TypeVar
@@ -79,11 +80,38 @@ def _candidats_git(dossier: Path) -> list[Path]:
     return [dossier / "config", dossier / "config.worktree", *_fichiers_sous(dossier / "hooks")]
 
 
+#: Une section de `.git/config` qui n'exécute rien et que git, l'IDE ou une
+#: session humaine réécrivent sans cesse (`push -u`, `vscode-merge-base`).
+_SECTION_DE_BRANCHE = re.compile(rb'^\s*\[branch\s+"')
+_ENTETE = re.compile(rb"^\s*\[")
+
+
+def sans_sections_de_branche(contenu: bytes) -> bytes:
+    """A git config without its `[branch "…"]` sections — ticket-937.
+
+    `remote`, `merge`, `rebase` ou `vscode-merge-base` n'exécutent rien ; les
+    garder dans l'empreinte bloquait un run dès qu'un `push -u` ou le
+    superviseur touchait le dépôt commun. `[remote]`, `[core]`, `[filter]`…
+    restent : une URL ou une commande changée détournerait le backend.
+    """
+    gardees: list[bytes] = []
+    dans_branche = False
+    for ligne in contenu.splitlines(keepends=True):
+        if _ENTETE.match(ligne):
+            dans_branche = bool(_SECTION_DE_BRANCHE.match(ligne))
+        if not dans_branche:
+            gardees.append(ligne)
+    return b"".join(gardees)
+
+
 def _condenser(chemin: Path) -> str | None:
     try:
-        return hashlib.sha256(chemin.read_bytes()).hexdigest()
+        contenu = chemin.read_bytes()
     except OSError:
         return None
+    if chemin.name in ("config", "config.worktree"):
+        contenu = sans_sections_de_branche(contenu)
+    return hashlib.sha256(contenu).hexdigest()
 
 
 def _nom(chemin: Path, racine: Path, dossiers_git: list[Path]) -> str:
