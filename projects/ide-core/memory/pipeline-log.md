@@ -8981,3 +8981,20 @@ error: Please commit or stash them.
 - 2026-11-11 10:10:11 UTC — [ticket-913] APPROVED après 3 tour(s)
 - 2026-11-11 10:11:09 UTC — [ticket-913] leçons: refusée — preuve absente du retour du run
 - 2026-11-11 10:13:51 UTC — [ticket-913] documentation: 0 fichier(s) (139171ms)
+- 2026-11-11 10:29:18 UTC — [ide-core] ticket-913 PR #1030 confiée au CIWatcher
+- 2026-11-11 09:13:00 UTC — [ide-core] ticket-910 PR #1027 mergée (CI verte)
+- 2026-11-11 10:29:24 UTC — [ticket-922] branche ticket-922-agents-cannot-read-the-frontend-s-local-env-files
+- 2026-11-11 10:29:27 UTC — [ticket-922] tour 1 — codeur démarré
+- 2026-11-11 10:32:13 UTC — [ticket-922] tour 1 — codeur terminé (166764ms)
+- 2026-11-11 10:32:44 UTC — [ticket-922] testeur: dur�es : ruff 1 s, pytest 26 s ; impact depuis base : 32 fichier(s) de test
+- 2026-11-11 10:32:44 UTC — [ticket-922] tests rouges au tour 1
+- 2026-11-11 10:32:44 UTC — [ticket-922] tour 2 — codeur démarré
+- 2026-11-11 10:33:04 UTC — [ticket-922] tour 2 — codeur terminé (20546ms)
+- 2026-11-11 10:33:39 UTC — [ticket-922] testeur: dur�es : ruff 0 s, mypy 11 s, mypy-linux 13 s, pytest 31 s ; impact depuis base : 32 fichier(s) de test
+- 2026-11-11 10:33:55 UTC — [ticket-922] securite: PASS — PASS : le diff ne fait que durcir la protection. Le hook refuse désormais aux ag (15921ms)
+- 2026-11-11 10:33:56 UTC — [ticket-922] tour 2 — reviewer démarré
+- 2026-11-11 10:34:11 UTC — [ticket-922] tour 2 — reviewer terminé (14657ms)
+- 2026-11-11 10:34:36 UTC — [ticket-922] validateur: fichiers cités joints : backend/tests/test_garde_jetons.py, frontend/.env.local, projects/ (dossier, 0 fichiers), backend/src/tessera/services/providers/garde_jetons.py (tronqué) ; absents : frontend/.env.development.local
+- 2026-11-11 10:34:36 UTC — [ticket-922] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le diff ajoute une nouvelle con (40562ms)
+- 2026-11-11 10:34:36 UTC — [ticket-922] APPROVED après 2 tour(s)
+- 2026-11-11 10:36:31 UTC — [ticket-922] leçons: refusée — plus de 200 caractères
