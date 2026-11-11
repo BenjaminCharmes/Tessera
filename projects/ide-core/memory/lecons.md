@@ -3,6 +3,7 @@
 Pièges observés sur ce projet, une ligne chacun. Le service écrit sous `## Proposées` ; un humain déplace une leçon sous `## En vigueur` pour qu'elle atteigne le codeur et le reviewer.
 
 ## Proposées
+- Quand tu développes un chemin (tilde, variables) avant de tester son état, le test de tilde devient mort — décide si tu testes avant ou après développement. (source : ticket-931, 2026-11-11)
 - Quand on ajoute des tests pour un module sensible, vérifier que les données de test ne déclenchent pas le contrôle de traces professionnelles du projet. (source : ticket-933, 2026-11-11)
 
 ## En vigueur
