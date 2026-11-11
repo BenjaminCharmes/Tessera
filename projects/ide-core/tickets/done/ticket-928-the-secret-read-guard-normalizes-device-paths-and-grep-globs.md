@@ -1,14 +1,15 @@
 ---
-id: ticket-928
-title: "The secret read guard sees through device and UNC paths and refuses a Grep glob that can reach a guarded file"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-11-11
 depends_on: []
 estimated_days: 1
-created: 2026-11-11
+id: ticket-928
+pr_number: 1046
+priority: high
+status: done
+title: The secret read guard sees through device and UNC paths and refuses a Grep
+  glob that can reach a guarded file
+type: fix
 ---
 
 # ticket-928 — La garde de lecture des secrets voit à travers `\\?\` et l'UNC local, et refuse un glob de `Grep` qui peut atteindre un fichier gardé

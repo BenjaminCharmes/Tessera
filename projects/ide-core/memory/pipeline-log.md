@@ -9149,3 +9149,31 @@ error: Please commit or stash them.
 - 2026-11-11 13:55:33 UTC — [ticket-919] validateur: APPROVED — Ticket-919 livré complet. Les trois composants (`PuceFiltre` pour les filtres, ` (31405ms)
 - 2026-11-11 13:55:33 UTC — [ticket-919] APPROVED après 1 tour(s)
 - 2026-11-11 13:56:16 UTC — [ticket-919] documentation: 0 fichier(s) (38516ms)
+- 2026-11-11 14:30:26 UTC — [ide-core] ticket-929 sauté : dépend de ticket-928, non mergé
+- 2026-11-11 14:30:26 UTC — [ide-core] ticket-928 PR #1046 confiée au CIWatcher
+- 2026-11-11 14:16:28 UTC — [ticket-919] livraison: arrêt — PR #1045 non mergée : CI failing : la PR #1045 reste ouverte.
+- 2026-11-11 14:30:26 UTC — [ticket-928] livraison: arrêt — PR #1046 non mergée : CI failing : la PR #1046 reste ouverte.
+- 2026-11-11 14:30:30 UTC — [ticket-930] branche ticket-930-the-project-mcp-config-cli-hook-scripts-and-the-c
+- 2026-11-11 14:30:31 UTC — [ticket-930] tour 1 — codeur démarré
+- 2026-11-11 14:31:22 UTC — [ticket-930] tour 1 — codeur terminé (50781ms)
+- 2026-11-11 14:31:42 UTC — [ticket-930] testeur: dur�es : ruff 0 s, mypy 8 s, pytest 16 s, mypy-linux 9 s ; impact depuis base : 18 fichier(s) de test
+- 2026-11-11 14:31:57 UTC — [ticket-930] securite: PASS — Ce diff ne fait qu'élargir les protections en écriture : `.mcp.json`, `.claude/h (15453ms)
+- 2026-11-11 14:31:57 UTC — [ticket-930] tour 1 — reviewer démarré
+- 2026-11-11 14:32:13 UTC — [ticket-930] tour 1 — reviewer terminé (15234ms)
+- 2026-11-11 14:32:24 UTC — [ticket-930] validateur: fichiers cités joints : backend/tests/test_chemins_proteges.py, scripts/termes_interdits_ci.py, backend/src/tessera/services/providers/redirections_bash.py (tronqué) ; absents : <projet>/.mcp.json, <projet>/.claude/hooks/x.py, <projet>/.claude/notes.md ; non joints (budget épuisé) : .mcp.json
+- 2026-11-11 14:32:24 UTC — [ticket-930] validateur: APPROVED — Tous les critères sont satisfaits. Le diff ajoute les trois protections manquant (26469ms)
+- 2026-11-11 14:32:24 UTC — [ticket-930] APPROVED après 1 tour(s)
+- 2026-11-11 14:38:25 UTC — [ticket-930] documentation: 0 fichier(s) (356625ms) — après tour de correction
+- 2026-11-11 14:02:07 UTC — [ide-core] ticket-919 PR #1045 confiée au CIWatcher
+- 2026-11-11 13:58:41 UTC — [ticket-918] livraison: arrêt — PR #1044 non mergée : CI failing : la PR #1044 reste ouverte.
+- 2026-11-11 14:02:11 UTC — [ticket-928] branche ticket-928-the-secret-read-guard-sees-through-device-and-unc
+- 2026-11-11 14:02:12 UTC — [ticket-928] tour 1 — codeur démarré
+- 2026-11-11 14:03:32 UTC — [ticket-928] tour 1 — codeur terminé (79983ms)
+- 2026-11-11 14:03:53 UTC — [ticket-928] testeur: dur�es : ruff 0 s, mypy 5 s, mypy-linux 11 s, pytest 19 s ; impact depuis base : 32 fichier(s) de test
+- 2026-11-11 14:04:07 UTC — [ticket-928] securite: PASS — Verdict PASS : le diff durcit la garde de lecture des secrets sans rien retirer. (14483ms)
+- 2026-11-11 14:04:07 UTC — [ticket-928] tour 1 — reviewer démarré
+- 2026-11-11 14:04:35 UTC — [ticket-928] validateur: fichiers cités joints : backend/tests/test_garde_jetons.py, .env, frontend/ (dossier, 17 fichiers), backend/src/tessera/services/providers/perimetre.py (tronqué) ; absents : *.py
+- 2026-11-11 14:04:35 UTC — [ticket-928] validateur: APPROVED — Les 6 critères sont satisfaits. Le codeur a extrait la normalisation des préfixe (27546ms)
+- 2026-11-11 14:04:36 UTC — [ticket-928] tour 1 — reviewer terminé (28953ms)
+- 2026-11-11 14:04:36 UTC — [ticket-928] APPROVED après 1 tour(s)
+- 2026-11-11 14:06:13 UTC — [ticket-928] documentation: 0 fichier(s) (92078ms)

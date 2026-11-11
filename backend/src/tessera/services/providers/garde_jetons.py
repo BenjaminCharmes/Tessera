@@ -34,6 +34,7 @@ from claude_agent_sdk import HookContext, HookInput, HookJSONOutput
 
 from tessera.config import Settings
 from tessera.services.noyau import jeton_de_session
+from tessera.services.providers.garde_chemins import glob_peut_designer, ramener_prefixe_windows
 from tessera.services.providers.garde_coffre import COFFRE_REFUS, commande_execute_le_coffre
 from tessera.services.providers.garde_reglages import REGLAGES_REFUS, commande_vise_les_reglages
 from tessera.utils.logger import get_logger
@@ -88,6 +89,7 @@ def _resoudre(brut: str, base: Path) -> Path | None:
     texte = texte.replace("\\", "/")
     if os.name == "nt":
         # Git Bash écrit `/c/Users/...` : le même fichier que `C:/Users/...`.
+        texte = ramener_prefixe_windows(texte)
         correspondance = _GIT_BASH.match(texte)
         if correspondance:
             texte = f"{correspondance[1].upper()}:/{correspondance[2]}"
@@ -192,11 +194,14 @@ def _outil_vise_le_env(
         return False
     dossier = _resoudre(str(entrees.get("path") or "."), base) or base
     chemin = str(entrees.get("path") or "")
-    if outil == "Grep" and chemin:
-        if vise_le_env(chemin, base, env_file):
+    glob = entrees.get("glob")
+    if outil == "Grep":
+        if chemin and vise_le_env(chemin, base, env_file):
             return True
-        # Sans `glob`, un dossier qui porte le fichier le lit avec le reste.
-        if not entrees.get("glob") and dossier_contient_le_env(chemin, base, env_file):
+        # Un dossier qui porte le fichier le livre avec le reste, sauf glob qui l'exclut.
+        if not glob and chemin and dossier_contient_le_env(chemin, base, env_file):
+            return True
+        if glob and glob_peut_designer(str(glob), dossier, env_file):
             return True
     motif = entrees.get("pattern" if outil == "Glob" else "glob")
     return bool(motif) and motif_vise_le_env(str(motif), dossier, env_file)
