@@ -9270,3 +9270,21 @@ error: Please commit or stash them.
 - 2026-11-11 16:41:14 UTC — [ticket-934] APPROVED après 3 tour(s)
 - 2026-11-11 16:42:13 UTC — [ticket-934] leçons: une leçon proposée
 - 2026-11-11 16:43:57 UTC — [ticket-934] documentation: 0 fichier(s) (99078ms)
+- 2026-11-11 16:59:26 UTC — [ide-core] ticket-934 PR #1053 confiée au CIWatcher
+- 2026-11-11 16:27:02 UTC — [ide-core] ticket-932 PR #1051 mergée (CI verte)
+- 2026-11-11 16:59:33 UTC — [ticket-929] branche ticket-929-the-secret-read-guard-also-covers-the-claude-subs
+- 2026-11-11 16:59:36 UTC — [ticket-929] tour 1 — codeur démarré
+- 2026-11-11 17:01:37 UTC — [ticket-929] tour 1 — codeur terminé (121171ms)
+- 2026-11-11 17:02:10 UTC — [ticket-929] testeur: dur�es : ruff 0 s, pytest 29 s ; impact depuis base : 32 fichier(s) de test
+- 2026-11-11 17:02:10 UTC — [ticket-929] tests rouges au tour 1
+- 2026-11-11 17:02:10 UTC — [ticket-929] tour 2 — codeur démarré
+- 2026-11-11 17:02:27 UTC — [ticket-929] tour 2 — codeur terminé (16594ms)
+- 2026-11-11 17:03:24 UTC — [ticket-929] testeur: dur�es : ruff 0 s, mypy 32 s, pytest 52 s, mypy-linux 21 s ; impact depuis base : 32 fichier(s) de test
+- 2026-11-11 17:03:40 UTC — [ticket-929] securite: PASS — Le diff ajoute des refus de lecture pour trois fichiers d'identifiants du compte (15953ms)
+- 2026-11-11 17:03:40 UTC — [ticket-929] tour 2 — reviewer démarré
+- 2026-11-11 17:04:01 UTC — [ticket-929] tour 2 — reviewer terminé (21108ms)
+- 2026-11-11 17:04:15 UTC — [ticket-929] validateur: fichiers cités joints : backend/tests/test_garde_jetons.py, <home>/.claude/settings.json ; absents : <home>/.claude/.credentials.json, hosts.yml
+- 2026-11-11 17:04:15 UTC — [ticket-929] validateur: APPROVED — Les cinq critères sont satisfaits. Le diff ajoute un nouveau module `garde_compt (35094ms)
+- 2026-11-11 17:04:15 UTC — [ticket-929] APPROVED après 2 tour(s)
+- 2026-11-11 17:06:21 UTC — [ticket-929] leçons: refusée — preuve absente du retour du run
+- 2026-11-11 17:09:32 UTC — [ticket-929] documentation: 0 fichier(s) (185157ms) — après tour de correction

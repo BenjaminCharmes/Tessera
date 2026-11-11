@@ -36,6 +36,7 @@ from tessera.config import Settings
 from tessera.services.noyau import jeton_de_session
 from tessera.services.providers.garde_chemins import glob_peut_designer, ramener_prefixe_windows
 from tessera.services.providers.garde_coffre import COFFRE_REFUS, commande_execute_le_coffre
+from tessera.services.providers.garde_comptes import COMPTE_REFUS, fichiers_de_compte
 from tessera.services.providers.garde_reglages import REGLAGES_REFUS, commande_vise_les_reglages
 from tessera.utils.logger import get_logger
 
@@ -213,7 +214,8 @@ def hook_refus_env_tessera(
     """Build the ``PreToolUse`` hook refusing reads of Tessera's secret files.
 
     Protected: the ``.env``, the session-token file (ticket-879) and the
-    frontend's ``.env*.local`` files (ticket-922). Relative paths resolve against ``cwd``, the run's working
+    frontend's ``.env*.local`` files (ticket-922) and the backend account's
+    credential files (ticket-929). Relative paths resolve against ``cwd``, the run's working
     folder; without one, against the process's. ``env_file`` defaults to
     ``Settings.env_file`` and ``fichier_jeton`` to
     ``jeton_de_session.chemin_du_fichier()``; both are resolved once, here.
@@ -227,6 +229,7 @@ def hook_refus_env_tessera(
             ((env_tessera.parent / "frontend" / nom).resolve(), ENV_LOCAL_REFUS)
             for nom in _ENV_LOCAUX
         ),
+        *((fichier, COMPTE_REFUS) for fichier in fichiers_de_compte()),
     )
 
     async def hook(

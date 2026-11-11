@@ -1,14 +1,16 @@
 ---
-id: ticket-929
-title: "The secret read guard also covers the Claude subscription session, git credentials and the GitHub CLI hosts file"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
-depends_on: ["ticket-928"]
-estimated_days: 0.5
 created: 2026-11-11
+depends_on:
+- ticket-928
+estimated_days: 0.5
+id: ticket-929
+pr_number: 1054
+priority: high
+status: done
+title: The secret read guard also covers the Claude subscription session, git credentials
+  and the GitHub CLI hosts file
+type: fix
 ---
 
 # ticket-929 — La garde de lecture couvre aussi la session de l'abonnement, les identifiants git et le fichier d'hôtes de `gh`
