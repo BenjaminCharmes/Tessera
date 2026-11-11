@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 2
 id: ticket-934
 plan: true
-pr_number: null
+pr_number: 1053
 priority: high
 status: done
 title: Under the dedicated agent account, the test command and the visual-check app
