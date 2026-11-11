@@ -142,13 +142,65 @@ def cibles_ecrites(commande: str) -> list[str]:
     Volontairement incomplet : ce qui ne se lit pas avec certitude n'est pas
     rendu, et passera donc.
     """
-    jetons = _jetons(commande)
+    jetons = _jetons(_sans_heredocs(commande))
     if jetons is None:
         return []
+    dossier, jetons = _dossier_de_tete(jetons)
     cibles, commandes = _decouper(jetons)
     for args in commandes:
         cibles.extend(_cibles_de_commande(args))
-    return [c for c in cibles if c not in _NON_FICHIERS]
+    return [_depuis(dossier, c) for c in cibles if c not in _NON_FICHIERS]
+
+
+#: `<<MOT`, `<<'MOT'`, `<<"MOT"`, `<<-MOT` (mais pas le here-string `<<<`).
+_RE_HEREDOC = re.compile(r"(?<!<)<<(?!<)-?\s*[\"']?(\w+)")
+
+
+def _sans_heredocs(commande: str) -> str:
+    """Retire le corps des heredocs, de la ligne qui suit `<<MOT` à sa ligne de fin.
+
+    Un heredoc non fermé court jusqu'à la fin de la commande : rien de plus
+    n'est lu qu'avant.
+    """
+    gardees: list[str] = []
+    fin: str | None = None
+    for ligne in commande.split(chr(10)):
+        if fin is not None:
+            if ligne.strip() == fin:
+                fin = None
+            continue
+        gardees.append(ligne)
+        trouve = _RE_HEREDOC.search(ligne)
+        if trouve:
+            fin = trouve.group(1)
+    return chr(10).join(gardees)
+
+
+_CHANGEMENTS_DE_DOSSIER = frozenset({"cd", "pushd", "popd"})
+
+
+def _dossier_de_tete(jetons: list[str]) -> tuple[str | None, list[str]]:
+    """Le dossier d'un `cd x &&` / `cd x ;` en tête, s'il se lit avec certitude."""
+    if len(jetons) < 4 or jetons[0] != "cd" or jetons[2] not in ("&&", ";"):
+        return None, jetons
+    dossier = jetons[1]
+    if _est_operateur(dossier) or dossier == "-" or dossier.startswith(("-", "~", "/", "\\")):
+        return None, jetons
+    if re.match(r"^[A-Za-z]:", dossier) or any(c in dossier for c in "$`*?"):
+        return None, jetons
+    reste = jetons[3:]
+    # Un autre `cd`, `pushd` ou `popd` plus loin : le dossier courant change,
+    # on ne sait plus où on est, donc le comportement actuel s'applique.
+    if any(_nom_commande(j) in _CHANGEMENTS_DE_DOSSIER for j in reste):
+        return None, jetons
+    return dossier, reste
+
+
+def _depuis(dossier: str | None, cible: str) -> str:
+    """La cible relative au dossier du `cd` ; une cible absolue ou variable reste telle quelle."""
+    if dossier is None or cible.startswith(("/", "~", "\\")) or re.match(r"^[A-Za-z]:|\$", cible):
+        return cible
+    return f"{dossier}/{cible}"
 
 
 #: Noms et préfixes de fichiers protégés qu'on cherche dans le code inline.
