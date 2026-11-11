@@ -4,7 +4,7 @@ created: 2026-11-11
 depends_on: []
 estimated_days: 1
 id: ticket-931
-pr_number: null
+pr_number: 1048
 priority: high
 status: done
 title: The Bash write guard expands ~ and variables, and refuses a relative target
