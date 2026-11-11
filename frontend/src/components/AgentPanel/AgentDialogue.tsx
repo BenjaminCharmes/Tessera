@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import CompteARebours from "./CompteARebours";
+import Button from "../../design/ui/Button";
 
 /**
  * Parler à l'agent pendant qu'il travaille (ticket-066).
@@ -162,14 +163,14 @@ export default function AgentDialogue({
       {/* L'arrêt est une sortie, pas une annulation : le run commite ce qu'il
           a déjà produit, parce que le ticket suivant dépend d'un arbre propre
           (ADR-018). */}
-      <button
-        type="button"
+      <div className="mb-3">
+<Button variante="arret" taille="compact"
         onClick={onStop}
         title="Le run commitera ce qu'il a déjà produit"
-        className="mb-3 rounded-sm border border-red-900/70 px-2 py-0.5 text-micro text-red-400 transition-colors hover:border-red-700 hover:text-red-300"
       >
         Arrêter le run
-      </button>
+      </Button>
+</div>
 
       <label
         htmlFor="dialogue-consigne"
@@ -186,13 +187,11 @@ export default function AgentDialogue({
           placeholder="lue par le prochain agent à parler"
           className="min-w-0 flex-1 rounded-sm border border-zinc-800 bg-zinc-950 px-2 py-1 text-xs text-zinc-200 outline-hidden placeholder:text-zinc-600 focus:border-zinc-600"
         />
-        <button
-          type="button"
+        <Button taille="compact"
           onClick={envoyerConsigne}
-          className="rounded-sm border border-zinc-700 px-2 py-1 text-xs text-zinc-300 transition-colors hover:border-zinc-500 hover:text-zinc-100"
         >
           Envoyer
-        </button>
+        </Button>
       </div>
     </div>
   );

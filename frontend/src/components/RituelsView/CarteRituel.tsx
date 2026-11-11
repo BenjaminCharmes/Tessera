@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { Rituel } from "../../lib/apiRituels";
 import type { Project } from "../../types/api";
+import Button from "../../design/ui/Button";
 import { libelleDeDate, libelleDuRythme } from "./format";
 
 interface CarteRituelProps {
@@ -10,8 +11,6 @@ interface CarteRituelProps {
   onFait: (id: string) => void;
   onReporter: (id: string) => void;
 }
-
-const BOUTON = "rounded-md border border-zinc-700 px-2.5 py-1 text-xs text-zinc-200 hover:bg-zinc-800";
 
 /** La carte d'un rituel en retard : de quoi le faire, et le « Fait » (ticket-903). */
 export default function CarteRituel({ rituel, projets, onOpenProject, onFait, onReporter }: CarteRituelProps) {
@@ -37,35 +36,34 @@ export default function CarteRituel({ rituel, projets, onOpenProject, onFait, on
       <p className="mt-2 text-sm text-zinc-300">{rituel.detail}</p>
       <div className="mt-3 flex items-center gap-2">
         <code className="rounded bg-zinc-900 px-2 py-1 text-xs text-zinc-200">{rituel.phrase}</code>
-        <button type="button" className={BOUTON} onClick={() => void copier()}>
+        <Button taille="compact" onClick={() => void copier()}>
           {copie ? "Copié" : "Copier"}
-        </button>
+        </Button>
       </div>
       <div className="mt-3 flex flex-wrap gap-2">
         {rituel.projets.map((id) => {
           const projet = projets.find((p) => p.id === id);
           return (
-            <button
+            <Button
               key={id}
-              type="button"
-              className={`${BOUTON} disabled:opacity-40`}
+              taille="compact"
               disabled={projet === undefined || onOpenProject === undefined}
               onClick={() => projet && onOpenProject?.(projet)}
             >
               Ouvrir {projet?.name ?? id}
-            </button>
+            </Button>
           );
         })}
-        <button
-          type="button"
-          className="rounded-md bg-violet-600 px-2.5 py-1 text-xs font-medium text-white hover:bg-violet-500"
+        <Button
+          variante="plein"
+          taille="compact"
           onClick={() => onFait(rituel.id)}
         >
           Fait
-        </button>
-        <button type="button" className={BOUTON} onClick={() => onReporter(rituel.id)}>
+        </Button>
+        <Button taille="compact" onClick={() => onReporter(rituel.id)}>
           Reporter à demain
-        </button>
+        </Button>
       </div>
     </li>
   );

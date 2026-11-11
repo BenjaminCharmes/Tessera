@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes } from "react";
+import type { AnchorHTMLAttributes, ButtonHTMLAttributes } from "react";
 
 /**
  * Bouton de la charte — ticket-439.
@@ -29,17 +29,23 @@ const TAILLES: Record<TailleBouton, string> = {
   pastille: "h-5 px-2 text-mini font-medium",
 };
 
-export default function Button({
-  variante = "borde",
-  taille = "normal",
-  type = "button",
-  ...reste
-}: ButtonProps) {
-  return (
-    <button
-      type={type}
-      className={`inline-flex items-center justify-center gap-1.5 rounded transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${VARIANTES[variante]} ${TAILLES[taille]}`}
-      {...reste}
-    />
-  );
+/** Un lien qui a l'aspect d'un bouton : même variantes, même tailles. */
+interface LienBoutonProps extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "className"> {
+  variante?: VarianteBouton;
+  taille?: TailleBouton;
+  href: string;
+}
+
+function classes(variante: VarianteBouton, taille: TailleBouton): string {
+  return `inline-flex max-w-full items-center justify-center gap-1.5 rounded transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${VARIANTES[variante]} ${TAILLES[taille]}`;
+}
+
+function LienBouton({ variante = "borde", taille = "normal", ...lien }: LienBoutonProps) {
+  return <a className={classes(variante, taille)} {...lien} />;
+}
+
+export default function Button(props: ButtonProps | LienBoutonProps) {
+  if ("href" in props && props.href !== undefined) return <LienBouton {...props} />;
+  const { variante = "borde", taille = "normal", type = "button", ...reste } = props as ButtonProps;
+  return <button type={type} className={classes(variante, taille)} {...reste} />;
 }

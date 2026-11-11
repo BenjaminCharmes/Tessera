@@ -1,3 +1,4 @@
+import Button from "../../design/ui/Button";
 import type { AdresseAnnoncee } from "./adresse";
 
 /**
@@ -14,17 +15,17 @@ import type { AdresseAnnoncee } from "./adresse";
  */
 export default function AdresseDuService({ url, etiquette }: AdresseAnnoncee) {
   return (
-    <a
+    <Button
       href={url}
+      taille="pastille"
       target="_blank"
       rel="noreferrer"
       title={etiquette ? `${etiquette} · ${url}` : url}
-      className="inline-flex max-w-full items-center gap-1.5 rounded-sm border border-zinc-700 px-1.5 py-0.5 text-micro text-zinc-400 transition-colors hover:border-zinc-500 hover:text-zinc-200"
     >
       {etiquette ? (
         <span className="shrink-0 text-zinc-500">{etiquette}</span>
       ) : null}
-      <span className="truncate">{url}</span>
-    </a>
+      <span className="min-w-0 truncate">{url}</span>
+    </Button>
   );
 }
