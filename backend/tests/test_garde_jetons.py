@@ -405,3 +405,55 @@ def test_the_hook_is_installed_on_every_agent_call(tmp_path: Path) -> None:
 
     matchers = (options.hooks or {})["PreToolUse"]
     assert "Read|Glob|Grep|Bash" in {m.matcher for m in matchers}
+
+
+# ------------------------------------------------------------------
+# Préfixes Windows et globs de Grep (ticket-928)
+# ------------------------------------------------------------------
+
+
+@pytest.mark.skipif(os.name != "nt", reason="the extended-length prefix only exists on Windows")
+async def test_read_refuses_the_extended_length_prefix(depot: _Depot) -> None:
+    prefixe = "\\" * 2 + "?" + "\\"
+    assert _refuse(await _appeler(depot, "Read", file_path=prefixe + str(depot.env)))
+
+
+@pytest.mark.skipif(os.name != "nt", reason="UNC loopback paths only exist on Windows")
+async def test_read_refuses_the_local_unc_spelling(depot: _Depot) -> None:
+    lecteur, reste = str(depot.env).split(":", 1)
+    unc = "\\" * 2 + "localhost" + "\\" + lecteur + "$" + reste
+
+    assert _refuse(await _appeler(depot, "Read", file_path=unc))
+
+
+def test_prefix_forms_fold_to_the_drive_path() -> None:
+    from tessera.services.providers.garde_chemins import ramener_prefixe_windows
+
+    for forme in ("//?/C:/a/.env", "//?/UNC/localhost/C$/a/.env", "//127.0.0.1/c$/a/.env"):
+        assert ramener_prefixe_windows(forme) == "C:/a/.env"
+    assert ramener_prefixe_windows("//serveur/C$/a") == "//serveur/C$/a"
+
+
+@pytest.mark.parametrize("glob", ["*env", "{.env,x}", "[.]env"])
+async def test_grep_on_the_env_folder_refuses_a_glob_that_reaches_it(
+    depot: _Depot, glob: str
+) -> None:
+    assert _refuse(
+        await _appeler(depot, "Grep", pattern="x", path=str(depot.racine), glob=glob)
+    )
+
+
+async def test_grep_on_frontend_refuses_the_local_glob(depot: _Depot) -> None:
+    frontend = depot.racine / "frontend"
+    frontend.mkdir()
+    (frontend / ".env.local").write_text("X=1\n", encoding="utf-8")
+
+    assert _refuse(
+        await _appeler_racine(depot, "Grep", pattern="x", path="frontend", glob="*.local")
+    )
+
+
+async def test_grep_on_the_env_folder_passes_with_a_py_glob(depot: _Depot) -> None:
+    assert not _refuse(
+        await _appeler(depot, "Grep", pattern="x", path=str(depot.racine), glob="*.py")
+    )

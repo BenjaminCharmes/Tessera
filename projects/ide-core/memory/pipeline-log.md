@@ -9151,3 +9151,16 @@ error: Please commit or stash them.
 - 2026-11-11 14:32:24 UTC — [ticket-930] validateur: APPROVED — Tous les critères sont satisfaits. Le diff ajoute les trois protections manquant (26469ms)
 - 2026-11-11 14:32:24 UTC — [ticket-930] APPROVED après 1 tour(s)
 - 2026-11-11 14:38:25 UTC — [ticket-930] documentation: 0 fichier(s) (356625ms) — après tour de correction
+- 2026-11-11 14:02:07 UTC — [ide-core] ticket-919 PR #1045 confiée au CIWatcher
+- 2026-11-11 13:58:41 UTC — [ticket-918] livraison: arrêt — PR #1044 non mergée : CI failing : la PR #1044 reste ouverte.
+- 2026-11-11 14:02:11 UTC — [ticket-928] branche ticket-928-the-secret-read-guard-sees-through-device-and-unc
+- 2026-11-11 14:02:12 UTC — [ticket-928] tour 1 — codeur démarré
+- 2026-11-11 14:03:32 UTC — [ticket-928] tour 1 — codeur terminé (79983ms)
+- 2026-11-11 14:03:53 UTC — [ticket-928] testeur: dur�es : ruff 0 s, mypy 5 s, mypy-linux 11 s, pytest 19 s ; impact depuis base : 32 fichier(s) de test
+- 2026-11-11 14:04:07 UTC — [ticket-928] securite: PASS — Verdict PASS : le diff durcit la garde de lecture des secrets sans rien retirer. (14483ms)
+- 2026-11-11 14:04:07 UTC — [ticket-928] tour 1 — reviewer démarré
+- 2026-11-11 14:04:35 UTC — [ticket-928] validateur: fichiers cités joints : backend/tests/test_garde_jetons.py, .env, frontend/ (dossier, 17 fichiers), backend/src/tessera/services/providers/perimetre.py (tronqué) ; absents : *.py
+- 2026-11-11 14:04:35 UTC — [ticket-928] validateur: APPROVED — Les 6 critères sont satisfaits. Le codeur a extrait la normalisation des préfixe (27546ms)
+- 2026-11-11 14:04:36 UTC — [ticket-928] tour 1 — reviewer terminé (28953ms)
+- 2026-11-11 14:04:36 UTC — [ticket-928] APPROVED après 1 tour(s)
+- 2026-11-11 14:06:13 UTC — [ticket-928] documentation: 0 fichier(s) (92078ms)
