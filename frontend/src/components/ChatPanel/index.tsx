@@ -5,6 +5,7 @@ import { useChat } from "../../hooks/useChat";
 import ChatMessageView from "./ChatMessageView";
 import ToolUseList from "./ToolUseList";
 import { IconCross, IconSend } from "../../design/icons";
+import Button from "../../design/ui/Button";
 
 interface ChatPanelProps {
   project: Project | null;
@@ -178,17 +179,17 @@ export default function ChatPanel({ project, conversationId }: ChatPanelProps) {
             disabled={chat.status === "connecting"}
             className="flex-1 resize-none rounded-sm bg-zinc-800 px-2 py-1.5 text-sm text-zinc-200 placeholder-zinc-600 outline-hidden focus:ring-1 focus:ring-zinc-600 disabled:opacity-50"
           />
-          <button
+          <Button
             type="submit"
+            variante="plein"
             disabled={!canSend}
             title="Envoyer (Entrée)"
-            className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-sm bg-violet-700 text-white hover:bg-violet-600 disabled:opacity-40 disabled:hover:bg-violet-700"
           >
             <IconSend size={16} />
             <span className="sr-only">
               {thinking ? "Envoi en cours" : "Envoyer"}
             </span>
-          </button>
+          </Button>
         </div>
       </form>
     </div>

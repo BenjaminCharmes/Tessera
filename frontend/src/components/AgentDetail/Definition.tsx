@@ -11,6 +11,7 @@ import type { AgentDetail as AgentDetailData } from "../../types/api";
 import { diffLignes } from "./diff";
 import { phraseDuRole } from "./chiffres";
 import PromptDiff from "./PromptDiff";
+import Button from "../../design/ui/Button";
 
 /**
  * La définition d'un agent, au centre de l'écran (ticket-076).
@@ -174,13 +175,11 @@ export default function Definition({ role }: { role: string }) {
                     >
                       {enregistrement ? "Enregistrement…" : "Confirmer"}
                     </button>
-                    <button
-                      type="button"
+                    <Button taille="compact"
                       onClick={() => setDiffOuvert(false)}
-                      className="rounded-sm border border-zinc-600 px-2 py-1 text-mini text-zinc-300 transition-colors hover:border-zinc-400"
                     >
                       Annuler
-                    </button>
+                    </Button>
                     {message && (
                       <span className="text-mini text-zinc-400">{message}</span>
                     )}

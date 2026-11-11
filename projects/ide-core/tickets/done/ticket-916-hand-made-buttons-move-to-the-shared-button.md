@@ -6,8 +6,8 @@ estimated_days: 0.5
 id: ticket-916
 pr_number: null
 priority: low
-status: todo
-title: "Hand-made buttons move to the shared Button component"
+status: done
+title: Hand-made buttons move to the shared Button component
 type: refactor
 ---
 
@@ -41,12 +41,12 @@ variante nouvelle seulement si un cas cité n'entre dans aucune.
 
 ## Critères d'acceptation
 
-- [ ] Les trois pleins violets cités utilisent `<Button variante="plein">`.
-- [ ] Les boutons bordés des huit fichiers cités utilisent `<Button>` ; la
+- [x] Les trois pleins violets cités utilisent `<Button variante="plein">`.
+- [x] Les boutons bordés des huit fichiers cités utilisent `<Button>` ; la
       constante `BOUTON` de `CarteRituel.tsx` a disparu.
-- [ ] Le diff n'ajoute aucune classe `bg-violet-600` ni `bg-violet-700` dans
+- [x] Le diff n'ajoute aucune classe `bg-violet-600` ni `bg-violet-700` dans
       `components/`.
-- [ ] Les tests existants de ces composants passent, adaptés si un sélecteur
+- [x] Les tests existants de ces composants passent, adaptés si un sélecteur
       dépendait d'une classe retirée.
 
 ## Ce que ça ne fait pas

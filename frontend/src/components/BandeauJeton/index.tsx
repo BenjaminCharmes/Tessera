@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { saisirJeton } from "../../lib/auth";
 import { onJetonManquant } from "../../lib/http";
+import Button from "../../design/ui/Button";
 
 export const CHEMIN_JETON_WINDOWS = "%LOCALAPPDATA%\\Tessera\\jeton-de-session";
 export const CHEMIN_JETON_AUTRE = "~/.local/state/tessera/jeton-de-session";
@@ -42,9 +43,9 @@ export default function BandeauJeton() {
         onChange={(e) => setValeur(e.target.value)}
         className="min-w-64 rounded border border-zinc-600 bg-zinc-900 px-2 py-1 text-zinc-100"
       />
-      <button type="submit" className="rounded bg-violet-600 px-3 py-1 text-white hover:bg-violet-500">
+      <Button type="submit" variante="plein" taille="compact">
         Valider
-      </button>
+      </Button>
       <span className="text-xs text-amber-200">
         Le backend l'écrit dans <code>{CHEMIN_JETON_WINDOWS}</code> (Windows) ou{" "}
         <code>{CHEMIN_JETON_AUTRE}</code>.

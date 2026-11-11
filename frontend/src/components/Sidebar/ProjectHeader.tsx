@@ -7,6 +7,7 @@ import StatusPill from "../../design/ui/StatusPill";
 import type { UseServicesResult } from "../../hooks/useServices";
 import { BAND } from "../../design/layout";
 import type { Project } from "../../types/api";
+import Button from "../../design/ui/Button";
 
 /**
  * En-tête du projet actif, épinglé au-dessus de la colonne qui défile
@@ -139,13 +140,11 @@ export default function ProjectHeader({
           Git
         </button>
         {project.id !== PROJET_CIBLE_DES_SIGNALEMENTS ? (
-          <button
-            type="button"
+          <Button taille="compact"
             onClick={() => setSignalementOuvert(true)}
-            className="whitespace-nowrap rounded border border-zinc-700 px-2 py-1 text-mini text-zinc-300 transition-colors hover:border-zinc-500 hover:text-zinc-100"
           >
             Signaler
-          </button>
+          </Button>
         ) : null}
       </div>
       {signalementOuvert ? (
