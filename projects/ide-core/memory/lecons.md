@@ -3,6 +3,7 @@
 Pièges observés sur ce projet, une ligne chacun. Le service écrit sous `## Proposées` ; un humain déplace une leçon sous `## En vigueur` pour qu'elle atteigne le codeur et le reviewer.
 
 ## Proposées
+- Quand tu développes un chemin (tilde, variables) avant de tester son état, le test de tilde devient mort — décide si tu testes avant ou après développement. (source : ticket-931, 2026-11-11)
 
 ## En vigueur
 - Quand on raccourcit les commentaires pour loger du code nouveau, c'est qu'on ajoute trop ; refactoriser l'architecture au lieu d'éroder la doc. (source : ticket-915, 2026-11-11)

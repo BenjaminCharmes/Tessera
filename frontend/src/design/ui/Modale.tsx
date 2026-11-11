@@ -109,3 +109,19 @@ export default function Modale({
     </div>
   );
 }
+
+interface TitreDeModaleProps {
+  children: ReactNode;
+  id?: string;
+  /** Marge seulement : le style du titre est le même partout. */
+  className?: string;
+}
+
+/** Le titre d'une modale : un `<h2>` au style unique. */
+export function TitreDeModale({ children, id, className = "" }: TitreDeModaleProps) {
+  return (
+    <h2 id={id} className={`text-base font-semibold text-zinc-100 ${className}`.trim()}>
+      {children}
+    </h2>
+  );
+}

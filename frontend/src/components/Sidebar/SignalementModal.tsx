@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { signalerATessera } from "../../lib/api";
-import Modale from "../../design/ui/Modale";
+import Modale, { TitreDeModale } from "../../design/ui/Modale";
 import type { Project, SignalementNature } from "../../types/api";
 
 interface SignalementModalProps {
@@ -58,9 +58,9 @@ export default function SignalementModal({
   return (
     <Modale onFermer={onClose} aria-label="Signaler à Tessera">
       <div className="w-full max-w-md rounded-lg border border-zinc-700 bg-zinc-900 p-6 shadow-xl">
-        <h2 className="mb-4 text-base font-semibold text-zinc-100">
+        <TitreDeModale className="mb-4">
           Signaler à Tessera
-        </h2>
+        </TitreDeModale>
         {ticketId ? (
           <div>
             <p className="mb-4 text-sm text-green-400" role="status">

@@ -1,14 +1,15 @@
 ---
-id: ticket-931
-title: "The Bash write guard expands ~ and variables, and refuses a relative target after a directory change it cannot follow"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-11-11
 depends_on: []
 estimated_days: 1
-created: 2026-11-11
+id: ticket-931
+pr_number: 1048
+priority: high
+status: done
+title: The Bash write guard expands ~ and variables, and refuses a relative target
+  after a directory change it cannot follow
+type: fix
 ---
 
 # ticket-931 — La garde d'écriture Bash développe `~` et les variables, et refuse une cible relative après un `cd` qu'elle ne suit pas
