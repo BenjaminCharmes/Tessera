@@ -4,7 +4,7 @@ created: 2026-11-11
 depends_on: []
 estimated_days: 0.5
 id: ticket-930
-pr_number: null
+pr_number: 1047
 priority: high
 status: done
 title: The project MCP config, CLI hook scripts and the CI forbidden-terms script
