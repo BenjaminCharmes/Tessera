@@ -40,12 +40,15 @@ function classes(variante: VarianteBouton, taille: TailleBouton): string {
   return `inline-flex max-w-full items-center justify-center gap-1.5 rounded transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${VARIANTES[variante]} ${TAILLES[taille]}`;
 }
 
-function LienBouton({ variante = "borde", taille = "normal", ...lien }: LienBoutonProps) {
+export function LienBouton({ variante = "borde", taille = "normal", ...lien }: LienBoutonProps) {
   return <a className={classes(variante, taille)} {...lien} />;
 }
 
-export default function Button(props: ButtonProps | LienBoutonProps) {
-  if ("href" in props && props.href !== undefined) return <LienBouton {...props} />;
-  const { variante = "borde", taille = "normal", type = "button", ...reste } = props as ButtonProps;
+export default function Button({
+  variante = "borde",
+  taille = "normal",
+  type = "button",
+  ...reste
+}: ButtonProps) {
   return <button type={type} className={classes(variante, taille)} {...reste} />;
 }

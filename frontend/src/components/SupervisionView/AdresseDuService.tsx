@@ -1,4 +1,4 @@
-import Button from "../../design/ui/Button";
+import { LienBouton } from "../../design/ui/Button";
 import type { AdresseAnnoncee } from "./adresse";
 
 /**
@@ -15,7 +15,7 @@ import type { AdresseAnnoncee } from "./adresse";
  */
 export default function AdresseDuService({ url, etiquette }: AdresseAnnoncee) {
   return (
-    <Button
+    <LienBouton
       href={url}
       taille="pastille"
       target="_blank"
@@ -26,6 +26,6 @@ export default function AdresseDuService({ url, etiquette }: AdresseAnnoncee) {
         <span className="shrink-0 text-zinc-500">{etiquette}</span>
       ) : null}
       <span className="min-w-0 truncate">{url}</span>
-    </Button>
+    </LienBouton>
   );
 }
