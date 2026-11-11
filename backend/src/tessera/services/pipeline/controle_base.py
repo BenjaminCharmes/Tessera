@@ -94,7 +94,8 @@ async def refus_avant_ouverture(
     """The 422 detail when a queue cannot start from these tickets, else None.
 
     Projet à worktree : chaque ticket doit être sur `origin/<base>`. Sinon, le
-    run travaille dans l'arbre du projet : chaque ticket doit y être.
+    run travaille dans l'arbre du projet : chaque ticket doit y être, ou sur
+    `origin/<base>` que le run avance avant de bifurquer (ticket-923).
     """
     ids = _sans_doublon(ticket_ids)
     politique = PolitiqueRun.lire(project_path)
@@ -102,6 +103,14 @@ async def refus_avant_ouverture(
         absents = await absents_de_la_base(project_path, ids)
         return message_de_refus_base(absents, base_du_projet(politique)) if absents else None
     absents = [tid for tid in ids if await ticket_svc.get_ticket(tid) is None]
+    if absents:
+        # Le run avance la base locale avant de bifurquer (ticket-406) : un
+        # ticket mergé sur `origin/<base>` y sera, même s'il manque à l'arbre.
+        # Git illisible (None) : on garde le refus tel qu'avant ticket-923.
+        sur_la_base = await asyncio.to_thread(
+            _absents_sur_la_base, project_path, base_du_projet(politique), absents
+        )
+        absents = absents if sur_la_base is None else sur_la_base
     if not absents:
         return None
     return f"Ticket(s) introuvable(s) dans le projet : {', '.join(absents)}."

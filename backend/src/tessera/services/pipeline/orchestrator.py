@@ -33,6 +33,7 @@ from tessera.services.pipeline.pipeline_run import PipelineRun, set_status, tole
 from tessera.services.pipeline.pipeline_text import _compose_feedback, _echec_de_tests, _first_line
 from tessera.services.pipeline.pipeline_tickets import relever_etat_initial, renvoyer_si_problemes
 from tessera.services.pipeline.run_dans_worktree import retirer_apres_echec, retirer_en_fin_de_run
+from tessera.services.pipeline.ticket_apres_avance import trouver_ticket
 from tessera.services.projets.ticket_service import TicketService
 from tessera.services.providers.enregistrant import activer_enregistrement
 from tessera.services.usage.quota_exhaustion import is_quota_exhausted, resume_label
@@ -352,16 +353,9 @@ class Orchestrator:
         run_id: str | None = None,
         dialogue: DialogueChannel | None = None,
     ) -> PipelineResult:
-        ticket = await self._ticket_svc.get_ticket(ticket_id)
-        if ticket is None and self._git_workspace is not None:
-            # Le fichier ticket a pu être déplacé sans commit lors d'un run
-            # précédent coupé net (ex: blocked/ sans commit). On tente de le
-            # retrouver sur la base distante avant de conclure « introuvable ».
-            restored = await self._git_workspace.restaurer_ticket_depuis_base(ticket_id)
-            if restored:
-                ticket = await self._ticket_svc.get_ticket(ticket_id)
-        if ticket is None:
-            raise ValueError(f"Ticket introuvable : {ticket_id}")
+        ticket = await trouver_ticket(self, ticket_id)
+        if isinstance(ticket, PipelineResult):
+            return ticket
 
         # Réinitialise le compteur de dépense du ticket : en file, les tickets
         # précédents ont déjà alimenté _spent_usd, et le contrôle entre deux
