@@ -9136,3 +9136,15 @@ error: Please commit or stash them.
 - 2026-11-11 13:27:03 UTC — [ticket-917] APPROVED après 1 tour(s)
 - 2026-11-11 13:31:22 UTC — [ticket-917] documentation: 1 fichier(s) (255172ms)
 - 2026-11-11 13:31:22 UTC — [ticket-926] documentation: pas de diff retrouvable, non documenté
+- 2026-11-11 13:47:34 UTC — [ide-core] ticket-918 PR #1044 confiée au CIWatcher
+- 2026-11-11 13:39:43 UTC — [ide-core] ticket-917 PR #1041 mergée (CI verte)
+- 2026-11-11 13:47:39 UTC — [ticket-919] branche ticket-919-filter-chips-counter-badges-and-the-focus-ring-ea
+- 2026-11-11 13:47:40 UTC — [ticket-919] tour 1 — codeur démarré
+- 2026-11-11 13:51:40 UTC — [ticket-919] tour 1 — codeur terminé (240250ms)
+- 2026-11-11 13:54:53 UTC — [ticket-919] testeur: dur�es : tsc 9 s, eslint 14 s, vitest 167 s
+- 2026-11-11 13:55:01 UTC — [ticket-919] securite: PASS — Le diff est un refactor de présentation : la nouvelle utilité CSS `focus-violet` (8328ms)
+- 2026-11-11 13:55:01 UTC — [ticket-919] tour 1 — reviewer démarré
+- 2026-11-11 13:55:20 UTC — [ticket-919] tour 1 — reviewer terminé (19218ms)
+- 2026-11-11 13:55:33 UTC — [ticket-919] validateur: fichiers cités joints : TousLesRuns.tsx, BarreProjets.tsx, Cloche.tsx, Pastille.tsx, Dossiers.tsx, index.css (tronqué)
+- 2026-11-11 13:55:33 UTC — [ticket-919] validateur: APPROVED — Ticket-919 livré complet. Les trois composants (`PuceFiltre` pour les filtres, ` (31405ms)
+- 2026-11-11 13:55:33 UTC — [ticket-919] APPROVED après 1 tour(s)
