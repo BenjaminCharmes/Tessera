@@ -29,9 +29,11 @@ from claude_agent_sdk import HookContext, HookInput, HookJSONOutput
 
 from tessera.services.projets.racine_depot import declare_ancestor, racine_ecriture_projet
 from tessera.services.providers.chemins_proteges import INTERPRETE_PROTEGE_REFUS, motif_de_protection, refus_de_protection
+from tessera.services.providers.developpement_chemin import developper, est_indetermine
 from tessera.services.providers.redirections_bash import cibles_ecrites, cibles_interpreteur_ecriture
 from tessera.services.providers.refus_garde import JournalDesRefus
 from tessera.services.providers.script_verification import script_de_verification
+from tessera.services.providers.suivi_cd import CD_INCERTAIN_REFUS, DOSSIER_INCERTAIN
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -82,7 +84,10 @@ def hors_perimetre(
     if racine is None:
         racine = racine_autorisee(project_path)
     try:
-        cible = Path(chemin)
+        texte = developper(chemin)
+        if est_indetermine(texte):
+            return True
+        cible = Path(texte)
         if not cible.is_absolute():
             cible = racine / cible
         return not cible.resolve().is_relative_to(racine)
@@ -161,9 +166,10 @@ def hook_refus_hors_perimetre(
         racine = racine_figee if racine_figee is not None else project_path.resolve()
         for cible in cibles:
             if hors_perimetre(cible, project_path, racine):
+                raison = CD_INCERTAIN_REFUS if cible.startswith(DOSSIER_INCERTAIN) else ECRITURE_REFUS
                 return _refus(
                     "ecriture_hors_perimetre_refusee", cible, project_path,
-                    ECRITURE_REFUS, journal,
+                    raison, journal,
                 )
             # Dans le projet, mais porteur de ses règles : `agents.json`, `.git/`,
             # `.claude/settings*.json`, `.github/workflows/` (ticket-119).

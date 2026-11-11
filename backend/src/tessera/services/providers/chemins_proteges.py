@@ -22,6 +22,7 @@ from fnmatch import fnmatch
 from pathlib import Path
 
 from tessera.config import Settings
+from tessera.services.providers.developpement_chemin import developper
 from tessera.services.providers.script_verification import motif_du_script
 from tessera.utils.noms_windows import normaliser_segment, normaliser_segments
 
@@ -53,7 +54,7 @@ def _cible_resolue(chemin: str, racine: Path) -> Path | None:
     échapper au garde : on le juge tel quel plutôt que de le laisser passer.
     """
     try:
-        cible = Path(chemin)
+        cible = Path(developper(chemin))
         if not cible.is_absolute():
             cible = racine / cible
     except ValueError:
