@@ -5,7 +5,6 @@ the early exits. Keeping the flow readable in one screen is the point: the
 order of the stages, and the conditions that end a run, are the part that is
 hard to get right.
 """
-import asyncio
 from collections.abc import Awaitable, Callable
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Optional
@@ -26,6 +25,7 @@ from tessera.services.pipeline.file_vivante import est_termine
 from tessera.services.pipeline.pipeline_approbation import apres_approbation
 from tessera.services.pipeline.pipeline_contraintes import arret_contraintes_hors_proposees
 from tessera.services.pipeline.pipeline_critere_protege import arret_critere_protege
+from tessera.services.pipeline.pipeline_empreinte import gardee
 from tessera.services.pipeline.pipeline_livraison import livrer_le_resultat
 from tessera.services.pipeline.pipeline_plan import run_plan
 from tessera.services.pipeline.pipeline_reprise import reprendre_sans_codeur, verifier_travail_repris
@@ -398,7 +398,8 @@ class Orchestrator:
         self._avertir_du_build(ticket_id)
         # Avant le premier tour, et seulement si le ticket le déclare. Ne lève
         # jamais : un plan manqué laisse le run tel qu'avant ticket-243.
-        await run_plan(self, run)
+        if isinstance(arret := await gardee(self, run, run_plan(self, run)), PipelineResult):
+            return arret
 
         # À partir d'ici une branche existe et les agents écrivent sur disque :
         # une panne qui remonterait laisserait leur travail non commité, donc
@@ -482,7 +483,7 @@ class Orchestrator:
             if not produit:
                 continue
 
-            blocked = await pipeline_controles.run_security_audit(self, run)
+            blocked = await gardee(self, run, pipeline_controles.run_security_audit(self, run))
             if blocked is not None:
                 return blocked
 
@@ -491,12 +492,10 @@ class Orchestrator:
 
             # Reviewer et validateur tournent en parallèle — la sécurité leur
             # est commune, mais aucun ne dépend de l'autre (ticket-289).
-            (rev_approved, rev_reason, raw_verdict), (val_approved, val_reason) = (
-                await asyncio.gather(
-                    pipeline_controles.run_review(self, run, context),
-                    pipeline_controles.run_validation(self, run),
-                )
-            )
+            verdicts = await gardee(self, run, pipeline_controles.run_review_and_validation(self, run, context))
+            if isinstance(verdicts, PipelineResult):
+                return verdicts
+            (rev_approved, rev_reason, raw_verdict), (val_approved, val_reason) = verdicts
 
             approved = rev_approved and val_approved
             if approved:
@@ -530,7 +529,8 @@ class Orchestrator:
                 return await outcomes.finish_stopped(self, run)
             return True
 
-        await pipeline_production.run_coder(self, run, context)
+        if arret := await pipeline_production.run_coder(self, run, context):
+            return arret
 
         if run.stop_requested:
             return await outcomes.finish_stopped(self, run)
@@ -551,7 +551,7 @@ class Orchestrator:
         # est économisé (ticket-098).
         # Deux expirations de suite terminent le run en blocked sans
         # repasser par le codeur (ticket-349).
-        tests_result = await pipeline_testeur.run_tests(self, run)
+        tests_result = await gardee(self, run, pipeline_testeur.run_tests(self, run))
         if not isinstance(tests_result, bool):
             return tests_result
         if not tests_result:

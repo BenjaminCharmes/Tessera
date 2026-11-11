@@ -615,3 +615,11 @@ Une ADR qu'aucune règle de `contraintes.md` ni aucun `CLAUDE.md` ne cite part d
 **Ne ferme pas** : le réseau ; le jeton OAuth, lisible par l'agent, voulu ; les droits des worktrees ; l'authentification, qui dépend du jeton longue durée tiré par `claude setup-token`.
 
 ---
+
+## ADR-084 — Un appel d'agent qui change un fichier protégé arrête le run
+
+**Date** : 2026-11-11
+**Décision** : `pipeline_empreinte.py` hache les fichiers que `motif_de_protection` désigne, plus `config` et `hooks/` du dépôt commun et du worktree, juste avant et après chaque appel (plan, codeur, tests, audit, revue + validateur). Une différence termine le run `blocked` avec commit (ADR-037), motif nommant les fichiers sans contenu ; au tour du codeur, avant la lecture du diff. Les lectures git passent `core.fsmonitor=false`.
+**Raison** : `sed -i`, `dd of=` ou un heredoc passent les gardes lexicales (ADR-031).
+**Ne voit pas** : l'écriture est constatée, pas empêchée ; le code exécuté pendant l'appel ; `filter.*` et `diff.external` ; les fichiers hors dépôt (ticket-931).
+**Faux positif** : un autre run ou `CIWatcher` qui écrit `.git/config` pendant l'appel ; revue et validateur partagent un garde.

@@ -11,7 +11,8 @@ from tessera.config import settings
 from tessera.models.agent import AgentResult, AgentRole
 from tessera.models.ticket import TicketStatus, TicketType
 from tessera.services.git_workspace import GitWorkspaceError
-from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent, PipelineResult
+from tessera.services.pipeline.pipeline_empreinte import arret_fichier_protege, empreinte, noms_changes
 from tessera.services.pipeline.pipeline_run import PipelineRun, set_status
 from tessera.services.pipeline.signaler_du_run import signaler_for
 from tessera.services.projets.artifact_snapshot import diff_artifacts, snapshot_artifacts
@@ -121,8 +122,14 @@ def journaliser_actions_epuisees(
     )
 
 
-async def run_coder(orch: "Orchestrator", run: PipelineRun, context: str) -> None:
-    """Run the coder, then capture what it actually wrote to disk."""
+async def run_coder(
+    orch: "Orchestrator", run: PipelineRun, context: str
+) -> PipelineResult | None:
+    """Run the coder, then capture what it actually wrote to disk.
+
+    Rend un résultat `blocked` quand l'appel a modifié un fichier protégé : la
+    comparaison précède la lecture du diff, qui lance git (ticket-933).
+    """
     # Un ticket `design` ne demande pas du code mais une décision, et
     # `ide-core/CLAUDE.md` promettait l'architecte dessus depuis le premier
     # commit sans que rien ne route par type (ticket-098). L'étape reste la
@@ -191,6 +198,7 @@ async def run_coder(orch: "Orchestrator", run: PipelineRun, context: str) -> Non
 
     # Ce qu'un rôle antérieur (le plan) aurait refusé n'est pas le tour du codeur.
     refus_du_tour(orch)
+    avant = await empreinte(orch)
     codeur_result = await orch._runner.run(
         role=role,
         ticket=run.ticket,
@@ -228,9 +236,12 @@ async def run_coder(orch: "Orchestrator", run: PipelineRun, context: str) -> Non
     )
 
     run.refus_du_tour = refus_du_tour(orch)
+    if changes := noms_changes(avant, await empreinte(orch)):
+        return await arret_fichier_protege(orch, run, changes)
     run.reviewed_code = await _capture_diff(orch, run, codeur_result.content)
     _capture_artifact_diff(orch, run)
     await set_status(orch, run, TicketStatus.in_review)
+    return None
 
 
 async def _capture_diff(orch: "Orchestrator", run: PipelineRun, prose: str) -> str:

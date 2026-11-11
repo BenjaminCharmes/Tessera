@@ -86,7 +86,12 @@ def writes(args: tuple[str, ...]) -> bool:
 
 def build_command(args: tuple[str, ...]) -> list[str]:
     """The full argv: cosmetic options always, hooks disabled for a write."""
-    options = ["-c", "core.quotePath=false", "-c", "core.longpaths=true"]
+    # `core.fsmonitor=false` : une clé écrite dans `.git/config` par un agent ne
+    # lance aucun programme au `git status` suivant (ticket-933).
+    options = [
+        "-c", "core.quotePath=false", "-c", "core.longpaths=true",
+        "-c", "core.fsmonitor=false",
+    ]
     if writes(args):
         options = ["-c", f"core.hooksPath={_dossier_sans_hooks()}", *options]
     return ["git", *options, *args]

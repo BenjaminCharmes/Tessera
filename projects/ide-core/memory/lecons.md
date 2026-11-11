@@ -3,6 +3,7 @@
 Pièges observés sur ce projet, une ligne chacun. Le service écrit sous `## Proposées` ; un humain déplace une leçon sous `## En vigueur` pour qu'elle atteigne le codeur et le reviewer.
 
 ## Proposées
+- Quand on ajoute des tests pour un module sensible, vérifier que les données de test ne déclenchent pas le contrôle de traces professionnelles du projet. (source : ticket-933, 2026-11-11)
 
 ## En vigueur
 - Quand on raccourcit les commentaires pour loger du code nouveau, c'est qu'on ajoute trop ; refactoriser l'architecture au lieu d'éroder la doc. (source : ticket-915, 2026-11-11)
