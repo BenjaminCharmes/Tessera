@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../../lib/api";
-import Modale from "../../design/ui/Modale";
+import Modale, { TitreDeModale } from "../../design/ui/Modale";
 import type { Project, RemovalPlan } from "../../types/api";
 
 interface RemoveProjectModalProps {
@@ -64,7 +64,7 @@ export default function RemoveProjectModal({
       aria-label={`Retirer ${project.id}`}
     >
       <div className="w-full max-w-md rounded-sm border border-zinc-700 bg-zinc-900 p-4 text-sm text-zinc-200">
-        <h2 className="mb-2 text-base font-medium">Retirer « {project.id} »</h2>
+        <TitreDeModale className="mb-2">Retirer « {project.id} »</TitreDeModale>
 
         {plan && (
           <div className="mb-3 space-y-1 text-xs text-zinc-400">

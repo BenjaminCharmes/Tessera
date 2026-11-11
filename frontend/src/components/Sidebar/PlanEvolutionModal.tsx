@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { Ticket, TicketDraft } from "../../types/api";
 import { api } from "../../lib/api";
-import Modale from "../../design/ui/Modale";
+import Modale, { TitreDeModale } from "../../design/ui/Modale";
 
 type ModalState = "idle" | "planning" | "review" | "creating" | "error";
 
@@ -110,9 +110,9 @@ export default function PlanEvolutionModal({
         {/* Step 1: description */}
         {(state === "idle" || state === "planning" || state === "error") && (
           <>
-            <h2 className="text-zinc-100 text-base font-semibold mb-1">
+            <TitreDeModale className="mb-1">
               Planifier une évolution
-            </h2>
+            </TitreDeModale>
             <p className="text-xs text-zinc-500 mb-4">
               Décris l'évolution souhaitée — l'agent générera une liste de
               tickets ordonnés.
@@ -171,9 +171,9 @@ export default function PlanEvolutionModal({
         {/* Step 2: review drafts */}
         {(state === "review" || state === "creating") && (
           <>
-            <h2 className="text-zinc-100 text-base font-semibold mb-1">
+            <TitreDeModale className="mb-1">
               {drafts.length} ticket{drafts.length !== 1 ? "s" : ""} générés
-            </h2>
+            </TitreDeModale>
             {summary && (
               <p className="text-xs text-zinc-400 mb-4 italic">{summary}</p>
             )}
