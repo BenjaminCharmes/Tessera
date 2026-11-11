@@ -11,7 +11,6 @@ Cette section n'est injectée dans aucun appel d'agent. Une règle nouvelle
 s'écrit ici, avec son ADR ; un humain l'accepte en la déplaçant dans sa
 section. (ADR-055)
 
-- **Un appel d'agent qui change un fichier protégé, un hook ou la config git arrête le run en `blocked`**, constaté par empreinte avant/après chaque appel, motif sans contenu. (ADR-084, ADR-037, ADR-031) — *à accepter : le contrôle tourne déjà.*
 - **Avec `worktree.compte_agent` et `AGENT_USER`, la commande de test et l'app du contrôle visuel partent aussi sous ce compte** ; tout échec de lancement est une panne d'environnement, jamais un repli sous le compte du backend. (ADR-085, ADR-083, ADR-037) — *à accepter quand `AGENT_USER` sera renseigné sur un projet.*
 - **Sous `AGENT_USER`, le CLI d'un agent part sous ce compte, environnement bâti de zéro** ; tout échec → `ProviderIndisponible`, jamais de repli sous le compte du backend. (ADR-083, ADR-037) — *à accepter quand `AGENT_USER` sera renseigné sur un projet : d'ici là, aucun agent ne la rencontre.*
 
@@ -93,6 +92,8 @@ section. (ADR-055)
 - **Le détecteur d'anomalies observe sans gouverner** : sans LLM, `git` ni
   `gh`, il ne touche à aucun run ni dépôt, et son échec n'atteint aucun run.
   (ADR-078, ADR-037)
+- **Un appel d'agent qui change un fichier protégé, un hook ou la config git
+  met le run en `blocked`** (empreinte avant/après). (ADR-084, ADR-037)
 - **Un projet ne porte qu'un run à la fois** (`RunLock`, 409) ; deux projets
   tournent en parallèle. (ADR-038)
 - **L'audit sécurité et le validateur échouent fermés.** Provider
@@ -132,12 +133,6 @@ section. (ADR-055)
   déclaré.** L'app part du worktree du run, sur un port libre, sans tuer de
   processus ; les captures restent hors du dépôt.
   (ADR-062, ADR-042, ADR-021)
-
-*(codeur, reviewer)*
-
-- **`ProjectLoader.list_projects()` ne liste que les dossiers avec un
-  `CLAUDE.md`** ; `Project.name` vient de son premier `# Titre`, sinon du nom
-  du dossier. (ADR-006, ADR-007)
 
 ## Provider et orchestration
 
