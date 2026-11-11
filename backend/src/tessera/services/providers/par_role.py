@@ -97,6 +97,7 @@ def provider_pour_role(
     journal_refus: JournalDesRefus | None = None,
     journal_repli: Callable[[str], None] | None = None,
     rapide: bool = False,
+    compte_agent: bool = False,
 ) -> LLMProvider:
     """Builds the provider `role` declares, wrapped in its fallback if any.
 
@@ -111,6 +112,8 @@ def provider_pour_role(
     Un rôle texte (`ROLES_TEXTE`) reçoit, pour le principal comme pour le
     repli, une durée totale maximale par appel (ticket-518). `journal_repli`
     reçoit la ligne que `ProviderAvecRepli` écrit quand le repli joue.
+
+    `compte_agent` : le projet du run a déclaré le compte dédié (ticket-915).
     """
     config = config_du_role(project_path, role)
     tools = outils_du_role(config, allow_tools, tools)
@@ -141,7 +144,8 @@ def provider_pour_role(
             allow_tools=allow_tools, tools=tools, racine_ecriture=racine_ecriture,
             skills=skills, duree_max_s=duree, effort=effort,
             base_url=url if principal else None,
-            endpoint_key=cle if principal else "", **journal,
+            endpoint_key=cle if principal else "",
+            compte_agent=compte_agent, **journal,
         )
 
     if rapide and config is not None and config.fallback is not None:

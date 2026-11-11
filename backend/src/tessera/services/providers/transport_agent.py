@@ -108,14 +108,16 @@ class TransportCompteAgent(SubprocessCLITransport):
 def transport_du_compte(
     prompt: str, options: ClaudeAgentOptions, lanceur: LanceurAgent | None = None,
     au_demarrage: Callable[[int], None] | None = None,
+    compte_agent: bool = False,
 ) -> TransportCompteAgent | None:
-    """Returns the transport for ``AGENT_USER``, or ``None`` when it is empty.
+    """Returns the transport for ``AGENT_USER``, or ``None`` when it is empty
+    or the project did not declare ``compte_agent`` (ticket-915).
 
     Mot de passe absent : ``ProviderIndisponible``, jamais de repli sous le
     compte du backend (ADR-037).
     """
     compte = settings.agent_user
-    if not compte:
+    if not compte or not compte_agent:
         return None
     mot_de_passe = settings.agent_logon_password.get_secret_value()
     if not mot_de_passe:

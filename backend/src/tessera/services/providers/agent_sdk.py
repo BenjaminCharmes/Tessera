@@ -110,6 +110,7 @@ def _build_options(
     journal_refus: JournalDesRefus | None = None,
     effort: EffortLevel | None = None,
     schema: dict[str, Any] | None = None,
+    compte_agent: bool = False,
 ) -> ClaudeAgentOptions:
     """Builds SDK options with the guardrails established by the ticket-044 spike.
 
@@ -154,9 +155,9 @@ def _build_options(
     mcp_servers, noms_mcp = serveur_tessera(ask_user, signaler, outille=allowed_tools != [])
     effective_tools = [*effective_tools, *noms_mcp]
 
-    # Compte dédié (ADR-083) : environnement bâti de zéro et CLI partagé ; vide,
-    # rien ne change. Le jeton absent lève `ProviderIndisponible`.
-    compte = settings.agent_user
+    # Compte dédié (ADR-083), si le projet du run le déclare (ticket-915) : env bâti
+    # de zéro et CLI partagé ; sinon rien ne change. Jeton absent : `ProviderIndisponible`.
+    compte = settings.agent_user if compte_agent else ""
     env = env_de_l_agent(compte, git_bash_path) if compte else env_du_sous_processus(git_bash_path)
 
     return ClaudeAgentOptions(
@@ -228,14 +229,15 @@ class ClaudeAgentSDKProvider:
         journal_refus: JournalDesRefus | None = None,
         duree_max_s: float | None = None,
         effort: EffortLevel | None = None,
+        compte_agent: bool = False,
     ) -> None:
+        self._compte_agent = compte_agent  # ticket-915 : faux, compte du backend
         # L'effort de raisonnement du rôle (ticket-573) ; None : défaut du SDK.
         self._effort = effort
         # Durée totale d'un appel (ticket-518) ; None : pas de borne, comme
         # pour le codeur, dont un tour légitime dure longtemps.
         self._duree_max_s = duree_max_s
-        # Là où les refus du garde-fou s'accumulent pour le reviewer et le
-        # validateur (ticket-476). None : personne ne les lira.
+        # Refus du garde-fou, pour le reviewer et le validateur (ticket-476) ; None : aucun.
         self._journal_refus = journal_refus
         self._max_turns = max_turns
         self._skills = list(skills) if skills else []
@@ -248,11 +250,9 @@ class ClaudeAgentSDKProvider:
         # donc ici que le quota se capte, et sa forme s'arrête ici (ticket-054).
         self.quota = QuotaTracker()
         self._allowed_tools = list(allowed_tools) if allowed_tools is not None else list(_ALLOWED_TOOLS)
-        # Chemin vers bash.exe sous Windows, transmis au sous-processus du SDK
-        # pour activer l'outil `Bash` (ticket-319).
+        # bash.exe sous Windows, transmis au sous-processus du SDK (`Bash`, ticket-319).
         self._git_bash_path = git_bash_path
-        # Délai maximum entre deux messages consécutifs (ticket-381).
-        # None à la construction → lu depuis les réglages.
+        # Délai maximum entre deux messages (ticket-381) ; None : lu des réglages.
         if silence_max_s is not None:
             self._silence_max_s = silence_max_s
         else:
@@ -357,7 +357,7 @@ class ClaudeAgentSDKProvider:
             racine_ecriture=self.racine_ecriture, resume=resume,
             skills=self._skills, git_bash_path=self._git_bash_path,
             journal_refus=self._journal_refus, effort=self._effort,
-            schema=schema,
+            schema=schema, compte_agent=self._compte_agent,
         )
         # Sous le compte dédié, le CLI part par le transport maison (ADR-083).
         groupe = creer_groupe()
@@ -365,7 +365,7 @@ class ClaudeAgentSDKProvider:
             _logger.warning("agent_sans_groupe", extra={"model": model})
         rappel = _rappel_de_rattachement(groupe)
         # Le PID du CLI ne se voit que dans le transport : toujours un transport maison.
-        transport = (transport_du_compte(user, options, au_demarrage=rappel)
+        transport = (transport_du_compte(user, options, au_demarrage=rappel, compte_agent=self._compte_agent)
                      or TransportSuivi(prompt=user, options=options, au_demarrage=rappel))
         chunks: list[str] = []
         result: ResultMessage | None = None

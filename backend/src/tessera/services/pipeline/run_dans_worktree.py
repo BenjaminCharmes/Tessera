@@ -63,7 +63,9 @@ async def ouvrir_worktree(
         )
         absents = await peupler(wt, project_path, config)
         # Après `populate` : un fichier copié (`.claude/settings.local.json`) reçoit son refus aussi.
-        await accorder_droits_agent(wt, politique.test_command)
+        # Seulement si le projet a déclaré le compte dédié (ticket-915).
+        if config.compte_agent:
+            await accorder_droits_agent(wt, politique.test_command)
     except GitWorkspaceError as exc:
         raise OrchestrateurRefuse(str(exc)) from exc
     return wt, absents

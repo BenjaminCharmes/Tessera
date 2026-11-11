@@ -67,10 +67,14 @@ def _valider(declaration: object, racine_depot: Path) -> ConfigWorktree | None:
     ):
         _mal_type("setup_timeout_s")
         return None
+    compte_agent = declaration.get("compte_agent", False)
+    if not isinstance(compte_agent, bool):
+        _mal_type("compte_agent")
+        return None
     entrees = tuple(e for e in (_entree(b, racine_depot) for b in brutes) if e is not None)
     return ConfigWorktree(
         populate=entrees, env=dict(env), test_command=commande, setup=preparation,
-        setup_timeout_s=delai,
+        setup_timeout_s=delai, compte_agent=compte_agent,
     )
 
 

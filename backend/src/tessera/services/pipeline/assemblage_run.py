@@ -132,6 +132,9 @@ async def build_orchestrator(
     # qu'un codeur aurait écrit dans `agents.json` pendant le run (ticket-119).
     politique = PolitiqueRun.lire(project_path)
     racine_ecriture = politique.racine_ecriture(project_path, worktree=wt)
+    # Lu ici, une fois, comme le reste : le compte dédié ne sert qu'aux runs
+    # d'un projet à worktree qui l'a déclaré (ticket-915).
+    isole = politique.worktree is not None and politique.worktree.compte_agent
 
     # Chaque rôle a son provider, déclaré dans le manifeste avec son repli
     # (ticket-188). Le reviewer relit : le sien est réduit à la lecture. Les
@@ -154,7 +157,7 @@ async def build_orchestrator(
         inner = provider_pour_role(
             project_path, role, tools=outils, racine_ecriture=racine_ecriture,
             project_id=project_id, max_turns=tours_du_role(role),
-            journal_refus=journal_refus, rapide=rapide,
+            journal_refus=journal_refus, rapide=rapide, compte_agent=isole,
         )
         return inner
 
@@ -174,7 +177,7 @@ async def build_orchestrator(
             project_path, role, tools=OUTILS_DE_RELECTURE,
             racine_ecriture=racine_ecriture, project_id=project_id,
             max_turns=tours_du_role(role), journal_repli=journal_repli,
-            rapide=rapide,
+            rapide=rapide, compte_agent=isole,
         )
         return ProviderEnregistrant(inner, role=role, db_path=settings.ide_db_path)
 

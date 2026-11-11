@@ -64,6 +64,27 @@ def test_a_bad_setup_timeout_invalidates_the_declaration(tmp_path: Path, valeur:
     assert _declarer(tmp_path, valeur) is None
 
 
+def test_compte_agent_defaults_to_false_and_reads_a_boolean(tmp_path: Path) -> None:
+    (tmp_path / "agents.json").write_text(json.dumps({"worktree": {}}), encoding="utf-8")
+    config = lire_worktree(tmp_path, tmp_path, "tracked")
+    assert config is not None and config.compte_agent is False
+    (tmp_path / "agents.json").write_text(
+        json.dumps({"worktree": {"compte_agent": True}}), encoding="utf-8"
+    )
+    config = lire_worktree(tmp_path, tmp_path, "tracked")
+    assert config is not None and config.compte_agent is True
+
+
+@pytest.mark.parametrize("valeur", ["oui", 1, 0, None, []])
+def test_a_non_boolean_compte_agent_invalidates_the_declaration(
+    tmp_path: Path, valeur: object
+) -> None:
+    (tmp_path / "agents.json").write_text(
+        json.dumps({"worktree": {"compte_agent": valeur}}), encoding="utf-8"
+    )
+    assert lire_worktree(tmp_path, tmp_path, "tracked") is None
+
+
 def test_delai_du_setup_prefers_the_declared_timeout() -> None:
     declare = PolitiqueRun(worktree=ConfigWorktree(setup="x", setup_timeout_s=900))
     assert delai_du_setup(declare, 420) == 900

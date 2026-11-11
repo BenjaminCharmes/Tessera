@@ -37,10 +37,10 @@ class LanceurDouble:
         raise RuntimeError("stop")
 
 
-def _options() -> ClaudeAgentOptions:
+def _options(compte_agent: bool = True) -> ClaudeAgentOptions:
     return _build_options(
         system="s", model="m", max_turns=1, max_budget_usd=None, cwd=Path.cwd(),
-        allowed_tools=[],
+        allowed_tools=[], compte_agent=compte_agent,
     )
 
 
@@ -53,7 +53,7 @@ def compte(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 async def _appel(lanceur: LanceurDouble) -> dict[str, object]:
-    transport = transport_du_compte("p", _options(), lanceur)
+    transport = transport_du_compte("p", _options(), lanceur, compte_agent=True)
     assert isinstance(transport, TransportCompteAgent)
     with pytest.raises(RuntimeError):
         await transport.connect()
@@ -65,7 +65,7 @@ def test_empty_agent_user_leaves_the_options_unchanged(monkeypatch: pytest.Monke
     options = _options()
     assert options.cli_path is None
     assert "CLAUDE_CODE_OAUTH_TOKEN" not in options.env
-    assert transport_du_compte("p", options) is None
+    assert transport_du_compte("p", options, compte_agent=True) is None
 
 
 def test_agent_user_sets_cli_path_and_environment(compte: None) -> None:
@@ -101,12 +101,12 @@ def test_missing_oauth_token_refuses(compte: None, monkeypatch: pytest.MonkeyPat
 def test_missing_password_refuses(compte: None, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(settings, "agent_logon_password", SecretStr(""))
     with pytest.raises(ProviderIndisponible):
-        transport_du_compte("p", _options(), LanceurDouble())
+        transport_du_compte("p", _options(), LanceurDouble(), compte_agent=True)
 
 
 async def test_unknown_account_refuses(compte: None) -> None:
     refus = ProviderIndisponible(message_de_logon(1326, COMPTE))
-    transport = transport_du_compte("p", _options(), LanceurDouble(refus))
+    transport = transport_du_compte("p", _options(), LanceurDouble(refus), compte_agent=True)
     assert transport is not None
     with pytest.raises(ProviderIndisponible):
         await transport.connect()
@@ -139,3 +139,20 @@ def test_logon_message_never_carries_the_password() -> None:
 def test_environment_block_is_sorted_and_double_terminated() -> None:
     texte = texte_d_environnement({"B": "2", "A": "1"})
     assert texte == "A=1\0B=2\0\0"
+
+
+def test_project_without_compte_agent_keeps_the_backend_account(compte: None) -> None:
+    options = _options(compte_agent=False)
+    assert options.cli_path is None
+    assert "CLAUDE_CODE_OAUTH_TOKEN" not in options.env
+    assert options.env.get("USERPROFILE") != rf"C:\Users\{COMPTE}"
+    assert transport_du_compte("p", options, LanceurDouble()) is None
+
+
+def test_compte_agent_with_empty_agent_user_changes_nothing(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(settings, "agent_user", "")
+    avec, sans = _options(compte_agent=True), _options(compte_agent=False)
+    assert avec.cli_path is None and avec.env == sans.env
+    assert transport_du_compte("p", avec, compte_agent=True) is None
