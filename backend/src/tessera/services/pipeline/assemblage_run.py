@@ -6,6 +6,9 @@ comme avant le déplacement : l'appelant — routeur d'orchestration ou de chat 
 les rend tels quels.
 """
 
+from dataclasses import replace
+from pathlib import Path
+
 from fastapi import HTTPException
 
 from tessera import reglages
@@ -36,7 +39,7 @@ from tessera.services.providers.par_role import modele_du_role, provider_pour_ro
 from tessera.services.providers.refus_garde import JournalDesRefus
 from tessera.services.verdicts.security_auditor import SecurityAuditorService
 from tessera.services.verdicts.validator import ValidatorService
-from tessera.services.verification.controle_visuel import lire_le_controle
+from tessera.services.verification.controle_visuel import ControleVisuel, lire_le_controle
 from tessera.services.verification.test_runner import TestRunnerService
 from tessera.services.worktrees.run_worktree import RunWorktree
 
@@ -113,6 +116,12 @@ async def build_project_context(project_id: str) -> str:
         f"## Décisions récentes\n{recent_decisions or '_Aucune décision._'}"
         f"{section_des_lecons}"
     )
+
+
+def _controle_du_run(project_path: Path, isole: bool) -> ControleVisuel | None:
+    """The declared visual check, marked with the run's dedicated account."""
+    controle = lire_le_controle(project_path)
+    return replace(controle, compte_agent=isole) if controle else None
 
 
 async def build_orchestrator(
@@ -207,7 +216,7 @@ async def build_orchestrator(
     test_runner = (
         TestRunnerService(
             cwd=pipeline_cfg.test_cwd, timeout=pipeline_cfg.test_timeout_s,
-            env=env_tests,
+            env=env_tests, compte_agent=isole,
         )
         if pipeline_cfg.testeur_enabled
         else None
@@ -279,7 +288,7 @@ async def build_orchestrator(
         attente_merge_max_s=settings.attente_merge_max_s,
         worktree=wt,
         depot=project_path if wt is not None else None,
-        controle_visuel=lire_le_controle(project_path),
+        controle_visuel=_controle_du_run(project_path, isole),
         chemins_absents=chemins_absents,
         preparation=preparation_du_run_declaree(
             politique, wt, project_path, env_tests, pipeline_cfg.test_timeout_s

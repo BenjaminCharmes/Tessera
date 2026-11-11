@@ -36,6 +36,8 @@ class ControleVisuel:
     captures: ConfigCaptures
     interface: tuple[str, ...]
     demarrage: Demarrage
+    #: Le run a déclaré le compte dédié : l'app y tourne aussi (ticket-934).
+    compte_agent: bool = False
 
 
 def _delai(brut: object) -> int:

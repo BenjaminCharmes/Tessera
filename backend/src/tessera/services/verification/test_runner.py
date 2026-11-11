@@ -4,24 +4,29 @@ import shlex
 import time
 from collections.abc import AsyncGenerator, Awaitable, Callable, Mapping
 from contextlib import asynccontextmanager
-from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
 from tessera.services.noyau.lancement import essais_de_commande
+from tessera.services.providers.lanceur_agent import LanceurAgent
 from tessera.services.verification.commande_chainee import decouper
 from tessera.services.verification.detail_du_delai import detail_du_delai
 from tessera.services.verification.env_du_code_de_projet import env_du_code_de_projet
 from tessera.services.verification.erreur_de_sortie import detail_avec_erreur
 from tessera.services.verification.groupe_d_etape import GroupeDEtape
+from tessera.services.verification.lancement_compte import EchecLancementCompte, compte_declare, lancer_sous_compte
 from tessera.services.verification.limiteur_de_suites import LimiteurDeSuites
 from tessera.services.verification.minuteur_d_etape import MinuteurDEtape
 from tessera.services.verification.outil_introuvable import outil_introuvable
 from tessera.services.verification.process_registry import CommandeInvalide, resoudre_le_cwd
+from tessera.services.verification.resultat_de_test import EtapeCoupee, EtapeTest, TestCommandNotFound, TestResult  # noqa: F401 — réexportés
 from tessera.services.verification.sortie_de_test import extract_counts, extract_errors, extract_failure_details, extract_summary_line
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
+
+# Les types de résultat vivent dans `resultat_de_test` ; ils restent importables d'ici.
+__all__ = ["EtapeCoupee", "EtapeTest", "TestCommandNotFound", "TestResult", "TestRunnerService"]
 
 _DEFAULT_TIMEOUT = 120
 
@@ -74,74 +79,14 @@ _PYTEST_NO_TESTS_COLLECTED = 5
 _LIGNES_DE_QUEUE = 60
 
 
-class TestCommandNotFound(Exception):
-    # Not a pytest test class despite the "Test" prefix — see TestResult.
-    __test__ = False
-
-
-@dataclass
-class TestResult:
-    # Tells pytest not to try collecting this as a test class just because
-    # its name starts with "Test" (it is a result dataclass, and pytest
-    # warns on every run otherwise).
-    __test__ = False
-
-    passed: bool
-    total: int
-    failed: int
-    output_summary: str
-    errors: list[str] = field(default_factory=list)
-    #: Détail structuré des échecs : section « short test summary info » de
-    #: pytest ou lignes FAIL/× de vitest, suivi du bloc FAILURES/ERRORS,
-    #: tronqué à 8 000 caractères. Vide quand les tests passent (ticket-393).
-    failure_details: str = ""
-    duration_ms: int = 0
-    #: La commande a-t-elle seulement démarré ? Faux quand l'exécutable est
-    #: introuvable — ce qui n'est pas la même chose que des tests rouges, et
-    #: ne demande pas la même chose au codeur. Deux tours de revue ont été
-    #: dépensés à corriger du code qui n'était pas en cause (ticket-157).
-    demarree: bool = True
-    #: Le délai global a-t-il été dépassé avant la fin de la commande ?
-    #: Distinct d'un test rouge : aucun test n'a été exécuté jusqu'au bout,
-    #: donc rien ne dit que le code est en cause. Relancer sans repasser par
-    #: le codeur est la bonne réponse (ticket-349).
-    expiree: bool = False
-    #: Chaque étape lancée et son code de sortie, dans l'ordre : ce que le
-    #: validateur lit pour juger « typecheck, lint et build passent »
-    #: (ticket-337).
-    etapes: list["EtapeTest"] = field(default_factory=list)
-    #: Quand ``expiree`` : l'étape en cours à la coupure et ce qu'elle avait
-    #: déjà consommé. Elle n'est pas dans ``etapes``, qui ne garde que les
-    #: étapes terminées avec un code de sortie (ticket-514).
-    etape_coupee: "EtapeCoupee | None" = None
-    #: Le délai global, en secondes, qui a expiré (0 tant qu'il n'a pas expiré).
-    delai_s: float = 0.0
-
-
-@dataclass
-class EtapeTest:
-    """One step of the test command, as it was launched."""
-
-    commande: str
-    code: int
-    #: Durée de l'étape, du lancement à la fin du processus (ticket-514).
-    duree_ms: int = 0
-
-
-@dataclass
-class EtapeCoupee:
-    """The step that was running when the global timeout expired."""
-
-    commande: str
-    duree_ms: int
-
-
 class TestRunnerService:
     def __init__(
         self,
         cwd: str | None = None,
         timeout: int | None = None,
         env: Mapping[str, str] | None = None,
+        compte_agent: bool = False,
+        lanceur: LanceurAgent | None = None,
     ) -> None:
         """``cwd`` and ``timeout`` come from the project's pipeline config.
 
@@ -157,6 +102,10 @@ class TestRunnerService:
         self._cwd = cwd
         self._timeout = timeout if timeout is not None else _DEFAULT_TIMEOUT
         self._env = dict(env) if env else None
+        # Compte dédié déclaré par le run (ticket-934, ADR-085) : la commande part
+        # alors sous `AGENT_USER`, jamais sous le compte du backend.
+        self._sous_compte = compte_agent and compte_declare()
+        self._lanceur = lanceur
 
     def detect_test_command(
         self,
@@ -183,6 +132,8 @@ class TestRunnerService:
         et c'est ce qui a rendu `blocked` un ticket dont le code était juste
         (ticket-157).
         """
+        if self._sous_compte:
+            return await lancer_sous_compte(args, dossier, self._env, self._lanceur)
         derniere: FileNotFoundError | None = None
         for tentative in essais_de_commande(args):
             try:
@@ -399,6 +350,22 @@ def _echec_de_lancement(
 ) -> TestResult:
     """Build the result of a step that could not run at all."""
     duration_ms = int((time.monotonic() - start) * 1000)
+    if isinstance(exc, EchecLancementCompte):
+        # Panne d'environnement, pas un test rouge ; aucun repli sous le compte
+        # du backend (ticket-934, ADR-085).
+        _logger.warning("test_runner_compte_agent_echec", extra={"error": str(exc)})
+        return TestResult(
+            passed=False,
+            demarree=False,
+            total=0,
+            failed=0,
+            output_summary=(
+                f"La commande de test n'a pas démarré sous le compte dédié : {exc}. "
+                "Panne d'environnement, ce n'est pas un test en échec."
+            ),
+            errors=[str(exc)],
+            duration_ms=duration_ms,
+        )
     if isinstance(exc, FileNotFoundError):
         # Pas un test rouge : la commande n'a pas démarré. Le dire
         # explicitement évite au codeur de corriger du code qui n'est pas

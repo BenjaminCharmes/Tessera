@@ -16,10 +16,12 @@ from urllib.parse import urlsplit, urlunsplit
 
 from tessera.services.noyau.groupe_de_processus import creer_groupe, fermer_le_groupe, rattacher_au_groupe, tuer_l_arbre
 from tessera.services.noyau.lancement import essais_de_commande, options_de_lancement
+from tessera.services.providers.lanceur_agent import LanceurAgent
 from tessera.services.verification.captures import app_repond
 from tessera.services.verification.captures_config import ConfigCaptures
 from tessera.services.verification.controle_visuel import JETON_PORT, Demarrage
 from tessera.services.verification.env_du_code_de_projet import env_du_code_de_projet
+from tessera.services.verification.lancement_compte import EchecLancementCompte, ProcessusDuCompte, compte_declare, lancer_sous_compte
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -98,6 +100,44 @@ async def demarrer_processus(args: list[str], cwd: Path) -> AppLancee:
             rattacher_au_groupe(groupe, processus.pid)
         return _Processus(processus, groupe)
     raise DemarrageEchoue(f"Commande introuvable : {args[0]}") from derniere
+
+
+@dataclass
+class _AppDuCompte:
+    """An `AppLancee` started under the dedicated account: stopped through its handle."""
+
+    processus: ProcessusDuCompte
+
+    @property
+    def code_de_sortie(self) -> int | None:
+        return self.processus.returncode
+
+    async def arreter(self) -> None:
+        if self.code_de_sortie is not None:
+            return
+        try:
+            self.processus.kill()
+            await asyncio.wait_for(self.processus.wait(), timeout=_DELAI_D_ARRET_S)
+        except Exception as exc:  # noqa: BLE001 — un arrêt raté ne casse pas le run
+            _logger.warning("arret_app_du_compte_echoue", extra={"erreur": str(exc)})
+
+
+def demarreur_du_run(compte_agent: bool, lanceur: LanceurAgent | None = None) -> Demarreur:
+    """The starter for a run: under `AGENT_USER` when declared, else the default.
+
+    Sous le compte dédié, un échec de lancement est un `DemarrageEchoue` : la
+    capture échoue, aucun repli sous le compte du backend (ticket-934, ADR-085).
+    """
+    if not (compte_agent and compte_declare()):
+        return demarrer_processus
+
+    async def sous_compte(args: list[str], cwd: Path) -> AppLancee:
+        try:
+            return _AppDuCompte(await lancer_sous_compte(args, cwd, None, lanceur))
+        except EchecLancementCompte as exc:
+            raise DemarrageEchoue(f"Lancement sous le compte dédié impossible : {exc}") from exc
+
+    return sous_compte
 
 
 def port_libre() -> int:
