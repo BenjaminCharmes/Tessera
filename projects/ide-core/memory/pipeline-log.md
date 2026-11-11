@@ -9288,3 +9288,26 @@ error: Please commit or stash them.
 - 2026-11-11 17:04:15 UTC — [ticket-929] APPROVED après 2 tour(s)
 - 2026-11-11 17:06:21 UTC — [ticket-929] leçons: refusée — preuve absente du retour du run
 - 2026-11-11 17:09:32 UTC — [ticket-929] documentation: 0 fichier(s) (185157ms) — après tour de correction
+- 2026-11-11 17:11:14 UTC — [ide-core] ticket-929 PR #1054 confiée au CIWatcher
+- 2026-11-11 17:05:18 UTC — [ide-core] ticket-934 PR #1053 mergée (CI verte)
+- 2026-11-11 17:11:29 UTC — [ticket-936] branche ticket-936-a-hosted-project-s-description-is-never-replaced
+- 2026-11-11 17:12:15 UTC — [ticket-936] plan rendu (43485ms)
+- 2026-11-11 17:12:15 UTC — [ticket-936] tour 1 — codeur démarré
+- 2026-11-11 17:14:43 UTC — [ticket-936] tour 1 — codeur terminé (148390ms)
+- 2026-11-11 17:15:26 UTC — [ticket-936] testeur: 1 failed, 302 passed, 8 warnings in 39.35s
+- 2026-11-11 17:15:26 UTC — [ticket-936] tests rouges au tour 1
+- 2026-11-11 17:15:26 UTC — [ticket-936] tour 2 — codeur démarré
+- 2026-11-11 17:17:59 UTC — [ticket-936] tour 2 — codeur terminé (152937ms)
+- 2026-11-11 17:19:13 UTC — [ticket-936] testeur: dur�es : ruff 0 s, pytest 70 s ; impact depuis base : 30 fichier(s) de test
+- 2026-11-11 17:19:13 UTC — [ticket-936] tests rouges au tour 2
+- 2026-11-11 17:19:13 UTC — [ticket-936] tour 3 — codeur démarré
+- 2026-11-11 17:19:41 UTC — [ticket-936] tour 3 — codeur terminé (28203ms)
+- 2026-11-11 17:20:55 UTC — [ticket-936] testeur: dur�es : ruff 0 s, mypy 8 s, mypy-linux 13 s, pytest 71 s ; impact depuis base : 30 fichier(s) de test
+- 2026-11-11 17:21:08 UTC — [ticket-936] securite: PASS — PASS : rien de CRITICAL ni de HIGH n'est introduit. Le diff ajoute un refus des  (13141ms)
+- 2026-11-11 17:21:08 UTC — [ticket-936] tour 3 — reviewer démarré
+- 2026-11-11 17:22:03 UTC — [ticket-936] tour 3 — reviewer terminé (54218ms)
+- 2026-11-11 17:22:33 UTC — [ticket-936] validateur: fichiers cités joints : backend/tests/ (dossier, 479 fichiers, tronqué), CLAUDE.md
+- 2026-11-11 17:22:33 UTC — [ticket-936] validateur: APPROVED — Les quatre critères d'acceptation sont satisfaits. Le codeur a implémenté un nou (84155ms)
+- 2026-11-11 17:22:33 UTC — [ticket-936] CHANGES_REQUESTED tour 3: Reviewer : 1. `phrases_interdites` ne retient la première phrase du CLAUDE.md de Tessera que si `racine not in projet.parents`. Or les projets hébergés vivent dans le dépôt Tessera : `tessera/projects
+- 2026-11-11 17:22:33 UTC — [ticket-936] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-11 17:22:38 UTC — [ide-core] file interrompue : ticket-936 non approuvé

@@ -12,6 +12,7 @@ le code livré qui le fonde, et ses jetons vérifiables doivent y figurer.
 import json
 from pathlib import Path
 
+from tessera.services.documentation.documentation_ailleurs import premiere_phrase
 from tessera.services.documentation.documentation_base import EditionRefusee
 from tessera.services.documentation.documentation_code import MatiereCode
 from tessera.services.documentation.documentation_preuve import ControleDePreuve
@@ -130,8 +131,21 @@ def remplacer_description(src: str, texte: str) -> str:
     return src[:debut] + valeur + src[fin:]
 
 
+def _refuser_si_ailleurs(texte: str, autres: list[str]) -> None:
+    """Refuse un texte dont la première phrase est celle d'un autre sujet."""
+    if premiere_phrase(texte) in autres:
+        raise EditionRefusee(
+            "la description reprend la première phrase d'un autre sujet "
+            "(un autre projet, ou le CLAUDE.md de Tessera) : elle doit parler "
+            "de ce projet."
+        )
+
+
 def ecrire_description(
-    manifeste: Path, description: object, controle: ControleDePreuve
+    manifeste: Path,
+    description: object,
+    controle: ControleDePreuve,
+    autres: list[str] | None = None,
 ) -> bool:
     """Écrit la description dans `manifeste` ; rend False si elle y était déjà.
 
@@ -139,6 +153,7 @@ def ecrire_description(
     long, preuve absente ou fausse, fichier illisible ou qui n'est pas un objet.
     """
     texte, preuve = _texte_valide(description)
+    _refuser_si_ailleurs(texte, autres or [])
     controle.verifier({"nouveau": texte, "preuve": preuve}, "agents.json")
     if not manifeste.is_file():
         raise EditionRefusee("agents.json est introuvable.")
@@ -162,6 +177,7 @@ def appliquer_description(
     matiere: MatiereCode,
     tickets: str,
     role: str,
+    autres: list[str] | None = None,
 ) -> tuple[list[str], list[str]]:
     """Traite la `description` d'une réponse : (fichiers écrits, refus).
 
@@ -172,7 +188,7 @@ def appliquer_description(
         return [], []
     try:
         ecrit = ecrire_description(
-            manifeste, donnees[_CLE], ControleDePreuve(matiere, tickets)
+            manifeste, donnees[_CLE], ControleDePreuve(matiere, tickets), autres
         )
     except EditionRefusee as exc:
         _logger.warning("description_refusee", extra={"role": role, "motif": str(exc)})
