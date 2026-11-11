@@ -7,7 +7,7 @@ id: ticket-936
 plan: true
 pr_number: null
 priority: high
-status: blocked
+status: done
 title: A hosted project's description is never replaced with Tessera's own
 type: fix
 ---
@@ -50,15 +50,15 @@ Deux trous :
 
 ## Critères d'acceptation
 
-- [ ] Un test de `backend/tests/` vérifie que, pour un projet hébergé, une
+- [x] Un test de `backend/tests/` vérifie que, pour un projet hébergé, une
       proposition qui commence par la première phrase du `CLAUDE.md` racine
       de Tessera est refusée avec un motif qui le dit.
-- [ ] Un test vérifie qu'une proposition qui reprend la description d'un
+- [x] Un test vérifie qu'une proposition qui reprend la description d'un
       autre projet est refusée.
-- [ ] Un test vérifie qu'une description propre au projet, qui cite Tessera
+- [x] Un test vérifie qu'une description propre au projet, qui cite Tessera
       en passant (« Sert à mesurer l'orchestration de Tessera »), est
       acceptée.
-- [ ] Un test vérifie, avec des doubles, que la matière fournie à
+- [x] Un test vérifie, avec des doubles, que la matière fournie à
       doc-technique pour un projet hébergé ne contient pas le `CLAUDE.md`
       racine de Tessera.
 
