@@ -9244,3 +9244,29 @@ error: Please commit or stash them.
 - 2026-11-11 15:53:12 UTC — [ticket-932] tour 1 — reviewer terminé (37453ms)
 - 2026-11-11 15:53:12 UTC — [ticket-932] APPROVED après 1 tour(s)
 - 2026-11-11 15:56:21 UTC — [ticket-932] documentation: 0 fichier(s) (184641ms) — après tour de correction
+- 2026-11-11 16:10:54 UTC — [ide-core] ticket-932 PR #1051 confiée au CIWatcher
+- 2026-11-11 15:56:44 UTC — [ticket-933] PR #1050 mise à jour avec develop : 61232b8 → 9e45d49
+- 2026-11-11 16:10:24 UTC — [ide-core] ticket-933 PR #1050 mergée (CI verte)
+- 2026-11-11 16:10:58 UTC — [ticket-934] branche ticket-934-under-the-dedicated-agent-account-the-test-comman
+- 2026-11-11 16:11:54 UTC — [ticket-934] plan rendu (54842ms)
+- 2026-11-11 16:11:54 UTC — [ticket-934] tour 1 — codeur démarré
+- 2026-11-11 16:14:56 UTC — [ticket-934] tour 1 — codeur terminé (181672ms)
+- 2026-11-11 16:21:19 UTC — [ticket-934] testeur: 1 failed, 2078 passed, 3 skipped, 88 warnings in 380.79s (0:06:20)
+- 2026-11-11 16:21:19 UTC — [ticket-934] tests rouges au tour 1
+- 2026-11-11 16:21:19 UTC — [ticket-934] tour 2 — codeur démarré
+- 2026-11-11 16:22:14 UTC — [ticket-934] tour 2 — codeur terminé (54327ms)
+- 2026-11-11 16:28:58 UTC — [ticket-934] testeur: 1 failed, 2827 passed, 3 skipped, 88 warnings in 401.53s (0:06:41)
+- 2026-11-11 16:28:58 UTC — [ticket-934] tests rouges au tour 2
+- 2026-11-11 16:28:58 UTC — [ticket-934] tour 3 — codeur démarré
+- 2026-11-11 16:31:02 UTC — [ticket-934] tour 3 — codeur terminé (123937ms)
+- 2026-11-11 16:34:47 UTC — [ide-core] ticket-912 retiré de la file
+- 2026-11-11 16:34:47 UTC — [ide-core] ticket-929 retiré de la file
+- 2026-11-11 16:40:12 UTC — [ticket-934] testeur: dur�es : ruff 0 s, mypy 9 s, mypy-linux 13 s, pytest 547 s ; impact depuis base : suite compl�te
+- 2026-11-11 16:40:32 UTC — [ticket-934] securite: PASS — PASS : aucune faille HIGH ou CRITICAL. Le diff fait partir la commande de test e (19796ms)
+- 2026-11-11 16:40:32 UTC — [ticket-934] tour 3 — reviewer démarré
+- 2026-11-11 16:41:06 UTC — [ticket-934] tour 3 — reviewer terminé (34092ms)
+- 2026-11-11 16:41:14 UTC — [ticket-934] validateur: fichiers cités joints : test_runner.py (tronqué) ; non joints (budget épuisé) : app_du_run.py, memory/decisions.md
+- 2026-11-11 16:41:14 UTC — [ticket-934] validateur: APPROVED — Le ticket met en place le lancement sous `AGENT_USER` pour `TestRunnerService` e (41797ms)
+- 2026-11-11 16:41:14 UTC — [ticket-934] APPROVED après 3 tour(s)
+- 2026-11-11 16:42:13 UTC — [ticket-934] leçons: une leçon proposée
+- 2026-11-11 16:43:57 UTC — [ticket-934] documentation: 0 fichier(s) (99078ms)

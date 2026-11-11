@@ -10,6 +10,7 @@ from tessera.services.git_workspace import GitWorkspaceError
 from tessera.services.noyau.diff_changements import lire_diff
 from tessera.services.noyau.pipeline_events import EventCallback, EventType, OrchestratorEvent, PipelineResult
 from tessera.services.pipeline.etape_de_capture import ResultatCapture, prendre_les_captures
+from tessera.services.verification.app_du_run import demarreur_du_run
 from tessera.services.verification.captures_session import lire_le_jeton
 from tessera.services.verification.controle_visuel import ControleVisuel, controle_du
 from tessera.utils.logger import get_logger
@@ -120,6 +121,7 @@ async def capturer_le_run(
     if manque is not None:
         return await _terminer(orch, controle, ticket_id, ResultatCapture(cause=manque), on_event)
     prise = await prendre_les_captures(
-        controle, orch._worktree.projet, project_id, ticket_id, jeton
+        controle, orch._worktree.projet, project_id, ticket_id, jeton,
+        demarreur=demarreur_du_run(controle.compte_agent),
     )
     return await _terminer(orch, controle, ticket_id, prise, on_event)

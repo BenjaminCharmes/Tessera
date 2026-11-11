@@ -623,3 +623,13 @@ Une ADR qu'aucune règle de `contraintes.md` ni aucun `CLAUDE.md` ne cite part d
 **Raison** : `sed -i`, `dd of=` ou un heredoc passent les gardes lexicales (ADR-031).
 **Ne voit pas** : l'écriture est constatée, pas empêchée ; le code exécuté pendant l'appel ; `filter.*` et `diff.external` ; les fichiers hors dépôt (ticket-931).
 **Faux positif** : un autre run ou `CIWatcher` qui écrit `.git/config` pendant l'appel ; revue et validateur partagent un garde.
+
+---
+
+## ADR-085 — La commande de test et l'app du contrôle visuel tournent aussi sous `AGENT_USER`
+
+**Date** : 2026-11-11
+**Décision** : amende ADR-083. Avec `worktree.compte_agent` et `AGENT_USER`, `TestRunnerService` et `demarreur_du_run` (app du contrôle visuel) passent par le `LanceurAgent`, via `lancement_compte.py`. Environnement bâti de zéro (`PATH`, `SystemRoot`, `TEMP`…), sans secret. Sinon, rien ne change.
+**Échec fermé** : compte, mot de passe ou lanceur manquant, logon refusé → `EchecLancementCompte` : test `demarree=False`, capture en échec, jamais de repli (ADR-037).
+**Sous `AGENT_USER`** : CLI, commande de test (aussi au retest après rebase), app visuelle. **Sous le backend** : setup du worktree (ticket à ouvrir), services (ADR-042), CI.
+**Limites** : pas de job Windows, `kill()` ne coupe que le processus direct ; le compte veut lecture sur `.venv`, `node_modules`, cache `uv`, écriture sur le worktree et `TEMP`.

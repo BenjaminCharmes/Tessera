@@ -12,6 +12,7 @@ s'écrit ici, avec son ADR ; un humain l'accepte en la déplaçant dans sa
 section. (ADR-055)
 
 - **Un appel d'agent qui change un fichier protégé, un hook ou la config git arrête le run en `blocked`**, constaté par empreinte avant/après chaque appel, motif sans contenu. (ADR-084, ADR-037, ADR-031) — *à accepter : le contrôle tourne déjà.*
+- **Avec `worktree.compte_agent` et `AGENT_USER`, la commande de test et l'app du contrôle visuel partent aussi sous ce compte** ; tout échec de lancement est une panne d'environnement, jamais un repli sous le compte du backend. (ADR-085, ADR-083, ADR-037) — *à accepter quand `AGENT_USER` sera renseigné sur un projet.*
 - **Sous `AGENT_USER`, le CLI d'un agent part sous ce compte, environnement bâti de zéro** ; tout échec → `ProviderIndisponible`, jamais de repli sous le compte du backend. (ADR-083, ADR-037) — *à accepter quand `AGENT_USER` sera renseigné sur un projet : d'ici là, aucun agent ne la rencontre.*
 
 ## Git et périmètre d'écriture

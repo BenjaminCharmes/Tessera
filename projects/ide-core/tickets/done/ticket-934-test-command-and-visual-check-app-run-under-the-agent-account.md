@@ -1,15 +1,16 @@
 ---
-id: ticket-934
-title: "Under the dedicated agent account, the test command and the visual-check app run under AGENT_USER too"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-11-11
 depends_on: []
 estimated_days: 2
-created: 2026-11-11
+id: ticket-934
 plan: true
+pr_number: 1053
+priority: high
+status: done
+title: Under the dedicated agent account, the test command and the visual-check app
+  run under AGENT_USER too
+type: fix
 ---
 
 # ticket-934 — Avec le compte dédié, la commande de test et l'app du contrôle visuel tournent aussi sous `AGENT_USER`
