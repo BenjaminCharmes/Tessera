@@ -9122,3 +9122,4 @@ error: Please commit or stash them.
 - 2026-11-11 13:08:39 UTC — [ticket-916] testeur: src/components/SupervisionView/RunCard.tsx(240,25): error TS7006: Parameter 'e' implicitly has an 'any' type.
 - 2026-11-11 13:08:39 UTC — [ticket-916] tests rouges au tour 3
 - 2026-11-11 13:08:39 UTC — [ticket-916] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-11 13:08:45 UTC — [ide-core] file interrompue : ticket-916 non approuvé
