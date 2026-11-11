@@ -9134,3 +9134,5 @@ error: Please commit or stash them.
 - 2026-11-11 13:27:03 UTC — [ticket-917] validateur: fichiers cités joints : HistoriqueView/index.tsx, ProjetsView/index.tsx, FichiersView/Sections.tsx, FichiersView/index.tsx, StatsView/index.tsx, StatsView/RunHistorique.tsx ; absents : design/ui/ViewState
 - 2026-11-11 13:27:03 UTC — [ticket-917] validateur: APPROVED — Tous les fichiers visés importent maintenant un composant de `ViewState`. Les fo (55875ms)
 - 2026-11-11 13:27:03 UTC — [ticket-917] APPROVED après 1 tour(s)
+- 2026-11-11 13:31:22 UTC — [ticket-917] documentation: 1 fichier(s) (255172ms)
+- 2026-11-11 13:31:22 UTC — [ticket-926] documentation: pas de diff retrouvable, non documenté
