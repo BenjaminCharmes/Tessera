@@ -9028,3 +9028,4 @@ error: Please commit or stash them.
 - 2026-11-11 10:58:26 UTC — [ticket-923] tour 3 — reviewer terminé (35858ms)
 - 2026-11-11 10:58:26 UTC — [ticket-923] APPROVED après 3 tour(s)
 - 2026-11-11 10:59:09 UTC — [ticket-923] leçons: refusée — preuve absente du retour du run
+- 2026-11-11 11:02:22 UTC — [ticket-923] documentation: 0 fichier(s) (187516ms) — après tour de correction
