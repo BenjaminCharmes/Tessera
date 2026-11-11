@@ -5,7 +5,7 @@ depends_on:
 - ticket-928
 estimated_days: 0.5
 id: ticket-929
-pr_number: null
+pr_number: 1054
 priority: high
 status: done
 title: The secret read guard also covers the Claude subscription session, git credentials
