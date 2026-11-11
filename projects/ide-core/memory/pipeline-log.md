@@ -9123,3 +9123,14 @@ error: Please commit or stash them.
 - 2026-11-11 13:08:39 UTC — [ticket-916] tests rouges au tour 3
 - 2026-11-11 13:08:39 UTC — [ticket-916] BLOCKED après 3 tour(s) sans approbation
 - 2026-11-11 13:08:45 UTC — [ide-core] file interrompue : ticket-916 non approuvé
+- 2026-11-11 12:55:19 UTC — [ide-core] ticket-914 PR #1037 mergée (CI verte)
+- 2026-11-11 13:20:37 UTC — [ticket-917] branche ticket-917-empty-loading-and-error-states-use-the-shared-vie
+- 2026-11-11 13:20:38 UTC — [ticket-917] tour 1 — codeur démarré
+- 2026-11-11 13:21:53 UTC — [ticket-917] tour 1 — codeur terminé (75202ms)
+- 2026-11-11 13:25:56 UTC — [ticket-917] testeur: dur�es : tsc 12 s, eslint 23 s, vitest 205 s
+- 2026-11-11 13:26:07 UTC — [ticket-917] securite: PASS — PASS : aucune faille de sécurité dans ce diff, qui ne touche que l'interface. Il (11282ms)
+- 2026-11-11 13:26:07 UTC — [ticket-917] tour 1 — reviewer démarré
+- 2026-11-11 13:26:36 UTC — [ticket-917] tour 1 — reviewer terminé (28921ms)
+- 2026-11-11 13:27:03 UTC — [ticket-917] validateur: fichiers cités joints : HistoriqueView/index.tsx, ProjetsView/index.tsx, FichiersView/Sections.tsx, FichiersView/index.tsx, StatsView/index.tsx, StatsView/RunHistorique.tsx ; absents : design/ui/ViewState
+- 2026-11-11 13:27:03 UTC — [ticket-917] validateur: APPROVED — Tous les fichiers visés importent maintenant un composant de `ViewState`. Les fo (55875ms)
+- 2026-11-11 13:27:03 UTC — [ticket-917] APPROVED après 1 tour(s)
