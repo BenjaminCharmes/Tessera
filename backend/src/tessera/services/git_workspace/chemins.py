@@ -15,7 +15,9 @@ _EMPTY_TREE_SHA = "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
 # approved run would commit it under the ticket's message. Excluded from
 # both the reviewed diff and the ticket's own commit via git's magic
 # pathspec `:(exclude)`.
-_ORCHESTRATOR_ARTIFACT_PATHS: tuple[str, ...] = ("tickets/", "memory/pipeline-log.md")
+_ORCHESTRATOR_ARTIFACT_PATHS: tuple[str, ...] = (
+    "tickets/", "memory/pipeline-log.md", "memory/journal/",
+)
 
 
 #: Journal du pipeline, relatif au dossier du projet.
