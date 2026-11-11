@@ -162,7 +162,7 @@ class _Provider:
         self._reponses = reponses
         self._role = role
 
-    async def complete(self, *, system: str, user: str, model: str, max_tokens: int) -> ProviderResult:
+    async def complete(self, *, system: str, user: str, model: str, max_tokens: int, **_: object) -> ProviderResult:
         return ProviderResult(content=self._reponses[self._role], input_tokens=0, output_tokens=0)
 
 

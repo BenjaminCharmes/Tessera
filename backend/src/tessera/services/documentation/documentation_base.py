@@ -39,3 +39,8 @@ def normaliser_typo(texte: str) -> tuple[str, list[int]]:
         sortie.append(rendu)
         positions.extend([i] * len(rendu))
     return "".join(sortie), positions
+
+
+def _titres_markdown(contenu: str) -> str:
+    """Extracts Markdown heading lines (starting with #) from file content."""
+    return "\n".join(ln for ln in contenu.splitlines() if ln.startswith("#"))

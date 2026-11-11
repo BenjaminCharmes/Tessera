@@ -145,7 +145,7 @@ class _Provider:
         self._role = role
         self._recus = recus
 
-    async def complete(self, *, system: str, user: str, model: str, max_tokens: int) -> ProviderResult:
+    async def complete(self, *, system: str, user: str, model: str, max_tokens: int, **_: object) -> ProviderResult:
         self._recus[self._role] = user
         return ProviderResult(content='{"editions": []}', input_tokens=0, output_tokens=0)
 

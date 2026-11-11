@@ -31,7 +31,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from tessera.services.documentation import documentation_claude_md as claude_md_doc
-from tessera.services.documentation.documentation_base import EditionRefusee
+from tessera.services.documentation.documentation_base import EditionRefusee, _titres_markdown
 from tessera.services.documentation.documentation_code import FournisseurMatiere, MatiereCode, bloc_diffs, bloc_fichiers, matiere_du_lot
 from tessera.services.documentation.documentation_description import appliquer_description
 from tessera.services.documentation.documentation_editions import _documentable, appliquer_editions
@@ -102,8 +102,10 @@ class DocumentationService:
         roles: tuple[str, ...] = _ROLES,
         base: str | None = None,
         matiere: FournisseurMatiere | None = None,
+        phrases_interdites: list[str] | None = None,
     ) -> None:
         self._provider = provider
+        self._phrases_interdites = phrases_interdites or []  # ticket-936
         # La base déclarée du projet et la source de la matière de code : le
         # diff de chaque ticket se prend contre elle (ticket-541).
         self._base = base
@@ -207,12 +209,14 @@ class DocumentationService:
                 user=user,
                 model=modele,
                 max_tokens=_MAX_TOKENS,
+                cwd=project_path,
             )
             donnees = donnees_de(str(reponse.content), role)
             if technique:
                 # L'agents.json du dossier où le run écrit, jamais le checkout.
                 ecrits, refuses = appliquer_description(
-                    project_path / "agents.json", donnees, matiere, intentions, role
+                    project_path / "agents.json", donnees, matiere, intentions, role,
+                    self._phrases_interdites,
                 )
                 fichiers_description.extend(ecrits)
                 refus_description.extend(refuses)
@@ -236,6 +240,7 @@ class DocumentationService:
                     ),
                     model=modele,
                     max_tokens=_MAX_TOKENS,
+                    cwd=project_path,
                 )
                 editions2 = editions_de(str(reponse2.content), role)
                 if not editions2:
@@ -271,11 +276,6 @@ class DocumentationService:
             tour_de_correction=tour_de_correction,
             ecartes=ecartes,
         )
-
-
-def _titres_markdown(contenu: str) -> str:
-    """Extracts Markdown heading lines (starting with #) from file content."""
-    return "\n".join(ln for ln in contenu.splitlines() if ln.startswith("#"))
 
 
 def _contenu_documentable(racine: Path, borne: int = _BORNE_DOC) -> str:

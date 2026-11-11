@@ -4,6 +4,7 @@ from collections.abc import Awaitable, Callable
 
 from tessera.config import settings
 from tessera.services.documentation.documentation import DocumentationService, ResultatDocumentation
+from tessera.services.documentation.documentation_ailleurs import phrases_interdites
 from tessera.services.documentation.roles_documentation import roles_de_documentation
 from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.noyau.journal_pipeline import journal_vers
@@ -48,7 +49,7 @@ def documenteur(
         inner = provider_pour_role(
             project_path, role, allow_tools=False, project_id=project_id,
             journal_repli=journal_vers(dossier_run / "memory" / "pipeline-log.md"),
-            rapide=rapide,
+            rapide=rapide, racine_ecriture=racine_doc,
         )
         return (
             ProviderEnregistrant(inner, role=role, db_path=settings.ide_db_path),
@@ -67,6 +68,10 @@ def documenteur(
         fournisseur=_fournisseur, claude_md=claude_md,
         roles=roles_de_documentation(project_path),
         base=politique.base_branch,
+        phrases_interdites=phrases_interdites(
+            project_path, settings.ide_workspace_dir,
+            settings.ide_prompts_dir.parent.parent,
+        ),
     )
 
     async def documenter() -> ResultatDocumentation:
