@@ -9054,3 +9054,20 @@ error: Please commit or stash them.
 - 2026-11-11 11:53:20 UTC — [ticket-925] APPROVED après 2 tour(s)
 - 2026-11-11 11:54:44 UTC — [ticket-925] leçons: rien à retenir
 - 2026-11-11 11:56:24 UTC — [ticket-925] documentation: 0 fichier(s) (95812ms)
+- 2026-11-11 11:56:42 UTC — [ide-core] ticket-925 PR #1035 confiée au CIWatcher
+- 2026-11-11 11:56:46 UTC — [ticket-915] branche ticket-915-the-agent-account-is-switched-on-project-by-proje
+- 2026-11-11 11:57:35 UTC — [ticket-915] plan rendu (48094ms)
+- 2026-11-11 11:57:35 UTC — [ticket-915] tour 1 — codeur démarré
+- 2026-11-11 12:00:21 UTC — [ticket-915] tour 1 — codeur terminé (165905ms)
+- 2026-11-11 12:08:41 UTC — [ticket-915] testeur: 1 failed, 1678 passed, 3 skipped, 46 warnings in 494.28s (0:08:14)
+- 2026-11-11 12:08:41 UTC — [ticket-915] tests rouges au tour 1
+- 2026-11-11 12:08:41 UTC — [ticket-915] tour 2 — codeur démarré
+- 2026-11-11 12:10:19 UTC — [ticket-915] tour 2 — codeur terminé (98500ms)
+- 2026-11-11 12:19:04 UTC — [ticket-915] testeur: dur�es : ruff 0 s, mypy 11 s, mypy-linux 12 s, pytest 522 s ; impact depuis base : 210 fichier(s) de test
+- 2026-11-11 12:19:27 UTC — [ticket-915] securite: PASS — Le diff rend le compte agent dédié facultatif par projet. Le déclenchement est f (22687ms)
+- 2026-11-11 12:19:27 UTC — [ticket-915] tour 2 — reviewer démarré
+- 2026-11-11 12:19:57 UTC — [ticket-915] tour 2 — reviewer terminé (29750ms)
+- 2026-11-11 12:20:11 UTC — [ticket-915] validateur: fichiers cités joints : models/worktree_config.py
+- 2026-11-11 12:20:11 UTC — [ticket-915] validateur: APPROVED — Tous les critères sont satisfaits. Le diff ajoute le champ `compte_agent: bool = (44125ms)
+- 2026-11-11 12:20:11 UTC — [ticket-915] APPROVED après 2 tour(s)
+- 2026-11-11 12:21:12 UTC — [ticket-915] leçons: une leçon proposée
