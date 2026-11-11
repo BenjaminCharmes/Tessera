@@ -55,7 +55,15 @@ jobs:
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           PR_TITLE: ${{ github.event.pull_request.title }}
           PR_BODY: ${{ github.event.pull_request.body }}
-        run: python3 scripts/termes_interdits_ci.py
+        # La porte s'exécute telle qu'elle est sur la base, jamais telle que la
+        # PR la livre : une PR qui réécrit le script ne désarme pas le contrôle
+        # et ne lit pas le secret (ticket-927).
+        run: |
+          porte="$RUNNER_TEMP/porte"
+          mkdir -p "$porte/hooks"
+          git show "$BASE_SHA:scripts/termes_interdits_ci.py" > "$porte/termes_interdits_ci.py"
+          git show "$BASE_SHA:scripts/hooks/pre-push" > "$porte/hooks/pre-push"
+          python3 "$porte/termes_interdits_ci.py"
 
   backend:
     name: Backend (pytest)
@@ -74,7 +82,10 @@ jobs:
       - name: Run tests with coverage
         run: cd backend && uv run pytest -v -m "not integration" --cov=tessera --cov-report=term-missing --cov-report=xml
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY || 'sk-ant-test-ci-key' }}
+          # Clé factice : les tests qui demandent une vraie clé sont marqués
+          # `integration` et exclus ici ; le code d'une PR ne reçoit aucun
+          # secret (ticket-927).
+          ANTHROPIC_API_KEY: sk-ant-test-ci-key
 
       - uses: actions/upload-artifact@v7
         if: always()
