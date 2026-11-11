@@ -14,6 +14,7 @@ graves ; `test_inspirations.py` vérifie qu'ils existent.
 | --- | --- |
 | Dépôt | `blader/humanizer` |
 | Version reprise | `v3.1.0`, commit `0ef9fe5bc357` du 28/10/2026 |
+| Version relue | `v4.0.0` du 10/11/2026, relue le 11/11/2026 (ticket-924) |
 | Date de reprise | 30/10/2026 (ticket-715) |
 | Mode | `idées réécrites` |
 | Licence | à confirmer sur le dépôt ; sans effet tant que rien n'est recopié |
@@ -36,6 +37,7 @@ une consigne (garde ajoutée dans « Comment écrire »). La version reprise res
 | --- | --- |
 | Dépôt | `pbakaus/impeccable` |
 | Version reprise | `cli-v4.8.0` du 26/10/2026, commit `df3a4abe7d08` |
+| Version relue | `skill-v4.8.2` du 09/11/2026, relue le 11/11/2026 (ticket-924) |
 | Date de reprise | 30/10/2026 (ticket-715) |
 | Mode | `idées réécrites` |
 | Licence | à confirmer sur le dépôt ; sans effet tant que rien n'est recopié |
