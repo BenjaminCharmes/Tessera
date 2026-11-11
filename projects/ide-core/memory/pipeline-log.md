@@ -8998,3 +8998,4 @@ error: Please commit or stash them.
 - 2026-11-11 10:34:36 UTC — [ticket-922] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le diff ajoute une nouvelle con (40562ms)
 - 2026-11-11 10:34:36 UTC — [ticket-922] APPROVED après 2 tour(s)
 - 2026-11-11 10:36:31 UTC — [ticket-922] leçons: refusée — plus de 200 caractères
+- 2026-11-11 10:38:14 UTC — [ticket-922] documentation: 0 fichier(s) (97593ms)
