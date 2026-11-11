@@ -8916,3 +8916,37 @@ error: Please commit or stash them.
 - 2026-11-10 13:34:11 UTC — [ticket-909] validateur: APPROVED — Le diff satisfait les 3 critères : un `beforeAll` paye le rendu à froid une seul (18937ms)
 - 2026-11-10 13:34:11 UTC — [ticket-909] APPROVED après 1 tour(s)
 - 2026-11-10 13:35:12 UTC — [ticket-909] documentation: 0 fichier(s) (55562ms)
+- 2026-11-10 13:37:18 UTC — [ide-core] ticket-908 PR #1021 mergée (CI verte)
+- 2026-11-10 13:40:39 UTC — [ide-core] ticket-909 PR #1022 confiée au CIWatcher
+- 2026-11-10 13:48:55 UTC — [ide-core] ticket-909 PR #1022 mergée (CI verte)
+- 2026-11-11 08:01:48 UTC — [ticket-910] branche ticket-910-a-weekly-report-lists-what-each-public-project-sh
+- 2026-11-11 08:01:52 UTC — [ticket-910] tour 1 — codeur démarré
+- 2026-11-11 08:05:32 UTC — [ticket-910] tour 1 — codeur terminé (219875ms)
+- 2026-11-11 08:17:28 UTC — [ticket-910] testeur: 1 failed, 4707 passed, 3 skipped, 72 warnings in 709.99s (0:11:49)
+- 2026-11-11 08:17:28 UTC — [ticket-910] tests rouges au tour 1
+- 2026-11-11 08:17:28 UTC — [ticket-910] tour 2 — codeur démarré
+- 2026-11-11 08:18:05 UTC — [ticket-910] tour 2 — codeur terminé (36953ms)
+- 2026-11-11 08:33:35 UTC — [ticket-910] testeur: dur�es : ruff 0 s, mypy 19 s, mypy-linux 18 s, pytest 923 s ; impact depuis base : suite compl�te
+- 2026-11-11 08:33:52 UTC — [ticket-910] securite: PASS — Local, read-only script with no endpoint or network access. The git call takes a (16342ms)
+- 2026-11-11 08:33:53 UTC — [ticket-910] tour 2 — reviewer démarré
+- 2026-11-11 08:34:18 UTC — [ticket-910] tour 2 — reviewer terminé (25467ms)
+- 2026-11-11 08:34:50 UTC — [ticket-910] validateur: fichiers cités joints : backend/src/tessera/services/projets/releve_semaine.py, scripts/releve_semaine.py ; absents : memory/faits-notables.md
+- 2026-11-11 08:34:50 UTC — [ticket-910] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le module `releve_semaine.py` e (58328ms)
+- 2026-11-11 08:34:50 UTC — [ticket-910] CHANGES_REQUESTED tour 2: Reviewer : 1. `LIGNE_PR_MERGEE` exige `[ticket-N] livraison: PR #N mergée`. Ce format n'apparaît plus dans le vrai journal depuis la mi-octobre. Depuis, CIWatcher écrit chaque merge sous la forme `- 2
+- 2026-11-11 08:34:50 UTC — [ticket-910] tour 3 — codeur démarré
+- 2026-11-11 08:36:36 UTC — [ticket-910] tour 3 — codeur terminé (106375ms)
+- 2026-11-11 08:40:42 UTC — [ide-core] ticket-912 retiré de la file
+- 2026-11-11 08:40:42 UTC — [ide-core] ticket-914 retiré de la file
+- 2026-11-11 08:40:42 UTC — [ide-core] ticket-915 retiré de la file
+- 2026-11-11 08:40:42 UTC — [ide-core] ticket-916 retiré de la file
+- 2026-11-11 08:40:42 UTC — [ide-core] ticket-917 retiré de la file
+- 2026-11-11 08:40:42 UTC — [ide-core] ticket-918 retiré de la file
+- 2026-11-11 08:40:42 UTC — [ide-core] ticket-919 retiré de la file
+- 2026-11-11 08:48:30 UTC — [ticket-910] testeur: dur�es : ruff 0 s, mypy 5 s, mypy-linux 6 s, pytest 710 s ; impact depuis base : suite compl�te
+- 2026-11-11 08:48:50 UTC — [ticket-910] securite: PASS — Le diff ajoute un script en lecture seule, sans route HTTP, sans LLM ni GitHub ; (19703ms)
+- 2026-11-11 08:48:50 UTC — [ticket-910] tour 3 — reviewer démarré
+- 2026-11-11 08:49:05 UTC — [ticket-910] tour 3 — reviewer terminé (15344ms)
+- 2026-11-11 08:49:47 UTC — [ticket-910] validateur: fichiers cités joints : backend/src/tessera/services/projets/releve_semaine.py, scripts/releve_semaine.py ; absents : memory/faits-notables.md
+- 2026-11-11 08:49:47 UTC — [ticket-910] validateur: APPROVED — Le module `releve_semaine.py` satisfait tous les critères d'acceptation. La fonc (57827ms)
+- 2026-11-11 08:49:47 UTC — [ticket-910] APPROVED après 3 tour(s)
+- 2026-11-11 08:50:48 UTC — [ticket-910] leçons: refusée — preuve absente du retour du run
