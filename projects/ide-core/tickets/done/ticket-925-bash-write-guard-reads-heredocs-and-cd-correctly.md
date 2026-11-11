@@ -4,7 +4,7 @@ created: 2026-11-11
 depends_on: []
 estimated_days: 0.5
 id: ticket-925
-pr_number: null
+pr_number: 1035
 priority: medium
 status: done
 title: The Bash write guard skips heredoc bodies and resolves paths after a leading
