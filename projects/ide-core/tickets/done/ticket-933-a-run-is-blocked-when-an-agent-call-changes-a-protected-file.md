@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 2
 id: ticket-933
 plan: true
-pr_number: null
+pr_number: 1050
 priority: high
 status: done
 title: A run is blocked when an agent call changes a protected file, git hooks or
