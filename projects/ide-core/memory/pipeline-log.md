@@ -8951,3 +8951,32 @@ error: Please commit or stash them.
 - 2026-11-11 08:49:47 UTC — [ticket-910] APPROVED après 3 tour(s)
 - 2026-11-11 08:50:48 UTC — [ticket-910] leçons: refusée — preuve absente du retour du run
 - 2026-11-11 08:54:02 UTC — [ticket-910] documentation: 0 fichier(s) (170967ms) — après tour de correction
+- 2026-11-11 09:05:35 UTC — [ide-core] ticket-910 PR #1027 confiée au CIWatcher
+- 2026-11-11 09:05:42 UTC — [ticket-913] branche ticket-913-a-monthly-housekeeping-report-points-at-what-grew
+- 2026-11-11 09:05:45 UTC — [ticket-913] tour 1 — codeur démarré
+- 2026-11-11 09:08:33 UTC — [ticket-913] tour 1 — codeur terminé (168797ms)
+- 2026-11-11 09:17:16 UTC — [ticket-913] testeur: 1 failed, 2058 passed, 3 skipped, 72 warnings in 516.54s (0:08:36)
+- 2026-11-11 09:17:16 UTC — [ticket-913] tests rouges au tour 1
+- 2026-11-11 09:17:16 UTC — [ticket-913] tour 2 — codeur démarré
+- 2026-11-11 09:17:46 UTC — [ticket-913] tour 2 — codeur terminé (30328ms)
+- 2026-11-11 09:29:03 UTC — [ticket-913] testeur: 1 failed, 4688 passed, 3 skipped, 72 warnings in 670.97s (0:11:10)
+- 2026-11-11 09:29:03 UTC — [ticket-913] tests rouges au tour 2
+- 2026-11-11 09:29:03 UTC — [ticket-913] tour 3 — codeur démarré
+- 2026-11-11 09:30:36 UTC — [ticket-913] tour 3 — codeur terminé (93139ms)
+- 2026-11-11 09:55:40 UTC — [ticket-913] testeur: délai dépassé, suite relancée
+- 2026-11-11 09:55:40 UTC — [ticket-913] testeur: délai dépassé (1500 s, durée réelle 1500 s) — base coupé après 1500 s
+- 2026-11-11 09:56:17 UTC — [ide-core] ticket-915 retiré de la file
+- 2026-11-11 09:56:17 UTC — [ide-core] ticket-914 retiré de la file
+- 2026-11-11 09:56:17 UTC — [ide-core] ticket-916 retiré de la file
+- 2026-11-11 09:56:17 UTC — [ide-core] ticket-917 retiré de la file
+- 2026-11-11 09:56:17 UTC — [ide-core] ticket-918 retiré de la file
+- 2026-11-11 09:56:17 UTC — [ide-core] ticket-919 retiré de la file
+- 2026-11-11 09:56:17 UTC — [ide-core] ticket-912 retiré de la file
+- 2026-11-11 10:09:04 UTC — [ticket-913] testeur: dur�es : ruff 1 s, mypy 13 s, mypy-linux 8 s, pytest 802 s ; impact depuis base : suite compl�te
+- 2026-11-11 10:09:23 UTC — [ticket-913] securite: PASS — Outil de relevé en lecture seule, lancé seulement en ligne de commande, sans poi (18921ms)
+- 2026-11-11 10:09:23 UTC — [ticket-913] tour 3 — reviewer démarré
+- 2026-11-11 10:09:46 UTC — [ticket-913] tour 3 — reviewer terminé (22703ms)
+- 2026-11-11 10:10:11 UTC — [ticket-913] validateur: fichiers cités joints : backend/src/tessera/services/projets/releve_menage.py, memory/ (dossier, 10 fichiers), scripts/releve_menage.py
+- 2026-11-11 10:10:11 UTC — [ticket-913] validateur: APPROVED — Les six critères d'acceptation sont satisfaits. Le module `releve_menage.py` exp (48000ms)
+- 2026-11-11 10:10:11 UTC — [ticket-913] APPROVED après 3 tour(s)
+- 2026-11-11 10:11:09 UTC — [ticket-913] leçons: refusée — preuve absente du retour du run
