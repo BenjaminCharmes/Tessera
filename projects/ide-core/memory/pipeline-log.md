@@ -9164,3 +9164,20 @@ error: Please commit or stash them.
 - 2026-11-11 14:04:36 UTC — [ticket-928] tour 1 — reviewer terminé (28953ms)
 - 2026-11-11 14:04:36 UTC — [ticket-928] APPROVED après 1 tour(s)
 - 2026-11-11 14:06:13 UTC — [ticket-928] documentation: 0 fichier(s) (92078ms)
+- 2026-11-11 14:38:45 UTC — [ide-core] ticket-930 PR #1047 confiée au CIWatcher
+- 2026-11-11 14:38:50 UTC — [ticket-931] branche ticket-931-the-bash-write-guard-expands-and-variables-and-re
+- 2026-11-11 14:38:51 UTC — [ticket-931] tour 1 — codeur démarré
+- 2026-11-11 14:40:24 UTC — [ticket-931] tour 1 — codeur terminé (93531ms)
+- 2026-11-11 14:41:04 UTC — [ticket-931] testeur: dur�es : ruff 0 s, pytest 37 s ; impact depuis base : 64 fichier(s) de test
+- 2026-11-11 14:41:04 UTC — [ticket-931] tests rouges au tour 1
+- 2026-11-11 14:41:04 UTC — [ticket-931] tour 2 — codeur démarré
+- 2026-11-11 14:41:25 UTC — [ticket-931] tour 2 — codeur terminé (21546ms)
+- 2026-11-11 14:42:09 UTC — [ticket-931] testeur: dur�es : ruff 0 s, mypy 9 s, mypy-linux 12 s, pytest 41 s ; impact depuis base : 64 fichier(s) de test
+- 2026-11-11 14:42:41 UTC — [ticket-931] securite: PASS — Le diff renforce la garde d'écriture Bash sans retirer aucun contrôle : ~ et $VA (32640ms)
+- 2026-11-11 14:42:41 UTC — [ticket-931] tour 2 — reviewer démarré
+- 2026-11-11 14:43:17 UTC — [ticket-931] validateur: fichiers cités joints : backend/src/tessera/services/providers/perimetre.py, backend/tests/test_redirections_heredoc_cd.py
+- 2026-11-11 14:43:17 UTC — [ticket-931] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code introduit `developpemen (34842ms)
+- 2026-11-11 14:43:25 UTC — [ticket-931] tour 2 — reviewer terminé (44062ms)
+- 2026-11-11 14:43:25 UTC — [ticket-931] APPROVED après 2 tour(s)
+- 2026-11-11 14:45:37 UTC — [ticket-931] leçons: une leçon proposée
+- 2026-11-11 14:46:43 UTC — [ticket-931] documentation: 0 fichier(s) (61046ms)
