@@ -457,3 +457,54 @@ async def test_grep_on_the_env_folder_passes_with_a_py_glob(depot: _Depot) -> No
     assert not _refuse(
         await _appeler(depot, "Grep", pattern="x", path=str(depot.racine), glob="*.py")
     )
+
+
+# ------------------------------------------------------------------
+# Backend account credential files — ticket-929
+# ------------------------------------------------------------------
+
+
+@pytest.fixture
+def compte(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    home = tmp_path / "home"
+    (home / ".claude").mkdir(parents=True)
+    for nom in ("HOME", "USERPROFILE"):
+        monkeypatch.setenv(nom, str(home))
+    for nom in ("GH_CONFIG_DIR", "APPDATA", "XDG_CONFIG_HOME"):
+        monkeypatch.delenv(nom, raising=False)
+    monkeypatch.setenv("APPDATA", str(home / "AppData" / "Roaming"))
+    return home
+
+
+async def test_read_refuses_the_claude_credentials(depot: _Depot, compte: Path) -> None:
+    sortie = await _appeler(depot, "Read", file_path=str(compte / ".claude" / ".credentials.json"))
+
+    assert _refuse(sortie)
+    reason = cast(dict[str, Any], sortie)["hookSpecificOutput"]["permissionDecisionReason"]
+    assert "pas une évasion" in reason
+
+
+async def test_bash_cat_of_git_credentials_is_refused(depot: _Depot, compte: Path) -> None:
+    assert _refuse(await _appeler(depot, "Bash", command="cat ~/.git-credentials"))
+
+
+async def test_read_refuses_the_gh_hosts_file(depot: _Depot, compte: Path) -> None:
+    hosts = (
+        compte / "AppData" / "Roaming" / "GitHub CLI" / "hosts.yml"
+        if os.name == "nt"
+        else compte / ".config" / "gh" / "hosts.yml"
+    )
+
+    assert _refuse(await _appeler(depot, "Read", file_path=str(hosts)))
+
+
+async def test_read_refuses_the_gh_hosts_file_under_gh_config_dir(
+    depot: _Depot, compte: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("GH_CONFIG_DIR", str(compte / "ghcfg"))
+
+    assert _refuse(await _appeler(depot, "Read", file_path=str(compte / "ghcfg" / "hosts.yml")))
+
+
+async def test_read_of_claude_settings_passes(depot: _Depot, compte: Path) -> None:
+    assert not _refuse(await _appeler(depot, "Read", file_path=str(compte / ".claude" / "settings.json")))
