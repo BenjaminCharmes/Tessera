@@ -203,3 +203,25 @@ filesystem à définir. Le contrôle de chemin vit entièrement dans
 **Raison** : sur une vingtaine de diffs, un défaut de plus n'est qu'un bruit, sauf corpus et règle figés d'avance.
 **Alternative rejetée** : brancher un second reviewer au pipeline — il bloquerait de vrais tickets.
 **Détail** : spec `2026-11-05-seconde-revue-design.md`.
+
+---
+
+## ADR-006 — ProjectLoader filtre sur CLAUDE.md
+
+**Date** : 2026-06  
+**Portée** : architect, codeur, reviewer  
+**Décision** : `ProjectLoader.list_projects()` ne liste que les dossiers contenant un `CLAUDE.md`, tandis que `list_projects()` (module-level) liste tous les dossiers.  
+**Raison** : L'orchestrateur ne doit travailler que sur des projets structurés. La fonction module-level reste disponible comme utilitaire bas niveau pour les tests et scripts.  
+**Archivée** : 2026-11-11 (ticket-938) — aucune règle ne la cite plus : son comportement est tenu par les tests du `ProjectLoader`, et la place de `contraintes.md` est allée à ADR-084.  
+**Alternative rejetée** : Filtrer aussi dans la fonction module-level (casserait les tests existants sans apport réel).
+
+---
+
+## ADR-007 — Modèle de projet : `name` parsé depuis le H1 du CLAUDE.md
+
+**Date** : 2026-06  
+**Portée** : architect, codeur, reviewer  
+**Décision** : Le champ `name` d'un `Project` est extrait de la première ligne `# Titre` du CLAUDE.md, avec fallback sur le nom du dossier.  
+**Raison** : Le nom du dossier est un identifiant technique (`ide-core`) ; le titre H1 est le nom lisible (`CLAUDE.md — projet ide-core`). Les deux coexistent.  
+**Archivée** : 2026-11-11 (ticket-938) — aucune règle ne la cite plus : son comportement est tenu par les tests du `ProjectLoader`, et la place de `contraintes.md` est allée à ADR-084.  
+**Alternative rejetée** : Utiliser uniquement le nom du dossier comme `name` (perd l'intention du CLAUDE.md).
