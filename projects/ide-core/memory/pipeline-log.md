@@ -9150,3 +9150,4 @@ error: Please commit or stash them.
 - 2026-11-11 14:32:24 UTC — [ticket-930] validateur: fichiers cités joints : backend/tests/test_chemins_proteges.py, scripts/termes_interdits_ci.py, backend/src/tessera/services/providers/redirections_bash.py (tronqué) ; absents : <projet>/.mcp.json, <projet>/.claude/hooks/x.py, <projet>/.claude/notes.md ; non joints (budget épuisé) : .mcp.json
 - 2026-11-11 14:32:24 UTC — [ticket-930] validateur: APPROVED — Tous les critères sont satisfaits. Le diff ajoute les trois protections manquant (26469ms)
 - 2026-11-11 14:32:24 UTC — [ticket-930] APPROVED après 1 tour(s)
+- 2026-11-11 14:38:25 UTC — [ticket-930] documentation: 0 fichier(s) (356625ms) — après tour de correction
