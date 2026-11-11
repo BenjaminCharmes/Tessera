@@ -5,6 +5,7 @@ Each gate fails closed: an exception from the auditor or the validator is a
 refusal, never a pass — except an exhausted quota, which must reach
 `run_pipeline` (ticket-498).
 """
+import asyncio
 import time
 from typing import TYPE_CHECKING
 
@@ -230,3 +231,10 @@ async def run_validation(
     if validation.verdict == "CHANGES_REQUESTED":
         return False, validation.feedback
     return True, ""
+
+
+async def run_review_and_validation(
+    orch: "Orchestrator", run: PipelineRun, context: str
+) -> tuple[tuple[bool, str, str], tuple[bool, str]]:
+    """Run the reviewer and the validator in parallel; neither depends on the other."""
+    return await asyncio.gather(run_review(orch, run, context), run_validation(orch, run))

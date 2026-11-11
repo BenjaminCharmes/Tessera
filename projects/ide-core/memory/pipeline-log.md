@@ -9177,6 +9177,30 @@ error: Please commit or stash them.
 - 2026-11-11 14:04:36 UTC — [ticket-928] tour 1 — reviewer terminé (28953ms)
 - 2026-11-11 14:04:36 UTC — [ticket-928] APPROVED après 1 tour(s)
 - 2026-11-11 14:06:13 UTC — [ticket-928] documentation: 0 fichier(s) (92078ms)
+- 2026-11-11 15:04:51 UTC — [ide-core] ticket-931 PR #1048 confiée au CIWatcher
+- 2026-11-11 14:44:04 UTC — [ticket-930] PR #1047 mise à jour avec develop : 5f1fde8 → 4bf602e
+- 2026-11-11 15:03:54 UTC — [ticket-930] livraison: arrêt — PR #1047 non mergée : CI failing : la PR #1047 reste ouverte.
+- 2026-11-11 15:04:55 UTC — [ticket-933] branche ticket-933-a-run-is-blocked-when-an-agent-call-changes-a-pro
+- 2026-11-11 15:06:02 UTC — [ticket-933] plan rendu (65594ms)
+- 2026-11-11 15:06:02 UTC — [ticket-933] tour 1 — codeur démarré
+- 2026-11-11 15:13:29 UTC — [ticket-933] tour 1 — codeur terminé (447514ms)
+- 2026-11-11 15:16:18 UTC — [ticket-933] testeur: 2 failed, 534 passed, 40 warnings in 165.33s (0:02:45)
+- 2026-11-11 15:16:18 UTC — [ticket-933] tests rouges au tour 1
+- 2026-11-11 15:16:18 UTC — [ticket-933] tour 2 — codeur démarré
+- 2026-11-11 15:17:23 UTC — [ticket-933] tour 2 — codeur terminé (64250ms)
+- 2026-11-11 15:23:05 UTC — [ticket-933] testeur: 1 failed, 890 passed, 40 warnings in 338.69s (0:05:38)
+- 2026-11-11 15:23:05 UTC — [ticket-933] tests rouges au tour 2
+- 2026-11-11 15:23:05 UTC — [ticket-933] tour 3 — codeur démarré
+- 2026-11-11 15:28:39 UTC — [ticket-933] tour 3 — codeur terminé (334000ms)
+- 2026-11-11 15:35:58 UTC — [ticket-933] testeur: dur�es : ruff 0 s, mypy 8 s, mypy-linux 13 s, pytest 436 s ; impact depuis base : 147 fichier(s) de test
+- 2026-11-11 15:36:18 UTC — [ticket-933] securite: PASS — Le diff ajoute une protection de plus : une empreinte sha256 des fichiers protég (20531ms)
+- 2026-11-11 15:36:19 UTC — [ticket-933] tour 3 — reviewer démarré
+- 2026-11-11 15:36:56 UTC — [ticket-933] validateur: fichiers cités joints : .git/config, agents.json, memory/decisions.md (tronqué) ; absents : .git/hooks/pre-commit
+- 2026-11-11 15:36:56 UTC — [ticket-933] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le ticket implémente un contrôl (37766ms)
+- 2026-11-11 15:37:02 UTC — [ticket-933] tour 3 — reviewer terminé (43078ms)
+- 2026-11-11 15:37:02 UTC — [ticket-933] APPROVED après 3 tour(s)
+- 2026-11-11 15:38:55 UTC — [ticket-933] leçons: une leçon proposée
+- 2026-11-11 15:42:00 UTC — [ticket-933] documentation: 0 fichier(s) (180530ms) — après tour de correction
 - 2026-11-11 14:38:45 UTC — [ide-core] ticket-930 PR #1047 confiée au CIWatcher
 - 2026-11-11 14:38:50 UTC — [ticket-931] branche ticket-931-the-bash-write-guard-expands-and-variables-and-re
 - 2026-11-11 14:38:51 UTC — [ticket-931] tour 1 — codeur démarré

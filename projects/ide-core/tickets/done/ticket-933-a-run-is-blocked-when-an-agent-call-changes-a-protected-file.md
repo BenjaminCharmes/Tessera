@@ -1,15 +1,16 @@
 ---
-id: ticket-933
-title: "A run is blocked when an agent call changes a protected file, git hooks or git config"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-11-11
 depends_on: []
 estimated_days: 2
-created: 2026-11-11
+id: ticket-933
 plan: true
+pr_number: 1050
+priority: high
+status: done
+title: A run is blocked when an agent call changes a protected file, git hooks or
+  git config
+type: fix
 ---
 
 # ticket-933 — Un run passe en `blocked` quand un appel d'agent modifie un fichier protégé, les hooks ou la config git
