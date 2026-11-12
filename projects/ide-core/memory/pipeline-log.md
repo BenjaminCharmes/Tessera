@@ -9465,3 +9465,20 @@ error: Please commit or stash them.
 - 2026-11-12 17:54:29 UTC — [ticket-949] CHANGES_REQUESTED tour 3: Reviewer : 1. La retenue ne survit pas à un redémarrage du backend. Au démarrage, en autonomie `merge`, `reprise_surveillance._reprendre_projet` reprend toutes les PR ouvertes. Elles viennent de deux 
 - 2026-11-12 17:54:29 UTC — [ticket-949] BLOCKED après 3 tour(s) sans approbation
 - 2026-11-12 17:54:36 UTC — [ide-core] file interrompue : ticket-949 non approuvé
+- 2026-11-12 16:59:39 UTC — [ide-core] ticket-953 PR #1081 confiée au CIWatcher
+- 2026-11-12 16:57:11 UTC — [ide-core] ticket-952 PR #1080 mergée (CI verte)
+- 2026-11-12 16:59:45 UTC — [ticket-954] branche ticket-954-the-documentation-batch-sees-the-whole-documentat
+- 2026-11-12 16:59:48 UTC — [ticket-954] tour 1 — codeur démarré
+- 2026-11-12 17:01:15 UTC — [ticket-954] tour 1 — codeur terminé (87046ms)
+- 2026-11-12 17:02:23 UTC — [ticket-954] testeur: 1 failed, 307 passed, 8 warnings in 58.64s
+- 2026-11-12 17:02:23 UTC — [ticket-954] tests rouges au tour 1
+- 2026-11-12 17:02:23 UTC — [ticket-954] tour 2 — codeur démarré
+- 2026-11-12 17:03:58 UTC — [ticket-954] tour 2 — codeur terminé (94546ms)
+- 2026-11-12 17:04:51 UTC — [ticket-954] testeur: dur�es : ruff 0 s, mypy 14 s, mypy-linux 10 s, pytest 46 s ; impact depuis base : 28 fichier(s) de test
+- 2026-11-12 17:05:02 UTC — [ticket-954] securite: PASS — Verdict : PASS. Le diff déplace la lecture de la documentation dans un nouveau m (9577ms)
+- 2026-11-12 17:05:02 UTC — [ticket-954] tour 2 — reviewer démarré
+- 2026-11-12 17:05:19 UTC — [ticket-954] tour 2 — reviewer terminé (17063ms)
+- 2026-11-12 17:05:40 UTC — [ticket-954] validateur: APPROVED — Les quatre critères d'acceptation sont satisfaits. Les tests couvrent le passage (37250ms)
+- 2026-11-12 17:05:40 UTC — [ticket-954] APPROVED après 2 tour(s)
+- 2026-11-12 17:07:49 UTC — [ticket-954] leçons: une leçon proposée
+- 2026-11-12 17:09:52 UTC — [ticket-954] documentation: 0 fichier(s) (117891ms)

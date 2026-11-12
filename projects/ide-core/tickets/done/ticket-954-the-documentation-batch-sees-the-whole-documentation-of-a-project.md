@@ -4,10 +4,11 @@ created: 2026-11-12
 depends_on: []
 estimated_days: 0.5
 id: ticket-954
-pr_number: null
+pr_number: 1083
 priority: high
-status: todo
-title: "The documentation batch sees the whole documentation of a project, and says when it cannot"
+status: done
+title: The documentation batch sees the whole documentation of a project, and says
+  when it cannot
 type: fix
 ---
 

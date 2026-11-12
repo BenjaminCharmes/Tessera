@@ -222,6 +222,22 @@ async def test_integration_tickets_sans_diff_listes_dans_l_evenement_et_le_journ
     assert "ticket-002" in journal[0]
 
 
+async def test_un_fichier_reduit_a_ses_titres_est_ecrit_dans_le_journal(tmp_path: Path) -> None:
+    orc = _make_orchestrator(tmp_path, runner=_runner(), git_workspace=_FakeGit())
+    orc._documenter = AsyncMock(
+        return_value=ResultatDocumentation(
+            [], [], ["ticket-001"], reduits=["docs/x.md (250000 caractères)"]
+        )
+    )
+    lignes: list[str] = []
+    orc._log = lignes.append  # type: ignore[method-assign]
+
+    await orc.run_pipeline("proj", "ticket-001", _noop)
+
+    journal = [ln for ln in lignes if "documentation trop longue, titres seuls" in ln]
+    assert journal == ["documentation trop longue, titres seuls : docs/x.md (250000 caractères)"]
+
+
 async def test_integration_provider_qui_leve_emet_documentation_failed(tmp_path: Path) -> None:
     """Service réel avec provider défaillant → DOCUMENTATION_FAILED émis, run toujours approuvé.
 
