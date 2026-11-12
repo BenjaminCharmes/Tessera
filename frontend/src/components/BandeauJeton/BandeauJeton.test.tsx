@@ -34,6 +34,29 @@ describe("BandeauJeton", () => {
     expect(screen.getByText(CHEMIN_JETON_AUTRE)).toBeTruthy();
   });
 
+  it("names STATIC_TOKEN and says the token lasts until the tab closes", async () => {
+    render(<BandeauJeton />);
+
+    await provoquerUn401();
+
+    expect(screen.getByText("STATIC_TOKEN")).toBeTruthy();
+    expect(screen.getByRole("alert").textContent).toContain(
+      "Gardé jusqu'à la fermeture de l'onglet",
+    );
+  });
+
+  it("declares a username and a current-password field for the browser vault", async () => {
+    render(<BandeauJeton />);
+
+    await provoquerUn401();
+
+    const champ = screen.getByLabelText("Jeton de session");
+    expect(champ.getAttribute("autocomplete")).toBe("current-password");
+    const formulaire = screen.getByRole("alert");
+    const identifiant = formulaire.querySelector('input[autocomplete="username"]');
+    expect(identifiant?.getAttribute("value")).toBe("tessera");
+  });
+
   it("hands the typed token to the session and hides itself", async () => {
     render(<BandeauJeton />);
     await provoquerUn401();
