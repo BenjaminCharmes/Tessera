@@ -64,6 +64,7 @@ filterwarnings = [
     "ignore::pytest.PytestUnhandledThreadExceptionWarning",
 ]
 markers = [
+    "perf: tests chronométrés, sensibles à la charge de la machine — sautés par scripts/verifier.py (testeur du pipeline), gardés par la CI GitHub",
     "integration: tests nécessitant une session Claude Code authentifiée et qui facturent l'abonnement Claude (dés-activés en CI) — pas une ANTHROPIC_API_KEY",
 ]
 
