@@ -9417,3 +9417,18 @@ error: Please commit or stash them.
 - 2026-11-12 16:18:20 UTC — [ticket-950] tests rouges au tour 3
 - 2026-11-12 16:18:20 UTC — [ticket-950] BLOCKED après 3 tour(s) sans approbation
 - 2026-11-12 16:18:31 UTC — [ide-core] file interrompue : ticket-950 non approuvé
+- 2026-11-12 16:39:08 UTC — [ticket-952] branche ticket-952-the-description-guard-covers-projects-hosted-insi
+- 2026-11-12 16:39:11 UTC — [ticket-952] tour 1 — codeur démarré
+- 2026-11-12 16:40:23 UTC — [ticket-952] tour 1 — codeur terminé (71453ms)
+- 2026-11-12 16:41:13 UTC — [ticket-952] testeur: 1 failed, 190 passed, 8 warnings in 42.81s
+- 2026-11-12 16:41:13 UTC — [ticket-952] tests rouges au tour 1
+- 2026-11-12 16:41:13 UTC — [ticket-952] tour 2 — codeur démarré
+- 2026-11-12 16:43:02 UTC — [ticket-952] tour 2 — codeur terminé (108453ms)
+- 2026-11-12 16:43:47 UTC — [ticket-952] testeur: dur�es : ruff 0 s, mypy 4 s, mypy-linux 6 s, pytest 41 s ; impact depuis base : 22 fichier(s) de test
+- 2026-11-12 16:44:03 UTC — [ticket-952] securite: PASS — Le diff rend plus stricte la règle qui refuse une description de projet reprenan (15500ms)
+- 2026-11-12 16:44:04 UTC — [ticket-952] tour 2 — reviewer démarré
+- 2026-11-12 16:44:34 UTC — [ticket-952] validateur: fichiers cités joints : projects/homelab-monitor (dossier, 7 fichiers), projects/ide-core (dossier, 2 fichiers), test_documentation_ailleurs.py
+- 2026-11-12 16:44:34 UTC — [ticket-952] validateur: APPROVED — Tous les critères sont satisfaits. Les quatre nouveaux tests (1 à 4) couvrent le (30625ms)
+- 2026-11-12 16:44:37 UTC — [ticket-952] tour 2 — reviewer terminé (33014ms)
+- 2026-11-12 16:44:37 UTC — [ticket-952] APPROVED après 2 tour(s)
+- 2026-11-12 16:45:41 UTC — [ticket-952] leçons: une leçon proposée
