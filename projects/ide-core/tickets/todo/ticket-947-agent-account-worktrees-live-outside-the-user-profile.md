@@ -6,6 +6,7 @@ estimated_days: 1
 id: ticket-947
 pr_number: null
 priority: high
+preuve_reelle: true
 status: todo
 title: "Worktrees of an agent-account project live outside the user profile"
 type: fix
@@ -43,6 +44,17 @@ ne peut écrire.
    Le compte agent n'y reçoit rien de plus que ce que
    `accorder_droits_agent` pose sur le worktree du run.
 3. `tessera.ps1 agent doctor` vérifie ce dossier et son ACL.
+
+## Preuve réelle
+
+Sur serpent (`worktree.compte_agent`, `AGENT_USER=tessera-agent`), lancer le
+ticket-009 en `single` :
+- le worktree du run est créé sous `C:\ProgramData\Tessera\worktrees\serpent\` ;
+- `icacls` sur ce dossier : pas d'héritage, SYSTEM et Administrateurs (F),
+  l'utilisateur du backend (M) ;
+- l'agent y écrit (fichier créé par le codeur), `whoami` dans un appel Bash
+  rend `tessera-agent`, et une lecture du `.env` de Tessera est refusée ;
+- `scripts/tessera.ps1 agent doctor` signale le dossier et son ACL.
 
 ## Critères d'acceptation
 

@@ -6,6 +6,7 @@ estimated_days: 1
 id: ticket-948
 pr_number: null
 priority: high
+preuve_reelle: true
 status: todo
 title: "A project venv whose launcher Smart App Control blocks is repaired before its tests and services"
 type: fix
@@ -49,6 +50,15 @@ l'original en `*.lanceur-uv`. Python retrouve son venv par `pyvenv.cfg`, et
    relancent la commande **une seule fois**. Un second échec reste une panne
    d'environnement (ADR-037).
 3. Hors Windows, rien ne change.
+
+## Preuve réelle
+
+Dans un dossier jetable : `uv venv`, puis remplacer `python.exe` du venv par
+un fichier que Smart App Control refuse (ou attendre un refus 4551 réel) ;
+lancer `reparer_venv` sur ce `.venv` : le lanceur original est gardé en
+`python.exe.lanceur-uv`, `.venv\Scripts\python.exe -c "import sys"` rend 0,
+et un second appel ne change rien. Puis un run réel d'un projet dont le venv a
+été bloqué : le journal porte `venv_repare` et la commande repart une fois.
 
 ## Critères d'acceptation
 
