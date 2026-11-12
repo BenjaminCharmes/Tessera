@@ -4,7 +4,7 @@
  * Le backend exige `Authorization: Bearer <jeton>` sur toute requête HTTP et
  * `?token=<jeton>` sur toute WebSocket — un navigateur ne peut pas poser
  * d'en-tête sur `new WebSocket(url)`. Le jeton n'est jamais inscrit dans le
- * code servi par Vite : il vient de la mémoire, de `localStorage`, du
+ * code servi par Vite : il vient de la mémoire, de `sessionStorage` (perdu à la fermeture de l'onglet), du
  * fragment `#jeton=<t>` de l'URL, ou de la commande Tauri `jeton_de_session`.
  * Il se lit à chaque appel plutôt qu'au chargement du module.
  */
@@ -18,26 +18,32 @@ let lectureTauri: Promise<string> | null = null;
 
 function ecrireStockage(jeton: string): void {
   try {
-    window.localStorage.setItem(CLE_STOCKAGE, jeton);
+    window.sessionStorage.setItem(CLE_STOCKAGE, jeton);
   } catch {
     // Stockage refusé : le jeton reste en mémoire pour cette session.
   }
 }
 
-/** Lit `localStorage`, puis l'ancienne valeur de `sessionStorage`, qu'il recopie. */
-function lireStockage(): string {
+/** Efface un jeton hérité de `localStorage`, partagé par toute page de la même origine. */
+function effacerHeritage(): void {
   try {
-    const partage = window.localStorage.getItem(CLE_STOCKAGE);
-    if (partage) return partage;
-    const ancien = window.sessionStorage.getItem(CLE_STOCKAGE) ?? "";
-    if (ancien) ecrireStockage(ancien);
-    return ancien;
+    window.localStorage.removeItem(CLE_STOCKAGE);
+  } catch {
+    // Stockage inaccessible : rien à effacer.
+  }
+}
+
+/** Lit `sessionStorage`, propre à l'onglet, après avoir effacé l'ancien `localStorage`. */
+function lireStockage(): string {
+  effacerHeritage();
+  try {
+    return window.sessionStorage.getItem(CLE_STOCKAGE) ?? "";
   } catch {
     return "";
   }
 }
 
-/** Prend le jeton du fragment, le range en `localStorage` et efface le fragment. */
+/** Prend le jeton du fragment, le range en `sessionStorage` et efface le fragment. */
 function lireFragment(): string {
   const parametres = new URLSearchParams(window.location.hash.replace(/^#/, ""));
   const jeton = parametres.get(PARAMETRE_FRAGMENT) ?? "";
@@ -80,7 +86,7 @@ export async function jetonDeSession(): Promise<string> {
   return jeton;
 }
 
-/** Jeton saisi à la main : rangé en `localStorage`, servi à la requête suivante. */
+/** Jeton saisi à la main : rangé en `sessionStorage`, servi à la requête suivante. */
 export function saisirJeton(jeton: string): void {
   const propre = jeton.trim();
   enMemoire = propre;
