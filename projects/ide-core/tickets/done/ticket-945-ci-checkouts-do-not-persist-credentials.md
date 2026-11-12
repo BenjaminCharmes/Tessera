@@ -6,7 +6,7 @@ estimated_days: 0.25
 id: ticket-945
 pr_number: null
 priority: medium
-status: todo
+status: done
 title: "CI checkouts do not persist the GitHub token for the PR code"
 type: chore
 ---
@@ -27,9 +27,9 @@ le 12/11 : `ubuntu-latest`), donc le risque reste borné au dépôt.
 
 ## Critères d'acceptation
 
-- [ ] Chaque `actions/checkout` de `.github/workflows/ci.yml` qui exécute le
+- [x] Chaque `actions/checkout` de `.github/workflows/ci.yml` qui exécute le
       code de la PR porte `persist-credentials: false`.
-- [ ] Un test de `backend/tests/` lit les workflows et le vérifie.
+- [x] Un test de `backend/tests/` lit les workflows et le vérifie.
 
 ## Ce que ça ne fait pas
 
