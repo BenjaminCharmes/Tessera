@@ -117,13 +117,13 @@ def build_pr_body(
     """
     parts = [f"Ticket **{ticket_id}** — {ticket_title}"]
 
-    objectif = _section(ticket_body, "Objectif")
-    if objectif:
-        parts.append(f"## Objectif\n\n{objectif}")
-
-    criteres = _section(ticket_body, "Critères d'acceptation")
-    if criteres:
-        parts.append(f"## Critères d'acceptation\n\n{criteres}")
+    # La preuve réelle se lit dans la PR : l'humain la constate avant de
+    # merger (ticket-949).
+    # Les trois sections sont recopiées telles quelles, dans cet ordre.
+    for titre in ("Objectif", "Critères d'acceptation", "Preuve réelle"):
+        texte = _section(ticket_body, titre)
+        if texte:
+            parts.append(f"## {titre}\n\n{texte}")
 
     if issue is not None:
         parts.append(f"Closes #{issue}")

@@ -393,12 +393,12 @@ def _ticket_from_post(post: frontmatter.Post, path: Path, project_id: str) -> Ti
         depends_on=_normalize_depends_on(meta.get("depends_on")),
         created=str(meta.get("created", "")),
         github_issue_url=str(meta["github_issue_url"])
-        if meta.get("github_issue_url")
-        else None,
+        if meta.get("github_issue_url") else None,
         pr_number=int(raw_pr_number) if isinstance(raw_pr_number, int) else None,
         # Seul un vrai booléen YAML l'active : « oui » ne demande rien.
         plan=meta.get("plan") is True,
         light=meta.get("light") is True,
+        preuve_reelle=meta.get("preuve_reelle") is True,
         body=str(post.content),
         project_id=project_id,
         file_path=str(path),

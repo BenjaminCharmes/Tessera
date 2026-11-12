@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 from tessera.services.livraison.livraison_evenements import evenements_de_livraison
 from tessera.services.noyau.pipeline_events import EventCallback, EventType, OrchestratorEvent, PipelineResult
 from tessera.services.pipeline import pipeline_fin_de_file as fin_de_file
-from tessera.services.pipeline.pipeline_approbation import retenir_pour_relecture
+from tessera.services.pipeline.pipeline_approbation import retenir_pour_preuve, retenir_pour_relecture
 
 if TYPE_CHECKING:
     from tessera.services.pipeline.orchestrator import Orchestrator
@@ -32,6 +32,9 @@ async def livrer_le_resultat(
     assert orch._livrer is not None
     with evenements_de_livraison(on_event, ticket_id):
         livraison = retenir_pour_relecture(await orch._livrer(resultat), resultat.relecture)
+        ticket = await orch._ticket_svc.get_ticket(ticket_id)
+        # `is True` : un double de ticket n'est pas un ticket qui demande une preuve.
+        livraison = retenir_pour_preuve(livraison, ticket is not None and ticket.preuve_reelle is True)
     for etape, duree_ms in zip(livraison.etapes, livraison.durees_ms, strict=False):
         orch._log(f"[{ticket_id}] livraison: {etape} ({duree_ms:.0f}ms)")
     if livraison.arret:
