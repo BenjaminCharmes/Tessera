@@ -107,6 +107,26 @@ async def apres_approbation(
     return resultat.model_copy(update={"relecture": relecture})
 
 
+ARRET_PREUVE_REELLE = "PR ouverte, merge après preuve réelle"
+
+
+def retenir_pour_preuve(livraison: Livraison, preuve_reelle: bool) -> Livraison:
+    """Keep an opened PR from the watcher until a real proof has been made.
+
+    Un ticket `preuve_reelle` ouvre sa PR mais ne la confie pas au merge
+    automatique : la preuve est faite par un humain ou la session ide-core
+    (ticket-949). Sans PR ouverte, il n'y a rien à retenir.
+    """
+    if not preuve_reelle or livraison.pr_number is None:
+        return livraison
+    arret = (
+        f"{livraison.arret} ; {ARRET_PREUVE_REELLE}"
+        if livraison.arret
+        else ARRET_PREUVE_REELLE
+    )
+    return replace(livraison, arret=arret, arret_voulu=True, pr_orpheline=False)
+
+
 def retenir_pour_relecture(livraison: Livraison, relecture: str | None) -> Livraison:
     """Keep an opened PR from the watcher when a human must read the captures.
 

@@ -52,6 +52,10 @@ class Ticket(BaseModel):
     #: de la documentation. Le prochain ticket normal documente le lot entier,
     #: marqueur compris (ticket-292).
     light: bool = False
+    #: Le ticket touche les processus, les comptes, les droits ou l'OS : sa PR
+    #: s'ouvre mais ne se merge qu'après une preuve faite sur la machine, que
+    #: le validateur ne juge pas (ticket-949).
+    preuve_reelle: bool = False
     body: str = Field(default="")
     project_id: str = ""
     file_path: str = Field(default="", description="Chemin absolu du fichier sur disque")

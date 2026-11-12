@@ -6,8 +6,9 @@ estimated_days: 1
 id: ticket-949
 pr_number: null
 priority: high
-status: todo
-title: "A ticket that needs a real proof stops at its PR, and the validator does not judge that proof"
+status: done
+title: A ticket that needs a real proof stops at its PR, and the validator does not
+  judge that proof
 type: fix
 ---
 
@@ -62,3 +63,12 @@ vérifiée avant le merge, pas par le validateur.
 - Ne touche pas le skill `new-ticket` : le pipeline refuse aux agents
   `.claude/` ; la session ide-core y décrit le champ à la main après le merge
   (premier run bloqué le 12/11 sur ce critère).
+## Livraison
+
+Run bloqué au 3e tour par le reviewer, sur un vrai trou : au redémarrage du
+backend, `reprise_surveillance` rendait au CIWatcher toute PR ouverte, celle
+d'un ticket `preuve_reelle` comprise, qui partait alors au merge. Corrigé à la
+main par la session ide-core le 12/11 : `_reprendre_ouverte` relit la fiche
+et saute un ticket `preuve_reelle` (`tests/test_reprise_preuve_reelle.py`,
+fiche `in-review` et PR trouvée par GitHub). Le skill `new-ticket` décrit le
+champ et la section, à la main (`.claude/` est refusé aux agents).

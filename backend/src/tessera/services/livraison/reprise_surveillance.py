@@ -74,10 +74,22 @@ async def _reprendre_ouverte(
     ticket_id: str,
     pr: int,
     surveillance: SurveillanceProjet,
+    tickets: TicketService,
     db_path: Path | str,
     on_event: EventCallback,
 ) -> None:
-    """Hand an open PR back to the watcher, unless its pushed commit is unknown."""
+    """Hand an open PR back to the watcher, unless its pushed commit is unknown.
+
+    Un ticket `preuve_reelle` n'est jamais rendu au CIWatcher : sa PR attend la
+    preuve faite sur la machine, redémarrage ou non (ticket-949).
+    """
+    ticket = await tickets.get_ticket(ticket_id)
+    if ticket is not None and ticket.preuve_reelle is True:
+        _ecrire_log(
+            projet,
+            f"[{projet.name}] {ticket_id} PR #{pr} non reprise : merge après preuve réelle",
+        )
+        return
     if await sha_pousse_du_ticket(db_path, projet.name, ticket_id) is None:
         _ecrire_log(
             projet,
@@ -104,7 +116,9 @@ async def _reprendre_ticket(
     """Re-read the PR of one ticket and act on its state."""
     etat = await surveillance.etat_pr(pr)
     if etat == "open":
-        await _reprendre_ouverte(projet, ticket.id, pr, surveillance, db_path, on_event)
+        await _reprendre_ouverte(
+            projet, ticket.id, pr, surveillance, tickets, db_path, on_event
+        )
     elif etat == "merged":
         await tickets.update_status(ticket.id, TicketStatus.done)
         _ecrire_log(
@@ -150,7 +164,7 @@ async def _reprendre_projet(
             continue
         vues.add(pr)
         await _proteger(projet, ticket_id, _reprendre_ouverte(
-            projet, ticket_id, pr, surveillance, db_path, on_event
+            projet, ticket_id, pr, surveillance, tickets, db_path, on_event
         ))
 
 

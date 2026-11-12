@@ -50,6 +50,16 @@ Optionnel : `plan: true` fait passer le ticket par un tour de plan en lecture
 seule avant le code (ticket-243). À réserver aux tickets dont l'approche n'est
 pas évidente : c'est un appel de plus.
 
+Optionnel : `preuve_reelle: true` (ticket-949) pour tout ticket qui touche
+les processus, les comptes, les droits ou l'OS (`services/providers/lanceur*`,
+`transport_agent`, `droits_*`, `lancement_compte`, `run_worktree`, les
+scripts du compte agent). Le corps porte alors une section `## Preuve réelle` :
+ce qu'il faut lancer sur la machine et ce qu'il faut y constater. Le
+validateur ne la reçoit pas, et le run approuvé s'arrête à sa PR, même en
+autonomie `merge` : la session ide-core fait la preuve, puis merge. Ne jamais
+écrire cette preuve dans les critères d'acceptation : aucun agent ne peut la
+fournir, et le validateur refuse trois tours (ticket-946, le 12/11).
+
 `type` n'est pas cosmétique : le pipeline le réutilise comme **préfixe du
 message de commit** écrit dans le dépôt (`feat: ticket-050 — …`).
 
