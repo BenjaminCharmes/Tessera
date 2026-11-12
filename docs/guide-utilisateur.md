@@ -99,6 +99,23 @@ la machine.
 
 ---
 
+### Authentification - Jeton de session
+
+Quand tu lances Tessera pour la première fois, l'interface te demande un jeton de session pour chaque nouvel onglet.
+
+Où trouver ton jeton :
+
+- **Si tu as défini `STATIC_TOKEN` dans `.env`** : utilise sa valeur.
+- **Sinon** : Tessera a écrit un jeton dans un fichier :
+  - Windows : `~\AppData\Local\Tessera\jeton-de-session`
+  - macOS/Linux : `~/.local/state/tessera/jeton-de-session`
+
+Ouvre ce fichier et copie le jeton qu'il contient.
+
+**Sauvegarder pour la prochaine fois** : Après avoir saisi le jeton, le navigateur peut le sauvegarder — à la prochaine ouverture d'onglet, il se remplira automatiquement. Le jeton reste valide jusqu'à la fermeture de l'onglet ; tu n'as rien à faire pour le renouveler sur la même session.
+
+Le jeton n'est jamais affiché à l'écran et jamais enregistré sur le disque : il vit dans le coffre du navigateur.
+
 ## 2. Ajouter un projet
 
 Un **projet** est un dossier contenant du code, des tickets et un `CLAUDE.md` qui
@@ -1049,6 +1066,9 @@ Le détecteur observe tes runs toutes les cinq minutes et signale les situations
 Tu reçois une notification quand le détecteur détecte quelque chose : cloche, son, notification système, selon tes réglages. Si tu ignores la notification, tu la retrouves dans le fil du run, en ambre, avec le message du détecteur. La même anomalie sur le même run n'est signalée qu'une fois : s'il s'arrête et reprend, tu la reverras.
 
 Tu peux désactiver les notifications d'anomalie dans la cloche, sans arrêter l'observation du run. L'anomalie reste visible dans le fil. Si le détecteur ralentit ton IDE ou te gêne, tu peux le désactiver complètement : mets `ANOMALIES_ACTIVES=false` dans `.env`.
+
+
+- **Documentation refusée en série** : les trois derniers lots ont tous été refusés sans aucun fichier modifié. Cela indique un problème systématique de génération — par exemple, une description toujours trop proche de celle de Tessera, ou une revue qui refuse régulièrement.
 
 ## 5 bis. Se repérer dans l'écran
 

@@ -12,7 +12,7 @@ le code livré qui le fonde, et ses jetons vérifiables doivent y figurer.
 import json
 from pathlib import Path
 
-from tessera.services.documentation.documentation_ailleurs import premiere_phrase
+from tessera.services.documentation.documentation_ailleurs import SUJET_TESSERA, a_pour_sujet_tessera, premiere_phrase
 from tessera.services.documentation.documentation_base import EditionRefusee
 from tessera.services.documentation.documentation_code import MatiereCode
 from tessera.services.documentation.documentation_preuve import ControleDePreuve
@@ -133,7 +133,9 @@ def remplacer_description(src: str, texte: str) -> str:
 
 def _refuser_si_ailleurs(texte: str, autres: list[str]) -> None:
     """Refuse un texte dont la première phrase est celle d'un autre sujet."""
-    if premiere_phrase(texte) in autres:
+    if premiere_phrase(texte) in autres or (
+        SUJET_TESSERA in autres and a_pour_sujet_tessera(texte)
+    ):
         raise EditionRefusee(
             "la description reprend la première phrase d'un autre sujet "
             "(un autre projet, ou le CLAUDE.md de Tessera) : elle doit parler "

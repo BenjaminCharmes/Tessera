@@ -4,10 +4,10 @@ created: 2026-11-12
 depends_on: []
 estimated_days: 0.5
 id: ticket-952
-pr_number: null
+pr_number: 1080
 priority: high
-status: todo
-title: "The description guard covers projects hosted inside the Tessera folder"
+status: done
+title: The description guard covers projects hosted inside the Tessera folder
 type: fix
 ---
 

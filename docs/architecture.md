@@ -78,6 +78,12 @@ Chaque appel d'agent SDK reçoit `CLAUDE_CODE_GIT_BASH_PATH` dans son environnem
 au Code Engine local de lancer Bash. Hors Windows, ce mécanisme ne s'applique pas (bash est
 toujours disponible) et `agent_shell` vaut `true`.
 
+#### Déport de valeurs longues sous compte agent (ticket-946)
+
+`CreateProcessWithLogonW` refuse une ligne de commande (`lpCommandLine`) de plus de 1 024 caractères. Le prompt système, la config MCP et les réglages du CLI Claude dépassent cette limite.
+
+La solution déporte les valeurs longues (prompt, config MCP, réglages) vers des fichiers temporaires. Chaque appel reçoit un dossier `tessera-appel-*` lisible par le compte agent en lecture seule (droits via icacls `/grant <compte>:(OI)(CI)R`), où vivent les fichiers. Le CLI utilise alors `--system-prompt-file`, `--append-system-prompt-file` et autres options fichier. Le dossier est nettoyé après la fermeture du processus, même en erreur.
+
 ### Enregistrement automatique des appels
 
 Chaque appel LLM d'un run est enregistré dans `agent_calls` avec `run_id`,
@@ -654,6 +660,12 @@ Les services lancés par Tessera (backends, workers déclarés par les projets) 
 Une tâche de fond `DetecteurDAnomalies` observe les runs vivants toutes les 300 secondes. Elle relit les événements depuis la base en lecture seule, applique six règles de détection, et émet une notification d'anomalie par clé — chaque clé n'est signalée qu'une seule fois. Si une série se rompt puis se reforme, c'est une nouvelle clé et une nouvelle anomalie.
 
 Le détecteur ne modifie que les champs `anomalies` du run, sans aucune action externe : c'est un témoin. Les anomalies s'affichent comme notifications dans la cloche (réglables par type, ticket-840), dans le fil du run, et marquées sur le Bureau.
+
+#### Refus de documentation en série (ticket-950)
+
+Une règle `documentation_refusee_en_serie` signale quand les trois derniers lots de documentation du projet ont tous au moins un refus sans aucun fichier modifié — une boucle où la doc est rejetée sans jamais avancer.
+
+La lecture `derniers_lots_de_documentation` ramène les N derniers événements `doc_updated` par `project_id` depuis la base SQLite, du plus récent au plus ancien, sans exposer le texte des refus (seuls les comptes sont conservés). La règle rend une `Anomalie` avec clé `documentation_refusee:<id_lot>` (un épisode) et mesure = seuil = 3.
 
 ### Coffre du système et gestion des secrets (ADR-073, tickets 794-798)
 

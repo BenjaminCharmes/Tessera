@@ -127,3 +127,59 @@ async def test_hosted_project_brief_has_no_tessera_claude_md_and_cwd_reaches_pro
     for appel in enregistreur.appels:
         assert appel["cwd"] == projet
         assert "Tessera est un IDE" not in str(appel["user"])
+
+
+_INCIDENT = (
+    "Tessera est un IDE multi-projets avec orchestration d'agents IA, "
+    "auto-hébergé. Le tableau de bord suit les sondes."
+)
+
+
+def _monde_reel(tmp_path: Path) -> tuple[Path, Path]:
+    """Real layout: the workspace is `<racine>/projects`, with the real opening."""
+    racine = tmp_path / "tessera"
+    espace = racine / "projects"
+    for nom in ("ide-core", "homelab-monitor", "voisin"):
+        (espace / nom).mkdir(parents=True)
+    (racine / "CLAUDE.md").write_text(
+        "# CLAUDE.md — Tessera\n\nTu travailles sur **Tessera** : un IDE "
+        "multi-projets avec orchestration d'agents IA, auto-hébergé.\n",
+        encoding="utf-8",
+    )
+    (espace / "voisin" / "agents.json").write_text(
+        json.dumps({"description": f"{_AUTRE} Plus."}), encoding="utf-8"
+    )
+    for nom in ("homelab-monitor", "ide-core"):
+        (espace / nom / "agents.json").write_text('{\n  "description": "ancienne"\n}\n', encoding="utf-8")
+    return racine, espace
+
+
+def test_incident_description_is_refused_for_a_project_under_the_root(tmp_path: Path) -> None:
+    racine, espace = _monde_reel(tmp_path)
+    projet = espace / "homelab-monitor"
+
+    with pytest.raises(EditionRefusee, match="autre sujet"):
+        _ecrire(projet, _INCIDENT, phrases_interdites(projet, espace, racine))
+
+
+def test_incident_description_is_accepted_for_ide_core(tmp_path: Path) -> None:
+    racine, espace = _monde_reel(tmp_path)
+    projet = espace / "ide-core"
+
+    assert _ecrire(projet, _INCIDENT, phrases_interdites(projet, espace, racine)) is True
+
+
+def test_passing_mention_is_accepted_for_a_hosted_project(tmp_path: Path) -> None:
+    racine, espace = _monde_reel(tmp_path)
+    projet = espace / "homelab-monitor"
+
+    texte = "Sert à mesurer l'orchestration de Tessera."
+    assert _ecrire(projet, texte, phrases_interdites(projet, espace, racine)) is True
+
+
+def test_neighbour_description_is_refused_under_the_root(tmp_path: Path) -> None:
+    racine, espace = _monde_reel(tmp_path)
+    projet = espace / "homelab-monitor"
+
+    with pytest.raises(EditionRefusee, match="autre sujet"):
+        _ecrire(projet, _AUTRE.upper(), phrases_interdites(projet, espace, racine))
