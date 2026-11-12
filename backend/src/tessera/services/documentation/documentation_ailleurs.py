@@ -12,6 +12,14 @@ from pathlib import Path
 #: Une phrase se termine à un point suivi d'un blanc, ou à la fin du texte.
 _FIN_DE_PHRASE = re.compile(r"(?<=[.!?])\s")
 _BLANCS = re.compile(r"\s+")
+#: Entrée de la liste interdite : toute première phrase qui a Tessera pour sujet.
+SUJET_TESSERA = "<sujet-tessera>"
+_DEBUT_TESSERA = re.compile(r"^\W*tessera\b")
+
+
+def a_pour_sujet_tessera(texte: str) -> bool:
+    """True when the first sentence of ``texte`` starts with "Tessera"."""
+    return _DEBUT_TESSERA.match(premiere_phrase(texte)) is not None
 
 
 def premiere_phrase(texte: str) -> str:
@@ -51,7 +59,7 @@ def phrases_interdites(
     """First sentences a description of ``project_path`` must not start with.
 
     Les descriptions des `agents.json` des projets voisins, et le `CLAUDE.md` de
-    `racine_tessera` sauf si le projet vit dans ce dépôt. Un fichier absent ou
+    `racine_tessera` sauf pour ide-core (`<racine>/projects/ide-core`) et la racine elle-même. Un fichier absent ou
     illisible est ignoré.
     """
     interdites: list[str] = []
@@ -61,6 +69,9 @@ def phrases_interdites(
                 interdites.append(_description_du_manifeste(voisin / "agents.json"))
     racine = racine_tessera.resolve()
     projet = project_path.resolve()
-    if racine != projet and racine not in projet.parents:
-        interdites.append(_premiere_phrase_du_claude_md(racine / "CLAUDE.md"))
+    if projet != racine / "projects" / "ide-core" and projet != racine:
+        phrase = _premiere_phrase_du_claude_md(racine / "CLAUDE.md")
+        interdites.append(phrase)
+        # Sans CLAUDE.md lisible, il n'y a pas de Tessera à ne pas confondre.
+        interdites.append(SUJET_TESSERA if phrase else "")
     return [p for p in interdites if p]
