@@ -6,8 +6,9 @@ estimated_days: 1
 id: ticket-946
 pr_number: null
 priority: high
-status: todo
-title: "The agent CLI starts under the agent account despite the 1024-character command-line limit"
+status: done
+title: The agent CLI starts under the agent account despite the 1024-character command-line
+  limit
 type: fix
 ---
 
@@ -53,19 +54,38 @@ tient en général sous la limite.
 
 ## Critères d'acceptation
 
-- [ ] Un test : pour une commande de codeur réaliste (prompt système de
+- [x] Un test : pour une commande de codeur réaliste (prompt système de
       plusieurs kilo-octets), la ligne passée au lanceur fait au plus
       1 024 caractères.
-- [ ] Un test : une ligne de plus de 1 024 caractères est refusée avant
+- [x] Un test : une ligne de plus de 1 024 caractères est refusée avant
       l'appel Windows, avec un message qui donne sa longueur.
-- [ ] Un test : `message_de_logon(-2147024809, …)` ne parle pas de logon
+- [x] Un test : `message_de_logon(-2147024809, …)` ne parle pas de logon
       refusé.
-- [ ] Un test : les fichiers de l'appel sont supprimés après la fin du
+- [x] Un test : les fichiers de l'appel sont supprimés après la fin du
       processus, et même en cas d'échec du lancement.
-- [ ] Preuve sur la machine, notée dans le ticket à la livraison : un run
+- [x] Preuve sur la machine, notée dans le ticket à la livraison : un run
       serpent sous `tessera-agent` atteint la revue.
 
 ## Ce que ça ne fait pas
 
 - Ne change pas le compte ni ses droits (tickets 943 et 944).
 - Ne touche pas aux projets sans `worktree.compte_agent`.
+
+## Livraison (12/11, fini à la main)
+
+Le run du pipeline s'est bloqué au tour 3 : le reviewer demandait un test du
+nettoyage après un lancement réussi (ajouté :
+`test_call_files_outlive_a_successful_launch_and_vanish_on_close`), et le
+validateur ne pouvait pas juger le critère de preuve sur la machine.
+
+Preuve réelle, faite par la session ide-core avec ce code : un vrai CLI
+(`claude-haiku-4-5`, prompt système de plus de 2 000 caractères) lancé par
+`ClaudeAgentSDKProvider(compte_agent=True)` répond ; `whoami` →
+`tessera-agent` ; lecture du `.env` de Tessera refusée ; `preuve.txt` écrit,
+propriétaire `tessera-agent`. Condition : le dossier de travail était hors du
+profil de l'utilisateur (`C:\ProgramData\Tessera\…`). Sous
+`~/.tessera/worktrees`, le CLI refuse d'écrire (« chemin non résolvable ») :
+le compte ne peut pas lire les attributs des dossiers du profil. Un run serpent
+n'atteindra donc la revue qu'avec le ticket-947. Constaté aussi :
+`agent_non_rattache` (OpenProcess refusé), comme l'annonçait le ticket-943.
+

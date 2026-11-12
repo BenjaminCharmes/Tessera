@@ -9346,6 +9346,28 @@ error: Please commit or stash them.
 - 2026-11-12 09:21:49 UTC — [ticket-941] APPROVED après 1 tour(s)
 - 2026-11-12 09:23:19 UTC — [ticket-941] documentation: 0 fichier(s) (72704ms)
 - 2026-11-12 09:23:19 UTC — [ticket-938] documentation: pas de diff retrouvable, non documenté
+- 2026-11-12 10:04:47 UTC — [ide-core] ticket-942 PR #1068 confiée au CIWatcher
+- 2026-11-12 09:33:27 UTC — [ticket-941] livraison: nouvelle tentative de la PR #1067 après une erreur réseau (ReadTimeout), PR non mergée
+- 2026-11-12 09:38:27 UTC — [ide-core] ticket-941 PR #1067 mergée (CI verte)
+- 2026-11-12 10:04:51 UTC — [ticket-946] branche ticket-946-the-agent-cli-starts-under-the-agent-account-desp
+- 2026-11-12 10:04:53 UTC — [ticket-946] tour 1 — codeur démarré
+- 2026-11-12 10:07:29 UTC — [ticket-946] tour 1 — codeur terminé (155485ms)
+- 2026-11-12 10:07:51 UTC — [ticket-946] testeur: 1 failed, 634 passed, 3 skipped, 8 warnings in 17.23s
+- 2026-11-12 10:07:51 UTC — [ticket-946] tests rouges au tour 1
+- 2026-11-12 10:07:51 UTC — [ticket-946] tour 2 — codeur démarré
+- 2026-11-12 10:09:58 UTC — [ticket-946] tour 2 — codeur terminé (126780ms)
+- 2026-11-12 10:10:22 UTC — [ticket-946] testeur: dur�es : ruff 0 s, pytest 20 s ; impact depuis base : 34 fichier(s) de test
+- 2026-11-12 10:10:22 UTC — [ticket-946] tests rouges au tour 2
+- 2026-11-12 10:10:22 UTC — [ticket-946] tour 3 — codeur démarré
+- 2026-11-12 10:10:38 UTC — [ticket-946] tour 3 — codeur terminé (15578ms)
+- 2026-11-12 10:11:04 UTC — [ticket-946] testeur: dur�es : ruff 0 s, mypy 7 s, mypy-linux 9 s, pytest 23 s ; impact depuis base : 34 fichier(s) de test
+- 2026-11-12 10:11:24 UTC — [ticket-946] securite: PASS — PASS : rien de critique ni de grave dans ce diff. Les valeurs longues (prompt sy (19311ms)
+- 2026-11-12 10:11:25 UTC — [ticket-946] tour 3 — reviewer démarré
+- 2026-11-12 10:11:55 UTC — [ticket-946] tour 3 — reviewer terminé (29657ms)
+- 2026-11-12 10:12:03 UTC — [ticket-946] validateur: CHANGES_REQUESTED — Les critères testables (1–4) sont tous satisfaits : les tests couvrent la limite (39360ms)
+- 2026-11-12 10:12:04 UTC — [ticket-946] CHANGES_REQUESTED tour 3: Reviewer : 1. Critère 4, première moitié (« les fichiers de l'appel sont supprimés après la fin du processus ») : aucun test ne la couvre. `test_call_files_are_removed_after_close` utilise `LanceurEsp
+- 2026-11-12 10:12:04 UTC — [ticket-946] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-12 10:12:08 UTC — [ide-core] file interrompue : ticket-946 non approuvé
 - 2026-11-12 09:32:22 UTC — [ide-core] ticket-941 PR #1067 confiée au CIWatcher
 - 2026-11-12 09:32:36 UTC — [ticket-942] branche ticket-942-an-app-squatting-port-5173-can-no-longer-pick-up
 - 2026-11-12 09:32:39 UTC — [ticket-942] tour 1 — codeur démarré

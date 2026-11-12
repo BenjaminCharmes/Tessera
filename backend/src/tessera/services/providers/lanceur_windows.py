@@ -36,6 +36,10 @@ _OPEN_EXISTING = 3
 #: Codes de `GetLastError` qui disent un compte ou un mot de passe refusé.
 _ERREURS_DE_LOGON = {1326: "compte inconnu ou mot de passe refusé", 1327: "restriction de compte",
                      1330: "mot de passe expiré", 1331: "compte désactivé", 1909: "compte verrouillé"}
+#: Limite de `lpCommandLine` pour `CreateProcessWithLogonW`, en caractères.
+LIMITE_LIGNE = 1024
+_ERROR_ACCESS_DENIED = 5
+_ERROR_INVALID_PARAMETER = 87
 
 
 class _StartupInfo(ctypes.Structure):
@@ -61,9 +65,29 @@ class _Attributs(ctypes.Structure):
                 ("bInheritHandle", wintypes.BOOL)]
 
 
+def _code_win32(code: int) -> int:
+    """Folds an HRESULT 0x8007xxxx (what `get_last_error` can return as a signed int) to its Win32 code."""
+    return code & 0xFFFF if (code & 0xFFFF0000) == 0x80070000 else code
+
+
 def message_de_logon(code: int, compte: str) -> str:
     """Returns the refusal text for a ``GetLastError`` code (no password in it)."""
+    code = _code_win32(code)
+    if code == _ERROR_INVALID_PARAMETER:
+        return f"lancement sous {compte} impossible : paramètre invalide (ligne de commande ou environnement)"
+    if code == _ERROR_ACCESS_DENIED:
+        return f"lancement sous {compte} impossible : accès refusé (droits sur le CLI ou le dossier de travail)"
     return f"logon du compte {compte} refusé : {_ERREURS_DE_LOGON.get(code, f'erreur Windows {code}')}"
+
+
+def ligne_de_commande(commande: Sequence[str]) -> str:
+    """Returns the command line; refuses one over the Windows limit, before any call."""
+    ligne = subprocess.list2cmdline(list(commande))
+    if len(ligne) > LIMITE_LIGNE:
+        raise ProviderIndisponible(
+            f"ligne de commande de {len(ligne)} caractères, au plus {LIMITE_LIGNE}"
+        )
+    return ligne
 
 
 def texte_d_environnement(env: Mapping[str, str]) -> str:
@@ -116,6 +140,7 @@ class LanceurWindows:
         self, commande: Sequence[str], compte: str, mot_de_passe: str,
         env: Mapping[str, str], cwd: str | None, avec_stderr: bool,
     ) -> Process:
+        texte_ligne = ligne_de_commande(commande)
         k32 = _CTYPES.WinDLL("kernel32", use_last_error=True)
         adv = _CTYPES.WinDLL("advapi32", use_last_error=True)
         in_enfant, in_parent = _tuyau(k32, parent_lit=False)
@@ -126,7 +151,7 @@ class LanceurWindows:
         si.cb = ctypes.sizeof(_StartupInfo)
         si.dwFlags = _STARTF_USESTDHANDLES
         si.hStdInput, si.hStdOutput, si.hStdError = in_enfant, out_enfant, err_enfant
-        ligne = ctypes.create_unicode_buffer(subprocess.list2cmdline(list(commande)))
+        ligne = ctypes.create_unicode_buffer(texte_ligne)
         ok = adv.CreateProcessWithLogonW(
             compte, ".", mot_de_passe, _LOGON_WITH_PROFILE, None, ligne,
             _CREATE_UNICODE_ENVIRONMENT | _CREATE_NO_WINDOW, bloc_d_environnement(env),

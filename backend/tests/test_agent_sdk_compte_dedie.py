@@ -44,8 +44,13 @@ def _options(compte_agent: bool = True) -> ClaudeAgentOptions:
     )
 
 
+async def _icacls_double(args: list[str]) -> tuple[int, str]:
+    return 0, ""
+
+
 @pytest.fixture
 def compte(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr("tessera.services.providers.fichiers_appel._icacls_reel", _icacls_double)
     monkeypatch.setattr(settings, "agent_user", COMPTE)
     monkeypatch.setattr(settings, "agent_logon_password", SecretStr("mdp-factice"))
     monkeypatch.setattr(settings, "agent_oauth_token", SecretStr("jeton-factice"))
@@ -133,7 +138,7 @@ async def test_transport_keeps_the_sdk_command_flags(compte: None) -> None:
 
 def test_logon_message_never_carries_the_password() -> None:
     assert "mdp" not in message_de_logon(1326, COMPTE)
-    assert "erreur Windows 5" in message_de_logon(5, COMPTE)
+    assert "erreur Windows 9999" in message_de_logon(9999, COMPTE)
 
 
 def test_environment_block_is_sorted_and_double_terminated() -> None:

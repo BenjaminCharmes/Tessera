@@ -25,7 +25,12 @@ def _options() -> ClaudeAgentOptions:
     return ClaudeAgentOptions(cli_path="cli", cwd=str(Path.cwd()), env={})
 
 
-async def test_account_transport_reports_the_pid() -> None:
+async def _icacls_double(args: list[str]) -> tuple[int, str]:
+    return 0, ""
+
+
+async def test_account_transport_reports_the_pid(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr("tessera.services.providers.fichiers_appel._icacls_reel", _icacls_double)
     vus: list[int] = []
     transport = TransportCompteAgent(
         "p", _options(), lanceur=LanceurPid(), compte="c", mot_de_passe="m",
