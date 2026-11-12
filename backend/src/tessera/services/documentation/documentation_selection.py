@@ -14,6 +14,9 @@ _logger = get_logger(__name__)
 
 MARQUEUR = "documentation.json"
 
+#: Refus d'un même ticket au bout desquels on cesse de le proposer (ticket-940).
+MAX_REFUS = 2
+
 
 @dataclass(frozen=True)
 class TicketADocumenter:
@@ -58,6 +61,60 @@ def _tickets_documentes(project_path: Path) -> set[str]:
     return documentes
 
 
+def _lire_marqueur(project_path: Path) -> dict[str, object]:
+    marqueur = project_path / "memory" / MARQUEUR
+    try:
+        data = json.loads(marqueur.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def tickets_abandonnes(project_path: Path) -> set[str]:
+    """Tickets given up after ``MAX_REFUS`` refused batches (ticket-940)."""
+    valeur = _lire_marqueur(project_path).get("abandonnes")
+    return {str(t) for t in valeur} if isinstance(valeur, list) else set()
+
+
+def compteurs_refus(project_path: Path) -> dict[str, int]:
+    """Refusal count per ticket; absent in the formats written before ticket-940."""
+    valeur = _lire_marqueur(project_path).get("refus")
+    if not isinstance(valeur, dict):
+        return {}
+    return {str(k): v for k, v in valeur.items() if isinstance(v, int)}
+
+
+def _ecrire_marqueur(
+    project_path: Path, documentes: set[str], refus: dict[str, int], abandonnes: set[str]
+) -> None:
+    contenu: dict[str, object] = {"documentes": sorted(documentes)}
+    if refus:
+        contenu["refus"] = dict(sorted(refus.items()))
+    if abandonnes:
+        contenu["abandonnes"] = sorted(abandonnes)
+    memoire = project_path / "memory"
+    memoire.mkdir(parents=True, exist_ok=True)
+    (memoire / MARQUEUR).write_text(json.dumps(contenu, indent=2) + "\n", encoding="utf-8")
+
+
+def enregistrer_refus(project_path: Path, ticket_ids: list[str]) -> list[str]:
+    """Count one refusal for each ticket; return those now abandoned.
+
+    A ticket reaching ``MAX_REFUS`` joins ``abandonnes`` and is no longer
+    offered by ``tickets_a_documenter`` (ticket-940).
+    """
+    refus = compteurs_refus(project_path)
+    abandonnes = tickets_abandonnes(project_path)
+    nouveaux: list[str] = []
+    for ticket in ticket_ids:
+        refus[ticket] = refus.get(ticket, 0) + 1
+        if refus[ticket] >= MAX_REFUS and ticket not in abandonnes:
+            abandonnes.add(ticket)
+            nouveaux.append(ticket)
+    _ecrire_marqueur(project_path, _tickets_documentes(project_path), refus, abandonnes)
+    return nouveaux
+
+
 def tickets_a_documenter(project_path: Path) -> list[TicketADocumenter]:
     """Les tickets terminés qui ne figurent pas encore dans le marqueur.
 
@@ -70,7 +127,7 @@ def tickets_a_documenter(project_path: Path) -> list[TicketADocumenter]:
     if not dossier.is_dir():
         return []
 
-    documentes = _tickets_documentes(project_path)
+    documentes = _tickets_documentes(project_path) | tickets_abandonnes(project_path)
     tickets: list[TicketADocumenter] = []
     for fichier in sorted(dossier.glob("*.md")):
         identifiant = "-".join(fichier.stem.split("-")[:2])
@@ -100,11 +157,14 @@ def marquer_documente(project_path: Path, ticket_ids: list[str]) -> None:
     ``{"documentes": [...]}`` format.  The old ``{"dernier_ticket": ...}``
     format is never written back (ADR-036).
     """
-    existants = _tickets_documentes(project_path)
-    tous = existants | set(ticket_ids)
-    memoire = project_path / "memory"
-    memoire.mkdir(parents=True, exist_ok=True)
-    (memoire / MARQUEUR).write_text(
-        json.dumps({"documentes": sorted(tous)}, indent=2) + "\n",
-        encoding="utf-8",
-    )
+    tous = _tickets_documentes(project_path) | set(ticket_ids)
+    refus = {t: n for t, n in compteurs_refus(project_path).items() if t not in tous}
+    _ecrire_marqueur(project_path, tous, refus, tickets_abandonnes(project_path))
+
+
+def consigner_lot(project_path: Path, ticket_ids: list[str], refuse: bool) -> list[str]:
+    """Record a batch's outcome; return the tickets abandoned by it (ticket-940)."""
+    if refuse:
+        return enregistrer_refus(project_path, ticket_ids)
+    marquer_documente(project_path, ticket_ids)
+    return []

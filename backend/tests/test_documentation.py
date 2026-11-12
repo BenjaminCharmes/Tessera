@@ -511,7 +511,8 @@ async def test_le_marqueur_navance_pas_si_toutes_editions_refusees(
 
     assert resultat.refus
     assert resultat.fichiers_modifies == []
-    assert resultat.marqueur_ecrit is False
+    # Le refus est compté dans le marqueur (ticket-940) : il faut le commiter.
+    assert resultat.marqueur_ecrit is True
     # ticket-001 doit réapparaître dans le prochain lot
     assert "ticket-001" in [t.id for t in tickets_a_documenter(tmp_path)]
 

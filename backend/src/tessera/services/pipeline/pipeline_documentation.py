@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from tessera.services.documentation.documentation_selection import MAX_REFUS
 from tessera.services.noyau.pipeline_events import EventCallback, EventType, OrchestratorEvent, PipelineResult
 from tessera.utils.logger import get_logger
 
@@ -29,6 +30,7 @@ class _Lot:
     refus: list[str]
     tickets: list[str]
     ecartes: list[str]
+    abandonnes: list[str]
     tronque: bool
     marqueur_ecrit: bool
     correction: bool
@@ -42,6 +44,7 @@ class _Lot:
             refus=list(getattr(doc, "refus", []) or []),
             tickets=list(getattr(doc, "tickets", []) or []),
             ecartes=list(getattr(doc, "ecartes", []) or []),
+            abandonnes=list(getattr(doc, "abandonnes", []) or []),
             tronque=bool(getattr(doc, "tronque", False)),
             marqueur_ecrit=bool(getattr(doc, "marqueur_ecrit", False)),
             correction=bool(getattr(doc, "tour_de_correction", False)),
@@ -145,7 +148,7 @@ def _journaliser(
 ) -> None:
     # « 0 fichier(s) » seul cachait six refus d'affilée sur démineur, chacun
     # pour plusieurs minutes de calcul (ticket-342).
-    motifs = "".join(f" — refusé : {r[:160]}" for r in lot.refus)
+    motifs = "".join(f" — refusé : {' '.join(r.split())[:160]}" for r in lot.refus)
     # Un tour de correction coûte un appel de plus : le journal le dit (ticket-395).
     correction = " — après tour de correction" if lot.correction else ""
     orch._log(
@@ -156,6 +159,11 @@ def _journaliser(
     # dit, ticket par ticket (ticket-541).
     for ecarte in lot.ecartes:
         orch._log(f"[{ecarte}] documentation: pas de diff retrouvable, non documenté")
+    if lot.abandonnes:
+        orch._log(
+            f"documentation abandonnée pour {', '.join(lot.abandonnes)}"
+            f" après {MAX_REFUS} refus"
+        )
 
 
 async def _commiter(
@@ -185,7 +193,7 @@ async def _commiter(
 async def _signaler(
     resultat: PipelineResult, lot: _Lot, on_event: EventCallback
 ) -> None:
-    if not (lot.fichiers or lot.refus or lot.tronque or lot.ecartes):
+    if not (lot.fichiers or lot.refus or lot.tronque or lot.ecartes or lot.abandonnes):
         return
     await on_event(
         OrchestratorEvent(
@@ -197,6 +205,7 @@ async def _signaler(
                 "tickets": lot.tickets,
                 "tronque": lot.tronque,
                 "ecartes": lot.ecartes,
+                "abandonnes": lot.abandonnes,
             },
         )
     )
