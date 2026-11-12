@@ -42,9 +42,6 @@ vérifiée avant le merge, pas par le validateur.
    et ouvre sa PR, mais ne la confie pas au merge automatique, même en
    autonomie `merge`. Le corps de la PR recopie la section `## Preuve réelle`,
    et le journal du pipeline écrit « PR ouverte, merge après preuve réelle ».
-4. Le skill `new-ticket` demande `preuve_reelle: true` pour tout ticket qui
-   touche `services/providers/lanceur*`, `transport_agent`, `droits_*`,
-   `lancement_compte`, `run_worktree` ou les scripts du compte agent.
 
 ## Critères d'acceptation
 
@@ -56,11 +53,12 @@ vérifiée avant le merge, pas par le validateur.
       ouvre sa PR et n'est pas confié au merge automatique ; la `Livraison`
       porte un arrêt voulu qui le dit.
 - [ ] Un test : sans `preuve_reelle`, la livraison ne change pas.
-- [ ] Le skill `.claude/skills/new-ticket/SKILL.md` décrit le champ et la
-      section, et un test de `backend/tests/` le vérifie.
 
 ## Ce que ça ne fait pas
 
 - N'automatise pas la preuve : elle reste faite et constatée par un humain
   ou par la session ide-core.
 - Ne change pas les autres niveaux d'autonomie.
+- Ne touche pas le skill `new-ticket` : le pipeline refuse aux agents
+  `.claude/` ; la session ide-core y décrit le champ à la main après le merge
+  (premier run bloqué le 12/11 sur ce critère).
