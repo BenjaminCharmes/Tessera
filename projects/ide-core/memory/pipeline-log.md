@@ -9416,3 +9416,4 @@ error: Please commit or stash them.
 - 2026-11-12 16:18:19 UTC — [ticket-950] testeur: 1 failed, 1245 passed, 8 warnings in 636.88s (0:10:36)
 - 2026-11-12 16:18:20 UTC — [ticket-950] tests rouges au tour 3
 - 2026-11-12 16:18:20 UTC — [ticket-950] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-12 16:18:31 UTC — [ide-core] file interrompue : ticket-950 non approuvé
