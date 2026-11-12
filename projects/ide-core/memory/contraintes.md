@@ -11,9 +11,6 @@ Cette section n'est injectée dans aucun appel d'agent. Une règle nouvelle
 s'écrit ici, avec son ADR ; un humain l'accepte en la déplaçant dans sa
 section. (ADR-055)
 
-- **Avec `worktree.compte_agent` et `AGENT_USER`, la commande de test et l'app du contrôle visuel partent aussi sous ce compte** ; tout échec de lancement est une panne d'environnement, jamais un repli sous le compte du backend. (ADR-085, ADR-083, ADR-037) — *à accepter quand `AGENT_USER` sera renseigné sur un projet.*
-- **Sous `AGENT_USER`, le CLI d'un agent part sous ce compte, environnement bâti de zéro** ; tout échec → `ProviderIndisponible`, jamais de repli sous le compte du backend. (ADR-083, ADR-037) — *à accepter quand `AGENT_USER` sera renseigné sur un projet : d'ici là, aucun agent ne la rencontre.*
-
 ## Git et périmètre d'écriture
 
 - **Un projet qui déclare `worktree` exécute chaque run dans son worktree,
@@ -41,13 +38,11 @@ section. (ADR-055)
   `tsconfig*.json`, `scripts` de `package.json`…) sans que le ticket la nomme par
   son chemin complet est refusé à la revue. (ADR-027, ADR-072)
 - **Une règle nouvelle s'écrit sous `## Proposées` dans `contraintes.md`,
-  avec son ADR.** Un diff qui modifie ce fichier ailleurs met le run en
-  `blocked` : un humain accepte la règle en la déplaçant dans sa section.
-  (ADR-055)
+  avec son ADR.** Un diff qui le modifie ailleurs met le run en `blocked` ;
+  un humain l'accepte en la déplaçant. (ADR-055)
 - **Une leçon s'écrit sous `## Proposées` de `memory/lecons.md`, par le
   service seul.** Seule `## En vigueur`, où un humain la déplace, atteint
-  codeur et reviewer. Un diff de run qui touche ce fichier met le run en
-  `blocked`. (ADR-074, ADR-055)
+  codeur et reviewer ; un diff de run qui y touche le met en `blocked`. (ADR-074, ADR-055)
 - **Avant toute création de branche, `git rev-parse --show-toplevel` doit
   renvoyer le dossier du projet**, sinon `NotAGitRepository`, sauf
   `git_root: ancestor`. (ADR-024, ADR-028)
@@ -69,12 +64,12 @@ section. (ADR-055)
 - **Un run non approuvé ne se livre jamais.** Les exceptions de livraison
   restent dans `Livraison.arret` et ne font pas échouer le run. (ADR-030)
 - **Sur un conflit de rebase, `resolveur-conflit` tente.** Une résolution
-  qui aboutit ouvre sa PR, jamais mergée seule, même en `merge`. Tout doute annule tout. (ADR-033)
+  qui aboutit ouvre sa PR, jamais mergée seule ; tout doute annule tout. (ADR-033)
 - **La phase 1 de livraison (rebase, push, PR) libère le verrou du
   projet.** La phase 2 (attente CI, merge) tourne dans `CIWatcher`.
   `depends_on` bloque le ticket suivant jusqu'au merge. Une CI rouge met le
   ticket en `blocked`, PR ouverte, sans relance. (ADR-051)
-- **Une livraison attend, dans une limite de temps, que les PR du projet
+- **Une livraison attend, un temps borné, que les PR du projet
   confiées à `CIWatcher` soient mergées ou bloquées**, pour rebaser dessus.
   (ADR-065, ADR-051)
 - **Une PR devenue conflictuelle ne se met à jour que par un merge de la base
@@ -90,7 +85,7 @@ section. (ADR-055)
   orphelin au démarrage, il se commite comme un run non approuvé, puis se
   supprime. (ADR-056, ADR-037)
 - **Le détecteur d'anomalies observe sans gouverner** : sans LLM, `git` ni
-  `gh`, il ne touche à aucun run ni dépôt, et son échec n'atteint aucun run.
+  `gh`, il ne touche ni run ni dépôt, et son échec n'en atteint aucun.
   (ADR-078, ADR-037)
 - **Un appel d'agent qui change un fichier protégé, un hook ou la config git
   met le run en `blocked`** (empreinte avant/après). (ADR-084, ADR-037)
@@ -143,6 +138,8 @@ section. (ADR-055)
   que sur indisponibilité (`provider_fallback`), run `rapide` ou prompt au-delà
   du `fallback_above_chars` d'un rôle `ollama`, jamais sur une réponse
   illisible. (ADR-046, ADR-059, ADR-071)
+- **Avec `worktree.compte_agent` et `AGENT_USER`, CLI, tests et app du
+  contrôle visuel partent sous ce compte, sans repli.** (ADR-083, ADR-085)
 - **Un rôle déclaré `"web": true` reçoit `WebFetch` et `WebSearch` et
   perd `Bash`.** (ADR-049)
 
@@ -190,8 +187,7 @@ section. (ADR-055)
 
 - **Les états n'utilisent que `zinc`, `red`, `amber`, `green`, `blue`.
   `violet` sert à l'identité et à l'interaction** — fond ou barre,
-  jamais en couleur de texte (sauf liens Markdown définis dans
-  `index.css`). (ADR-026)
+  jamais en couleur de texte (sauf liens Markdown d'`index.css`). (ADR-026)
 - **Les graphiques utilisent les teintes `data-1`, `data-2`, `data-3`
   (cyan, indigo, magenta), dans cet ordre.** Seulement dans
   `design/charts/`, jamais les familles CSS en brut. (ADR-047)
