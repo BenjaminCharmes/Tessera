@@ -9460,3 +9460,4 @@ error: Please commit or stash them.
 - 2026-11-12 17:05:40 UTC — [ticket-954] validateur: APPROVED — Les quatre critères d'acceptation sont satisfaits. Les tests couvrent le passage (37250ms)
 - 2026-11-12 17:05:40 UTC — [ticket-954] APPROVED après 2 tour(s)
 - 2026-11-12 17:07:49 UTC — [ticket-954] leçons: une leçon proposée
+- 2026-11-12 17:09:52 UTC — [ticket-954] documentation: 0 fichier(s) (117891ms)
