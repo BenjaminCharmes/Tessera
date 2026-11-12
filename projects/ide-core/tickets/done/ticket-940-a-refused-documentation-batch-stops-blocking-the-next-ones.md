@@ -4,10 +4,11 @@ created: 2026-11-12
 depends_on: []
 estimated_days: 0.5
 id: ticket-940
-pr_number: null
+pr_number: 1071
 priority: high
-status: todo
-title: "A documentation batch refused twice leaves the queue instead of blocking every later batch"
+status: done
+title: A documentation batch refused twice leaves the queue instead of blocking every
+  later batch
 type: fix
 ---
 

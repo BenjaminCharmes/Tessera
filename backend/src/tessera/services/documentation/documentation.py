@@ -37,7 +37,7 @@ from tessera.services.documentation.documentation_description import appliquer_d
 from tessera.services.documentation.documentation_editions import _documentable, appliquer_editions
 from tessera.services.documentation.documentation_preuve import fichiers_de_la_matiere
 from tessera.services.documentation.documentation_reponse import donnees_de, editions_de, editions_depuis
-from tessera.services.documentation.documentation_selection import MARQUEUR, TicketADocumenter, marquer_documente, tickets_a_documenter
+from tessera.services.documentation.documentation_selection import MARQUEUR, TicketADocumenter, consigner_lot, marquer_documente, tickets_a_documenter
 from tessera.services.noyau.modeles_par_defaut import MODELE_PRODUCTION
 from tessera.services.providers.base import LLMProvider
 from tessera.utils.logger import get_logger
@@ -73,6 +73,8 @@ class ResultatDocumentation:
     #: Tickets retirés du lot faute de diff retrouvable : marqués documentés,
     #: jamais lus par un agent (ticket-541).
     ecartes: list[str] = field(default_factory=list)
+    #: Tickets abandonnés après deux refus (ticket-940).
+    abandonnes: list[str] = field(default_factory=list)
 
 
 #: Les deux lectures d'une même livraison. Deux rôles et pas un seul : un agent
@@ -258,14 +260,11 @@ class DocumentationService:
                     )
                     refus.append(f"{role} : {exc2}")
 
-        # Le marqueur n'avance que si au moins une édition a été appliquée, ou
-        # si aucune édition n'a été proposée. S'il n'y a que des refus, on
-        # réessaiera au prochain run (ticket-213).
+        # Le marqueur avance si une édition est appliquée ou si aucune n'est
+        # proposée ; un lot refusé est compté, abandonné au 2e refus (t.940).
         toutes_refusees = not modifies and bool(refus)
-        marqueur_ecrit = bool(ecartes)
-        if not toutes_refusees:
-            marquer_documente(project_path, [t.id for t in tickets])
-            marqueur_ecrit = True
+        abandonnes = consigner_lot(project_path, [t.id for t in tickets], toutes_refusees)
+        marqueur_ecrit = True
 
         return ResultatDocumentation(
             fichiers_modifies=[*modifies, *fichiers_description],
@@ -275,6 +274,7 @@ class DocumentationService:
             marqueur_ecrit=marqueur_ecrit,
             tour_de_correction=tour_de_correction,
             ecartes=ecartes,
+            abandonnes=abandonnes,
         )
 
 

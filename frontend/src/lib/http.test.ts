@@ -64,7 +64,7 @@ describe("send", () => {
 
     await send("/projects").catch(() => undefined);
 
-    expect(window.localStorage.getItem("tessera.jeton")).toBeNull();
+    expect(window.sessionStorage.getItem("tessera.jeton")).toBeNull();
   });
 
   it("stops calling onJetonManquant once it is unregistered", async () => {

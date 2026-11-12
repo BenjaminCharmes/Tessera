@@ -9368,3 +9368,37 @@ error: Please commit or stash them.
 - 2026-11-12 10:12:04 UTC — [ticket-946] CHANGES_REQUESTED tour 3: Reviewer : 1. Critère 4, première moitié (« les fichiers de l'appel sont supprimés après la fin du processus ») : aucun test ne la couvre. `test_call_files_are_removed_after_close` utilise `LanceurEsp
 - 2026-11-12 10:12:04 UTC — [ticket-946] BLOCKED après 3 tour(s) sans approbation
 - 2026-11-12 10:12:08 UTC — [ide-core] file interrompue : ticket-946 non approuvé
+- 2026-11-12 09:32:22 UTC — [ide-core] ticket-941 PR #1067 confiée au CIWatcher
+- 2026-11-12 09:32:36 UTC — [ticket-942] branche ticket-942-an-app-squatting-port-5173-can-no-longer-pick-up
+- 2026-11-12 09:32:39 UTC — [ticket-942] tour 1 — codeur démarré
+- 2026-11-12 09:34:32 UTC — [ticket-942] tour 1 — codeur terminé (113360ms)
+- 2026-11-12 09:46:20 UTC — [ticket-942] testeur: dur�es : ruff 0 s, mypy 19 s, tsc 30 s, mypy-linux 29 s, eslint 67 s, vitest 207 s, pytest 705 s ; impact depuis base : suite compl�te
+- 2026-11-12 09:46:33 UTC — [ticket-942] securite: PASS — Le diff durcit la sécurité : le jeton passe en sessionStorage, l'héritage de loc (12641ms)
+- 2026-11-12 09:46:34 UTC — [ticket-942] configuration des tests modifiée : frontend/vite.config.ts
+- 2026-11-12 09:46:34 UTC — [ticket-942] tour 1 — reviewer démarré
+- 2026-11-12 09:46:56 UTC — [ticket-942] tour 1 — reviewer terminé (22671ms)
+- 2026-11-12 09:48:14 UTC — [ticket-942] validateur: fichiers cités joints : frontend/vite.config.ts, backend/tests/ (dossier, 485 fichiers, tronqué)
+- 2026-11-12 09:48:14 UTC — [ticket-942] validateur: APPROVED — All four functional objectives are met: `strictPort: true` binds port 5173 to pr (100030ms)
+- 2026-11-12 09:48:14 UTC — [ticket-942] APPROVED après 1 tour(s)
+- 2026-11-12 09:52:04 UTC — [ticket-942] documentation: 1 fichier(s) (224343ms) — après tour de correction
+- 2026-11-12 10:10:49 UTC — [ide-core] ticket-942 PR #1068 mergée (CI verte)
+- 2026-11-12 10:38:38 UTC — [ticket-940] branche ticket-940-a-documentation-batch-refused-twice-leaves-the-qu
+- 2026-11-12 10:38:42 UTC — [ticket-940] tour 1 — codeur démarré
+- 2026-11-12 10:42:29 UTC — [ticket-940] tour 1 — codeur terminé (226889ms)
+- 2026-11-12 10:43:31 UTC — [ticket-940] testeur: 1 failed, 307 passed, 8 warnings in 57.21s
+- 2026-11-12 10:43:31 UTC — [ticket-940] tests rouges au tour 1
+- 2026-11-12 10:43:31 UTC — [ticket-940] tour 2 — codeur démarré
+- 2026-11-12 10:44:09 UTC — [ticket-940] tour 2 — codeur terminé (37547ms)
+- 2026-11-12 10:44:51 UTC — [ticket-940] testeur: dur�es : ruff 0 s, pytest 39 s ; impact depuis base : 28 fichier(s) de test
+- 2026-11-12 10:44:51 UTC — [ticket-940] tests rouges au tour 2
+- 2026-11-12 10:44:51 UTC — [ticket-940] tour 3 — codeur démarré
+- 2026-11-12 10:45:13 UTC — [ticket-940] tour 3 — codeur terminé (20984ms)
+- 2026-11-12 10:45:48 UTC — [ticket-940] testeur: dur�es : ruff 0 s, mypy 9 s, mypy-linux 15 s, pytest 32 s ; impact depuis base : 28 fichier(s) de test
+- 2026-11-12 10:45:58 UTC — [ticket-940] securite: PASS — Je n'ai trouvé aucune faille de sécurité dans ce diff. Il ajoute un compteur de  (9765ms)
+- 2026-11-12 10:45:59 UTC — [ticket-940] tour 3 — reviewer démarré
+- 2026-11-12 10:46:23 UTC — [ticket-940] tour 3 — reviewer terminé (24030ms)
+- 2026-11-12 10:46:40 UTC — [ticket-940] validateur: fichiers cités joints : documentation.json, memory/pipeline-log.md (tronqué) ; non joints (budget épuisé) : documentation.py, documentation_selection.py
+- 2026-11-12 10:46:40 UTC — [ticket-940] validateur: APPROVED — Tous les critères d'acceptation du ticket 940 sont satisfaits. Les six tests cor (41750ms)
+- 2026-11-12 10:46:41 UTC — [ticket-940] APPROVED après 3 tour(s)
+- 2026-11-12 10:47:06 UTC — [ticket-940] leçons: une leçon proposée
+- 2026-11-12 10:48:14 UTC — [ticket-940] documentation: 0 fichier(s) (62500ms)
