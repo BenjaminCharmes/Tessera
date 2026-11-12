@@ -9402,3 +9402,17 @@ error: Please commit or stash them.
 - 2026-11-12 10:46:41 UTC — [ticket-940] APPROVED après 3 tour(s)
 - 2026-11-12 10:47:06 UTC — [ticket-940] leçons: une leçon proposée
 - 2026-11-12 10:48:14 UTC — [ticket-940] documentation: 0 fichier(s) (62500ms)
+- 2026-11-12 15:34:51 UTC — [ticket-950] branche ticket-950-documentation-refused-on-several-runs-in-a-row-ra
+- 2026-11-12 15:35:00 UTC — [ticket-950] tour 1 — codeur démarré
+- 2026-11-12 15:39:25 UTC — [ticket-950] tour 1 — codeur terminé (262484ms)
+- 2026-11-12 15:52:05 UTC — [ticket-950] testeur: 1 failed, 1245 passed, 8 warnings in 751.43s (0:12:31)
+- 2026-11-12 15:52:05 UTC — [ticket-950] tests rouges au tour 1
+- 2026-11-12 15:52:05 UTC — [ticket-950] tour 2 — codeur démarré
+- 2026-11-12 15:52:45 UTC — [ticket-950] tour 2 — codeur terminé (39437ms)
+- 2026-11-12 16:06:21 UTC — [ticket-950] testeur: dur�es : ruff 0 s, tsc 57 s, eslint 298 s, pytest 373 s, vitest 454 s ; impact depuis base : 100 fichier(s) de test
+- 2026-11-12 16:06:22 UTC — [ticket-950] tests rouges au tour 2
+- 2026-11-12 16:06:22 UTC — [ticket-950] tour 3 — codeur démarré
+- 2026-11-12 16:07:22 UTC — [ticket-950] tour 3 — codeur terminé (56578ms)
+- 2026-11-12 16:18:19 UTC — [ticket-950] testeur: 1 failed, 1245 passed, 8 warnings in 636.88s (0:10:36)
+- 2026-11-12 16:18:20 UTC — [ticket-950] tests rouges au tour 3
+- 2026-11-12 16:18:20 UTC — [ticket-950] BLOCKED après 3 tour(s) sans approbation
