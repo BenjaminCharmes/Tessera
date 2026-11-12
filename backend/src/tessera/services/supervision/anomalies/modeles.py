@@ -17,6 +17,7 @@ Regle = Literal[
     "cout_anormal",
     "tours_de_revue",
     "blocages_identiques",
+    "documentation_refusee_en_serie",
 ]
 
 Unite = Literal["appels", "s", "usd", "pourcent", "tours", "runs"]
@@ -93,3 +94,12 @@ class RunFini:
     ticket_id: str
     final_status: str | None
     arret: str | None
+
+
+@dataclass(frozen=True)
+class LotDoc:
+    """One `doc_updated` event, reduced to counts: never the text of a refusal."""
+
+    id: int
+    fichiers: int
+    refus: int

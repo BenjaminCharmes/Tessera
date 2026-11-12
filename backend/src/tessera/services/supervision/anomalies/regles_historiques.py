@@ -7,7 +7,7 @@ from collections.abc import Sequence
 from datetime import datetime
 from statistics import median
 
-from tessera.services.supervision.anomalies.modeles import Anomalie, Etape, RunFini
+from tessera.services.supervision.anomalies.modeles import Anomalie, Etape, LotDoc, RunFini
 
 
 def mediane_si_assez(echantillon: Sequence[float], minimum: int = 10) -> float | None:
@@ -188,5 +188,36 @@ def blocages_identiques(derniers: Sequence[RunFini]) -> Anomalie | None:
         message="Les deux derniers runs de ce ticket se sont bloqués pour la même cause.",
         mesure=2.0,
         seuil=2.0,
+        unite="runs",
+    )
+
+
+#: Lots de documentation consécutifs, tous refusés sans rien écrire, qui font un constat.
+LOTS_REFUSES_EN_SERIE = 3
+
+
+def documentation_refusee_en_serie(
+    lots: Sequence[LotDoc], *, ticket_id: str, serie: int = LOTS_REFUSES_EN_SERIE
+) -> Anomalie | None:
+    """The `serie` latest documentation batches all have a refusal and no changed file.
+
+    `lots` va du plus récent au plus ancien. La clé tient au lot le plus récent :
+    un épisode, qui se redit au prochain lot refusé.
+    """
+    if len(lots) < serie:
+        return None
+    derniers = lots[:serie]
+    if any(lot.refus < 1 or lot.fichiers > 0 for lot in derniers):
+        return None
+    return Anomalie(
+        regle="documentation_refusee_en_serie",
+        cle=f"documentation_refusee:{derniers[0].id}",
+        ticket_id=ticket_id,
+        message=(
+            f"Les {serie} derniers lots de documentation du projet ont tous été "
+            "refusés, sans aucun fichier modifié."
+        ),
+        mesure=float(serie),
+        seuil=float(serie),
         unite="runs",
     )
