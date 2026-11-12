@@ -9464,3 +9464,4 @@ error: Please commit or stash them.
 - 2026-11-12 17:54:29 UTC — [ticket-949] tour 3 — reviewer terminé (38625ms)
 - 2026-11-12 17:54:29 UTC — [ticket-949] CHANGES_REQUESTED tour 3: Reviewer : 1. La retenue ne survit pas à un redémarrage du backend. Au démarrage, en autonomie `merge`, `reprise_surveillance._reprendre_projet` reprend toutes les PR ouvertes. Elles viennent de deux 
 - 2026-11-12 17:54:29 UTC — [ticket-949] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-12 17:54:36 UTC — [ide-core] file interrompue : ticket-949 non approuvé
