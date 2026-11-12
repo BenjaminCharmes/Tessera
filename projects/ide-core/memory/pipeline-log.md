@@ -9346,3 +9346,16 @@ error: Please commit or stash them.
 - 2026-11-12 09:21:49 UTC — [ticket-941] APPROVED après 1 tour(s)
 - 2026-11-12 09:23:19 UTC — [ticket-941] documentation: 0 fichier(s) (72704ms)
 - 2026-11-12 09:23:19 UTC — [ticket-938] documentation: pas de diff retrouvable, non documenté
+- 2026-11-12 09:32:22 UTC — [ide-core] ticket-941 PR #1067 confiée au CIWatcher
+- 2026-11-12 09:32:36 UTC — [ticket-942] branche ticket-942-an-app-squatting-port-5173-can-no-longer-pick-up
+- 2026-11-12 09:32:39 UTC — [ticket-942] tour 1 — codeur démarré
+- 2026-11-12 09:34:32 UTC — [ticket-942] tour 1 — codeur terminé (113360ms)
+- 2026-11-12 09:46:20 UTC — [ticket-942] testeur: dur�es : ruff 0 s, mypy 19 s, tsc 30 s, mypy-linux 29 s, eslint 67 s, vitest 207 s, pytest 705 s ; impact depuis base : suite compl�te
+- 2026-11-12 09:46:33 UTC — [ticket-942] securite: PASS — Le diff durcit la sécurité : le jeton passe en sessionStorage, l'héritage de loc (12641ms)
+- 2026-11-12 09:46:34 UTC — [ticket-942] configuration des tests modifiée : frontend/vite.config.ts
+- 2026-11-12 09:46:34 UTC — [ticket-942] tour 1 — reviewer démarré
+- 2026-11-12 09:46:56 UTC — [ticket-942] tour 1 — reviewer terminé (22671ms)
+- 2026-11-12 09:48:14 UTC — [ticket-942] validateur: fichiers cités joints : frontend/vite.config.ts, backend/tests/ (dossier, 485 fichiers, tronqué)
+- 2026-11-12 09:48:14 UTC — [ticket-942] validateur: APPROVED — All four functional objectives are met: `strictPort: true` binds port 5173 to pr (100030ms)
+- 2026-11-12 09:48:14 UTC — [ticket-942] APPROVED après 1 tour(s)
+- 2026-11-12 09:52:04 UTC — [ticket-942] documentation: 1 fichier(s) (224343ms) — après tour de correction

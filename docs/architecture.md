@@ -1801,6 +1801,10 @@ En local, une liste vide désactive le contrôle. En CI, son absence bloque le
 merge — c'est intentionnel.
 
 
+## Isolation du jeton GitHub en CI (ticket-945)
+
+Le code d'une PR exécuté par la CI (tests, E2E) ne peut pas accéder au `GITHUB_TOKEN` du runner : chaque étape `actions/checkout` de `.github/workflows/ci.yml` porte `persist-credentials: false`, ce qui empêche le jeton de rester dans le `.git/config` du checkout.
+
 ## Détection de secrets dans les diffs (ticket-547)
 
 Avant de pousser une branche, `GitHubWorkflowService.open_pull_request()` vérifie que les lignes ajoutées ne contiennent pas de secrets reconnaissables — jetons, clés, identifiants. La détection est **déterministe**, sans appel LLM.

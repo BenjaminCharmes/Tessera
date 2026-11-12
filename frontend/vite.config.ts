@@ -19,6 +19,9 @@ export default defineConfig({
     },
   },
   server: {
+    // Port pris : le lancement échoue au lieu de glisser sur 5174, dont
+    // l'origine serait celle d'une autre page (ticket-942).
+    strictPort: true,
     proxy: {
       "/api": {
         target: "http://localhost:8100",

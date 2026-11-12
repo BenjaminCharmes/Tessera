@@ -53,7 +53,19 @@ function Show-Help {
     Write-Host ''
 }
 
+function Test-Port5173Libre {
+    # Un intrus sur 5173 aurait l'origine de l'interface (ticket-942).
+    $tenu = @(Get-NetTCPConnection -LocalPort 5173 -State Listen -ErrorAction SilentlyContinue)
+    if ($tenu.Count -gt 0) {
+        Write-Host "[KO] Le port 5173 est deja pris (PID $($tenu[0].OwningProcess)) : le liberer avant de lancer Vite." -ForegroundColor Red
+        return $false
+    }
+    Write-Host '[OK] Le port 5173 est libre.' -ForegroundColor Green
+    return $true
+}
+
 function Invoke-Doctor {
+    $null = Test-Port5173Libre
     Push-Location (Join-Path $Root 'backend')
     try { & uv run python -m tessera.doctor }
     finally { Pop-Location }

@@ -28,27 +28,28 @@ afterEach(() => {
 });
 
 describe("jetonDeSession", () => {
-  it("takes the token from the URL fragment, keeps it in localStorage and clears the fragment", async () => {
+  it("takes the token from the URL fragment, keeps it in sessionStorage only and clears the fragment", async () => {
     window.history.replaceState(null, "", "/#jeton=abc");
 
     await expect(auth.jetonDeSession()).resolves.toBe("abc");
 
-    expect(window.localStorage.getItem("tessera.jeton")).toBe("abc");
+    expect(window.sessionStorage.getItem("tessera.jeton")).toBe("abc");
+    expect(window.localStorage.length).toBe(0);
     expect(window.location.hash).toBe("");
   });
 
-  it("reads localStorage before anything else", async () => {
-    window.localStorage.setItem("tessera.jeton", "stocke");
+  it("reads sessionStorage before anything else", async () => {
+    window.sessionStorage.setItem("tessera.jeton", "stocke");
 
     await expect(auth.jetonDeSession()).resolves.toBe("stocke");
     expect(invokeSimule).not.toHaveBeenCalled();
   });
 
-  it("migrates a token found only in sessionStorage to localStorage", async () => {
-    window.sessionStorage.setItem("tessera.jeton", "ancien");
+  it("erases a token inherited in localStorage on load and does not use it", async () => {
+    window.localStorage.setItem("tessera.jeton", "herite");
 
-    await expect(auth.jetonDeSession()).resolves.toBe("ancien");
-    expect(window.localStorage.getItem("tessera.jeton")).toBe("ancien");
+    await expect(auth.jetonDeSession()).resolves.toBe("");
+    expect(window.localStorage.getItem("tessera.jeton")).toBeNull();
   });
 
   it("calls the Tauri command once for two reads", async () => {
@@ -81,12 +82,12 @@ describe("jetonEnCache, saisirJeton and oublierJeton", () => {
     auth.saisirJeton("  tape  ");
 
     expect(auth.jetonEnCache()).toBe("tape");
-    expect(window.localStorage.getItem("tessera.jeton")).toBe("tape");
+    expect(window.sessionStorage.getItem("tessera.jeton")).toBe("tape");
 
     auth.oublierJeton();
 
     expect(auth.jetonEnCache()).toBe("");
-    expect(window.localStorage.getItem("tessera.jeton")).toBeNull();
+    expect(window.sessionStorage.getItem("tessera.jeton")).toBeNull();
   });
 });
 
