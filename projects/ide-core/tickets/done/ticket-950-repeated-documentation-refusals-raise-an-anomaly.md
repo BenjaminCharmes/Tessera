@@ -6,7 +6,7 @@ estimated_days: 0.5
 id: ticket-950
 pr_number: null
 priority: high
-status: blocked
+status: done
 title: Documentation refused on several runs in a row raises an anomaly
 type: fix
 ---
@@ -61,3 +61,11 @@ Les données existent déjà : chaque lot de documentation émet un événement
 - Ne corrige rien : le détecteur observe sans gouverner (ADR-078).
 - Ne surveille pas les autres échecs répétés (CI rouge, services) : une
   règle par cas, quand il se présente.
+## Livraison
+
+Run bloqué au 3e tour par un seul test, sans lien avec le diff :
+`test_usage_stats_responds_in_under_two_seconds_on_fifty_thousand_rows`
+(6,5 s puis 5,8 s pour un seuil de 2 s, pendant que quatre files tournaient en
+parallèle). Vérifié à la main par la session ide-core le 12/11 : les tests des
+anomalies et `test_usage_stats.py` passent seuls (115), mypy, ruff, vitest,
+tsc et eslint aussi.
