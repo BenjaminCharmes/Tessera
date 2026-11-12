@@ -63,6 +63,9 @@ texte que tu as lu, par un texte nouveau :
 est refusée avec toutes les autres. Seule une édition qui **retire** un texte
 (`nouveau` vide) s'en passe.
 
+**L'extrait tient sur une seule ligne**, recopiée telle quelle, sans `...` ni
+ligne reformatée.
+
 Les nombres avec une unité (`5 Mo`), les `ADR-N`, les `ticket-N`, les numéros
 de migration, les formats en capitales (`GIF`) et les mots entre guillemets que
 ton texte introduit doivent figurer dans les tickets, le diff ou les fichiers

@@ -472,3 +472,40 @@ async def test_the_service_refuses_an_invented_token_twice(tmp_path: Path) -> No
 
     assert any("jeton vérifiable" in r for r in resultat.refus)
     assert (tmp_path / "docs" / "guide.md").read_text(encoding="utf-8") == "Avant.\n"
+
+
+_NL = chr(10)
+_FICHIER_PREUVE = "alpha = 1" + chr(10) + "non citee = 0" + chr(10) + "beta = 2" + chr(10) * 2 + "gamma = 3"
+
+
+def _controle_fichier() -> ControleDePreuve:
+    return ControleDePreuve(_matiere("x = 0", _FICHIER_PREUVE))
+
+
+def test_lines_of_one_block_separated_by_an_uncited_line_are_accepted() -> None:
+    _verifier(_controle_fichier(), _NL.join(["alpha = 1", "beta = 2", "gamma = 3"]))
+
+
+def test_the_refusal_names_the_missing_line() -> None:
+    with pytest.raises(EditionRefusee, match="delta = 4"):
+        _verifier(_controle_fichier(), _NL.join(["alpha = 1", "delta = 4"]))
+
+
+def test_lines_present_in_different_blocks_are_refused() -> None:
+    controle = ControleDePreuve(
+        MatiereCode(fichiers=[FichierLivre("a.py", "un = 1"), FichierLivre("b.py", "deux = 2")])
+    )
+    with pytest.raises(EditionRefusee, match="deux = 2"):
+        _verifier(controle, _NL.join(["un = 1", "deux = 2"]))
+
+
+def test_an_absent_single_line_extract_is_still_refused() -> None:
+    with pytest.raises(EditionRefusee, match="absente = 1"):
+        _verifier(_controle_fichier(), "absente = 1")
+
+
+@pytest.mark.parametrize("prompt", ["doc-technique.md", "doc-fonctionnelle.md"])
+def test_the_prompts_ask_for_a_single_line_extract(prompt: str) -> None:
+    racine = Path(__file__).resolve().parents[2]
+    texte = (racine / "agents" / "prompts" / prompt).read_text(encoding="utf-8")
+    assert "L'extrait tient sur une seule ligne" in texte
