@@ -9367,3 +9367,4 @@ error: Please commit or stash them.
 - 2026-11-12 10:12:03 UTC — [ticket-946] validateur: CHANGES_REQUESTED — Les critères testables (1–4) sont tous satisfaits : les tests couvrent la limite (39360ms)
 - 2026-11-12 10:12:04 UTC — [ticket-946] CHANGES_REQUESTED tour 3: Reviewer : 1. Critère 4, première moitié (« les fichiers de l'appel sont supprimés après la fin du processus ») : aucun test ne la couvre. `test_call_files_are_removed_after_close` utilise `LanceurEsp
 - 2026-11-12 10:12:04 UTC — [ticket-946] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-12 10:12:08 UTC — [ide-core] file interrompue : ticket-946 non approuvé
