@@ -9510,3 +9510,4 @@ error: Please commit or stash them.
 - 2026-11-12 18:43:23 UTC — [ticket-958] validateur: CHANGES_REQUESTED — Le run n'a produit aucun code : les trois tours ont échoué car le garde-fou a re (19203ms)
 - 2026-11-12 18:43:23 UTC — [ticket-958] CHANGES_REQUESTED tour 3: Reviewer : 1. Aucun des cinq critères d'acceptation n'est rempli. Le diff ne contient ni le contrôle des dépendances en mode single dans routers/orchestrator.py, ni le module de contrôle, ni aucun des
 - 2026-11-12 18:43:23 UTC — [ticket-958] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-12 18:43:28 UTC — [ide-core] file interrompue : ticket-958 non approuvé
