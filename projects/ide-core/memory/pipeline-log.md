@@ -9432,3 +9432,4 @@ error: Please commit or stash them.
 - 2026-11-12 16:44:37 UTC — [ticket-952] tour 2 — reviewer terminé (33014ms)
 - 2026-11-12 16:44:37 UTC — [ticket-952] APPROVED après 2 tour(s)
 - 2026-11-12 16:45:41 UTC — [ticket-952] leçons: une leçon proposée
+- 2026-11-12 16:49:43 UTC — [ticket-952] documentation: 2 fichier(s) (236061ms)
