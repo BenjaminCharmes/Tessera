@@ -9344,3 +9344,5 @@ error: Please commit or stash them.
 - 2026-11-12 09:21:49 UTC — [ticket-941] validateur: fichiers cités joints : .git/config, backend/src/tessera (dossier, 11 fichiers)
 - 2026-11-12 09:21:49 UTC — [ticket-941] validateur: APPROVED — Tous les critères du ticket-941 sont satisfaits. Le codeur a créé un point uniqu (50922ms)
 - 2026-11-12 09:21:49 UTC — [ticket-941] APPROVED après 1 tour(s)
+- 2026-11-12 09:23:19 UTC — [ticket-941] documentation: 0 fichier(s) (72704ms)
+- 2026-11-12 09:23:19 UTC — [ticket-938] documentation: pas de diff retrouvable, non documenté
