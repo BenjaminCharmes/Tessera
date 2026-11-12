@@ -68,6 +68,9 @@ code, pas ta phrase. Une édition sans `preuve`, ou dont un extrait n'existe pas
 dans ce qu'on t'a donné, est refusée avec toutes les autres. Seule une édition
 qui **retire** un texte (`nouveau` vide) s'en passe.
 
+**L'extrait tient sur une seule ligne**, recopiée telle quelle, sans `...` ni
+ligne reformatée.
+
 Les nombres avec une unité (`5 Mo`), les formats en capitales (`GIF`), les
 numéros de migration et les mots entre guillemets que ton texte introduit
 doivent figurer dans les tickets, le diff ou les fichiers fournis — pas

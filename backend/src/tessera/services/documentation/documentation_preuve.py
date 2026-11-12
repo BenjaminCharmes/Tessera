@@ -101,6 +101,20 @@ def _blocs_de_preuve(matiere: MatiereCode) -> list[str]:
     return [aplatir(bloc) for bloc in blocs]
 
 
+def _ligne_absente(extrait: str, blocs: list[str]) -> str | None:
+    """First line of ``extrait`` missing from every block that holds all the others.
+
+    Each non-empty line, flattened, must sit in one same block; ``None`` if so.
+    """
+    lignes = [plat for plat in (aplatir(ligne) for ligne in extrait.splitlines()) if plat]
+    candidats = blocs
+    for ligne in lignes:
+        candidats = [bloc for bloc in candidats if ligne in bloc]
+        if not candidats:
+            return ligne
+    return None
+
+
 def fichiers_de_la_matiere(matiere: MatiereCode) -> list[str]:
     """Every file the agent was given, shown or not, sorted and without duplicates."""
     noms: set[str] = set(matiere.fichiers_non_montres)
@@ -178,11 +192,13 @@ class ControleDePreuve:
                     f"{chemin} : règle « preuve » — chaque entrée porte `fichier` et "
                     "`extrait`, tous deux non vides."
                 )
-            plat = aplatir(extrait)
-            if not any(plat in bloc for bloc in self._blocs):
+            manquante = _ligne_absente(extrait, self._blocs)
+            if manquante is not None:
                 raise EditionRefusee(
-                    f"{chemin} : règle « preuve » — l'extrait « {extrait.strip()[:60]} » "
-                    f"({fichier}) n'est ni dans le diff ni dans les fichiers fournis."
+                    f"{chemin} : règle « preuve » — la ligne « {manquante[:120]} » de "
+                    f"l'extrait « {extrait.strip()[:60]} » ({fichier}) n'est ni dans le "
+                    "diff ni dans les fichiers fournis, ou pas dans le même bloc que les "
+                    "autres lignes. Cite une seule ligne, recopiée à l'identique."
                 )
 
     def _jetons_nouveaux(self, edition: dict[str, object], chemin: str) -> None:

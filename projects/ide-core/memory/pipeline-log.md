@@ -9433,3 +9433,14 @@ error: Please commit or stash them.
 - 2026-11-12 16:44:37 UTC — [ticket-952] APPROVED après 2 tour(s)
 - 2026-11-12 16:45:41 UTC — [ticket-952] leçons: une leçon proposée
 - 2026-11-12 16:49:43 UTC — [ticket-952] documentation: 2 fichier(s) (236061ms)
+- 2026-11-12 16:50:45 UTC — [ide-core] ticket-952 PR #1080 confiée au CIWatcher
+- 2026-11-12 16:50:51 UTC — [ticket-953] branche ticket-953-a-documentation-proof-extract-is-checked-line-by
+- 2026-11-12 16:50:55 UTC — [ticket-953] tour 1 — codeur démarré
+- 2026-11-12 16:54:14 UTC — [ticket-953] tour 1 — codeur terminé (199046ms)
+- 2026-11-12 16:55:16 UTC — [ticket-953] testeur: dur�es : ruff 0 s, mypy 13 s, mypy-linux 23 s, pytest 57 s ; impact depuis base : 22 fichier(s) de test
+- 2026-11-12 16:55:31 UTC — [ticket-953] securite: PASS — Le diff porte uniquement sur la façon de comparer un extrait de preuve dans le s (14453ms)
+- 2026-11-12 16:55:32 UTC — [ticket-953] tour 1 — reviewer démarré
+- 2026-11-12 16:55:53 UTC — [ticket-953] tour 1 — reviewer terminé (21139ms)
+- 2026-11-12 16:56:05 UTC — [ticket-953] validateur: APPROVED — Les six critères d'acceptation sont tous satisfaits. Le ticket ajoute la fonctio (33406ms)
+- 2026-11-12 16:56:06 UTC — [ticket-953] APPROVED après 1 tour(s)
+- 2026-11-12 16:58:36 UTC — [ticket-953] documentation: 0 fichier(s) (146156ms)
