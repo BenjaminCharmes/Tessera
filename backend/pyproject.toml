@@ -38,7 +38,9 @@ no-binary-package = ["mypy"]
 # Même blocage pour la DLL de rpds-py 2026.9.1 (2026-10-12) : la chaîne
 # claude_agent_sdk → mcp → jsonschema → referencing → rpds ne s'importe plus.
 # 2026.6.3 passe ; un `uv lock --upgrade` ne doit pas la remplacer.
-constraint-dependencies = ["rpds-py==2026.6.3"]
+# Le 12/11, la DLL de pydantic-core 2.50.4 (pydantic 2.14.3) est refusée à son
+# tour ; 2.50.2 passe (ticket-939).
+constraint-dependencies = ["rpds-py==2026.6.3", "pydantic-core==2.50.2"]
 
 [build-system]
 requires = ["hatchling"]
