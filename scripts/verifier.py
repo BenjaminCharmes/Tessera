@@ -64,7 +64,10 @@ class Step:
 
 def pytest_command() -> list[str]:
     """Return the pytest command, spread over several workers when xdist is installed."""
-    cmd = [_PYTHON, "-m", "pytest", "-q", "-x", "-m", "not integration"]
+    # Les tests chronométrés (`perf`) mesurent le temps de la machine : sous
+    # plusieurs files en parallèle, ils échouaient sans lien avec le diff
+    # (ticket-956). La CI GitHub, seule sur son runner, les garde.
+    cmd = [_PYTHON, "-m", "pytest", "-q", "-x", "-m", "not integration and not perf"]
     # Sans xdist (environnement synchronisé sans l'extra `dev`), la suite
     # tourne en série plutôt que d'échouer sur une option inconnue.
     if importlib.util.find_spec("xdist") is not None:

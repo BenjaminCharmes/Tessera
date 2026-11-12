@@ -287,6 +287,7 @@ async def test_totals_run_count_excludes_queue_and_autonomous_rows(
     assert "s1" in ids
 
 
+@pytest.mark.perf
 async def test_usage_stats_responds_in_under_two_seconds_on_fifty_thousand_rows(
     tmp_path: Path,
 ) -> None:

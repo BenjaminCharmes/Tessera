@@ -199,6 +199,16 @@ def test_pytest_runs_on_several_workers_when_xdist_is_installed() -> None:
     assert cmd[cmd.index("-n") + 1] == "8"
 
 
+def test_pytest_skips_integration_and_timing_tests() -> None:
+    """The pipeline tester runs beside other queues: timing tests stay in CI."""
+    from verifier import pytest_command
+
+    cmd = pytest_command()
+
+    marqueurs = cmd[cmd.index("-m", cmd.index("pytest")) + 1]
+    assert marqueurs == "not integration and not perf"
+
+
 def test_pytest_runs_serially_when_xdist_is_missing() -> None:
     from verifier import pytest_command
 
