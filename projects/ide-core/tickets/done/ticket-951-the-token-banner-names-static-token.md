@@ -33,12 +33,20 @@ Le texte du bandeau donne les deux cas : avec `STATIC_TOKEN`, c'est sa
 valeur ; sinon, le fichier tiré au démarrage. Il dit aussi que la saisie vaut
 jusqu'à la fermeture de l'onglet.
 
+Pour ne pas ressaisir le jeton chaque jour (demande de Benjamin), le champ se
+déclare mot de passe (`autocomplete="current-password"`, identifiant fixe
+`tessera`) : le gestionnaire du navigateur propose de l'enregistrer et le
+remplit au prochain onglet. Le jeton reste dans le coffre du navigateur,
+jamais en `localStorage` : la protection du ticket-942 tient.
+
 ## Critères d'acceptation
 
 - [x] Après un 401, le bandeau nomme `STATIC_TOKEN` et les deux chemins du
       fichier (test vitest).
 - [x] Il dit que le jeton est gardé jusqu'à la fermeture de l'onglet (test
       vitest).
+- [x] Le champ porte `autocomplete="current-password"` et le formulaire un
+      identifiant `username` fixe (test vitest).
 
 ## Ce que ça ne fait pas
 

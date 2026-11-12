@@ -45,6 +45,18 @@ describe("BandeauJeton", () => {
     );
   });
 
+  it("declares a username and a current-password field for the browser vault", async () => {
+    render(<BandeauJeton />);
+
+    await provoquerUn401();
+
+    const champ = screen.getByLabelText("Jeton de session");
+    expect(champ.getAttribute("autocomplete")).toBe("current-password");
+    const formulaire = screen.getByRole("alert");
+    const identifiant = formulaire.querySelector('input[autocomplete="username"]');
+    expect(identifiant?.getAttribute("value")).toBe("tessera");
+  });
+
   it("hands the typed token to the session and hides itself", async () => {
     render(<BandeauJeton />);
     await provoquerUn401();
