@@ -7,6 +7,7 @@ et `ask_user` au protocole de contrôle, branché sur ce transport.
 """
 import sys
 from collections.abc import Callable
+from pathlib import Path
 
 from anyio.abc import Process
 from anyio.streams.text import TextReceiveStream, TextSendStream
@@ -16,6 +17,7 @@ from claude_agent_sdk._internal.transport.subprocess_cli import SubprocessCLITra
 from claude_agent_sdk._version import __version__
 
 from tessera.config import settings
+from tessera.services.providers.fichiers_appel import creer_dossier_d_appel, deporter_les_valeurs, supprimer_dossier_d_appel
 from tessera.services.providers.lanceur_agent import LanceurAgent
 from tessera.services.providers.noms import ProviderIndisponible
 from tessera.utils.logger import get_logger
@@ -67,6 +69,7 @@ class TransportCompteAgent(SubprocessCLITransport):
         self._lanceur = lanceur
         self._compte = compte
         self._mot_de_passe = mot_de_passe
+        self._dossier_d_appel: Path | None = None
 
     async def connect(self) -> None:
         if self._process:
@@ -83,14 +86,28 @@ class TransportCompteAgent(SubprocessCLITransport):
         }
         if self._cwd:
             env["PWD"] = self._cwd
-        commande = self._build_command()
-        _logger.info("agent_lance_sous_compte", extra={"compte": self._compte})
-        process: Process = await self._lanceur.lancer(
-            commande, compte=self._compte, mot_de_passe=self._mot_de_passe,
-            env=env, cwd=self._cwd, avec_stderr=self._options.stderr is not None,
-        )
+        self._dossier_d_appel = await creer_dossier_d_appel(self._compte)
+        try:
+            commande = deporter_les_valeurs(self._build_command(), self._dossier_d_appel)
+            _logger.info("agent_lance_sous_compte", extra={"compte": self._compte})
+            process: Process = await self._lanceur.lancer(
+                commande, compte=self._compte, mot_de_passe=self._mot_de_passe,
+                env=env, cwd=self._cwd, avec_stderr=self._options.stderr is not None,
+            )
+        except BaseException:
+            supprimer_dossier_d_appel(self._dossier_d_appel)
+            self._dossier_d_appel = None
+            raise
         self._brancher(process)
         _annoncer_le_pid(self._au_demarrage, process.pid)
+
+    async def close(self) -> None:
+        """Closes the CLI, then removes the call's files."""
+        try:
+            await super().close()
+        finally:
+            supprimer_dossier_d_appel(self._dossier_d_appel)
+            self._dossier_d_appel = None
 
     def _brancher(self, process: Process) -> None:
         """Wires the streams as the parent class does after its own spawn."""
