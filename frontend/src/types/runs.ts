@@ -95,7 +95,8 @@ export type RegleAnomalie =
   | "silence"
   | "cout_anormal"
   | "tours_de_revue"
-  | "blocages_identiques";
+  | "blocages_identiques"
+  | "documentation_refusee_en_serie";
 
 /** Une anomalie relevée sur un run, telle que `run_anomaly` la porte. Jamais l'`input` d'un outil. */
 export interface Anomalie {

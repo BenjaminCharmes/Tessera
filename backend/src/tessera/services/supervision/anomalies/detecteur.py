@@ -22,7 +22,14 @@ from tessera.services.supervision.anomalies import lecture_evenements, lecture_h
 from tessera.services.supervision.anomalies.etapes import ETAPES_SILENCIEUSES, etapes_depuis
 from tessera.services.supervision.anomalies.modeles import Anomalie, Etape
 from tessera.services.supervision.anomalies.regles_directes import outil_repete, silence, tours_de_revue
-from tessera.services.supervision.anomalies.regles_historiques import blocages_identiques, cout_budget, cout_median, etape_longue, mediane_si_assez
+from tessera.services.supervision.anomalies.regles_historiques import (
+    blocages_identiques,
+    cout_budget,
+    cout_median,
+    documentation_refusee_en_serie,
+    etape_longue,
+    mediane_si_assez,
+)
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -123,6 +130,10 @@ class DetecteurDAnomalies:
                 )
             constats.extend(await self._constats_de_cout(run, ticket))
             constats.append(await self._constat_de_blocages(run, ticket))
+            lots = await lecture_historique.derniers_lots_de_documentation(
+                base, run.project_id
+            )
+            constats.append(documentation_refusee_en_serie(lots, ticket_id=ticket))
 
         constats.append(self._constat_de_silence(run, maintenant, ticket, ouvertes, medianes_armees))
         if ticket:

@@ -3,13 +3,14 @@
 Le second des deux fichiers du détecteur à toucher SQLite, en lecture seule.
 Chaque lecture est bornée : jamais toute la table `agent_events`.
 """
+import json
 from datetime import datetime
 from pathlib import Path
 from typing import Any
 
 from tessera.services.supervision.anomalies.etapes import etapes_depuis, types_de_l_etape
 from tessera.services.supervision.anomalies.lecture_base import ouvrir_en_lecture
-from tessera.services.supervision.anomalies.modeles import EvenementLu, LigneOuverte, RunFini
+from tessera.services.supervision.anomalies.modeles import EvenementLu, LigneOuverte, LotDoc, RunFini
 
 #: Lignes lues par type d'événement : de quoi couvrir 20 étapes, sans la table entière.
 BORNE_PAR_TYPE = 200
@@ -114,3 +115,36 @@ async def derniers_runs_finis(
     async with ouvrir_en_lecture(db_path) as db:
         async with db.execute(requete, (project_id, ticket_id, n)) as curseur:
             return [RunFini(*ligne) for ligne in await curseur.fetchall()]
+
+
+async def derniers_lots_de_documentation(
+    db_path: Path | str, project_id: str, n: int = 3
+) -> list[LotDoc]:
+    """The `n` latest `doc_updated` events of the project, newest first.
+
+    Seuls les comptes sortent de la lecture : le texte d'un refus n'y passe pas.
+    """
+    requete = """
+        SELECT e.id, e.data_json FROM agent_events e JOIN pipeline_runs r ON r.id = e.run_id
+        WHERE r.project_id = ? AND e.type = 'doc_updated'
+        ORDER BY e.id DESC LIMIT ?
+    """
+    async with ouvrir_en_lecture(db_path) as db:
+        async with db.execute(requete, (project_id, n)) as curseur:
+            lignes = await curseur.fetchall()
+    return [_lot(int(ligne[0]), ligne[1]) for ligne in lignes]
+
+
+def _lot(id_: int, data_json: str | None) -> LotDoc:
+    try:
+        donnees = json.loads(data_json or "{}")
+    except ValueError:
+        donnees = {}
+    if not isinstance(donnees, dict):
+        donnees = {}
+    fichiers, refus = donnees.get("fichiers"), donnees.get("refus")
+    return LotDoc(
+        id_,
+        len(fichiers) if isinstance(fichiers, list) else 0,
+        len(refus) if isinstance(refus, list) else 0,
+    )

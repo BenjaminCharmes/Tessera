@@ -8,6 +8,7 @@ export const LIBELLES_REGLE: Record<RegleAnomalie, string> = {
   cout_anormal: "coût anormal",
   tours_de_revue: "dernier tour de revue",
   blocages_identiques: "blocages identiques",
+  documentation_refusee_en_serie: "documentation refusée en série",
 };
 
 /** Le libellé d'une règle ; une règle que ce client ne connaît pas se rend avec son identifiant brut. */
