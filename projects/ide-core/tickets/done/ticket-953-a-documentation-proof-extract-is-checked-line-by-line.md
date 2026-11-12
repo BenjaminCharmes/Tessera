@@ -4,7 +4,7 @@ created: 2026-11-12
 depends_on: []
 estimated_days: 0.5
 id: ticket-953
-pr_number: null
+pr_number: 1081
 priority: high
 status: done
 title: A documentation proof extract is checked line by line, and a refusal says which
