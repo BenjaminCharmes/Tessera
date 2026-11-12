@@ -9444,3 +9444,23 @@ error: Please commit or stash them.
 - 2026-11-12 16:56:05 UTC — [ticket-953] validateur: APPROVED — Les six critères d'acceptation sont tous satisfaits. Le ticket ajoute la fonctio (33406ms)
 - 2026-11-12 16:56:06 UTC — [ticket-953] APPROVED après 1 tour(s)
 - 2026-11-12 16:58:36 UTC — [ticket-953] documentation: 0 fichier(s) (146156ms)
+- 2026-11-12 17:11:05 UTC — [ide-core] ticket-954 PR #1083 confiée au CIWatcher
+- 2026-11-12 17:04:42 UTC — [ide-core] ticket-953 PR #1081 mergée (CI verte)
+- 2026-11-12 17:11:30 UTC — [ticket-949] branche ticket-949-a-ticket-that-needs-a-real-proof-stops-at-its-pr
+- 2026-11-12 17:11:40 UTC — [ticket-949] tour 1 — codeur démarré
+- 2026-11-12 17:14:04 UTC — [ticket-949] tour 1 — codeur terminé (142734ms)
+- 2026-11-12 17:24:14 UTC — [ticket-949] testeur: 2 failed, 1013 passed, 32 warnings in 602.98s (0:10:02)
+- 2026-11-12 17:24:14 UTC — [ticket-949] tests rouges au tour 1
+- 2026-11-12 17:24:14 UTC — [ticket-949] tour 2 — codeur démarré
+- 2026-11-12 17:26:49 UTC — [ticket-949] tour 2 — codeur terminé (154968ms)
+- 2026-11-12 17:39:42 UTC — [ticket-949] testeur: dur�es : ruff 0 s, tsc 26 s, eslint 38 s, vitest 203 s, pytest 768 s ; impact depuis base : 194 fichier(s) de test
+- 2026-11-12 17:39:43 UTC — [ticket-949] tests rouges au tour 2
+- 2026-11-12 17:39:43 UTC — [ticket-949] tour 3 — codeur démarré
+- 2026-11-12 17:40:52 UTC — [ticket-949] tour 3 — codeur terminé (68906ms)
+- 2026-11-12 17:53:35 UTC — [ticket-949] testeur: dur�es : ruff 1 s, mypy 61 s, tsc 68 s, mypy-linux 26 s, eslint 74 s, vitest 235 s, pytest 739 s ; impact depuis base : 194 fichier(s) de test
+- 2026-11-12 17:53:49 UTC — [ticket-949] securite: PASS — PASS : aucune faille CRITICAL ou HIGH. Le diff ajoute une garde qui empêche le m (13421ms)
+- 2026-11-12 17:53:50 UTC — [ticket-949] tour 3 — reviewer démarré
+- 2026-11-12 17:54:18 UTC — [ticket-949] validateur: APPROVED — Tous les critères sont satisfaits. Le champ `preuve_reelle: bool = False` est aj (28139ms)
+- 2026-11-12 17:54:29 UTC — [ticket-949] tour 3 — reviewer terminé (38625ms)
+- 2026-11-12 17:54:29 UTC — [ticket-949] CHANGES_REQUESTED tour 3: Reviewer : 1. La retenue ne survit pas à un redémarrage du backend. Au démarrage, en autonomie `merge`, `reprise_surveillance._reprendre_projet` reprend toutes les PR ouvertes. Elles viennent de deux 
+- 2026-11-12 17:54:29 UTC — [ticket-949] BLOCKED après 3 tour(s) sans approbation
