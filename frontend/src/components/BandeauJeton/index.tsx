@@ -47,8 +47,9 @@ export default function BandeauJeton() {
         Valider
       </Button>
       <span className="text-xs text-amber-200">
-        Le backend l'écrit dans <code>{CHEMIN_JETON_WINDOWS}</code> (Windows) ou{" "}
-        <code>{CHEMIN_JETON_AUTRE}</code>.
+        Avec <code>STATIC_TOKEN</code> défini, c'est sa valeur. Sinon, le backend
+        l'écrit dans <code>{CHEMIN_JETON_WINDOWS}</code> (Windows) ou{" "}
+        <code>{CHEMIN_JETON_AUTRE}</code>. Gardé jusqu'à la fermeture de l'onglet.
       </span>
     </form>
   );

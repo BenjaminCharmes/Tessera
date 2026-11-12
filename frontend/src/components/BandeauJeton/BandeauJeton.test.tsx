@@ -34,6 +34,17 @@ describe("BandeauJeton", () => {
     expect(screen.getByText(CHEMIN_JETON_AUTRE)).toBeTruthy();
   });
 
+  it("names STATIC_TOKEN and says the token lasts until the tab closes", async () => {
+    render(<BandeauJeton />);
+
+    await provoquerUn401();
+
+    expect(screen.getByText("STATIC_TOKEN")).toBeTruthy();
+    expect(screen.getByRole("alert").textContent).toContain(
+      "Gardé jusqu'à la fermeture de l'onglet",
+    );
+  });
+
   it("hands the typed token to the session and hides itself", async () => {
     render(<BandeauJeton />);
     await provoquerUn401();
