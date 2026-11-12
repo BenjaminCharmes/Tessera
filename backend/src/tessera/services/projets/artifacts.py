@@ -25,6 +25,7 @@ import asyncio
 from pathlib import Path
 from typing import Literal
 
+from tessera.services.noyau.git_commande import build_command
 from tessera.services.projets.manifeste import ecrire_clef, lire_manifeste
 
 ArtifactMode = Literal["tracked", "local"]
@@ -133,7 +134,7 @@ async def tracked_artifact_paths(project_path: Path) -> list[str]:
     `git rm --cached`, qui se propose — il ne se fait pas en silence.
     """
     proc = await asyncio.create_subprocess_exec(
-        "git", "ls-files", "--", *ARTIFACT_PATHS,
+        *build_command(("ls-files", "--", *ARTIFACT_PATHS)),
         cwd=str(project_path),
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,

@@ -11,6 +11,7 @@ from collections import Counter
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from tessera.services.noyau.git_commande import build_command
 from tessera.utils.logger import get_logger
 
 if TYPE_CHECKING:
@@ -92,7 +93,7 @@ class CarteDuDepot:
         """
         try:
             proc = await asyncio.create_subprocess_exec(
-                "git", "ls-files", "-z",
+                *build_command(("ls-files", "-z")),
                 cwd=str(self._racine),
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,

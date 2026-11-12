@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services.pipeline.pipeline_empreinte import empreinte, sans_sections_de_branche
+from tessera.services.pipeline.pipeline_empreinte import empreinte, entrees_de_config
 
 _IDENTITE = ["-c", "user.name=Test", "-c", "user.email=test@example.com"]
 
@@ -56,16 +56,42 @@ async def test_a_key_outside_branch_sections_still_changes_the_fingerprint(
     assert await empreinte(_Orch(depot)) != avant  # type: ignore[arg-type]
 
 
-def test_branch_sections_are_dropped_and_the_rest_is_kept() -> None:
-    contenu = (
-        b'[core]\n\tbare = false\n'
-        b'[branch "a"]\n\tremote = origin\n\tmerge = refs/heads/a\n'
-        b'[remote "origin"]\n\turl = https://example.com/r.git\n'
-        b'  [branch "b"]\n\tremote = origin\n'
-        b'[filter "x"]\n\tclean = cat\n'
+def _config(depot: Path) -> Path:
+    return depot / ".git" / "config"
+
+
+async def test_a_key_hidden_on_a_branch_header_line_changes_the_fingerprint(depot: Path) -> None:
+    avant = await empreinte(_Orch(depot))  # type: ignore[arg-type]
+    with _config(depot).open("a", encoding="utf-8") as f:
+        f.write('[branch "x"] [core]\n\tfsmonitor = echo-injected\n')
+    assert await empreinte(_Orch(depot)) != avant  # type: ignore[arg-type]
+
+
+async def test_an_include_on_a_branch_header_line_and_its_target_change_the_fingerprint(
+    depot: Path,
+) -> None:
+    cible = _config(depot).parent / "cfg"
+    cible.write_text("[user]\n\tname = a\n", encoding="utf-8")
+    avant = await empreinte(_Orch(depot))  # type: ignore[arg-type]
+    with _config(depot).open("a", encoding="utf-8") as f:
+        f.write('[branch "x"] [include]\n\tpath = cfg\n')
+    inclus = await empreinte(_Orch(depot))  # type: ignore[arg-type]
+    assert inclus != avant
+    cible.write_text("[core]\n\tfsmonitor = echo-injected\n", encoding="utf-8")
+    assert await empreinte(_Orch(depot)) != inclus  # type: ignore[arg-type]
+
+
+async def test_branch_remote_and_merge_changes_keep_the_fingerprint(depot: Path) -> None:
+    avant = await empreinte(_Orch(depot))  # type: ignore[arg-type]
+    _git(depot, "config", "branch.main.remote", "origin")
+    _git(depot, "config", "branch.main.merge", "refs/heads/main")
+    assert await empreinte(_Orch(depot)) == avant  # type: ignore[arg-type]
+
+
+def test_entrees_de_config_leaves_branch_keys_out(tmp_path: Path) -> None:
+    fichier = tmp_path / "config"
+    fichier.write_text(
+        '[core]\n\tbare = false\n[branch "a"]\n\tremote = origin\n\tmerge = m\n',
+        encoding="utf-8",
     )
-    assert sans_sections_de_branche(contenu) == (
-        b'[core]\n\tbare = false\n'
-        b'[remote "origin"]\n\turl = https://example.com/r.git\n'
-        b'[filter "x"]\n\tclean = cat\n'
-    )
+    assert entrees_de_config(fichier) == b"core.bare\nfalse"

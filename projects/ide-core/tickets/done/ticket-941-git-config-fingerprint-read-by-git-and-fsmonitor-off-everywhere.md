@@ -4,10 +4,11 @@ created: 2026-11-12
 depends_on: []
 estimated_days: 1
 id: ticket-941
-pr_number: null
+pr_number: 1067
 priority: high
-status: todo
-title: "The git config fingerprint is read by git itself, and every backend git call neutralises fsmonitor"
+status: done
+title: The git config fingerprint is read by git itself, and every backend git call
+  neutralises fsmonitor
 type: fix
 ---
 

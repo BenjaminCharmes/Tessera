@@ -10,6 +10,8 @@ from dataclasses import dataclass
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
+from tessera.services.noyau.git_commande import build_command
+
 _TITRE_ADR = re.compile(r"^##\s+(ADR-\d+)\b", re.MULTILINE)
 _NUMERO_ADR = re.compile(r"ADR-\d+(?!\d)")
 _DATE = re.compile(r"\b(\d{4}-\d{2}-\d{2})\b")
@@ -84,7 +86,7 @@ def journal(projet: Path) -> tuple[int, str | None]:
 def _dernier_commit(projet: Path, chemin: Path) -> datetime | None:
     try:
         sortie = subprocess.run(
-            ["git", "log", "-1", "--format=%cI", "--", chemin.relative_to(projet).as_posix()],
+            build_command(("log", "-1", "--format=%cI", "--", chemin.relative_to(projet).as_posix())),
             cwd=projet, capture_output=True, text=True, timeout=30, check=False,
         ).stdout.strip()
         return datetime.fromisoformat(sortie) if sortie else None

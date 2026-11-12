@@ -18,6 +18,7 @@ from pathlib import Path
 
 from tessera.config import settings
 from tessera.config_coffre import noms_en_clair, source_effective
+from tessera.services.noyau.git_commande import build_command
 
 _BACKEND_PORT = 8100
 _FRONTEND_PORT = 5173
@@ -209,7 +210,7 @@ def _git(repo: Path, *args: str) -> tuple[int, str]:
     """Run a read-only git command; a missing binary or a timeout reads as a failure."""
     try:
         done = subprocess.run(
-            ["git", "-C", str(repo), *args],
+            build_command(("-C", str(repo), *args)),
             capture_output=True,
             text=True,
             timeout=_GIT_TIMEOUT_S,

@@ -17,6 +17,7 @@ from pydantic import BaseModel
 from tessera.models.project import Project
 from tessera.models.ticket import TicketStatus
 from tessera.services.gardes.politique_run import PolitiqueRun
+from tessera.services.noyau.git_commande import build_command
 from tessera.services.projets.online_declaration import StripeMode, read_online_declaration
 from tessera.services.projets.racine_depot import declare_ancestor, depot_au_dessus, depot_le_plus_proche
 from tessera.services.projets.ticket_service import _STATUS_DIRS
@@ -182,7 +183,7 @@ def _signature(project_path: Path) -> _Signature:
 async def _git_dates(project_path: Path, *args: str) -> list[str]:
     """Les lignes de `git log` pour ce dossier ; liste vide sans dépôt."""
     proc = await asyncio.create_subprocess_exec(
-        "git", "log", *args, "--format=%cI", "--", ".",
+        *build_command(("log", *args, "--format=%cI", "--", ".")),
         cwd=str(project_path),
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.DEVNULL,

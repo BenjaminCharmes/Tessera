@@ -13,11 +13,13 @@ La liste ne copie pas `chemins_proteges.py` : on énumère des candidats bornés
 import asyncio
 import hashlib
 import re
+import subprocess
 from collections.abc import Awaitable
 from pathlib import Path
 from typing import TYPE_CHECKING, TypeVar
 
 from tessera.services.git_workspace.git_runner import git
+from tessera.services.noyau.git_commande import build_command
 from tessera.services.noyau.pipeline_events import PipelineResult
 from tessera.services.pipeline.pipeline_contraintes import bloquer
 from tessera.services.pipeline.pipeline_run import PipelineRun
@@ -80,28 +82,32 @@ def _candidats_git(dossier: Path) -> list[Path]:
     return [dossier / "config", dossier / "config.worktree", *_fichiers_sous(dossier / "hooks")]
 
 
-#: Une section de `.git/config` qui n'exécute rien et que git, l'IDE ou une
-#: session humaine réécrivent sans cesse (`push -u`, `vscode-merge-base`).
-_SECTION_DE_BRANCHE = re.compile(rb'^\s*\[branch\s+"')
-_ENTETE = re.compile(rb"^\s*\[")
+#: Clés de branche que git, l'IDE ou une session humaine réécrivent sans cesse
+#: (`push -u`, `vscode-merge-base`) et qui n'exécutent rien (ticket-937).
+_CLE_DE_BRANCHE = re.compile(r"^branch\..+\.(remote|merge|rebase|vscode-merge-base)$")
 
 
-def sans_sections_de_branche(contenu: bytes) -> bytes:
-    """A git config without its `[branch "…"]` sections — ticket-937.
+def _est_cle_de_branche(entree: bytes) -> bool:
+    cle = entree.split(b"\n", 1)[0].decode("utf-8", "replace")
+    return _CLE_DE_BRANCHE.match(cle) is not None
 
-    `remote`, `merge`, `rebase` ou `vscode-merge-base` n'exécutent rien ; les
-    garder dans l'empreinte bloquait un run dès qu'un `push -u` ou le
-    superviseur touchait le dépôt commun. `[remote]`, `[core]`, `[filter]`…
-    restent : une URL ou une commande changée détournerait le backend.
+
+def entrees_de_config(chemin: Path) -> bytes | None:
+    """Sorted `git config --list --includes` entries, branch keys left out; None if git fails.
+
+    Git lit lui-même le fichier : `[branch "x"] [core]` sur une ligne, ou un
+    `[include]`, ne trompent pas l'empreinte comme ils trompaient un filtre de
+    texte (ticket-941). Les fichiers inclus entrent dans la liste.
     """
-    gardees: list[bytes] = []
-    dans_branche = False
-    for ligne in contenu.splitlines(keepends=True):
-        if _ENTETE.match(ligne):
-            dans_branche = bool(_SECTION_DE_BRANCHE.match(ligne))
-        if not dans_branche:
-            gardees.append(ligne)
-    return b"".join(gardees)
+    commande = build_command(("config", "--file", str(chemin), "--list", "--includes", "-z"))
+    try:
+        res = subprocess.run(commande, capture_output=True, timeout=30, check=False)
+    except (OSError, subprocess.SubprocessError):
+        return None
+    if res.returncode != 0:
+        return None
+    entrees = [e for e in res.stdout.split(b"\0") if e and not _est_cle_de_branche(e)]
+    return b"\0".join(sorted(entrees))
 
 
 def _condenser(chemin: Path) -> str | None:
@@ -110,7 +116,9 @@ def _condenser(chemin: Path) -> str | None:
     except OSError:
         return None
     if chemin.name in ("config", "config.worktree"):
-        contenu = sans_sections_de_branche(contenu)
+        # Si git ne peut pas lire le fichier, le contenu brut est haché : la porte
+        # échoue fermée.
+        contenu = entrees_de_config(chemin) or contenu
     return hashlib.sha256(contenu).hexdigest()
 
 

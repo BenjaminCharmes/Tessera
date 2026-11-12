@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import Literal
 
 from tessera.services.noyau import reservation
+from tessera.services.noyau.git_commande import build_command
 
 Genre = Literal["ticket", "adr"]
 
@@ -34,7 +35,7 @@ class GitIllisible(Exception):
 def lire_git(depot: Path, *args: str) -> str:
     """Stdout of `git <args>` run in `depot`; raises GitIllisible on failure."""
     proc = subprocess.run(
-        ["git", "-c", "core.quotePath=false", *args],
+        build_command(args),
         cwd=depot, capture_output=True, check=False,
     )
     if proc.returncode != 0:

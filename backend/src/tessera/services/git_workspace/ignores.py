@@ -5,6 +5,7 @@ import asyncio
 from tessera.services.git_workspace.chemins import _ORCHESTRATOR_ARTIFACT_PATHS, _RUN_POLICY_PATHS
 from tessera.services.git_workspace.erreurs import GitCommandError
 from tessera.services.git_workspace.socle import GitCore
+from tessera.services.noyau.git_commande import build_command
 from tessera.utils.logger import get_logger
 
 _logger = get_logger("tessera.services.git_workspace")
@@ -39,7 +40,7 @@ class GitIgnores(GitCore):
     async def _is_ignored(self, path: str) -> bool:
         """True si le dépôt ignore ce chemin (`.gitignore` ou `.git/info/exclude`)."""
         proc = await asyncio.create_subprocess_exec(
-            "git", "check-ignore", "-q", "--", path,
+            *build_command(("check-ignore", "-q", "--", path)),
             cwd=str(self._project_path),
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,

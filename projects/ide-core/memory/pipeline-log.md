@@ -9333,3 +9333,16 @@ error: Please commit or stash them.
 - 2026-11-11 18:08:58 UTC — [ticket-912] APPROVED après 1 tour(s)
 - 2026-11-11 18:09:50 UTC — [ticket-912] leçons: refusée — preuve absente du retour du run
 - 2026-11-11 18:13:41 UTC — [ticket-912] documentation: 0 fichier(s) (225062ms) — après tour de correction
+- 2026-11-11 18:19:03 UTC — [ide-core] ticket-912 PR #1062 mergée (CI verte)
+- 2026-11-12 09:00:45 UTC — [ticket-941] branche ticket-941-the-git-config-fingerprint-is-read-by-git-itself
+- 2026-11-12 09:00:47 UTC — [ticket-941] tour 1 — codeur démarré
+- 2026-11-12 09:11:13 UTC — [ticket-941] tour 1 — codeur terminé (625187ms)
+- 2026-11-12 09:20:23 UTC — [ticket-941] testeur: dur�es : ruff 0 s, mypy 81 s, mypy-linux 78 s, pytest 547 s ; impact depuis base : 214 fichier(s) de test
+- 2026-11-12 09:20:57 UTC — [ticket-941] securite: PASS — Ce diff durcit la sécurité : tous les appels git passent par `build_command`, qu (33968ms)
+- 2026-11-12 09:20:58 UTC — [ticket-941] tour 1 — reviewer démarré
+- 2026-11-12 09:21:37 UTC — [ticket-941] tour 1 — reviewer terminé (39030ms)
+- 2026-11-12 09:21:49 UTC — [ticket-941] validateur: fichiers cités joints : .git/config, backend/src/tessera (dossier, 11 fichiers)
+- 2026-11-12 09:21:49 UTC — [ticket-941] validateur: APPROVED — Tous les critères du ticket-941 sont satisfaits. Le codeur a créé un point uniqu (50922ms)
+- 2026-11-12 09:21:49 UTC — [ticket-941] APPROVED après 1 tour(s)
+- 2026-11-12 09:23:19 UTC — [ticket-941] documentation: 0 fichier(s) (72704ms)
+- 2026-11-12 09:23:19 UTC — [ticket-938] documentation: pas de diff retrouvable, non documenté

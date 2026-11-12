@@ -12,6 +12,8 @@ from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
 
+from tessera.services.noyau.git_commande import build_command
+
 # Les motifs du journal, nommés : le format peut évoluer (ticket-910). Une PR
 # mergée s'écrit sous deux formes : l'ancienne (`[ticket-N] livraison: PR #N
 # mergée`) et celle de CIWatcher (`[projet] ticket-N PR #N mergée`).
@@ -98,7 +100,7 @@ def _lire_faits(projet: Path, du: date, au: date) -> list[str]:
 def _compter_commits(projet: Path, du: date, au: date, base: str) -> int:
     """Count commits of the period on ``base``; raise ``OSError`` if the history is unreadable."""
     cmd = [
-        "git", "-C", str(projet), "rev-list", "--count",
+        *build_command(("-C", str(projet), "rev-list", "--count")),
         f"--since={du.isoformat()}T00:00:00+00:00",
         f"--until={au.isoformat()}T23:59:59+00:00", base, "--",
     ]
