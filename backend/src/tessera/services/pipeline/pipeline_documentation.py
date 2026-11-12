@@ -31,6 +31,7 @@ class _Lot:
     tickets: list[str]
     ecartes: list[str]
     abandonnes: list[str]
+    reduits: list[str]
     tronque: bool
     marqueur_ecrit: bool
     correction: bool
@@ -45,6 +46,7 @@ class _Lot:
             tickets=list(getattr(doc, "tickets", []) or []),
             ecartes=list(getattr(doc, "ecartes", []) or []),
             abandonnes=list(getattr(doc, "abandonnes", []) or []),
+            reduits=list(getattr(doc, "reduits", []) or []),
             tronque=bool(getattr(doc, "tronque", False)),
             marqueur_ecrit=bool(getattr(doc, "marqueur_ecrit", False)),
             correction=bool(getattr(doc, "tour_de_correction", False)),
@@ -159,6 +161,8 @@ def _journaliser(
     # dit, ticket par ticket (ticket-541).
     for ecarte in lot.ecartes:
         orch._log(f"[{ecarte}] documentation: pas de diff retrouvable, non documenté")
+    for reduit in lot.reduits:
+        orch._log(f"documentation trop longue, titres seuls : {reduit}")
     if lot.abandonnes:
         orch._log(
             f"documentation abandonnée pour {', '.join(lot.abandonnes)}"
