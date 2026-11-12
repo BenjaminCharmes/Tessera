@@ -9379,3 +9379,4 @@ error: Please commit or stash them.
 - 2026-11-12 10:46:40 UTC — [ticket-940] validateur: APPROVED — Tous les critères d'acceptation du ticket 940 sont satisfaits. Les six tests cor (41750ms)
 - 2026-11-12 10:46:41 UTC — [ticket-940] APPROVED après 3 tour(s)
 - 2026-11-12 10:47:06 UTC — [ticket-940] leçons: une leçon proposée
+- 2026-11-12 10:48:14 UTC — [ticket-940] documentation: 0 fichier(s) (62500ms)
