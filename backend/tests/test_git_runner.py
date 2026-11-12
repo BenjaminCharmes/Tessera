@@ -15,6 +15,7 @@ from tessera.services.creation_projet import project_removal
 from tessera.services.git_workspace import GitCommandError, git_runner, journal_en_attente, ticket_diff
 from tessera.services.git_workspace.git_runner import GitResult, git, writes
 from tessera.services.livraison import branch_cleanup, realignement_base
+from tessera.services.noyau import git_commande
 from tessera.services.pipeline import reprise_orphelin
 from tessera.services.worktrees import temporary_worktree
 
@@ -131,7 +132,7 @@ async def test_a_read_does_not_create_the_empty_hooks_folder(
         appels.append("cree")
         return tmp_path / "vide"
 
-    monkeypatch.setattr(git_runner, "_dossier_sans_hooks", dossier)
+    monkeypatch.setattr(git_commande, "_dossier_sans_hooks", dossier)
 
     await git(repo, "status", "--porcelain")
     await git(repo, "rev-parse", "HEAD")

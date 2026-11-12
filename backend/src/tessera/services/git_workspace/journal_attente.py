@@ -12,6 +12,7 @@ from pathlib import Path
 
 from tessera.services.git_workspace import journal_en_attente
 from tessera.services.git_workspace.git_runner import git
+from tessera.services.noyau.git_commande import build_command
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -46,13 +47,13 @@ def attente_vers_fichier(journal: Path, ligne: str) -> bool:
         return False
     try:
         suivi = subprocess.run(
-            ["git", "ls-files", "--error-unmatch", "--", _JOURNAL.as_posix()],
+            build_command(("ls-files", "--error-unmatch", "--", _JOURNAL.as_posix())),
             cwd=racine, capture_output=True, timeout=15, check=False,
         )
         if suivi.returncode != 0:
             return False
         commun = subprocess.run(
-            ["git", "rev-parse", "--git-common-dir"],
+            build_command(("rev-parse", "--git-common-dir")),
             cwd=racine, capture_output=True, text=True, timeout=15, check=False,
         )
         chemin = _chemin(commun.stdout, racine) if commun.returncode == 0 else None

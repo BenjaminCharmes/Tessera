@@ -4,6 +4,7 @@ import asyncio
 
 from tessera.services.git_workspace.avance_base import GitAvanceBase
 from tessera.services.git_workspace.erreurs import GitCommandError
+from tessera.services.noyau.git_commande import build_command
 from tessera.utils.logger import get_logger
 
 _logger = get_logger("tessera.services.git_workspace")
@@ -153,7 +154,7 @@ class GitBase(GitAvanceBase):
 
         if sha_locale is not None and sha_locale != fetch_sha:
             proc = await asyncio.create_subprocess_exec(
-                "git", "merge-base", "--is-ancestor", sha_locale, fetch_sha,
+                *build_command(("merge-base", "--is-ancestor", sha_locale, fetch_sha)),
                 cwd=str(self._project_path),
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,

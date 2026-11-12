@@ -7,6 +7,7 @@ from pathlib import Path
 from tessera.models.project import CloneProjectResponse
 from tessera.services.creation_projet.project_analyzer import ProjectAnalyzerService
 from tessera.services.creation_projet.project_importer import _scaffold_artifact_dirs
+from tessera.services.noyau.git_commande import build_command
 from tessera.services.projets.artifacts import apply_artifact_mode, default_mode_for
 from tessera.services.projets.manifeste import ecrire_clef
 from tessera.services.projets.project_loader import load_project
@@ -86,7 +87,7 @@ class GitCloneService:
             # `--depth` implique `--single-branch` : le refspec se réduisait à
             # la seule branche clonée, et un push de la branche du ticket ne
             # laissait aucune référence `origin/<branche>` (ticket-517).
-            "git", "clone", "--depth=1", "--no-single-branch", url, str(dest),
+            *build_command(("clone", "--depth=1", "--no-single-branch", url, str(dest))),
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
         )

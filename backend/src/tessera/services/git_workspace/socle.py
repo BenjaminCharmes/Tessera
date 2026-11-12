@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from tessera.services.git_workspace.erreurs import GitCommandError, NotAGitRepository
-from tessera.services.git_workspace.git_runner import _dossier_sans_hooks
+from tessera.services.noyau.git_commande import _dossier_sans_hooks, build_command
 from tessera.services.projets.racine_depot import declare_ancestor
 
 if TYPE_CHECKING:
@@ -78,7 +78,7 @@ class GitCore:
 
     async def _has_head(self) -> bool:
         proc = await asyncio.create_subprocess_exec(
-            "git", "rev-parse", "--verify", "--quiet", "HEAD",
+            *build_command(("rev-parse", "--verify", "--quiet", "HEAD")),
             cwd=str(self._project_path),
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
@@ -88,7 +88,7 @@ class GitCore:
 
     async def _branch_exists(self, branch_name: str) -> bool:
         proc = await asyncio.create_subprocess_exec(
-            "git", "rev-parse", "--verify", "--quiet", f"refs/heads/{branch_name}",
+            *build_command(("rev-parse", "--verify", "--quiet", f"refs/heads/{branch_name}")),
             cwd=str(self._project_path),
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
@@ -138,7 +138,7 @@ class GitCore:
     async def _toplevel(self) -> Path | None:
         """The resolved `--show-toplevel` of the project folder, `None` if git fails."""
         proc = await asyncio.create_subprocess_exec(
-            "git", "rev-parse", "--show-toplevel",
+            *build_command(("rev-parse", "--show-toplevel")),
             cwd=str(self._project_path),
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
@@ -176,7 +176,7 @@ class GitCore:
     async def _is_inside_any_work_tree(self) -> bool:
         """True si un dépôt existe, ici ou au-dessus — pour le cas déclaré."""
         proc = await asyncio.create_subprocess_exec(
-            "git", "rev-parse", "--is-inside-work-tree",
+            *build_command(("rev-parse", "--is-inside-work-tree")),
             cwd=str(self._project_path),
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
@@ -189,7 +189,7 @@ class GitCore:
         if await self._is_own_repository():
             return
         raise NotAGitRepository(
-            command=["git", "rev-parse", "--show-toplevel"],
+            command=build_command(("rev-parse", "--show-toplevel")),
             returncode=0,
             stderr=(
                 f"{self._project_path} n'est pas la racine d'un dépôt git. "
@@ -208,14 +208,9 @@ class GitCore:
         # — `python -c`, un clone déjà piégé — ne doit pas tourner non plus.
         # `-c` prime sur `.git/config`, donc sur un `core.hooksPath` qu'un
         # agent y aurait écrit.
-        command = [
-            "git",
-            "-c", f"core.hooksPath={_dossier_sans_hooks()}",
-            "-c", "core.quotePath=false",
-            # Chemins longs de Windows : un worktree de run vit sous un dossier profond.
-            "-c", "core.longpaths=true",
-            *args,
-        ]
+        # Les hooks restent neutralisés même pour une lecture : le chemin est
+        # donné explicitement, `build_command` pose le reste (fsmonitor, ticket-941).
+        command = build_command(("-c", f"core.hooksPath={_dossier_sans_hooks()}", *args))
         proc = await asyncio.create_subprocess_exec(
             *command,
             cwd=str(self._project_path),

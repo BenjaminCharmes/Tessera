@@ -18,6 +18,7 @@ from pydantic import BaseModel, ValidationError
 
 from tessera.config import _REPO_ROOT, settings
 from tessera.services.github.github_contents import ConflitContenu, ErreurContenu, FichierDistant, GitHubContents
+from tessera.services.noyau.git_commande import build_command
 from tessera.services.projets import rituels as local
 from tessera.utils.logger import get_logger
 
@@ -67,7 +68,7 @@ def lire_origin() -> str | None:
     """URL of `origin` in the Tessera repository; None when git or the remote is missing."""
     try:
         sortie = subprocess.run(
-            ["git", "remote", "get-url", "origin"],
+            build_command(("remote", "get-url", "origin")),
             cwd=_REPO_ROOT, capture_output=True, text=True, timeout=10, check=False,
         )
     except (OSError, subprocess.SubprocessError):
