@@ -2,10 +2,13 @@
 import json
 from collections.abc import Mapping, Sequence
 from pathlib import Path
+from types import SimpleNamespace
+from typing import Any
 
 import pytest
 from anyio.abc import Process
 from claude_agent_sdk import ClaudeAgentOptions
+from claude_agent_sdk._internal.transport.subprocess_cli import SubprocessCLITransport
 from pydantic import SecretStr
 
 from tessera.config import settings
@@ -123,3 +126,34 @@ def test_only_long_json_and_prompts_move_to_files(tmp_path: Path) -> None:
     assert "C:/deja/un/chemin.json" in sortie
     fichier = Path(sortie[sortie.index("--settings") + 1])
     assert fichier.read_text(encoding="utf-8") == long_json
+
+
+class LanceurQuiReussit(LanceurEspion):
+    """Starts a fake process; records the call files that exist at launch."""
+
+    async def lancer(
+        self, commande: Sequence[str], *, compte: str, mot_de_passe: str,
+        env: Mapping[str, str], cwd: str | None, avec_stderr: bool,
+    ) -> Process:
+        self.ligne = ligne_de_commande(commande)
+        self.fichiers = [Path(a) for a in commande if "tessera-appel-" in a and Path(a).exists()]
+        faux: Any = SimpleNamespace(pid=4242, stdout=None, stderr=None, stdin=None)
+        return faux  # type: ignore[no-any-return]
+
+
+async def test_call_files_outlive_a_successful_launch_and_vanish_on_close(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    async def fermeture_du_parent(self: SubprocessCLITransport) -> None:
+        return None
+
+    monkeypatch.setattr(SubprocessCLITransport, "close", fermeture_du_parent)
+    lanceur = LanceurQuiReussit()
+    transport = transport_du_compte("p", _options(), lanceur, compte_agent=True)
+    assert isinstance(transport, TransportCompteAgent)
+    await transport.connect()
+    assert lanceur.fichiers, "le prompt système long doit passer par un fichier"
+    assert all(f.exists() for f in lanceur.fichiers)  # le CLI les lit pendant tout l'appel
+    await transport.close()
+    assert all(not f.exists() for f in lanceur.fichiers)
+    assert all(not f.parent.exists() for f in lanceur.fichiers)
