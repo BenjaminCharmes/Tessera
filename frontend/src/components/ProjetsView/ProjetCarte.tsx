@@ -37,7 +37,9 @@ function etatServices(projet: ProjectOverview): string | undefined {
 
 /**
  * « À faire » toujours, les autres seulement s'ils comptent : quatre zéros prenaient
- * la place des boutons sur la même ligne (ticket-633).
+ * la place des boutons sur la même ligne (ticket-633). Ils vivent sur la ligne des
+ * dates, sans retour à la ligne : à côté de trois boutons, ils se cassaient mot à
+ * mot et débordaient de la carte (ticket-955).
  */
 function Compteurs({ projet }: { projet: ProjectOverview }) {
   const t = projet.tickets;
@@ -48,7 +50,10 @@ function Compteurs({ projet }: { projet: ProjectOverview }) {
     { libelle: "Faits", nombre: t.done, couleur: "text-green-400" },
   ];
   return (
-    <ul className="flex min-w-0 flex-wrap gap-x-3 text-micro leading-tight">
+    <ul
+      data-testid="compteurs"
+      className="flex shrink-0 gap-x-3 whitespace-nowrap text-micro"
+    >
       {lignes.filter((l, i) => i === 0 || l.nombre > 0).map((l) => (
         <li key={l.libelle} className={l.couleur}>
           {l.libelle} <span className="font-medium">{l.nombre}</span>
@@ -61,7 +66,7 @@ function Compteurs({ projet }: { projet: ProjectOverview }) {
 function Dates({ projet }: { projet: ProjectOverview }) {
   const activite = ilYa(projet.last_activity);
   return (
-    <p className="flex flex-wrap gap-x-3 text-micro text-zinc-500">
+    <p className="flex min-w-0 flex-wrap gap-x-3 text-micro text-zinc-500">
       <span title={dateExacte(projet.created_at)}>
         Créé {ilYa(projet.created_at)}
       </span>
@@ -188,12 +193,16 @@ export default function ProjetCarte({
         <div className="flex h-4 items-center">
           <LienDepot projet={projet} />
         </div>
-        <Dates projet={projet} />
-        <div className="flex h-7 items-center justify-between gap-2">
+        <div className="flex items-start justify-between gap-3">
+          <Dates projet={projet} />
           <Compteurs projet={projet} />
+        </div>
+        {/* Trois boutons longs (« Ajouter à la file (1) ») débordaient par la
+            gauche : ils passent à la ligne plutôt que de sortir (ticket-955). */}
+        <div className="flex min-h-7 items-center justify-end gap-2">
           <div
             data-testid="actions-de-carte"
-            className="flex shrink-0 items-center gap-1.5"
+            className="flex min-w-0 flex-wrap items-center justify-end gap-1.5"
           >
             <LancerFile
               projet={projet}
