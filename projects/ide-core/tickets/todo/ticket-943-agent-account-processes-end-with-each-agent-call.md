@@ -6,6 +6,7 @@ estimated_days: 2
 id: ticket-943
 pr_number: null
 priority: high
+preuve_reelle: true
 status: todo
 title: "Processes of the agent account end with each agent call, and the worktree right is withdrawn between calls"
 type: fix
@@ -44,6 +45,16 @@ projet, dont le chemin est prévisible.
    compte sur le worktree (`icacls /remove`). Le droit est reposé au
    lancement suivant.
 3. Si le retrait ou l'arrêt échoue, le run passe en `blocked` (ADR-037).
+
+## Preuve réelle
+
+Sur serpent (`worktree.compte_agent`), lancer un run réel sous `tessera-agent`,
+puis, après chaque appel d'agent :
+- `Get-CimInstance Win32_Process` filtré sur le propriétaire `tessera-agent` :
+  aucun processus restant ;
+- `icacls <worktree du run>` : plus d'ACE `tessera-agent` entre deux appels,
+  de nouveau présente pendant un appel ;
+- le run finit `done` ou `blocked` avec son commit, jamais un arbre sale.
 
 ## Critères d'acceptation
 
