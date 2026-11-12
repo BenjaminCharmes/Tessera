@@ -33,6 +33,7 @@ from pathlib import Path
 from tessera.services.documentation import documentation_claude_md as claude_md_doc
 from tessera.services.documentation.documentation_base import EditionRefusee, _titres_markdown
 from tessera.services.documentation.documentation_code import FournisseurMatiere, MatiereCode, bloc_diffs, bloc_fichiers, matiere_du_lot
+from tessera.services.documentation.documentation_contenu import contenu_et_reduits
 from tessera.services.documentation.documentation_description import appliquer_description
 from tessera.services.documentation.documentation_editions import _documentable, appliquer_editions
 from tessera.services.documentation.documentation_preuve import fichiers_de_la_matiere
@@ -51,10 +52,6 @@ _logger = get_logger(__name__)
 #: son diff (ticket-541) ; garder les plus récents laissait un trou dans
 #: l'historique documenté que personne ne rattrapait.
 _PLAFOND = 5
-
-#: Volume total de documentation inclus dans le message (en caractères).
-#: Au-delà, un fichier est représenté par ses seuls titres Markdown.
-_BORNE_DOC = 60_000
 
 
 @dataclass(frozen=True)
@@ -75,6 +72,9 @@ class ResultatDocumentation:
     ecartes: list[str] = field(default_factory=list)
     #: Tickets abandonnés après deux refus (ticket-940).
     abandonnes: list[str] = field(default_factory=list)
+    #: Fichiers de documentation réduits à leurs titres, « chemin (N caractères) »
+    #: (ticket-954).
+    reduits: list[str] = field(default_factory=list)
 
 
 #: Les deux lectures d'une même livraison. Deux rôles et pas un seul : un agent
@@ -188,7 +188,8 @@ class DocumentationService:
         modifies: list[str] = []
         refus: list[str] = []
         tour_de_correction = False
-        brief = _brief(tickets, matiere, _contenu_documentable(racine))
+        contenu_doc, reduits = contenu_et_reduits(racine)
+        brief = _brief(tickets, matiere, contenu_doc)
         # Le texte des tickets sert au contrôle des jetons : un numéro d'ADR
         # qu'un ticket cite n'est pas inventé (ticket-542).
         intentions = "\n".join(f"{t.titre}\n{t.corps}" for t in tickets)
@@ -275,49 +276,8 @@ class DocumentationService:
             tour_de_correction=tour_de_correction,
             ecartes=ecartes,
             abandonnes=abandonnes,
+            reduits=reduits,
         )
-
-
-def _contenu_documentable(racine: Path, borne: int = _BORNE_DOC) -> str:
-    """Current content of documentable files, bounded to `borne` characters total.
-
-    Files are included in full up to the budget. When a file would push the
-    running total over ``borne``, its full content is replaced by a list of
-    Markdown headings so the agents can still see the structure.
-    """
-    fichiers: list[tuple[str, str]] = []
-
-    readme = racine / "README.md"
-    if readme.is_file():
-        fichiers.append(("README.md", readme.read_text(encoding="utf-8")))
-
-    docs_dir = racine / "docs"
-    if docs_dir.is_dir():
-        for f in sorted(docs_dir.glob("*.md")):
-            fichiers.append((f"docs/{f.name}", f.read_text(encoding="utf-8")))
-
-    if not fichiers:
-        return ""
-
-    morceaux: list[str] = []
-    budget = borne
-
-    for chemin, contenu in fichiers:
-        entete = f"\n### {chemin}\n\n"
-        if len(entete) + len(contenu) <= budget:
-            morceaux.append(entete + contenu)
-            budget -= len(entete) + len(contenu)
-        else:
-            titres = _titres_markdown(contenu)
-            resume = entete + f"[contenu trop long — titres uniquement]\n{titres}\n"
-            morceaux.append(resume)
-            budget -= len(resume)
-            if budget <= 0:
-                break
-
-    if not morceaux:
-        return ""
-    return "\n---\nDocumentation actuelle :\n" + "".join(morceaux)
 
 
 def _brief(
