@@ -63,7 +63,9 @@ class ProcessAgent(Process):
         stdin: BinaryIO,
         stdout: BinaryIO,
         stderr: BinaryIO | None,
+        fermer: Callable[[], None] | None = None,
     ) -> None:
+        self._fermer = fermer
         self._pid = pid
         self._attendre = attendre
         self._arreter = arreter
@@ -114,3 +116,6 @@ class ProcessAgent(Process):
         await self._stdout.aclose()
         if self._stderr is not None:
             await self._stderr.aclose()
+        # Le job (ticket-943) : sa fermeture tue ce que le processus a laissé.
+        if self._fermer is not None:
+            self._fermer()

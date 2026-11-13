@@ -19,6 +19,16 @@ from tessera.services.providers.noms import ProviderIndisponible
 from tessera.services.providers.transport_agent import TransportCompteAgent, transport_du_compte
 
 
+@pytest.fixture(autouse=True)
+def sans_droits_reels(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Le droit d'écriture par appel (ticket-943) a ses propres tests : ici, pas d'`icacls`."""
+    async def rien(*_: object) -> None:
+        return None
+
+    monkeypatch.setattr("tessera.services.providers.transport_agent.ouvrir_appel", rien)
+    monkeypatch.setattr("tessera.services.providers.transport_agent.clore_appel", rien)
+
+
 class LanceurEspion:
     """Records the command line and which of its files exist at launch time."""
 

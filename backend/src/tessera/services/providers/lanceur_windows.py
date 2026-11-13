@@ -15,6 +15,7 @@ from typing import Any, BinaryIO, cast
 import anyio
 from anyio.abc import Process
 
+from tessera.services.noyau.groupe_de_processus import creer_groupe, fermer_le_groupe
 from tessera.services.providers.noms import ProviderIndisponible
 from tessera.services.providers.process_agent import ProcessAgent
 
@@ -25,6 +26,8 @@ _CTYPES: Any = ctypes
 _LOGON_WITH_PROFILE = 0x1
 _CREATE_UNICODE_ENVIRONMENT = 0x400
 _CREATE_NO_WINDOW = 0x08000000
+_CREATE_SUSPENDED = 0x4
+_ECHEC_REPRISE = 0xFFFFFFFF
 _STARTF_USESTDHANDLES = 0x100
 _HANDLE_FLAG_INHERIT = 0x1
 _INFINITE = 0xFFFFFFFF
@@ -125,6 +128,37 @@ def _fichier(handle: int, mode: str) -> BinaryIO:
     return cast(BinaryIO, os.fdopen(descripteur, mode, buffering=0))
 
 
+def lancer_dans_un_job(
+    k32: Any, adv: Any, groupe: Any,
+    cible: tuple[str, str, Any, Any, str | None], structures: tuple[_StartupInfo, _ProcessInfo],
+) -> tuple[bool, int]:
+    """Starts the process suspended, puts it in `groupe`, then resumes it (ticket-943).
+
+    `cible` : compte, mot de passe, ligne de commande, environnement, dossier.
+    Rend (démarré, code d'erreur). Le processus ne tourne jamais hors du job : si
+    l'affectation ou la reprise échoue, il est terminé et `ProviderIndisponible` levée.
+    """
+    compte, mot_de_passe, ligne, env, cwd = cible
+    si, info = structures
+    ok = adv.CreateProcessWithLogonW(
+        compte, ".", mot_de_passe, _LOGON_WITH_PROFILE, None, ligne,
+        _CREATE_UNICODE_ENVIRONMENT | _CREATE_NO_WINDOW | _CREATE_SUSPENDED, env,
+        cwd, ctypes.byref(si), ctypes.byref(info),
+    )
+    code = _CTYPES.get_last_error()
+    if not ok:
+        return False, code
+    # Le `hProcess` rendu porte les droits requis ; un `OpenProcess` sur un
+    # processus d'un autre compte les refuserait.
+    if not k32.AssignProcessToJobObject(groupe, info.hProcess) or k32.ResumeThread(info.hThread) == _ECHEC_REPRISE:
+        k32.TerminateProcess(info.hProcess, 1)
+        k32.CloseHandle(info.hThread)
+        k32.CloseHandle(info.hProcess)
+        raise ProviderIndisponible(f"processus de {compte} impossible à placer dans un job ou à reprendre")
+    k32.CloseHandle(info.hThread)
+    return True, code
+
+
 class LanceurWindows:
     """``LanceurAgent`` over ``CreateProcessWithLogonW``."""
 
@@ -143,6 +177,10 @@ class LanceurWindows:
         texte_ligne = ligne_de_commande(commande)
         k32 = _CTYPES.WinDLL("kernel32", use_last_error=True)
         adv = _CTYPES.WinDLL("advapi32", use_last_error=True)
+        # Le job d'abord : sans lui, rien ne démarre (ticket-943, ADR-037).
+        groupe = creer_groupe()
+        if groupe is None:
+            raise ProviderIndisponible("job object impossible à créer : l'agent ne démarre pas sans lui")
         in_enfant, in_parent = _tuyau(k32, parent_lit=False)
         out_enfant, out_parent = _tuyau(k32, parent_lit=True)
         err_enfant, err_parent = _tuyau(k32, True) if avec_stderr else (_nul(k32), 0)
@@ -152,25 +190,37 @@ class LanceurWindows:
         si.dwFlags = _STARTF_USESTDHANDLES
         si.hStdInput, si.hStdOutput, si.hStdError = in_enfant, out_enfant, err_enfant
         ligne = ctypes.create_unicode_buffer(texte_ligne)
-        ok = adv.CreateProcessWithLogonW(
-            compte, ".", mot_de_passe, _LOGON_WITH_PROFILE, None, ligne,
-            _CREATE_UNICODE_ENVIRONMENT | _CREATE_NO_WINDOW, bloc_d_environnement(env),
-            cwd, ctypes.byref(si), ctypes.byref(info),
-        )
-        code = _CTYPES.get_last_error()
-        for h in (in_enfant, out_enfant, err_enfant):
-            k32.CloseHandle(h)
+        ok, code = False, 0
+        try:
+            ok, code = lancer_dans_un_job(
+                k32, adv, groupe, (compte, mot_de_passe, ligne, bloc_d_environnement(env), cwd), (si, info)
+            )
+        finally:
+            for h in (in_enfant, out_enfant, err_enfant):
+                k32.CloseHandle(h)
+            if not ok:
+                fermer_le_groupe(groupe)
+                for h in (in_parent, out_parent, err_parent):
+                    if h:
+                        k32.CloseHandle(h)
         if not ok:
-            for h in (in_parent, out_parent, err_parent):
-                if h:
-                    k32.CloseHandle(h)
             raise ProviderIndisponible(message_de_logon(code, compte))
-        k32.CloseHandle(info.hThread)
-        return self._process(k32, info, in_parent, out_parent, err_parent)
+        return self._process(k32, info, groupe, in_parent, out_parent, err_parent)
 
     @staticmethod
-    def _process(k32: Any, info: _ProcessInfo, i: int, o: int, e: int) -> Process:
+    def _process(k32: Any, info: _ProcessInfo, groupe: Any, i: int, o: int, e: int) -> Process:
         proc = info.hProcess
+        ferme: list[bool] = []
+
+        def fermer_le_job() -> None:
+            # Fermer le job tue tout ce qu'il contient ; une seule fois.
+            if not ferme:
+                ferme.append(True)
+                fermer_le_groupe(groupe)
+
+        def arreter() -> None:
+            k32.TerminateProcess(proc, 1)
+            fermer_le_job()
 
         def attendre() -> int:
             k32.WaitForSingleObject(proc, _INFINITE)
@@ -182,7 +232,7 @@ class LanceurWindows:
 
         return ProcessAgent(
             pid=info.dwProcessId, attendre=attendre,
-            arreter=lambda: k32.TerminateProcess(proc, 1), sonder=sonder,
+            arreter=arreter, sonder=sonder, fermer=fermer_le_job,
             stdin=_fichier(i, "wb"), stdout=_fichier(o, "rb"),
             stderr=_fichier(e, "rb") if e else None,
         )

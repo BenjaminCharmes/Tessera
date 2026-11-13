@@ -5,8 +5,9 @@ renseigné, la commande de test et l'app du contrôle visuel partent par le
 `LanceurAgent` du CLI (ADR-083), jamais sous le compte du backend. Tout échec
 est un `EchecLancementCompte` : aucun repli (ADR-037).
 
-Le lanceur Windows ne crée pas de job : `kill()` ne coupe que le processus
-direct, et la lecture des tubes comme l'attente sont bornées par l'appelant
+Le lanceur Windows place chaque processus dans un job `KILL_ON_JOB_CLOSE`
+(ticket-943) ; `clore()` le ferme et retire le droit d'écriture du compte sur
+le worktree. La lecture des tubes comme l'attente sont bornées par l'appelant
 (`wait_for`, minuteur d'étape).
 """
 import asyncio
@@ -19,8 +20,10 @@ from anyio.abc import ByteReceiveStream, Process
 
 from tessera.config import settings
 from tessera.services.noyau.lancement import essais_de_commande
+from tessera.services.providers.droits_appel import clore_appel, ouvrir_appel
 from tessera.services.providers.lanceur_agent import LanceurAgent
 from tessera.services.providers.noms import ProviderIndisponible
+from tessera.services.providers.process_agent import ProcessAgent
 from tessera.services.providers.transport_agent import fabriquer_lanceur
 from tessera.services.verification.env_du_code_de_projet import env_du_code_de_projet
 from tessera.utils.logger import get_logger
@@ -67,8 +70,19 @@ async def _lire(flux: ByteReceiveStream | None) -> bytes:
 class ProcessusDuCompte:
     """The surface of an asyncio process, over a process started under the account."""
 
-    def __init__(self, processus: Process) -> None:
+    def __init__(self, processus: Process, racine_droits: Path | None = None) -> None:
         self._processus = processus
+        self._racine_droits = racine_droits
+
+    async def clore(self) -> None:
+        """Ends the call: closes the process's job, withdraws the write right (ticket-943).
+
+        Idempotent. Un refus lève `DroitsAgentRefuses` : le run passe en `blocked`.
+        """
+        racine, self._racine_droits = self._racine_droits, None
+        if isinstance(self._processus, ProcessAgent):
+            await self._processus.aclose()
+        await clore_appel(racine)
 
     @property
     def pid(self) -> int:
@@ -115,6 +129,20 @@ async def lancer_sous_compte(
         lance = lanceur or fabriquer_lanceur()
     except ProviderIndisponible as exc:
         raise EchecLancementCompte(str(exc)) from exc
+    racine_droits = await ouvrir_appel(dossier)
+    try:
+        return await _lancer_les_formes(lance, args, dossier, env, racine_droits)
+    except BaseException:
+        await clore_appel(racine_droits)
+        raise
+
+
+async def _lancer_les_formes(
+    lance: LanceurAgent, args: Sequence[str], dossier: Path,
+    env: Mapping[str, str] | None, racine_droits: Path | None,
+) -> ProcessusDuCompte:
+    compte = settings.agent_user or ""
+    mot_de_passe = settings.agent_logon_password.get_secret_value()
     derniere: Exception | None = None
     # Les formes de `essais_de_commande` (`npm`, puis `npm.cmd`) : le lanceur ne
     # distingue pas « introuvable » d'un logon refusé, on tente donc chacune.
@@ -128,5 +156,5 @@ async def lancer_sous_compte(
         except (ProviderIndisponible, OSError) as exc:
             derniere = exc
             continue
-        return ProcessusDuCompte(processus)
+        return ProcessusDuCompte(processus, racine_droits)
     raise EchecLancementCompte(str(derniere or "commande vide")) from derniere

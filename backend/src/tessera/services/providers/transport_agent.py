@@ -17,9 +17,11 @@ from claude_agent_sdk._internal.transport.subprocess_cli import SubprocessCLITra
 from claude_agent_sdk._version import __version__
 
 from tessera.config import settings
+from tessera.services.providers.droits_appel import clore_appel, ouvrir_appel
 from tessera.services.providers.fichiers_appel import creer_dossier_d_appel, deporter_les_valeurs, supprimer_dossier_d_appel
 from tessera.services.providers.lanceur_agent import LanceurAgent
 from tessera.services.providers.noms import ProviderIndisponible
+from tessera.services.providers.process_agent import ProcessAgent
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -70,6 +72,7 @@ class TransportCompteAgent(SubprocessCLITransport):
         self._compte = compte
         self._mot_de_passe = mot_de_passe
         self._dossier_d_appel: Path | None = None
+        self._racine_droits: Path | None = None
 
     async def connect(self) -> None:
         if self._process:
@@ -86,8 +89,9 @@ class TransportCompteAgent(SubprocessCLITransport):
         }
         if self._cwd:
             env["PWD"] = self._cwd
-        self._dossier_d_appel = await creer_dossier_d_appel(self._compte)
+        self._racine_droits = await ouvrir_appel(self._cwd) if self._cwd else None
         try:
+            self._dossier_d_appel = await creer_dossier_d_appel(self._compte)
             commande = deporter_les_valeurs(self._build_command(), self._dossier_d_appel)
             _logger.info("agent_lance_sous_compte", extra={"compte": self._compte})
             process: Process = await self._lanceur.lancer(
@@ -97,17 +101,27 @@ class TransportCompteAgent(SubprocessCLITransport):
         except BaseException:
             supprimer_dossier_d_appel(self._dossier_d_appel)
             self._dossier_d_appel = None
+            await self._clore_les_droits()
             raise
         self._brancher(process)
         _annoncer_le_pid(self._au_demarrage, process.pid)
 
     async def close(self) -> None:
-        """Closes the CLI, then removes the call's files."""
+        """Closes the CLI and its job, removes the call's files, withdraws the write right."""
+        process = self._process
         try:
             await super().close()
+            if isinstance(process, ProcessAgent):
+                await process.aclose()
         finally:
             supprimer_dossier_d_appel(self._dossier_d_appel)
             self._dossier_d_appel = None
+            await self._clore_les_droits()
+
+    async def _clore_les_droits(self) -> None:
+        """Ends the call's right once; a refusal raises (the run ends `blocked`)."""
+        racine, self._racine_droits = self._racine_droits, None
+        await clore_appel(racine)
 
     def _brancher(self, process: Process) -> None:
         """Wires the streams as the parent class does after its own spawn."""
