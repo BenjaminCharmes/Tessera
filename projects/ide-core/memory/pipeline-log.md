@@ -9511,3 +9511,14 @@ error: Please commit or stash them.
 - 2026-11-12 18:43:23 UTC — [ticket-958] CHANGES_REQUESTED tour 3: Reviewer : 1. Aucun des cinq critères d'acceptation n'est rempli. Le diff ne contient ni le contrôle des dépendances en mode single dans routers/orchestrator.py, ni le module de contrôle, ni aucun des
 - 2026-11-12 18:43:23 UTC — [ticket-958] BLOCKED après 3 tour(s) sans approbation
 - 2026-11-12 18:43:28 UTC — [ide-core] file interrompue : ticket-958 non approuvé
+- 2026-11-13 08:25:19 UTC — [ticket-958] branche ticket-958-a-single-run-is-refused-while-one-of-its-dependen
+- 2026-11-13 08:25:22 UTC — [ticket-958] branche reprise (3 commit(s)) — refus précédent : revue, codeur en premier
+- 2026-11-13 08:25:22 UTC — [ticket-958] tour 1 — codeur démarré
+- 2026-11-13 08:29:23 UTC — [ticket-958] tour 1 — codeur terminé (240828ms)
+- 2026-11-13 08:30:07 UTC — [ticket-958] testeur: dur�es : ruff 1 s, mypy 21 s, pytest 32 s, mypy-linux 18 s ; impact depuis base : 19 fichier(s) de test
+- 2026-11-13 08:30:24 UTC — [ticket-958] securite: PASS — PASS : le diff ajoute un contrôle des dépendances au mode `single` (refus 409, c (17264ms)
+- 2026-11-13 08:30:25 UTC — [ticket-958] tour 1 — reviewer démarré
+- 2026-11-13 08:30:46 UTC — [ticket-958] tour 1 — reviewer terminé (20766ms)
+- 2026-11-13 08:30:52 UTC — [ticket-958] validateur: APPROVED — Le code implémente le contrôle des dépendances pour les runs single : une dépend (27141ms)
+- 2026-11-13 08:30:52 UTC — [ticket-958] APPROVED après 1 tour(s)
+- 2026-11-13 08:32:07 UTC — [ticket-958] leçons: refusée — preuve absente du retour du run
