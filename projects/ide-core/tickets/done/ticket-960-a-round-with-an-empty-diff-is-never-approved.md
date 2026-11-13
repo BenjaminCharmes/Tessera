@@ -6,7 +6,7 @@ estimated_days: 0.5
 id: ticket-960
 pr_number: null
 priority: high
-status: blocked
+status: done
 title: A round whose diff is empty is never approved, whatever the verdicts say
 type: fix
 ---
@@ -45,15 +45,20 @@ sans une ligne de code.
 
 ## Critères d'acceptation
 
-- [ ] Un test : avec un diff réel vide et deux verdicts `APPROVED`, le tour
+- [x] Un test : avec un diff réel vide et deux verdicts `APPROVED`, le tour
       n'est pas approuvé et le retour au codeur contient « aucun fichier
       modifié ».
-- [ ] Un test : avec un diff non vide et deux verdicts `APPROVED`, le tour est
+- [x] Un test : avec un diff non vide et deux verdicts `APPROVED`, le tour est
       approuvé, comme aujourd'hui.
-- [ ] Un test : une `GitWorkspaceError` au calcul du diff empêche
+- [x] Un test : une `GitWorkspaceError` au calcul du diff empêche
       l'approbation du tour.
-- [ ] Un test : sans espace git, un tour approuvé par les deux verdicts reste
+- [x] Un test : sans espace git, un tour approuvé par les deux verdicts reste
       approuvé.
+
+- [x] Un test : diff git vide mais un artefact changé hors tenue du pipeline
+      (un run `design` qui écrit `memory/decisions.md`) : le tour est approuvé.
+      Le journal du pipeline et le fichier du ticket lui-même ne comptent pas
+      (remarque du reviewer, tour 3 ; ajouté à la main).
 
 ## Ce que ça ne fait pas
 

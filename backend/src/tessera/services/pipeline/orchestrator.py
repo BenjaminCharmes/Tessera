@@ -498,7 +498,7 @@ class Orchestrator:
             (rev_approved, rev_reason, raw_verdict), (val_approved, val_reason) = verdicts
 
             approved = rev_approved and val_approved
-            if approved and not run.diff_vide:
+            if approved and not run.rien_produit:
                 return await outcomes.finish_approved(self, run)
 
             feedback = _FEEDBACK_DIFF_VIDE if approved else _compose_feedback(

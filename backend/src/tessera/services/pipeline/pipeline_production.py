@@ -15,7 +15,7 @@ from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent,
 from tessera.services.pipeline.pipeline_empreinte import arret_fichier_protege, empreinte, noms_changes
 from tessera.services.pipeline.pipeline_run import PipelineRun, set_status
 from tessera.services.pipeline.signaler_du_run import signaler_for
-from tessera.services.projets.artifact_snapshot import diff_artifacts, snapshot_artifacts
+from tessera.services.projets.artifact_snapshot import artefacts_produits, diff_artifacts, snapshot_artifacts
 from tessera.services.providers.refus_garde import refus_du_tour
 from tessera.utils.logger import get_logger
 
@@ -285,6 +285,7 @@ def _capture_artifact_diff(orch: "Orchestrator", run: PipelineRun) -> None:
     if orch._project_path is None or run.artifact_snapshot is None:
         return
     run.artifact_diff = diff_artifacts(run.artifact_snapshot, orch._project_path)
+    run.artefacts_produits = artefacts_produits(run.artifact_snapshot, orch._project_path, run.ticket_id)
 
 
 def _role_qui_produit(type_de_ticket: "TicketType") -> AgentRole:
