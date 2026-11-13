@@ -4,10 +4,10 @@ created: 2026-11-13
 depends_on: []
 estimated_days: 0.5
 id: ticket-967
-pr_number: null
+pr_number: 1112
 priority: medium
-status: todo
-title: "A project service never starts on a port Tessera uses"
+status: done
+title: A project service never starts on a port Tessera uses
 type: fix
 ---
 

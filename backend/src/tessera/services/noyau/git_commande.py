@@ -68,12 +68,36 @@ def build_command(args: tuple[str, ...]) -> list[str]:
     """The full argv: cosmetic options always, hooks disabled for a write."""
     # `core.fsmonitor=false` : une clé écrite dans `.git/config` par un agent ne
     # lance aucun programme au `git status` suivant (ticket-933).
-    options = [
-        "-c", "core.quotePath=false", "-c", "core.longpaths=true",
-        "-c", "core.fsmonitor=false",
-    ]
+    options = ["-c", "core.quotePath=false", "-c", "core.longpaths=true"]
+    for reglage in _REGLAGES_SANS_PROGRAMME:
+        options += ["-c", reglage]
     if writes(args):
         options = ["-c", f"core.hooksPath={_dossier_sans_hooks()}", *options]
-    return ["git", *options, *args]
+    return ["git", *options, *_avec_diff_sans_programme(args)]
+
+
+#: Clés qui nomment un programme : forcées à vide pour toute commande, une clé
+#: écrite dans `.git/config` par un agent ne lance rien (ticket-965). Un
+#: `filter.<nom>.*` ne se neutralise pas sans son nom : voir `pipeline_empreinte`.
+_REGLAGES_SANS_PROGRAMME = (
+    "core.fsmonitor=false", "commit.gpgsign=false", "tag.gpgSign=false",
+    "gpg.program=", "core.sshCommand=", "diff.external=", "core.pager=cat",
+)
+
+#: Sous-commandes qui lisent un diff : ni programme externe ni textconv.
+_SOUS_COMMANDES_DE_DIFF = frozenset({"diff", "show", "log"})
+
+
+def _avec_diff_sans_programme(args: tuple[str, ...]) -> tuple[str, ...]:
+    """`args` with `--no-ext-diff --no-textconv` right after a diff-reading subcommand."""
+    if _subcommand(args) not in _SOUS_COMMANDES_DE_DIFF:
+        return args
+    suivants = iter(enumerate(args))
+    for i, arg in suivants:
+        if arg in _OPTIONS_WITH_VALUE:
+            next(suivants, None)
+        elif not arg.startswith("-"):
+            return (*args[: i + 1], "--no-ext-diff", "--no-textconv", *args[i + 1:])
+    return args
 
 

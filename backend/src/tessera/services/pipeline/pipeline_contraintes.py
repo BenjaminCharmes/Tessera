@@ -108,15 +108,19 @@ async def arret_revue_hors_perimetre(
 
 
 async def bloquer(
-    orch: "Orchestrator", run: PipelineRun, code: str, raison: str, resume: str
+    orch: "Orchestrator", run: PipelineRun, code: str, raison: str, resume: str,
+    commiter: bool = True,
 ) -> PipelineResult:
-    """End the run `blocked`, with its unapproved commit, naming `raison`."""
+    """End the run `blocked`, with its unapproved commit unless `commiter` is False."""
     await set_status(orch, run, TicketStatus.blocked)
     await emit(run, EventType.ERROR, reason=code, detail=raison)
     orch._log(f"[{run.ticket_id}] BLOCKED — {raison}")
-    commit_sha, arret = await commit_ou_bloquer(
-        orch, run, _unapproved_commit_message(run.ticket_id, resume)
-    )
+    commit_sha: str | None = None
+    arret: str | None = None
+    if commiter:
+        commit_sha, arret = await commit_ou_bloquer(
+            orch, run, _unapproved_commit_message(run.ticket_id, resume)
+        )
     await emit(
         run,
         EventType.PIPELINE_DONE,

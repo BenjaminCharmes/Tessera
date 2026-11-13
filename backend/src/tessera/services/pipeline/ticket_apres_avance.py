@@ -72,8 +72,15 @@ async def trouver_ticket(orch: "Orchestrator", ticket_id: str) -> Ticket | Pipel
         if await orch._git_workspace.restaurer_ticket_depuis_base(ticket_id):
             ticket = await orch._ticket_svc.get_ticket(ticket_id)
     if ticket is not None:
+        # Figé ici, avant le premier agent : la livraison ne relit pas la fiche,
+        # que le codeur a pu réécrire pendant le run (ticket-964).
+        orch._preuves_reelles[ticket_id] = ticket.preuve_reelle is True
         return ticket
     avance = await lire_apres_avance(orch, ticket_id)
     if avance is None:
         raise ValueError(f"Ticket introuvable : {ticket_id}")
-    return avance[0] if avance[0] is not None else arret_ticket_absent(ticket_id, avance[1])
+    if avance[0] is None:
+        return arret_ticket_absent(ticket_id, avance[1])
+    # Retrouvé après l'avance : figé de même (ticket-964).
+    orch._preuves_reelles[ticket_id] = avance[0].preuve_reelle is True
+    return avance[0]
