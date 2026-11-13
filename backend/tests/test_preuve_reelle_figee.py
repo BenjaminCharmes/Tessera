@@ -101,3 +101,27 @@ async def test_restart_does_not_resume_a_pr_whose_base_ticket_asks_for_proof(
     await reprendre_surveillances(workspace, db, espion.fabrique, _sans_evenement)
 
     assert espion.surveillees == []
+
+
+async def test_flag_is_frozen_for_a_ticket_found_after_the_base_advance(
+    monkeypatch: Any,
+) -> None:
+    from tessera.services.pipeline import ticket_apres_avance
+
+    ticket = SimpleNamespace(preuve_reelle=True)
+
+    async def absent(ticket_id: str) -> None:
+        return None
+
+    async def apres_avance(orch: Any, ticket_id: str) -> tuple[Any, str]:
+        return ticket, ""
+
+    monkeypatch.setattr(ticket_apres_avance, "lire_apres_avance", apres_avance)
+    orch = SimpleNamespace(
+        _ticket_svc=SimpleNamespace(get_ticket=absent),
+        _git_workspace=None,
+        _preuves_reelles={},
+    )
+
+    assert await ticket_apres_avance.trouver_ticket(orch, "ticket-001") is ticket  # type: ignore[arg-type]
+    assert orch._preuves_reelles == {"ticket-001": True}

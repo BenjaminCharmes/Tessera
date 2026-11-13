@@ -79,4 +79,8 @@ async def trouver_ticket(orch: "Orchestrator", ticket_id: str) -> Ticket | Pipel
     avance = await lire_apres_avance(orch, ticket_id)
     if avance is None:
         raise ValueError(f"Ticket introuvable : {ticket_id}")
-    return avance[0] if avance[0] is not None else arret_ticket_absent(ticket_id, avance[1])
+    if avance[0] is None:
+        return arret_ticket_absent(ticket_id, avance[1])
+    # Retrouvé après l'avance : figé de même (ticket-964).
+    orch._preuves_reelles[ticket_id] = avance[0].preuve_reelle is True
+    return avance[0]

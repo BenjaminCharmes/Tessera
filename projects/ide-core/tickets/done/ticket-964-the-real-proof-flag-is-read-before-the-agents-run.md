@@ -6,7 +6,7 @@ estimated_days: 0.5
 id: ticket-964
 pr_number: null
 priority: high
-status: blocked
+status: done
 title: The real-proof flag of a ticket is read before any agent runs, not after
 type: fix
 ---
@@ -42,12 +42,12 @@ frontmatter de son ticket rend sa PR au merge automatique, sans preuve.
 
 ## Critères d'acceptation
 
-- [ ] Un test : un run dont le ticket porte `preuve_reelle: true` au départ,
+- [x] Un test : un run dont le ticket porte `preuve_reelle: true` au départ,
       et dont le codeur (simulé) réécrit le ticket sans ce drapeau, ouvre sa
       PR sans la confier au merge.
-- [ ] Un test : un ticket sans `preuve_reelle` au départ, que le codeur
+- [x] Un test : un ticket sans `preuve_reelle` au départ, que le codeur
       réécrit avec `preuve_reelle: true`, garde son comportement habituel.
-- [ ] Un test : au redémarrage, une PR ouverte dont le ticket portait
+- [x] Un test : au redémarrage, une PR ouverte dont le ticket portait
       `preuve_reelle: true` sur la base n'est pas reprise par la surveillance,
       même si le fichier du dossier du run a perdu le drapeau.
 

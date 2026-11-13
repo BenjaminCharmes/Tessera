@@ -34,8 +34,8 @@ from tessera.models.ticket import Ticket, TicketStatus
 from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.github.github_service import PrOuverte
 from tessera.services.livraison.ci_watcher import EtatPr, decrire_exception
-from tessera.services.livraison.reprise_outils import ecrire_log as _ecrire_log
 from tessera.services.livraison.preuve_sur_la_base import preuve_reelle_sur_la_base
+from tessera.services.livraison.reprise_outils import ecrire_log as _ecrire_log
 from tessera.services.livraison.reprise_outils import prs_a_reprendre
 from tessera.services.livraison.sha_approbation import sha_pousse_du_ticket
 from tessera.services.noyau.pipeline_events import EventCallback
