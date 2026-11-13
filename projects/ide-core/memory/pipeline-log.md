@@ -9248,3 +9248,4 @@ error: Please commit or stash them.
 - 2026-11-13 18:06:55 UTC — [ticket-964] testeur: dur�es : ruff 0 s, pytest 328 s ; impact depuis base : 173 fichier(s) de test
 - 2026-11-13 18:06:55 UTC — [ticket-964] tests rouges au tour 3
 - 2026-11-13 18:06:55 UTC — [ticket-964] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-13 18:07:01 UTC — [ide-core] file interrompue : ticket-964 non approuvé
