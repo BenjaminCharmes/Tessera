@@ -16,6 +16,7 @@ from tessera.models.project import (
 from tessera.routers.projects.shared import loader, new_router
 from tessera.services.creation_projet.git_clone import CloneError, GitCloneService
 from tessera.services.creation_projet.git_link import init_repository
+from tessera.services.creation_projet.hook_pre_push import installer_hook
 from tessera.services.creation_projet.project_analyzer import ProjectAnalyzerService
 from tessera.services.creation_projet.project_creator import ProjectCreatorService
 from tessera.services.creation_projet.project_from_template import create_project_from_template as _create_from_template
@@ -64,6 +65,7 @@ async def create_project(body: ProjectCreate) -> ProjectCreationResult:
     try:
         await init_repository(settings.ide_workspace_dir / project.id)
         repository_ready = True
+        installer_hook(settings.ide_workspace_dir / project.id)
     except Exception as exc:  # noqa: BLE001 — l'état part dans la réponse
         _logger.warning(
             "project_git_init_failed",
