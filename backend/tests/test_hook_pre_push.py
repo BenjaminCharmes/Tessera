@@ -396,3 +396,25 @@ def test_a_git_failure_blocks_the_push(tmp_path: Path, monkeypatch: pytest.Monke
 
     with patch.object(subprocess, "run", side_effect=fake_run):
         assert HOOK.main() == 1
+
+
+def test_new_branch_diff_reads_the_content_of_unpushed_commits(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Ticket-972 : `--not` placé avant le SHA le niait aussi ; une branche neuve
+    # n'était contrôlée que sur ses messages, jamais sur son contenu.
+    depot = tmp_path / "depot"
+    depot.mkdir()
+    def git(*args: str) -> str:
+        return subprocess.run(
+            ["git", "-c", "user.name=t", "-c", "user.email=t@example.com", *args],
+            cwd=depot, check=True, capture_output=True, text=True,
+        ).stdout
+    git("init", "-q")
+    (depot / "a.txt").write_text("ligne ajoutee\n", encoding="utf-8")
+    git("add", "a.txt")
+    git("commit", "-q", "-m", "c1")
+    sha = git("rev-parse", "HEAD").strip()
+    monkeypatch.chdir(depot)
+
+    assert "+ligne ajoutee" in HOOK._get_diff_lines(sha, NULL_SHA)
