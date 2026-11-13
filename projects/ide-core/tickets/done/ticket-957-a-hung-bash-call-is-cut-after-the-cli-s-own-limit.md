@@ -6,7 +6,7 @@ estimated_days: 0.5
 id: ticket-957
 pr_number: null
 priority: medium
-status: blocked
+status: done
 title: A hung Bash call is cut soon after the CLI's own limit, not after twenty minutes
 type: fix
 ---
@@ -45,14 +45,14 @@ de cette limite est figé, pas lent.
 
 ## Critères d'acceptation
 
-- [ ] Un test avec un flux simulé : après un `tool_use` `Bash` sans
+- [x] Un test avec un flux simulé : après un `tool_use` `Bash` sans
       `tool_result`, le silence est coupé à `bash_silence_max_s`, avec le
       message « appel Bash ».
-- [ ] Un test : après le `tool_result` de cet appel, la borne redevient
+- [x] Un test : après le `tool_result` de cet appel, la borne redevient
       `agent_silence_max_s`.
-- [ ] Un test : un `tool_use` d'un autre outil (`Read`) garde
+- [x] Un test : un `tool_use` d'un autre outil (`Read`) garde
       `agent_silence_max_s`.
-- [ ] Un test : `bash_silence_max_s` à 0 désactive la borne propre à Bash.
+- [x] Un test : `bash_silence_max_s` à 0 désactive la borne propre à Bash.
 
 ## Ce que ça ne fait pas
 

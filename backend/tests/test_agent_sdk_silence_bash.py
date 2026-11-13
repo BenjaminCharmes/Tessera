@@ -5,9 +5,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from claude_agent_sdk import (
-    AssistantMessage, ClaudeAgentOptions, ResultMessage, ToolResultBlock, ToolUseBlock, UserMessage,
-)
+from claude_agent_sdk import AssistantMessage, ClaudeAgentOptions, ResultMessage, ToolResultBlock, ToolUseBlock, UserMessage
 
 from tessera.services.providers import agent_sdk as agent_sdk_module
 from tessera.services.providers.agent_sdk import ClaudeAgentSDKProvider
