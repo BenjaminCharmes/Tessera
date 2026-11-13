@@ -9482,3 +9482,18 @@ error: Please commit or stash them.
 - 2026-11-12 17:05:40 UTC — [ticket-954] APPROVED après 2 tour(s)
 - 2026-11-12 17:07:49 UTC — [ticket-954] leçons: une leçon proposée
 - 2026-11-12 17:09:52 UTC — [ticket-954] documentation: 0 fichier(s) (117891ms)
+- 2026-11-13 08:37:39 UTC — [ide-core] ticket-958 PR #1089 confiée au CIWatcher
+- 2026-11-13 08:37:45 UTC — [ticket-957] branche ticket-957-a-hung-bash-call-is-cut-soon-after-the-cli-s-own
+- 2026-11-13 08:37:48 UTC — [ticket-957] tour 1 — codeur démarré
+- 2026-11-13 08:39:05 UTC — [ticket-957] tour 1 — codeur terminé (76719ms)
+- 2026-11-13 08:45:25 UTC — [ticket-957] testeur: 1 failed, 1542 passed, 3 skipped, 24 warnings in 373.93s (0:06:13)
+- 2026-11-13 08:45:26 UTC — [ticket-957] tests rouges au tour 1
+- 2026-11-13 08:45:26 UTC — [ticket-957] tour 2 — codeur démarré
+- 2026-11-13 08:46:07 UTC — [ticket-957] tour 2 — codeur terminé (40609ms)
+- 2026-11-13 08:58:09 UTC — [ticket-957] testeur: 1 failed, 2137 passed, 3 skipped, 24 warnings in 716.53s (0:11:56)
+- 2026-11-13 08:58:09 UTC — [ticket-957] tests rouges au tour 2
+- 2026-11-13 08:58:09 UTC — [ticket-957] tour 3 — codeur démarré
+- 2026-11-13 08:59:48 UTC — [ticket-957] tour 3 — codeur terminé (98264ms)
+- 2026-11-13 09:09:09 UTC — [ticket-957] testeur: dur�es : ruff 0 s, pytest 556 s ; impact depuis base : 284 fichier(s) de test
+- 2026-11-13 09:09:10 UTC — [ticket-957] tests rouges au tour 3
+- 2026-11-13 09:09:10 UTC — [ticket-957] BLOCKED après 3 tour(s) sans approbation
