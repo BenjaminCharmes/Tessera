@@ -57,6 +57,28 @@ def fichiers_proteges(wt: RunWorktree, script: Path | None) -> list[Path]:
     return trouves
 
 
+async def poser_ecriture(racine: Path, compte: str, lanceur: Icacls = _icacls_reel) -> None:
+    """Give `compte` modify on `racine` and read-only on its `.git` (before each call)."""
+    await _lancer(lanceur, [str(racine), "/grant", f"{compte}:(OI)(CI)M"])
+    git = racine / ".git"
+    if git.exists():
+        droit = "(OI)(CI)RX" if git.is_dir() else "RX"
+        await _lancer(lanceur, [str(git), "/inheritance:d"])
+        await _lancer(lanceur, [str(git), "/remove:g", compte])
+        await _lancer(lanceur, [str(git), "/grant:r", f"{compte}:{droit}"])
+
+
+async def retirer_ecriture(racine: Path, compte: str, lanceur: Icacls = _icacls_reel) -> None:
+    """Withdraw every grant of `compte` on `racine` and its `.git` (ticket-943).
+
+    Les refus posés fichier par fichier restent : ils ne donnent rien au compte.
+    """
+    git = racine / ".git"
+    if git.exists():
+        await _lancer(lanceur, [str(git), "/remove:g", compte])
+    await _lancer(lanceur, [str(racine), "/remove:g", compte])
+
+
 async def accorder_droits_agent(
     wt: RunWorktree,
     commande_de_tests: str | None,
@@ -66,13 +88,7 @@ async def accorder_droits_agent(
     compte = settings.agent_user
     if not compte:
         return
-    await _lancer(lanceur, [str(wt.racine), "/grant", f"{compte}:(OI)(CI)M"])
-    git = wt.racine / ".git"
-    if git.exists():
-        droit = "(OI)(CI)RX" if git.is_dir() else "RX"
-        await _lancer(lanceur, [str(git), "/inheritance:d"])
-        await _lancer(lanceur, [str(git), "/remove:g", compte])
-        await _lancer(lanceur, [str(git), "/grant:r", f"{compte}:{droit}"])
+    await poser_ecriture(wt.racine, compte, lanceur)
     script = script_de_verification(wt.projet, commande_de_tests)
     for fichier in fichiers_proteges(wt, script):
         await _lancer(lanceur, [str(fichier), "/deny", f"{compte}:(W,D)"])
