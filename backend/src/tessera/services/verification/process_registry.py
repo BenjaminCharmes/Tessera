@@ -23,6 +23,7 @@ from tessera.services.noyau.groupe_de_processus import creer_groupe, fermer_le_g
 from tessera.services.noyau.lancement import essais_de_commande, options_de_lancement
 from tessera.services.providers.perimetre import racine_autorisee
 from tessera.services.verification.env_du_code_de_projet import env_du_code_de_projet
+from tessera.services.verification.reprise_sac import relancer_si_refuse
 from tessera.services.verification.service_etat import ServiceEtat
 from tessera.utils.logger import get_logger
 
@@ -238,10 +239,8 @@ class ProcessRegistry:
     ) -> Service:
         """Lance une commande déclarée, sans shell, sous la racine du projet.
 
-        Refuse si ce service tourne déjà : deux lancements de suite laissaient
-        douze processus là où trois suffisent, et la liste n'en montrait qu'un
-        (ticket-153). L'interface l'empêchait en affichant « Arrêter », mais
-        une protection qui ne vit que dans l'affichage n'en est pas une.
+        Refuse si ce service tourne déjà : deux lancements laissaient douze
+        processus là où trois suffisent (ticket-153).
         """
         deja = next(
             (s for s in self.services_de(project_id) if s.nom == nom and s.en_cours),
@@ -257,9 +256,12 @@ class ProcessRegistry:
             processus = await self._lancer(args, dossier)
         except FileNotFoundError as exc:
             raise CommandeInvalide(introuvable(args[0])) from exc
-        # Deux filets, pour deux pannes différentes : le groupe global tue
-        # tout si le backend meurt (ticket-150) ; le groupe du service permet
-        # de tuer son seul arbre à l'arrêt (ticket-153).
+        except OSError as exc:
+            processus = await relancer_si_refuse(
+                exc, lambda: self._lancer(args, dossier), dossier, racine, project_id
+            )
+        # Deux filets : le groupe global tue tout si le backend meurt
+        # (ticket-150), celui du service son seul arbre à l'arrêt (ticket-153).
         rattacher(processus.pid)
         groupe = creer_groupe()
         if groupe is not None:
@@ -292,10 +294,8 @@ class ProcessRegistry:
     async def _lancer(self, args: list[str], dossier: Path) -> Any:
         """Lance les arguments, en essayant l'équivalent Windows au besoin.
 
-        La règle de résolution vit dans `services/noyau/lancement.py`, appelée
-        aussi par `TestRunnerService` : elle n'existait ici que sous forme
-        d'une copie, et le testeur, qui ne l'avait pas, rendait `blocked` des
-        tickets dont le code était juste (ticket-143, ticket-157).
+        La règle vit dans `services/noyau/lancement.py`, partagée avec
+        `TestRunnerService` (ticket-143, ticket-157).
         """
         derniere: FileNotFoundError | None = None
         for tentative in essais_de_commande(args):

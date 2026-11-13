@@ -4,6 +4,7 @@ import shlex
 import time
 from collections.abc import AsyncGenerator, Awaitable, Callable, Mapping
 from contextlib import asynccontextmanager
+from functools import partial
 from pathlib import Path
 from typing import Any
 
@@ -19,6 +20,7 @@ from tessera.services.verification.limiteur_de_suites import LimiteurDeSuites
 from tessera.services.verification.minuteur_d_etape import MinuteurDEtape
 from tessera.services.verification.outil_introuvable import outil_introuvable
 from tessera.services.verification.process_registry import CommandeInvalide, resoudre_le_cwd
+from tessera.services.verification.reprise_sac import relancer_apres_refus
 from tessera.services.verification.resultat_de_test import EtapeCoupee, EtapeTest, TestCommandNotFound, TestResult  # noqa: F401 — réexportés
 from tessera.services.verification.sortie_de_test import extract_counts, extract_errors, extract_failure_details, extract_summary_line
 from tessera.utils.logger import get_logger
@@ -163,12 +165,9 @@ class TestRunnerService:
         timeout: int | None = None,
         en_attente: Callable[[], Awaitable[None]] | None = None,
     ) -> TestResult:
-        # Résolu, et pas seulement absolu : `projects/` ne contient que des
-        # liens symboliques vers les vrais dépôts. Lancé sur le chemin du
-        # lien, Vite résout une racine réelle qu'il ne retrouve plus, et les
-        # tests échouaient sous le pipeline en passant à la main, au même
-        # instant et au même endroit. ADR-017 pose déjà l'invariant pour le
-        # provider ; il vaut partout où l'on lance un processus (ticket-158).
+        # Résolu, pas seulement absolu : `projects/` ne contient que des liens
+        # vers les vrais dépôts, et Vite ne retrouve pas la racine réelle d'un
+        # chemin de lien (ticket-158, ADR-017).
         project_path = project_path.resolve()
         cmd = self.detect_test_command(project_path, override=test_command)
         if timeout is None:
@@ -201,8 +200,7 @@ class TestRunnerService:
                 errors=[str(exc)],
             )
 
-        # Le créneau est pris ici : l'attente ne compte pas dans le délai.
-        # `start` n'est relevé qu'une fois le créneau obtenu (ticket-348).
+        # Créneau pris ici : l'attente ne compte pas dans le délai (ticket-348).
         async with _acquis(en_attente):
             start = time.monotonic()
             etapes: list[EtapeTest] = []
@@ -211,6 +209,8 @@ class TestRunnerService:
             for args in etapes_args:
                 debut_etape = time.monotonic()
                 issue = await self._executer(args, dossier, cmd, timeout, start)
+                issue = await relancer_apres_refus(
+                    issue, partial(self._executer, args, dossier, cmd, timeout, start), dossier, project_path)
                 duree_etape_ms = int((time.monotonic() - debut_etape) * 1000)
                 if isinstance(issue, TestResult):
                     issue.etapes = etapes

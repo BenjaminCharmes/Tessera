@@ -9,6 +9,8 @@ two apart so the coder is not sent to fix code that is not at fault
 import re
 from pathlib import Path
 
+from tessera.services.verification.reprise_sac import refuse_par_sac
+
 # Chaque motif capture le nom de l'outil dans son premier groupe.
 _PNPM = re.compile(
     r"ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL\s+Command \"([^\"]+)\" not found"
@@ -31,6 +33,9 @@ def outil_introuvable(sortie: str, dossier: Path, projet: Path | None = None) ->
     ``node_modules`` path outside both is a stale link. A module of the
     project's own code (outside ``node_modules``) is never a missing tool.
     """
+    if refuse_par_sac(sortie):
+        # Lanceur du venv encore refusé après la réparation (ticket-948).
+        return "python.exe de .venv (bloqué par Smart App Control)"
     for motif in (_PNPM, _SHELL, _WINDOWS):
         trouve = motif.search(sortie)
         if trouve:
