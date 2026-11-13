@@ -33,12 +33,19 @@ rituels:
     projets: [carriere]
 
   - id: rapport-mensuel
-    titre: Rapport mensuel
-    rythme: { type: mensuel, jour: 18, heure: "10:00", avant: 22 }
-    duree_min: 20
+    titre: Rapport mensuel et pointage
+    rythme: { type: mensuel, jour: 15, heure: "10:00", avant: 20 }
+    duree_min: 30
     phrase: point mensuel
-    detail: Rédiger le rapport du mois, à rendre avant le 22.
+    detail: Pointage horaire du mois et rapport d'activité, au plus tard le 20.
     projets: [carriere]
+
+  - id: note-de-frais
+    titre: Note de frais
+    rythme: { type: mensuel, jour: 22, heure: "10:00", avant: 27 }
+    duree_min: 10
+    phrase: note de frais
+    detail: Valider la note de frais du mois, au plus tard le 27.
 
   - id: portfolio-hebdo
     titre: Portfolio de la semaine
