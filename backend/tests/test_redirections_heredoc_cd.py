@@ -111,3 +111,26 @@ async def test_cd_then_cd_up_then_escape_is_refused(tmp_path: Path) -> None:
     projet = _projet(tmp_path)
 
     assert await _refuse(projet, "cd backend && cd .. && echo x > ../dehors.txt") is True
+
+
+async def test_relative_target_resolves_from_agent_folder_under_ancestor_root(
+    tmp_path: Path,
+) -> None:
+    # Ticket-959 : le codeur d'ide-core tourne dans `projects/ide-core`, sa
+    # racine d'écriture est le dépôt. `cd ../../backend && cat > x` vise
+    # `<dépôt>/backend/x`, pas `<dépôt>/../../backend/x`.
+    depot = tmp_path / "depot"
+    projet = depot / "projects" / "ide-core"
+    projet.mkdir(parents=True)
+    (depot / "backend").mkdir()
+    hook = hook_refus_hors_perimetre(projet, racine=depot.resolve())
+
+    async def refuse(commande: str) -> bool:
+        sortie = await hook(
+            {"tool_name": "Bash", "tool_input": {"command": commande}}, None, None
+        )
+        return bool(sortie)
+
+    assert await refuse("cd ../../backend && cat > m.py <<'EOF'\nx\nEOF") is False
+    assert await refuse("echo x > ../../backend/m.py") is False
+    assert await refuse("cd ../../.. && echo x > dehors.txt") is True

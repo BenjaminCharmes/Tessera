@@ -89,7 +89,9 @@ def hors_perimetre(
             return True
         cible = Path(texte)
         if not cible.is_absolute():
-            cible = racine / cible
+            # Relatif au dossier de l'agent (son `cwd`), pas à la racine : sous
+            # `git_root: ancestor` les deux diffèrent (ticket-959).
+            cible = project_path / cible
         return not cible.resolve().is_relative_to(racine)
     except (OSError, ValueError):
         # Un chemin que le système refuse de résoudre n'est pas un chemin
