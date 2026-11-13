@@ -4,7 +4,7 @@ created: 2026-11-12
 depends_on: []
 estimated_days: 2
 id: ticket-943
-pr_number: null
+pr_number: 1102
 preuve_reelle: true
 priority: high
 status: done
