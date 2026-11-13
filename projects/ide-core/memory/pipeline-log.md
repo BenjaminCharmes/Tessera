@@ -9257,3 +9257,6 @@ error: Please commit or stash them.
 - 2026-11-13 16:02:47 UTC — [ide-core] ticket-967 retiré de la file
 - 2026-11-13 16:02:47 UTC — [ide-core] ticket-968 retiré de la file
 - 2026-11-13 16:03:23 UTC — [ticket-962] leçons: une leçon proposée
+- 2026-11-13 16:05:27 UTC — [ticket-962] documentation: 0 fichier(s) (115594ms)
+- 2026-11-13 16:05:27 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-13 16:05:27 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
