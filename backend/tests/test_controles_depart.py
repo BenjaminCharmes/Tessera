@@ -219,3 +219,9 @@ def test_an_unknown_placeholder_is_a_gap_naming_it(workspace: Path) -> None:
     manques = manques_avant_depart(projet, "ghp_exemple", racine_worktree=wt)
 
     assert len(manques) == 1 and "{depot}" in manques[0]
+
+
+def test_refus_des_manques_is_none_for_a_missing_folder(tmp_path: Path) -> None:
+    from tessera.services.pipeline.controles_depart import refus_des_manques
+
+    assert refus_des_manques(tmp_path / "absent", "", "p", False) is None
