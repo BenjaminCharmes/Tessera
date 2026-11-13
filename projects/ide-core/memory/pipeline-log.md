@@ -9241,3 +9241,6 @@ error: Please commit or stash them.
 - 2026-11-13 13:22:56 UTC — [ticket-947] validateur: APPROVED — Tous les critères sont satisfaits. Le code déploie une nouvelle variable `IDE_WO (46483ms)
 - 2026-11-13 13:23:08 UTC — [ticket-947] tour 1 — reviewer terminé (59358ms)
 - 2026-11-13 13:23:10 UTC — [ticket-947] APPROVED après 1 tour(s)
+- 2026-11-13 13:31:32 UTC — [ticket-947] documentation: 2 fichier(s) (473139ms) — après tour de correction — refusé : doc-fonctionnelle : docs/guide-utilisateur.md : règle « preuve » — l'édition ne cite aucun code livré. Ajoute `preuve: [{fichier, extrait}]`, extrait recopié du
+- 2026-11-13 13:31:32 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-13 13:31:32 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
