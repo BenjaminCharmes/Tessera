@@ -756,3 +756,94 @@ async def _lister_runs() -> list[dict[str, object]]:
     from tessera.services.noyau.database_runs import list_runs
 
     return await list_runs(settings.ide_db_path, "mon-projet")
+
+
+# ------------------------------------------------------------------
+# Dépendances d'un run single — ticket-958
+# ------------------------------------------------------------------
+
+
+def _ecrire_ticket(ws: Path, ticket_id: str, statut: str, depends_on: list[str]) -> None:
+    dossier = {"todo": "todo", "done": "done", "blocked": "blocked"}[statut]
+    deps = "[" + ", ".join(depends_on) + "]"
+    (ws / "mon-projet" / "tickets" / dossier / f"{ticket_id}.md").write_text(
+        f"---\nid: {ticket_id}\ntitle: \"T\"\ntype: feat\nstatus: {statut}\n"
+        f"priority: medium\nagent: codeur\ndepends_on: {deps}\n---\n\n# {ticket_id}\n",
+        encoding="utf-8",
+    )
+
+
+def _brancher_faux(monkeypatch: pytest.MonkeyPatch) -> _FakeOrchestrator:
+    fake = _FakeOrchestrator()
+
+    async def _build(project_id: str) -> _FakeOrchestrator:
+        return fake
+
+    monkeypatch.setattr("tessera.routers.orchestrator.build_orchestrator", _build)
+    return fake
+
+
+def _lancer(client: TestClient, ticket_id: str, **extra: object) -> object:
+    return client.post(
+        "/api/v1/orchestrator/run",
+        json={"project_id": "mon-projet", "ticket_id": ticket_id, **extra},
+    )
+
+
+def test_single_is_refused_when_a_dependency_is_blocked(
+    workspace: Path, monkeypatch: pytest.MonkeyPatch, client: TestClient
+) -> None:
+    _brancher_faux(monkeypatch)
+    _ecrire_ticket(workspace, "ticket-010", "blocked", [])
+    _ecrire_ticket(workspace, "ticket-011", "todo", ["ticket-010"])
+    resp = _lancer(client, "ticket-011")
+    assert resp.status_code == 409  # type: ignore[attr-defined]
+    detail = resp.json()["detail"]  # type: ignore[attr-defined]
+    assert "ticket-010" in detail and "blocked" in detail
+
+
+def test_single_is_refused_when_a_dependency_is_missing(
+    workspace: Path, monkeypatch: pytest.MonkeyPatch, client: TestClient
+) -> None:
+    _brancher_faux(monkeypatch)
+    _ecrire_ticket(workspace, "ticket-011", "todo", ["ticket-099"])
+    resp = _lancer(client, "ticket-011")
+    assert resp.status_code == 409  # type: ignore[attr-defined]
+    assert "ticket-099" in resp.json()["detail"]  # type: ignore[attr-defined]
+
+
+def test_single_starts_when_every_dependency_is_done(
+    workspace: Path, monkeypatch: pytest.MonkeyPatch, client: TestClient
+) -> None:
+    _brancher_faux(monkeypatch)
+    _ecrire_ticket(workspace, "ticket-010", "done", [])
+    _ecrire_ticket(workspace, "ticket-011", "todo", ["ticket-010"])
+    with client.websocket_connect("/api/v1/orchestrator/observe") as ws:
+        _demarrer(client, {"project_id": "mon-projet", "ticket_id": "ticket-011"})
+        _attendre(ws, "run_closed")
+
+
+def test_single_force_starts_despite_an_unfinished_dependency(
+    workspace: Path, monkeypatch: pytest.MonkeyPatch, client: TestClient
+) -> None:
+    _brancher_faux(monkeypatch)
+    _ecrire_ticket(workspace, "ticket-010", "blocked", [])
+    _ecrire_ticket(workspace, "ticket-011", "todo", ["ticket-010"])
+    with client.websocket_connect("/api/v1/orchestrator/observe") as ws:
+        _demarrer(
+            client,
+            {"project_id": "mon-projet", "ticket_id": "ticket-011", "force": True},
+        )
+        _attendre(ws, "run_closed")
+
+
+def test_single_refusal_does_not_reserve_the_project(
+    workspace: Path, monkeypatch: pytest.MonkeyPatch, client: TestClient
+) -> None:
+    _brancher_faux(monkeypatch)
+    _ecrire_ticket(workspace, "ticket-010", "blocked", [])
+    _ecrire_ticket(workspace, "ticket-011", "todo", ["ticket-010"])
+    assert _lancer(client, "ticket-011").status_code == 409  # type: ignore[attr-defined]
+    with client.websocket_connect("/api/v1/orchestrator/observe") as ws:
+        _demarrer(client, {"project_id": "mon-projet", "ticket_id": "ticket-001"})
+        _attendre(ws, "run_closed")

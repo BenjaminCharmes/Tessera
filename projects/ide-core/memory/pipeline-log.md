@@ -9482,3 +9482,46 @@ error: Please commit or stash them.
 - 2026-11-12 17:05:40 UTC — [ticket-954] APPROVED après 2 tour(s)
 - 2026-11-12 17:07:49 UTC — [ticket-954] leçons: une leçon proposée
 - 2026-11-12 17:09:52 UTC — [ticket-954] documentation: 0 fichier(s) (117891ms)
+- 2026-11-12 17:18:01 UTC — [ide-core] ticket-954 PR #1083 mergée (CI verte)
+- 2026-11-12 18:38:33 UTC — [ticket-958] branche ticket-958-a-single-run-is-refused-while-one-of-its-dependen
+- 2026-11-12 18:38:38 UTC — [ticket-958] tour 1 — codeur démarré
+- 2026-11-12 18:39:27 UTC — [ticket-958] tour 1 — codeur terminé (48139ms)
+- 2026-11-12 18:39:56 UTC — [ticket-958] testeur: OK (exit 0)
+- 2026-11-12 18:40:08 UTC — [ticket-958] securite: PASS — Il n'y a aucun diff à auditer. Ce qui m'a été transmis est le compte rendu du co (11235ms)
+- 2026-11-12 18:40:10 UTC — [ticket-958] tour 1 — reviewer démarré
+- 2026-11-12 18:40:39 UTC — [ticket-958] tour 1 — reviewer terminé (28578ms)
+- 2026-11-12 18:40:59 UTC — [ticket-958] validateur: APPROVED — All acceptance criteria target backend code (`backend/src/tessera/` and `backend (48485ms)
+- 2026-11-12 18:41:01 UTC — [ticket-958] CHANGES_REQUESTED tour 1: Reviewer : 1. Aucun des cinq critères d'acceptation n'est rempli : le diff ne contient ni le contrôle des dépendances en mode single dans routers/orchestrator.py, ni le module services/pipeline, ni au
+- 2026-11-12 18:41:01 UTC — [ticket-958] tour 2 — codeur démarré
+- 2026-11-12 18:41:36 UTC — [ticket-958] tour 2 — codeur terminé (32656ms)
+- 2026-11-12 18:41:44 UTC — [ticket-958] testeur: en attente d'un créneau de test
+- 2026-11-12 18:42:03 UTC — [ticket-958] testeur: OK (exit 0)
+- 2026-11-12 18:42:09 UTC — [ticket-958] securite: PASS — Je n'ai reçu aucun diff, seulement le rapport du codeur : il n'a modifié aucun f (5453ms)
+- 2026-11-12 18:42:10 UTC — [ticket-958] tour 2 — reviewer démarré
+- 2026-11-12 18:42:24 UTC — [ticket-958] tour 2 — reviewer terminé (13843ms)
+- 2026-11-12 18:42:30 UTC — [ticket-958] validateur: CHANGES_REQUESTED — Le run n'a produit aucun code : le garde-fou a rejeté l'écriture du module `serv (19514ms)
+- 2026-11-12 18:42:30 UTC — [ticket-958] CHANGES_REQUESTED tour 2: Reviewer : 1. Aucun des cinq critères d'acceptation n'est rempli. Le diff ne contient ni le contrôle des dépendances en mode single dans routers/orchestrator.py, ni le module de contrôle, ni aucun des
+- 2026-11-12 18:42:30 UTC — [ticket-958] tour 3 — codeur démarré
+- 2026-11-12 18:42:38 UTC — [ticket-958] tour 3 — codeur terminé (7265ms)
+- 2026-11-12 18:42:56 UTC — [ticket-958] testeur: OK (exit 0)
+- 2026-11-12 18:43:03 UTC — [ticket-958] securite: PASS — Le diff est vide : le codeur dit qu'il n'a modifié aucun fichier, parce que le h (6203ms)
+- 2026-11-12 18:43:04 UTC — [ticket-958] tour 3 — reviewer démarré
+- 2026-11-12 18:43:16 UTC — [ticket-958] tour 3 — reviewer terminé (12093ms)
+- 2026-11-12 18:43:23 UTC — [ticket-958] validateur: CHANGES_REQUESTED — Le run n'a produit aucun code : les trois tours ont échoué car le garde-fou a re (19203ms)
+- 2026-11-12 18:43:23 UTC — [ticket-958] CHANGES_REQUESTED tour 3: Reviewer : 1. Aucun des cinq critères d'acceptation n'est rempli. Le diff ne contient ni le contrôle des dépendances en mode single dans routers/orchestrator.py, ni le module de contrôle, ni aucun des
+- 2026-11-12 18:43:23 UTC — [ticket-958] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-12 18:43:28 UTC — [ide-core] file interrompue : ticket-958 non approuvé
+- 2026-11-13 08:25:19 UTC — [ticket-958] branche ticket-958-a-single-run-is-refused-while-one-of-its-dependen
+- 2026-11-13 08:25:22 UTC — [ticket-958] branche reprise (3 commit(s)) — refus précédent : revue, codeur en premier
+- 2026-11-13 08:25:22 UTC — [ticket-958] tour 1 — codeur démarré
+- 2026-11-13 08:29:23 UTC — [ticket-958] tour 1 — codeur terminé (240828ms)
+- 2026-11-13 08:30:07 UTC — [ticket-958] testeur: dur�es : ruff 1 s, mypy 21 s, pytest 32 s, mypy-linux 18 s ; impact depuis base : 19 fichier(s) de test
+- 2026-11-13 08:30:24 UTC — [ticket-958] securite: PASS — PASS : le diff ajoute un contrôle des dépendances au mode `single` (refus 409, c (17264ms)
+- 2026-11-13 08:30:25 UTC — [ticket-958] tour 1 — reviewer démarré
+- 2026-11-13 08:30:46 UTC — [ticket-958] tour 1 — reviewer terminé (20766ms)
+- 2026-11-13 08:30:52 UTC — [ticket-958] validateur: APPROVED — Le code implémente le contrôle des dépendances pour les runs single : une dépend (27141ms)
+- 2026-11-13 08:30:52 UTC — [ticket-958] APPROVED après 1 tour(s)
+- 2026-11-13 08:32:07 UTC — [ticket-958] leçons: refusée — preuve absente du retour du run
+- 2026-11-13 08:37:19 UTC — [ticket-958] documentation: 2 fichier(s) (304641ms) — après tour de correction
+- 2026-11-13 08:37:19 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-13 08:37:19 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
