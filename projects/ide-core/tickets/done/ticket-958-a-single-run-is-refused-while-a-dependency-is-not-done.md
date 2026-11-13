@@ -4,7 +4,7 @@ created: 2026-11-12
 depends_on: []
 estimated_days: 0.5
 id: ticket-958
-pr_number: null
+pr_number: 1089
 priority: high
 status: done
 title: A single run is refused while one of its dependencies is not done
