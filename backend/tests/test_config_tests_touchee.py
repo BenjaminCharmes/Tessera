@@ -67,6 +67,14 @@ def test_conftest_et_vitest_sont_nommes() -> None:
     assert fichiers == ["backend/tests/conftest.py", "frontend/vitest.config.ts"]
 
 
+def test_vitest_setup_file_is_test_configuration() -> None:
+    # Ticket-966 : `contraintes.md` dit `vitest.*` ; un setup global peut
+    # affaiblir tous les tests (Kadoomi 178, `vitest.setup.ts`).
+    diff = _VITEST.replace("vitest.config.ts", "vitest.setup.ts")
+
+    assert fichiers_de_config_touches(diff, []) == ["frontend/vitest.setup.ts"]
+
+
 def test_un_diff_sans_configuration_ne_porte_pas_davertissement() -> None:
     fichiers = fichiers_de_config_touches(_CODE, [])
 
