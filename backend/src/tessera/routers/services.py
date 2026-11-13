@@ -17,6 +17,7 @@ from tessera.services.noyau.services_demandes import demander, retirer
 from tessera.services.projets.project_loader import load_services_config
 from tessera.services.supervision.inventaire_apps import inventaire
 from tessera.services.supervision.sonde_systeme import SondeSysteme
+from tessera.services.verification.ports_de_tessera import conflit_avec_tessera
 from tessera.services.verification.process_registry import PROCESS_REGISTRY, CommandeInvalide, ProcessRegistry, Service, ServiceDejaEnCours
 from tessera.services.verification.service_etat import ServiceEtat, ServicesArretes, ServicesDemarres
 from tessera.utils.logger import get_logger
@@ -91,6 +92,22 @@ async def _refuser_si_deja_lance_hors_de_tessera(
             )
 
 
+def _refuser_un_port_de_tessera(project_id: str, declares: list[dict[str, str]]) -> None:
+    """409 naming the port if a declared service would sit on one of Tessera's."""
+    for declare in declares:
+        port = conflit_avec_tessera(declare["commande"])
+        if port is not None:
+            raise HTTPException(
+                status_code=409,
+                detail=(
+                    f"Le service « {declare['nom']} » du projet « {project_id} » "
+                    f"viserait le port {port}, qui est celui de Tessera. "
+                    "Déclare un autre port dans son `agents.json` "
+                    "(par exemple `--port 5180`)."
+                ),
+            )
+
+
 async def lancer_les_services(
     project_id: str, sonde: SondeSysteme, registre: ProcessRegistry = PROCESS_REGISTRY
 ) -> ServicesDemarres:
@@ -109,6 +126,7 @@ async def lancer_les_services(
                 'entrée portant {"nom": "...", "commande": "..."}.'
             ),
         )
+    _refuser_un_port_de_tessera(project_id, declares)
     await _refuser_si_deja_lance_hors_de_tessera(
         project_id, {d["nom"] for d in declares}, sonde
     )
