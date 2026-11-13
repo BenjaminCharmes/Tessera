@@ -9230,6 +9230,25 @@ error: Please commit or stash them.
 - 2026-11-13 09:36:21 UTC — [ticket-960] CHANGES_REQUESTED tour 3: Reviewer : 1. Les tickets `design` (architecte, revues de projet) ne peuvent plus être approuvés. `diff_depuis_base` exclut toujours `tickets/` (`_ORCHESTRATOR_ARTIFACT_PATHS`, dans git_workspace/chem
 - 2026-11-13 09:36:21 UTC — [ticket-960] BLOCKED après 3 tour(s) sans approbation
 - 2026-11-13 09:36:31 UTC — [ide-core] file interrompue : ticket-960 non approuvé
+- 2026-11-13 16:54:13 UTC — [ide-core] ticket-962 PR #1106 confiée au CIWatcher
+- 2026-11-13 16:56:41 UTC — [ticket-962] livraison: nouvelle tentative de la PR #1106 après une erreur réseau (ConnectError: [Errno 11001] getaddrinfo failed), PR non mergée
+- 2026-11-13 16:56:44 UTC — [ticket-962] livraison: arrêt — PR #1106 non mergée : tête de la PR #1106 illisible (ConnectError: [Errno 11001] getaddrinfo failed) : elle reste ouverte
+- 2026-11-13 17:41:43 UTC — [ticket-964] branche ticket-964-the-real-proof-flag-of-a-ticket-is-read-before-an
+- 2026-11-13 17:41:47 UTC — [ticket-964] tour 1 — codeur démarré
+- 2026-11-13 17:44:15 UTC — [ticket-964] tour 1 — codeur terminé (148125ms)
+- 2026-11-13 17:44:21 UTC — [ticket-964] testeur: en attente d'un créneau de test
+- 2026-11-13 17:50:24 UTC — [ticket-964] testeur: 1 failed, 782 passed, 40 warnings in 230.38s (0:03:50)
+- 2026-11-13 17:50:25 UTC — [ticket-964] tests rouges au tour 1
+- 2026-11-13 17:50:25 UTC — [ticket-964] tour 2 — codeur démarré
+- 2026-11-13 17:50:49 UTC — [ticket-964] tour 2 — codeur terminé (24328ms)
+- 2026-11-13 17:55:38 UTC — [ticket-964] testeur: 1 failed, 1068 passed, 40 warnings in 283.02s (0:04:43)
+- 2026-11-13 17:55:38 UTC — [ticket-964] tests rouges au tour 2
+- 2026-11-13 17:55:38 UTC — [ticket-964] tour 3 — codeur démarré
+- 2026-11-13 18:01:22 UTC — [ticket-964] tour 3 — codeur terminé (343172ms)
+- 2026-11-13 18:06:55 UTC — [ticket-964] testeur: dur�es : ruff 0 s, pytest 328 s ; impact depuis base : 173 fichier(s) de test
+- 2026-11-13 18:06:55 UTC — [ticket-964] tests rouges au tour 3
+- 2026-11-13 18:06:55 UTC — [ticket-964] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-13 18:07:01 UTC — [ide-core] file interrompue : ticket-964 non approuvé
 - 2026-11-13 15:33:46 UTC — [ide-core] ticket-948 PR #1103 non surveillée (livraison arrêtée)
 - 2026-11-13 15:34:13 UTC — [ticket-962] branche ticket-962-each-documentation-role-reads-the-documentation-a
 - 2026-11-13 15:34:51 UTC — [ticket-962] tour 1 — codeur démarré
