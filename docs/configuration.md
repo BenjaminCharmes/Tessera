@@ -17,12 +17,14 @@ Toutes les variables sont dans `.env` (copie de `.env.example`) :
 | `LLM_MAX_BUDGET_USD` | | `2.0` | Plafond de dépense d'un seul appel agent. Un dépassement n'est plus une erreur : le run se termine non approuvé et commite son travail (ADR-037) |
 | `LLM_DUREE_MAX_ROLE_TEXTE_S` | | `900` | Durée totale maximale d'un appel de rôle texte (validateur, sécurité, documentation), attente de créneau Ollama comprise (en secondes, `0` = aucune borne, ticket-518). Dépassée, l'appel est indisponible : le repli joue, et la ligne `<rôle>: repli vers …` s'écrit dans `pipeline-log.md` |
 | `AGENT_SILENCE_MAX_S` | | `1200` | Délai maximum sans message du flux d'un agent avant interruption du processus (en secondes, ticket-381) |
+| `BASH_SILENCE_MAX_S` | | `660` | Même borne, tant qu'un appel Bash attend son résultat : la limite du CLI plus une minute (ticket-957). 0 la désactive. |
 | `RUN_MAX_BUDGET_USD` | | `5.0` | Plafond de dépense d'un run autonome (`0` = aucun). En mode file, le plafond est multiplié par le nombre de tickets, sauf si la requête fixe `budget_usd` |
 | `CHAT_MAX_CONVERSATION_USD` | | `2.0` | Plafond cumulé d'une conversation du chat |
 | `KEEP_AWAKE_DURING_RUNS` | | `true` | Maintient le système éveillé tant qu'un run est ouvert (Windows uniquement — no-op ailleurs). L'écran peut s'éteindre ; seule la mise en veille du système est empêchée. Désactiver si un outil externe gère déjà la veille (ticket-394) |
 | `IDE_WORKSPACE_DIR` | | `~/tessera-workspace` | Dossier des projets |
 | `IDE_STATE_DIR` | | `%LOCALAPPDATA%\Tessera` (Windows); `~/.local/state/tessera` (macOS/Linux) | Dossier hors du dépôt pour l'état persistant de l'IDE (signalements en attente, journaux de lancement). Créé au besoin. Les logs du backend et Vite y vont dans un sous-dossier `logs/` |
 | `IDE_WORKTREES_DIR` | | `~/.tessera/worktrees` | Racine des worktrees de run, `<projet>/<ticket>` dessous (ADR-056). Hors de tout dépôt ; la garder courte, Windows limitant la longueur des chemins. Ne sert qu'aux projets qui déclarent `worktree` dans `agents.json` |
+| `IDE_WORKTREES_DIR_AGENT` | | `C:\ProgramData\Tessera\worktrees` | Racine des worktrees d'un projet à `worktree.compte_agent` quand `AGENT_USER` est renseigné : le CLI du compte ne résout pas les chemins du profil. Créée au premier usage, ACL sans héritage (SYSTEM et Administrateurs `F`, utilisateur du backend `M`) ; `agent doctor` la vérifie |
 | `IDE_PROMPTS_DIR` | | `agents/prompts/` | Dossier des system prompts |
 | `IDE_LOG_LEVEL` | | `INFO` | Niveau de log |
 | `GITHUB_TOKEN` | | `""` | Token GitHub (sync issues, clone, PRs) |

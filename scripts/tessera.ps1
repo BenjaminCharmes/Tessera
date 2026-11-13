@@ -150,6 +150,25 @@ function Get-VersionCli([string]$Chemin) {
     return ([string](& $Chemin --version 2>$null)).Trim()
 }
 
+function Test-DossierWorktreesAgent {
+    # IDE_WORKTREES_DIR_AGENT : absent, c'est normal avant le 1er run ; present, son ACL est sans heritage.
+    $dossier = if ($env:IDE_WORKTREES_DIR_AGENT) { $env:IDE_WORKTREES_DIR_AGENT } else { 'C:\ProgramData\Tessera\worktrees' }
+    if (-not (Test-Path -LiteralPath $dossier)) {
+        Write-Host "[info]  dossier des worktrees agent absent ($dossier) : cree au premier run"
+        return
+    }
+    # Par SID, pas par nom : sur un Windows en francais, icacls ecrit
+    # « AUTORITE NT\Systeme » et « BUILTIN\Administrateurs ».
+    $acl = Get-Acl -LiteralPath $dossier
+    $heritage = -not $acl.AreAccessRulesProtected
+    $complets = @($acl.Access | Where-Object { $_.AccessControlType -eq 'Allow' -and ($_.FileSystemRights -band [System.Security.AccessControl.FileSystemRights]::FullControl) -eq [System.Security.AccessControl.FileSystemRights]::FullControl } | ForEach-Object {
+        try { $_.IdentityReference.Translate([System.Security.Principal.SecurityIdentifier]).Value } catch { $null }
+    })
+    $droits = ($complets -contains 'S-1-5-18') -and ($complets -contains 'S-1-5-32-544')
+    Test-Etape "dossier des worktrees agent ($dossier) sans heritage" (-not $heritage) "icacls '$dossier' /inheritance:r"
+    Test-Etape 'dossier des worktrees agent : SYSTEM et Administrateurs (F)' $droits "icacls '$dossier' /grant:r *S-1-5-18:(OI)(CI)F *S-1-5-32-544:(OI)(CI)F"
+}
+
 function Invoke-AgentDoctor {
     $script:AgentEchecs = 0
     $compte = 'tessera-agent'
@@ -169,6 +188,7 @@ function Invoke-AgentDoctor {
     foreach ($outil in 'uv', 'node') {
         Test-Etape "$outil trouve sur ce poste" ([bool](Get-Command $outil -ErrorAction SilentlyContinue)) "installer $outil, puis agent setup (droits RX)"
     }
+    Test-DossierWorktreesAgent
     if ($script:AgentEchecs -gt 0) { exit 1 }
     Write-Host 'Compte agent pret.' -ForegroundColor Green
     exit 0
