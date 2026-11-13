@@ -17,7 +17,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Position = 0)]
-    [ValidateSet('help', 'setup', 'doctor', 'run', 'dev', 'dev-frontend', 'stop', 'test', 'lint', 'verify', 'check-tickets', 'secrets', 'agent')]
+    [ValidateSet('help', 'setup', 'doctor', 'run', 'dev', 'dev-frontend', 'stop', 'test', 'lint', 'verify', 'check-tickets', 'secrets', 'agent', 'hooks')]
     [string]$Task = 'help',
 
     # Identifiant du projet, pour `check-tickets` ; sous-verbe, pour `secrets`.
@@ -47,6 +47,7 @@ function Show-Help {
     Write-Host '  .\scripts\tessera.ps1 secrets lister      Dit ou vit chaque secret (coffre, .env, absent)'
     Write-Host '  .\scripts\tessera.ps1 secrets set <NOM>   Range un secret, saisi masque'
     Write-Host '  .\scripts\tessera.ps1 secrets supprimer <NOM>  Retire un secret du coffre'
+    Write-Host '  .\scripts\tessera.ps1 hooks            Pose le hook pre-push des termes interdits dans chaque projet'
     Write-Host '  .\scripts\tessera.ps1 agent setup         Installe le compte agent (voir docs/agent-isolation.md)'
     Write-Host '  .\scripts\tessera.ps1 agent jeton         Change le jeton d abonnement de l agent'
     Write-Host '  .\scripts\tessera.ps1 agent doctor        Verifie le compte agent, son coffre et son CLI'
@@ -107,6 +108,14 @@ function Invoke-Secrets([string]$SousVerbe, [string]$NomSecret) {
             & uv run python -m tessera.coffre_cli $SousVerbe
         }
     } finally { Pop-Location }
+    exit $LASTEXITCODE
+}
+
+function Invoke-Hooks {
+    # ticket-968 : le hook pre-push de Tessera dans le depot de chaque projet.
+    Push-Location (Join-Path $Root 'backend')
+    try { & uv run python -m tessera.services.creation_projet.hook_pre_push }
+    finally { Pop-Location }
     exit $LASTEXITCODE
 }
 
@@ -280,6 +289,7 @@ switch ($Task) {
     'doctor' { Invoke-Doctor }
     'secrets' { Invoke-Secrets $Projet $Nom }
     'agent' { Invoke-Agent $Projet }
+    'hooks' { Invoke-Hooks }
     'stop' { Stop-Tessera }
     'dev' { Start-Backend; Write-Host '-> http://localhost:8100/docs' }
     'dev-frontend' { Start-Frontend; Write-Host '-> http://localhost:5173' }
