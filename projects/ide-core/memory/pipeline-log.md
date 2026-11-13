@@ -9309,3 +9309,14 @@ error: Please commit or stash them.
 - 2026-11-13 18:51:20 UTC — [ticket-967] documentation: 0 fichier(s) (242703ms) — après tour de correction
 - 2026-11-13 18:51:20 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
 - 2026-11-13 18:51:20 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-13 18:53:31 UTC — [ide-core] ticket-967 PR #1112 confiée au CIWatcher
+- 2026-11-13 18:46:53 UTC — [ide-core] ticket-965 PR #1111 mergée (CI verte)
+- 2026-11-13 18:53:36 UTC — [ticket-968] branche ticket-968-every-project-repository-carries-the-forbidden-te
+- 2026-11-13 18:53:39 UTC — [ticket-968] tour 1 — codeur démarré
+- 2026-11-13 18:58:55 UTC — [ticket-968] tour 1 — codeur terminé (316421ms)
+- 2026-11-13 19:07:10 UTC — [ticket-968] testeur: dur�es : ruff 0 s, mypy 11 s, mypy-linux 12 s, pytest 490 s ; impact depuis base : suite compl�te
+- 2026-11-13 19:07:37 UTC — [ticket-968] securite: PASS — Le diff pose un hook pre-push de deux lignes qui appelle le script de Tessera pa (26907ms)
+- 2026-11-13 19:07:38 UTC — [ticket-968] tour 1 — reviewer démarré
+- 2026-11-13 19:07:58 UTC — [ticket-968] validateur: APPROVED — Les quatre critères d'acceptation sont satisfaits. Le code produit installe le h (20062ms)
+- 2026-11-13 19:08:09 UTC — [ticket-968] tour 1 — reviewer terminé (31437ms)
+- 2026-11-13 19:08:10 UTC — [ticket-968] APPROVED après 1 tour(s)
