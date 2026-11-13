@@ -4,11 +4,12 @@ created: 2026-11-12
 depends_on: []
 estimated_days: 1
 id: ticket-948
-pr_number: null
-priority: high
+pr_number: 1103
 preuve_reelle: true
-status: todo
-title: "A project venv whose launcher Smart App Control blocks is repaired before its tests and services"
+priority: high
+status: done
+title: A project venv whose launcher Smart App Control blocks is repaired before its
+  tests and services
 type: fix
 ---
 
