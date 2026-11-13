@@ -9522,3 +9522,6 @@ error: Please commit or stash them.
 - 2026-11-13 08:30:52 UTC — [ticket-958] validateur: APPROVED — Le code implémente le contrôle des dépendances pour les runs single : une dépend (27141ms)
 - 2026-11-13 08:30:52 UTC — [ticket-958] APPROVED après 1 tour(s)
 - 2026-11-13 08:32:07 UTC — [ticket-958] leçons: refusée — preuve absente du retour du run
+- 2026-11-13 08:37:19 UTC — [ticket-958] documentation: 2 fichier(s) (304641ms) — après tour de correction
+- 2026-11-13 08:37:19 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-13 08:37:19 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
