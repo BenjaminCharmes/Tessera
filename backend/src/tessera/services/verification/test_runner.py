@@ -260,7 +260,7 @@ class TestRunnerService:
         try:
             return await self._executer_dans(groupe, args, dossier, cmd, timeout, start)
         finally:
-            groupe.fermer()
+            await groupe.fermer_et_clore()
 
     async def _executer_dans(
         self,
@@ -283,7 +283,7 @@ class TestRunnerService:
         try:
             try:
                 proc = await self._lancer(args, dossier)
-                groupe.rattacher(proc.pid)
+                groupe.rattacher(proc.pid, proc)
                 minuteur = MinuteurDEtape(groupe, proc.pid, restant)
                 minuteur.armer()
                 stdout_bytes, stderr_bytes = await asyncio.wait_for(

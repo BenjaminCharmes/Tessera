@@ -18,6 +18,16 @@ from tessera.services.providers.transport_agent import TransportCompteAgent, tra
 COMPTE = "agent-test"
 
 
+@pytest.fixture(autouse=True)
+def sans_droits_reels(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Le droit d'écriture par appel (ticket-943) a ses propres tests : ici, pas d'`icacls`."""
+    async def rien(*_: object) -> None:
+        return None
+
+    monkeypatch.setattr("tessera.services.providers.transport_agent.ouvrir_appel", rien)
+    monkeypatch.setattr("tessera.services.providers.transport_agent.clore_appel", rien)
+
+
 class LanceurDouble:
     """Records what it is asked to launch; never starts anything."""
 

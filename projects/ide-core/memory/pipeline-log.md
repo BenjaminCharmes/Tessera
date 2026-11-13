@@ -9253,6 +9253,26 @@ error: Please commit or stash them.
 - 2026-11-13 15:32:48 UTC — [ticket-948] documentation: 0 fichier(s) (149047ms) — après tour de correction
 - 2026-11-13 15:32:48 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
 - 2026-11-13 15:32:48 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-13 13:48:36 UTC — [ide-core] ticket-947 PR #1095 non surveillée (livraison arrêtée)
+- 2026-11-13 13:48:52 UTC — [ticket-943] branche ticket-943-processes-of-the-agent-account-end-with-each-agen
+- 2026-11-13 13:49:22 UTC — [ticket-943] tour 1 — codeur démarré
+- 2026-11-13 13:55:55 UTC — [ticket-943] tour 1 — codeur terminé (388328ms)
+- 2026-11-13 13:56:00 UTC — [ticket-943] testeur: en attente d'un créneau de test
+- 2026-11-13 14:06:16 UTC — [ticket-943] testeur: 1 failed, 762 passed, 3 skipped, 88 warnings in 398.62s (0:06:38)
+- 2026-11-13 14:06:17 UTC — [ticket-943] tests rouges au tour 1
+- 2026-11-13 14:06:17 UTC — [ticket-943] tour 2 — codeur démarré
+- 2026-11-13 14:15:46 UTC — [ticket-943] tour 2 — codeur terminé (567937ms)
+- 2026-11-13 14:16:00 UTC — [ticket-943] testeur: en attente d'un créneau de test
+- 2026-11-13 14:27:55 UTC — [ticket-943] testeur: dur�es : ruff 1 s, mypy 56 s, mypy-linux 57 s, pytest 605 s ; impact depuis base : 116 fichier(s) de test
+- 2026-11-13 14:28:53 UTC — [ticket-943] securite: PASS — Verdict : PASS. Le diff réduit les droits du compte agent : l'écriture n'est acc (54390ms)
+- 2026-11-13 14:28:58 UTC — [ticket-943] tour 2 — reviewer démarré
+- 2026-11-13 14:30:10 UTC — [ticket-943] tour 2 — reviewer terminé (71905ms)
+- 2026-11-13 14:30:55 UTC — [ticket-943] validateur: APPROVED — Les quatre critères d'acceptation sont satisfaits. Les tests demandés sont prése (117156ms)
+- 2026-11-13 14:30:58 UTC — [ticket-943] APPROVED après 2 tour(s)
+- 2026-11-13 14:31:53 UTC — [ticket-943] leçons: refusée — plus de 200 caractères
+- 2026-11-13 14:33:21 UTC — [ticket-943] documentation: 0 fichier(s) (78375ms)
+- 2026-11-13 14:33:21 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-13 14:33:21 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
 - 2026-11-13 12:58:03 UTC — [ticket-947] branche ticket-947-worktrees-of-an-agent-account-project-live-outsid
 - 2026-11-13 12:58:09 UTC — [ticket-947] tour 1 — codeur démarré
 - 2026-11-13 13:05:34 UTC — [ticket-947] tour 1 — codeur terminé (443687ms)

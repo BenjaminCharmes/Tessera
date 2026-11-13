@@ -13,8 +13,10 @@ import asyncio
 import os
 import subprocess
 import threading
+from collections.abc import Awaitable, Callable
 
 from tessera.services.noyau import groupe_de_processus
+from tessera.services.verification.lancement_compte import ProcessusDuCompte
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -33,12 +35,24 @@ class GroupeDEtape:
     def __init__(self) -> None:
         self._groupe = groupe_de_processus.creer_groupe()
         self._rattache = False
+        self._a_clore: Callable[[], Awaitable[None]] | None = None
         self._verrou = threading.Lock()
         if self._groupe is None and groupe_de_processus.groupe_disponible():
             _logger.warning("etape_sans_groupe")
 
-    def rattacher(self, pid: object) -> bool:
+    async def fermer_et_clore(self) -> None:
+        """Close the group, then end the call of a process under the agent account.
+
+        `clore()` ferme le job du compte et retire son droit d'écriture ; un refus
+        lève `DroitsAgentRefuses` et met le run en `blocked` (ticket-943).
+        """
+        self.fermer()
+        if self._a_clore is not None:
+            await self._a_clore()
+
+    def rattacher(self, pid: object, processus: object = None) -> bool:
         """Put the process in the group; ``False`` leaves the step ungrouped."""
+        self._a_clore = processus.clore if isinstance(processus, ProcessusDuCompte) else None
         if self._groupe is None or not isinstance(pid, int):
             return False
         self._rattache = groupe_de_processus.rattacher_au_groupe(self._groupe, pid)

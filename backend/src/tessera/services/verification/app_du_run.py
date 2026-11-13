@@ -113,13 +113,15 @@ class _AppDuCompte:
         return self.processus.returncode
 
     async def arreter(self) -> None:
-        if self.code_de_sortie is not None:
-            return
-        try:
-            self.processus.kill()
-            await asyncio.wait_for(self.processus.wait(), timeout=_DELAI_D_ARRET_S)
-        except Exception as exc:  # noqa: BLE001 — un arrêt raté ne casse pas le run
-            _logger.warning("arret_app_du_compte_echoue", extra={"erreur": str(exc)})
+        if self.code_de_sortie is None:
+            try:
+                self.processus.kill()
+                await asyncio.wait_for(self.processus.wait(), timeout=_DELAI_D_ARRET_S)
+            except Exception as exc:  # noqa: BLE001 — un arrêt raté ne casse pas le run
+                _logger.warning("arret_app_du_compte_echoue", extra={"erreur": str(exc)})
+        # Hors du `try` : un droit non retiré (`DroitsAgentRefuses`) met le run en
+        # `blocked` (ticket-943) ; le job fermé tue ce que l'app a laissé.
+        await self.processus.clore()
 
 
 def demarreur_du_run(compte_agent: bool, lanceur: LanceurAgent | None = None) -> Demarreur:
