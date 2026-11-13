@@ -4,10 +4,10 @@ created: 2026-11-13
 depends_on: []
 estimated_days: 0.5
 id: ticket-962
-pr_number: null
+pr_number: 1106
 priority: medium
-status: todo
-title: "Each documentation role reads the documentation as it is when it is called"
+status: done
+title: Each documentation role reads the documentation as it is when it is called
 type: fix
 ---
 

@@ -6,6 +6,7 @@ Pièges observés sur ce projet, une ligne chacun. Le service écrit sous `## Pr
 - Quand on ajoute la gestion du marqueur à un module de sélection, on dépasse le plafond — créer un module séparé pour la persistance. (source : ticket-940, 2026-11-12)
 - Quand on ajoute une restriction fictive à une liste interdite sans vérifier la source, les tests attendant une liste vide échouent. (source : ticket-952, 2026-11-12)
 - Quand une refactorisation crée un nouveau module, vérifier qu'il est testé par la suite de vérification des plafonds de fichier. (source : ticket-954, 2026-11-12)
+- Quand tu refactorise un fichier trop volumineux en changeant aussi sa logique, scinde en deux PR : d'abord réduire, puis améliorer. (source : ticket-962, 2026-11-13)
 
 ## En vigueur
 - Quand on ajoute des tests pour un module sensible, vérifier que les données de test ne déclenchent pas le contrôle de traces professionnelles du projet. (source : ticket-933, 2026-11-11)

@@ -48,7 +48,7 @@ a{color:#c4b5fd}a:hover{color:#ddd6fe}
             <span style="padding: 2px 8px; border-radius: 4px; background: rgba(248,113,113,0.12); color: #fca5a5; font-size: 11px">interrompue</span>
           </div>
           <div style="display: flex; align-items: center; gap: 10px; color: #a1a1aa; font-size: 12px">
-            <span style="font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; color: #e4e4e7">guessimo.com</span>
+            <span style="font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; color: #e4e4e7">guessimo.example</span>
             <span style="padding: 2px 8px; border-radius: 4px; background: rgba(251,191,36,0.12); color: #fcd34d; font-size: 11px">Stripe test</span>
             <span>Lancée à 14:32 · terminée en 1 min 12 s</span>
           </div>
@@ -118,11 +118,11 @@ class Component extends DCLogic {
       failed:      { libelle: 'échec',              fond: 'rgba(248,113,113,0.12)', texte: '#fca5a5' }
     };
     const liste = [
-      ['Projet Vercel', 'Vercel', 'skipped', 'Projet « guessimo » trouvé, relié au dépôt ; guessimo.com déjà ajouté.'],
+      ['Projet Vercel', 'Vercel', 'skipped', 'Projet « guessimo » trouvé, relié au dépôt ; guessimo.example déjà ajouté.'],
       ['Base Neon', 'Neon', 'done', 'Projet Neon « guessimo » créé ; DATABASE_URL écrite dans Vercel.'],
       ['Variables', 'Vercel', 'done', 'NEXT_PUBLIC_APP_URL, SESSION_SECRET, CRON_SECRET posées. Aucune écrasée.'],
       ['Domaine Resend', 'Resend', 'done', 'Domaine créé, 3 enregistrements collectés ; clé d’envoi écrite dans RESEND_API_KEY.'],
-      ['DNS', 'Cloudflare', 'manual', 'Zone guessimo.com absente du compte Cloudflare : 5 enregistrements à poser chez ton registrar.'],
+      ['DNS', 'Cloudflare', 'manual', 'Zone guessimo.example absente du compte Cloudflare : 5 enregistrements à poser chez ton registrar.'],
       ['Vérification Resend', 'Resend', 'pending', 'En attente des DNS. Ce n’est pas un échec : une relance la relit.'],
       ['Clé Stripe du site', 'Vercel', 'needs_human', 'STRIPE_SECRET_KEY absente du projet Vercel : l’API Stripe ne crée pas de clé.'],
       ['Stripe — produit et prix', 'Stripe', 'done', 'Produit « Guessimo Premium » et prix 4,99 € (guessimo_premium) créés en mode test.'],
