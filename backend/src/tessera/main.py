@@ -120,7 +120,8 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     )
     # Les worktrees de run qu'un arrêt a laissés : commit, puis suppression (ticket-520).
     await reprendre_worktrees_orphelins(
-        settings.ide_workspace_dir, settings.ide_worktrees_dir
+        settings.ide_workspace_dir, settings.ide_worktrees_dir,
+        settings.ide_worktrees_dir_agent,
     )
     await _reprendre_les_surveillances()
     # Les services que l'utilisateur avait lancés (ticket-890, ADR-082).

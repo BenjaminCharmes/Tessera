@@ -133,9 +133,10 @@ def _candidats(worktrees_dir: Path) -> list[tuple[Path, str]]:
     return trouves
 
 
-async def _reprendre_tous(workspace_dir: Path, worktrees_dir: Path) -> None:
+async def _reprendre_tous(workspace_dir: Path, worktrees_dirs: list[Path]) -> None:
     registre = await _enregistrements(workspace_dir)
-    for racine, ticket_id in _candidats(worktrees_dir):
+    candidats = [c for dossier in worktrees_dirs for c in _candidats(dossier)]
+    for racine, ticket_id in candidats:
         depot = registre.get(_cle(racine))
         if depot is None or not _TICKET_ID_RE.fullmatch(ticket_id):
             _laisser(racine, "inconnu_des_depots")
@@ -143,13 +144,17 @@ async def _reprendre_tous(workspace_dir: Path, worktrees_dir: Path) -> None:
             await _reprendre_un(racine, ticket_id, depot)
 
 
-async def reprendre_worktrees_orphelins(workspace_dir: Path, worktrees_dir: Path) -> None:
+async def reprendre_worktrees_orphelins(
+    workspace_dir: Path, worktrees_dir: Path, worktrees_dir_agent: Path | None = None
+) -> None:
     """Commit, then remove, the run worktrees a stop left behind; prune dead ones.
+    Both worktrees folders are walked: the user one and, when given, the agent one.
 
     Called by the lifespan right after `reprendre_depots_orphelins`. The checkout of
     a project is never read or moved. Any error is logged and never raised.
     """
     try:
-        await _reprendre_tous(workspace_dir, worktrees_dir)
+        dossiers = [worktrees_dir] + ([worktrees_dir_agent] if worktrees_dir_agent else [])
+        await _reprendre_tous(workspace_dir, dossiers)
     except Exception:  # noqa: BLE001 — la reprise est un filet, pas une condition
         _logger.exception("reprise_worktrees_echec")

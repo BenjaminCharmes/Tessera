@@ -4,11 +4,11 @@ created: 2026-11-12
 depends_on: []
 estimated_days: 1
 id: ticket-947
-pr_number: null
-priority: high
+pr_number: 1095
 preuve_reelle: true
-status: todo
-title: "Worktrees of an agent-account project live outside the user profile"
+priority: high
+status: done
+title: Worktrees of an agent-account project live outside the user profile
 type: fix
 ---
 

@@ -861,6 +861,10 @@ Il renvoie `CHANGES_REQUESTED` avec sa raison, et le codeur repart pour un tour 
 tenant compte du retour. Au bout de **3 tours** sans approbation, le ticket passe en
 `blocked/` — et le travail produit est **quand même commité** (voir plus bas).
 
+### Si aucun fichier n'a changé
+
+Quand un codeur décrit le travail attendu mais n'écrit rien sur disque, le tour est automatiquement refusé même si le reviewer et le validateur approuvent. Un message demande d'écrire réellement les fichiers. Le codeur repart pour un tour où il doit modifier le code.
+
 ### Si l'audit de sécurité bloque
 
 Une faille `CRITICAL` ou `HIGH` arrête le pipeline immédiatement : le ticket passe
