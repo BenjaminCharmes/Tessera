@@ -65,7 +65,9 @@ _MOTIFS: tuple[tuple[str, re.Pattern[str]], ...] = (
     (
         "url-credentials",
         re.compile(
-            rf"://[^{_URL_EXCLUS}]+:"
+            # L'utilisateur s'écrit avec les caractères d'une URL : une regex
+            # (`(?:[^@/]+@)`) n'en est pas une (ticket-969).
+            r"://[A-Za-z0-9._%~+-]+:"
             rf"(?!(?:password|passwd|pass|secret|changeme|x+|\*+)@)"
             rf"[^{_URL_EXCLUS}]+@",
             re.IGNORECASE,
