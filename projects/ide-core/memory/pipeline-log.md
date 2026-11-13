@@ -9320,3 +9320,6 @@ error: Please commit or stash them.
 - 2026-11-13 19:07:58 UTC — [ticket-968] validateur: APPROVED — Les quatre critères d'acceptation sont satisfaits. Le code produit installe le h (20062ms)
 - 2026-11-13 19:08:09 UTC — [ticket-968] tour 1 — reviewer terminé (31437ms)
 - 2026-11-13 19:08:10 UTC — [ticket-968] APPROVED après 1 tour(s)
+- 2026-11-13 19:12:12 UTC — [ticket-968] documentation: 0 fichier(s) (236655ms) — après tour de correction
+- 2026-11-13 19:12:12 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-13 19:12:12 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
