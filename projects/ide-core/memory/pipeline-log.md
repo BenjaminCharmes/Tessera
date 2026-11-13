@@ -9306,3 +9306,6 @@ error: Please commit or stash them.
 - 2026-11-13 18:46:56 UTC — [ticket-967] validateur: APPROVED — All acceptance criteria are satisfied. The implementation correctly prevents pro (19359ms)
 - 2026-11-13 18:46:58 UTC — [ticket-967] tour 1 — reviewer terminé (21375ms)
 - 2026-11-13 18:46:58 UTC — [ticket-967] APPROVED après 1 tour(s)
+- 2026-11-13 18:51:20 UTC — [ticket-967] documentation: 0 fichier(s) (242703ms) — après tour de correction
+- 2026-11-13 18:51:20 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-13 18:51:20 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
