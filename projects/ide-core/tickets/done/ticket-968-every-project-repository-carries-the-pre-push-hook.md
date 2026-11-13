@@ -4,7 +4,7 @@ created: 2026-11-13
 depends_on: []
 estimated_days: 0.5
 id: ticket-968
-pr_number: null
+pr_number: 1113
 priority: medium
 status: done
 title: Every project repository carries the forbidden-terms pre-push hook
