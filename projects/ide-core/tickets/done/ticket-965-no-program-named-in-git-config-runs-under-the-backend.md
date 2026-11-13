@@ -4,10 +4,11 @@ created: 2026-11-13
 depends_on: []
 estimated_days: 0.5
 id: ticket-965
-pr_number: null
+pr_number: 1111
 priority: high
-status: todo
-title: "No program named in a project's git config runs when the backend commits or diffs"
+status: done
+title: No program named in a project's git config runs when the backend commits or
+  diffs
 type: fix
 ---
 
