@@ -194,7 +194,7 @@ Réponses d'erreur :
   - Un projet avec `worktree` déclaré refuse les modes `queue` et `autonomous` : seul `single` est autorisé (les files doivent tourner dans des worktrees successifs, reste à concevoir).
   
   La réponse liste les critères non satisfaits. Passer `force: true` contourne les validations sur `autonomy`, `test_command` et `github_remote`, mais pas la restriction worktree qui s'applique systématiquement.
-- **`409` Conflict** : le projet porte déjà un run en cours.
+- **`409` Conflict** : le projet porte déjà un run en cours, ou (mode `single`) une dépendance du ticket n'est pas `done`.
 - **`404` Not Found** : le projet est inconnu.
 
 ### Runs
