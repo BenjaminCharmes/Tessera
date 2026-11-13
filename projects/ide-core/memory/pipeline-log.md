@@ -9296,3 +9296,16 @@ error: Please commit or stash them.
 - 2026-11-13 18:40:20 UTC — [ticket-965] documentation: 1 fichier(s) (368344ms) — après tour de correction
 - 2026-11-13 18:40:20 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
 - 2026-11-13 18:40:20 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-13 18:41:36 UTC — [ide-core] ticket-965 PR #1111 confiée au CIWatcher
+- 2026-11-13 18:41:43 UTC — [ticket-967] branche ticket-967-a-project-service-never-starts-on-a-port-tessera
+- 2026-11-13 18:41:46 UTC — [ticket-967] tour 1 — codeur démarré
+- 2026-11-13 18:44:18 UTC — [ticket-967] tour 1 — codeur terminé (151358ms)
+- 2026-11-13 18:46:24 UTC — [ticket-967] testeur: dur�es : ruff 0 s, mypy 20 s, mypy-linux 19 s, pytest 121 s ; impact depuis base : 93 fichier(s) de test
+- 2026-11-13 18:46:36 UTC — [ticket-967] securite: PASS — J'ai lu le diff, je n'ai rien lu hors du diff, et je n'y trouve aucune faille CR (10483ms)
+- 2026-11-13 18:46:36 UTC — [ticket-967] tour 1 — reviewer démarré
+- 2026-11-13 18:46:56 UTC — [ticket-967] validateur: APPROVED — All acceptance criteria are satisfied. The implementation correctly prevents pro (19359ms)
+- 2026-11-13 18:46:58 UTC — [ticket-967] tour 1 — reviewer terminé (21375ms)
+- 2026-11-13 18:46:58 UTC — [ticket-967] APPROVED après 1 tour(s)
+- 2026-11-13 18:51:20 UTC — [ticket-967] documentation: 0 fichier(s) (242703ms) — après tour de correction
+- 2026-11-13 18:51:20 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-13 18:51:20 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
