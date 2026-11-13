@@ -9210,3 +9210,23 @@ error: Please commit or stash them.
 - 2026-11-13 08:37:19 UTC — [ticket-958] documentation: 2 fichier(s) (304641ms) — après tour de correction
 - 2026-11-13 08:37:19 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
 - 2026-11-13 08:37:19 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-13 08:43:58 UTC — [ide-core] ticket-958 PR #1089 mergée (CI verte)
+- 2026-11-13 09:12:40 UTC — [ticket-960] branche ticket-960-a-round-whose-diff-is-empty-is-never-approved-wha
+- 2026-11-13 09:12:43 UTC — [ticket-960] tour 1 — codeur démarré
+- 2026-11-13 09:15:41 UTC — [ticket-960] tour 1 — codeur terminé (177516ms)
+- 2026-11-13 09:21:15 UTC — [ticket-960] testeur: 1 failed, 520 passed, 40 warnings in 329.52s (0:05:29)
+- 2026-11-13 09:21:16 UTC — [ticket-960] tests rouges au tour 1
+- 2026-11-13 09:21:16 UTC — [ticket-960] tour 2 — codeur démarré
+- 2026-11-13 09:23:05 UTC — [ticket-960] tour 2 — codeur terminé (109125ms)
+- 2026-11-13 09:28:05 UTC — [ticket-960] testeur: dur�es : ruff 0 s, pytest 296 s ; impact depuis base : 100 fichier(s) de test
+- 2026-11-13 09:28:06 UTC — [ticket-960] tests rouges au tour 2
+- 2026-11-13 09:28:06 UTC — [ticket-960] tour 3 — codeur démarré
+- 2026-11-13 09:28:37 UTC — [ticket-960] tour 3 — codeur terminé (30718ms)
+- 2026-11-13 09:34:44 UTC — [ticket-960] testeur: dur�es : ruff 0 s, mypy 21 s, mypy-linux 25 s, pytest 362 s ; impact depuis base : 100 fichier(s) de test
+- 2026-11-13 09:35:02 UTC — [ticket-960] securite: PASS — Le diff resserre la porte d'approbation : un diff vide, ou un diff en échec, met (17125ms)
+- 2026-11-13 09:35:03 UTC — [ticket-960] tour 3 — reviewer démarré
+- 2026-11-13 09:36:12 UTC — [ticket-960] tour 3 — reviewer terminé (68796ms)
+- 2026-11-13 09:36:21 UTC — [ticket-960] validateur: APPROVED — Tous les critères sont satisfaits. Le diff implémente correctement le drapeau `r (77781ms)
+- 2026-11-13 09:36:21 UTC — [ticket-960] CHANGES_REQUESTED tour 3: Reviewer : 1. Les tickets `design` (architecte, revues de projet) ne peuvent plus être approuvés. `diff_depuis_base` exclut toujours `tickets/` (`_ORCHESTRATOR_ARTIFACT_PATHS`, dans git_workspace/chem
+- 2026-11-13 09:36:21 UTC — [ticket-960] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-13 09:36:31 UTC — [ide-core] file interrompue : ticket-960 non approuvé

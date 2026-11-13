@@ -30,7 +30,7 @@ from tessera.services.pipeline.pipeline_livraison import livrer_le_resultat
 from tessera.services.pipeline.pipeline_plan import run_plan
 from tessera.services.pipeline.pipeline_reprise import reprendre_sans_codeur, verifier_travail_repris
 from tessera.services.pipeline.pipeline_run import PipelineRun, set_status, tolerant
-from tessera.services.pipeline.pipeline_text import _compose_feedback, _echec_de_tests, _first_line
+from tessera.services.pipeline.pipeline_text import _FEEDBACK_DIFF_VIDE, _compose_feedback, _echec_de_tests, _first_line
 from tessera.services.pipeline.pipeline_tickets import relever_etat_initial, renvoyer_si_problemes
 from tessera.services.pipeline.run_dans_worktree import retirer_apres_echec, retirer_en_fin_de_run
 from tessera.services.pipeline.ticket_apres_avance import trouver_ticket
@@ -498,10 +498,10 @@ class Orchestrator:
             (rev_approved, rev_reason, raw_verdict), (val_approved, val_reason) = verdicts
 
             approved = rev_approved and val_approved
-            if approved:
+            if approved and not run.rien_produit:
                 return await outcomes.finish_approved(self, run)
 
-            feedback = _compose_feedback(
+            feedback = _FEEDBACK_DIFF_VIDE if approved else _compose_feedback(
                 rev_approved, rev_reason, raw_verdict, val_approved, val_reason
             )
             run.review_feedback.append(feedback)

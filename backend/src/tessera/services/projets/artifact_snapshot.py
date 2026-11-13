@@ -48,6 +48,21 @@ def snapshot_artifacts(project_path: Path) -> dict[str, str]:
     return result
 
 
+def artefacts_produits(before: dict[str, str], project_path: Path, ticket_id: str) -> bool:
+    """True when an artifact changed beyond the pipeline's own bookkeeping (ticket-960).
+
+    Le journal du pipeline et le fichier du ticket lui-même (statut, cases)
+    changent à chaque tour sans que l'agent ait rien produit.
+    """
+    after = snapshot_artifacts(project_path)
+    return any(
+        before.get(p, "") != after.get(p, "")
+        and not p.endswith("pipeline-log.md")
+        and ticket_id not in p
+        for p in set(before) | set(after)
+    )
+
+
 def diff_artifacts(before: dict[str, str], project_path: Path) -> str:
     """Compute a textual diff between ``before`` snapshot and current artifact state.
 

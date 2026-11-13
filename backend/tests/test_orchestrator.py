@@ -1085,7 +1085,9 @@ class _FailingDiffGit(_FakeGit):
         raise GitWorkspaceError("git diff failed")
 
 
-async def test_diff_en_echec_retombe_sur_la_prose_et_termine(tmp_path: Path) -> None:
+async def test_diff_en_echec_retombe_sur_la_prose_et_ne_s_approuve_pas(
+    tmp_path: Path,
+) -> None:
     runner = _RecordingRunner()
     git = _FailingDiffGit()
 
@@ -1094,7 +1096,7 @@ async def test_diff_en_echec_retombe_sur_la_prose_et_termine(tmp_path: Path) -> 
     )
     result = await orchestrator.run_pipeline("projet", "ticket-001", _noop)
 
-    assert result.approved is True
+    assert result.approved is False
     reviewer_calls = [c for c in runner.calls if c["role"] == AgentRole.reviewer]
     assert "prose du codeur" in str(reviewer_calls[0]["project_context"])
 

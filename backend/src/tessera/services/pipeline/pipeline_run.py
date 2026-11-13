@@ -88,6 +88,20 @@ class PipelineRun:
     # Les écritures que le garde-fou a refusées au codeur ce tour-ci, déjà mises
     # en forme pour le reviewer et le validateur (ticket-476). Vide : aucun refus.
     refus_du_tour: str = ""
+    # Vrai quand le diff git réel du tour est vide ou n'a pu être calculé :
+    # le tour ne s'approuve pas sur la prose du codeur (ticket-960).
+    diff_vide: bool = False
+    # Vrai quand l'agent a changé un artefact hors tenue du pipeline (ticket-960).
+    artefacts_produits: bool = False
+
+    @property
+    def rien_produit(self) -> bool:
+        """True when the round changed neither code nor artifacts (ticket-960).
+
+        Un run `design` n'écrit que `tickets/` ou `memory/`, que le diff git
+        exclut : son travail est dans `artifact_diff`.
+        """
+        return self.diff_vide and not self.artefacts_produits
 
     @property
     def stop_requested(self) -> bool:
@@ -107,6 +121,8 @@ class PipelineRun:
         self.contexte_du_tour = ""
         self.artifact_diff = ""
         self.refus_du_tour = ""
+        self.diff_vide = False
+        self.artefacts_produits = False
 
 
 async def emit(run: PipelineRun, event_type: EventType, **data: Any) -> None:

@@ -15,7 +15,7 @@ from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent,
 from tessera.services.pipeline.pipeline_empreinte import arret_fichier_protege, empreinte, noms_changes
 from tessera.services.pipeline.pipeline_run import PipelineRun, set_status
 from tessera.services.pipeline.signaler_du_run import signaler_for
-from tessera.services.projets.artifact_snapshot import diff_artifacts, snapshot_artifacts
+from tessera.services.projets.artifact_snapshot import artefacts_produits, diff_artifacts, snapshot_artifacts
 from tessera.services.providers.refus_garde import refus_du_tour
 from tessera.utils.logger import get_logger
 
@@ -263,12 +263,12 @@ async def _capture_diff(orch: "Orchestrator", run: PipelineRun, prose: str) -> s
         diff = await orch._git_workspace.diff_depuis_base()
     except GitWorkspaceError as exc:
         _logger.warning("diff_failed", extra={"error": str(exc)})
+        diff = ""  # échoue fermé : un diff inconnu vaut un diff vide
+    run.diff_vide = not diff.strip()
+    if run.diff_vide:
         _logger.info("diff_empty_fallback_to_prose", extra={"ticket_id": run.ticket_id})
         return prose
-    if diff.strip():
-        return diff
-    _logger.info("diff_empty_fallback_to_prose", extra={"ticket_id": run.ticket_id})
-    return prose
+    return diff
 
 
 def _capture_artifact_diff(orch: "Orchestrator", run: PipelineRun) -> None:
@@ -285,6 +285,7 @@ def _capture_artifact_diff(orch: "Orchestrator", run: PipelineRun) -> None:
     if orch._project_path is None or run.artifact_snapshot is None:
         return
     run.artifact_diff = diff_artifacts(run.artifact_snapshot, orch._project_path)
+    run.artefacts_produits = artefacts_produits(run.artifact_snapshot, orch._project_path, run.ticket_id)
 
 
 def _role_qui_produit(type_de_ticket: "TicketType") -> AgentRole:
