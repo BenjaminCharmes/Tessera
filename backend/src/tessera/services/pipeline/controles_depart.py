@@ -15,6 +15,9 @@ from tessera.services.projets.project_loader import load_pipeline_config
 from tessera.services.verification.commande_chainee import decouper
 from tessera.services.verification.commande_effective import PlaceholderInconnu, commande_effective
 from tessera.services.verification.process_registry import CommandeInvalide, resoudre_le_cwd
+from tessera.utils.logger import get_logger
+
+_logger = get_logger(__name__)
 
 
 def manques_avant_depart(
@@ -38,6 +41,17 @@ def manques_avant_depart(
     manques.extend(_manque_de_ci(project_path, politique))
     manques.extend(_commandes_introuvables(project_path, politique, racine_worktree))
     return manques
+
+
+def refus_des_manques(
+    project_path: Path, github_token: str, project_id: str, force: bool
+) -> str | None:
+    """The refusal listing every gap, None when fine; `force` journals and lets go (ticket-477)."""
+    manques = manques_avant_depart(project_path, github_token)
+    if manques and force:
+        _logger.warning("depart_force", extra={"project_id": project_id, "manques": manques})
+        return None
+    return " ; ".join(manques) if manques else None
 
 
 def _manque_de_ci(project_path: Path, politique: PolitiqueRun) -> list[str]:

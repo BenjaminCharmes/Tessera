@@ -75,7 +75,7 @@ def lancement(
         vu["dans_la_tache"] = reglages.courants()
         RUN_REGISTRY.fermer(run.run_id)
 
-    monkeypatch.setattr(routeur, "manques_avant_depart", lambda *a, **k: [])
+    monkeypatch.setattr(routeur, "refus_des_manques", lambda *a, **k: None)
     monkeypatch.setattr(routeur, "build_orchestrator", assemblage)
     monkeypatch.setattr(routeur, "executer", executeur)
     yield vu
