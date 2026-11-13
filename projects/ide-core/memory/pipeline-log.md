@@ -9250,6 +9250,20 @@ error: Please commit or stash them.
 - 2026-11-13 14:33:21 UTC — [ticket-943] documentation: 0 fichier(s) (78375ms)
 - 2026-11-13 14:33:21 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
 - 2026-11-13 14:33:21 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-13 12:58:03 UTC — [ticket-947] branche ticket-947-worktrees-of-an-agent-account-project-live-outsid
+- 2026-11-13 12:58:09 UTC — [ticket-947] tour 1 — codeur démarré
+- 2026-11-13 13:05:34 UTC — [ticket-947] tour 1 — codeur terminé (443687ms)
+- 2026-11-13 13:05:38 UTC — [ticket-947] testeur: en attente d'un créneau de test
+- 2026-11-13 13:21:35 UTC — [ticket-947] testeur: dur�es : ruff 1 s, mypy 40 s, mypy-linux 49 s, pytest 911 s ; impact depuis base : suite compl�te
+- 2026-11-13 13:22:06 UTC — [ticket-947] securite: PASS — Aucune faille CRITICAL ni HIGH n'est introduite : `_sous_le_dossier` résout les  (30202ms)
+- 2026-11-13 13:22:09 UTC — [ticket-947] tour 1 — reviewer démarré
+- 2026-11-13 13:22:56 UTC — [ticket-947] validateur: fichiers cités joints : backend/tests/ (dossier, 494 fichiers, tronqué)
+- 2026-11-13 13:22:56 UTC — [ticket-947] validateur: APPROVED — Tous les critères sont satisfaits. Le code déploie une nouvelle variable `IDE_WO (46483ms)
+- 2026-11-13 13:23:08 UTC — [ticket-947] tour 1 — reviewer terminé (59358ms)
+- 2026-11-13 13:23:10 UTC — [ticket-947] APPROVED après 1 tour(s)
+- 2026-11-13 13:31:32 UTC — [ticket-947] documentation: 2 fichier(s) (473139ms) — après tour de correction — refusé : doc-fonctionnelle : docs/guide-utilisateur.md : règle « preuve » — l'édition ne cite aucun code livré. Ajoute `preuve: [{fichier, extrait}]`, extrait recopié du
+- 2026-11-13 13:31:32 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-13 13:31:32 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
 - 2026-11-13 16:54:13 UTC — [ide-core] ticket-962 PR #1106 confiée au CIWatcher
 - 2026-11-13 16:56:41 UTC — [ticket-962] livraison: nouvelle tentative de la PR #1106 après une erreur réseau (ConnectError: [Errno 11001] getaddrinfo failed), PR non mergée
 - 2026-11-13 16:56:44 UTC — [ticket-962] livraison: arrêt — PR #1106 non mergée : tête de la PR #1106 illisible (ConnectError: [Errno 11001] getaddrinfo failed) : elle reste ouverte
