@@ -9544,3 +9544,4 @@ error: Please commit or stash them.
 - 2026-11-13 09:36:21 UTC — [ticket-960] validateur: APPROVED — Tous les critères sont satisfaits. Le diff implémente correctement le drapeau `r (77781ms)
 - 2026-11-13 09:36:21 UTC — [ticket-960] CHANGES_REQUESTED tour 3: Reviewer : 1. Les tickets `design` (architecte, revues de projet) ne peuvent plus être approuvés. `diff_depuis_base` exclut toujours `tickets/` (`_ORCHESTRATOR_ARTIFACT_PATHS`, dans git_workspace/chem
 - 2026-11-13 09:36:21 UTC — [ticket-960] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-13 09:36:31 UTC — [ide-core] file interrompue : ticket-960 non approuvé
