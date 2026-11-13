@@ -23,6 +23,7 @@ Toutes les variables sont dans `.env` (copie de `.env.example`) :
 | `IDE_WORKSPACE_DIR` | | `~/tessera-workspace` | Dossier des projets |
 | `IDE_STATE_DIR` | | `%LOCALAPPDATA%\Tessera` (Windows); `~/.local/state/tessera` (macOS/Linux) | Dossier hors du dépôt pour l'état persistant de l'IDE (signalements en attente, journaux de lancement). Créé au besoin. Les logs du backend et Vite y vont dans un sous-dossier `logs/` |
 | `IDE_WORKTREES_DIR` | | `~/.tessera/worktrees` | Racine des worktrees de run, `<projet>/<ticket>` dessous (ADR-056). Hors de tout dépôt ; la garder courte, Windows limitant la longueur des chemins. Ne sert qu'aux projets qui déclarent `worktree` dans `agents.json` |
+| `IDE_WORKTREES_DIR_AGENT` | | `C:\ProgramData\Tessera\worktrees` | Racine des worktrees d'un projet à `worktree.compte_agent` quand `AGENT_USER` est renseigné : le CLI du compte ne résout pas les chemins du profil. Créée au premier usage, ACL sans héritage (SYSTEM et Administrateurs `F`, utilisateur du backend `M`) ; `agent doctor` la vérifie |
 | `IDE_PROMPTS_DIR` | | `agents/prompts/` | Dossier des system prompts |
 | `IDE_LOG_LEVEL` | | `INFO` | Niveau de log |
 | `GITHUB_TOKEN` | | `""` | Token GitHub (sync issues, clone, PRs) |

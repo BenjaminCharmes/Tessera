@@ -13,6 +13,7 @@ from pathlib import Path
 
 from tessera.config import settings
 from tessera.services.git_workspace import GitCommandError, GitWorkspaceError
+from tessera.services.worktrees.dossier_agent import dossier_des_worktrees, preparer_dossier_agent
 from tessera.services.worktrees.run_worktree_populate import chemin_etendu, retirer_les_liens
 from tessera.services.worktrees.temporary_worktree import run_git
 from tessera.utils.logger import get_logger
@@ -84,20 +85,20 @@ def _sous_le_dossier(racine: Path) -> Path:
     Résolu : un lien symbolique posé dans le dossier des worktrees ne doit pas
     mener une écriture, ou une suppression, ailleurs sur le disque.
     """
-    dossier = settings.ide_worktrees_dir.resolve()
+    dossiers = [settings.ide_worktrees_dir.resolve(), settings.ide_worktrees_dir_agent.resolve()]
     resolue = racine.resolve()
-    if resolue == dossier or not resolue.is_relative_to(dossier):
-        raise CheminRefuse(f"{racine} n'est pas sous {dossier} : rien n'est écrit ni supprimé.")
-    return resolue
+    if any(resolue != d and resolue.is_relative_to(d) for d in dossiers):
+        return resolue
+    raise CheminRefuse(f"{racine} n'est pas sous {dossiers[0]} : rien n'est écrit ni supprimé.")
 
 
-def _racine_sure(project_id: str, ticket_id: str) -> Path:
+def _racine_sure(project_id: str, ticket_id: str, base: Path) -> Path:
     """The worktree root of a ticket, built only from validated ids."""
     if not validate_project_id(project_id):
         raise CheminRefuse(f"Identifiant de projet refusé : {project_id!r}.")
     if not _TICKET_ID_RE.fullmatch(ticket_id):
         raise CheminRefuse(f"Identifiant de ticket refusé : {ticket_id!r}.")
-    return _sous_le_dossier(settings.ide_worktrees_dir / project_id / ticket_id)
+    return _sous_le_dossier(base / project_id / ticket_id)
 
 
 async def _extraites(depot: Path) -> dict[str, Path]:
@@ -157,15 +158,19 @@ async def creer(
     ticket_id: str,
     branche: str,
     base: str,
+    compte_agent: bool = False,
 ) -> RunWorktree:
     """Create, or resume, the worktree of `ticket_id` on `branche`, forked from `origin/<base>`.
 
     The checkout of `depot` is neither read nor moved. Raises `BrancheDejaExtraite`
     when another working tree holds the branch, `WorktreeOccupe` when the folder
     is there but is not a clean worktree of it, `CheminRefuse` when an id is not
-    valid or the root would leave `ide_worktrees_dir`. Nothing is ever forced.
+    valid or the root would leave the worktrees folders. With `compte_agent` and
+    `AGENT_USER`, the root is under `ide_worktrees_dir_agent`. Nothing is ever forced.
     """
-    racine = _racine_sure(project_id, ticket_id)
+    if compte_agent and settings.agent_user:
+        await preparer_dossier_agent()
+    racine = _racine_sure(project_id, ticket_id, dossier_des_worktrees(compte_agent))
     if branche.startswith("-"):
         raise CheminRefuse(f"Nom de branche refusé : {branche!r}.")
     projet = await _projet_dans(racine, depot, project_path)

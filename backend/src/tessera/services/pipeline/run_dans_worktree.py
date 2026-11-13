@@ -60,6 +60,7 @@ async def ouvrir_worktree(
         wt = await creer(
             project_path, project_path, project_id, ticket_id,
             _branch_name(ticket_id, titre), base_du_projet(politique),
+            compte_agent=config.compte_agent,
         )
         absents = await peupler(wt, project_path, config)
         # Après `populate` : un fichier copié (`.claude/settings.local.json`) reçoit son refus aussi.

@@ -184,6 +184,9 @@ class Settings(BaseSettings):
     # et par ticket. Hors de tout dépôt — rien à exclure, rien qu'un `git add`
     # balaie — et court, à cause des chemins longs de Windows.
     ide_worktrees_dir: Path = Path.home() / ".tessera" / "worktrees"
+    # Worktrees des projets au compte agent dédié (ticket-947) : hors du profil,
+    # où le CLI du compte ne résout pas les chemins.
+    ide_worktrees_dir_agent: Path = Path(r"C:\ProgramData\Tessera\worktrees")
     # Fichier de log tournant (5 × 10 Mo). Ancré sur la racine du dépôt pour
     # ne pas dépendre du répertoire de lancement (ticket-330).
     ide_log_file: Path = _REPO_ROOT / "backend" / "logs" / "tessera.log"

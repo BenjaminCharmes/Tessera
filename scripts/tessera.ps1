@@ -141,6 +141,20 @@ function Get-VersionCli([string]$Chemin) {
     return ([string](& $Chemin --version 2>$null)).Trim()
 }
 
+function Test-DossierWorktreesAgent {
+    # IDE_WORKTREES_DIR_AGENT : absent, c'est normal avant le 1er run ; present, son ACL est sans heritage.
+    $dossier = if ($env:IDE_WORKTREES_DIR_AGENT) { $env:IDE_WORKTREES_DIR_AGENT } else { 'C:\ProgramData\Tessera\worktrees' }
+    if (-not (Test-Path -LiteralPath $dossier)) {
+        Write-Host "[info]  dossier des worktrees agent absent ($dossier) : cree au premier run"
+        return
+    }
+    $acl = (& icacls $dossier) -join "`n"
+    $heritage = $acl -match '\(I\)'
+    $droits = ($acl -match 'SYSTEM:\(OI\)\(CI\)\(F\)') -and ($acl -match 'Administrators:\(OI\)\(CI\)\(F\)')
+    Test-Etape "dossier des worktrees agent ($dossier) sans heritage" (-not $heritage) "icacls '$dossier' /inheritance:r"
+    Test-Etape 'dossier des worktrees agent : SYSTEM et Administrateurs (F)' $droits "icacls '$dossier' /grant:r *S-1-5-18:(OI)(CI)F *S-1-5-32-544:(OI)(CI)F"
+}
+
 function Invoke-AgentDoctor {
     $script:AgentEchecs = 0
     $compte = 'tessera-agent'
@@ -160,6 +174,7 @@ function Invoke-AgentDoctor {
     foreach ($outil in 'uv', 'node') {
         Test-Etape "$outil trouve sur ce poste" ([bool](Get-Command $outil -ErrorAction SilentlyContinue)) "installer $outil, puis agent setup (droits RX)"
     }
+    Test-DossierWorktreesAgent
     if ($script:AgentEchecs -gt 0) { exit 1 }
     Write-Host 'Compte agent pret.' -ForegroundColor Green
     exit 0
