@@ -134,3 +134,31 @@ async def test_relative_target_resolves_from_agent_folder_under_ancestor_root(
     assert await refuse("cd ../../backend && cat > m.py <<'EOF'\nx\nEOF") is False
     assert await refuse("echo x > ../../backend/m.py") is False
     assert await refuse("cd ../../.. && echo x > dehors.txt") is True
+
+
+async def test_relative_target_to_a_protected_repo_file_stays_refused(
+    tmp_path: Path,
+) -> None:
+    # Ticket-963 : depuis `projects/ide-core`, une cible relative vers un
+    # fichier protégé du dépôt doit être jugée sur le même chemin absolu que la
+    # garde de périmètre, sinon elle échappe à la protection.
+    depot = tmp_path / "depot"
+    projet = depot / "projects" / "ide-core"
+    projet.mkdir(parents=True)
+    (depot / "scripts" / "hooks").mkdir(parents=True)
+    voisin = depot / "projects" / "voisin"
+    voisin.mkdir()
+    (voisin / "CLAUDE.md").write_text("x", encoding="utf-8")
+    hook = hook_refus_hors_perimetre(projet, racine=depot.resolve())
+
+    async def refuse(commande: str) -> bool:
+        sortie = await hook(
+            {"tool_name": "Bash", "tool_input": {"command": commande}}, None, None
+        )
+        return bool(sortie)
+
+    assert await refuse("echo x > ../../scripts/hooks/pre-push") is True
+    assert await refuse("echo x > ../../scripts/termes_interdits_ci.py") is True
+    assert await refuse("echo x > ../voisin/agents.json") is True
+    assert await refuse("cd ../.. && echo x > scripts/hooks/pre-push") is True
+    assert await refuse("echo x > ../../backend/ok.py") is False

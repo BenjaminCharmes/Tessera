@@ -99,6 +99,16 @@ def hors_perimetre(
         return True
 
 
+def _absolue(chemin: str, project_path: Path) -> str:
+    """`chemin` made absolute from the agent's folder, as `hors_perimetre` reads it."""
+    try:
+        texte = developper(chemin)
+    except ValueError:
+        return chemin
+    cible = Path(texte)
+    return str(cible if cible.is_absolute() else project_path / cible)
+
+
 def hook_refus_hors_perimetre(
     project_path: Path | None,
     racine: Path | None = None,
@@ -174,8 +184,9 @@ def hook_refus_hors_perimetre(
                     raison, journal,
                 )
             # Dans le projet, mais porteur de ses règles : `agents.json`, `.git/`,
-            # `.claude/settings*.json`, `.github/workflows/` (ticket-119).
-            motif = motif_de_protection(cible, project_path, racine, script)
+            # `.claude/settings*.json`, `.github/workflows/` (ticket-119). Jugé
+            # sur le même chemin absolu que le périmètre (ticket-963).
+            motif = motif_de_protection(_absolue(cible, project_path), project_path, racine, script)
             if motif is not None:
                 return _refus(
                     "ecriture_protegee_refusee",
