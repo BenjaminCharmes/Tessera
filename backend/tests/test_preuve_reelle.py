@@ -99,6 +99,7 @@ async def _livrer(preuve_reelle: bool, monkeypatch: Any) -> tuple[PipelineResult
         _livrer=livrer,
         _surveiller=surveiller,
         _ticket_svc=_Tickets(preuve_reelle),
+        _preuves_reelles={"ticket-001": preuve_reelle},
         _log=lambda ligne: None,
     )
     resultat = PipelineResult(

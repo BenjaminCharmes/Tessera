@@ -123,8 +123,8 @@ class Orchestrator:
         self._git_workspace = git_workspace
         self._run_max_budget_usd = run_max_budget_usd
         self._spent_usd = 0.0
-        # Dépense du ticket en cours, remise à zéro à l'entrée de chaque
-        # _run_pipeline : le contrôle entre deux tours juge le ticket seul (ticket-386).
+        self._preuves_reelles: dict[str, bool] = {}  # figé au départ du run (ticket-964)
+        # Dépense du ticket en cours, remise à zéro à chaque _run_pipeline (ticket-386).
         self._ticket_spent_usd = 0.0
         # True quand run_queue est en cours : todo vs blocked entre deux tours (ticket-386).
         self._in_queue = False
