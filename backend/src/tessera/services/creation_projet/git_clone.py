@@ -5,6 +5,7 @@ import shutil
 from pathlib import Path
 
 from tessera.models.project import CloneProjectResponse
+from tessera.services.creation_projet.hook_pre_push import installer_hook
 from tessera.services.creation_projet.project_analyzer import ProjectAnalyzerService
 from tessera.services.creation_projet.project_importer import _scaffold_artifact_dirs
 from tessera.services.noyau.git_commande import build_command
@@ -67,6 +68,7 @@ class GitCloneService:
             raise
 
         _scaffold_artifact_dirs(dest)
+        installer_hook(dest)
         self._store_github_remote(dest, repo_url)
         # Le dépôt appartient déjà à quelqu'un d'autre : les artefacts
         # Tessera restent locaux par défaut (ticket-062). L'utilisateur

@@ -685,6 +685,15 @@ Résolvez A (conflit, rebase, relance manuelle) avant de relancer la file.
 
 Optionnel : ajoute `plan: true` dans le frontmatter pour faire passer ton ticket par un tour de planification (lecture seule) avant que le codeur ne le prenne. C'est un appel supplémentaire au modèle, à réserver aux tickets dont l'approche n'est pas évidente.
 
+
+#### Tickets qui demandent une preuve réelle
+
+Optionnel : ajoute `preuve_reelle: true` au frontmatter si ton ticket touche les processus système, les comptes utilisateur, les droits d'accès ou l'OS. Tu dois alors écrire une section `## Preuve réelle` — décris exactement ce qu'il faut lancer sur ta machine et ce qu'il faut constater.
+
+Quand un tel ticket est approuvé, le run ouvre sa pull request puis s'arrête, même si ton projet est en autonomie `merge`. La session ide-core fait elle-même la vérification, puis fusionne. Aucun agent n'écrit la preuve : seul tu la lis et la valides.
+
+N'écris jamais la preuve dans les critères d'acceptation. Les agents ne peuvent pas la remplir, et le validateur la refusera trois fois.
+
 ### Critères d'acceptation obligatoires pour le code
 
 Pour tout ticket `feat`, `fix` ou `refactor`, tu dois ajouter une section `## Critères d'acceptation`. C'est là que tu énumères les comportements ou résultats que le validateur vérifiera.

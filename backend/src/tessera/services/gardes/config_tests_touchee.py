@@ -42,8 +42,8 @@ NOMS_SIGNALES = (
     ".mypy.ini",
     ".coveragerc",
     "vite.config.*",
-    "vitest.config.*",
-    "vitest.workspace.*",
+    # `vitest.*` comme `contraintes.md` : config, workspace et setup (ticket-966).
+    "vitest.*",
     "eslint.config.*",
     "tsconfig*.json",
 )

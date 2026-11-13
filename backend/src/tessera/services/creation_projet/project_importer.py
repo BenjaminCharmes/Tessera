@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Literal
 
 from tessera.models.project import Project
+from tessera.services.creation_projet.hook_pre_push import installer_hook
 from tessera.services.projets.project_loader import load_project
 
 _COPY_EXCLUSIONS = {
@@ -110,6 +111,7 @@ class ProjectImporter:
             _copy_project(resolved, dest)
 
         _scaffold_artifact_dirs(dest)
+        installer_hook(dest)
         return load_project(dest)
 
     def _validate_source(self, resolved: Path) -> None:

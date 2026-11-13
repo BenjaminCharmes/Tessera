@@ -188,4 +188,15 @@ async def arret_fichier_protege(
     """Block the run, naming the protected files an agent call changed."""
     raison = "fichier protégé modifié pendant un appel d'agent : " + ", ".join(changes)
     _logger.warning("protected_file_modified", extra={"files": changes})
-    return await bloquer(orch, run, CODE_ARRET, raison, RESUME)
+    commiter = not config_git_changee(changes)
+    if not commiter:
+        # Un `filter.*` de la config nouvelle s'exécuterait au `git add` : l'arbre
+        # reste tel quel (ticket-965).
+        _logger.warning("commit_de_blocage_saute", extra={"files": changes})
+    return await bloquer(orch, run, CODE_ARRET, raison, RESUME, commiter=commiter)
+
+
+def config_git_changee(changes: list[str]) -> bool:
+    """True when a changed name is a git `config` or `config.worktree` file."""
+    return any(n.rsplit("/", 1)[-1] in ("config", "config.worktree") and "/" in n
+               and not n.startswith((".claude/", ".github/", "scripts/")) for n in changes)

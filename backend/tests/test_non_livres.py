@@ -97,6 +97,7 @@ class _Orch:
         self._surveiller = None
         self._run_recorder = None
         self._interruption: str | None = None
+        self._preuves_reelles: dict[str, bool] = {}
         self._est_termine = _jamais
         self._interrompre = Orchestrator._interrompre.__get__(self)  # type: ignore[attr-defined]
         self._bloquer_branche_modifiee = Orchestrator._bloquer_branche_modifiee.__get__(self)  # type: ignore[attr-defined]

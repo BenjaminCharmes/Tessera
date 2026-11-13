@@ -9244,3 +9244,96 @@ error: Please commit or stash them.
 - 2026-11-13 13:31:32 UTC — [ticket-947] documentation: 2 fichier(s) (473139ms) — après tour de correction — refusé : doc-fonctionnelle : docs/guide-utilisateur.md : règle « preuve » — l'édition ne cite aucun code livré. Ajoute `preuve: [{fichier, extrait}]`, extrait recopié du
 - 2026-11-13 13:31:32 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
 - 2026-11-13 13:31:32 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-13 16:54:13 UTC — [ide-core] ticket-962 PR #1106 confiée au CIWatcher
+- 2026-11-13 16:56:41 UTC — [ticket-962] livraison: nouvelle tentative de la PR #1106 après une erreur réseau (ConnectError: [Errno 11001] getaddrinfo failed), PR non mergée
+- 2026-11-13 16:56:44 UTC — [ticket-962] livraison: arrêt — PR #1106 non mergée : tête de la PR #1106 illisible (ConnectError: [Errno 11001] getaddrinfo failed) : elle reste ouverte
+- 2026-11-13 17:41:43 UTC — [ticket-964] branche ticket-964-the-real-proof-flag-of-a-ticket-is-read-before-an
+- 2026-11-13 17:41:47 UTC — [ticket-964] tour 1 — codeur démarré
+- 2026-11-13 17:44:15 UTC — [ticket-964] tour 1 — codeur terminé (148125ms)
+- 2026-11-13 17:44:21 UTC — [ticket-964] testeur: en attente d'un créneau de test
+- 2026-11-13 17:50:24 UTC — [ticket-964] testeur: 1 failed, 782 passed, 40 warnings in 230.38s (0:03:50)
+- 2026-11-13 17:50:25 UTC — [ticket-964] tests rouges au tour 1
+- 2026-11-13 17:50:25 UTC — [ticket-964] tour 2 — codeur démarré
+- 2026-11-13 17:50:49 UTC — [ticket-964] tour 2 — codeur terminé (24328ms)
+- 2026-11-13 17:55:38 UTC — [ticket-964] testeur: 1 failed, 1068 passed, 40 warnings in 283.02s (0:04:43)
+- 2026-11-13 17:55:38 UTC — [ticket-964] tests rouges au tour 2
+- 2026-11-13 17:55:38 UTC — [ticket-964] tour 3 — codeur démarré
+- 2026-11-13 18:01:22 UTC — [ticket-964] tour 3 — codeur terminé (343172ms)
+- 2026-11-13 18:06:55 UTC — [ticket-964] testeur: dur�es : ruff 0 s, pytest 328 s ; impact depuis base : 173 fichier(s) de test
+- 2026-11-13 18:06:55 UTC — [ticket-964] tests rouges au tour 3
+- 2026-11-13 18:06:55 UTC — [ticket-964] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-13 18:07:01 UTC — [ide-core] file interrompue : ticket-964 non approuvé
+- 2026-11-13 15:33:46 UTC — [ide-core] ticket-948 PR #1103 non surveillée (livraison arrêtée)
+- 2026-11-13 15:34:13 UTC — [ticket-962] branche ticket-962-each-documentation-role-reads-the-documentation-a
+- 2026-11-13 15:34:51 UTC — [ticket-962] tour 1 — codeur démarré
+- 2026-11-13 15:38:25 UTC — [ticket-962] tour 1 — codeur terminé (212156ms)
+- 2026-11-13 15:38:31 UTC — [ticket-962] testeur: en attente d'un créneau de test
+- 2026-11-13 15:40:21 UTC — [ticket-962] testeur: 1 failed, 345 passed, 8 warnings in 67.64s (0:01:07)
+- 2026-11-13 15:40:24 UTC — [ticket-962] tests rouges au tour 1
+- 2026-11-13 15:40:24 UTC — [ticket-962] tour 2 — codeur démarré
+- 2026-11-13 15:43:07 UTC — [ticket-962] tour 2 — codeur terminé (161327ms)
+- 2026-11-13 15:43:17 UTC — [ticket-962] testeur: en attente d'un créneau de test
+- 2026-11-13 15:52:54 UTC — [ticket-962] testeur: dur�es : ruff 2 s, pytest 333 s ; impact depuis base : 27 fichier(s) de test
+- 2026-11-13 15:52:55 UTC — [ticket-962] tests rouges au tour 2
+- 2026-11-13 15:52:55 UTC — [ticket-962] tour 3 — codeur démarré
+- 2026-11-13 15:57:33 UTC — [ticket-962] tour 3 — codeur terminé (273531ms)
+- 2026-11-13 15:57:43 UTC — [ticket-962] testeur: en attente d'un créneau de test
+- 2026-11-13 16:01:20 UTC — [ticket-962] testeur: dur�es : ruff 1 s, mypy 42 s, mypy-linux 35 s, pytest 114 s ; impact depuis base : 27 fichier(s) de test
+- 2026-11-13 16:01:34 UTC — [ticket-962] securite: PASS — Ce diff est surtout une refonte. Les fonctions `titres_fichiers_vises` et `brief (12655ms)
+- 2026-11-13 16:01:35 UTC — [ticket-962] tour 3 — reviewer démarré
+- 2026-11-13 16:02:01 UTC — [ticket-962] tour 3 — reviewer terminé (25500ms)
+- 2026-11-13 16:02:31 UTC — [ticket-962] validateur: fichiers cités joints : docs/guide-utilisateur.md (tronqué) ; non joints (budget épuisé) : services/documentation
+- 2026-11-13 16:02:31 UTC — [ticket-962] validateur: APPROVED — Le ticket implémente correctement la solution : à chaque appel de rôle, le brief (55843ms)
+- 2026-11-13 16:02:32 UTC — [ticket-962] APPROVED après 3 tour(s)
+- 2026-11-13 16:02:47 UTC — [ide-core] ticket-964 retiré de la file
+- 2026-11-13 16:02:47 UTC — [ide-core] ticket-965 retiré de la file
+- 2026-11-13 16:02:47 UTC — [ide-core] ticket-967 retiré de la file
+- 2026-11-13 16:02:47 UTC — [ide-core] ticket-968 retiré de la file
+- 2026-11-13 16:03:23 UTC — [ticket-962] leçons: une leçon proposée
+- 2026-11-13 16:05:27 UTC — [ticket-962] documentation: 0 fichier(s) (115594ms)
+- 2026-11-13 16:05:27 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-13 16:05:27 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-13 18:17:51 UTC — [ticket-965] branche ticket-965-no-program-named-in-a-project-s-git-config-runs-w
+- 2026-11-13 18:17:58 UTC — [ticket-965] tour 1 — codeur démarré
+- 2026-11-13 18:19:33 UTC — [ticket-965] tour 1 — codeur terminé (94280ms)
+- 2026-11-13 18:22:45 UTC — [ticket-965] testeur: 1 failed, 480 passed, 16 warnings in 186.79s (0:03:06)
+- 2026-11-13 18:22:45 UTC — [ticket-965] tests rouges au tour 1
+- 2026-11-13 18:22:45 UTC — [ticket-965] tour 2 — codeur démarré
+- 2026-11-13 18:23:13 UTC — [ticket-965] tour 2 — codeur terminé (27640ms)
+- 2026-11-13 18:31:58 UTC — [ticket-965] testeur: dur�es : ruff 0 s, mypy 2 s, mypy-linux 3 s, pytest 521 s ; impact depuis base : 135 fichier(s) de test
+- 2026-11-13 18:32:22 UTC — [ticket-965] securite: PASS — Le diff durcit les commandes git : il neutralise gpg, ssh, pager et diff externe (23562ms)
+- 2026-11-13 18:32:23 UTC — [ticket-965] tour 2 — reviewer démarré
+- 2026-11-13 18:32:55 UTC — [ticket-965] validateur: APPROVED — Les quatre critères d'acceptation sont satisfaits. `build_command` force mainten (32530ms)
+- 2026-11-13 18:33:07 UTC — [ticket-965] tour 2 — reviewer terminé (44172ms)
+- 2026-11-13 18:33:07 UTC — [ticket-965] APPROVED après 2 tour(s)
+- 2026-11-13 18:33:50 UTC — [ticket-965] leçons: refusée — preuve absente du retour du run
+- 2026-11-13 18:40:20 UTC — [ticket-965] documentation: 1 fichier(s) (368344ms) — après tour de correction
+- 2026-11-13 18:40:20 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-13 18:40:20 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-13 18:41:36 UTC — [ide-core] ticket-965 PR #1111 confiée au CIWatcher
+- 2026-11-13 18:41:43 UTC — [ticket-967] branche ticket-967-a-project-service-never-starts-on-a-port-tessera
+- 2026-11-13 18:41:46 UTC — [ticket-967] tour 1 — codeur démarré
+- 2026-11-13 18:44:18 UTC — [ticket-967] tour 1 — codeur terminé (151358ms)
+- 2026-11-13 18:46:24 UTC — [ticket-967] testeur: dur�es : ruff 0 s, mypy 20 s, mypy-linux 19 s, pytest 121 s ; impact depuis base : 93 fichier(s) de test
+- 2026-11-13 18:46:36 UTC — [ticket-967] securite: PASS — J'ai lu le diff, je n'ai rien lu hors du diff, et je n'y trouve aucune faille CR (10483ms)
+- 2026-11-13 18:46:36 UTC — [ticket-967] tour 1 — reviewer démarré
+- 2026-11-13 18:46:56 UTC — [ticket-967] validateur: APPROVED — All acceptance criteria are satisfied. The implementation correctly prevents pro (19359ms)
+- 2026-11-13 18:46:58 UTC — [ticket-967] tour 1 — reviewer terminé (21375ms)
+- 2026-11-13 18:46:58 UTC — [ticket-967] APPROVED après 1 tour(s)
+- 2026-11-13 18:51:20 UTC — [ticket-967] documentation: 0 fichier(s) (242703ms) — après tour de correction
+- 2026-11-13 18:51:20 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-13 18:51:20 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-13 18:53:31 UTC — [ide-core] ticket-967 PR #1112 confiée au CIWatcher
+- 2026-11-13 18:46:53 UTC — [ide-core] ticket-965 PR #1111 mergée (CI verte)
+- 2026-11-13 18:53:36 UTC — [ticket-968] branche ticket-968-every-project-repository-carries-the-forbidden-te
+- 2026-11-13 18:53:39 UTC — [ticket-968] tour 1 — codeur démarré
+- 2026-11-13 18:58:55 UTC — [ticket-968] tour 1 — codeur terminé (316421ms)
+- 2026-11-13 19:07:10 UTC — [ticket-968] testeur: dur�es : ruff 0 s, mypy 11 s, mypy-linux 12 s, pytest 490 s ; impact depuis base : suite compl�te
+- 2026-11-13 19:07:37 UTC — [ticket-968] securite: PASS — Le diff pose un hook pre-push de deux lignes qui appelle le script de Tessera pa (26907ms)
+- 2026-11-13 19:07:38 UTC — [ticket-968] tour 1 — reviewer démarré
+- 2026-11-13 19:07:58 UTC — [ticket-968] validateur: APPROVED — Les quatre critères d'acceptation sont satisfaits. Le code produit installe le h (20062ms)
+- 2026-11-13 19:08:09 UTC — [ticket-968] tour 1 — reviewer terminé (31437ms)
+- 2026-11-13 19:08:10 UTC — [ticket-968] APPROVED après 1 tour(s)
+- 2026-11-13 19:12:12 UTC — [ticket-968] documentation: 0 fichier(s) (236655ms) — après tour de correction
+- 2026-11-13 19:12:12 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-13 19:12:12 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
