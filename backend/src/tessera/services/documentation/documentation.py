@@ -31,14 +31,16 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from tessera.services.documentation import documentation_claude_md as claude_md_doc
-from tessera.services.documentation.documentation_base import EditionRefusee, _titres_markdown
+from tessera.services.documentation.documentation_base import EditionRefusee
 from tessera.services.documentation.documentation_code import FournisseurMatiere, MatiereCode, bloc_diffs, bloc_fichiers, matiere_du_lot
 from tessera.services.documentation.documentation_contenu import contenu_et_reduits
 from tessera.services.documentation.documentation_description import appliquer_description
-from tessera.services.documentation.documentation_editions import _documentable, appliquer_editions
+from tessera.services.documentation.documentation_editions import appliquer_editions
 from tessera.services.documentation.documentation_preuve import fichiers_de_la_matiere
 from tessera.services.documentation.documentation_reponse import donnees_de, editions_de, editions_depuis
 from tessera.services.documentation.documentation_selection import MARQUEUR, TicketADocumenter, consigner_lot, marquer_documente, tickets_a_documenter
+from tessera.services.documentation.documentation_titres import brief_correction as _brief_correction
+from tessera.services.documentation.documentation_titres import titres_fichiers_vises as _titres_fichiers_vises
 from tessera.services.noyau.modeles_par_defaut import MODELE_PRODUCTION
 from tessera.services.providers.base import LLMProvider
 from tessera.utils.logger import get_logger
@@ -188,8 +190,9 @@ class DocumentationService:
         modifies: list[str] = []
         refus: list[str] = []
         tour_de_correction = False
-        contenu_doc, reduits = contenu_et_reduits(racine)
-        brief = _brief(tickets, matiere, contenu_doc)
+        # `reduits` est le budget du lot, calculé une fois ; le contenu que
+        # chaque rôle lit, lui, se relit sur le disque à son appel (ticket-962).
+        _, reduits = contenu_et_reduits(racine)
         # Le texte des tickets sert au contrôle des jetons : un numéro d'ADR
         # qu'un ticket cite n'est pas inventé (ticket-542).
         intentions = "\n".join(f"{t.titre}\n{t.corps}" for t in tickets)
@@ -206,7 +209,7 @@ class DocumentationService:
             technique = role == claude_md_doc.ROLE
             claude_md = self._claude_md if technique else None
             agents_md = claude_md_doc.agents_md_de(racine, claude_md)
-            user = brief + claude_md_doc.sections_du_brief(claude_md, agents_md)
+            user = _user_du_disque(racine, tickets, matiere, claude_md, agents_md)
             reponse = await provider.complete(
                 system=systeme,
                 user=user,
@@ -227,9 +230,11 @@ class DocumentationService:
             if not editions:
                 continue
             try:
-                modifies.extend(
-                    appliquer_editions(racine, editions, claude_md, matiere, intentions, agents_md)
+                ecrits_role = appliquer_editions(
+                    racine, editions, claude_md, matiere, intentions, agents_md
                 )
+                modifies.extend(ecrits_role)
+                _journaliser_editions(role, ecrits_role)
             except EditionRefusee as exc:
                 # Tour de correction (ticket-395) : rappeler l'agent une seule fois
                 # avec le motif du refus et les titres des fichiers visés.
@@ -239,7 +244,8 @@ class DocumentationService:
                 reponse2 = await provider.complete(
                     system=systeme,
                     user=_brief_correction(
-                        user, str(reponse.content), motif, titres, fichiers
+                        _user_du_disque(racine, tickets, matiere, claude_md, agents_md),
+                        str(reponse.content), motif, titres, fichiers
                     ),
                     model=modele,
                     max_tokens=_MAX_TOKENS,
@@ -249,11 +255,11 @@ class DocumentationService:
                 if not editions2:
                     continue
                 try:
-                    modifies.extend(
-                        appliquer_editions(
-                            racine, editions2, claude_md, matiere, intentions, agents_md
-                        )
+                    ecrits2 = appliquer_editions(
+                        racine, editions2, claude_md, matiere, intentions, agents_md
                     )
+                    modifies.extend(ecrits2)
+                    _journaliser_editions(role, ecrits2)
                 except EditionRefusee as exc2:
                     # Deuxième refus : comportement courant (ticket-395).
                     _logger.warning(
@@ -280,6 +286,23 @@ class DocumentationService:
         )
 
 
+def _user_du_disque(
+    racine: Path,
+    tickets: list[TicketADocumenter],
+    matiere: MatiereCode,
+    claude_md: Path | None,
+    agents_md: Path | None,
+) -> str:
+    """Build a role's prompt from the documentation as it is on disk now (ticket-962)."""
+    brief = _brief(tickets, matiere, contenu_et_reduits(racine)[0])
+    return brief + claude_md_doc.sections_du_brief(claude_md, agents_md)
+
+
+def _journaliser_editions(role: str, fichiers: list[str]) -> None:
+    """Log the files a role's accepted editions changed (ticket-962)."""
+    _logger.info("editions_appliquees", extra={"role": role, "fichiers": fichiers})
+
+
 def _brief(
     tickets: list[TicketADocumenter], matiere: MatiereCode, contenu_doc: str = ""
 ) -> str:
@@ -301,61 +324,3 @@ def _brief(
     suite = (bloc_diffs(matiere), bloc_fichiers(matiere), contenu_doc)
     morceaux.extend(bloc for bloc in suite if bloc)
     return "\n".join(morceaux)
-
-
-def _titres_fichiers_vises(racine: Path, editions: list[dict[str, object]]) -> str:
-    """Get Markdown headings of files targeted by the editions.
-
-    Returns a formatted string listing headings per file, to be included in the
-    corrective-round message so the agent can pick a valid existing section.
-    """
-    morceaux: list[str] = []
-    vus: set[str] = set()
-    for ed in editions:
-        chemin = str(ed.get("fichier", ""))
-        if chemin in vus:
-            continue
-        vus.add(chemin)
-        # `fichier` vient de la réponse de l'agent : seule la documentation se
-        # lit, comme seule elle s'écrit (`appliquer_editions`), et jamais hors
-        # de la racine — un « ../../.env » ne doit rien renvoyer au modèle.
-        if not _documentable(chemin):
-            continue
-        fichier = (racine / chemin).resolve()
-        if not fichier.is_relative_to(racine.resolve()):
-            continue
-        if fichier.is_file():
-            titres = _titres_markdown(fichier.read_text(encoding="utf-8"))
-            if titres:
-                morceaux.append(f"\n### {chemin}\n\n{titres}")
-    return "".join(morceaux)
-
-
-def _brief_correction(
-    user_original: str,
-    reponse_precedente: str,
-    motif_refus: str,
-    titres_fichiers: str,
-    fichiers_matiere: list[str] | None = None,
-) -> str:
-    """Message for the one-shot corrective round (ticket-395).
-
-    ``fichiers_matiere`` lists the files the agent was given: a ``preuve`` can
-    only cite one of them (ticket-542).
-    """
-    parties: list[str] = [
-        user_original,
-        "\n\n---\n\nTa réponse précédente a été refusée.\n\n"
-        f"Motif du refus : {motif_refus}",
-    ]
-    if titres_fichiers:
-        parties.append(
-            "\n\nTitres Markdown des fichiers visés (liste exhaustive) :" + titres_fichiers
-        )
-    if fichiers_matiere:
-        parties.append(
-            "\n\nFichiers du code fourni, où une preuve peut puiser : "
-            + ", ".join(fichiers_matiere)
-        )
-    parties.append("\n\nPropose une nouvelle liste d'éditions corrigée.")
-    return "".join(parties)

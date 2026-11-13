@@ -7,6 +7,7 @@ from pathlib import Path
 from tessera.config import _REPO_ROOT
 from tessera.models.project import ProjectCreate, ProjectFromTemplateResult
 from tessera.services.creation_projet.git_link import init_repository
+from tessera.services.creation_projet.hook_pre_push import installer_hook
 from tessera.services.creation_projet.template_claude_md import write_claude_md
 from tessera.services.noyau.modeles_par_defaut import MODELE_JUGEMENT, MODELE_PRODUCTION
 from tessera.services.projets.manifeste import lire_liste
@@ -229,6 +230,7 @@ async def create_project_from_template(
     try:
         await init_repository(project_path, initial_branch=_BASE_BRANCH)
         git_ready = True
+        installer_hook(project_path)
     except Exception as exc:
         _logger.warning(
             "template_project_git_init_failed",

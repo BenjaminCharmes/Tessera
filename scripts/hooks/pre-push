@@ -191,7 +191,9 @@ def _get_diff_lines(local_sha: str, remote_sha: str) -> list[str]:
     patches for commits not yet on any remote.
     """
     if remote_sha == NULL_SHA:
-        cmd = ["git", "log", "-p", "--not", "--remotes", local_sha]
+        # Le SHA avant `--not` : placé après, il était nié lui aussi et le
+        # diff d'une branche neuve restait vide (ticket-972).
+        cmd = ["git", "log", "-p", local_sha, "--not", "--remotes"]
     else:
         cmd = ["git", "diff", f"{remote_sha}..{local_sha}"]
 
