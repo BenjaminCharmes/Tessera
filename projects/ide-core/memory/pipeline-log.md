@@ -9230,3 +9230,23 @@ error: Please commit or stash them.
 - 2026-11-13 09:36:21 UTC — [ticket-960] CHANGES_REQUESTED tour 3: Reviewer : 1. Les tickets `design` (architecte, revues de projet) ne peuvent plus être approuvés. `diff_depuis_base` exclut toujours `tickets/` (`_ORCHESTRATOR_ARTIFACT_PATHS`, dans git_workspace/chem
 - 2026-11-13 09:36:21 UTC — [ticket-960] BLOCKED après 3 tour(s) sans approbation
 - 2026-11-13 09:36:31 UTC — [ide-core] file interrompue : ticket-960 non approuvé
+- 2026-11-13 14:54:01 UTC — [ide-core] ticket-943 PR #1102 non reprise : merge après preuve réelle
+- 2026-11-13 14:54:01 UTC — [ide-core] ticket-947 PR #1095 non reprise : merge après preuve réelle
+- 2026-11-13 14:40:59 UTC — [ide-core] ticket-943 PR #1102 non surveillée (livraison arrêtée)
+- 2026-11-13 14:54:54 UTC — [ticket-948] branche ticket-948-a-project-venv-whose-launcher-smart-app-control-b
+- 2026-11-13 14:54:59 UTC — [ticket-948] tour 1 — codeur démarré
+- 2026-11-13 15:01:12 UTC — [ticket-948] tour 1 — codeur terminé (372500ms)
+- 2026-11-13 15:01:29 UTC — [ticket-948] testeur: en attente d'un créneau de test
+- 2026-11-13 15:11:40 UTC — [ticket-948] testeur: dur�es : ruff 1 s, pytest 556 s ; impact depuis base : 169 fichier(s) de test
+- 2026-11-13 15:11:40 UTC — [ticket-948] tests rouges au tour 1
+- 2026-11-13 15:11:40 UTC — [ticket-948] tour 2 — codeur démarré
+- 2026-11-13 15:14:37 UTC — [ticket-948] tour 2 — codeur terminé (175953ms)
+- 2026-11-13 15:14:51 UTC — [ticket-948] testeur: en attente d'un créneau de test
+- 2026-11-13 15:27:06 UTC — [ticket-948] testeur: dur�es : ruff 0 s, mypy 33 s, mypy-linux 22 s, pytest 502 s ; impact depuis base : 169 fichier(s) de test
+- 2026-11-13 15:27:32 UTC — [ticket-948] securite: PASS — Verdict PASS : je n'ai trouvé aucune faille CRITICAL ou HIGH dans ce diff. Aucun (24546ms)
+- 2026-11-13 15:27:33 UTC — [ticket-948] tour 2 — reviewer démarré
+- 2026-11-13 15:28:15 UTC — [ticket-948] tour 2 — reviewer terminé (42312ms)
+- 2026-11-13 15:28:57 UTC — [ticket-948] validateur: fichiers cités joints : backend/tests/test_longueur_des_fichiers.py ; absents : pyvenv.cfg, <tmp>/ailleurs/uv/python/cpython-3.11, .venv/Scripts
+- 2026-11-13 15:28:57 UTC — [ticket-948] validateur: APPROVED — Tous les critères sont satisfaits. Les deux nouveaux modules venv_sac.py et repr (84375ms)
+- 2026-11-13 15:28:57 UTC — [ticket-948] APPROVED après 2 tour(s)
+- 2026-11-13 15:30:10 UTC — [ticket-948] leçons: refusée — preuve absente du retour du run
