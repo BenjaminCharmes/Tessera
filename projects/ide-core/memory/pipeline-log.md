@@ -9279,3 +9279,17 @@ error: Please commit or stash them.
 - 2026-11-13 16:05:27 UTC — [ticket-962] documentation: 0 fichier(s) (115594ms)
 - 2026-11-13 16:05:27 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
 - 2026-11-13 16:05:27 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-13 18:17:51 UTC — [ticket-965] branche ticket-965-no-program-named-in-a-project-s-git-config-runs-w
+- 2026-11-13 18:17:58 UTC — [ticket-965] tour 1 — codeur démarré
+- 2026-11-13 18:19:33 UTC — [ticket-965] tour 1 — codeur terminé (94280ms)
+- 2026-11-13 18:22:45 UTC — [ticket-965] testeur: 1 failed, 480 passed, 16 warnings in 186.79s (0:03:06)
+- 2026-11-13 18:22:45 UTC — [ticket-965] tests rouges au tour 1
+- 2026-11-13 18:22:45 UTC — [ticket-965] tour 2 — codeur démarré
+- 2026-11-13 18:23:13 UTC — [ticket-965] tour 2 — codeur terminé (27640ms)
+- 2026-11-13 18:31:58 UTC — [ticket-965] testeur: dur�es : ruff 0 s, mypy 2 s, mypy-linux 3 s, pytest 521 s ; impact depuis base : 135 fichier(s) de test
+- 2026-11-13 18:32:22 UTC — [ticket-965] securite: PASS — Le diff durcit les commandes git : il neutralise gpg, ssh, pager et diff externe (23562ms)
+- 2026-11-13 18:32:23 UTC — [ticket-965] tour 2 — reviewer démarré
+- 2026-11-13 18:32:55 UTC — [ticket-965] validateur: APPROVED — Les quatre critères d'acceptation sont satisfaits. `build_command` force mainten (32530ms)
+- 2026-11-13 18:33:07 UTC — [ticket-965] tour 2 — reviewer terminé (44172ms)
+- 2026-11-13 18:33:07 UTC — [ticket-965] APPROVED après 2 tour(s)
+- 2026-11-13 18:33:50 UTC — [ticket-965] leçons: refusée — preuve absente du retour du run
