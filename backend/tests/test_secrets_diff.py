@@ -109,6 +109,13 @@ def test_placeholder_and_short_key_are_not_detected() -> None:
         assert chercher_secrets(_diff(ligne)) == [], ligne
 
 
+def test_a_url_regex_is_not_a_credential() -> None:
+    # Ticket-969 : repo-health 064, une regex d'URL GitHub bloquait la livraison.
+    regex = r'r"^(?:https?://(?:[^@/]+@)?github\.com/|git@github\.com:)"'
+
+    assert chercher_secrets(_diff(regex)) == []
+
+
 def test_line_number_follows_the_new_file() -> None:
     diff = (
         "diff --git a/a.py b/a.py\n"
