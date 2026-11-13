@@ -38,6 +38,7 @@ from tessera.services.providers.refus_cli import ReleveDesRefusCli
 from tessera.services.providers.refus_garde import JournalDesRefus
 from tessera.services.providers.reglages_ancetres import reglages_sans_consignes_ancetres
 from tessera.services.providers.signaler import ContexteSignal, serveur_tessera
+from tessera.services.providers.silence_bash import SuiviAppelsBash
 from tessera.services.providers.traitement_messages import traiter_message
 from tessera.services.providers.transport_agent import TransportSuivi, transport_du_compte
 from tessera.services.usage.quota_tracker import QuotaTracker
@@ -226,6 +227,7 @@ class ClaudeAgentSDKProvider:
         skills: list[str] | None = None,
         git_bash_path: str | None = None,
         silence_max_s: float | None = None,
+        bash_silence_max_s: float | None = None,
         journal_refus: JournalDesRefus | None = None,
         duree_max_s: float | None = None,
         effort: EffortLevel | None = None,
@@ -257,6 +259,7 @@ class ClaudeAgentSDKProvider:
             self._silence_max_s = silence_max_s
         else:
             self._silence_max_s = settings.agent_silence_max_s
+        self._bash_silence_max_s = bash_silence_max_s  # ticket-957 ; None : réglages
 
     async def complete(
         self,
@@ -370,9 +373,7 @@ class ClaudeAgentSDKProvider:
         chunks: list[str] = []
         result: ResultMessage | None = None
         refus_cli = ReleveDesRefusCli()
-        # None → pas de borne (0 ou négatif désactive également).
-        silence_timeout: float | None = self._silence_max_s if self._silence_max_s > 0 else None
-
+        suivi_bash = SuiviAppelsBash(self._silence_max_s, self._bash_silence_max_s)
         flux = _sdk_gen(prompt=user, options=options, transport=transport)
         try:
             async with aclosing(flux) as gen:
@@ -383,20 +384,19 @@ class ClaudeAgentSDKProvider:
                         # son tâche interne vient de finir. Avec un flux qui émet
                         # sans cesse, la durée maximale était alors perdue et
                         # l'appel ne finissait jamais (ticket-518).
-                        async with asyncio.timeout(silence_timeout):
+                        async with asyncio.timeout(suivi_bash.borne()):
                             message = await gen.__anext__()
                     except TimeoutError:
                         _logger.warning(
                             "agent_silencieux_arrete",
-                            extra={"model": model, "silence_s": self._silence_max_s},
+                            extra={"model": model, "silence_s": suivi_bash.borne()},
                         )
-                        raise ProviderIndisponible(
-                            f"agent silencieux depuis {self._silence_max_s:.0f} s"
-                        ) from None
+                        raise ProviderIndisponible(suivi_bash.message_d_arret()) from None
                     except StopAsyncIteration:
                         break
 
                     refus_cli.observer(message)
+                    suivi_bash.observer(message)
                     final = await traiter_message(
                         message, chunks=chunks, quota=self.quota,
                         on_token=on_token, on_tool_use=on_tool_use,
