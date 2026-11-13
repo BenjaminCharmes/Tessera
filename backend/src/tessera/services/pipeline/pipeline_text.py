@@ -12,6 +12,12 @@ if TYPE_CHECKING:
 _CRITERIA_HEADING = re.compile(r"##\s*(critères|acceptance criteria)", re.IGNORECASE)
 _CRITERIA_ITEM = re.compile(r"\s*-\s*\[[ xX]?\]\s*(.+)")
 
+# Retour au codeur quand les verdicts approuvent un tour sans diff réel (ticket-960).
+_FEEDBACK_DIFF_VIDE = (
+    "Aucun fichier modifié : rien à approuver. Écris le code sur le disque ; "
+    "décrire un travail ne suffit pas."
+)
+
 
 def _single_line(text: str) -> str:
     """Collapse any run of whitespace (newlines included) into single spaces.

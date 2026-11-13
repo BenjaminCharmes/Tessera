@@ -263,12 +263,12 @@ async def _capture_diff(orch: "Orchestrator", run: PipelineRun, prose: str) -> s
         diff = await orch._git_workspace.diff_depuis_base()
     except GitWorkspaceError as exc:
         _logger.warning("diff_failed", extra={"error": str(exc)})
+        diff = ""  # échoue fermé : un diff inconnu vaut un diff vide
+    run.diff_vide = not diff.strip()
+    if run.diff_vide:
         _logger.info("diff_empty_fallback_to_prose", extra={"ticket_id": run.ticket_id})
         return prose
-    if diff.strip():
-        return diff
-    _logger.info("diff_empty_fallback_to_prose", extra={"ticket_id": run.ticket_id})
-    return prose
+    return diff
 
 
 def _capture_artifact_diff(orch: "Orchestrator", run: PipelineRun) -> None:
