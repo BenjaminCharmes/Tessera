@@ -7,11 +7,12 @@ from pydantic import SecretStr
 
 from tessera.config import settings
 from tessera.services.verification.app_du_run import DemarrageEchoue, demarrer_processus, demarreur_du_run
+from tests.chaine_factice import chaine_factice  # noqa: F401
 from tests.doubles_compte import LanceurDouble, ProcessDouble
 
 
 @pytest.fixture
-def compte(monkeypatch: pytest.MonkeyPatch) -> None:
+def compte(monkeypatch: pytest.MonkeyPatch, chaine: Path) -> None:
     monkeypatch.setattr(settings, "agent_user", "tessera-agent")
     monkeypatch.setattr(settings, "agent_logon_password", SecretStr("pw"))
 

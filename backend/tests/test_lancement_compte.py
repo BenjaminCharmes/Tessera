@@ -7,11 +7,12 @@ from pydantic import SecretStr
 
 from tessera.config import settings
 from tessera.services.verification.lancement_compte import EchecLancementCompte, env_du_compte, lancer_sous_compte
+from tests.chaine_factice import chaine_factice  # noqa: F401
 from tests.doubles_compte import LanceurDouble, ProcessDouble
 
 
 @pytest.fixture
-def compte(monkeypatch: pytest.MonkeyPatch) -> None:
+def compte(monkeypatch: pytest.MonkeyPatch, chaine: Path) -> None:
     monkeypatch.setattr(settings, "agent_user", "tessera-agent")
     monkeypatch.setattr(settings, "agent_logon_password", SecretStr("pw"))
 
@@ -64,7 +65,7 @@ async def test_empty_account_refuses(monkeypatch: pytest.MonkeyPatch, tmp_path: 
         await lancer_sous_compte(["x"], tmp_path, None, LanceurDouble())
 
 
-def test_environment_is_built_from_nothing_without_secrets(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_environment_is_built_from_nothing_without_secrets(monkeypatch: pytest.MonkeyPatch, chaine: Path) -> None:
     monkeypatch.setenv("PATH", "/bin")
     monkeypatch.setenv("UNE_AUTRE_VARIABLE", "fuite")
     monkeypatch.setenv("GITHUB_TOKEN", "secret")
