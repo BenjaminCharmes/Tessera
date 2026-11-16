@@ -9675,3 +9675,4 @@ error: Please commit or stash them.
 - 2026-11-16 15:12:34 UTC — [ticket-971] validateur: APPROVED — Les six critères d'acceptation sont satisfaits par le code et les tests. La rela (47077ms)
 - 2026-11-16 15:12:34 UTC — [ticket-971] CHANGES_REQUESTED tour 3: Reviewer : 1. Une étape rouge qui contient des échecs non reconnus par le parseur peut redevenir verte. Avec `scripts/verifier.py` (lignes 183-185 et 207-213), une erreur ruff, mypy, mypy-linux, tsc o
 - 2026-11-16 15:12:34 UTC — [ticket-971] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-16 15:12:50 UTC — [ide-core] file interrompue : ticket-971 non approuvé
