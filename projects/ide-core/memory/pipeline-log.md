@@ -9585,3 +9585,22 @@ error: Please commit or stash them.
 - 2026-11-16 14:46:17 UTC — [ticket-981] documentation: 0 fichier(s) (129156ms) — après tour de correction
 - 2026-11-16 14:46:17 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
 - 2026-11-16 14:46:17 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-16 15:13:41 UTC — [ticket-982] branche ticket-982-the-path-of-every-agent-account-process-is-built
+- 2026-11-16 15:13:44 UTC — [ticket-982] tour 1 — codeur démarré
+- 2026-11-16 15:16:48 UTC — [ticket-982] tour 1 — codeur terminé (183578ms)
+- 2026-11-16 15:23:47 UTC — [ide-core] ticket-985 retiré de la file
+- 2026-11-16 15:27:20 UTC — [ticket-982] testeur: dur�es : ruff 0 s, mypy 18 s, mypy-linux 25 s, pytest 627 s ; impact depuis base : suite compl�te
+- 2026-11-16 15:27:35 UTC — [ticket-982] securite: PASS — Le diff réduit le PATH du compte agent : la chaîne d'outils en tête, puis seulem (14375ms)
+- 2026-11-16 15:27:35 UTC — [ticket-982] tour 1 — reviewer démarré
+- 2026-11-16 15:28:17 UTC — [ticket-982] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits : filtrage des entrées C:\Users (41281ms)
+- 2026-11-16 15:28:30 UTC — [ticket-982] tour 1 — reviewer terminé (54297ms)
+- 2026-11-16 15:28:30 UTC — [ticket-982] CHANGES_REQUESTED tour 1: Reviewer : 1. Le test d'architecture `test_no_module_builds_an_account_path_elsewhere` ne peut pas détecter la régression qu'il doit empêcher. D'abord, il ne lit que les fichiers dont le nom contient 
+- 2026-11-16 15:28:30 UTC — [ticket-982] tour 2 — codeur démarré
+- 2026-11-16 15:29:02 UTC — [ticket-982] tour 2 — codeur terminé (32343ms)
+- 2026-11-16 15:40:16 UTC — [ticket-982] testeur: dur�es : ruff 0 s, mypy 3 s, mypy-linux 5 s, pytest 670 s ; impact depuis base : suite compl�te
+- 2026-11-16 15:40:36 UTC — [ticket-982] securite: PASS — Le diff réduit le PATH du compte agent à la chaîne d'outils partagée et aux doss (18890ms)
+- 2026-11-16 15:40:37 UTC — [ticket-982] tour 2 — reviewer démarré
+- 2026-11-16 15:40:57 UTC — [ticket-982] tour 2 — reviewer terminé (20780ms)
+- 2026-11-16 15:41:03 UTC — [ticket-982] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits : filtrage des entrées C:\Users (25890ms)
+- 2026-11-16 15:41:03 UTC — [ticket-982] APPROVED après 2 tour(s)
+- 2026-11-16 15:41:46 UTC — [ticket-982] leçons: une leçon proposée
