@@ -92,10 +92,13 @@ async def _refuser_si_deja_lance_hors_de_tessera(
             )
 
 
-def _refuser_un_port_de_tessera(project_id: str, declares: list[dict[str, str]]) -> None:
+def _refuser_un_port_de_tessera(
+    project_id: str, declares: list[dict[str, str]], racine: Path
+) -> None:
     """409 naming the port if a declared service would sit on one of Tessera's."""
     for declare in declares:
-        port = conflit_avec_tessera(declare["commande"])
+        dossier = racine / declare.get("cwd", "")
+        port = conflit_avec_tessera(declare["commande"], dossier)
         if port is not None:
             raise HTTPException(
                 status_code=409,
@@ -126,7 +129,7 @@ async def lancer_les_services(
                 'entrée portant {"nom": "...", "commande": "..."}.'
             ),
         )
-    _refuser_un_port_de_tessera(project_id, declares)
+    _refuser_un_port_de_tessera(project_id, declares, racine)
     await _refuser_si_deja_lance_hors_de_tessera(
         project_id, {d["nom"] for d in declares}, sonde
     )

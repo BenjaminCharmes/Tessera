@@ -9380,6 +9380,58 @@ error: Please commit or stash them.
 - 2026-11-13 19:12:12 UTC — [ticket-968] documentation: 0 fichier(s) (236655ms) — après tour de correction
 - 2026-11-13 19:12:12 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
 - 2026-11-13 19:12:12 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-13 18:58:18 UTC — [ide-core] ticket-967 PR #1112 mergée (CI verte)
+- 2026-11-13 19:21:19 UTC — [ide-core] ticket-968 PR #1113 confiée au CIWatcher
+- 2026-11-13 19:27:42 UTC — [ticket-968] livraison: arrêt — PR #1113 non mergée : Le merge de la PR #1113 a échoué sur une erreur réseau (ReadTimeout, la PR est lue « open »). La PR reste ouverte.
+- 2026-11-16 09:18:28 UTC — [ticket-974] branche ticket-974-la-garde-de-port-du-ticket-967-lit-le-port-que-le
+- 2026-11-16 09:18:32 UTC — [ticket-974] tour 1 — codeur démarré
+- 2026-11-16 09:20:52 UTC — [ticket-974] tour 1 — codeur terminé (140000ms)
+- 2026-11-16 09:23:40 UTC — [ticket-974] testeur: dur�es : ruff 8 s, mypy 36 s, mypy-linux 51 s, pytest 162 s ; impact depuis base : 93 fichier(s) de test
+- 2026-11-16 09:24:11 UTC — [ticket-974] securite: PASS — Le diff lit `package.json` et `vite.config` du dossier du service pour en déduir (30016ms)
+- 2026-11-16 09:24:13 UTC — [ticket-974] tour 1 — reviewer démarré
+- 2026-11-16 09:24:58 UTC — [ticket-974] tour 1 — reviewer terminé (44750ms)
+- 2026-11-16 09:25:20 UTC — [ticket-974] validateur: fichiers cités joints : frontend/vite.config.ts, vite.config.ts, package.json
+- 2026-11-16 09:25:20 UTC — [ticket-974] validateur: CHANGES_REQUESTED — Le code implémente correctement la logique : lecture du `cwd`, extraction de `pa (67155ms)
+- 2026-11-16 09:25:21 UTC — [ticket-974] CHANGES_REQUESTED tour 1: Validateur : Le code implémente correctement la logique : lecture du `cwd`, extraction de `package.json` et `vite.config.ts`, détection du port cible sans exécution. Les 5 premiers critères (tests uni
+- 2026-11-16 09:25:21 UTC — [ticket-974] tour 2 — codeur démarré
+- 2026-11-16 09:25:35 UTC — [ticket-974] tour 2 — codeur terminé (12250ms)
+- 2026-11-16 09:25:49 UTC — [ticket-974] testeur: en attente d'un créneau de test
+- 2026-11-16 09:28:35 UTC — [ticket-974] testeur: dur�es : ruff 0 s, mypy 5 s, mypy-linux 5 s, pytest 159 s ; impact depuis base : 93 fichier(s) de test
+- 2026-11-16 09:29:03 UTC — [ticket-974] securite: PASS — Le diff lit package.json et la config Vite en texte, sans rien exécuter, pour tr (27827ms)
+- 2026-11-16 09:29:04 UTC — [ticket-974] tour 2 — reviewer démarré
+- 2026-11-16 09:29:27 UTC — [ticket-974] tour 2 — reviewer terminé (22782ms)
+- 2026-11-16 09:30:14 UTC — [ticket-974] validateur: fichiers cités joints : frontend/vite.config.ts, vite.config.ts, package.json
+- 2026-11-16 09:30:14 UTC — [ticket-974] validateur: CHANGES_REQUESTED — Les cinq premiers critères sont tous satisfaits par les tests unitaires (exit 0, (70750ms)
+- 2026-11-16 09:30:15 UTC — [ticket-974] CHANGES_REQUESTED tour 2: Validateur : Les cinq premiers critères sont tous satisfaits par les tests unitaires (exit 0, pytest 159 s) : lecture du `cwd`, extraction du script `dev` et du `vite.config.ts`, détection du port san
+- 2026-11-16 09:30:15 UTC — [ticket-974] tour 3 — codeur démarré
+- 2026-11-16 09:30:22 UTC — [ticket-974] tour 3 — codeur terminé (7047ms)
+- 2026-11-16 09:33:50 UTC — [ide-core] ticket-971 retiré de la file
+- 2026-11-16 09:33:50 UTC — [ide-core] ticket-970 retiré de la file
+- 2026-11-16 09:33:50 UTC — [ide-core] ticket-973 retiré de la file
+- 2026-11-16 09:34:05 UTC — [ticket-974] testeur: dur�es : ruff 0 s, mypy 4 s, mypy-linux 7 s, pytest 218 s ; impact depuis base : 93 fichier(s) de test
+- 2026-11-16 09:34:32 UTC — [ticket-974] securite: PASS — Le diff lit package.json et vite.config sans les exécuter (json.loads, regex) et (26625ms)
+- 2026-11-16 09:34:36 UTC — [ticket-974] tour 3 — reviewer démarré
+- 2026-11-16 09:35:06 UTC — [ticket-974] tour 3 — reviewer terminé (30420ms)
+- 2026-11-16 09:35:24 UTC — [ticket-974] validateur: fichiers cités joints : frontend/vite.config.ts, vite.config.ts, package.json
+- 2026-11-16 09:35:24 UTC — [ticket-974] validateur: CHANGES_REQUESTED — Les cinq premiers critères sont satisfaits : le diff implémente la lecture du `c (50436ms)
+- 2026-11-16 09:35:25 UTC — [ticket-974] CHANGES_REQUESTED tour 3: Validateur : Les cinq premiers critères sont satisfaits : le diff implémente la lecture du `cwd`, l'extraction du script `dev` et de la config Vite, la détection du port sans exécution, et la gestion 
+- 2026-11-16 09:35:25 UTC — [ticket-974] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-16 09:35:30 UTC — [ide-core] file interrompue : ticket-974 non approuvé
+- 2026-11-16 09:48:12 UTC — [ticket-974] branche ticket-974-la-garde-de-port-du-ticket-967-lit-le-port-que-le
+- 2026-11-16 09:48:16 UTC — [ticket-974] branche reprise (3 commit(s)) — refus précédent : revue, codeur en premier
+- 2026-11-16 09:48:16 UTC — [ticket-974] tour 1 — codeur démarré
+- 2026-11-16 09:49:04 UTC — [ticket-974] tour 1 — codeur terminé (47516ms)
+- 2026-11-16 09:52:44 UTC — [ticket-974] testeur: dur�es : ruff 0 s, mypy 5 s, mypy-linux 6 s, pytest 212 s ; impact depuis base : 93 fichier(s) de test
+- 2026-11-16 09:53:10 UTC — [ticket-974] securite: PASS — PASS : le diff ne lit que des fichiers du projet, avec read_text et json.loads,  (25484ms)
+- 2026-11-16 09:53:11 UTC — [ticket-974] tour 1 — reviewer démarré
+- 2026-11-16 09:53:38 UTC — [ticket-974] tour 1 — reviewer terminé (27484ms)
+- 2026-11-16 09:53:40 UTC — [ticket-974] validateur: fichiers cités joints : frontend/vite.config.ts, vite.config.ts, package.json
+- 2026-11-16 09:53:40 UTC — [ticket-974] validateur: APPROVED — La garde de port lit désormais le dossier du service pour extrait le port réel d (29813ms)
+- 2026-11-16 09:53:41 UTC — [ticket-974] APPROVED après 1 tour(s)
+- 2026-11-16 09:54:31 UTC — [ticket-974] leçons: refusée — preuve absente du retour du run
+- 2026-11-16 09:58:53 UTC — [ticket-974] documentation: 0 fichier(s) (253592ms) — après tour de correction
+- 2026-11-16 09:58:53 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-16 09:58:53 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
 - 2026-11-16 09:59:14 UTC — [ide-core] ticket-974 PR #1119 non surveillée (livraison arrêtée)
 - 2026-11-16 09:59:20 UTC — [ticket-977] branche ticket-977-un-run-relit-son-ticket-une-fois-la-base-avanc-e
 - 2026-11-16 09:59:23 UTC — [ticket-977] tour 1 — codeur démarré
