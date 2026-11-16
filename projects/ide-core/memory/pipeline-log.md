@@ -9380,3 +9380,22 @@ error: Please commit or stash them.
 - 2026-11-13 19:12:12 UTC — [ticket-968] documentation: 0 fichier(s) (236655ms) — après tour de correction
 - 2026-11-13 19:12:12 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
 - 2026-11-13 19:12:12 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-16 09:59:14 UTC — [ide-core] ticket-974 PR #1119 non surveillée (livraison arrêtée)
+- 2026-11-16 09:59:20 UTC — [ticket-977] branche ticket-977-un-run-relit-son-ticket-une-fois-la-base-avanc-e
+- 2026-11-16 09:59:23 UTC — [ticket-977] tour 1 — codeur démarré
+- 2026-11-16 10:01:54 UTC — [ticket-977] tour 1 — codeur terminé (150703ms)
+- 2026-11-16 10:09:41 UTC — [ticket-977] testeur: 2 failed, 838 passed, 40 warnings in 455.99s (0:07:35)
+- 2026-11-16 10:09:41 UTC — [ticket-977] tests rouges au tour 1
+- 2026-11-16 10:09:41 UTC — [ticket-977] tour 2 — codeur démarré
+- 2026-11-16 10:11:14 UTC — [ticket-977] tour 2 — codeur terminé (91875ms)
+- 2026-11-16 10:22:02 UTC — [ticket-977] testeur: dur�es : ruff 0 s, mypy 22 s, tsc 39 s, mypy-linux 25 s, eslint 54 s, vitest 339 s, pytest 642 s ; impact depuis base : 160 fichier(s) de test
+- 2026-11-16 10:22:11 UTC — [ticket-977] securite: PASS — Je n'ai trouvé aucune faille dans ce diff. Après la création de la branche, il r (8078ms)
+- 2026-11-16 10:22:11 UTC — [ticket-977] tour 2 — reviewer démarré
+- 2026-11-16 10:22:42 UTC — [ticket-977] tour 2 — reviewer terminé (31140ms)
+- 2026-11-16 10:23:18 UTC — [ticket-977] validateur: APPROVED — Tous les critères sont couverts par les tests. Le code implémente correctement l (66969ms)
+- 2026-11-16 10:23:18 UTC — [ticket-977] CHANGES_REQUESTED tour 2: Reviewer : 1. Le critère d'acceptation 1 n'est pas rempli. Le ticket exige un test sur un vrai dépôt de test : la base locale porte une version A de la fiche, `origin/<base>` porte une version B, et a
+- 2026-11-16 10:23:18 UTC — [ticket-977] tour 3 — codeur démarré
+- 2026-11-16 10:25:10 UTC — [ticket-977] tour 3 — codeur terminé (111202ms)
+- 2026-11-16 10:40:27 UTC — [ticket-977] testeur: dur�es : ruff 0 s, mypy 11 s, mypy-linux 10 s, tsc 55 s, eslint 69 s, vitest 350 s, pytest 908 s ; impact depuis base : 161 fichier(s) de test
+- 2026-11-16 10:40:27 UTC — [ticket-977] tests rouges au tour 3
+- 2026-11-16 10:40:27 UTC — [ticket-977] BLOCKED après 3 tour(s) sans approbation
