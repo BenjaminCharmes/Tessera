@@ -9946,3 +9946,8 @@ error: Please commit or stash them.
 - 2026-11-18 14:08:10 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
 - 2026-11-18 14:08:10 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
 - 2026-11-18 14:08:10 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-16 16:03:58 UTC — [ide-core] ticket-984 PR #1135 non surveillée (livraison arrêtée)
+- 2026-11-16 16:27:10 UTC — [ticket-983] branche ticket-983-agent-doctor-launches-node-uv-and-python-as-the-a
+- 2026-11-16 16:27:12 UTC — [ticket-983] tour 1 — codeur démarré
+- 2026-11-16 16:29:18 UTC — [ticket-983] tour 1 — codeur terminé (126125ms)
+- 2026-11-16 16:29:20 UTC — [ticket-983] ARRÊTÉ par l'utilisateur au tour 1
