@@ -9558,3 +9558,4 @@ error: Please commit or stash them.
 - 2026-11-16 12:32:41 UTC — [ticket-981] branche ticket-981-agent-setup-installs-a-shared-toolchain-outside-e
 - 2026-11-16 12:32:48 UTC — [ticket-981] tour 1 — codeur démarré
 - 2026-11-16 12:33:18 UTC — [ticket-981] INTERROMPU au tour 1 — ResultError: Claude Code returned an error result: You've hit your 5-hour limit · resets 3pm (Europe/Paris) (exit code: 1)
+- 2026-11-16 12:33:23 UTC — [ide-core] file interrompue : ticket-981 non approuvé
