@@ -3,6 +3,7 @@ agent: codeur
 created: '2026-11-16'
 depends_on: []
 id: ticket-975
+pr_number: 1124
 preuve_reelle: true
 priority: high
 status: done
