@@ -9604,3 +9604,6 @@ error: Please commit or stash them.
 - 2026-11-16 15:41:03 UTC — [ticket-982] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits : filtrage des entrées C:\Users (25890ms)
 - 2026-11-16 15:41:03 UTC — [ticket-982] APPROVED après 2 tour(s)
 - 2026-11-16 15:41:46 UTC — [ticket-982] leçons: une leçon proposée
+- 2026-11-16 15:44:43 UTC — [ticket-982] documentation: 0 fichier(s) (171922ms) — après tour de correction
+- 2026-11-16 15:44:43 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-16 15:44:43 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
