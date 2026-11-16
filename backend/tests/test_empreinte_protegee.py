@@ -93,6 +93,21 @@ async def test_empreinte_covers_the_test_command_script(depot: Path) -> None:
     assert noms_changes(avant, await empreinte(_Orch(depot, "python verif.py"))) == ["verif.py"]  # type: ignore[arg-type]
 
 
+async def test_empreinte_sees_a_pyc_appearing_under_the_hooks_folder(depot: Path) -> None:
+    hooks = depot / "scripts" / "hooks"
+    hooks.mkdir(parents=True)
+    (hooks / "pre-push").write_text("#!/usr/bin/env python\n", encoding="utf-8")
+    avant = await empreinte(_Orch(depot))  # type: ignore[arg-type]
+
+    cache = hooks / "__pycache__"
+    cache.mkdir()
+    (cache / "pre-pushcpython-311.pyc").write_bytes(b"\x00")
+
+    assert noms_changes(avant, await empreinte(_Orch(depot))) == [  # type: ignore[arg-type]
+        "scripts/hooks/__pycache__/pre-pushcpython-311.pyc"
+    ]
+
+
 async def test_empreinte_ignores_unprotected_files(depot: Path) -> None:
     avant = await empreinte(_Orch(depot))  # type: ignore[arg-type]
 

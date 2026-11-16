@@ -103,7 +103,7 @@ class TestRunnerService:
         """
         self._cwd = cwd
         self._timeout = timeout if timeout is not None else _DEFAULT_TIMEOUT
-        self._env = dict(env) if env else None
+        self._env = {**(env or {}), "PYTHONDONTWRITEBYTECODE": "1"}  # pas de `.pyc` sous un dossier protégé
         # Compte dédié déclaré par le run (ticket-934, ADR-085) : la commande part
         # alors sous `AGENT_USER`, jamais sous le compte du backend.
         self._sous_compte = compte_agent and compte_declare()

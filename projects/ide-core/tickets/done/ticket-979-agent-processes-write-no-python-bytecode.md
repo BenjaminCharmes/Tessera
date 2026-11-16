@@ -3,8 +3,9 @@ agent: codeur
 created: '2026-11-16'
 depends_on: []
 id: ticket-979
+pr_number: 1125
 priority: high
-status: todo
+status: done
 title: Les processus des agents n'écrivent pas de bytecode Python
 type: fix
 ---

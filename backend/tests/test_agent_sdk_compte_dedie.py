@@ -103,6 +103,10 @@ def test_agent_environment_holds_no_backend_variable(
     assert env["CLAUDE_CODE_GIT_BASH_PATH"] == r"C:\Git\bin\bash.exe"
 
 
+def test_agent_env_disables_bytecode(compte: None) -> None:
+    assert env_de_l_agent(COMPTE, None)["PYTHONDONTWRITEBYTECODE"] == "1"
+
+
 def test_noms_secrets_holds_the_two_agent_secrets() -> None:
     assert {"AGENT_LOGON_PASSWORD", "AGENT_OAUTH_TOKEN"} <= set(NOMS_SECRETS)
 
