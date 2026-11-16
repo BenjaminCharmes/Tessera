@@ -9559,3 +9559,17 @@ error: Please commit or stash them.
 - 2026-11-16 12:32:48 UTC — [ticket-981] tour 1 — codeur démarré
 - 2026-11-16 12:33:18 UTC — [ticket-981] INTERROMPU au tour 1 — ResultError: Claude Code returned an error result: You've hit your 5-hour limit · resets 3pm (Europe/Paris) (exit code: 1)
 - 2026-11-16 12:33:23 UTC — [ide-core] file interrompue : ticket-981 non approuvé
+- 2026-11-16 12:38:20 UTC — [ide-core] ticket-980 PR #1128 mergée (CI verte)
+- 2026-11-16 14:13:23 UTC — [ticket-981] branche ticket-981-agent-setup-installs-a-shared-toolchain-outside-e
+- 2026-11-16 14:14:39 UTC — [ticket-981] testeur: OK (exit 0)
+- 2026-11-16 14:14:40 UTC — [ticket-981] branche reprise (2 commit(s)) — tests green, codeur sauté
+- 2026-11-16 14:15:21 UTC — [ticket-981] securite: PASS — Le diff transmis est vide : il n'y a aucune ligne ajoutée ou supprimée à juger,  (38858ms)
+- 2026-11-16 14:15:21 UTC — [ticket-981] tour 1 — reviewer démarré
+- 2026-11-16 14:15:50 UTC — [ticket-981] validateur: CHANGES_REQUESTED — Le diff ne contient que les métadonnées du ticket (passage blocked → in-progress (28921ms)
+- 2026-11-16 14:16:41 UTC — [ticket-981] tour 1 — reviewer terminé (79219ms)
+- 2026-11-16 14:16:41 UTC — [ticket-981] CHANGES_REQUESTED tour 1: Reviewer : 1. Le run n'implémente aucun critère d'acceptation. Le diff ne modifie ni scripts/agent-setup-admin.ps1 ni scripts/agent-setup.ps1. Il manque la création de C:\ProgramData\Tessera\toolchain
+- 2026-11-16 14:16:41 UTC — [ticket-981] tour 2 — codeur démarré
+- 2026-11-16 14:17:38 UTC — [ticket-981] tour 2 — codeur terminé (56421ms)
+- 2026-11-16 14:30:37 UTC — [ticket-981] testeur: dur�es : ruff 0 s, mypy 8 s, mypy-linux 6 s, pytest 775 s ; impact depuis base : suite compl�te
+- 2026-11-16 14:31:16 UTC — [ticket-981] securite: PASS — Le diff resserre les droits : l'agent n'a plus de RX sur le profil (`/remove /T` (35312ms)
+- 2026-11-16 14:31:16 UTC — [ticket-981] ARRÊTÉ par l'utilisateur au tour 2
