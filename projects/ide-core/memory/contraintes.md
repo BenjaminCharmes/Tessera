@@ -11,12 +11,6 @@ Cette section n'est injectée dans aucun appel d'agent. Une règle nouvelle
 s'écrit ici, avec son ADR ; un humain l'accepte en la déplaçant dans sa
 section. (ADR-055)
 
-- **Un processus du compte agent ne lance que des outils de
-  `C:\ProgramData\Tessera\toolchain\`, son `PATH` sans entrée sous
-  `C:\Users`.** Le compte n'écrit pas dans la chaîne ; aucun droit ne lui est
-  donné sur un profil. `agent doctor` vérifie par un lancement sous le compte.
-  (ADR-086, ADR-083, ADR-085)
-
 ## Git et périmètre d'écriture
 
 - **Un projet qui déclare `worktree` exécute chaque run dans son worktree,
@@ -146,6 +140,10 @@ section. (ADR-055)
   illisible. (ADR-046, ADR-059, ADR-071)
 - **Avec `worktree.compte_agent` et `AGENT_USER`, CLI, tests et app du
   contrôle visuel partent sous ce compte, sans repli.** (ADR-083, ADR-085)
+- **Un processus du compte agent ne lance que des outils de
+  `C:\ProgramData\Tessera\toolchain\`, son `PATH` sans entrée sous
+  `C:\Users`.** Le compte n'écrit pas dans la chaîne ; aucun droit ne lui est
+  donné sur un profil. (ADR-086, ADR-083, ADR-085)
 - **Un rôle déclaré `"web": true` reçoit `WebFetch` et `WebSearch` et
   perd `Bash`.** (ADR-049)
 
