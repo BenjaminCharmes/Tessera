@@ -53,6 +53,14 @@ porte ADR-072 l'a refusé, à raison, mais le tour était perdu. Kadoomi (172,
    `tests_instables_relances` (fichiers, durée). Rouges : l'étape reste rouge
    avec la sortie d'origine et celle de la relance.
 4. Un échec qui n'est pas une expiration n'est jamais relancé.
+5. **La relance n'a lieu que si les tests sont la seule cause de l'échec.**
+   `scripts/verifier.py` combine ruff, mypy, mypy-linux, tsc, eslint, vitest
+   et pytest dans une seule sortie : une erreur d'un outil statique y paraît
+   en section (`mypy :` suivi d'un extrait), sans ligne FAIL. Si la sortie
+   contient une section en échec d'un autre outil que vitest ou pytest, ou
+   une ligne que le parseur ne sait pas classer, rien n'est relancé et
+   l'étape reste rouge (relevé par le reviewer, 16/11, run 92959c84). Un
+   diff illisible empêche aussi toute relance (même run).
 
 ## Critères d'acceptation
 
@@ -67,6 +75,11 @@ porte ADR-072 l'a refusé, à raison, mais le tour était perdu. Kadoomi (172,
 - [ ] Un test : un échec d'assertion (pas une expiration) n'est pas relancé.
 - [ ] Un test : la même chose pour une sortie pytest avec une expiration
       pytest-timeout.
+- [ ] Un test : une sortie de `verifier.py` qui porte une expiration vitest
+      hors du diff **et** une section `mypy :` (ou ruff, tsc, eslint) en
+      échec n'est pas relancée, et l'étape reste rouge.
+- [ ] Un test : un diff illisible (`diff_depuis_base` qui lève) n'ouvre
+      aucune relance.
 
 ## Ce que ça ne fait pas
 
