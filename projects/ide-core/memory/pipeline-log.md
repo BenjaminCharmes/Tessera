@@ -9645,3 +9645,33 @@ error: Please commit or stash them.
 - 2026-11-17 10:05:17 UTC — [ticket-987] documentation: 0 fichier(s) (196891ms) — après tour de correction
 - 2026-11-17 10:05:17 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
 - 2026-11-17 10:05:17 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-16 14:46:39 UTC — [ide-core] ticket-982 sauté : dépend de ticket-981, non mergé
+- 2026-11-16 14:46:39 UTC — [ide-core] ticket-983 sauté : dépend de ticket-981, non mergé
+- 2026-11-16 14:46:39 UTC — [ide-core] ticket-984 sauté : dépend de ticket-981, non mergé
+- 2026-11-16 14:46:39 UTC — [ide-core] ticket-981 PR #1131 non surveillée (livraison arrêtée)
+- 2026-11-16 14:46:44 UTC — [ticket-971] branche ticket-971-a-test-that-times-out-in-files-the-diff-does-not
+- 2026-11-16 14:46:47 UTC — [ticket-971] tour 1 — codeur démarré
+- 2026-11-16 14:52:13 UTC — [ticket-971] tour 1 — codeur terminé (325139ms)
+- 2026-11-16 14:52:25 UTC — [ide-core] ticket-970 retiré de la file
+- 2026-11-16 14:52:25 UTC — [ide-core] ticket-973 retiré de la file
+- 2026-11-16 14:54:35 UTC — [ide-core] ticket-970 retiré de la file
+- 2026-11-16 14:54:35 UTC — [ide-core] ticket-973 retiré de la file
+- 2026-11-16 14:56:21 UTC — [ticket-971] testeur: 2 failed, 439 passed, 112 warnings in 241.82s (0:04:01)
+- 2026-11-16 14:56:21 UTC — [ticket-971] tests rouges au tour 1
+- 2026-11-16 14:56:21 UTC — [ticket-971] tour 2 — codeur démarré
+- 2026-11-16 15:00:34 UTC — [ticket-971] tour 2 — codeur terminé (252110ms)
+- 2026-11-16 15:05:06 UTC — [ticket-971] testeur: dur�es : ruff 0 s, mypy 15 s, mypy-linux 13 s, pytest 267 s ; impact depuis base : 83 fichier(s) de test
+- 2026-11-16 15:05:29 UTC — [ticket-971] securite: PASS — Verdict PASS : aucune faille CRITICAL ou HIGH dans ce diff. La relance passe par (22422ms)
+- 2026-11-16 15:05:29 UTC — [ticket-971] tour 2 — reviewer démarré
+- 2026-11-16 15:05:55 UTC — [ticket-971] validateur: APPROVED — Tous les critères d'acceptation du ticket-971 sont satisfaits. Le code implément (25922ms)
+- 2026-11-16 15:06:07 UTC — [ticket-971] tour 2 — reviewer terminé (37639ms)
+- 2026-11-16 15:06:07 UTC — [ticket-971] CHANGES_REQUESTED tour 2: Reviewer : 1. Quand le diff ne peut pas être lu, la relance s'ouvre au lieu de se fermer. La docstring de `_diff_du_run` promet `None when unknown, so no test is run again`, mais `fichiers_du_diff` (p
+- 2026-11-16 15:06:07 UTC — [ticket-971] tour 3 — codeur démarré
+- 2026-11-16 15:07:38 UTC — [ticket-971] tour 3 — codeur terminé (90046ms)
+- 2026-11-16 15:11:17 UTC — [ticket-971] testeur: dur�es : ruff 0 s, mypy 10 s, mypy-linux 13 s, pytest 215 s ; impact depuis base : 83 fichier(s) de test
+- 2026-11-16 15:11:46 UTC — [ticket-971] securite: PASS — Le diff ne crée aucune faille CRITICAL ou HIGH : pas de shell, pas de secret, et (29046ms)
+- 2026-11-16 15:11:47 UTC — [ticket-971] tour 3 — reviewer démarré
+- 2026-11-16 15:12:15 UTC — [ticket-971] tour 3 — reviewer terminé (28125ms)
+- 2026-11-16 15:12:34 UTC — [ticket-971] validateur: APPROVED — Les six critères d'acceptation sont satisfaits par le code et les tests. La rela (47077ms)
+- 2026-11-16 15:12:34 UTC — [ticket-971] CHANGES_REQUESTED tour 3: Reviewer : 1. Une étape rouge qui contient des échecs non reconnus par le parseur peut redevenir verte. Avec `scripts/verifier.py` (lignes 183-185 et 207-213), une erreur ruff, mypy, mypy-linux, tsc o
+- 2026-11-16 15:12:34 UTC — [ticket-971] BLOCKED après 3 tour(s) sans approbation
