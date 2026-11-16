@@ -20,6 +20,9 @@ class EventType(str, Enum):
     AGENT_TOKEN = "agent_token"
     AGENT_TOOL_USE = "agent_tool_use"
     BRANCH_CREATED = "branch_created"
+    #: La fiche du ticket a changé quand la base a avancé : le run suit la
+    #: version relue (ticket-977). `ancien_sha` et `nouveau_sha` bornent l'avance.
+    TICKET_RELU_APRES_AVANCE = "ticket_relu_apres_avance"
     AGENT_DONE = "agent_done"
     AGENT_QUESTION = "agent_question"
     TICKET_STATUS_CHANGED = "ticket_status_changed"

@@ -11,6 +11,7 @@ export type EventType =
   | "agent_done"
   | "agent_question"
   | "branch_created"
+  | "ticket_relu_apres_avance"
   | "ticket_status_changed"
   | "test_started"
   | "test_result"

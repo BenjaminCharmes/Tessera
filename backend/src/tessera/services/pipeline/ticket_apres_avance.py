@@ -9,8 +9,9 @@ from typing import TYPE_CHECKING
 
 from tessera.models.ticket import Ticket, TicketStatus
 from tessera.services.git_workspace import journal_attente, journal_en_attente
-from tessera.services.noyau.pipeline_events import PipelineResult
+from tessera.services.noyau.pipeline_events import EventType, PipelineResult
 from tessera.services.pipeline import pipeline_branche
+from tessera.services.pipeline.pipeline_run import PipelineRun, emit
 from tessera.utils.logger import get_logger
 
 if TYPE_CHECKING:
@@ -84,3 +85,56 @@ async def trouver_ticket(orch: "Orchestrator", ticket_id: str) -> Ticket | Pipel
     # Retrouvé après l'avance : figé de même (ticket-964).
     orch._preuves_reelles[ticket_id] = avance[0].preuve_reelle is True
     return avance[0]
+
+
+async def sha_de_base(orch: "Orchestrator") -> str | None:
+    """The head SHA, or None when it cannot be read (no repo, test double)."""
+    if orch._git_workspace is None:
+        return None
+    try:
+        return str(await orch._git_workspace.head_sha())
+    except Exception:  # noqa: BLE001 — un SHA manquant ne doit pas coûter le run
+        return None
+
+
+def _texte_change(avant: Ticket, apres: Ticket) -> bool:
+    exclus = {"file_path", "status"}
+    return avant.model_dump(exclude=exclus) != apres.model_dump(exclude=exclus)
+
+
+async def relire_apres_branche(
+    orch: "Orchestrator", run: PipelineRun, sha_avant: str | None
+) -> PipelineResult | None:
+    """Re-read the ticket once the base is advanced and the branch created (ticket-977).
+
+    Remplace `run.ticket` par la fiche relue et refait le gel de `preuve_reelle`.
+    Fiche introuvable : un résultat bloqué, sans agent. Dans un worktree de run,
+    rien n'est relu : il part déjà d'`origin/<base>`.
+    """
+    if orch._git_workspace is None or getattr(orch, "_worktree", None) is not None:
+        return None
+    relu = await orch._ticket_svc.get_ticket(run.ticket_id)
+    if relu is None:
+        return arret_ticket_absent(run.ticket_id, "fiche introuvable après l'avance de la base")
+    if not _texte_change(run.ticket, relu):
+        return None
+    run.ticket = relu
+    orch._preuves_reelles[run.ticket_id] = relu.preuve_reelle is True
+    sha_apres = await sha_de_base(orch)
+    await emit(
+        run, EventType.TICKET_RELU_APRES_AVANCE, ancien_sha=sha_avant, nouveau_sha=sha_apres
+    )
+    orch._log(
+        f"[{run.ticket_id}] fiche relue après l'avance de la base "
+        f"({sha_avant or '?'} → {sha_apres or '?'})"
+    )
+    return None
+
+
+async def creer_branche_et_relire(orch: "Orchestrator", run: PipelineRun) -> PipelineResult | None:
+    """Create the run's branch, then re-read the ticket the advanced base may have changed."""
+    sha_avant = await sha_de_base(orch)
+    refus = await pipeline_branche.create_branch(orch, run)
+    if refus is not None:
+        return refus
+    return await relire_apres_branche(orch, run, sha_avant)
