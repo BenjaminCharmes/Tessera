@@ -9421,3 +9421,20 @@ error: Please commit or stash them.
 - 2026-11-16 11:00:25 UTC — [ticket-977] documentation: 0 fichier(s) (94546ms)
 - 2026-11-16 11:00:25 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
 - 2026-11-16 11:00:25 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-16 11:28:11 UTC — [ide-core] ticket-975 PR #1124 non surveillée (livraison arrêtée)
+- 2026-11-16 11:16:52 UTC — [ide-core] ticket-977 PR #1122 mergée (CI verte)
+- 2026-11-16 11:28:18 UTC — [ticket-979] branche ticket-979-les-processus-des-agents-n-crivent-pas-de-bytecod
+- 2026-11-16 11:28:23 UTC — [ticket-979] tour 1 — codeur démarré
+- 2026-11-16 11:30:35 UTC — [ticket-979] tour 1 — codeur terminé (131125ms)
+- 2026-11-16 11:35:08 UTC — [ticket-979] testeur: 1 failed, 723 passed, 3 skipped, 104 warnings in 267.50s (0:04:27)
+- 2026-11-16 11:35:09 UTC — [ticket-979] tests rouges au tour 1
+- 2026-11-16 11:35:09 UTC — [ticket-979] tour 2 — codeur démarré
+- 2026-11-16 11:36:19 UTC — [ticket-979] tour 2 — codeur terminé (69968ms)
+- 2026-11-16 11:40:38 UTC — [ticket-979] testeur: dur�es : ruff 0 s, mypy 9 s, mypy-linux 9 s, pytest 255 s ; impact depuis base : 111 fichier(s) de test
+- 2026-11-16 11:40:55 UTC — [ticket-979] securite: PASS — Je n'ai trouvé aucune vulnérabilité : le diff ajoute seulement `PYTHONDONTWRITEB (16469ms)
+- 2026-11-16 11:40:56 UTC — [ticket-979] tour 2 — reviewer démarré
+- 2026-11-16 11:41:14 UTC — [ticket-979] validateur: fichiers cités joints : scripts/hooks/__pycache__/ (dossier, 1 fichiers)
+- 2026-11-16 11:41:14 UTC — [ticket-979] validateur: APPROVED — Les quatre critères sont satisfaits par le code et les tests. La variable `PYTHO (17953ms)
+- 2026-11-16 11:41:16 UTC — [ticket-979] tour 2 — reviewer terminé (19797ms)
+- 2026-11-16 11:41:16 UTC — [ticket-979] APPROVED après 2 tour(s)
+- 2026-11-16 11:41:43 UTC — [ticket-979] leçons: refusée — plus de 200 caractères
