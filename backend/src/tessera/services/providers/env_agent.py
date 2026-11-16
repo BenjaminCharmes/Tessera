@@ -4,6 +4,7 @@ import os
 from tessera.config import settings
 from tessera.services.providers.env_sdk import env_du_sous_processus
 from tessera.services.providers.noms import ProviderIndisponible
+from tessera.services.providers.path_compte import path_du_compte
 
 #: Où le CLI partagé est copié, hors du profil de l'utilisateur (ticket-894).
 CLI_PARTAGE = r"C:\ProgramData\Tessera\bin\claude.exe"
@@ -29,7 +30,6 @@ def _de_base(compte: str) -> dict[str, str]:
     profil = profil_de(compte)
     return {
         "SystemRoot": racine,
-        "PATH": rf"{racine}\System32;{racine}",
         "TEMP": rf"{profil}\AppData\Local\Temp",
         "TMP": rf"{profil}\AppData\Local\Temp",
         "USERPROFILE": profil,
@@ -49,6 +49,7 @@ def env_de_l_agent(compte: str, git_bash_path: str | None) -> dict[str, str]:
         raise ProviderIndisponible("AGENT_OAUTH_TOKEN absent : l'agent ne peut pas s'authentifier")
     env = _de_base(compte)
     env.update(env_du_sous_processus(git_bash_path))
+    env["PATH"] = path_du_compte()
     env["CLAUDE_CODE_OAUTH_TOKEN"] = jeton
     # Le filtre retire les noms de secrets vidés par `env_sdk` : ils n'ont rien à y faire.
     return {k: v for k, v in env.items() if k in CLES_AUTORISEES}

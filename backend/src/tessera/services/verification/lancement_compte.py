@@ -23,6 +23,7 @@ from tessera.services.noyau.lancement import essais_de_commande
 from tessera.services.providers.droits_appel import clore_appel, ouvrir_appel
 from tessera.services.providers.lanceur_agent import LanceurAgent
 from tessera.services.providers.noms import ProviderIndisponible
+from tessera.services.providers.path_compte import ChaineAbsente, path_du_compte
 from tessera.services.providers.process_agent import ProcessAgent
 from tessera.services.providers.transport_agent import fabriquer_lanceur
 from tessera.services.verification.env_du_code_de_projet import env_du_code_de_projet
@@ -33,7 +34,7 @@ _logger = get_logger(__name__)
 #: Les seuls noms repris du backend : de quoi trouver les outils et un dossier
 #: temporaire. Le reste de l'environnement du backend n'atteint pas le compte.
 _NOMS_REPRIS = frozenset(
-    {"path", "pathext", "systemroot", "windir", "comspec", "temp", "tmp"}
+    {"pathext", "systemroot", "windir", "comspec", "temp", "tmp"}
 )
 
 
@@ -49,6 +50,10 @@ def compte_declare() -> bool:
 def env_du_compte(extra: Mapping[str, str] | None = None) -> dict[str, str]:
     """Build the environment from nothing: the allow-list, then ``extra``, no secret."""
     base = {nom: val for nom, val in os.environ.items() if nom.lower() in _NOMS_REPRIS}
+    try:
+        base["PATH"] = path_du_compte()
+    except ChaineAbsente as exc:
+        raise EchecLancementCompte(str(exc)) from exc
     base.update(extra or {})
     # Repasse par le filtre des secrets : un `extra` déclaré ne les réintroduit pas.
     sans_secret = env_du_code_de_projet(base)

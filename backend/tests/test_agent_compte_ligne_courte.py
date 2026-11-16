@@ -17,6 +17,7 @@ from tessera.services.providers.fichiers_appel import creer_dossier_d_appel, dep
 from tessera.services.providers.lanceur_windows import LIMITE_LIGNE, LanceurWindows, ligne_de_commande, message_de_logon
 from tessera.services.providers.noms import ProviderIndisponible
 from tessera.services.providers.transport_agent import TransportCompteAgent, transport_du_compte
+from tests.chaine_factice import chaine_factice  # noqa: F401
 
 
 @pytest.fixture(autouse=True)
@@ -54,7 +55,7 @@ async def _icacls_ok(args: list[str]) -> tuple[int, str]:
 
 
 @pytest.fixture(autouse=True)
-def compte(monkeypatch: pytest.MonkeyPatch) -> None:
+def compte(monkeypatch: pytest.MonkeyPatch, chaine: Path) -> None:
     monkeypatch.setattr("tessera.services.providers.fichiers_appel._icacls_reel", _icacls_ok)
     monkeypatch.setattr(settings, "agent_user", "agent-test")
     monkeypatch.setattr(settings, "agent_logon_password", SecretStr("mdp-factice"))

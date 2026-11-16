@@ -14,6 +14,7 @@ from tessera.services.providers.env_agent import CLES_AUTORISEES, CLI_PARTAGE, e
 from tessera.services.providers.lanceur_windows import message_de_logon, texte_d_environnement
 from tessera.services.providers.noms import ProviderIndisponible
 from tessera.services.providers.transport_agent import TransportCompteAgent, transport_du_compte
+from tests.chaine_factice import chaine_factice  # noqa: F401
 
 COMPTE = "agent-test"
 
@@ -59,7 +60,7 @@ async def _icacls_double(args: list[str]) -> tuple[int, str]:
 
 
 @pytest.fixture
-def compte(monkeypatch: pytest.MonkeyPatch) -> None:
+def compte(monkeypatch: pytest.MonkeyPatch, chaine: Path) -> None:
     monkeypatch.setattr("tessera.services.providers.fichiers_appel._icacls_reel", _icacls_double)
     monkeypatch.setattr(settings, "agent_user", COMPTE)
     monkeypatch.setattr(settings, "agent_logon_password", SecretStr("mdp-factice"))
@@ -131,7 +132,7 @@ async def test_unknown_account_refuses(compte: None) -> None:
         await transport.connect()
 
 
-async def test_transport_passes_account_and_environment_to_the_launcher(compte: None) -> None:
+async def test_transport_passes_account_and_environment_to_the_launcher(compte: None, chaine: Path) -> None:
     appel = await _appel(LanceurDouble())
     env = appel["env"]
     commande = appel["commande"]
@@ -141,7 +142,7 @@ async def test_transport_passes_account_and_environment_to_the_launcher(compte: 
     assert env["USERPROFILE"] == rf"C:\Users\{COMPTE}"
     assert env["CLAUDE_CODE_OAUTH_TOKEN"] == "jeton-factice"
     assert "STATIC_TOKEN" not in env and "AGENT_LOGON_PASSWORD" not in env
-    assert env["PATH"].startswith(env["SystemRoot"])
+    assert env["PATH"].startswith(str(chaine / "node"))
 
 
 async def test_transport_keeps_the_sdk_command_flags(compte: None) -> None:
