@@ -3,8 +3,9 @@ agent: architect
 created: '2026-11-16'
 depends_on: []
 id: ticket-976
+pr_number: 1126
 priority: high
-status: todo
+status: done
 title: Le compte agent lance des outils qu'il peut lire, hors du profil de l'utilisateur
 type: design
 ---

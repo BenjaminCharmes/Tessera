@@ -613,3 +613,12 @@ Une ADR qu'aucune règle de `contraintes.md` ni aucun `CLAUDE.md` ne cite part d
 **Échec fermé** : compte, mot de passe ou lanceur manquant, logon refusé → `EchecLancementCompte` : test `demarree=False`, capture en échec, jamais de repli (ADR-037).
 **Sous `AGENT_USER`** : CLI, commande de test (aussi au retest après rebase), app visuelle. **Sous le backend** : setup du worktree (ticket à ouvrir), services (ADR-042), CI.
 **Limites** : pas de job Windows, `kill()` ne coupe que le processus direct ; le compte veut lecture sur `.venv`, `node_modules`, cache `uv`, écriture sur le worktree et `TEMP`.
+
+---
+
+## ADR-086 — Le compte agent n'a pour outils qu'une chaîne partagée hors de tout profil
+
+**Date** : 2026-11-16
+**Décision** : amende ADR-083 et ADR-085. node, npm, uv et Python lancés sous `AGENT_USER` viennent de `C:\ProgramData\Tessera\toolchain\`, copie posée par `agent setup` : écriture à l'utilisateur et aux administrateurs, lecture-exécution au compte. Le `PATH` de tout processus du compte (CLI, tests, app visuelle) est bâti de zéro : cette chaîne, puis les entrées système hors `C:\Users`. Les droits `RX` donnés sur le profil se retirent. `agent doctor` lance `node`, `uv` et `python --version` sous le compte.
+**Raison** : node ne résout pas son chemin sous un profil fermé (EPERM sur `scoop`) ; lire le profil rouvre ce que l'isolation ferme.
+**Alternative rejetée** : `Program Files` (installeur administrateur, versions du poste imposées) ; lecture d'un dossier du profil (ancêtres à traverser, droits orphelins).
