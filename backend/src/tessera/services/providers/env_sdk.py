@@ -45,6 +45,9 @@ def env_du_sous_processus(git_bash_path: str | None) -> dict[str, str]:
     env["GIT_CONFIG_KEY_0"] = "credential.helper"
     env["GIT_CONFIG_VALUE_0"] = ""
     env["GIT_TERMINAL_PROMPT"] = "0"
+    # Pas de bytecode : un `.pyc` fabriqué sous `scripts/hooks/__pycache__`
+    # remplacerait le hook relu au prochain push. L'empreinte reste le filet.
+    env["PYTHONDONTWRITEBYTECODE"] = "1"
     # Sous Windows, le SDK n'active `Bash` que si cette variable pointe vers
     # un bash.exe. Sans elle, l'outil disparaît en silence (ticket-319).
     if git_bash_path:

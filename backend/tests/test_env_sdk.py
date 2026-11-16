@@ -49,6 +49,10 @@ def test_subprocess_env_disables_the_git_credential_helper() -> None:
     assert env["GIT_TERMINAL_PROMPT"] == "0"
 
 
+def test_subprocess_env_disables_bytecode() -> None:
+    assert env_du_sous_processus(None)["PYTHONDONTWRITEBYTECODE"] == "1"
+
+
 def test_subprocess_env_keeps_the_git_bash_path() -> None:
     env = env_du_sous_processus("C:/outils/bash.exe")
 
