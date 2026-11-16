@@ -9550,3 +9550,6 @@ error: Please commit or stash them.
 - 2026-11-16 12:24:49 UTC — [ticket-980] validateur: APPROVED — Les 7 critères d'acceptation sont satisfaits. Le diff ajoute une boucle de relec (34515ms)
 - 2026-11-16 12:24:49 UTC — [ticket-980] APPROVED après 3 tour(s)
 - 2026-11-16 12:25:53 UTC — [ticket-980] leçons: refusée — vérification affaiblie : un contrôle retiré ou ignoré
+- 2026-11-16 12:29:25 UTC — [ticket-980] documentation: 0 fichier(s) (207625ms) — après tour de correction
+- 2026-11-16 12:29:25 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-16 12:29:25 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
