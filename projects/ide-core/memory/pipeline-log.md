@@ -9507,3 +9507,16 @@ error: Please commit or stash them.
 - 2026-11-16 11:22:37 UTC — [ticket-975] documentation: 0 fichier(s) (79906ms)
 - 2026-11-16 11:22:37 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
 - 2026-11-16 11:22:37 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-16 11:42:42 UTC — [ide-core] ticket-979 PR #1125 confiée au CIWatcher
+- 2026-11-16 11:45:38 UTC — [ticket-979] PR #1125 mise à jour avec develop : 64f65c8 → 01e2dd6
+- 2026-11-16 11:51:40 UTC — [ide-core] ticket-979 PR #1125 mergée (CI verte)
+- 2026-11-16 12:04:46 UTC — [ticket-976] branche ticket-976-le-compte-agent-lance-des-outils-qu-il-peut-lire
+- 2026-11-16 12:04:51 UTC — [ticket-976] tour 1 — codeur démarré
+- 2026-11-16 12:06:41 UTC — [ticket-976] tour 1 — architect terminé (108750ms)
+- 2026-11-16 12:06:59 UTC — [ticket-976] testeur: OK (exit 0)
+- 2026-11-16 12:07:06 UTC — [ticket-976] securite: PASS — Le diff ne touche que de la documentation, sans code exécutable, secret ni confi (5640ms)
+- 2026-11-16 12:07:06 UTC — [ticket-976] tour 1 — reviewer démarré
+- 2026-11-16 12:07:26 UTC — [ticket-976] tour 1 — reviewer terminé (20250ms)
+- 2026-11-16 12:07:41 UTC — [ticket-976] validateur: fichiers cités joints : contraintes.md
+- 2026-11-16 12:07:41 UTC — [ticket-976] validateur: APPROVED — Le ticket de design a produit l'ADR-086 qui tranche entre les trois pistes (chaî (34641ms)
+- 2026-11-16 12:07:41 UTC — [ticket-976] APPROVED après 1 tour(s)
