@@ -9409,3 +9409,4 @@ error: Please commit or stash them.
 - 2026-11-16 10:42:48 UTC — [ide-core] ticket-976 retiré de la file
 - 2026-11-16 10:46:30 UTC — [ticket-977] tour 1 — codeur terminé (246375ms)
 - 2026-11-16 10:46:31 UTC — [ticket-977] BLOCKED — fichier protégé modifié pendant un appel d'agent : scripts/hooks/__pycache__/pre-pushcpython-311.pyc
+- 2026-11-16 10:46:35 UTC — [ide-core] file interrompue : ticket-977 non approuvé
