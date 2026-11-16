@@ -3,6 +3,7 @@ agent: codeur
 created: '2026-11-16'
 depends_on: []
 id: ticket-977
+pr_number: 1122
 priority: high
 status: done
 title: Un run relit son ticket une fois la base avancée
