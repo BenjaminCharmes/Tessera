@@ -3,6 +3,7 @@ agent: codeur
 created: '2026-11-16'
 depends_on: []
 id: ticket-980
+pr_number: 1128
 priority: high
 status: done
 title: Un merge douteux se relit pendant deux minutes avant de compter comme un échec
