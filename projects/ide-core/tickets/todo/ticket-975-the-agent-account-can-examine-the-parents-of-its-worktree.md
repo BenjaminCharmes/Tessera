@@ -3,6 +3,7 @@ agent: codeur
 created: '2026-11-16'
 depends_on: []
 id: ticket-975
+preuve_reelle: true
 priority: high
 status: todo
 title: Le compte agent peut examiner les dossiers parents de son worktree
@@ -53,11 +54,14 @@ Node fait de même (`realpath`) : tout outil qui résout son chemin échouera.
       `worktrees\<projet>` (test).
 - [ ] Le droit d'écriture du ticket (`poser_ecriture`, `retirer_ecriture`)
       ne change pas (tests existants inchangés).
-- [ ] **Preuve réelle (session ide-core, après redémarrage)** : relancer
-      Serpent ticket-009 sous `tessera-agent` ; les `Read` du codeur dans
-      `C:\ProgramData\Tessera\worktrees\serpent\ticket-009` aboutissent ;
-      `icacls` montre `tessera-agent:(RX)` sans `(OI)(CI)` sur `worktrees` et
-      `worktrees\serpent`.
+
+## Preuve réelle
+
+Faite par la session ide-core après merge et redémarrage, pas par le
+validateur : relancer Serpent ticket-009 sous `tessera-agent` ; les `Read` du
+codeur dans `C:\ProgramData\Tessera\worktrees\serpent\ticket-009`
+aboutissent ; `icacls` montre `tessera-agent:(RX)` sans `(OI)(CI)` sur
+`worktrees` et `worktrees\serpent`.
 
 ## Ce que ça ne fait pas
 
