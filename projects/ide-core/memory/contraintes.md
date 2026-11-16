@@ -139,11 +139,9 @@ section. (ADR-055)
   du `fallback_above_chars` d'un rôle `ollama`, jamais sur une réponse
   illisible. (ADR-046, ADR-059, ADR-071)
 - **Avec `worktree.compte_agent` et `AGENT_USER`, CLI, tests et app du
-  contrôle visuel partent sous ce compte, sans repli.** (ADR-083, ADR-085)
-- **Un processus du compte agent ne lance que des outils de
-  `C:\ProgramData\Tessera\toolchain\`, son `PATH` sans entrée sous
-  `C:\Users`.** Le compte n'écrit pas dans la chaîne ; aucun droit ne lui est
-  donné sur un profil. (ADR-086, ADR-083, ADR-085)
+  contrôle visuel partent sous ce compte, sans repli, avec les seuls outils
+  de `C:\ProgramData\Tessera\toolchain\`** : ni `PATH` ni droit sous
+  `C:\Users`. (ADR-083, ADR-085, ADR-086)
 - **Un rôle déclaré `"web": true` reçoit `WebFetch` et `WebSearch` et
   perd `Bash`.** (ADR-049)
 
