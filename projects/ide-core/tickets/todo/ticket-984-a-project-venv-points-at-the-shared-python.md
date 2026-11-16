@@ -1,5 +1,6 @@
 ---
 id: ticket-984
+preuve_reelle: true
 title: "A project venv points at the shared Python, not at one in a profile"
 type: fix
 status: todo
@@ -31,8 +32,11 @@ setup décide où pointe le venv.
       deux variables ; sans compte agent, il ne les porte pas.
 - [ ] Test : `home` de `pyvenv.cfg`, sur un venv fabriqué par le setup, est
       sous `toolchain\python`.
-- [ ] Preuve réelle : un projet Python à compte agent passe son étape de test
-      sous `tessera-agent` ; Serpent ticket-009 aussi (non-régression).
+
+## Preuve réelle
+
+Faite par la session ide-core après merge et redémarrage, pas par le
+validateur : un projet Python à compte agent passe son étape de test sous `tessera-agent` ; Serpent ticket-009 aussi (non-régression).
 
 ## Ce que ça ne fait pas
 

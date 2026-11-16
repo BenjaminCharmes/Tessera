@@ -1,5 +1,6 @@
 ---
 id: ticket-983
+preuve_reelle: true
 title: "agent doctor launches node, uv and python as the agent account"
 type: fix
 status: todo
@@ -34,9 +35,13 @@ Serpent ticket-009.
 - [ ] Test du module avec un lanceur factice : succès, échec d'un outil,
       délai dépassé, mot de passe absent.
 - [ ] Test : le module est refusé à un agent par le garde Bash.
-- [ ] Preuve réelle : avec la chaîne de ticket-981, `agent doctor` passe ; en
-      renommant `toolchain\node`, il échoue en nommant node. Puis Serpent
-      ticket-009 sous `tessera-agent` passe l'étape de test.
+
+## Preuve réelle
+
+Faite par la session ide-core après merge et redémarrage, pas par le
+validateur : avec la chaîne de ticket-981, `agent doctor` passe ; en
+renommant `toolchain\node`, il échoue en nommant node. Puis Serpent
+ticket-009 sous `tessera-agent` passe l'étape de test.
 
 ## Ce que ça ne fait pas
 

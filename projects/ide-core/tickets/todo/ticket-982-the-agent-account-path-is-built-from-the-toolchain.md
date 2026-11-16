@@ -1,5 +1,6 @@
 ---
 id: ticket-982
+preuve_reelle: true
 title: "The PATH of every agent-account process is built from the toolchain"
 type: fix
 status: todo
@@ -33,8 +34,11 @@ mène au profil de l'utilisateur ; `env_agent._de_base` ne donne au CLI que
 - [ ] Test : chaîne absente → `EchecLancementCompte`.
 - [ ] Un test d'architecture : aucun module ne construit un `PATH` de compte
       hors de `path_du_compte()`.
-- [ ] Preuve réelle : Serpent ticket-009 sous `tessera-agent` passe l'étape de
-      test (`npm run typecheck`).
+
+## Preuve réelle
+
+Faite par la session ide-core après merge et redémarrage, pas par le
+validateur : Serpent ticket-009 sous `tessera-agent` passe l'étape de test (`npm run typecheck`).
 
 ## Ce que ça ne fait pas
 

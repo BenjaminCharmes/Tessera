@@ -1,5 +1,6 @@
 ---
 id: ticket-981
+preuve_reelle: true
 title: "agent setup installs a shared toolchain outside every profile"
 type: fix
 status: todo
@@ -36,8 +37,11 @@ l'utilisateur ; node, uv et Python y vivent (scoop, `%APPDATA%\uv`,
 - [ ] Plus aucun droit de `tessera-agent` sur le profil de l'utilisateur
       (`icacls` ne liste plus le compte).
 - [ ] Relancer `agent setup` ne recopie rien quand les versions sont égales.
-- [ ] Preuve réelle : Serpent ticket-009 sous `tessera-agent` passe l'étape de
-      test (avec ticket-982).
+
+## Preuve réelle
+
+Faite par la session ide-core après merge et redémarrage, pas par le
+validateur : Serpent ticket-009 sous `tessera-agent` passe l'étape de test (avec ticket-982).
 
 ## Ce que ça ne fait pas
 
