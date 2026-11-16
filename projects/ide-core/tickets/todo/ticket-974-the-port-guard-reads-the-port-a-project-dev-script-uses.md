@@ -3,6 +3,7 @@ agent: codeur
 created: '2026-11-16'
 depends_on: []
 id: ticket-974
+preuve_reelle: true
 priority: high
 status: todo
 title: La garde de port du ticket 967 lit le port que le script dev d'un projet fixe
@@ -67,10 +68,14 @@ et `_refuser_un_port_de_tessera` (`routers/services.py`) lui passe
 - [ ] `vite.config.ts` absent ou `package.json` illisible : refus comme
       aujourd'hui (test).
 - [ ] Les cas paramétrés existants de `test_port_vise` passent inchangés.
-- [ ] **Preuve réelle (session ide-core, après redémarrage)** :
-      `POST /api/v1/projects/vigie/services/start` (ou un autre projet listé
-      ci-dessus, avec l'accord de sa session) ne répond plus 409 ; le
-      frontend écoute sur son port de `vite.config.ts`.
+
+## Preuve réelle
+
+Faite par la session ide-core après merge et redémarrage, pas par le
+validateur : `POST /api/v1/projects/<projet>/services/start` sur un projet
+listé ci-dessus dont l'`agents.json` déclare encore `npm run dev` sans
+`--port`, avec l'accord de sa session, ne répond plus 409, et le frontend
+écoute sur le port de son `vite.config.ts`.
 
 ## Ce que ça ne fait pas
 
