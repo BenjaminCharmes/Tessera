@@ -19,6 +19,7 @@ from tessera.services.noyau.pipeline_events import EventType, PipelineResult
 from tessera.services.pipeline.pipeline_outcomes import commit_ou_bloquer
 from tessera.services.pipeline.pipeline_run import PipelineRun, emit, set_status
 from tessera.services.pipeline.pipeline_text import _unapproved_commit_message
+from tessera.services.verification.chaine_python import ChaineAbsente, fusionner_env, verifier_chaine
 from tessera.services.verification.commande_effective import setup_effectif
 from tessera.services.verification.test_runner import TestResult, TestRunnerService
 from tessera.utils.logger import get_logger
@@ -27,6 +28,8 @@ if TYPE_CHECKING:
     from tessera.services.pipeline.orchestrator import Orchestrator
 
 _logger = get_logger(__name__)
+
+_PREFIXE_ECHEC = "La préparation du worktree a échoué :"
 
 
 @dataclass
@@ -53,7 +56,7 @@ def _raison_de_l_echec(commande: str, resultat: TestResult) -> str:
         cause = f"commande non démarrée ({resultat.output_summary})"
     else:
         cause = resultat.output_summary
-    texte = f"La préparation du worktree a échoué : `{commande}` — {cause}"
+    texte = f"{_PREFIXE_ECHEC} `{commande}` — {cause}"
     if resultat.failure_details:
         texte = f"{texte}\n{resultat.failure_details}"
     return texte
@@ -78,9 +81,15 @@ def preparation_du_run(
     commande = setup_effectif(politique.worktree, racine, depot)
     if commande is None:
         return None
-    lanceur = runner or TestRunnerService(cwd=None, timeout=timeout, env=env)
+    config = politique.worktree
+    lanceur = runner or TestRunnerService(cwd=None, timeout=timeout, env=fusionner_env(config, env))
 
     async def preparer() -> ResultatPreparation:
+        try:
+            verifier_chaine(config)
+        except ChaineAbsente as exc:
+            # Échec fermé : sans la chaîne, le venv pointerait dans un profil.
+            return ResultatPreparation(commande, 0, None, f"{_PREFIXE_ECHEC} `{commande}` — {exc}")
         # La racine du worktree, pas le dossier du projet : le gestionnaire de paquets
         # y cherche son fichier de verrou.
         resultat = await lanceur.run_tests(racine, test_command=commande)
