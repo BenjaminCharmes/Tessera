@@ -9520,3 +9520,7 @@ error: Please commit or stash them.
 - 2026-11-16 12:07:41 UTC — [ticket-976] validateur: fichiers cités joints : contraintes.md
 - 2026-11-16 12:07:41 UTC — [ticket-976] validateur: APPROVED — Le ticket de design a produit l'ADR-086 qui tranche entre les trois pistes (chaî (34641ms)
 - 2026-11-16 12:07:41 UTC — [ticket-976] APPROVED après 1 tour(s)
+- 2026-11-16 12:07:46 UTC — [ticket-976] fichiers non suivis laissés par le run : tickets/todo/ticket-981-agent-setup-installs-a-shared-toolchain.md, tickets/todo/ticket-982-the-agent-account-path-is-built-from-the-toolchain.md, tickets/todo/ticket-983-agent-doctor-launches-the-tools-as-the-agent-account.md, tickets/todo/ticket-984-a-project-venv-points-at-the-shared-python.md (à ignorer dans .gitignore ?)
+- 2026-11-16 12:09:31 UTC — [ticket-976] documentation: 1 fichier(s) (105327ms)
+- 2026-11-16 12:09:31 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-16 12:09:31 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
