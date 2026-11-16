@@ -9582,3 +9582,6 @@ error: Please commit or stash them.
 - 2026-11-16 14:43:40 UTC — [ticket-981] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le code implémente la création (18920ms)
 - 2026-11-16 14:44:02 UTC — [ticket-981] tour 1 — reviewer terminé (40828ms)
 - 2026-11-16 14:44:03 UTC — [ticket-981] APPROVED après 1 tour(s)
+- 2026-11-16 14:46:17 UTC — [ticket-981] documentation: 0 fichier(s) (129156ms) — après tour de correction
+- 2026-11-16 14:46:17 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-16 14:46:17 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
