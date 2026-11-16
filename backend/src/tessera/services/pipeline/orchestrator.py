@@ -33,7 +33,7 @@ from tessera.services.pipeline.pipeline_run import PipelineRun, set_status, tole
 from tessera.services.pipeline.pipeline_text import _FEEDBACK_DIFF_VIDE, _compose_feedback, _echec_de_tests, _first_line
 from tessera.services.pipeline.pipeline_tickets import relever_etat_initial, renvoyer_si_problemes
 from tessera.services.pipeline.run_dans_worktree import retirer_apres_echec, retirer_en_fin_de_run
-from tessera.services.pipeline.ticket_apres_avance import trouver_ticket
+from tessera.services.pipeline.ticket_apres_avance import creer_branche_et_relire, trouver_ticket
 from tessera.services.projets.ticket_service import TicketService
 from tessera.services.providers.enregistrant import activer_enregistrement
 from tessera.services.usage.quota_exhaustion import is_quota_exhausted, resume_label
@@ -382,7 +382,7 @@ class Orchestrator:
         if refused is not None:
             return refused
 
-        refused = await pipeline_branche.create_branch(self, run)
+        refused = await creer_branche_et_relire(self, run)  # ticket-977
         if refused is not None:
             return refused
         pipeline_production.take_artifact_snapshot(self, run)
