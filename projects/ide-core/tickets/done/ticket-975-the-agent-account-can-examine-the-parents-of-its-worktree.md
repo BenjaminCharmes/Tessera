@@ -3,9 +3,10 @@ agent: codeur
 created: '2026-11-16'
 depends_on: []
 id: ticket-975
+pr_number: 1124
 preuve_reelle: true
 priority: high
-status: todo
+status: done
 title: Le compte agent peut examiner les dossiers parents de son worktree
 type: fix
 ---

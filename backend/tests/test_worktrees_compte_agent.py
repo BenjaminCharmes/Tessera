@@ -65,6 +65,38 @@ async def test_folder_creation_sets_acl_without_inheritance(checkout: Path) -> N
     assert len(appels) == 2  # un dossier existant n'est pas retouché
 
 
+async def test_agent_account_gets_list_right_on_worktrees_folder_without_inheritance(
+    checkout: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(settings, "agent_user", "tessera-agent")
+    appels: list[list[str]] = []
+
+    async def lanceur(args: list[str]) -> tuple[int, str]:
+        appels.append(args)
+        return 0, ""
+
+    dossier = await preparer_dossier_agent(lanceur, utilisateur="ben")
+    assert [str(dossier), "/grant", "tessera-agent:(RX)"] in appels
+    await preparer_dossier_agent(lanceur, utilisateur="ben")  # dossier existant : droit reposé
+    assert appels.count([str(dossier), "/grant", "tessera-agent:(RX)"]) == 2
+    assert not any("(OI)" in a and "tessera-agent" in a for args in appels for a in args)
+
+
+async def test_opening_a_worktree_grants_list_right_on_project_folder(
+    checkout: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(settings, "agent_user", "tessera-agent")
+    appels: list[list[str]] = []
+
+    async def lanceur(args: list[str]) -> tuple[int, str]:
+        appels.append(args)
+        return 0, ""
+
+    monkeypatch.setattr(dossier_agent, "_icacls_reel", lanceur)
+    wt = await creer(checkout, checkout, "demo", "ticket-1", BRANCHE, "develop", compte_agent=True)
+    assert [str(wt.racine.parent), "/grant", "tessera-agent:(RX)"] in appels
+
+
 async def test_orphan_cleanup_walks_the_agent_folder_too(
     checkout: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

@@ -9441,3 +9441,17 @@ error: Please commit or stash them.
 - 2026-11-16 11:42:25 UTC — [ticket-979] documentation: 0 fichier(s) (37265ms)
 - 2026-11-16 11:42:25 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
 - 2026-11-16 11:42:25 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-16 11:12:02 UTC — [ide-core] ticket-977 PR #1122 confiée au CIWatcher
+- 2026-11-16 11:12:16 UTC — [ticket-975] branche ticket-975-le-compte-agent-peut-examiner-les-dossiers-parent
+- 2026-11-16 11:12:19 UTC — [ticket-975] tour 1 — codeur démarré
+- 2026-11-16 11:15:14 UTC — [ticket-975] tour 1 — codeur terminé (174921ms)
+- 2026-11-16 11:15:18 UTC — [ticket-975] testeur: en attente d'un créneau de test
+- 2026-11-16 11:20:29 UTC — [ticket-975] testeur: dur�es : ruff 0 s, mypy 17 s, mypy-linux 18 s, pytest 259 s ; impact depuis base : 84 fichier(s) de test
+- 2026-11-16 11:20:48 UTC — [ticket-975] securite: PASS — PASS : le diff ajoute seulement un droit `(RX)` non héritable au compte agent, s (18484ms)
+- 2026-11-16 11:20:49 UTC — [ticket-975] tour 1 — reviewer démarré
+- 2026-11-16 11:21:08 UTC — [ticket-975] tour 1 — reviewer terminé (19343ms)
+- 2026-11-16 11:21:12 UTC — [ticket-975] validateur: APPROVED — Les trois critères sont satisfaits. Le code ajoute correctement `accorder_lectur (23500ms)
+- 2026-11-16 11:21:12 UTC — [ticket-975] APPROVED après 1 tour(s)
+- 2026-11-16 11:22:37 UTC — [ticket-975] documentation: 0 fichier(s) (79906ms)
+- 2026-11-16 11:22:37 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-16 11:22:37 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
