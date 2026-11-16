@@ -9417,3 +9417,15 @@ error: Please commit or stash them.
 - 2026-11-16 09:35:25 UTC — [ticket-974] CHANGES_REQUESTED tour 3: Validateur : Les cinq premiers critères sont satisfaits : le diff implémente la lecture du `cwd`, l'extraction du script `dev` et de la config Vite, la détection du port sans exécution, et la gestion 
 - 2026-11-16 09:35:25 UTC — [ticket-974] BLOCKED après 3 tour(s) sans approbation
 - 2026-11-16 09:35:30 UTC — [ide-core] file interrompue : ticket-974 non approuvé
+- 2026-11-16 09:48:12 UTC — [ticket-974] branche ticket-974-la-garde-de-port-du-ticket-967-lit-le-port-que-le
+- 2026-11-16 09:48:16 UTC — [ticket-974] branche reprise (3 commit(s)) — refus précédent : revue, codeur en premier
+- 2026-11-16 09:48:16 UTC — [ticket-974] tour 1 — codeur démarré
+- 2026-11-16 09:49:04 UTC — [ticket-974] tour 1 — codeur terminé (47516ms)
+- 2026-11-16 09:52:44 UTC — [ticket-974] testeur: dur�es : ruff 0 s, mypy 5 s, mypy-linux 6 s, pytest 212 s ; impact depuis base : 93 fichier(s) de test
+- 2026-11-16 09:53:10 UTC — [ticket-974] securite: PASS — PASS : le diff ne lit que des fichiers du projet, avec read_text et json.loads,  (25484ms)
+- 2026-11-16 09:53:11 UTC — [ticket-974] tour 1 — reviewer démarré
+- 2026-11-16 09:53:38 UTC — [ticket-974] tour 1 — reviewer terminé (27484ms)
+- 2026-11-16 09:53:40 UTC — [ticket-974] validateur: fichiers cités joints : frontend/vite.config.ts, vite.config.ts, package.json
+- 2026-11-16 09:53:40 UTC — [ticket-974] validateur: APPROVED — La garde de port lit désormais le dossier du service pour extrait le port réel d (29813ms)
+- 2026-11-16 09:53:41 UTC — [ticket-974] APPROVED après 1 tour(s)
+- 2026-11-16 09:54:31 UTC — [ticket-974] leçons: refusée — preuve absente du retour du run
