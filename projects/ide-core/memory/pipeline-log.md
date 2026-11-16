@@ -9573,3 +9573,4 @@ error: Please commit or stash them.
 - 2026-11-16 14:30:37 UTC — [ticket-981] testeur: dur�es : ruff 0 s, mypy 8 s, mypy-linux 6 s, pytest 775 s ; impact depuis base : suite compl�te
 - 2026-11-16 14:31:16 UTC — [ticket-981] securite: PASS — Le diff resserre les droits : l'agent n'a plus de RX sur le profil (`/remove /T` (35312ms)
 - 2026-11-16 14:31:16 UTC — [ticket-981] ARRÊTÉ par l'utilisateur au tour 2
+- 2026-11-16 14:31:22 UTC — [ide-core] file interrompue : ticket-981 non approuvé
