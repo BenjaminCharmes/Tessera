@@ -129,6 +129,10 @@ Les décisions d'architecture en vigueur sont dans
 [`projects/ide-core/memory/contraintes.md`](projects/ide-core/memory/contraintes.md) :
 ce sont des contraintes, pas des archives.
 
+Chaque agent reçoit `memory/contraintes.md` de son projet lors de chaque appel,
+filtré selon son rôle. `memory/decisions.md` reste la source complète — elle
+ne voyage que sur demande ou comme repli si les contraintes sont vides.
+
 ## Self-hosting
 
 Tessera est son propre premier projet. `projects/ide-core/` contient les
