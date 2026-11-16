@@ -3,6 +3,7 @@ agent: codeur
 created: '2026-11-16'
 depends_on: []
 id: ticket-974
+pr_number: 1119
 priority: high
 status: done
 title: La garde de port du ticket 967 lit le port que le script dev d'un projet fixe
