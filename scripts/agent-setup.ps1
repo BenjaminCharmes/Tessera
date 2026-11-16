@@ -13,6 +13,7 @@ $Racine  = Split-Path -Parent $PSScriptRoot
 $PyVenv  = Join-Path $Racine 'backend\.venv\Scripts\python.exe'
 $Partage = 'C:\ProgramData\Tessera'
 $Remise  = Join-Path $Partage 'remise-mot-de-passe.txt'
+$Outils  = Join-Path $Partage 'toolchain'
 
 $id = [Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()
 if ($id.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
@@ -47,13 +48,62 @@ function Copy-AgentCli {
     New-Item -ItemType Directory -Force -Path "$Partage\bin" | Out-Null
     Copy-Item $source "$Partage\bin\claude.exe" -Force
     Write-Host "-> CLI copie dans $Partage\bin"
+}
+
+# Les droits RX que les anciennes versions donnaient sur le profil se retirent
+# (/T : l'heritage les avait poses sur chaque enfant) et ne se redonnent plus.
+function Remove-ProfileRights {
     foreach ($d in @("$Moi\scoop\apps", "$Moi\AppData\Roaming\uv\python", "$Moi\.local\bin")) {
         if (Test-Path $d) {
-            icacls $d /grant "${Compte}:(OI)(CI)RX" /Q | Out-Null
+            icacls $d /remove $Compte /T /Q | Out-Null
             if ($LASTEXITCODE -ne 0) { throw "icacls a echoue ($LASTEXITCODE) sur $d" }
-            Write-Host "-> lecture seule : $d"
+            Write-Host "-> droits de $Compte retires : $d"
         }
     }
+}
+
+# Copie $Source dans $Cible sauf si le marqueur de version est deja a jour.
+function Sync-Tool([string]$Source, [string]$Cible, [string]$Version) {
+    $marque = Join-Path $Cible '.version'
+    if ((Test-Path -LiteralPath $marque) -and ((Get-Content -LiteralPath $marque -Raw).Trim() -eq $Version)) {
+        Write-Host "-> $Cible deja a jour ($Version)"
+        return
+    }
+    if (Test-Path -LiteralPath $Cible) { Remove-Item -LiteralPath $Cible -Recurse -Force }
+    New-Item -ItemType Directory -Force -Path $Cible | Out-Null
+    Copy-Item -Path (Join-Path $Source '*') -Destination $Cible -Recurse -Force
+    Set-Content -LiteralPath $marque -Value $Version -Encoding ASCII
+    Write-Host "-> $Cible copie ($Version)"
+}
+
+function Get-RealDir([string]$Exe) {
+    $dir = Split-Path -Parent (Get-Command $Exe -ErrorAction Stop).Source
+    $item = Get-Item -LiteralPath $dir
+    # Jonction `current` de scoop : on copie la vraie version, pas le lien.
+    if ($item.LinkType -and $item.Target) { return @($item.Target)[0] }
+    return $dir
+}
+
+function Copy-Toolchain {
+    if (-not (Test-Path -LiteralPath $Outils)) {
+        throw "Introuvable : $Outils (lance d'abord agent-setup-admin.ps1)"
+    }
+    $nodeDir = Get-RealDir 'node'
+    Sync-Tool $nodeDir "$Outils\node" ((& "$nodeDir\node.exe" --version) | Select-Object -First 1)
+
+    $uvDir = Get-RealDir 'uv'
+    $uvTmp = Join-Path $env:TEMP 'tessera-uv-src'
+    if (Test-Path $uvTmp) { Remove-Item -LiteralPath $uvTmp -Recurse -Force }
+    New-Item -ItemType Directory -Force -Path $uvTmp | Out-Null
+    foreach ($f in 'uv.exe', 'uvx.exe') { Copy-Item "$uvDir\$f" $uvTmp -Force }
+    Sync-Tool $uvTmp "$Outils\uv" ((& "$uvDir\uv.exe" --version) | Select-Object -First 1)
+    Remove-Item -LiteralPath $uvTmp -Recurse -Force
+
+    # uv laisse en place un Python deja installe dans ce dossier.
+    $env:UV_PYTHON_INSTALL_DIR = "$Outils\python"
+    & "$Outils\uv\uv.exe" python install
+    if ($LASTEXITCODE -ne 0) { throw "uv python install a echoue ($LASTEXITCODE)" }
+    Write-Host "-> Python dans $Outils\python"
 }
 
 function Set-AgentToken {
@@ -73,5 +123,7 @@ function Set-AgentToken {
 if ($Jeton) { Set-AgentToken; exit 0 }
 Set-AgentPassword
 Copy-AgentCli
+Remove-ProfileRights
+Copy-Toolchain
 Set-AgentToken
 Write-Host '-> Installation terminee. Verifie : .\scripts\tessera.ps1 agent doctor'

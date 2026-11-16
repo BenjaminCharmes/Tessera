@@ -1,12 +1,13 @@
 ---
-id: ticket-981
-preuve_reelle: true
-title: "agent setup installs a shared toolchain outside every profile"
-type: fix
-status: todo
-priority: high
 agent: codeur
 depends_on: []
+id: ticket-981
+pr_number: 1131
+preuve_reelle: true
+priority: high
+status: done
+title: agent setup installs a shared toolchain outside every profile
+type: fix
 ---
 
 ## Contexte

@@ -61,6 +61,16 @@ Invoke-Icacls $Partage /inheritance:r
 Invoke-Icacls "$Partage\bin" /reset /T
 Write-Host "-> $Partage pret ($Proprietaire : modifier, $Compte : lecture, heritage coupe)"
 
+# 4 bis. Chaine d'outils partagee (node, uv, python) : l'agent la lit et
+#    l'execute, ne l'ecrit pas. Memes droits que $Partage, poses par SID,
+#    heritage coupe : rien ne vient du profil de l'utilisateur.
+$Outils = Join-Path $Partage 'toolchain'
+New-Item -ItemType Directory -Force -Path $Outils | Out-Null
+Invoke-Icacls $Outils /grant:r "*S-1-5-18:(OI)(CI)F" "*S-1-5-32-544:(OI)(CI)F" `
+    "${Proprietaire}:(OI)(CI)M" "${Compte}:(OI)(CI)RX"
+Invoke-Icacls $Outils /inheritance:r
+Write-Host "-> $Outils pret ($Proprietaire : modifier, $Compte : lecture-execution, heritage coupe)"
+
 # 5. Remise du mot de passe : le fichier est cree vide et verrouille AVANT d'y
 #    ecrire, pour n'etre jamais lisible par un autre compte, meme un instant.
 #    Ensuite lisible et supprimable par l'utilisateur seul (plus SYSTEM et les
