@@ -35,6 +35,13 @@ agent: codeur     # codeur | reviewer | architect
 ---
 ```
 
+Un ticket qui touche les processus, les comptes, les droits ou l'OS ajoute
+`preuve_reelle: true` et porte sa preuve dans une section `## Preuve réelle`
+à part : ce qu'il faut lancer sur la machine et ce qu'il faut y constater.
+**Jamais dans les critères d'acceptation** : aucun agent ne peut la fournir,
+le validateur la refuse trois tours (ticket-974, le 16/11), et sans le champ
+le run se merge sans elle.
+
 ## Tu écris sur le disque, pas dans ta réponse
 
 Tu disposes des outils fichier : `Read`, `Write`, `Edit`, `Glob`, `Grep`, et
