@@ -9410,3 +9410,11 @@ error: Please commit or stash them.
 - 2026-11-16 10:46:30 UTC — [ticket-977] tour 1 — codeur terminé (246375ms)
 - 2026-11-16 10:46:31 UTC — [ticket-977] BLOCKED — fichier protégé modifié pendant un appel d'agent : scripts/hooks/__pycache__/pre-pushcpython-311.pyc
 - 2026-11-16 10:46:35 UTC — [ide-core] file interrompue : ticket-977 non approuvé
+- 2026-11-16 10:47:52 UTC — [ticket-977] branche ticket-977-un-run-relit-son-ticket-une-fois-la-base-avanc-e
+- 2026-11-16 10:57:52 UTC — [ticket-977] testeur: dur�es : ruff 0 s, mypy 4 s, mypy-linux 5 s, tsc 30 s, eslint 42 s, vitest 208 s, pytest 597 s ; impact depuis base : 161 fichier(s) de test
+- 2026-11-16 10:57:52 UTC — [ticket-977] branche reprise (5 commit(s)) — tests green, codeur sauté
+- 2026-11-16 10:58:04 UTC — [ticket-977] securite: PASS — Ce diff relit la fiche du ticket depuis le dépôt local après la création de la b (9046ms)
+- 2026-11-16 10:58:06 UTC — [ticket-977] tour 1 — reviewer démarré
+- 2026-11-16 10:58:38 UTC — [ticket-977] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code ajoute une relecture de (32297ms)
+- 2026-11-16 10:58:44 UTC — [ticket-977] tour 1 — reviewer terminé (38563ms)
+- 2026-11-16 10:58:45 UTC — [ticket-977] APPROVED après 1 tour(s)
