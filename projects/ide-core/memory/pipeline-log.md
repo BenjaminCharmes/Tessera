@@ -9399,3 +9399,4 @@ error: Please commit or stash them.
 - 2026-11-16 10:40:27 UTC — [ticket-977] testeur: dur�es : ruff 0 s, mypy 11 s, mypy-linux 10 s, tsc 55 s, eslint 69 s, vitest 350 s, pytest 908 s ; impact depuis base : 161 fichier(s) de test
 - 2026-11-16 10:40:27 UTC — [ticket-977] tests rouges au tour 3
 - 2026-11-16 10:40:27 UTC — [ticket-977] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-16 10:40:34 UTC — [ide-core] file interrompue : ticket-977 non approuvé
