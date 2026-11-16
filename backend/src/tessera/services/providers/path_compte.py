@@ -8,7 +8,13 @@ from tessera.services.providers.noms import ProviderIndisponible
 #: La chaîne d'outils partagée, hors de tout profil (ticket-981 l'installe).
 TOOLCHAIN = Path(r"C:\ProgramData\Tessera\toolchain")
 
-_SOUS_DOSSIERS = ("node", "uv", "python", r"python\Scripts")
+_SOUS_DOSSIERS: tuple[tuple[str, ...], ...] = (
+    ("node",), ("uv",), ("python",), ("python", "Scripts"),
+)
+
+#: Séparateur du PATH d'un compte Windows, quel que soit l'OS qui l'assemble
+#: (la CI tourne sous Linux, où `os.pathsep` vaut `:`).
+_SEPARATEUR = ";"
 
 
 class ChaineAbsente(ProviderIndisponible):
@@ -32,7 +38,7 @@ def _entrees_du_backend() -> list[str]:
     """Backend PATH entries under a system folder and present on disk."""
     racines = _racines_admises()
     gardees: list[str] = []
-    for entree in os.environ.get("PATH", os.environ.get("Path", "")).split(os.pathsep):
+    for entree in os.environ.get("PATH", os.environ.get("Path", "")).split(_SEPARATEUR):
         if entree and any(_est_sous(entree, r) for r in racines) and Path(entree).is_dir():
             gardees.append(entree)
     return gardees
@@ -48,5 +54,5 @@ def path_du_compte() -> str:
         raise ChaineAbsente(
             f"chaîne d'outils absente ({TOOLCHAIN}) : lancer `agent setup` (ADR-086)"
         )
-    entrees = [str(TOOLCHAIN / sous) for sous in _SOUS_DOSSIERS]
-    return os.pathsep.join(entrees + _entrees_du_backend())
+    entrees = [str(TOOLCHAIN.joinpath(*parties)) for parties in _SOUS_DOSSIERS]
+    return _SEPARATEUR.join(entrees + _entrees_du_backend())
