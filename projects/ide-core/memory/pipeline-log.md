@@ -9432,3 +9432,6 @@ error: Please commit or stash them.
 - 2026-11-16 11:21:08 UTC — [ticket-975] tour 1 — reviewer terminé (19343ms)
 - 2026-11-16 11:21:12 UTC — [ticket-975] validateur: APPROVED — Les trois critères sont satisfaits. Le code ajoute correctement `accorder_lectur (23500ms)
 - 2026-11-16 11:21:12 UTC — [ticket-975] APPROVED après 1 tour(s)
+- 2026-11-16 11:22:37 UTC — [ticket-975] documentation: 0 fichier(s) (79906ms)
+- 2026-11-16 11:22:37 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-16 11:22:37 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
