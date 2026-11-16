@@ -696,7 +696,10 @@ async def test_merge_timeout_on_a_merged_pr_ends_merged(tmp_path: Path) -> None:
     assert any("confirmée après une erreur réseau" in e for e in livraison.etapes)
 
 
-async def test_merge_timeout_on_an_open_pr_stops(tmp_path: Path) -> None:
+async def test_merge_timeout_on_an_open_pr_stops(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr("tessera.services.livraison.livraison_merge.FENETRE_RELECTURE_S", 0.0)
     workflow = _MergeQuiLache(httpx.ReadTimeout("lent"), etat="open")
     svc, _git, _w = _service(tmp_path, "merge", workflow=workflow)
 

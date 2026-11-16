@@ -8,3 +8,4 @@ Une ligne par action : `- date | action | cible | sha | résumé`. Le service se
 - 2026-11-10 | a_toi | regle-04ca96e2 |  | decider : ADR-042 cité touche une porte ou un mot sensible
 - 2026-11-10 | a_toi | regle-d2a98cda |  | decider : le bloc touche une porte, un mot sensible ou le superviseur
 - 2026-11-16 | a_toi | regle-7d3eaabe |  | decider : ADR-083 cité touche une porte ou un mot sensible
+- 2026-11-16 | a_toi | ticket-985 |  | trier : 2 échecs de suite : sortie du modèle absente : rien n'est écrit
