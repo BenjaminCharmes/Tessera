@@ -4,7 +4,8 @@ The CLI of the agent account cannot resolve paths under the user profile, so
 these projects get their worktrees under `IDE_WORKTREES_DIR_AGENT`. The folder
 is created once, with an explicit ACL and no inheritance: SYSTEM and the
 administrators full control, the backend's user modify. The agent account gets
-nothing here beyond what `accorder_droits_agent` sets on the worktree of a run.
+nothing here beyond read-and-list on this folder alone (no inheritance, so the
+CLI can examine the path) and what `accorder_droits_agent` sets on a run worktree.
 """
 import asyncio
 import getpass
@@ -52,18 +53,35 @@ async def preparer_dossier_agent(
     """
     lanceur = lanceur or _icacls_reel
     dossier = settings.ide_worktrees_dir_agent
-    if dossier.exists():
-        return dossier
-    dossier.mkdir(parents=True)
-    compte = utilisateur or getpass.getuser()
-    etapes = [
-        [str(dossier), "/inheritance:r"],
-        [str(dossier), "/grant:r", f"{_SYSTEME}:(OI)(CI)F", f"{_ADMINISTRATEURS}:(OI)(CI)F",
-         f"{compte}:(OI)(CI)M"],
-    ]
-    for args in etapes:
-        code, sortie = await lanceur(args)
-        if code != 0:
-            raise DossierAgentRefuse(f"icacls a échoué (code {code}) sur {dossier} : {sortie.strip()}")
-    _logger.info("dossier_worktrees_agent_cree", extra={"dossier": str(dossier)})
+    if not dossier.exists():
+        dossier.mkdir(parents=True)
+        compte = utilisateur or getpass.getuser()
+        etapes = [
+            [str(dossier), "/inheritance:r"],
+            [str(dossier), "/grant:r", f"{_SYSTEME}:(OI)(CI)F", f"{_ADMINISTRATEURS}:(OI)(CI)F",
+             f"{compte}:(OI)(CI)M"],
+        ]
+        for args in etapes:
+            await _lancer(lanceur, args, dossier)
+        _logger.info("dossier_worktrees_agent_cree", extra={"dossier": str(dossier)})
+    # Idempotent : un dossier créé avant ce droit le reçoit au prochain run.
+    if settings.agent_user:
+        await accorder_lecture_dossier(dossier, settings.agent_user, lanceur)
     return dossier
+
+
+async def _lancer(lanceur: Icacls, args: list[str], dossier: Path) -> None:
+    code, sortie = await lanceur(args)
+    if code != 0:
+        raise DossierAgentRefuse(f"icacls a échoué (code {code}) sur {dossier} : {sortie.strip()}")
+
+
+async def accorder_lecture_dossier(
+    dossier: Path, compte: str, lanceur: Icacls | None = None
+) -> None:
+    """Let `compte` list `dossier` and read its attributes, without inheritance.
+
+    The CLI checks every segment of a path for links: a parent it cannot
+    examine makes the whole path refused. Nothing below `dossier` is granted.
+    """
+    await _lancer(lanceur or _icacls_reel, [str(dossier), "/grant", f"{compte}:(RX)"], dossier)

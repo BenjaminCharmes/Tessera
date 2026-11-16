@@ -13,7 +13,7 @@ from pathlib import Path
 
 from tessera.config import settings
 from tessera.services.git_workspace import GitCommandError, GitWorkspaceError
-from tessera.services.worktrees.dossier_agent import dossier_des_worktrees, preparer_dossier_agent
+from tessera.services.worktrees.dossier_agent import accorder_lecture_dossier, dossier_des_worktrees, preparer_dossier_agent
 from tessera.services.worktrees.run_worktree_populate import chemin_etendu, retirer_les_liens
 from tessera.services.worktrees.temporary_worktree import run_git
 from tessera.utils.logger import get_logger
@@ -183,6 +183,9 @@ async def creer(
         await _reprendre(racine, branche, extraites)
     else:
         await _ajouter(depot, racine, branche, base)
+    if compte_agent and settings.agent_user:
+        # Le dossier du projet : le compte y voit les noms, pas le contenu des autres tickets.
+        await accorder_lecture_dossier(racine.parent, settings.agent_user)
     return RunWorktree(racine=racine, projet=projet, branche=branche)
 
 
