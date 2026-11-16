@@ -9553,3 +9553,8 @@ error: Please commit or stash them.
 - 2026-11-16 12:29:25 UTC — [ticket-980] documentation: 0 fichier(s) (207625ms) — après tour de correction
 - 2026-11-16 12:29:25 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
 - 2026-11-16 12:29:25 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-16 12:32:32 UTC — [ide-core] ticket-980 PR #1128 confiée au CIWatcher
+- 2026-11-16 12:16:24 UTC — [ide-core] ticket-976 PR #1126 mergée (CI verte)
+- 2026-11-16 12:32:41 UTC — [ticket-981] branche ticket-981-agent-setup-installs-a-shared-toolchain-outside-e
+- 2026-11-16 12:32:48 UTC — [ticket-981] tour 1 — codeur démarré
+- 2026-11-16 12:33:18 UTC — [ticket-981] INTERROMPU au tour 1 — ResultError: Claude Code returned an error result: You've hit your 5-hour limit · resets 3pm (Europe/Paris) (exit code: 1)
