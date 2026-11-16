@@ -28,6 +28,7 @@ from tessera.services.github.github_service import MergeabiliteTimeoutError, PRN
 from tessera.services.github.sync_map import SyncMapService
 from tessera.services.projets.autonomie import NiveauAutonomie, lire_niveau, niveau_peut_merger
 from tessera.utils.logger import get_logger
+from tessera.utils.statut_douteux import refus_ou_doute
 
 _logger = get_logger(__name__)
 
@@ -409,11 +410,10 @@ class GitHubWorkflowService:
             )
             return False
         except httpx.HTTPStatusError as exc:
-            _logger.warning(
-                "merge_http_erreur",
-                extra={"pr": pr_number, "status": exc.response.status_code},
-            )
-            return False
+            # Un refus de GitHub est un verdict ; un 5xx ou un « merge en cours »
+            # est un doute, qui remonte pour que l'appelant relise la PR.
+            # Le motif du refus est journalisé par le helper, jamais le corps.
+            return refus_ou_doute(exc, pr_number)
         _logger.info(
             "merge_effectue",
             extra={"pr": pr_number, "ci": ci, "methode": merge_method},

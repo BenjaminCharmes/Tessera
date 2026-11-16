@@ -4,14 +4,20 @@ Un merge qui expire n'est pas un merge qui a échoué : GitHub a pu le faire
 avant que la réponse ne se perde. Arrêter la livraison sur ce doute laisse
 une PR mergée que l'IDE croit ouverte. On relit donc la PR avant de conclure.
 """
+import asyncio
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from typing import Protocol
 
 import httpx
 
 from tessera.utils.logger import get_logger
+from tessera.utils.statut_douteux import statut_douteux
 
 _logger = get_logger(__name__)
+
+FENETRE_RELECTURE_S = 120.0
+INTERVALLE_RELECTURE_S = 15.0
 
 
 class _Relecture(Protocol):
@@ -37,43 +43,65 @@ class IssueMerge:
     merged: bool
     confirme_apres_reseau: bool = False
     erreur_reseau: str | None = None
+    relu_pendant_s: float = 0.0
 
 
 async def relire_apres_erreur_reseau(
-    relecture: _Relecture, pr_number: int, exc: httpx.TransportError
+    relecture: _Relecture,
+    pr_number: int,
+    nom: str,
+    fenetre_s: float | None = None,
+    intervalle_s: float | None = None,
+    dormir: Callable[[float], Awaitable[None]] = asyncio.sleep,
 ) -> IssueMerge:
-    """Rereads the PR after a network error on the merge call.
+    """Rereads the PR during a bounded window after a doubtful merge call.
 
-    Fails closed (ADR-039): only a PR read as `merged` counts as merged. Any
-    other state, or a reread that fails too, keeps the stop.
+    A merge GitHub is still performing reads `open`, so one reread is not
+    enough. Fails closed (ADR-039): only `merged` counts as merged; `closed`,
+    a PR still `open` at the end of the window, or a failed reread stop.
     """
-    nom = type(exc).__name__
-    try:
-        etat = await relecture.pr_state(pr_number)
-    except Exception as relecture_exc:  # noqa: BLE001 — une relecture muette garde l'arrêt
-        _logger.warning(
-            "merge_relecture_impossible",
-            extra={"pr": pr_number, "erreur": type(relecture_exc).__name__},
-        )
-        return IssueMerge(
-            merged=False,
-            erreur_reseau=f"{nom}, puis la relecture de la PR a échoué aussi",
-        )
-    if etat == "merged":
-        _logger.info("merge_confirme_apres_erreur_reseau", extra={"pr": pr_number})
-        return IssueMerge(merged=True, confirme_apres_reseau=True)
-    return IssueMerge(
-        merged=False, erreur_reseau=f"{nom}, la PR est lue « {etat} »"
-    )
+    fenetre = FENETRE_RELECTURE_S if fenetre_s is None else fenetre_s
+    intervalle = INTERVALLE_RELECTURE_S if intervalle_s is None else intervalle_s
+    ecoule = 0.0
+    while True:
+        try:
+            etat = await relecture.pr_state(pr_number)
+        except Exception as relecture_exc:  # noqa: BLE001 — une relecture muette garde l'arrêt
+            _logger.warning(
+                "merge_relecture_impossible",
+                extra={"pr": pr_number, "erreur": type(relecture_exc).__name__},
+            )
+            return IssueMerge(
+                merged=False,
+                erreur_reseau=f"{nom}, puis la relecture de la PR a échoué aussi",
+                relu_pendant_s=ecoule,
+            )
+        if etat == "merged":
+            _logger.info("merge_confirme_apres_erreur_reseau", extra={"pr": pr_number})
+            return IssueMerge(merged=True, confirme_apres_reseau=True)
+        if etat != "open" or ecoule + intervalle > fenetre:
+            return IssueMerge(
+                merged=False,
+                erreur_reseau=f"{nom}, la PR est lue « {etat} »",
+                relu_pendant_s=ecoule,
+            )
+        await dormir(intervalle)
+        ecoule += intervalle
 
 
 async def tenter_le_merge(
-    workflow: _Fusion, pr_number: int, sha_attendu: str | None
+    workflow: _Fusion,
+    pr_number: int,
+    sha_attendu: str | None,
+    fenetre_s: float | None = None,
+    intervalle_s: float | None = None,
+    dormir: Callable[[float], Awaitable[None]] = asyncio.sleep,
 ) -> IssueMerge:
-    """Merges, and rereads the PR when the network gave out (ticket-713).
+    """Merges, and rereads the PR when the answer is a doubt (ticket-713).
 
-    A refusal from GitHub (HTTP status) is a verdict, not a doubt: it is
-    never reread.
+    A network error, a 5xx or a 405 "Merge already in progress" is a doubt,
+    reread over a window; any other refusal from GitHub is a verdict, never
+    reread. The merge is never retried.
     """
     try:
         if sha_attendu is None:
@@ -83,18 +111,29 @@ async def tenter_le_merge(
                 pr_number, sha_attendu=sha_attendu
             )
     except httpx.TransportError as exc:
-        return await relire_apres_erreur_reseau(workflow, pr_number, exc)
-    except httpx.HTTPStatusError:
-        return IssueMerge(merged=False)
-    return IssueMerge(merged=merged)
+        nom = type(exc).__name__
+    except httpx.HTTPStatusError as exc:
+        if not statut_douteux(exc):
+            return IssueMerge(merged=False)
+        nom = f"HTTP {exc.response.status_code}"
+    else:
+        return IssueMerge(merged=merged)
+    return await relire_apres_erreur_reseau(
+        workflow, pr_number, nom, fenetre_s, intervalle_s, dormir
+    )
 
 
 def arret_de_merge(pr_number: int, issue: IssueMerge) -> str:
     """The stop line of a merge that did not happen."""
     if issue.erreur_reseau is not None:
+        duree = (
+            f" La PR a été relue pendant {issue.relu_pendant_s:.0f} s."
+            if issue.relu_pendant_s
+            else ""
+        )
         return (
             f"Le merge de la PR #{pr_number} a échoué sur une erreur réseau "
-            f"({issue.erreur_reseau}). La PR reste ouverte."
+            f"({issue.erreur_reseau}).{duree} La PR reste ouverte."
         )
     return f"GitHub a refusé le merge de la PR #{pr_number}."
 
