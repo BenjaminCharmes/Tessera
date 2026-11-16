@@ -9,6 +9,7 @@ from pydantic import BaseModel
 from tessera.config import settings
 from tessera.models.ticket import Ticket, TicketBatchCreate, TicketBatchResponse, TicketCreate, TicketListResponse, TicketStatus, TicketStatusUpdate
 from tessera.routers.dependencies import require_github_service, require_valid_project_id
+from tessera.routers.merge_http import merge_ou_502
 from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.git_workspace import GitWorkspaceError, GitWorkspaceService
 from tessera.services.git_workspace.ticket_diff import TicketDiff, diff_du_ticket
@@ -520,8 +521,7 @@ async def merge_pull_request_for_ticket(
         raise HTTPException(status_code=404, detail=f"Ticket {ticket_id} introuvable")
     if ticket.pr_number is None:
         raise HTTPException(
-            status_code=422, detail="Ce ticket n'a pas de pull request ouverte."
-        )
+            422, "Ce ticket n'a pas de pull request ouverte.")
 
     project_path = settings.ide_workspace_dir / project_id
     project = load_project(project_path)
@@ -536,7 +536,7 @@ async def merge_pull_request_for_ticket(
         project_path=project_path,
     )
 
-    merge = await service.merge_si_la_ci_est_verte(ticket.pr_number)
+    merge = await merge_ou_502(service, ticket.pr_number)
     if not merge:
         raise HTTPException(
             status_code=422,
