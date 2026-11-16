@@ -15,7 +15,7 @@ from tessera.routers.services_reprise import reprendre_les_services
 from tessera.routers.services_running import get_sonde
 from tessera.services.noyau.database import init_db
 from tessera.services.noyau.services_demandes import demander, lister
-from tessera.services.verification.ports_de_tessera import port_vise
+from tessera.services.verification.ports_de_tessera import conflit_avec_tessera, port_vise
 from tessera.services.verification.process_registry import PROCESS_REGISTRY
 
 _DORMEUR = f'"{sys.executable}" -c "import time; time.sleep(30)"'
@@ -97,6 +97,79 @@ def test_other_port_starts(workspace: Path) -> None:
 )
 def test_port_vise(commande: str, attendu: int | None) -> None:
     assert port_vise(commande) == attendu
+
+
+def _frontend(dossier: Path, dev: str | None, vite: str | None) -> None:
+    dossier.mkdir(parents=True, exist_ok=True)
+    if dev is not None:
+        pkg = {"scripts": {"dev": dev}}
+        (dossier / "package.json").write_text(json.dumps(pkg), encoding="utf-8")
+    if vite is not None:
+        (dossier / "vite.config.ts").write_text(vite, encoding="utf-8")
+
+
+_VITE_5194 = "export default { plugins: [a({x: 1})], server: { host: 'x', port: 5194 } }"
+
+
+@pytest.mark.parametrize(
+    ("dev", "vite", "attendu"),
+    [
+        ("vite", _VITE_5194, 5194),
+        ("vite", "export default { port: 5194 }", 5173),
+        ("vite", "export default { server: { open: true } }", 5173),
+        ("vite", None, 5173),
+        ("vite --port 5174", _VITE_5194, 5174),
+        ("next dev", None, None),
+        ("next dev", _VITE_5194, None),
+        (None, _VITE_5194, 5173),
+    ],
+)
+def test_port_vise_reads_the_service_folder(
+    tmp_path: Path, dev: str | None, vite: str | None, attendu: int | None
+) -> None:
+    _frontend(tmp_path, dev, vite)
+    assert port_vise("npm run dev", tmp_path) == attendu
+
+
+def test_port_vise_with_bare_vite_reads_the_config(tmp_path: Path) -> None:
+    _frontend(tmp_path, None, _VITE_5194)
+    assert port_vise("vite", tmp_path) == 5194
+
+
+def test_port_vise_with_invalid_package_json_stays_closed(tmp_path: Path) -> None:
+    (tmp_path / "package.json").write_text("{nope", encoding="utf-8")
+    assert port_vise("npm run dev", tmp_path) == 5173
+
+
+def _projet_frontend(ws: Path, dev: str | None, vite: str | None) -> None:
+    _projet(ws, "npm run dev")
+    agents = ws / "alpha" / "agents.json"
+    services = [{"nom": "web", "commande": "npm run dev", "cwd": "frontend"}]
+    agents.write_text(
+        json.dumps({"project_id": "alpha", "services": services}), encoding="utf-8"
+    )
+    _frontend(ws / "alpha" / "frontend", dev, vite)
+
+
+def test_service_with_port_in_vite_config_is_not_refused(workspace: Path) -> None:
+    _projet_frontend(workspace, "vite", _VITE_5194)
+    dossier = workspace / "alpha" / "frontend"
+    assert port_vise("npm run dev", dossier) == 5194
+    assert conflit_avec_tessera("npm run dev", dossier) is None
+
+
+def test_service_without_port_in_vite_config_is_refused(workspace: Path) -> None:
+    _projet_frontend(workspace, "vite", "export default {}")
+    code, texte = _start()
+    assert code == 409
+    assert "5173" in texte
+
+
+def test_service_script_with_tessera_port_is_refused(workspace: Path) -> None:
+    _projet_frontend(workspace, "vite --port 5174", None)
+    code, texte = _start()
+    assert code == 409
+    assert "5174" in texte
 
 
 def test_resume_does_not_relaunch_a_refused_service(
