@@ -9416,3 +9416,4 @@ error: Please commit or stash them.
 - 2026-11-16 09:35:24 UTC — [ticket-974] validateur: CHANGES_REQUESTED — Les cinq premiers critères sont satisfaits : le diff implémente la lecture du `c (50436ms)
 - 2026-11-16 09:35:25 UTC — [ticket-974] CHANGES_REQUESTED tour 3: Validateur : Les cinq premiers critères sont satisfaits : le diff implémente la lecture du `cwd`, l'extraction du script `dev` et de la config Vite, la détection du port sans exécution, et la gestion 
 - 2026-11-16 09:35:25 UTC — [ticket-974] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-16 09:35:30 UTC — [ide-core] file interrompue : ticket-974 non approuvé
