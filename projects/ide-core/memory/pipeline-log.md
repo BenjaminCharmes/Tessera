@@ -9429,3 +9429,6 @@ error: Please commit or stash them.
 - 2026-11-16 09:53:40 UTC — [ticket-974] validateur: APPROVED — La garde de port lit désormais le dossier du service pour extrait le port réel d (29813ms)
 - 2026-11-16 09:53:41 UTC — [ticket-974] APPROVED après 1 tour(s)
 - 2026-11-16 09:54:31 UTC — [ticket-974] leçons: refusée — preuve absente du retour du run
+- 2026-11-16 09:58:53 UTC — [ticket-974] documentation: 0 fichier(s) (253592ms) — après tour de correction
+- 2026-11-16 09:58:53 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-16 09:58:53 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
