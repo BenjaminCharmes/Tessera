@@ -9400,3 +9400,12 @@ error: Please commit or stash them.
 - 2026-11-16 10:40:27 UTC — [ticket-977] tests rouges au tour 3
 - 2026-11-16 10:40:27 UTC — [ticket-977] BLOCKED après 3 tour(s) sans approbation
 - 2026-11-16 10:40:34 UTC — [ide-core] file interrompue : ticket-977 non approuvé
+- 2026-11-16 10:42:21 UTC — [ticket-977] branche ticket-977-un-run-relit-son-ticket-une-fois-la-base-avanc-e
+- 2026-11-16 10:42:24 UTC — [ticket-977] branche reprise (3 commit(s)) — refus précédent : revue, codeur en premier
+- 2026-11-16 10:42:24 UTC — [ticket-977] tour 1 — codeur démarré
+- 2026-11-16 10:42:48 UTC — [ide-core] ticket-970 retiré de la file
+- 2026-11-16 10:42:48 UTC — [ide-core] ticket-973 retiré de la file
+- 2026-11-16 10:42:48 UTC — [ide-core] ticket-971 retiré de la file
+- 2026-11-16 10:42:48 UTC — [ide-core] ticket-976 retiré de la file
+- 2026-11-16 10:46:30 UTC — [ticket-977] tour 1 — codeur terminé (246375ms)
+- 2026-11-16 10:46:31 UTC — [ticket-977] BLOCKED — fichier protégé modifié pendant un appel d'agent : scripts/hooks/__pycache__/pre-pushcpython-311.pyc
