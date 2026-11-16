@@ -9524,3 +9524,29 @@ error: Please commit or stash them.
 - 2026-11-16 12:09:31 UTC — [ticket-976] documentation: 1 fichier(s) (105327ms)
 - 2026-11-16 12:09:31 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
 - 2026-11-16 12:09:31 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-16 12:10:03 UTC — [ide-core] ticket-976 PR #1126 confiée au CIWatcher
+- 2026-11-16 12:10:17 UTC — [ticket-980] branche ticket-980-un-merge-douteux-se-relit-pendant-deux-minutes-av
+- 2026-11-16 12:10:20 UTC — [ticket-980] tour 1 — codeur démarré
+- 2026-11-16 12:11:54 UTC — [ticket-980] tour 1 — codeur terminé (94202ms)
+- 2026-11-16 12:14:11 UTC — [ticket-980] testeur: dur�es : ruff 0 s, mypy 18 s, mypy-linux 16 s, pytest 132 s ; impact depuis base : 55 fichier(s) de test
+- 2026-11-16 12:14:22 UTC — [ticket-980] securite: PASS — Le diff étend la relecture d'une PR, sur une fenêtre bornée, aux erreurs 5xx et  (10389ms)
+- 2026-11-16 12:14:23 UTC — [ticket-980] tour 1 — reviewer démarré
+- 2026-11-16 12:14:53 UTC — [ticket-980] tour 1 — reviewer terminé (29952ms)
+- 2026-11-16 12:14:54 UTC — [ticket-980] validateur: APPROVED — Les 7 critères d'acceptation sont satisfaits. Le diff ajoute une boucle de relec (30186ms)
+- 2026-11-16 12:14:54 UTC — [ticket-980] CHANGES_REQUESTED tour 1: Reviewer : 1. Le point 2 du ticket ne se produit pas en production. Dans `merge_si_la_ci_est_verte`, `except httpx.HTTPStatusError` (lignes 411-416) attrape toute erreur HTTP de `merge_quand_fusionnab
+- 2026-11-16 12:14:54 UTC — [ticket-980] tour 2 — codeur démarré
+- 2026-11-16 12:16:39 UTC — [ticket-980] tour 2 — codeur terminé (105186ms)
+- 2026-11-16 12:18:22 UTC — [ticket-980] testeur: 1 failed, 379 passed, 8 warnings in 96.62s (0:01:36)
+- 2026-11-16 12:18:22 UTC — [ticket-980] tests rouges au tour 2
+- 2026-11-16 12:18:22 UTC — [ticket-980] tour 3 — codeur démarré
+- 2026-11-16 12:21:49 UTC — [ticket-980] tour 3 — codeur terminé (206500ms)
+- 2026-11-16 12:24:00 UTC — [ticket-980] testeur: dur�es : ruff 0 s, mypy 12 s, mypy-linux 10 s, pytest 126 s ; impact depuis base : 62 fichier(s) de test
+- 2026-11-16 12:24:14 UTC — [ticket-980] securite: PASS — Le diff ne fait que reclasser des erreurs HTTP de GitHub et ajouter une relectur (13188ms)
+- 2026-11-16 12:24:14 UTC — [ticket-980] tour 3 — reviewer démarré
+- 2026-11-16 12:24:36 UTC — [ide-core] ticket-970 retiré de la file
+- 2026-11-16 12:24:36 UTC — [ide-core] ticket-973 retiré de la file
+- 2026-11-16 12:24:36 UTC — [ide-core] ticket-971 retiré de la file
+- 2026-11-16 12:24:42 UTC — [ticket-980] tour 3 — reviewer terminé (27156ms)
+- 2026-11-16 12:24:49 UTC — [ticket-980] validateur: APPROVED — Les 7 critères d'acceptation sont satisfaits. Le diff ajoute une boucle de relec (34515ms)
+- 2026-11-16 12:24:49 UTC — [ticket-980] APPROVED après 3 tour(s)
+- 2026-11-16 12:25:53 UTC — [ticket-980] leçons: refusée — vérification affaiblie : un contrôle retiré ou ignoré
