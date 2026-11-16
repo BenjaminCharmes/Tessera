@@ -9951,3 +9951,4 @@ error: Please commit or stash them.
 - 2026-11-16 16:27:12 UTC — [ticket-983] tour 1 — codeur démarré
 - 2026-11-16 16:29:18 UTC — [ticket-983] tour 1 — codeur terminé (126125ms)
 - 2026-11-16 16:29:20 UTC — [ticket-983] ARRÊTÉ par l'utilisateur au tour 1
+- 2026-11-16 16:29:25 UTC — [ide-core] file interrompue : ticket-983 non approuvé
