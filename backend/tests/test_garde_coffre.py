@@ -116,3 +116,8 @@ def test_existing_env_guard_cases_still_pass() -> None:
     # `test_garde_jetons.py` n'est pas modifié par ce ticket : il tourne avec
     # la suite, et ce test vérifie qu'il existe toujours.
     assert (Path(__file__).parent / "test_garde_jetons.py").is_file()
+
+
+async def test_refuses_agent_doctor_cli(tmp_path: Path) -> None:
+    assert await _refuse(tmp_path, "python -m tessera.agent_doctor_cli")
+    assert await _refuse(tmp_path, "uv run python -m tessera.agent_doctor_cli")

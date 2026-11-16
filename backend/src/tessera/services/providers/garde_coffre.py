@@ -30,7 +30,7 @@ _RECHERCHES = frozenset(
     {"grep", "egrep", "fgrep", "rg", "ag", "ack", "findstr", "select-string", "sls"}
 )
 _TEXTES = re.compile(
-    r"-m\s*['\"]?(?:keyring|tessera\.coffre_cli)\b"
+    r"-m\s*['\"]?(?:keyring|tessera\.coffre_cli|tessera\.agent_doctor_cli)\b"
     r"|\bimport\s+keyring\b|\bfrom\s+keyring\b"
     r"|get-storedcredential|credread|passwordvault",
     re.IGNORECASE,

@@ -185,9 +185,14 @@ function Invoke-AgentDoctor {
     Test-Etape "CLI partage present ($partage)" ($partagee -ne '') '.\scripts\tessera.ps1 agent setup'
     $recopie = "Copy-Item '$embarque' '$partage' -Force (ou agent setup)"
     Test-Etape "CLI partage de la version du SDK (partage '$partagee', SDK '$sdk')" (($partagee -ne '') -and ($partagee -eq $sdk)) $recopie
-    foreach ($outil in 'uv', 'node') {
-        Test-Etape "$outil trouve sur ce poste" ([bool](Get-Command $outil -ErrorAction SilentlyContinue)) "installer $outil, puis agent setup (droits RX)"
-    }
+    # Les outils se lancent SOUS le compte agent (ticket-983) : Get-Command tourne sous le
+    # compte de l'utilisateur et laissait passer un EPERM.
+    $sortieOutils = & $pyVenv -m tessera.agent_doctor_cli 2>&1
+    $sortieOutils | ForEach-Object { Write-Host "  $_" }
+    Test-Etape 'node, uv et python se lancent sous le compte agent' ($LASTEXITCODE -eq 0) '.\scripts	essera.ps1 agent setup'
+    $profil = $env:USERPROFILE
+    $droitsProfil = @(Get-Acl -LiteralPath $profil -ErrorAction SilentlyContinue | ForEach-Object { $_.Access } | Where-Object { "$($_.IdentityReference)" -like "*\$compte" })
+    Test-Etape "aucun droit de $compte sur le profil de l'utilisateur" ($droitsProfil.Count -eq 0) "icacls '$profil' /remove $compte"
     Test-DossierWorktreesAgent
     if ($script:AgentEchecs -gt 0) { exit 1 }
     Write-Host 'Compte agent pret.' -ForegroundColor Green
