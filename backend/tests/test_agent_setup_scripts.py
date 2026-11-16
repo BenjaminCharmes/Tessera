@@ -75,6 +75,28 @@ def test_admin_script_locks_the_password_file_before_writing_it() -> None:
     assert verrou < texte.index("Set-Content -LiteralPath $Remise")
 
 
+def test_admin_script_creates_the_toolchain_with_inheritance_cut() -> None:
+    texte = _ADMIN.read_text(encoding="ascii")
+    assert "toolchain" in texte
+    assert "Invoke-Icacls $Outils /inheritance:r" in texte
+    assert '"*S-1-5-18:(OI)(CI)F"' in texte
+    assert '"${Compte}:(OI)(CI)RX"' in texte.split("$Outils /grant:r", 1)[1]
+
+
+def test_user_script_copies_the_toolchain_idempotently() -> None:
+    texte = _UTILISATEUR.read_text(encoding="ascii")
+    for nom in ("node", "uv", "UV_PYTHON_INSTALL_DIR", "uv python install", ".version"):
+        assert nom in texte
+    assert "LinkType" in texte  # the real folder, not scoop's `current` junction
+    assert "deja a jour" in texte
+
+
+def test_user_script_removes_profile_rights_and_never_grants_them() -> None:
+    texte = _UTILISATEUR.read_text(encoding="ascii")
+    assert "/remove $Compte /T" in texte
+    assert "/grant" not in texte
+
+
 def test_admin_script_stops_on_a_failed_icacls() -> None:
     texte = _ADMIN.read_text(encoding="ascii")
     assert "$LASTEXITCODE -ne 0" in texte
