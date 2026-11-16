@@ -9585,3 +9585,15 @@ error: Please commit or stash them.
 - 2026-11-16 14:46:17 UTC — [ticket-981] documentation: 0 fichier(s) (129156ms) — après tour de correction
 - 2026-11-16 14:46:17 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
 - 2026-11-16 14:46:17 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-16 15:56:22 UTC — [ide-core] ticket-983 sauté : dépend de ticket-982, non mergé
+- 2026-11-16 15:56:22 UTC — [ide-core] ticket-982 PR #1134 non surveillée (livraison arrêtée)
+- 2026-11-16 15:56:28 UTC — [ticket-984] branche ticket-984-a-project-venv-points-at-the-shared-python-not-at
+- 2026-11-16 15:56:31 UTC — [ticket-984] tour 1 — codeur démarré
+- 2026-11-16 15:59:10 UTC — [ticket-984] tour 1 — codeur terminé (158609ms)
+- 2026-11-16 16:01:25 UTC — [ticket-984] testeur: dur�es : ruff 0 s, mypy 26 s, mypy-linux 19 s, pytest 130 s ; impact depuis base : 50 fichier(s) de test
+- 2026-11-16 16:01:39 UTC — [ticket-984] securite: PASS — Le diff ajoute deux variables uv, sans secret, à l'environnement du setup. Il re (13547ms)
+- 2026-11-16 16:01:40 UTC — [ticket-984] tour 1 — reviewer démarré
+- 2026-11-16 16:02:05 UTC — [ticket-984] validateur: fichiers cités joints : aucun ; absents : pyvenv.cfg
+- 2026-11-16 16:02:05 UTC — [ticket-984] validateur: APPROVED — Les deux critères sont entièrement satisfaits par les tests écrits dans le diff  (24219ms)
+- 2026-11-16 16:02:08 UTC — [ticket-984] tour 1 — reviewer terminé (27828ms)
+- 2026-11-16 16:02:08 UTC — [ticket-984] APPROVED après 1 tour(s)
