@@ -2,7 +2,7 @@ import asyncio
 import os
 import shlex
 import time
-from collections.abc import AsyncGenerator, Awaitable, Callable, Mapping
+from collections.abc import AsyncGenerator, Awaitable, Callable, Mapping, Sequence
 from contextlib import asynccontextmanager
 from functools import partial
 from pathlib import Path
@@ -11,7 +11,7 @@ from typing import Any
 from tessera.services.noyau.lancement import essais_de_commande
 from tessera.services.providers.lanceur_agent import LanceurAgent
 from tessera.services.verification.commande_chainee import decouper
-from tessera.services.verification.detail_du_delai import detail_du_delai
+from tessera.services.verification.detail_du_delai import noter_la_coupure
 from tessera.services.verification.env_du_code_de_projet import env_du_code_de_projet
 from tessera.services.verification.erreur_de_sortie import detail_avec_erreur
 from tessera.services.verification.groupe_d_etape import GroupeDEtape
@@ -20,6 +20,7 @@ from tessera.services.verification.limiteur_de_suites import LimiteurDeSuites
 from tessera.services.verification.minuteur_d_etape import MinuteurDEtape
 from tessera.services.verification.outil_introuvable import outil_introuvable
 from tessera.services.verification.process_registry import CommandeInvalide, resoudre_le_cwd
+from tessera.services.verification.relance_instable import Relance, noter_les_relances, reprendre_l_etape
 from tessera.services.verification.reprise_sac import relancer_apres_refus
 from tessera.services.verification.resultat_de_test import EtapeCoupee, EtapeTest, TestCommandNotFound, TestResult  # noqa: F401 — réexportés
 from tessera.services.verification.sortie_de_test import extract_counts, extract_errors, extract_failure_details, extract_summary_line
@@ -164,6 +165,7 @@ class TestRunnerService:
         test_command: str | None = None,
         timeout: int | None = None,
         en_attente: Callable[[], Awaitable[None]] | None = None,
+        fichiers_du_diff: Sequence[str] | None = None,
     ) -> TestResult:
         # Résolu, pas seulement absolu : `projects/` ne contient que des liens
         # vers les vrais dépôts, et Vite ne retrouve pas la racine réelle d'un
@@ -205,6 +207,7 @@ class TestRunnerService:
             start = time.monotonic()
             etapes: list[EtapeTest] = []
             sorties: list[str] = []
+            relances: list[Relance] = []
             code = 0
             for args in etapes_args:
                 debut_etape = time.monotonic()
@@ -218,9 +221,15 @@ class TestRunnerService:
                         # Coupée par le minuteur : sa durée est déjà posée.
                         coupee = issue.etape_coupee
                         duree = coupee.duree_ms if coupee else duree_etape_ms
-                        _noter_la_coupure(issue, args, duree, timeout)
+                        noter_la_coupure(issue, args, duree, timeout)
                     return issue
                 code, sortie = issue
+                if code != 0 and fichiers_du_diff is not None:
+                    # Seule une expiration hors du diff se relance, une fois (ticket-971).
+                    code, sortie, relance = await reprendre_l_etape(
+                        code, sortie, fichiers_du_diff, dossier, project_path,
+                        lambda a, d: self._executer(a, d, cmd, timeout, start))
+                    relances += [relance] if relance else []
                 etapes.append(
                     EtapeTest(
                         commande=shlex.join(args), code=code, duree_ms=duree_etape_ms
@@ -243,6 +252,7 @@ class TestRunnerService:
             else:
                 result = _parse_output(code, "\n".join(sorties).strip(), duration_ms)
             result.etapes = etapes
+            noter_les_relances(result, relances)
             return result
 
     async def _executer(
@@ -394,21 +404,6 @@ def _echec_de_lancement(
         errors=[str(exc)],
         duration_ms=duration_ms,
     )
-
-
-def _noter_la_coupure(
-    result: TestResult, args: list[str], duree_ms: int, timeout: float
-) -> None:
-    """Record on an expired ``result`` which step was cut, and for how long it ran.
-
-    Le détail des étapes (terminées puis coupée) rejoint le résumé : c'est ce
-    que le journal et le codeur lisent (ticket-514).
-    """
-    result.etape_coupee = EtapeCoupee(commande=shlex.join(args), duree_ms=duree_ms)
-    result.delai_s = float(timeout)
-    detail = detail_du_delai(result)
-    if detail:
-        result.output_summary = f"{result.output_summary}\nÉtapes : {detail}"
 
 
 def _marquer_panne_d_environnement(

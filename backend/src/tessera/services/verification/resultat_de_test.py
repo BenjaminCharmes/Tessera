@@ -44,6 +44,9 @@ class TestResult:
     etape_coupee: "EtapeCoupee | None" = None
     #: Le délai global, en secondes, qui a expiré (0 tant qu'il n'a pas expiré).
     delai_s: float = 0.0
+    #: Fichiers expirés relancés seuls, puis verts (ticket-971) ; vide sinon.
+    instables_relances: list[str] = field(default_factory=list)
+    instables_relances_ms: int = 0
 
 
 @dataclass

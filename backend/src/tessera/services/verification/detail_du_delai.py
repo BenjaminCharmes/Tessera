@@ -7,6 +7,8 @@ import shlex
 from pathlib import PurePath
 from typing import TYPE_CHECKING
 
+from tessera.services.verification.resultat_de_test import EtapeCoupee
+
 if TYPE_CHECKING:
     from tessera.services.verification.test_runner import TestResult
 
@@ -60,3 +62,18 @@ def ligne_de_delai(result: "TestResult") -> str:
         entete = f"délai dépassé ({result.delai_s:.0f} s, durée réelle {_secondes(result.duration_ms)})"
     detail = detail_du_delai(result)
     return f"{entete} — {detail}" if detail else entete
+
+
+def noter_la_coupure(
+    result: "TestResult", args: list[str], duree_ms: int, timeout: float
+) -> None:
+    """Record on an expired ``result`` which step was cut, and for how long it ran.
+
+    Le détail des étapes (terminées puis coupée) rejoint le résumé : c'est ce
+    que le journal et le codeur lisent (ticket-514).
+    """
+    result.etape_coupee = EtapeCoupee(commande=shlex.join(args), duree_ms=duree_ms)
+    result.delai_s = float(timeout)
+    detail = detail_du_delai(result)
+    if detail:
+        result.output_summary = f"{result.output_summary}\nÉtapes : {detail}"
