@@ -24,6 +24,15 @@ des tests pour le faire passer.
 Soir du 13/11, cinq files en parallèle. Curio 098 et 100, deux tickets
 backend, ont perdu trois tours chacun : le testeur était rouge sur
 `App.challenges.test.tsx` et `play-screen.test.tsx` (« Test timed out »).
+
+Le 16/11, trois files en parallèle : ide-core 977 a perdu son dernier tour sur
+`StatsView/RecentRunsCard.test.tsx`, fichier hors de son diff, avec
+`TestingLibraryElementError: Unable to find an element with the text: Aucun
+run ne correspond à « zzz »`. C'est un `findBy` dont le délai propre a
+expiré, pas un « Test timed out ». Le même jour, un codeur de Curio a
+signalé (signalement fusionné ici, ex-979) que l'étape frontend tombait sur
+un fichier différent à chaque tour d'un ticket backend seul
+(`review-options`, puis `play-screen`), et que chacun passait relancé seul.
 Sur le 100, le codeur a modifié `frontend/vitest.config.ts` (testTimeout,
 hookTimeout, maxWorkers) et `test-setup.ts` pour faire passer ces tests : la
 porte ADR-072 l'a refusé, à raison, mais le tour était perdu. Kadoomi (172,
@@ -35,6 +44,7 @@ porte ADR-072 l'a refusé, à raison, mais le tour était perdu. Kadoomi (172,
    fichiers de test en échec dans la sortie (les extracteurs de
    `sortie_de_test.py` les lisent déjà en partie).
 2. Si **tous** les échecs sont des expirations (vitest « Test timed out »,
+   Testing Library « Unable to find an element » ou « Timed out in waitFor »,
    pytest-timeout « Timeout ») **et** qu'aucun des fichiers en échec, ni le
    code qu'ils testent dans le même dossier, n'est dans le diff du run, ces
    fichiers sont relancés **une fois**, seuls (`vitest run <fichiers>`,
@@ -49,6 +59,9 @@ porte ADR-072 l'a refusé, à raison, mais le tour était perdu. Kadoomi (172,
 - [ ] Un test : une sortie vitest dont le seul échec est un « Test timed out »
       dans un fichier hors du diff provoque une relance de ce fichier seul ;
       verte, l'étape est verte et `tests_instables_relances` est journalisé.
+- [ ] Un test : une sortie vitest dont le seul échec est un
+      `TestingLibraryElementError: Unable to find an element` dans un fichier
+      hors du diff est relancée de même.
 - [ ] Un test : la relance rouge garde l'étape rouge, avec les deux sorties.
 - [ ] Un test : un fichier en échec qui est dans le diff n'est pas relancé.
 - [ ] Un test : un échec d'assertion (pas une expiration) n'est pas relancé.
