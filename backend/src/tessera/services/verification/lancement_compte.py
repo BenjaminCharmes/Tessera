@@ -21,6 +21,7 @@ from anyio.abc import ByteReceiveStream, Process
 
 from tessera.config import settings
 from tessera.services.providers.droits_appel import clore_appel, ouvrir_appel
+from tessera.services.providers.env_agent import env_du_profil
 from tessera.services.providers.lanceur_agent import LanceurAgent
 from tessera.services.providers.noms import ProviderIndisponible
 from tessera.services.providers.path_compte import ChaineAbsente, path_du_compte, resoudre_executable
@@ -31,11 +32,13 @@ from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
 
-#: Les seuls noms repris du backend : de quoi trouver les outils et un dossier
-#: temporaire. Le reste de l'environnement du backend n'atteint pas le compte.
-_NOMS_REPRIS = frozenset(
-    {"pathext", "systemroot", "windir", "comspec", "temp", "tmp"}
-)
+#: Les seuls noms repris du backend : de quoi trouver les outils. Le dossier
+#: temporaire vient du profil du compte (ticket-988) ; le reste de
+#: l'environnement du backend n'atteint pas le compte.
+_NOMS_REPRIS = frozenset({"pathext", "systemroot", "windir", "comspec"})
+
+#: Les noms que le profil du compte fixe et qu'aucun `extra` ne remplace.
+_DU_PROFIL = frozenset(env_du_profil("x"))
 
 
 class EchecLancementCompte(ProviderIndisponible):
@@ -50,11 +53,13 @@ def compte_declare() -> bool:
 def env_du_compte(extra: Mapping[str, str] | None = None) -> dict[str, str]:
     """Build the environment from nothing: the allow-list, then ``extra``, no secret."""
     base = {nom: val for nom, val in os.environ.items() if nom.lower() in _NOMS_REPRIS}
+    base.update(env_du_profil(settings.agent_user or ""))
     try:
         base["PATH"] = path_du_compte()
     except ChaineAbsente as exc:
         raise EchecLancementCompte(str(exc)) from exc
-    base.update(extra or {})
+    # Un `extra` déclaré ne ramène pas le dossier temporaire chez l'utilisateur.
+    base.update({k: v for k, v in (extra or {}).items() if k not in _DU_PROFIL})
     # Repasse par le filtre des secrets : un `extra` déclaré ne les réintroduit pas.
     sans_secret = env_du_code_de_projet(base)
     return {nom: sans_secret[nom] for nom in base if nom in sans_secret}
