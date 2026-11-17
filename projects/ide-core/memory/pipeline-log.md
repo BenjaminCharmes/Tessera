@@ -9730,3 +9730,24 @@ error: Please commit or stash them.
 - 2026-11-17 11:33:16 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
 - 2026-11-17 11:33:16 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
 - 2026-11-17 11:33:16 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-17 11:34:17 UTC — [ide-core] ticket-973 PR #1144 confiée au CIWatcher
+- 2026-11-17 11:32:06 UTC — [ide-core] ticket-970 PR #1143 mergée (CI verte)
+- 2026-11-17 11:34:21 UTC — [ticket-985] branche ticket-985-un-ticket-arr-t-porte-toujours-son-motif
+- 2026-11-17 11:34:24 UTC — [ticket-985] tour 1 — codeur démarré
+- 2026-11-17 11:35:51 UTC — [ticket-985] tour 1 — codeur terminé (86703ms)
+- 2026-11-17 11:37:27 UTC — [ticket-985] testeur: 1 failed, 372 passed, 48 warnings in 90.89s (0:01:30)
+- 2026-11-17 11:37:28 UTC — [ticket-985] tests rouges au tour 1
+- 2026-11-17 11:37:28 UTC — [ticket-985] tour 2 — codeur démarré
+- 2026-11-17 11:38:20 UTC — [ticket-985] tour 2 — codeur terminé (51938ms)
+- 2026-11-17 11:40:43 UTC — [ticket-985] testeur: dur�es : ruff 0 s, mypy 10 s, mypy-linux 11 s, pytest 139 s ; impact depuis base : 75 fichier(s) de test
+- 2026-11-17 11:40:53 UTC — [ticket-985] securite: PASS — PASS : aucune faille bloquante. Le diff remplit seulement un `arret` vide, sur t (8842ms)
+- 2026-11-17 11:40:53 UTC — [ticket-985] tour 2 — reviewer démarré
+- 2026-11-17 11:41:08 UTC — [ticket-985] tour 2 — reviewer terminé (14515ms)
+- 2026-11-17 11:41:31 UTC — [ticket-985] validateur: fichiers cités joints : pipeline_outcomes.py
+- 2026-11-17 11:41:31 UTC — [ticket-985] validateur: APPROVED — Tous les critères sont satisfaits. Le code ajoute les raisons manquantes aux tro (37328ms)
+- 2026-11-17 11:41:31 UTC — [ticket-985] APPROVED après 2 tour(s)
+- 2026-11-17 11:43:06 UTC — [ticket-985] leçons: fichier plein, à compacter à la main
+- 2026-11-17 11:47:49 UTC — [ticket-985] documentation: 0 fichier(s) (277562ms) — après tour de correction
+- 2026-11-17 11:47:49 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-17 11:47:49 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-17 11:47:49 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)

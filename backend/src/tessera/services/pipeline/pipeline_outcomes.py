@@ -13,7 +13,7 @@ from tessera.services.noyau.pipeline_events import EventType, PipelineResult
 from tessera.services.pipeline.lecons_run import proposer_lecon
 from tessera.services.pipeline.pipeline_approbation import noter_tete_approuvee
 from tessera.services.pipeline.pipeline_run import PipelineRun, emit, set_status
-from tessera.services.pipeline.pipeline_text import _single_line, _unapproved_commit_message
+from tessera.services.pipeline.pipeline_text import _premiere_ligne, _single_line, _unapproved_commit_message
 from tessera.utils.logger import get_logger
 
 if TYPE_CHECKING:
@@ -87,7 +87,7 @@ async def finish_security_block(
         approved=False,
         branch=run.branch,
         commit_sha=commit_sha,
-        arret=arret,
+        arret=arret or f"audit sécurité : {_premiere_ligne(summary)}",
     )
 
 
@@ -241,7 +241,7 @@ async def finish_stopped(orch: "Orchestrator", run: PipelineRun) -> PipelineResu
         approved=False,
         branch=run.branch,
         commit_sha=commit_sha,
-        arret=arret,
+        arret=arret or "arrêté à la demande",
     )
 
 
@@ -276,7 +276,7 @@ async def finish_rounds_exhausted(
         approved=False,
         branch=run.branch,
         commit_sha=commit_sha,
-        arret=arret,
+        arret=arret or f"non approuvé après {orch._max_review_rounds} tours",
     )
 
 
