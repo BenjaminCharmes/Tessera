@@ -129,3 +129,9 @@ def _echec_de_tests(run: "PipelineRun") -> str:
         "Les tests du projet échouent — corrige-les avant toute autre chose.\n"
         f"{resultat.output_summary}\n{erreurs}"
     )
+
+
+def _premiere_ligne(texte: str) -> str:
+    """First non-empty line of a summary, cut to a readable length."""
+    lignes = [ligne.strip() for ligne in texte.splitlines() if ligne.strip()]
+    return (lignes[0] if lignes else "")[:200]
