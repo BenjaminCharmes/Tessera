@@ -1,7 +1,6 @@
 # Contraintes en vigueur
 
-Règles en vigueur, chacune avec son ADR ; leur histoire est dans
-`decisions.md`.
+Chaque règle porte son ADR ; l'histoire est dans `decisions.md`.
 
 ---
 
@@ -23,17 +22,16 @@ section. (ADR-055)
 - **Ne jamais écrire hors de la racine d'écriture du run** — le projet, son
   worktree (ADR-056) ou le dépôt ancêtre si `git_root: ancestor`. Un hook
   `PreToolUse` bloque ailleurs `Write`, `Edit`, `NotebookEdit` et les
-  redirections Bash simples. Lire hors du projet reste permis, sauf le `.env`
+  redirections Bash simples. Lire ailleurs reste permis, sauf le `.env`
   de Tessera. (ADR-031, ADR-053)
 - **Le service de documentation n'écrit dans `agents.json` que la clé
   `description`**, proposée par doc-technique et contrôlée. (ADR-068,
   ADR-027, ADR-057)
 - **Ne jamais émettre une commande git ou `gh` en écriture.** Le hook
-  `PreToolUse` n'admet que des lectures nommées (liste blanche). `agents.json`, `.git/`,
+  `PreToolUse` n'admet que des lectures nommées. `agents.json`, `.git/`,
   `.claude/settings*.json` et `.github/workflows/` se refusent en écriture.
   (ADR-067, ADR-027)
-- **Le script que `test_command` lance se refuse en écriture**, comme
-  `agents.json`. Un diff qui touche la configuration des tests (`conftest.py`,
+- **Le script que `test_command` lance se refuse en écriture.** Un diff qui touche la configuration des tests (`conftest.py`,
   `[tool.pytest*]`, `[tool.mypy]`, `vite.config.*`, `vitest.*`, `eslint.config.*`,
   `tsconfig*.json`, `scripts` de `package.json`…) sans que le ticket la nomme par
   son chemin complet est refusé à la revue. (ADR-027, ADR-072)
@@ -43,15 +41,15 @@ section. (ADR-055)
 - **Une leçon s'écrit sous `## Proposées` de `memory/lecons.md`, par le
   service seul.** Seule `## En vigueur`, où un humain la déplace, atteint
   codeur et reviewer ; un diff de run qui y touche le met en `blocked`. (ADR-074, ADR-055)
-- **Avant toute création de branche, `git rev-parse --show-toplevel` doit
-  renvoyer le dossier du projet**, sinon `NotAGitRepository`, sauf
+- **Avant toute création de branche, `git rev-parse --show-toplevel` renvoie
+  le dossier du projet**, sinon `NotAGitRepository`, sauf
   `git_root: ancestor`. (ADR-024, ADR-028)
 
 ## Livraison et autonomie
 
 - **Chaque run, et le chat (`chat-<horodatage>`), a sa branche et finit par
   un commit** : approuvé, type du ticket ; sinon `chore: … — unapproved work
-  (…)`. L'arbre ne reste jamais sale. (ADR-018, ADR-019)
+  (…)`. (ADR-018, ADR-019)
 - **Ne jamais forcer un push** : un refus est une information. (ADR-022)
 - **Déclarer le niveau d'autonomie dans `agents.json`** (`autonomy:
   commit | pr | merge`, défaut : `commit`). Merge sur CI verte seulement,
@@ -142,7 +140,7 @@ section. (ADR-055)
   contrôle visuel partent sous ce compte, sans repli, avec les seuls outils
   de `C:\ProgramData\Tessera\toolchain\`** : ni `PATH` ni droit sous
   `C:\Users`. (ADR-083, ADR-085, ADR-086)
-- **Un rôle déclaré `"web": true` reçoit `WebFetch` et `WebSearch` et
+- **Un rôle `"web": true` reçoit `WebFetch` et `WebSearch` et
   perd `Bash`.** (ADR-049)
 
 *(architect, codeur, reviewer)*
@@ -223,8 +221,8 @@ section. (ADR-055)
 
 *(codeur)*
 
-- **Tests frontend : Vitest + React Testing Library, pas Jest. Monaco est
-  bundlé depuis `monaco-editor` via Vite, pas de CDN.** (ADR-014, ADR-012)
+- **Tests frontend : Vitest + React Testing Library, pas Jest. Monaco vient
+  de `monaco-editor` via Vite, sans CDN.** (ADR-014, ADR-012)
 - **Pas de gestionnaire d'état global (Zustand, Jotai) tant que l'état
   partagé tient dans `useActiveProject` et `runStore.ts`** ; à revoir au-delà
   de 5 états globaux. (ADR-013)
