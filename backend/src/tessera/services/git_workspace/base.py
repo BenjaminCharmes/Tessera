@@ -2,9 +2,8 @@
 
 import asyncio
 
-from tessera.services.git_workspace.avance_base import GitAvanceBase
 from tessera.services.git_workspace.erreurs import GitCommandError
-from tessera.services.noyau.git_commande import build_command
+from tessera.services.git_workspace.realignement import GitRealignement
 from tessera.utils.logger import get_logger
 
 _logger = get_logger("tessera.services.git_workspace")
@@ -18,7 +17,7 @@ _TENTATIVES_FETCH = 3
 _ATTENTE_ENTRE_FETCH_S = 2.0
 
 
-class GitBase(GitAvanceBase):
+class GitBase(GitRealignement):
     """The base ref: initialisation, fetch and merge-base."""
 
     async def _base_distante(self, base_branch: str) -> str:
@@ -135,9 +134,9 @@ class GitBase(GitAvanceBase):
                 )
             return None
 
-        # Parse FETCH_HEAD
+        # Lecture de la base distante (ref de suivi, pas FETCH_HEAD : ticket-970)
         try:
-            fetch_sha = (await self._run("rev-parse", "FETCH_HEAD")).strip()
+            fetch_sha = await self._sha_base_distante(base_branch)
         except GitCommandError as exc:
             _logger.warning(
                 "base_ref_fetch_head_introuvable", extra={"error": str(exc)}
@@ -153,14 +152,9 @@ class GitBase(GitAvanceBase):
             sha_locale = None
 
         if sha_locale is not None and sha_locale != fetch_sha:
-            proc = await asyncio.create_subprocess_exec(
-                *build_command(("merge-base", "--is-ancestor", sha_locale, fetch_sha)),
-                cwd=str(self._project_path),
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
-            )
-            await proc.communicate()
-            if proc.returncode != 0:
+            if not await self._est_ancetre(sha_locale, fetch_sha) and not (
+                await self._realigner_si_memes_arbres(base_branch, sha_locale, fetch_sha)
+            ):
                 raison = (
                     f"La branche locale « {base_branch} » ({sha_locale[:7]}) a divergé "
                     f"de la base distante ({fetch_sha[:7]}) : le run est bloqué."

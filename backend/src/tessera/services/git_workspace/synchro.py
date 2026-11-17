@@ -54,9 +54,9 @@ class GitSync(GitBase):
         # concurrent git process overwriting the file (FETCH_HEAD is not a
         # named ref, but a plain file that any fetch overwrites).
         try:
-            fetch_sha = (await self._run("rev-parse", "FETCH_HEAD")).strip()
+            fetch_sha = await self._sha_base_distante(base_branch)
         except GitCommandError as exc:
-            raison = f"rev-parse FETCH_HEAD échoué : {exc.stderr.strip()}"
+            raison = f"lecture de la base distante échouée : {exc.stderr.strip()}"
             _logger.warning("sync_base_rev_parse_echoue", extra={"erreur": raison})
             return raison
 

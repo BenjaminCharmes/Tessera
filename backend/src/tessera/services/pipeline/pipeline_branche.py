@@ -207,7 +207,9 @@ async def _basculer(
         )
         if raison_blocage is not None:
             _logger.warning("base_divergee_blocage", extra={"raison": raison_blocage})
-            await set_status(orch, run, TicketStatus.blocked)
+            # Le fichier du ticket ne bouge pas : un déplacement non commité
+            # laisserait l'arbre sale, et le commiter ferait diverger la base
+            # locale (ADR-018, ADR-037 ; ticket-970).
             await emit(run, EventType.ERROR, reason=raison_blocage)
             return PipelineResult(
                 ticket_id=run.ticket_id,
@@ -240,7 +242,8 @@ async def _basculer(
         # checked out, mixing unrelated work across tickets.
         arret = str(exc)
         _logger.warning("branch_creation_failed", extra={"error": arret})
-        await set_status(orch, run, TicketStatus.blocked)
+        # La fiche ne bouge pas : déplacée sans commit, elle laisserait l'arbre
+        # sale ; commitée sur la base, elle la ferait diverger (ticket-970).
         await emit(run, EventType.ERROR, reason=arret)
         return PipelineResult(
             ticket_id=run.ticket_id,

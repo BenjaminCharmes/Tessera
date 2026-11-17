@@ -274,7 +274,8 @@ async def test_create_branch_git_command_error_bloque_le_run() -> None:
     assert result.arret is not None
     assert "overwritten" in result.arret
     assert run.branch is None
-    assert TicketStatus.blocked in svc.statuts
+    # La fiche reste en place : un déplacement non commité salirait l'arbre (ticket-970).
+    assert svc.statuts == []
     assert any(e.type == EventType.ERROR for e in events)
 
 
@@ -390,7 +391,8 @@ async def test_create_branch_fichier_code_modifie_bloque(tmp_path: Path) -> None
     assert result.final_status is TicketStatus.blocked
     assert result.arret is not None
     assert run.branch is None
-    assert TicketStatus.blocked in svc.statuts
+    # La fiche reste en place : un déplacement non commité salirait l'arbre (ticket-970).
+    assert svc.statuts == []
 
     # code.py was NOT committed by commit_bookkeeping: it is still dirty
     status_out = await _git_out(root, "status", "--porcelain", "--untracked-files=no")
