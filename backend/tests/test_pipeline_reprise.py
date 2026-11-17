@@ -39,6 +39,7 @@ class _FakeTestRunner:
         project_path: Path,
         test_command: str | None = None,
         en_attente: object = None,
+        fichiers_du_diff: object = None,
     ) -> TestResult:
         self.calls += 1
         if len(self._results) > 1:

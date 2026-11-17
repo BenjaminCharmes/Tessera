@@ -9,6 +9,7 @@ Pièges observés sur ce projet, une ligne chacun. Le service écrit sous `## Pr
 - Quand tu refactorise un fichier trop volumineux en changeant aussi sa logique, scinde en deux PR : d'abord réduire, puis améliorer. (source : ticket-962, 2026-11-13)
 - Quand un test architectural doit concentrer une logique, ne pas exempter sur un motif qui couvrirait aussi les appels à ce lieu. (source : ticket-982, 2026-11-16)
 - Quand on ajoute une méthode à une classe moquée, mettre à jour tous les mocks de cette classe pour qu'ils l'aient. (source : ticket-987, 2026-11-17)
+- Quand un parseur d'erreurs a des lacunes signalées, corriger d'abord le parseur principal avant d'ajouter un détecteur parallèle qui en dépend. (source : ticket-971, 2026-11-17)
 
 ## En vigueur
 - Quand on ajoute des tests pour un module sensible, vérifier que les données de test ne déclenchent pas le contrôle de traces professionnelles du projet. (source : ticket-933, 2026-11-11)

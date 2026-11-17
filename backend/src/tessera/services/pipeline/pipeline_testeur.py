@@ -1,6 +1,7 @@
 """Stage — the project's test suite (ticket-688, split from `pipeline_stages`)."""
 from typing import TYPE_CHECKING
 
+from tessera.services.noyau.diff_changements import lire_diff
 from tessera.services.noyau.pipeline_events import EventType, PipelineResult
 from tessera.services.pipeline.pipeline_outcomes import finish_timeout_expired
 from tessera.services.pipeline.pipeline_run import PipelineRun, emit
@@ -24,6 +25,23 @@ def _noter_le_delai(orch: "Orchestrator", run: PipelineRun, result: "TestResult"
     orch._log(f"[{run.ticket_id}] testeur: {ligne_de_delai(result)}")
     if detail_du_delai(result):
         run.test_context = f"\n\n## Résultats des tests ⏱\n{result.output_summary}\n"
+
+
+async def _diff_du_run(orch: "Orchestrator") -> list[str] | None:
+    """The files the run changed; None when unreadable, so no test is run again.
+
+    Distinct de `fichiers_du_diff`, qui rend `[]` d'un diff illisible : lu comme
+    « rien n'a changé », il ouvrirait la relance (ticket-971, ADR-037).
+    """
+    lire = getattr(orch._git_workspace, "diff_depuis_base", None)
+    try:
+        diff = await lire() if lire is not None else None
+    except Exception as exc:  # noqa: BLE001 — un diff illisible ne bloque pas le testeur
+        _logger.warning("diff_du_testeur_illisible", extra={"error": str(exc)})
+        return None
+    if not isinstance(diff, str):
+        return None
+    return [fichier.chemin for fichier in lire_diff(diff)]
 
 
 async def run_tests(
@@ -61,6 +79,7 @@ async def run_tests(
             orch._project_path,
             test_command=orch._test_command,
             en_attente=_on_attente,
+            fichiers_du_diff=await _diff_du_run(orch),
         )
 
         # Un timeout ne dit rien sur le code : relancer une fois sans repasser
@@ -78,6 +97,11 @@ async def run_tests(
                 return await finish_timeout_expired(orch, run)
 
         run.test_result = result
+        if result.instables_relances:
+            orch._log(
+                f"[{run.ticket_id}] testeur: tests_instables_relances "
+                f"{result.instables_relances} ({result.instables_relances_ms} ms)"
+            )
         await emit(
             run,
             EventType.TEST_RESULT,
