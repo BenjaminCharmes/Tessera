@@ -58,7 +58,7 @@ async def test_rights_are_set_in_order(wt: RunWorktree, monkeypatch: pytest.Monk
         [git, "/remove:g", COMPTE],
         [git, "/grant:r", f"{COMPTE}:(OI)(CI)RX"],
     ]
-    refuses = {Path(a[0]).name for a in appels[4:] if a[1:] == ["/deny", f"{COMPTE}:(W,D)"]}
+    refuses = {Path(a[0]).name for a in appels[4:] if a[1:] == ["/deny", f"{COMPTE}:(WD,AD,WEA,WA,DE)"]}
     assert refuses == {"agents.json", "CLAUDE.md", "verif.py"}
     assert len(appels) == 4 + 3
 
@@ -75,3 +75,18 @@ async def test_icacls_failure_raises(wt: RunWorktree, monkeypatch: pytest.Monkey
     monkeypatch.setattr(settings, "agent_user", COMPTE)
     with pytest.raises(DroitsAgentRefuses):
         await accorder_droits_agent(wt, None, Enregistreur(code=5))
+
+
+async def test_protected_files_stay_readable(wt: RunWorktree, monkeypatch: pytest.MonkeyPatch) -> None:
+    # ticket-994 : les droits simples W et D d'icacls portent SYNCHRONIZE ; les
+    # refuser interdit toute ouverture du fichier, lecture comprise (un test de
+    # Serpent lisait .github/workflows/ci.yml et recevait EPERM).
+    monkeypatch.setattr(settings, "agent_user", COMPTE)
+    icacls = Enregistreur()
+    await accorder_droits_agent(wt, "python scripts/verif.py", icacls)
+    refus = [a[2] for a in icacls.appels if a[1:2] == ["/deny"]]
+    assert refus
+    for droit in refus:
+        drapeaux = droit.split(":", 1)[1].strip("()").split(",")
+        assert "W" not in drapeaux and "D" not in drapeaux and "F" not in drapeaux and "M" not in drapeaux
+        assert {"WD", "AD", "DE"} <= set(drapeaux)

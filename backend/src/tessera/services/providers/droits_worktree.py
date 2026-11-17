@@ -2,7 +2,7 @@
 
 ADR-083. The CLI runs under `AGENT_USER`; the worktree belongs to the backend's
 account. Three rules, set with `icacls`, never `F` (it includes deleting children):
-modify on the worktree, read-only `.git`, write and delete refused on each
+modify on the worktree, read-only `.git`, write and delete (fine-grained rights, reading kept) refused on each
 existing file that `motif_de_protection` designates (policy files, test script).
 Without `AGENT_USER`, nothing is set.
 """
@@ -43,6 +43,12 @@ async def _lancer(lanceur: Icacls, args: list[str]) -> None:
     code, sortie = await lanceur(args)
     if code != 0:
         raise DroitsAgentRefuses(f"icacls a échoué (code {code}) sur {args[0]} : {sortie.strip()}")
+
+
+#: Écrire, ajouter, changer attributs et attributs étendus, supprimer : les droits
+#: précis. Les droits simples `W` et `D` d'icacls portent aussi SYNCHRONIZE, et
+#: les refuser interdit d'ouvrir le fichier, même en lecture (ticket-994).
+_REFUS_ECRITURE = "(WD,AD,WEA,WA,DE)"
 
 
 def fichiers_proteges(wt: RunWorktree, script: Path | None) -> list[Path]:
@@ -91,5 +97,5 @@ async def accorder_droits_agent(
     await poser_ecriture(wt.racine, compte, lanceur)
     script = script_de_verification(wt.projet, commande_de_tests)
     for fichier in fichiers_proteges(wt, script):
-        await _lancer(lanceur, [str(fichier), "/deny", f"{compte}:(W,D)"])
+        await _lancer(lanceur, [str(fichier), "/deny", f"{compte}:{_REFUS_ECRITURE}"])
     _logger.info("droits_agent_poses", extra={"racine": str(wt.racine)})
