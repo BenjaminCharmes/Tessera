@@ -110,3 +110,27 @@ async def test_path_with_a_folder_is_passed_as_given(compte: None, tmp_path: Pat
     chemin = str(tmp_path / "bin" / "outil.exe")
     await lancer_sous_compte([chemin], tmp_path, None, lanceur)
     assert lanceur.appels[0]["commande"] == [chemin]
+
+
+def test_temporary_files_and_npm_cache_go_to_the_agent_profile(
+    monkeypatch: pytest.MonkeyPatch, chaine: Path
+) -> None:
+    # ticket-988 : le TEMP du backend est dans le profil de l'utilisateur, où le
+    # compte ne peut rien créer (vitest : EPERM sur mkdir).
+    monkeypatch.setattr(settings, "agent_user", "tessera-agent")
+    monkeypatch.setenv("TEMP", r"C:\Users\moi\AppData\Local\Temp")
+    monkeypatch.setenv("TMP", r"C:\Users\moi\AppData\Local\Temp")
+    env = env_du_compte()
+    assert env["TEMP"] == r"C:\Users\tessera-agent\AppData\Local\Temp"
+    assert env["TMP"] == env["TEMP"]
+    assert env["npm_config_cache"] == r"C:\Users\tessera-agent\AppData\Local\npm-cache"
+    assert env["USERPROFILE"] == r"C:\Users\tessera-agent"
+    assert not [v for v in env.values() if r"C:\Users\moi" in v]
+
+
+def test_declared_extra_does_not_move_temp_back_to_the_backend(
+    monkeypatch: pytest.MonkeyPatch, chaine: Path
+) -> None:
+    monkeypatch.setattr(settings, "agent_user", "tessera-agent")
+    env = env_du_compte({"PYTHONPATH": "src"})
+    assert env["TEMP"].startswith(r"C:\Users\tessera-agent")

@@ -16,6 +16,7 @@ CLES_AUTORISEES: frozenset[str] = frozenset({
     "LOCALAPPDATA", "CLAUDE_CODE_OAUTH_TOKEN", "GH_CONFIG_DIR",
     "GIT_CONFIG_COUNT", "GIT_CONFIG_KEY_0", "GIT_CONFIG_VALUE_0",
     "GIT_TERMINAL_PROMPT", "CLAUDE_CODE_GIT_BASH_PATH", "PYTHONDONTWRITEBYTECODE",
+    "npm_config_cache",
 })
 
 
@@ -24,19 +25,30 @@ def profil_de(compte: str) -> str:
     return rf"C:\Users\{compte}"
 
 
-def _de_base(compte: str) -> dict[str, str]:
-    """System variables and the agent's own profile, built from nothing."""
-    racine = os.environ.get("SystemRoot", r"C:\Windows")
+def env_du_profil(compte: str) -> dict[str, str]:
+    """The variables that send temporary files and caches to the agent's own profile.
+
+    Partagées par le CLI et les commandes du run (ticket-988) : celles du
+    backend visent le profil de l'utilisateur, où le compte ne crée rien.
+    `npm_config_cache` passe devant le `npmrc` copié de scoop avec la chaîne
+    d'outils, qui vise lui aussi ce profil.
+    """
     profil = profil_de(compte)
+    local = rf"{profil}\AppData\Local"
     return {
-        "SystemRoot": racine,
-        "TEMP": rf"{profil}\AppData\Local\Temp",
-        "TMP": rf"{profil}\AppData\Local\Temp",
+        "TEMP": rf"{local}\Temp",
+        "TMP": rf"{local}\Temp",
         "USERPROFILE": profil,
         "HOME": profil,
         "APPDATA": rf"{profil}\AppData\Roaming",
-        "LOCALAPPDATA": rf"{profil}\AppData\Local",
+        "LOCALAPPDATA": local,
+        "npm_config_cache": rf"{local}\npm-cache",
     }
+
+
+def _de_base(compte: str) -> dict[str, str]:
+    """System variables and the agent's own profile, built from nothing."""
+    return {"SystemRoot": os.environ.get("SystemRoot", r"C:\Windows"), **env_du_profil(compte)}
 
 
 def env_de_l_agent(compte: str, git_bash_path: str | None) -> dict[str, str]:
