@@ -34,6 +34,17 @@ est celui de ton compte.
 
 Changer d'abonnement : `.\scripts\tessera.ps1 agent jeton`.
 
+## Variables d'environnement du compte
+
+Les fichiers temporaires (`TEMP`, `TMP`) et le cache npm de l'IDE sont configurés pour vivre dans le profil du compte agent, pas celui du backend. Cela évite les erreurs `EPERM` quand le compte agent essaie de créer des fichiers dans le profil d'un autre utilisateur.
+
+Concrètement, quand `vitest` ou `npm ci` tourne sous le compte agent :
+- `TEMP` = `C:\Users\tessera-agent\AppData\Local\Temp`
+- `TMP` = `C:\Users\tessera-agent\AppData\Local\Temp`
+- `npm_config_cache` = `C:\Users\tessera-agent\AppData\Local\npm-cache`
+
+**Tu n'as rien à faire.** L'IDE gère cela automatiquement quand il lance les outils sous le compte agent.
+
 ## `agent doctor`
 
 Il liste chaque point avec son remède : compte présent, mot de passe et jeton
