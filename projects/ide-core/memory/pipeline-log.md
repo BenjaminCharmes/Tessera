@@ -9726,3 +9726,7 @@ error: Please commit or stash them.
 - 2026-11-17 11:31:48 UTC — [ticket-973] validateur: APPROVED — Les trois critères sont satisfaits par le code et les tests. La commande `hooks` (21687ms)
 - 2026-11-17 11:31:50 UTC — [ticket-973] tour 1 — reviewer terminé (23328ms)
 - 2026-11-17 11:31:50 UTC — [ticket-973] APPROVED après 1 tour(s)
+- 2026-11-17 11:33:16 UTC — [ticket-973] documentation: 0 fichier(s) (81609ms)
+- 2026-11-17 11:33:16 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-17 11:33:16 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-17 11:33:16 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
