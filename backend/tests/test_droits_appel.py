@@ -5,7 +5,7 @@ import pytest
 
 from tessera.config import settings
 from tessera.services.providers import droits_appel
-from tessera.services.providers.droits_appel import clore_appel, ouvrir_appel, processus_du_compte
+from tessera.services.providers.droits_appel import clore_appel, ouvrir_appel
 from tessera.services.providers.droits_worktree import DroitsAgentRefuses
 from tessera.services.verification.groupe_d_etape import GroupeDEtape
 from tessera.services.verification.lancement_compte import ProcessusDuCompte
@@ -121,15 +121,6 @@ async def test_folder_outside_a_repository_gets_no_right(tmp_path: Path) -> None
     if droits_appel.racine_du_worktree(sans_depot) is None:
         assert await ouvrir_appel(sans_depot, icacls) is None
         assert icacls.appels == []
-
-
-def test_tasklist_rows_are_filtered_on_the_account() -> None:
-    csv_texte = (
-        '"node.exe","101","Services","0","50 K","Unknown","PC\\tessera-agent","0:00:01","N/A"\n'
-        '"code.exe","102","Console","1","50 K","Running","PC\\benjamin","0:00:01","N/A"\n'
-        'INFO: ligne ignorée\n'
-    )
-    assert processus_du_compte(csv_texte, COMPTE) == [(101, "node.exe")]
 
 
 async def test_step_group_ends_the_call_of_its_process() -> None:

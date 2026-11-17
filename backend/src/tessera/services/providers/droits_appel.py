@@ -7,13 +7,12 @@ son droit est retiré ; le suivant le repose. Un échec est une
 `DroitsAgentRefuses` : le run passe en `blocked` (ADR-037).
 """
 import asyncio
-import csv
-import io
 from collections.abc import Awaitable, Callable
 from pathlib import Path
 
 from tessera.config import settings
 from tessera.services.providers.droits_worktree import DroitsAgentRefuses, Icacls, _icacls_reel, poser_ecriture, retirer_ecriture
+from tessera.services.providers.processus_compte import processus_du_compte, sid_du_compte
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -23,21 +22,8 @@ Enumerer = Callable[[str], Awaitable[list[tuple[int, str]]]]
 #: Arrête un processus par son pid.
 Tuer = Callable[[int], Awaitable[None]]
 
-_COLONNE_UTILISATEUR = 6
 _ACTIFS: dict[Path, int] = {}
 _VERROU = asyncio.Lock()
-
-
-def processus_du_compte(csv_tasklist: str, compte: str) -> list[tuple[int, str]]:
-    """Parse `tasklist /V /FO CSV /NH`; keep the rows whose user is `compte`."""
-    voulu = compte.lower().split("\\")[-1]
-    trouves: list[tuple[int, str]] = []
-    for ligne in csv.reader(io.StringIO(csv_tasklist)):
-        if len(ligne) <= _COLONNE_UTILISATEUR or not ligne[1].isdigit():
-            continue
-        if ligne[_COLONNE_UTILISATEUR].lower().split("\\")[-1] == voulu:
-            trouves.append((int(ligne[1]), ligne[0]))
-    return trouves
 
 
 async def _executer(*args: str) -> tuple[int, str]:
@@ -49,10 +35,9 @@ async def _executer(*args: str) -> tuple[int, str]:
 
 
 async def _enumerer_reel(compte: str) -> list[tuple[int, str]]:
-    code, sortie = await _executer("tasklist", "/V", "/FO", "CSV", "/NH")
-    if code != 0:
-        raise DroitsAgentRefuses(f"tasklist a échoué (code {code})")
-    return processus_du_compte(sortie, compte)
+    """The account's processes by token SID: in milliseconds, without resolving any account name (ticket-991)."""
+    sid = await asyncio.to_thread(sid_du_compte, compte)
+    return await asyncio.to_thread(processus_du_compte, sid)
 
 
 async def _tuer_reel(pid: int) -> None:
