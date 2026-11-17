@@ -9712,3 +9712,6 @@ error: Please commit or stash them.
 - 2026-11-17 11:11:41 UTC — [ticket-970] validateur: APPROVED — Le ticket-970 implémente correctement le réalignement de base après squash et le (46891ms)
 - 2026-11-17 11:11:42 UTC — [ticket-970] APPROVED après 2 tour(s)
 - 2026-11-17 11:12:52 UTC — [ticket-970] leçons: refusée — preuve absente du retour du run
+- 2026-11-17 11:16:29 UTC — [ticket-970] documentation: 0 fichier(s) (211139ms) — après tour de correction
+- 2026-11-17 11:16:29 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-17 11:16:29 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
