@@ -9676,3 +9676,16 @@ error: Please commit or stash them.
 - 2026-11-16 15:12:34 UTC — [ticket-971] CHANGES_REQUESTED tour 3: Reviewer : 1. Une étape rouge qui contient des échecs non reconnus par le parseur peut redevenir verte. Avec `scripts/verifier.py` (lignes 183-185 et 207-213), une erreur ruff, mypy, mypy-linux, tsc o
 - 2026-11-16 15:12:34 UTC — [ticket-971] BLOCKED après 3 tour(s) sans approbation
 - 2026-11-16 15:12:50 UTC — [ide-core] file interrompue : ticket-971 non approuvé
+- 2026-11-17 10:15:32 UTC — [ide-core] ticket-987 PR #1140 confiée au CIWatcher
+- 2026-11-17 10:15:42 UTC — [ticket-971] branche ticket-971-a-test-that-times-out-in-files-the-diff-does-not
+- 2026-11-17 10:15:42 UTC — [ticket-971] fiche relue après l'avance de la base (691f92b5e0e2b43e0e9bc88fa54cd54bc55d09a8 → f6d7053e1927304e1d1e7b2bbeccab64600e6484)
+- 2026-11-17 10:15:46 UTC — [ticket-971] branche reprise (3 commit(s)) — refus précédent : revue, codeur en premier
+- 2026-11-17 10:15:46 UTC — [ticket-971] tour 1 — codeur démarré
+- 2026-11-17 10:19:50 UTC — [ticket-971] tour 1 — codeur terminé (242842ms)
+- 2026-11-17 10:24:52 UTC — [ticket-971] testeur: dur�es : ruff 0 s, mypy 44 s, mypy-linux 60 s, pytest 292 s ; impact depuis base : 84 fichier(s) de test
+- 2026-11-17 10:25:18 UTC — [ticket-971] securite: PASS — Je laisse passer (PASS) : aucune faille CRITICAL ou HIGH n'est introduite. La re (25358ms)
+- 2026-11-17 10:25:18 UTC — [ticket-971] tour 1 — reviewer démarré
+- 2026-11-17 10:25:50 UTC — [ticket-971] validateur: APPROVED — Les 6 critères sont tous couverts par des tests unitaires dans `test_relance_ins (31422ms)
+- 2026-11-17 10:25:52 UTC — [ticket-971] tour 1 — reviewer terminé (33421ms)
+- 2026-11-17 10:25:52 UTC — [ticket-971] APPROVED après 1 tour(s)
+- 2026-11-17 10:26:37 UTC — [ticket-971] leçons: une leçon proposée
