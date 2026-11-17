@@ -37,6 +37,7 @@ class GitState(GitIgnores, GitHistory):
         if base is None:
             return _resumer_lockfiles(await self.current_diff())
 
+        await self._refuser_les_liens()
         non_suivis = await self._untracked_files()
         await self._run("add", "-A", "-N")
         pathspec = (
@@ -77,6 +78,7 @@ class GitState(GitIgnores, GitHistory):
         # *intent-to-add* suffit à faire refuser `git rebase` et à faire voir
         # l'arbre sale au ticket suivant — une file de trois n'en livrait
         # qu'un (ticket-170). Lire ne doit rien laisser derrière soi.
+        await self._refuser_les_liens()
         non_suivis = await self._untracked_files()
         await self._run("add", "-A", "-N")
         pathspec = (

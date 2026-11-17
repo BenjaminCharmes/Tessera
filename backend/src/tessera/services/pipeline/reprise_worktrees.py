@@ -15,6 +15,7 @@ import re
 from pathlib import Path
 
 from tessera.services.git_workspace import GitWorkspaceError
+from tessera.services.git_workspace.liens import args_entree_d_index, est_lien_suivi, liens_non_declares
 from tessera.services.pipeline.pipeline_text import _unapproved_commit_message
 from tessera.services.pipeline.reprise_orphelin import _RAISON_ARRET
 from tessera.services.worktrees.run_worktree import RunWorktree, supprimer
@@ -102,9 +103,30 @@ async def _commiter_le_travail(racine: Path, ticket_id: str) -> bool:
     return True
 
 
+async def _admis(racine: Path, chemin: str) -> bool:
+    """True for a path git ignores or already tracks (a link it will not open)."""
+    for forme in (chemin, chemin + "/"):
+        try:
+            await run_git(racine, "check-ignore", "-q", "--", forme)
+        except GitWorkspaceError:
+            continue
+        return True
+    try:
+        sortie = await run_git(racine, *args_entree_d_index(chemin))
+    except GitWorkspaceError:
+        return False
+    return est_lien_suivi(sortie, chemin)
+
+
 async def _reprendre_un(racine: Path, ticket_id: str, depot: Path) -> None:
     """Save then remove one worktree; every failure leaves the folder in place."""
     try:
+        # Avant de retirer quoi que ce soit : un lien non déclaré se nomme et
+        # arrête la reprise, il ne s'efface pas en silence (audit C2).
+        refuses = await liens_non_declares(racine, lambda chemin: _admis(racine, chemin))
+        if refuses:
+            _laisser(racine, "lien_non_declare", ", ".join(refuses))
+            return
         restants = retirer_les_liens(racine)
         if restants:
             _laisser(racine, "liens_persistants", ", ".join(str(r) for r in restants))

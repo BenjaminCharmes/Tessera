@@ -4,6 +4,7 @@ import asyncio
 
 from tessera.services.git_workspace.chemins import _ORCHESTRATOR_ARTIFACT_PATHS, _RUN_POLICY_PATHS
 from tessera.services.git_workspace.erreurs import GitCommandError
+from tessera.services.git_workspace.liens import args_entree_d_index, est_lien_suivi, refuser_les_liens
 from tessera.services.git_workspace.socle import GitCore
 from tessera.services.noyau.git_commande import build_command
 from tessera.utils.logger import get_logger
@@ -47,6 +48,38 @@ class GitIgnores(GitCore):
         )
         await proc.communicate()
         return proc.returncode == 0
+
+    async def _refuser_les_liens(self) -> None:
+        """Bloque avant tout `add` ou `diff` si l'arbre porte un lien que git suivrait.
+
+        L'arbre se parcourt depuis la racine du dépôt quand le projet travaille
+        dans son parent (ADR-024), depuis le dossier du projet sinon.
+        """
+        racine = self._project_path
+        if self._travaille_dans_le_parent():
+            racine = await self._toplevel() or racine
+
+        async def lancer(*args: str) -> tuple[int, str]:
+            proc = await asyncio.create_subprocess_exec(
+                *build_command(args),
+                cwd=str(racine),
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+            )
+            sortie, _ = await proc.communicate()
+            return proc.returncode or 0, sortie.decode("utf-8", errors="replace")
+
+        async def admis(chemin: str) -> bool:
+            # Ignoré, ou lien symbolique que l'index porte comme tel (mode 120000) :
+            # git le range comme lien, il ne l'ouvre pas. Un dossier suivi
+            # remplacé par une jonction n'est ni l'un ni l'autre.
+            for forme in (chemin, chemin + "/"):
+                if (await lancer("check-ignore", "-q", "--", forme))[0] == 0:
+                    return True
+            _, sortie = await lancer(*args_entree_d_index(chemin))
+            return est_lien_suivi(sortie, chemin)
+
+        await refuser_les_liens(racine, admis)
 
     async def _purger_stage_ignoré(self) -> None:
         """Retire de l'index les fichiers désormais couverts par `.gitignore`.

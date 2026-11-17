@@ -129,6 +129,9 @@ async def _appliquer(entree: EntreePopulate, source: Path, cible: Path, depot: P
     # Le contrôle git passe en premier : un chemin suivi existe déjà dans le worktree.
     if entree.mode == "link" and not await _est_ignore(depot, entree.path):
         _refuser(entree, "non_ignore_par_git")
+    elif entree.mode == "link" and not source.resolve().is_relative_to(depot.resolve()):
+        # Un lien du checkout qui sortirait du dépôt ferait pointer le worktree hors de la cible déclarée.
+        _refuser(entree, "hors_de_la_cible_declaree")
     elif os.path.lexists(cible):
         # Un worktree repris garde ce qu'un run précédent y a laissé.
         _refuser(entree, "cible_existante")
