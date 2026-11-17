@@ -9715,3 +9715,18 @@ error: Please commit or stash them.
 - 2026-11-17 11:16:29 UTC — [ticket-970] documentation: 0 fichier(s) (211139ms) — après tour de correction
 - 2026-11-17 11:16:29 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
 - 2026-11-17 11:16:29 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-17 11:26:32 UTC — [ide-core] ticket-970 PR #1143 confiée au CIWatcher
+- 2026-11-17 10:39:24 UTC — [ide-core] ticket-971 PR #1142 mergée (CI verte)
+- 2026-11-17 11:26:39 UTC — [ticket-973] branche ticket-973-the-hooks-command-skips-a-project-that-has-an-ope
+- 2026-11-17 11:26:49 UTC — [ticket-973] tour 1 — codeur démarré
+- 2026-11-17 11:29:11 UTC — [ticket-973] tour 1 — codeur terminé (140921ms)
+- 2026-11-17 11:31:17 UTC — [ticket-973] testeur: dur�es : ruff 1 s, mypy 58 s, mypy-linux 53 s, pytest 113 s ; impact depuis base : 15 fichier(s) de test
+- 2026-11-17 11:31:26 UTC — [ticket-973] securite: PASS — Rien à signaler dans ce diff. La base SQLite s'ouvre en lecture seule (`mode=ro` (8514ms)
+- 2026-11-17 11:31:26 UTC — [ticket-973] tour 1 — reviewer démarré
+- 2026-11-17 11:31:48 UTC — [ticket-973] validateur: APPROVED — Les trois critères sont satisfaits par le code et les tests. La commande `hooks` (21687ms)
+- 2026-11-17 11:31:50 UTC — [ticket-973] tour 1 — reviewer terminé (23328ms)
+- 2026-11-17 11:31:50 UTC — [ticket-973] APPROVED après 1 tour(s)
+- 2026-11-17 11:33:16 UTC — [ticket-973] documentation: 0 fichier(s) (81609ms)
+- 2026-11-17 11:33:16 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-17 11:33:16 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-17 11:33:16 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)

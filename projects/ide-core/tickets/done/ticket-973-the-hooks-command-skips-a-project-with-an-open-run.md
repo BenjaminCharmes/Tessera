@@ -4,10 +4,10 @@ created: 2026-11-13
 depends_on: []
 estimated_days: 0.5
 id: ticket-973
-pr_number: null
+pr_number: 1144
 priority: medium
-status: todo
-title: "The hooks command skips a project that has an open run"
+status: done
+title: The hooks command skips a project that has an open run
 type: fix
 ---
 
