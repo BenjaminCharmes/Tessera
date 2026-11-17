@@ -9689,3 +9689,6 @@ error: Please commit or stash them.
 - 2026-11-17 10:25:52 UTC — [ticket-971] tour 1 — reviewer terminé (33421ms)
 - 2026-11-17 10:25:52 UTC — [ticket-971] APPROVED après 1 tour(s)
 - 2026-11-17 10:26:37 UTC — [ticket-971] leçons: une leçon proposée
+- 2026-11-17 10:30:05 UTC — [ticket-971] documentation: 1 fichier(s) (202983ms) — après tour de correction
+- 2026-11-17 10:30:05 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-17 10:30:05 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
