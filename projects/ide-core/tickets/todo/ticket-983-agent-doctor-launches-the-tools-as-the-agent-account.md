@@ -28,6 +28,12 @@ Serpent ticket-009.
   appel ; un échec indique `agent setup`.
 - Le doctor vérifie aussi qu'aucun droit de `tessera-agent` ne subsiste sur le
   profil de l'utilisateur.
+- Le module lance aussi `npm config get cache` sous le compte : une valeur
+  hors du profil de l'agent est un échec (ticket-988 : le `npmrc` intégré à
+  npm, copié de scoop, vise le profil de l'utilisateur).
+- `agent-setup.ps1` vide le `npmrc` intégré de la copie
+  (`toolchain\node\node_modules\npm\npmrc`) après avoir copié node : ni
+  `prefix=` ni `cache=` sous `C:\Users`.
 - Un agent n'exécute pas ce module : il lit le coffre (contrainte
   « secret de Tessera »), le garde de commande le refuse.
 
@@ -36,6 +42,9 @@ Serpent ticket-009.
 - [ ] Test du module avec un lanceur factice : succès, échec d'un outil,
       délai dépassé, mot de passe absent.
 - [ ] Test : le module est refusé à un agent par le garde Bash.
+- [ ] Test : un cache npm rendu sous le profil de l'utilisateur est un échec
+      qui nomme `agent setup`.
+- [ ] Test : `agent-setup.ps1` réécrit le `npmrc` de la copie de node.
 
 ## Preuve réelle
 
