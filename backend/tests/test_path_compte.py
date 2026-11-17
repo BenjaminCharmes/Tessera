@@ -61,3 +61,10 @@ def test_no_module_builds_an_account_path_elsewhere() -> None:
 
 def test_backend_path_is_not_taken_over_by_the_allow_list() -> None:
     assert "path" not in {nom.lower() for nom in _NOMS_REPRIS}
+
+
+def test_executable_is_found_with_the_windows_extensions(tmp_path: Path) -> None:
+    (tmp_path / "uv.exe").write_bytes(b"")
+    assert path_compte.resoudre_executable("uv", str(tmp_path)) == str(tmp_path / "uv.exe")
+    assert path_compte.resoudre_executable("uv.exe", f"{tmp_path / 'absent'};{tmp_path}") is not None
+    assert path_compte.resoudre_executable("absent", str(tmp_path)) is None

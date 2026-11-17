@@ -20,7 +20,7 @@ def compte(monkeypatch: pytest.MonkeyPatch, chaine: Path) -> None:
 async def test_app_starts_through_the_account_launcher(compte: None, tmp_path: Path) -> None:
     lanceur = LanceurDouble()
     with patch("asyncio.create_subprocess_exec") as direct:
-        app = await demarreur_du_run(True, lanceur)(["npm", "run", "dev"], tmp_path)
+        app = await demarreur_du_run(True, lanceur)(["node", "serveur.js"], tmp_path)
     direct.assert_not_called()
     assert lanceur.appels[0]["compte"] == "tessera-agent"
     assert lanceur.appels[0]["cwd"] == str(tmp_path)
@@ -29,7 +29,7 @@ async def test_app_starts_through_the_account_launcher(compte: None, tmp_path: P
 
 async def test_stopping_the_app_kills_the_process_handle(compte: None, tmp_path: Path) -> None:
     lanceur = LanceurDouble(ProcessDouble())
-    app = await demarreur_du_run(True, lanceur)(["x"], tmp_path)
+    app = await demarreur_du_run(True, lanceur)(["node"], tmp_path)
     await app.arreter()
     assert lanceur.processus.tue is True
 
@@ -40,7 +40,7 @@ async def test_launcher_failure_is_a_start_failure_without_fallback(
     starter = demarreur_du_run(True, LanceurDouble(refus="logon refuse"))
     with patch("asyncio.create_subprocess_exec") as direct:
         with pytest.raises(DemarrageEchoue):
-            await starter(["x"], tmp_path)
+            await starter(["node"], tmp_path)
     direct.assert_not_called()
 
 

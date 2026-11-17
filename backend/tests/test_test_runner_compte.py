@@ -21,7 +21,7 @@ async def test_command_goes_through_the_account_launcher(compte: None, tmp_path:
     lanceur = LanceurDouble(ProcessDouble(b"1 passed in 0.1s", b"", code=0))
     runner = TestRunnerService(compte_agent=True, lanceur=lanceur, env={"PYTHONPATH": "src"})
     with patch("asyncio.create_subprocess_exec") as direct:
-        result = await runner.run_tests(tmp_path, test_command="pytest -q")
+        result = await runner.run_tests(tmp_path, test_command="node test.js")
     direct.assert_not_called()
     assert result.passed is True
     assert lanceur.appels[0]["compte"] == "tessera-agent"

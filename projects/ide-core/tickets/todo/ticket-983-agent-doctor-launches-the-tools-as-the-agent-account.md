@@ -19,7 +19,8 @@ Serpent ticket-009.
 
 - Un module Python `tessera.agent_doctor_cli` (lancé par `python -m` depuis
   le venv, comme `coffre_cli`) : par `lancer_sous_compte` et `path_du_compte()`,
-  il exécute `node --version`, `uv --version` et `python --version` sous
+  il exécute `node --version`, `uv --version` et `uv run --no-project python
+  --version` (aucun `python.exe` n'est sur le `PATH` du compte, ticket-986) sous
   `AGENT_USER`, avec un délai borné, et imprime une ligne par outil. Code de
   sortie non nul au premier échec ; le message nomme la cause (logon, EPERM,
   introuvable). Aucun secret imprimé.

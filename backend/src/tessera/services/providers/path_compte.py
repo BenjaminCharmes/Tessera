@@ -17,6 +17,11 @@ _SOUS_DOSSIERS: tuple[tuple[str, ...], ...] = (
 _SEPARATEUR = ";"
 
 
+#: Ce que Windows tient pour exécutable sans shell ; `npm` sans extension est un
+#: script sh, que `CreateProcess` ne sait pas lancer.
+_EXTENSIONS = (".com", ".exe", ".bat", ".cmd")
+
+
 class ChaineAbsente(ProviderIndisponible):
     """The shared toolchain is not installed: ``agent setup`` has not run."""
 
@@ -56,3 +61,19 @@ def path_du_compte() -> str:
         )
     entrees = [str(TOOLCHAIN.joinpath(*parties)) for parties in _SOUS_DOSSIERS]
     return _SEPARATEUR.join(entrees + _entrees_du_backend())
+
+
+def resoudre_executable(nom: str, chemin: str) -> str | None:
+    """Finds ``nom`` in the entries of ``chemin``, an account ``PATH``; None when absent.
+
+    `CreateProcessWithLogonW` cherche un nom nu dans le PATH de l'appelant — le
+    backend, donc le profil de l'utilisateur — et non dans l'environnement
+    passé au processus (ticket-986). Le nom se résout donc ici, avant l'appel.
+    """
+    suffixes = ("",) if nom.lower().endswith(_EXTENSIONS) else _EXTENSIONS
+    for entree in filter(None, chemin.split(_SEPARATEUR)):
+        for suffixe in suffixes:
+            candidat = Path(entree) / (nom + suffixe)
+            if candidat.is_file():
+                return str(candidat)
+    return None
