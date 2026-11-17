@@ -3,6 +3,7 @@ agent: codeur
 created: '2026-11-16'
 depends_on: []
 id: ticket-985
+pr_number: 1146
 priority: medium
 status: done
 title: Un ticket arrêté porte toujours son motif
