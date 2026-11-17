@@ -9622,3 +9622,23 @@ error: Please commit or stash them.
 - 2026-11-16 16:03:37 UTC — [ticket-984] documentation: 0 fichier(s) (83579ms)
 - 2026-11-16 16:03:37 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
 - 2026-11-16 16:03:37 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-17 09:15:34 UTC — [ticket-987] branche ticket-987-a-resumed-ticket-reads-the-file-of-its-base
+- 2026-11-17 09:15:37 UTC — [ticket-987] tour 1 — codeur démarré
+- 2026-11-17 09:25:49 UTC — [ticket-987] tour 1 — codeur terminé (610687ms)
+- 2026-11-17 09:36:17 UTC — [ticket-987] testeur: 3 failed, 468 passed, 16 warnings in 615.91s (0:10:15)
+- 2026-11-17 09:36:17 UTC — [ticket-987] tests rouges au tour 1
+- 2026-11-17 09:36:17 UTC — [ticket-987] tour 2 — codeur démarré
+- 2026-11-17 09:42:40 UTC — [ticket-987] tour 2 — codeur terminé (382343ms)
+- 2026-11-17 09:42:48 UTC — [ticket-987] testeur: en attente d'un créneau de test
+- 2026-11-17 09:49:51 UTC — [ticket-987] testeur: 1 failed, 904 passed, 16 warnings in 406.19s (0:06:46)
+- 2026-11-17 09:49:52 UTC — [ticket-987] tests rouges au tour 2
+- 2026-11-17 09:49:52 UTC — [ticket-987] tour 3 — codeur démarré
+- 2026-11-17 09:50:58 UTC — [ticket-987] tour 3 — codeur terminé (65858ms)
+- 2026-11-17 09:59:59 UTC — [ticket-987] testeur: dur�es : ruff 0 s, mypy 18 s, mypy-linux 17 s, pytest 536 s ; impact depuis base : 114 fichier(s) de test
+- 2026-11-17 10:00:18 UTC — [ticket-987] securite: PASS — Je n'ai trouvé aucune faille CRITICAL ou HIGH dans ce diff, donc le verdict est  (18358ms)
+- 2026-11-17 10:00:18 UTC — [ticket-987] tour 3 — reviewer démarré
+- 2026-11-17 10:00:47 UTC — [ticket-987] tour 3 — reviewer terminé (28889ms)
+- 2026-11-17 10:01:04 UTC — [ticket-987] validateur: fichiers cités joints : tickets/ (dossier, 0 fichiers) ; absents : stale/
+- 2026-11-17 10:01:04 UTC — [ticket-987] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code ajoute la lecture du ti (45312ms)
+- 2026-11-17 10:01:04 UTC — [ticket-987] APPROVED après 3 tour(s)
+- 2026-11-17 10:01:54 UTC — [ticket-987] leçons: une leçon proposée
