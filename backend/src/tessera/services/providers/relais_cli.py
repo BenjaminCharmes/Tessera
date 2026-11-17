@@ -13,7 +13,7 @@ Le processus relayé hérite du job de l'appel (ticket-943).
 """
 import json
 import subprocess
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from pathlib import Path
 
 from tessera.services.providers.lanceur_windows import LIMITE_LIGNE
@@ -42,15 +42,18 @@ def _node_du_path(chemin: str) -> str | None:
     return None
 
 
-def relayer_si_trop_long(commande: Sequence[str], dossier: Path, chemin: str) -> list[str]:
+def relayer_si_trop_long(
+    commande: Sequence[str], dossier: Path, chemin: Callable[[], str]
+) -> list[str]:
     """Return ``commande``, or its relay through ``dossier`` when its line exceeds the limit.
 
-    ``chemin`` is the account's ``PATH``: the relay's node must come from it
-    (ADR-086). Without one, ``ProviderIndisponible`` (ADR-037).
+    ``chemin`` gives the account's ``PATH``, read only when a relay is needed:
+    the relay's node must come from it (ADR-086). Without one,
+    ``ProviderIndisponible`` (ADR-037).
     """
     if len(subprocess.list2cmdline(list(commande))) <= LIMITE_LIGNE:
         return list(commande)
-    node = _node_du_path(chemin)
+    node = _node_du_path(chemin())
     if node is None:
         raise ProviderIndisponible(
             "ligne de commande trop longue et node absent du PATH du compte : pas de relais"

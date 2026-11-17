@@ -96,7 +96,7 @@ class TransportCompteAgent(SubprocessCLITransport):
             self._dossier_d_appel = await creer_dossier_d_appel(self._compte)
             commande = deporter_les_valeurs(self._build_command(), self._dossier_d_appel)
             # `--json-schema` reste en ligne : au-delà de la limite, le relais (ticket-992).
-            commande = relayer_si_trop_long(commande, self._dossier_d_appel, path_du_compte())
+            commande = relayer_si_trop_long(commande, self._dossier_d_appel, path_du_compte)
             _logger.info("agent_lance_sous_compte", extra={"compte": self._compte})
             process: Process = await self._lanceur.lancer(
                 commande, compte=self._compte, mot_de_passe=self._mot_de_passe,
