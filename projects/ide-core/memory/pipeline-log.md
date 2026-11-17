@@ -9692,3 +9692,23 @@ error: Please commit or stash them.
 - 2026-11-17 10:30:05 UTC — [ticket-971] documentation: 1 fichier(s) (202983ms) — après tour de correction
 - 2026-11-17 10:30:05 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
 - 2026-11-17 10:30:05 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-17 10:33:37 UTC — [ide-core] ticket-971 PR #1142 confiée au CIWatcher
+- 2026-11-17 10:21:35 UTC — [ide-core] ticket-987 PR #1140 mergée (CI verte)
+- 2026-11-17 10:33:43 UTC — [ticket-970] branche ticket-970-a-local-base-that-only-diverges-in-history-after
+- 2026-11-17 10:33:45 UTC — [ticket-970] tour 1 — codeur démarré
+- 2026-11-17 10:44:25 UTC — [ticket-970] tour 1 — codeur terminé (639733ms)
+- 2026-11-17 10:55:37 UTC — [ticket-970] testeur: dur�es : ruff 0 s, mypy 47 s, mypy-linux 31 s, pytest 666 s ; impact depuis base : 115 fichier(s) de test
+- 2026-11-17 10:56:05 UTC — [ticket-970] securite: PASS — PASS : ce diff ne crée aucune faille d'injection, de path traversal ni de contou (25952ms)
+- 2026-11-17 10:56:05 UTC — [ticket-970] tour 1 — reviewer démarré
+- 2026-11-17 10:57:02 UTC — [ticket-970] validateur: APPROVED — Le code implémente le realignment de base après squash via la classe `GitRealign (56358ms)
+- 2026-11-17 10:57:05 UTC — [ticket-970] tour 1 — reviewer terminé (59687ms)
+- 2026-11-17 10:57:06 UTC — [ticket-970] CHANGES_REQUESTED tour 1: Reviewer : 1. Le point 3 du ticket n'est corrigé que pour la divergence de base. Dans la même fonction, la branche `except GitWorkspaceError` (échec de `create_branch`, donc avant le premier agent et 
+- 2026-11-17 10:57:06 UTC — [ticket-970] tour 2 — codeur démarré
+- 2026-11-17 11:00:50 UTC — [ticket-970] tour 2 — codeur terminé (223702ms)
+- 2026-11-17 11:10:31 UTC — [ticket-970] testeur: dur�es : ruff 0 s, mypy 17 s, mypy-linux 20 s, pytest 576 s ; impact depuis base : 115 fichier(s) de test
+- 2026-11-17 11:10:54 UTC — [ticket-970] securite: PASS — Aucune faille relevée, verdict PASS. Les commandes git passent des listes d'argu (20937ms)
+- 2026-11-17 11:10:54 UTC — [ticket-970] tour 2 — reviewer démarré
+- 2026-11-17 11:11:20 UTC — [ticket-970] tour 2 — reviewer terminé (25094ms)
+- 2026-11-17 11:11:41 UTC — [ticket-970] validateur: APPROVED — Le ticket-970 implémente correctement le réalignement de base après squash et le (46891ms)
+- 2026-11-17 11:11:42 UTC — [ticket-970] APPROVED après 2 tour(s)
+- 2026-11-17 11:12:52 UTC — [ticket-970] leçons: refusée — preuve absente du retour du run
