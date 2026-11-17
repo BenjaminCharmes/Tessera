@@ -22,6 +22,8 @@ def _orch(fiches: list[Ticket | None]) -> tuple[Orchestrator, MagicMock]:
     svc.get_ticket = AsyncMock(side_effect=fiches)
     git = MagicMock()
     git.head_sha = AsyncMock(return_value="b" * 40)
+    git.lire_ticket_sur_base_ref = AsyncMock(return_value=None)
+    git.lire_ticket_sur_base_ref = AsyncMock(return_value=None)
     orch = object.__new__(Orchestrator)
     orch._ticket_svc = svc
     orch._git_workspace = git
