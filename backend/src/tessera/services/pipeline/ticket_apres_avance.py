@@ -12,6 +12,8 @@ from tessera.services.git_workspace import journal_attente, journal_en_attente
 from tessera.services.noyau.pipeline_events import EventType, PipelineResult
 from tessera.services.pipeline import pipeline_branche
 from tessera.services.pipeline.pipeline_run import PipelineRun, emit
+from tessera.services.projets.ticket_alignement import aligner_sur_contenu
+from tessera.services.projets.ticket_service import ticket_depuis_contenu
 from tessera.utils.logger import get_logger
 
 if TYPE_CHECKING:
@@ -102,6 +104,29 @@ def _texte_change(avant: Ticket, apres: Ticket) -> bool:
     return avant.model_dump(exclude=exclus) != apres.model_dump(exclude=exclus)
 
 
+async def _aligner_sur_la_base(orch: "Orchestrator", relu: Ticket) -> tuple[Ticket, bool]:
+    """The ticket as ``_base_ref`` writes it, and whether the tree's copy lagged it.
+
+    Une branche reprise porte sa propre fiche, déplacée et au texte périmé
+    (ticket-987) : la base gagne, le statut reste celui du pipeline, et il ne
+    reste qu'un fichier. Rien n'est écrit quand la fiche est déjà celle de la base.
+    """
+    # getattr : les doubles de workspace des tests d'étape n'ont pas cette lecture.
+    lire = getattr(orch._git_workspace, "lire_ticket_sur_base_ref", None)
+    contenu = await lire(relu.id) if lire is not None else None
+    if contenu is None:
+        return relu, False
+    try:
+        base = ticket_depuis_contenu("tickets/todo/base.md", contenu, relu.project_id)
+    except ValueError:
+        return relu, False
+    copies = orch._ticket_svc._find_all_files(relu.id)
+    if len(copies) <= 1 and not _texte_change(relu, base):
+        return relu, False
+    aligne = aligner_sur_contenu(orch._ticket_svc, relu.id, contenu)
+    return (aligne or relu), True
+
+
 async def relire_apres_branche(
     orch: "Orchestrator", run: PipelineRun, sha_avant: str | None
 ) -> PipelineResult | None:
@@ -116,7 +141,8 @@ async def relire_apres_branche(
     relu = await orch._ticket_svc.get_ticket(run.ticket_id)
     if relu is None:
         return arret_ticket_absent(run.ticket_id, "fiche introuvable après l'avance de la base")
-    if not _texte_change(run.ticket, relu):
+    relu, periodee = await _aligner_sur_la_base(orch, relu)
+    if not periodee and not _texte_change(run.ticket, relu):
         return None
     run.ticket = relu
     orch._preuves_reelles[run.ticket_id] = relu.preuve_reelle is True

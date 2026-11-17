@@ -8,6 +8,7 @@ Pièges observés sur ce projet, une ligne chacun. Le service écrit sous `## Pr
 - Quand une refactorisation crée un nouveau module, vérifier qu'il est testé par la suite de vérification des plafonds de fichier. (source : ticket-954, 2026-11-12)
 - Quand tu refactorise un fichier trop volumineux en changeant aussi sa logique, scinde en deux PR : d'abord réduire, puis améliorer. (source : ticket-962, 2026-11-13)
 - Quand un test architectural doit concentrer une logique, ne pas exempter sur un motif qui couvrirait aussi les appels à ce lieu. (source : ticket-982, 2026-11-16)
+- Quand on ajoute une méthode à une classe moquée, mettre à jour tous les mocks de cette classe pour qu'ils l'aient. (source : ticket-987, 2026-11-17)
 
 ## En vigueur
 - Quand on ajoute des tests pour un module sensible, vérifier que les données de test ne déclenchent pas le contrôle de traces professionnelles du projet. (source : ticket-933, 2026-11-11)
