@@ -168,3 +168,21 @@ async def test_call_files_outlive_a_successful_launch_and_vanish_on_close(
     await transport.close()
     assert all(not f.exists() for f in lanceur.fichiers)
     assert all(not f.parent.exists() for f in lanceur.fichiers)
+
+
+async def test_auditor_command_with_its_schema_goes_through_the_relay() -> None:
+    # ticket-992 : `--json-schema` n'a pas d'équivalent fichier ; la ligne de
+    # l'audit faisait 1 051 caractères.
+    from tessera.services.verdicts.security_schema import SECURITY_SCHEMA
+
+    options = _build_options(
+        system="audit " * 600, model="m", max_turns=1, max_budget_usd=None,
+        cwd=Path.cwd(), allowed_tools=[], compte_agent=True, schema=SECURITY_SCHEMA,
+    )
+    lanceur = LanceurEspion()
+    transport = transport_du_compte("p", options, lanceur, compte_agent=True)
+    assert isinstance(transport, TransportCompteAgent)
+    with pytest.raises((RuntimeError, ProviderIndisponible)):
+        await transport.connect()
+    assert 0 < len(lanceur.ligne) <= LIMITE_LIGNE
+    assert "relais.js" in lanceur.ligne

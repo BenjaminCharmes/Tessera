@@ -21,7 +21,9 @@ from tessera.services.providers.droits_appel import clore_appel, ouvrir_appel
 from tessera.services.providers.fichiers_appel import creer_dossier_d_appel, deporter_les_valeurs, supprimer_dossier_d_appel
 from tessera.services.providers.lanceur_agent import LanceurAgent
 from tessera.services.providers.noms import ProviderIndisponible
+from tessera.services.providers.path_compte import path_du_compte
 from tessera.services.providers.process_agent import ProcessAgent
+from tessera.services.providers.relais_cli import relayer_si_trop_long
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -93,6 +95,8 @@ class TransportCompteAgent(SubprocessCLITransport):
         try:
             self._dossier_d_appel = await creer_dossier_d_appel(self._compte)
             commande = deporter_les_valeurs(self._build_command(), self._dossier_d_appel)
+            # `--json-schema` reste en ligne : au-delà de la limite, le relais (ticket-992).
+            commande = relayer_si_trop_long(commande, self._dossier_d_appel, path_du_compte)
             _logger.info("agent_lance_sous_compte", extra={"compte": self._compte})
             process: Process = await self._lanceur.lancer(
                 commande, compte=self._compte, mot_de_passe=self._mot_de_passe,
