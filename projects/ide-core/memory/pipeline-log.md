@@ -9764,3 +9764,7 @@ error: Please commit or stash them.
 - 2026-11-17 16:00:16 UTC — [ticket-995] tour 1 — reviewer terminé (27014ms)
 - 2026-11-17 16:00:17 UTC — [ticket-995] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits par les tests ajoutés. Le code m (28203ms)
 - 2026-11-17 16:00:17 UTC — [ticket-995] APPROVED après 1 tour(s)
+- 2026-11-17 16:03:15 UTC — [ticket-995] documentation: 1 fichier(s) (172766ms) — après tour de correction
+- 2026-11-17 16:03:15 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-17 16:03:15 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-17 16:03:15 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
