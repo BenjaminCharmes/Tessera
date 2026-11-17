@@ -9747,3 +9747,7 @@ error: Please commit or stash them.
 - 2026-11-17 11:41:31 UTC — [ticket-985] validateur: APPROVED — Tous les critères sont satisfaits. Le code ajoute les raisons manquantes aux tro (37328ms)
 - 2026-11-17 11:41:31 UTC — [ticket-985] APPROVED après 2 tour(s)
 - 2026-11-17 11:43:06 UTC — [ticket-985] leçons: fichier plein, à compacter à la main
+- 2026-11-17 11:47:49 UTC — [ticket-985] documentation: 0 fichier(s) (277562ms) — après tour de correction
+- 2026-11-17 11:47:49 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-17 11:47:49 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-17 11:47:49 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
