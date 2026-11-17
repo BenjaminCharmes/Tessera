@@ -9751,3 +9751,21 @@ error: Please commit or stash them.
 - 2026-11-17 11:47:49 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
 - 2026-11-17 11:47:49 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
 - 2026-11-17 11:47:49 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-17 16:06:11 UTC — [ticket-996] branche ticket-996-a-reparse-point-in-the-run-tree-blocks-the-run-be
+- 2026-11-17 16:06:14 UTC — [ticket-996] tour 1 — codeur démarré
+- 2026-11-17 16:09:30 UTC — [ticket-996] tour 1 — codeur terminé (195187ms)
+- 2026-11-17 16:13:40 UTC — [ticket-996] testeur: dur�es : ruff 0 s, mypy 12 s, mypy-linux 13 s, pytest 244 s ; impact depuis base : 109 fichier(s) de test
+- 2026-11-17 16:14:11 UTC — [ticket-996] securite: PASS — Le diff ajoute un refus des jonctions et liens non déclarés avant `add` et `diff (31235ms)
+- 2026-11-17 16:14:12 UTC — [ticket-996] tour 1 — reviewer démarré
+- 2026-11-17 16:14:46 UTC — [ticket-996] tour 1 — reviewer terminé (33750ms)
+- 2026-11-17 16:15:11 UTC — [ticket-996] validateur: APPROVED — All three acceptance criteria are satisfied. The implementation detects and refu (58500ms)
+- 2026-11-17 16:15:11 UTC — [ticket-996] CHANGES_REQUESTED tour 1: Reviewer : 1. La fonction `admis` laisse passer tout lien pour lequel `git ls-files --error-unmatch -- <chemin>` réussit. Or cette commande réussit aussi quand le chemin est un dossier qui contient de
+- 2026-11-17 16:15:11 UTC — [ticket-996] tour 2 — codeur démarré
+- 2026-11-17 16:17:30 UTC — [ticket-996] tour 2 — codeur terminé (138608ms)
+- 2026-11-17 16:22:00 UTC — [ticket-996] testeur: dur�es : ruff 0 s, mypy 13 s, mypy-linux 16 s, pytest 265 s ; impact depuis base : 109 fichier(s) de test
+- 2026-11-17 16:22:19 UTC — [ticket-996] securite: PASS — Le diff ajoute une protection : les jonctions et liens symboliques non déclarés  (19016ms)
+- 2026-11-17 16:22:20 UTC — [ticket-996] tour 2 — reviewer démarré
+- 2026-11-17 16:22:57 UTC — [ticket-996] tour 2 — reviewer terminé (37187ms)
+- 2026-11-17 16:23:21 UTC — [ticket-996] validateur: APPROVED — Tous les critères sont satisfaits. Le code refuse les points de reparse (jonctio (60702ms)
+- 2026-11-17 16:23:21 UTC — [ticket-996] APPROVED après 2 tour(s)
+- 2026-11-17 16:24:26 UTC — [ticket-996] leçons: fichier plein, à compacter à la main
