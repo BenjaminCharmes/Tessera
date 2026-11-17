@@ -3,6 +3,7 @@ agent: codeur
 depends_on:
 - ticket-977
 id: ticket-987
+pr_number: 1140
 priority: medium
 status: done
 title: A resumed ticket reads the file of its base
