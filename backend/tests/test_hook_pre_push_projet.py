@@ -1,13 +1,15 @@
 """Tests for the pre-push hook installed in project repositories — ticket-968."""
 import json
 import os
+import sqlite3
 import subprocess
 import sys
+from contextlib import closing
 from pathlib import Path
 
 import pytest
 
-from tessera.services.creation_projet.hook_pre_push import EtatHook, installer_hook, installer_sur_tous
+from tessera.services.creation_projet.hook_pre_push import EtatHook, installer_hook, installer_sur_tous, main, projets_avec_run_ouvert
 from tessera.services.creation_projet.project_importer import ProjectImporter
 from tests.conftest import requires_symlinks
 
@@ -98,6 +100,51 @@ def test_install_on_all_projects_names_each(tmp_path: Path) -> None:
     (tmp_path / "b").mkdir()
     etats = installer_sur_tous(tmp_path)
     assert etats == {"a": EtatHook.INSTALLE, "b": EtatHook.SANS_DEPOT}
+
+
+def _base_avec_run_ouvert(chemin: Path, projet: str) -> Path:
+    with closing(sqlite3.connect(chemin)) as db:
+        db.execute("CREATE TABLE pipeline_runs (id TEXT, project_id TEXT, finished_at TEXT)")
+        db.execute("INSERT INTO pipeline_runs VALUES ('r1', ?, NULL)", (projet,))
+        db.execute("INSERT INTO pipeline_runs VALUES ('r0', 'autre', '2026-11-13')")
+        db.commit()
+    return chemin
+
+
+def test_open_run_is_detected_in_database(tmp_path: Path) -> None:
+    base = _base_avec_run_ouvert(tmp_path / "t.db", "vigie")
+    assert projets_avec_run_ouvert(base) == frozenset({"vigie"})
+    assert projets_avec_run_ouvert(tmp_path / "absente.db") == frozenset()
+
+
+def test_project_with_open_run_is_skipped(tmp_path: Path) -> None:
+    vigie = _depot(tmp_path, "vigie")
+    etats = installer_sur_tous(tmp_path, frozenset({"vigie"}))
+    assert etats == {"vigie": EtatHook.RUN_EN_COURS}
+    assert not (vigie / ".git" / "hooks" / "pre-push").exists()
+
+
+def test_other_projects_get_their_hook_in_the_same_call(tmp_path: Path) -> None:
+    _depot(tmp_path, "vigie")
+    autre = _depot(tmp_path, "autre")
+    etats = installer_sur_tous(tmp_path, frozenset({"vigie"}))
+    assert etats == {"autre": EtatHook.INSTALLE, "vigie": EtatHook.RUN_EN_COURS}
+    assert (autre / ".git" / "hooks" / "pre-push").is_file()
+
+
+def test_command_returns_1_when_a_project_was_skipped(tmp_path: Path) -> None:
+    espace = tmp_path / "ws"
+    espace.mkdir()
+    _depot(espace, "vigie")
+    base = _base_avec_run_ouvert(tmp_path / "t.db", "vigie")
+    assert main(espace, base) == 1
+
+
+def test_command_returns_0_without_open_run(tmp_path: Path) -> None:
+    espace = tmp_path / "ws"
+    espace.mkdir()
+    _depot(espace, "p")
+    assert main(espace, tmp_path / "absente.db") == 0
 
 
 @requires_symlinks
