@@ -9642,3 +9642,6 @@ error: Please commit or stash them.
 - 2026-11-17 10:01:04 UTC — [ticket-987] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code ajoute la lecture du ti (45312ms)
 - 2026-11-17 10:01:04 UTC — [ticket-987] APPROVED après 3 tour(s)
 - 2026-11-17 10:01:54 UTC — [ticket-987] leçons: une leçon proposée
+- 2026-11-17 10:05:17 UTC — [ticket-987] documentation: 0 fichier(s) (196891ms) — après tour de correction
+- 2026-11-17 10:05:17 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-17 10:05:17 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
