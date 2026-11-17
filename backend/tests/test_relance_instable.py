@@ -171,3 +171,22 @@ async def test_stage_passes_the_changed_paths_when_the_diff_is_read(tmp_path: Pa
     orch, run = _orch_du_testeur(tmp_path, workspace)
     await pipeline_testeur.run_tests(orch, run)
     assert orch._test_runner.run_tests.call_args.kwargs["fichiers_du_diff"] == ["frontend/src/a.tsx"]
+
+
+@pytest.mark.parametrize(
+    "extra",
+    [
+        "\ntsc :\nsrc/a.ts(1,1): error TS2322: bad",
+        "\nruff :\nFound 2 errors.",
+        "\nsrc/a.py:3:1: error: Incompatible types",
+        "\n Test Files  2 failed (2)",
+    ],
+)
+def test_timeout_next_to_a_foreign_failure_is_not_rerun(extra: str) -> None:
+    assert fichiers_a_relancer(VITEST_TIMEOUT + extra, []) == {}
+
+
+def test_pytest_summary_announcing_more_failures_is_not_rerun() -> None:
+    sortie = PYTEST_TIMEOUT + "\n2 failed, 5 passed in 3s"
+    assert fichiers_a_relancer(sortie, []) == {}
+    assert fichiers_a_relancer(PYTEST_TIMEOUT + "\n1 failed, 5 passed in 3s", []) != {}

@@ -11,6 +11,7 @@ from collections.abc import Awaitable, Callable, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 
+from tessera.services.verification.echecs_etrangers import contient_un_echec_etranger
 from tessera.services.verification.resultat_de_test import TestResult
 from tessera.utils.logger import get_logger
 
@@ -99,7 +100,11 @@ def touche_le_diff(fichier: str, diff: Sequence[str]) -> bool:
 def fichiers_a_relancer(sortie: str, diff: Sequence[str]) -> dict[str, list[str]]:
     """Files to run again by kind; empty unless every failure is a timeout outside the diff."""
     echecs = lire_les_echecs(sortie)
-    if not echecs or "unhandled" in sortie.lower():
+    if not echecs:
+        return {}
+    vitest = len({e.fichier for e in echecs if e.genre == "vitest"})
+    pytest_ids = sum(1 for e in echecs if e.genre == "pytest")
+    if contient_un_echec_etranger(sortie, vitest, pytest_ids):
         return {}
     if any(not e.expiration or touche_le_diff(e.fichier, diff) for e in echecs):
         return {}
