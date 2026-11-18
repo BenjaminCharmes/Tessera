@@ -9800,3 +9800,7 @@ error: Please commit or stash them.
 - 2026-11-18 10:59:02 UTC — [ticket-1000] validateur: APPROVED — Les deux critères sont satisfaits. Le code change le comportement de `relire_apr (19343ms)
 - 2026-11-18 10:59:17 UTC — [ticket-1000] tour 1 — reviewer terminé (34484ms)
 - 2026-11-18 10:59:17 UTC — [ticket-1000] APPROVED après 1 tour(s)
+- 2026-11-18 11:00:49 UTC — [ticket-1000] documentation: 0 fichier(s) (69562ms)
+- 2026-11-18 11:00:49 UTC — documentation trop longue, titres seuls : docs/architecture.md (181178 caractères)
+- 2026-11-18 11:00:49 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-18 11:00:49 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
