@@ -9941,3 +9941,8 @@ error: Please commit or stash them.
 - 2026-11-18 14:04:31 UTC — [ticket-998] tour 1 — reviewer démarré
 - 2026-11-18 14:05:07 UTC — [ticket-998] tour 1 — reviewer terminé (35171ms)
 - 2026-11-18 14:05:08 UTC — [ticket-998] APPROVED après 1 tour(s)
+- 2026-11-18 14:06:03 UTC — [ticket-998] fichiers non suivis laissés par le run : tickets/todo/ticket-1006-the-agent-account-gives-back-the-files-it-created.md, tickets/todo/ticket-1007-one-worktree-at-a-time-under-the-agent-account.md, tickets/todo/ticket-1008-the-agent-profile-is-wiped-when-the-account-is-idle.md, tickets/todo/ticket-1009-the-agent-process-loads-no-registry-profile.md (à ignorer dans .gitignore ?)
+- 2026-11-18 14:08:10 UTC — [ticket-998] documentation: 0 fichier(s) (126014ms)
+- 2026-11-18 14:08:10 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-18 14:08:10 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-18 14:08:10 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
