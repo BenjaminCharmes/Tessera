@@ -10,6 +10,12 @@ Quand la ligne dépasse encore, le compte lance `node relais.js relais.json` :
 le relais relit la commande complète et la lance sans shell (`CreateProcess`,
 32 767 caractères), entrées et sorties héritées, et rend son code de sortie.
 Le processus relayé hérite du job de l'appel (ticket-943).
+
+`--preserve-symlinks-main` (ticket-1003) : sans lui, node résout le chemin réel
+de son script en examinant chaque dossier parent (`lstat`). Le dossier d'appel
+vit dans le TEMP de l'utilisateur, sous un profil que le compte de l'agent ne
+peut pas examiner : EPERM sur `AppData`, code 1, audit indisponible. Ouvrir le
+script et `relais.json` par leur chemin complet reste permis.
 """
 import json
 import subprocess
@@ -62,4 +68,4 @@ def relayer_si_trop_long(
     arguments = dossier / "relais.json"
     script.write_text(_RELAIS_JS, encoding="utf-8")
     arguments.write_text(json.dumps(list(commande)), encoding="utf-8")
-    return [node, str(script), str(arguments)]
+    return [node, "--preserve-symlinks-main", str(script), str(arguments)]

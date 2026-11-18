@@ -32,7 +32,8 @@ def test_long_command_is_relayed_through_files(tmp_path: Path) -> None:
     commande = ["claude.exe", "--print", "--json-schema", schema]
     relayee = relayer_si_trop_long(commande, tmp_path, lambda: _node(tmp_path))
     assert relayee == [
-        str(tmp_path / "bin" / "node.exe"), str(tmp_path / "relais.js"), str(tmp_path / "relais.json"),
+        str(tmp_path / "bin" / "node.exe"), "--preserve-symlinks-main",
+        str(tmp_path / "relais.js"), str(tmp_path / "relais.json"),
     ]
     assert subprocess.list2cmdline(relayee).__len__() <= LIMITE_LIGNE
     assert json.loads((tmp_path / "relais.json").read_text(encoding="utf-8")) == commande
