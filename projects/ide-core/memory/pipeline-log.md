@@ -9867,3 +9867,7 @@ error: Please commit or stash them.
 - 2026-11-18 12:05:16 UTC — [ticket-989] tour 1 — reviewer terminé (21671ms)
 - 2026-11-18 12:05:19 UTC — [ticket-989] validateur: APPROVED — Le diff implémente complètement le ticket : nouvelle classe `EditionRefusee` por (22765ms)
 - 2026-11-18 12:05:19 UTC — [ticket-989] APPROVED après 1 tour(s)
+- 2026-11-18 12:07:16 UTC — [ticket-989] documentation: 0 fichier(s) (93812ms)
+- 2026-11-18 12:07:16 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-18 12:07:16 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-18 12:07:16 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
