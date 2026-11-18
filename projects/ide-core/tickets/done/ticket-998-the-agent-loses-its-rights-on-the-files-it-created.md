@@ -2,6 +2,7 @@
 agent: architect
 depends_on: []
 id: ticket-998
+pr_number: 1171
 priority: high
 status: done
 title: 'Design: the agent account loses its rights on the files it created at the
