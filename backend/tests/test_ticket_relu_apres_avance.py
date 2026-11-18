@@ -77,16 +77,6 @@ async def test_missing_ticket_after_advance_blocks() -> None:
     assert resultat.arret is not None and "ticket-100" in resultat.arret
 
 
-async def test_run_worktree_keeps_its_ticket() -> None:
-    orch, svc = _orch([_fiche("B")])
-    orch._worktree = object()
-    run = _run(_fiche("A"), [])
-
-    assert await relire_apres_branche(orch, run, None) is None
-    assert run.ticket.body == "A"
-    svc.get_ticket.assert_not_called()
-
-
 @pytest.fixture
 def _stages(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(

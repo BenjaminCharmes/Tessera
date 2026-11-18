@@ -133,10 +133,11 @@ async def relire_apres_branche(
     """Re-read the ticket once the base is advanced and the branch created (ticket-977).
 
     Remplace `run.ticket` par la fiche relue et refait le gel de `preuve_reelle`.
-    Fiche introuvable : un résultat bloqué, sans agent. Dans un worktree de run,
-    rien n'est relu : il part déjà d'`origin/<base>`.
+    Fiche introuvable : un résultat bloqué, sans agent. Vaut aussi dans un worktree
+    de run : une branche reprise y est extraite telle quelle, avec la fiche que le
+    codeur a pu réécrire ; `preuve_reelle`, critères et type se lisent sur la base.
     """
-    if orch._git_workspace is None or getattr(orch, "_worktree", None) is not None:
+    if orch._git_workspace is None:
         return None
     relu = await orch._ticket_svc.get_ticket(run.ticket_id)
     if relu is None:
