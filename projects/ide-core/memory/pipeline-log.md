@@ -9958,3 +9958,22 @@ error: Please commit or stash them.
 - 2026-11-18 10:52:57 UTC — [ticket-997] livraison: rebase sur develop (563ms)
 - 2026-11-18 10:52:57 UTC — [ticket-997] livraison: PR #1157 ouverte (4984ms)
 - 2026-11-18 10:52:57 UTC — [ticket-997] livraison: arrêt — PR ouverte, merge après preuve réelle
+- 2026-11-18 13:47:59 UTC — [ide-core] ticket-1004 PR #1169 confiée au CIWatcher
+- 2026-11-18 13:48:18 UTC — [ticket-997] branche ticket-997-an-agent-process-the-backend-cannot-inspect-block
+- 2026-11-18 13:48:19 UTC — [ticket-997] fiche relue après l'avance de la base (afbfdead6ec9ee0758ec82db535f57c1b6b8b213 → 82b86ee6311f0deabff612965eae9d120a8d145e)
+- 2026-11-18 13:49:48 UTC — [ticket-997] testeur: dur�es : ruff 0 s, mypy 33 s, pytest 39 s, mypy-linux 24 s ; impact depuis base : 13 fichier(s) de test
+- 2026-11-18 13:49:48 UTC — [ticket-997] branche reprise (5 commit(s)) — tests green, codeur sauté
+- 2026-11-18 13:50:33 UTC — [ticket-997] securite: PASS — PASS : le diff durcit le contrôle. Un processus récent dont le jeton est illisib (25671ms)
+- 2026-11-18 13:50:34 UTC — [ticket-997] tour 1 — reviewer démarré
+- 2026-11-18 13:50:54 UTC — [ticket-997] tour 1 — reviewer terminé (19469ms)
+- 2026-11-18 13:51:21 UTC — [ticket-997] validateur: CHANGES_REQUESTED — Critères 3 et 4 validés : le buffer plein déclenche une énumération plus grande  (47296ms)
+- 2026-11-18 13:51:22 UTC — [ticket-997] CHANGES_REQUESTED tour 1: Reviewer : 1. La règle du suspect est exactement celle que la fiche a refusée. Tout processus absent de l'instantané `_AVANT` dont l'ouverture est refusée (ERROR_ACCESS_DENIED) devient suspect. Or, me
+- 2026-11-18 13:51:22 UTC — [ticket-997] tour 2 — codeur démarré
+- 2026-11-18 13:54:50 UTC — [ticket-997] tour 2 — codeur terminé (207781ms)
+- 2026-11-18 13:56:39 UTC — [ticket-997] testeur: dur�es : ruff 0 s, mypy 15 s, mypy-linux 15 s, pytest 52 s ; impact depuis base : 13 fichier(s) de test
+- 2026-11-18 13:57:03 UTC — [ticket-997] securite: PASS — Le diff renforce le ménage des processus du compte agent sans affaiblir aucune g (23578ms)
+- 2026-11-18 13:57:04 UTC — [ticket-997] tour 2 — reviewer démarré
+- 2026-11-18 13:57:29 UTC — [ticket-997] validateur: APPROVED — Les quatre critères d'acceptation sont tous couverts par des tests explicites qu (25593ms)
+- 2026-11-18 13:57:38 UTC — [ticket-997] tour 2 — reviewer terminé (33969ms)
+- 2026-11-18 13:57:38 UTC — [ticket-997] APPROVED après 2 tour(s)
+- 2026-11-18 13:58:59 UTC — [ticket-997] leçons: refusée — preuve absente du retour du run
