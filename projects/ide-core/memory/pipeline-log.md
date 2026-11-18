@@ -10000,3 +10000,4 @@ error: Please commit or stash them.
 - 2026-11-18 12:09:05 UTC — [ticket-1001] tour 1 — codeur démarré
 - 2026-11-18 12:12:36 UTC — [ticket-1001] tour 1 — codeur terminé (210468ms)
 - 2026-11-18 12:12:36 UTC — [ticket-1001] BLOCKED — fichier protégé modifié pendant un appel d'agent : scripts/hooks/pre-push
+- 2026-11-18 12:12:56 UTC — [ide-core] file interrompue : ticket-1001 non approuvé
