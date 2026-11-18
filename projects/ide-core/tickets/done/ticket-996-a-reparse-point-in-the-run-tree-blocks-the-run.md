@@ -1,12 +1,13 @@
 ---
-id: ticket-996
-title: "A reparse point in the run tree blocks the run before any add or diff"
-type: fix
-status: todo
-priority: critical
 agent: codeur
 depends_on: []
+id: ticket-996
+pr_number: 1155
 preuve_reelle: true
+priority: critical
+status: done
+title: A reparse point in the run tree blocks the run before any add or diff
+type: fix
 ---
 
 ## Signalement

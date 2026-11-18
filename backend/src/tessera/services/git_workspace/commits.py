@@ -40,6 +40,8 @@ class GitCommits(GitState):
         removed them with ``rm`` so they disappear from the repository rather
         than staying as empty files. The commit is not blocked.
         """
+        # Avant tout `add` : un lien non déclaré fait indexer sa cible (audit C2).
+        await self._refuser_les_liens()
         policy_modifiees = await self._detect_modified_policy_files()
         if policy_modifiees:
             _logger.warning(
@@ -96,6 +98,7 @@ class GitCommits(GitState):
         retenus = [c for c in chemins if not await self._is_ignored(c)]
         if not retenus:
             return False
+        await self._refuser_les_liens()
         await self._run("add", "-A", "--", *retenus)
         if not (await self._run("diff", "--cached", "--name-only")).strip():
             return False
@@ -122,6 +125,7 @@ class GitCommits(GitState):
         """
         retenus = [c for c in chemins if not await self._is_ignored(c)]
         if retenus:
+            await self._refuser_les_liens()
             await self._run("add", "-A", "--", *retenus)
 
     async def _list_tracked_ticket_basenames(self) -> frozenset[str]:

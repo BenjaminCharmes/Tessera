@@ -4,6 +4,7 @@ import asyncio
 
 from tessera.services.git_workspace.chemins import _ORCHESTRATOR_ARTIFACT_PATHS, _RUN_POLICY_PATHS
 from tessera.services.git_workspace.erreurs import GitCommandError
+from tessera.services.git_workspace.liens import refuser_les_liens
 from tessera.services.git_workspace.socle import GitCore
 from tessera.services.noyau.git_commande import build_command
 from tessera.utils.logger import get_logger
@@ -47,6 +48,18 @@ class GitIgnores(GitCore):
         )
         await proc.communicate()
         return proc.returncode == 0
+
+    async def _refuser_les_liens(self) -> None:
+        """Bloque avant tout `add` ou `diff` si l'arbre porte un lien que git suivrait.
+
+        L'arbre se parcourt depuis la racine du dépôt quand le projet travaille
+        dans son parent (ADR-024), depuis le dossier du projet sinon.
+        """
+        racine = self._project_path
+        if self._travaille_dans_le_parent():
+            racine = await self._toplevel() or racine
+
+        await refuser_les_liens(racine)
 
     async def _purger_stage_ignoré(self) -> None:
         """Retire de l'index les fichiers désormais couverts par `.gitignore`.
