@@ -76,6 +76,7 @@ def load_forbidden_terms(
         resultat = lancer(
             commande, capture_output=True, text=True, encoding="utf-8",
             errors="replace", timeout=DELAI_LECTURE_S, check=False,
+            cwd=racine,  # jamais le dépôt poussé : son `python` ne doit rien y trouver
         )
     except (OSError, subprocess.SubprocessError):
         raise LectureImpossible from None

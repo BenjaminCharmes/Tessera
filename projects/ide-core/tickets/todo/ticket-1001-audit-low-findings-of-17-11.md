@@ -24,8 +24,10 @@ preuve_reelle: true
   à relancer après `--`, et refuser un nom qui commence par `-`.
 - **L6** `scripts/agent-setup-admin.ps1` : créer le fichier de remise du mot
   de passe avec son ACL finale (héritage coupé) avant d'y écrire, pas après.
-- **L9** `scripts/hooks/pre-push` : lancer `coffre_cli` depuis la racine de
-  Tessera (`cwd` fixé), jamais depuis le dépôt poussé.
+- **L9** : fait à la main le 18/11 (`cwd=racine` dans `scripts/hooks/pre-push`,
+  test `test_vault_runs_from_tessera_root_not_the_pushed_repo`). Un hook est
+  un fichier protégé : le run du 18/11 qui l'a modifié a été arrêté
+  (ADR-084). **Ne pas toucher à `scripts/hooks/`.**
 - **L10** `worktrees/dossier_agent.py` et `Test-DossierWorktreesAgent` :
   refuser un dossier des worktrees qui porte un droit hérité pour le compte
   agent ou pour `Users`.
