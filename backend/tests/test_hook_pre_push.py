@@ -418,3 +418,17 @@ def test_new_branch_diff_reads_the_content_of_unpushed_commits(
     monkeypatch.chdir(depot)
 
     assert "+ligne ajoutee" in HOOK._get_diff_lines(sha, NULL_SHA)
+
+
+def test_vault_runs_from_tessera_root_not_the_pushed_repo() -> None:
+    """L9 of the 17/11 audit: the vault never starts in the pushed repository."""
+    hook = _load_hook()
+    racine = Path(__file__).resolve().parents[2]
+    vus: dict[str, object] = {}
+
+    def lancer(cmd: list[str], **kw: object) -> "subprocess.CompletedProcess[str]":
+        vus.update(kw)
+        return subprocess.CompletedProcess(cmd, 0, "", "")
+
+    hook.load_forbidden_terms(racine, lancer)
+    assert vus["cwd"] == racine
