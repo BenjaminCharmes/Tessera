@@ -10131,3 +10131,5 @@ error: Please commit or stash them.
 - 2026-11-18 18:00:46 UTC — [ticket-1011] validateur: APPROVED — Les deux critères sont satisfaits. Le diff ajoute le chemin manquant pour les li (32500ms)
 - 2026-11-18 18:00:46 UTC — [ticket-1011] APPROVED après 3 tour(s)
 - 2026-11-18 18:01:47 UTC — [ticket-1011] leçons: fichier plein, à compacter à la main
+- 2026-11-18 18:02:21 UTC — [ticket-1011] documentation: 0 fichier(s) (905ms)
+- 2026-11-18 18:02:21 UTC — [ticket-1011] documentation: pas de diff retrouvable, non documenté
