@@ -18,10 +18,10 @@ from tessera.config import settings
 from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.git_workspace import GitCommandError
 from tessera.services.livraison.livraison_apres import controler_approbation, ouvrir_avec_recours, pr_a_relire, sha_pousse
-from tessera.services.livraison.livraison_arrets import ARRET_NON_APPROUVE, arret_ci_illisible, arret_conflit, arret_niveau_commit, arret_pr_en_conflit
+from tessera.services.livraison.livraison_arrets import ARRET_NON_APPROUVE, arret_apres_ci, arret_conflit, arret_niveau_commit
 from tessera.services.livraison.livraison_conflit import annoncer_fin_de_conflit, resolveur_suivi, signal_courant
 from tessera.services.livraison.livraison_intervention import ControleDuDiff, livrer_intervention
-from tessera.services.livraison.livraison_merge import arret_de_merge, tenter_le_merge, tete_a_change
+from tessera.services.livraison.livraison_merge import arret_de_merge, attendre_verdict_sans_ci, tenter_le_merge, tete_a_change
 from tessera.services.livraison.livraison_ports import GitLivraison, WorkflowLivraison
 from tessera.services.livraison.livraison_rebase import noter_ce_que_le_rebase_a_fait, retester_apres_rebase, tete_avant_rebase
 from tessera.services.livraison.livraison_resultat import Livraison as Livraison
@@ -356,53 +356,38 @@ class LivraisonService:
         # complet pour un verdict qui ne viendra pas (ADR-045). Le refus sur
         # une CI rouge, lui, reste dans `niveau_peut_merger` : la déclaration
         # dit « pas de CI », pas « ignore la CI ».
-        if self._politique is not None and self._politique.merge_without_ci:
+        # Seul `none` passe sans verdict : une CI `pending` vient de
+        # s'inscrire, on attend son verdict (ticket-1004).
+        sans_ci = self._politique is not None and self._politique.merge_without_ci
+        t0 = time.monotonic()
+        if sans_ci:
+            ci = await attendre_verdict_sans_ci(
+                self._workflow.etat_ci, self._dormir, pr_number,
+                self._attente_ci_max_s, self._intervalle_ci_s,
+            )
+        else:
+            ci = await self._attendre_la_ci(pr_number)
+        ci_ms = (time.monotonic() - t0) * 1000
+        if sans_ci and ci == "none":
             etapes.append("CI : non attendue, déclarée absente")
             durees_ms.append(0.0)
             return await self._merger(
                 pr_number, etapes, durees_ms, ticket_id, sha_attendu
             )
-
-        t0 = time.monotonic()
-        ci = await self._attendre_la_ci(pr_number)
-        ci_ms = (time.monotonic() - t0) * 1000
         etapes.append(f"CI : {ci}")
         durees_ms.append(ci_ms)
 
-        if ci == "pending":
-            return Livraison(
-                etapes=tuple(etapes),
-                durees_ms=tuple(durees_ms),
-                pr_number=pr_number,
-                arret=(
-                    "Fin de l'attente : la CI de la PR "
-                    f"#{pr_number} n'a pas rendu de verdict. La PR reste "
-                    "ouverte."
-                ),
-            )
-        if ci == "unreadable":
-            return Livraison(
-                etapes=tuple(etapes),
-                durees_ms=tuple(durees_ms),
-                pr_number=pr_number,
-                arret=arret_ci_illisible(
-                    getattr(self._workflow, "code_http_ci", None), pr_number
-                ),
-            )
-        if ci == "conflicting":
-            return Livraison(
-                etapes=tuple(etapes),
-                durees_ms=tuple(durees_ms),
-                pr_number=pr_number,
-                arret=arret_pr_en_conflit(pr_number, self._base_branch),
-                a_mettre_a_jour=True,
-            )
         if ci != "passing":
+            arret, a_mettre_a_jour = arret_apres_ci(
+                ci, pr_number, self._base_branch,
+                getattr(self._workflow, "code_http_ci", None),
+            )
             return Livraison(
                 etapes=tuple(etapes),
                 durees_ms=tuple(durees_ms),
                 pr_number=pr_number,
-                arret=f"CI {ci} : la PR #{pr_number} reste ouverte.",
+                arret=arret,
+                a_mettre_a_jour=a_mettre_a_jour,
             )
 
         return await self._merger(

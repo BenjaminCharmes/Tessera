@@ -164,6 +164,8 @@ class GitHubWorkflowService:
         # Code HTTP du dernier refus de lecture de la CI (ticket-449) : la
         # livraison le cite quand l'état vaut `unreadable`.
         self.code_http_ci: int | None = None
+        # État de CI qui a fait refuser le dernier merge, sans appel à GitHub.
+        self.refus_ci: str | None = None
 
     def _niveau(self) -> NiveauAutonomie:
         """Le niveau qui vaut pour cet appel : figé s'il l'a été, lu sinon."""
@@ -358,18 +360,15 @@ class GitHubWorkflowService:
         Avec `sha_attendu`, le merge est lié à ce commit : GitHub le refuse si
         la tête de la PR a bougé entre-temps (ticket-492).
 
-        ADR-022 interdisait tout merge. Elle devient conditionnelle (ADR-029) :
-        la declaration du projet dit que l'utilisateur renonce a sa relecture
-        sur ce depot-la, et la CI verte est le seul signal objectif dont l'IDE
-        dispose pour savoir que le code passe.
-
-        Les deux conditions se verifient **ici**, au moment d'agir. Un plan
-        calcule plus tot aurait pu l'etre sur une CI qui depuis est passee au
-        rouge.
+        Merge conditionnel (ADR-029) : la declaration du projet remplace la
+        relecture humaine, la CI verte est le seul signal objectif. Les deux
+        conditions se verifient **ici**, au moment d'agir, pas sur un plan
+        calcule plus tot.
 
         Rend `False` sans rien faire des qu'une condition manque : c'est le cas
-        normal sur la grande majorite des projets, pas une erreur.
+        normal, pas une erreur.
         """
+        self.refus_ci = None
         if self._github is None or self._project_path is None:
             return False
         # La declaration se lit avant l'appel reseau : sur la grande majorite
@@ -386,6 +385,7 @@ class GitHubWorkflowService:
                 "merge_refuse",
                 extra={"pr": pr_number, "ci": ci, "projet": str(self._project_path)},
             )
+            self.refus_ci = ci
             return False
 
         # La méthode de merge vient de la politique figée avant le premier
