@@ -1,4 +1,5 @@
 """The agent account writes in a worktree only during a call — ticket-943."""
+import getpass
 from pathlib import Path
 
 import pytest
@@ -76,9 +77,15 @@ async def test_right_is_withdrawn_after_a_call_and_set_again_before_the_next(wor
     assert [str(worktree.resolve()), "/grant", f"{COMPTE}:(OI)(CI)M"] in icacls.appels
     icacls.appels.clear()
     await clore_appel(racine, icacls, procs.enumerer, procs.tuer)
+    racine_s, git = str(worktree.resolve()), str(worktree.resolve() / ".git")
     assert icacls.appels == [
-        [str(worktree.resolve() / ".git"), "/remove:g", COMPTE],
-        [str(worktree.resolve()), "/remove:g", COMPTE],
+        [git, "/remove:g", COMPTE],
+        [racine_s, "/remove:g", COMPTE],
+        [racine_s, "/setowner", getpass.getuser(), "/T", "/C", "/L"],
+        [racine_s, "/reset", "/T", "/C", "/L"],
+        [git, "/inheritance:d"],
+        [git, "/remove:g", COMPTE],
+        [git, "/grant:r", f"{COMPTE}:(OI)(CI)RX"],
     ]
     icacls.appels.clear()
     await ouvrir_appel(worktree, icacls)
@@ -93,13 +100,23 @@ async def test_overlapping_calls_withdraw_the_right_once_at_the_last(worktree: P
     await clore_appel(premier, icacls, procs.enumerer, procs.tuer)
     assert icacls.appels == []
     await clore_appel(second, icacls, procs.enumerer, procs.tuer)
-    assert len(icacls.appels) == 2
+    assert sum(1 for a in icacls.appels if "/setowner" in a) == 1
+    assert sum(1 for a in icacls.appels if "/reset" in a) == 1
 
 
 async def test_a_failed_withdrawal_raises_so_the_run_is_blocked(worktree: Path) -> None:
     racine = await ouvrir_appel(worktree, Icacls())
     with pytest.raises(DroitsAgentRefuses):
         await clore_appel(racine, Icacls(code=5), Processus([]).enumerer, Processus([]).tuer)
+
+
+@pytest.mark.parametrize("commande", ["/setowner", "/reset"])
+async def test_a_failed_take_back_raises(worktree: Path, commande: str) -> None:
+    racine = await ouvrir_appel(worktree, Icacls())
+    with pytest.raises(DroitsAgentRefuses):
+        await clore_appel(
+            racine, Icacls(echec_sur=commande), Processus([]).enumerer, Processus([]).tuer
+        )
 
 
 async def test_leftover_processes_of_the_account_are_stopped_at_the_end(worktree: Path) -> None:
@@ -119,7 +136,7 @@ async def test_a_failed_stop_still_withdraws_the_right_then_raises(worktree: Pat
     icacls.appels.clear()
     with pytest.raises(DroitsAgentRefuses):
         await clore_appel(racine, icacls, Processus([(11, "node.exe")]).enumerer, tuer)
-    assert len(icacls.appels) == 2
+    assert [str(worktree.resolve()), "/remove:g", COMPTE] in icacls.appels
 
 
 async def test_without_agent_user_nothing_is_set_or_removed(

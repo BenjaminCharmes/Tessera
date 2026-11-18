@@ -1,4 +1,5 @@
 """The agent account gets exactly what a run needs on its worktree — ticket-895."""
+import getpass
 import json
 from pathlib import Path
 
@@ -53,22 +54,24 @@ async def test_rights_are_set_in_order(wt: RunWorktree, monkeypatch: pytest.Monk
     appels = icacls.appels
     assert appels[0] == [str(wt.racine), "/grant", f"{COMPTE}:(OI)(CI)M"]
     git = str(wt.racine / ".git")
-    assert appels[1:4] == [
+    assert appels[1] == [str(wt.racine), "/grant", "*S-1-3-4:(OI)(CI)(RC)"]
+    assert appels[2] == [str(wt.racine), "/grant", f"{getpass.getuser()}:(OI)(CI)F"]
+    assert appels[3:6] == [
         [git, "/inheritance:d"],
         [git, "/remove:g", COMPTE],
         [git, "/grant:r", f"{COMPTE}:(OI)(CI)RX"],
     ]
-    refuses = {Path(a[0]).name for a in appels[4:] if a[1:] == ["/deny", f"{COMPTE}:(WD,AD,WEA,WA,DE)"]}
+    refuses = {Path(a[0]).name for a in appels[6:] if a[1:] == ["/deny", f"{COMPTE}:(WD,AD,WEA,WA,DE)"]}
     assert refuses == {"agents.json", "CLAUDE.md", "verif.py"}
-    assert len(appels) == 4 + 3
+    assert len(appels) == 6 + 3
 
 
-async def test_no_call_grants_full_control(wt: RunWorktree, monkeypatch: pytest.MonkeyPatch) -> None:
+async def test_agent_account_never_gets_full_control(wt: RunWorktree, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(settings, "agent_user", COMPTE)
     icacls = Enregistreur()
     await accorder_droits_agent(wt, "python scripts/verif.py", icacls)
     for appel in icacls.appels:
-        assert all(not arg.endswith(":F") and "(F)" not in arg for arg in appel)
+        assert not any(arg.startswith(f"{COMPTE}:") and arg.endswith("F") for arg in appel)
 
 
 async def test_icacls_failure_raises(wt: RunWorktree, monkeypatch: pytest.MonkeyPatch) -> None:
