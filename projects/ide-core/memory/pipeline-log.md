@@ -9890,3 +9890,23 @@ error: Please commit or stash them.
 - 2026-11-18 12:40:32 UTC — [ticket-1005] CHANGES_REQUESTED tour 3: Reviewer : 1. Critère 1 non couvert. Il demande un run `blocked` au tour 1, sans aucun appel d'audit, de reviewer ni de validateur. `test_a_refused_link_blocks_the_run_and_names_the_link` appelle seul
 - 2026-11-18 12:40:32 UTC — [ticket-1005] BLOCKED après 3 tour(s) sans approbation
 - 2026-11-18 12:40:54 UTC — [ide-core] file interrompue : ticket-1005 non approuvé
+- 2026-11-18 12:14:59 UTC — [ide-core] ticket-989 PR #1165 mergée (CI verte)
+- 2026-11-18 12:41:32 UTC — [ticket-1005] branche ticket-1005-a-refused-link-ends-the-run-at-once-named-instea
+- 2026-11-18 12:41:36 UTC — [ticket-1005] branche reprise (3 commit(s)) — refus précédent : revue, codeur en premier
+- 2026-11-18 12:41:36 UTC — [ticket-1005] tour 1 — codeur démarré
+- 2026-11-18 12:44:24 UTC — [ticket-1005] tour 1 — codeur terminé (168250ms)
+- 2026-11-18 12:51:43 UTC — [ticket-1005] testeur: dur�es : ruff 0 s, mypy 2 s, mypy-linux 4 s, pytest 397 s ; impact depuis base : 108 fichier(s) de test
+- 2026-11-18 12:52:02 UTC — [ticket-1005] securite: PASS — Verdict PASS. Le diff fait échouer le run fermé : un lien non déclaré met le run (18234ms)
+- 2026-11-18 12:52:02 UTC — [ticket-1005] tour 1 — reviewer démarré
+- 2026-11-18 12:52:34 UTC — [ticket-1005] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le code implémente correctemen (31640ms)
+- 2026-11-18 12:52:43 UTC — [ticket-1005] tour 1 — reviewer terminé (40812ms)
+- 2026-11-18 12:52:43 UTC — [ticket-1005] CHANGES_REQUESTED tour 1: Reviewer : 1. Critère 1 : « l'arrêt contient le chemin du lien » n'est pas vraiment testé. Les deux tests vérifient `"lien" in resultat.arret`, mais `arret` commence toujours par « lien non déclaré da
+- 2026-11-18 12:52:43 UTC — [ticket-1005] tour 2 — codeur démarré
+- 2026-11-18 12:53:16 UTC — [ticket-1005] tour 2 — codeur terminé (32407ms)
+- 2026-11-18 12:58:57 UTC — [ticket-1005] testeur: dur�es : ruff 0 s, mypy 3 s, mypy-linux 4 s, pytest 282 s ; impact depuis base : 108 fichier(s) de test
+- 2026-11-18 12:59:15 UTC — [ticket-1005] securite: PASS — PASS : aucune faille CRITICAL ni HIGH introduite, seulement un risque LOW de cou (16922ms)
+- 2026-11-18 12:59:15 UTC — [ticket-1005] tour 2 — reviewer démarré
+- 2026-11-18 12:59:30 UTC — [ticket-1005] tour 2 — reviewer terminé (14296ms)
+- 2026-11-18 12:59:55 UTC — [ticket-1005] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le code implémente bien le flu (40047ms)
+- 2026-11-18 12:59:56 UTC — [ticket-1005] APPROVED après 2 tour(s)
+- 2026-11-18 13:00:34 UTC — [ticket-1005] leçons: refusée — preuve absente du retour du run
