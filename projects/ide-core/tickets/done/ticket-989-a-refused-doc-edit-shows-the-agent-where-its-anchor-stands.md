@@ -2,6 +2,7 @@
 agent: codeur
 depends_on: []
 id: ticket-989
+pr_number: 1165
 priority: medium
 status: done
 title: A refused doc edit shows the agent where its anchor stands
