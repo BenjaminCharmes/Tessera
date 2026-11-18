@@ -12,7 +12,7 @@ from pathlib import Path
 
 from tessera.config import settings
 from tessera.services.providers.droits_worktree import DroitsAgentRefuses, Icacls, _icacls_reel, poser_ecriture, retirer_ecriture
-from tessera.services.providers.processus_compte import processus_du_compte, sid_du_compte
+from tessera.services.providers.processus_compte import ProcessusIllisibles, instantane_pids, processus_du_compte, processus_existe, sid_du_compte
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -23,6 +23,8 @@ Enumerer = Callable[[str], Awaitable[list[tuple[int, str]]]]
 Tuer = Callable[[int], Awaitable[None]]
 
 _ACTIFS: dict[Path, int] = {}
+#: PIDs présents à l'ouverture du premier appel de chaque worktree.
+_AVANT: dict[Path, frozenset[int]] = {}
 _VERROU = asyncio.Lock()
 
 
@@ -37,12 +39,16 @@ async def _executer(*args: str) -> tuple[int, str]:
 async def _enumerer_reel(compte: str) -> list[tuple[int, str]]:
     """The account's processes by token SID: in milliseconds, without resolving any account name (ticket-991)."""
     sid = await asyncio.to_thread(sid_du_compte, compte)
-    return await asyncio.to_thread(processus_du_compte, sid)
+    avant = frozenset().union(*_AVANT.values())
+    return await asyncio.to_thread(processus_du_compte, sid, avant)
 
 
-async def _tuer_reel(pid: int) -> None:
+async def _tuer_reel(pid: int, existe: Callable[[int], bool] = processus_existe) -> None:
     code, sortie = await _executer("taskkill", "/F", "/T", "/PID", str(pid))
     if code != 0:
+        if not await asyncio.to_thread(existe, pid):
+            _logger.info("processus_deja_disparu", extra={"pid": pid})
+            return
         raise DroitsAgentRefuses(f"taskkill a échoué sur {pid} (code {code}) : {sortie.strip()}")
 
 
@@ -66,9 +72,16 @@ def _sous_les_worktrees(racine: Path) -> bool:
 
 async def arreter_les_restants(compte: str, enumerer: Enumerer, tuer: Tuer) -> None:
     """Stop every process still owned by `compte`; log each image name."""
-    for pid, image in await enumerer(compte):
+    illisibles: ProcessusIllisibles | None = None
+    try:
+        trouves = await enumerer(compte)
+    except ProcessusIllisibles as exc:
+        trouves, illisibles = exc.trouves, exc
+    for pid, image in trouves:
         _logger.warning("processus_du_compte_restant", extra={"pid": pid, "image": image})
         await tuer(pid)
+    if illisibles is not None:
+        raise illisibles
 
 
 async def ouvrir_appel(cwd: str | Path, icacls: Icacls = _icacls_reel) -> Path | None:
@@ -87,6 +100,7 @@ async def ouvrir_appel(cwd: str | Path, icacls: Icacls = _icacls_reel) -> Path |
     async with _VERROU:
         if _ACTIFS.get(racine, 0) == 0:
             await poser_ecriture(racine, compte, icacls)
+            _AVANT[racine] = await asyncio.to_thread(instantane_pids)
         _ACTIFS[racine] = _ACTIFS.get(racine, 0) + 1
     return racine
 
@@ -113,6 +127,7 @@ async def clore_appel(
                 await arreter_les_restants(compte, enumerer, tuer)
             except DroitsAgentRefuses as exc:
                 erreur = exc
+            _AVANT.clear()
         await retirer_ecriture(racine, compte, icacls)
         if erreur is not None:
             raise erreur

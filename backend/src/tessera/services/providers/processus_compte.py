@@ -6,8 +6,9 @@ chaque processus : 87 s par appel sur le poste, payées par chaque étape de tes
 (typecheck, lint, vitest), jusqu'à faire sauter le délai du testeur.
 
 Ici, aucun nom n'est résolu : le SID du compte est lu une fois, puis comparé à
-celui du jeton de chaque processus. Un processus dont le jeton ne s'ouvre pas
-n'est pas celui du compte que le backend a lancé (le backend ouvre ceux-là).
+celui du jeton de chaque processus. Un jeton qui ne s'ouvre pas est « illisible » : sans suite pour un processus
+déjà là au début de l'appel, mais suspect pour un processus apparu depuis (un
+processus du compte, sorti du job, qui a réécrit sa DACL) : `DroitsAgentRefuses`.
 """
 import ctypes
 import ntpath
@@ -24,6 +25,10 @@ _PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
 _TOKEN_QUERY = 0x0008
 _TOKEN_USER = 1
 _MAX_PIDS = 16384
+_ERREUR_PID_INCONNU = 87
+_ERREUR_ACCES_REFUSE = 5
+#: Processus qui refuse jusqu'à son ouverture (≠ None : disparu, sans objet ou SYSTEM).
+ILLISIBLE = b""
 _MAX_CHEMIN = 32768
 
 
@@ -45,21 +50,46 @@ def sid_du_compte(compte: str) -> bytes:
     return sid.raw[: taille_sid.value]
 
 
-def _pids() -> list[int]:
-    tableau = (wintypes.DWORD * _MAX_PIDS)()
+def _lire_pids(capacite: int) -> tuple[list[int], bool]:
+    """The PIDs listed in a buffer of ``capacite`` entries, and whether it was full."""
+    tableau = (wintypes.DWORD * capacite)()
     octets = wintypes.DWORD(0)
     if not _dll("psapi").EnumProcesses(tableau, ctypes.sizeof(tableau), ctypes.byref(octets)):
         raise DroitsAgentRefuses(f"liste des processus illisible (erreur Windows {_CTYPES.get_last_error()})")
-    return list(tableau[: octets.value // ctypes.sizeof(wintypes.DWORD)])
+    pids = list(tableau[: octets.value // ctypes.sizeof(wintypes.DWORD)])
+    return pids, octets.value >= ctypes.sizeof(tableau)
+
+
+def _pids(lire: Callable[[int], tuple[list[int], bool]] = _lire_pids) -> list[int]:
+    """Every PID; the buffer doubles while it comes back full (no silent truncation)."""
+    capacite = _MAX_PIDS
+    pids, plein = lire(capacite)
+    while plein:
+        capacite *= 2
+        pids, plein = lire(capacite)
+    return pids
+
+
+def processus_existe(pid: int) -> bool:
+    """Whether ``pid`` still exists (a denied open still means it exists)."""
+    k32 = _dll("kernel32")
+    processus = k32.OpenProcess(_PROCESS_QUERY_LIMITED_INFORMATION, False, pid)
+    if processus:
+        k32.CloseHandle(processus)
+        return True
+    return bool(_CTYPES.get_last_error() != _ERREUR_PID_INCONNU)
 
 
 def _sid_du_processus(pid: int) -> bytes | None:
     k32, adv = _dll("kernel32"), _dll("advapi32")
     processus = k32.OpenProcess(_PROCESS_QUERY_LIMITED_INFORMATION, False, pid)
     if not processus:
-        return None
+        # Seule l'ouverture refusée est la signature d'une DACL réécrite : un processus
+        # SYSTEM ou protégé (PPL) laisse ouvrir le processus en lecture limitée.
+        return ILLISIBLE if _CTYPES.get_last_error() == _ERREUR_ACCES_REFUSE else None
     try:
         jeton = wintypes.HANDLE()
+        # Processus ouvrable mais jeton refusé : cas courant des processus SYSTEM, jamais suspect.
         if not adv.OpenProcessToken(processus, _TOKEN_QUERY, ctypes.byref(jeton)):
             return None
         try:
@@ -97,11 +127,42 @@ def processus_par_sid(
     pids: Callable[[], list[int]] = _pids,
     sid_de: Callable[[int], bytes | None] = _sid_du_processus,
     image_de: Callable[[int], str | None] = _image_du_processus,
+    avant: frozenset[int] | None = None,
 ) -> list[tuple[int, str]]:
-    """The (pid, image name) of every process whose token carries ``sid``."""
-    return [(pid, image_de(pid) or "?") for pid in pids() if pid and sid_de(pid) == sid]
+    """The (pid, image name) of every process whose token carries ``sid``.
+
+    With ``avant`` (the PIDs present when the call began), a process absent from it whose
+    token is unreadable raises ``ProcessusIllisibles``: it cannot be told apart from the account's.
+    """
+    trouves: list[tuple[int, str]] = []
+    suspects: list[int] = []
+    for pid in pids():
+        lu = sid_de(pid) if pid else None
+        if lu == sid:
+            trouves.append((pid, image_de(pid) or "?"))
+        elif lu == ILLISIBLE and avant is not None and pid not in avant:
+            suspects.append(pid)
+    if suspects:
+        raise ProcessusIllisibles(suspects, trouves)
+    return trouves
 
 
-def processus_du_compte(sid: bytes) -> list[tuple[int, str]]:
+class ProcessusIllisibles(DroitsAgentRefuses):
+    """New processes whose token cannot be read; ``trouves`` are the readable ones to stop first."""
+
+    def __init__(self, suspects: list[int], trouves: list[tuple[int, str]]) -> None:
+        super().__init__(f"processus récents au jeton illisible, peut-être du compte : {suspects}")
+        self.trouves = trouves
+
+
+def instantane_pids() -> frozenset[int]:
+    """The PIDs present now; empty when the listing is unavailable."""
+    try:
+        return frozenset(_pids())
+    except (OSError, AttributeError, DroitsAgentRefuses):
+        return frozenset()
+
+
+def processus_du_compte(sid: bytes, avant: frozenset[int] | None = None) -> list[tuple[int, str]]:
     """The processes of the account whose SID is ``sid``, on this machine."""
-    return processus_par_sid(sid)
+    return processus_par_sid(sid, avant=avant)
