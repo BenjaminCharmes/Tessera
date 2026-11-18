@@ -10021,3 +10021,7 @@ error: Please commit or stash them.
 - 2026-11-18 15:30:37 UTC — [ticket-1001] validateur: APPROVED — Le critère unique demandant un test par point de l'audit (L1, L4, L6, L9, L10, r (30782ms)
 - 2026-11-18 15:30:37 UTC — [ticket-1001] APPROVED après 2 tour(s)
 - 2026-11-18 15:31:31 UTC — [ticket-1001] leçons: fichier plein, à compacter à la main
+- 2026-11-18 15:34:15 UTC — [ticket-1001] documentation: 0 fichier(s) (139312ms) — après tour de correction
+- 2026-11-18 15:34:15 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-18 15:34:15 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-18 15:34:15 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
