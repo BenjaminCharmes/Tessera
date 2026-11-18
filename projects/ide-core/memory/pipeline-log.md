@@ -9852,3 +9852,7 @@ error: Please commit or stash them.
 - 2026-11-18 11:53:42 UTC — [ticket-990] tour 1 — reviewer terminé (15625ms)
 - 2026-11-18 11:53:50 UTC — [ticket-990] validateur: APPROVED — Les trois critères sont couverts par les tests du fichier test_ligne_des_echecs. (23092ms)
 - 2026-11-18 11:53:50 UTC — [ticket-990] APPROVED après 1 tour(s)
+- 2026-11-18 11:56:43 UTC — [ticket-990] documentation: 0 fichier(s) (152062ms)
+- 2026-11-18 11:56:43 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-18 11:56:43 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-18 11:56:43 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
