@@ -6,7 +6,15 @@ la preuve puisse les utiliser sans importer le service (import circulaire).
 
 
 class EditionRefusee(Exception):
-    """Une modification proposée ne s'applique pas. Rien n'a été écrit."""
+    """Une modification proposée ne s'applique pas. Rien n'a été écrit.
+
+    ``extrait`` is an optional excerpt of the targeted file, for the corrective
+    round only: ``str(exc)`` stays the message alone.
+    """
+
+    def __init__(self, message: str, extrait: str = "") -> None:
+        super().__init__(message)
+        self.extrait = extrait
 
 
 #: Typographie française ramenée à son équivalent ASCII (ticket-402). Chaque
