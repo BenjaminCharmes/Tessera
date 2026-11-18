@@ -27,7 +27,7 @@ from tessera.services.providers.noms import ProviderIndisponible
 from tessera.services.providers.path_compte import ChaineAbsente, path_du_compte, resoudre_executable
 from tessera.services.providers.process_agent import ProcessAgent
 from tessera.services.providers.transport_agent import fabriquer_lanceur
-from tessera.services.verification.env_du_code_de_projet import env_du_code_de_projet
+from tessera.services.verification.env_du_code_de_projet import est_un_nom_de_secret
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -52,6 +52,8 @@ def compte_declare() -> bool:
 
 def env_du_compte(extra: Mapping[str, str] | None = None) -> dict[str, str]:
     """Build the environment from nothing: the allow-list, then ``extra``, no secret."""
+    if any(nom.lower() == "path" for nom in (extra or {})):
+        raise EchecLancementCompte("`worktree.env` ne peut pas porter PATH : il vient de la chaîne d'outils (ADR-086)")
     base = {nom: val for nom, val in os.environ.items() if nom.lower() in _NOMS_REPRIS}
     base.update(env_du_profil(settings.agent_user or ""))
     try:
@@ -61,8 +63,7 @@ def env_du_compte(extra: Mapping[str, str] | None = None) -> dict[str, str]:
     # Un `extra` déclaré ne ramène pas le dossier temporaire chez l'utilisateur.
     base.update({k: v for k, v in (extra or {}).items() if k not in _DU_PROFIL})
     # Repasse par le filtre des secrets : un `extra` déclaré ne les réintroduit pas.
-    sans_secret = env_du_code_de_projet(base)
-    return {nom: sans_secret[nom] for nom in base if nom in sans_secret}
+    return {nom: val for nom, val in base.items() if not est_un_nom_de_secret(nom)}
 
 
 async def _lire(flux: ByteReceiveStream | None) -> bytes:

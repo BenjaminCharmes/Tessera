@@ -71,8 +71,8 @@ def test_admin_script_cuts_programdata_inheritance_on_the_shared_folder() -> Non
 
 def test_admin_script_locks_the_password_file_before_writing_it() -> None:
     texte = _ADMIN.read_text(encoding="ascii")
-    verrou = texte.index("Invoke-Icacls $Remise /inheritance:r")
-    assert verrou < texte.index("Set-Content -LiteralPath $Remise")
+    verrou = texte.index("SetAccessRuleProtection($true, $false)")
+    assert verrou < texte.index("$Flux.Write")
 
 
 def test_admin_script_creates_the_toolchain_with_inheritance_cut() -> None:

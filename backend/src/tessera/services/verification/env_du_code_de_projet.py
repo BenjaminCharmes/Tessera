@@ -17,15 +17,24 @@ _JETONS_GITHUB: tuple[str, ...] = ("GITHUB_TOKEN", "GH_TOKEN")
 # pas la casse, et une copie en `github_token` porterait le même jeton.
 _NOMS_RETIRES = frozenset(nom.lower() for nom in (*NOMS_SECRETS, *_JETONS_GITHUB))
 
+# Un `extra` déclaré par le projet ne ramène pas un secret sous un autre nom.
+_SUFFIXES_SECRETS = ("_token", "_key", "_secret", "_password")
+
+
+def est_un_nom_de_secret(nom: str) -> bool:
+    """True for a Tessera secret, a GitHub token or a name that looks like a credential."""
+    bas = nom.lower()
+    return bas in _NOMS_RETIRES or bas.endswith(_SUFFIXES_SECRETS)
+
 
 def env_du_code_de_projet(extra: Mapping[str, str] | None = None) -> dict[str, str]:
     """Return a copy of ``os.environ`` without Tessera's secrets, then ``extra``.
 
     Every name of ``NOMS_SECRETS`` plus ``GITHUB_TOKEN`` and ``GH_TOKEN`` is
-    removed ; ``extra`` is applied on top, so a project may still declare a
-    variable of its own.
+    removed ; ``extra`` is applied on top, minus the same names and any name
+    ending in ``_TOKEN``, ``_KEY``, ``_SECRET`` or ``_PASSWORD``.
     """
     env = {nom: valeur for nom, valeur in os.environ.items() if nom.lower() not in _NOMS_RETIRES}
     if extra:
-        env.update(extra)
+        env.update({k: v for k, v in extra.items() if not est_un_nom_de_secret(k)})
     return env

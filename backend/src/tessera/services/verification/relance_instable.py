@@ -124,9 +124,12 @@ def _racine_des_fichiers(fichiers: list[str], candidats: list[Path]) -> Path | N
 
 
 def _commande(genre: str, fichiers: list[str]) -> list[str]:
+    """Build the retry command; a name read from an output never becomes an option."""
+    if any(f.startswith("-") for f in fichiers):
+        raise ValueError(f"nom de fichier refusé : {fichiers!r}")
     if genre == "vitest":
-        return ["npx", "vitest", "run", *fichiers]
-    return ["uv", "run", "python", "-m", "pytest", "-q", "-p", "no:cacheprovider", *fichiers]
+        return ["npx", "vitest", "run", *fichiers]  # cac range ce qui suit `--` hors des filtres
+    return ["uv", "run", "python", "-m", "pytest", "-q", "-p", "no:cacheprovider", "--", *fichiers]
 
 
 async def relancer_les_instables(
@@ -138,7 +141,7 @@ async def relancer_les_instables(
 ) -> Relance | None:
     """Run the timed-out files again once; None when the failure is not eligible."""
     par_genre = fichiers_a_relancer(sortie, diff)
-    if not par_genre:
+    if not par_genre or any(f.startswith("-") for fs in par_genre.values() for f in fs):
         return None
     debut = time.monotonic()
     vert = True
