@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING
 
 from tessera.models.ticket import TicketStatus
 from tessera.services.git_workspace import GitWorkspaceError
+from tessera.services.git_workspace.liens import LienNonDeclare
 from tessera.services.noyau.pipeline_events import EventType, PipelineResult
 from tessera.services.pipeline.lecons_run import proposer_lecon
 from tessera.services.pipeline.pipeline_approbation import noter_tete_approuvee
@@ -105,11 +106,11 @@ async def commit_work(
         return None
     try:
         commit_sha = await orch._git_workspace.commit_all(message)
+    except LienNonDeclare:
+        # Un lien refusé a son propre chemin de sortie (ticket-1011).
+        raise
     except GitWorkspaceError as exc:
-        # Cet échec était un simple `warning` : il partait dans les logs du
-        # serveur et le run annonçait quand même APPROVED. Le travail restait
-        # alors dans l'arbre, le ticket suivant le trouvait sale et se
-        # bloquait, et rien à l'écran ne reliait les deux (ticket-068).
+        # Un simple `warning` laissait le run APPROVED et l'arbre sale (ticket-068).
         _logger.warning("commit_failed", extra={"error": str(exc)})
         await emit(run, EventType.ERROR, reason="commit_failed", message=str(exc))
         raise CommitFailed(str(exc)) from exc
@@ -119,22 +120,23 @@ async def commit_work(
 
 
 async def commit_ou_bloquer(
-    orch: "Orchestrator", run: PipelineRun, message: str
+    orch: "Orchestrator", run: PipelineRun, message: str, *, relever_les_liens: bool = False
 ) -> tuple[str | None, str | None]:
     """Commit the work; on failure, return the cause instead of raising.
 
-    Le point de sortie unique de tous les `finish_*` (ticket-121). Avant,
-    seul `finish_approved` attrapait `CommitFailed` : sur un blocage
-    sécurité, un arrêt ou un épuisement des tours, l'exception remontait à
-    `_run_pipeline`, qui appelait `finish_interrupted`, qui rappelait
-    `commit_work`, qui relevait — 500 FastAPI, arbre sale, run jamais clos.
-    Un commit raté est une sortie du run comme une autre : il se nomme dans
-    `arret`, il ne se propage pas.
+    Point de sortie unique des `finish_*` (ticket-121) : un commit raté se
+    nomme dans `arret`, il ne se propage pas (sinon 500 et arbre sale).
     """
     try:
         return await commit_work(orch, run, message), None
     except CommitFailed as exc:
         return None, f"commit_failed: {_single_line(str(exc))[:200]}"
+    except LienNonDeclare as lien:
+        if relever_les_liens:
+            raise
+        from tessera.services.pipeline.pipeline_lien_refuse import commit_apres_lien
+
+        return await commit_apres_lien(orch, run, message, lien)
 
 
 async def finish_approved(orch: "Orchestrator", run: PipelineRun) -> PipelineResult:
@@ -146,24 +148,24 @@ async def finish_approved(orch: "Orchestrator", run: PipelineRun) -> PipelineRes
     """
     orch._log(f"[{run.ticket_id}] APPROVED après {run.round_num} tour(s)")
 
-    # Le ticket change de statut **avant** le commit, comme sur toutes les
-    # autres sorties. `finish_approved` était le seul à faire l'inverse : le
-    # déplacement du fichier de `in-review/` vers `done/` arrivait après le
-    # dernier commit et restait dans l'arbre. ADR-018 veut un arbre propre à
-    # la sortie, et ici ce n'est pas le ticket suivant qui trinquait mais la
-    # livraison du ticket courant, immédiate : `git rebase` refuse de démarrer
-    # sur des modifications non commitées (ticket-159).
+    # Statut **avant** le commit, comme sur toute sortie : le fichier du ticket
+    # doit entrer dans le dernier commit (arbre propre, ADR-018, ticket-159).
     await set_status(orch, run, TicketStatus.done)
     await proposer_lecon(orch, run)
 
-    # Ce message est écrit dans le dépôt *de l'utilisateur* : il suit donc la
-    # convention de ce dépôt — Conventional Commits — avec le type du ticket
-    # plutôt qu'un "feat:" codé en dur, qui mal-étiquetait les fix/chore/docs.
-    commit_sha, arret = await commit_ou_bloquer(
-        orch,
-        run,
-        f"{run.ticket.type.value}: {run.ticket_id} — {_single_line(run.ticket.title)}",
-    )
+    # Message écrit dans le dépôt de l'utilisateur : Conventional Commits, type du ticket.
+    try:
+        commit_sha, arret = await commit_ou_bloquer(
+            orch,
+            run,
+            f"{run.ticket.type.value}: {run.ticket_id} — {_single_line(run.ticket.title)}",
+            relever_les_liens=True,
+        )
+    except LienNonDeclare as lien:
+        # Un lien apparu après la lecture du diff : le run n'est plus approuvé.
+        from tessera.services.pipeline.pipeline_lien_refuse import finish_lien_refuse
+
+        return await finish_lien_refuse(orch, run, lien)
     if arret is not None:
         # « Rien à committer » (commit_sha None) reste un succès : le travail
         # existait déjà. Un commit *raté* est autre chose, et le ticket ne peut
@@ -185,17 +187,13 @@ async def finish_approved(orch: "Orchestrator", run: PipelineRun) -> PipelineRes
             arret=arret,
         )
 
-    # `branch` sur chaque sortie : l'UI reconstruit son résultat depuis cet
-    # événement, et sans la branche elle proposait de « lancer d'abord le
-    # pipeline » après un run approuvé (ticket-123).
+    # `branch` sur chaque sortie : l'UI reconstruit son résultat depuis cet événement (ticket-123).
     await emit(
         run, EventType.PIPELINE_DONE, approved=True, rounds=run.round_num, branch=run.branch
     )
 
-    # Seul un ticket *approuvé* avance la ref de base. L'isolation par branche
-    # garde le travail rejeté hors du ticket suivant ; elle ne doit pas aussi
-    # cacher le travail approuvé aux tickets qui suivent, sinon chaque étape
-    # d'un plan séquentiel tournerait sur une base périmée.
+    # Seul un ticket approuvé avance la ref de base, sinon un plan séquentiel
+    # tournerait sur une base périmée.
     if commit_sha is not None and orch._git_workspace is not None:
         try:
             await orch._git_workspace.advance_base_ref()

@@ -3,9 +3,10 @@ agent: codeur
 depends_on:
 - ticket-1005
 id: ticket-1011
+pr_number: 1178
 preuve_reelle: false
 priority: high
-status: todo
+status: done
 title: A link found at the final commit is named, removed, and the work is committed
 type: fix
 ---
