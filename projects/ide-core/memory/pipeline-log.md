@@ -9931,3 +9931,13 @@ error: Please commit or stash them.
 - 2026-11-18 13:30:28 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
 - 2026-11-18 13:30:28 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
 - 2026-11-18 13:30:28 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-18 13:53:32 UTC — [ide-core] ticket-1004 PR #1169 mergée (CI verte)
+- 2026-11-18 14:00:36 UTC — [ticket-998] branche ticket-998-design-the-agent-account-loses-its-rights-on-the
+- 2026-11-18 14:00:39 UTC — [ticket-998] tour 1 — codeur démarré
+- 2026-11-18 14:03:08 UTC — [ticket-998] tour 1 — architect terminé (149125ms)
+- 2026-11-18 14:04:12 UTC — [ticket-998] testeur: OK (exit 0)
+- 2026-11-18 14:04:29 UTC — [ticket-998] securite: PASS — PASS : le diff ne change que deux fichiers de documentation. Il ajoute une règle (16250ms)
+- 2026-11-18 14:04:31 UTC — [ticket-998] validateur: APPROVED — Aucun critère d'acceptation — approbation automatique. (0ms)
+- 2026-11-18 14:04:31 UTC — [ticket-998] tour 1 — reviewer démarré
+- 2026-11-18 14:05:07 UTC — [ticket-998] tour 1 — reviewer terminé (35171ms)
+- 2026-11-18 14:05:08 UTC — [ticket-998] APPROVED après 1 tour(s)
