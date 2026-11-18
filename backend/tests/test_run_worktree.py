@@ -84,6 +84,7 @@ async def test_creer_twice_resumes_a_clean_worktree(checkout: Path) -> None:
 async def test_creer_refuses_a_folder_that_is_not_the_worktree(checkout: Path) -> None:
     occupe = settings.ide_worktrees_dir / "demo" / "ticket-1"
     occupe.mkdir(parents=True)
+    (occupe / "reste.txt").write_text("x", encoding="utf-8")
     with pytest.raises(WorktreeOccupe):
         await _creer(checkout)
 
