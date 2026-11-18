@@ -4,6 +4,7 @@ depends_on:
 - ticket-981
 - ticket-982
 id: ticket-983
+pr_number: 1172
 preuve_reelle: true
 priority: high
 status: done
