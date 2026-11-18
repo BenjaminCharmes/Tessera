@@ -2,6 +2,7 @@
 agent: codeur
 depends_on: []
 id: ticket-1001
+pr_number: 1174
 preuve_reelle: true
 priority: medium
 status: done
