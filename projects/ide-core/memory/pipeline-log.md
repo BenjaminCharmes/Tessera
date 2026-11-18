@@ -9977,3 +9977,4 @@ error: Please commit or stash them.
 - 2026-11-18 13:57:38 UTC — [ticket-997] tour 2 — reviewer terminé (33969ms)
 - 2026-11-18 13:57:38 UTC — [ticket-997] APPROVED après 2 tour(s)
 - 2026-11-18 13:58:59 UTC — [ticket-997] leçons: refusée — preuve absente du retour du run
+- 2026-11-18 13:59:37 UTC — [ticket-997] documentation: 0 fichier(s) (94ms)
