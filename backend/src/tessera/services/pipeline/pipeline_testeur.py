@@ -6,6 +6,7 @@ from tessera.services.noyau.pipeline_events import EventType, PipelineResult
 from tessera.services.pipeline.pipeline_outcomes import finish_timeout_expired
 from tessera.services.pipeline.pipeline_run import PipelineRun, emit
 from tessera.services.verification.detail_du_delai import detail_du_delai, ligne_de_delai
+from tessera.services.verification.ligne_des_echecs import ligne_du_testeur
 from tessera.utils.logger import get_logger
 
 if TYPE_CHECKING:
@@ -123,7 +124,7 @@ async def run_tests(
         run.test_context = (
             f"\n\n## Résultats des tests {badge}\n{result.output_summary}\n{details}"
         )
-        orch._log(f"[{run.ticket_id}] testeur: {result.output_summary}")
+        orch._log(f"[{run.ticket_id}] testeur: {ligne_du_testeur(result)}")
         return bool(result.passed)
     except TestCommandNotFound:
         orch._log(f"[{run.ticket_id}] testeur: commande non détectée, ignoré")
