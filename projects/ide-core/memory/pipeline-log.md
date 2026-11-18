@@ -9994,3 +9994,9 @@ error: Please commit or stash them.
 - 2026-11-18 14:08:10 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
 - 2026-11-18 14:08:10 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
 - 2026-11-18 14:08:10 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-18 12:08:57 UTC — [ide-core] ticket-989 PR #1165 confiée au CIWatcher
+- 2026-11-18 12:06:41 UTC — [ide-core] ticket-990 PR #1164 mergée (CI verte)
+- 2026-11-18 12:09:02 UTC — [ticket-1001] branche ticket-1001-low-findings-of-the-17-11-audit-declared-env-rel
+- 2026-11-18 12:09:05 UTC — [ticket-1001] tour 1 — codeur démarré
+- 2026-11-18 12:12:36 UTC — [ticket-1001] tour 1 — codeur terminé (210468ms)
+- 2026-11-18 12:12:36 UTC — [ticket-1001] BLOCKED — fichier protégé modifié pendant un appel d'agent : scripts/hooks/pre-push
