@@ -106,3 +106,44 @@ async def test_reprise_refuses_to_commit_a_tree_with_an_undeclared_link(checkout
 
     assert wt.racine.exists()
     assert git(checkout, "rev-parse", BRANCHE) == avant
+
+
+async def test_many_ignored_links_are_admitted_in_one_batch(
+    checkout: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Un projet pnpm porte des milliers de liens ignorés : un appel git par lien
+    # coûtait des minutes à chaque diff.
+    from tessera.services.git_workspace import liens
+
+    dehors = _cible_exterieure(checkout)
+    for i in range(30):
+        lier(dehors, checkout / "node_modules" / f"lien-{i}")
+    appels: list[tuple[str, ...]] = []
+    vrai_git = liens._git
+
+    async def compter(racine: Path, args: tuple[str, ...], entree: bytes | None = None) -> tuple[int, str]:
+        appels.append(args)
+        return await vrai_git(racine, args, entree)
+
+    monkeypatch.setattr(liens, "_git", compter)
+
+    assert await liens.liens_non_declares(checkout) == []
+    assert appels == [("check-ignore", "-z", "--stdin")]
+
+
+async def test_a_failed_batch_falls_back_to_one_check_per_link(
+    checkout: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from tessera.services.git_workspace import liens
+
+    lier(_cible_exterieure(checkout), checkout / "node_modules" / "lien")
+    vrai_git = liens._git
+
+    async def lot_en_echec(racine: Path, args: tuple[str, ...], entree: bytes | None = None) -> tuple[int, str]:
+        if "--stdin" in args:
+            return 128, ""
+        return await vrai_git(racine, args, entree)
+
+    monkeypatch.setattr(liens, "_git", lot_en_echec)
+
+    assert await liens.liens_non_declares(checkout) == []

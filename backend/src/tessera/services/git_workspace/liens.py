@@ -13,15 +13,13 @@ que d'ignorés. Tout autre lien est refusé, nommé, et le run passe `blocked`
 import asyncio
 import os
 import stat
-from collections.abc import Awaitable, Callable
 from pathlib import Path
 
 from tessera.services.git_workspace.erreurs import GitWorkspaceError
+from tessera.services.noyau.git_commande import build_command
 
 #: `stat.FILE_ATTRIBUTE_REPARSE_POINT` n'existe que sous Windows (cf. populate).
 _REPARSE_POINT = int(getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400))
-
-EstIgnore = Callable[[str], Awaitable[bool]]
 
 
 class LienNonDeclare(GitWorkspaceError):
@@ -84,14 +82,58 @@ def est_lien_suivi(sortie: str, chemin: str) -> bool:
     return False
 
 
-async def liens_non_declares(racine: Path, est_admis: EstIgnore) -> list[str]:
-    """The links under `racine` that `est_admis` does not accept."""
+async def _git(racine: Path, args: tuple[str, ...], entree: bytes | None = None) -> tuple[int, str]:
+    """Run a read-only git command in `racine`; return its exit code and stdout."""
+    proc = await asyncio.create_subprocess_exec(
+        *build_command(args),
+        cwd=str(racine),
+        stdin=asyncio.subprocess.PIPE if entree is not None else asyncio.subprocess.DEVNULL,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    sortie, _ = await proc.communicate(entree)
+    return proc.returncode or 0, sortie.decode("utf-8", errors="replace")
+
+
+async def _ignores_en_lot(racine: Path, chemins: list[str]) -> set[str]:
+    """The paths of `chemins` git ignores, judged in a single `check-ignore --stdin`.
+
+    Un projet pnpm ou Next porte des milliers de liens, tous ignorés : un appel
+    git par lien coûtait des minutes à chaque diff. Un échec fatal du lot
+    (code 128) n'admet rien ici ; chaque chemin repasse alors un par un.
+    """
+    if not chemins:
+        return set()
+    entree = "".join(f"{chemin}\0" for chemin in chemins).encode("utf-8")
+    code, sortie = await _git(racine, ("check-ignore", "-z", "--stdin"), entree)
+    if code not in (0, 1):
+        return set()
+    return {chemin for chemin in sortie.split("\0") if chemin}
+
+
+async def _admis_un(racine: Path, chemin: str) -> bool:
+    """True for a path git ignores, or a symlink the index tracks as such.
+
+    Ignoré, ou lien symbolique que l'index porte comme tel (mode 120000) : git
+    le range comme lien, il ne l'ouvre pas. Un dossier suivi remplacé par une
+    jonction n'est ni l'un ni l'autre.
+    """
+    for forme in (chemin, chemin + "/"):
+        if (await _git(racine, ("check-ignore", "-q", "--", forme)))[0] == 0:
+            return True
+    _, sortie = await _git(racine, args_entree_d_index(chemin))
+    return est_lien_suivi(sortie, chemin)
+
+
+async def liens_non_declares(racine: Path) -> list[str]:
+    """The links under `racine` git would follow: neither ignored nor tracked as links."""
     liens = await asyncio.to_thread(trouver_liens, racine)
-    return [lien for lien in liens if not await est_admis(lien)]
+    ignores = await _ignores_en_lot(racine, liens)
+    return [lien for lien in liens if lien not in ignores and not await _admis_un(racine, lien)]
 
 
-async def refuser_les_liens(racine: Path, est_admis: EstIgnore) -> None:
+async def refuser_les_liens(racine: Path) -> None:
     """Raise `LienNonDeclare` when the tree holds a link git would follow."""
-    refuses = await liens_non_declares(racine, est_admis)
+    refuses = await liens_non_declares(racine)
     if refuses:
         raise LienNonDeclare(refuses)
