@@ -9838,3 +9838,7 @@ error: Please commit or stash them.
 - 2026-11-18 11:47:23 UTC — [ticket-993] validateur: APPROVED — All three acceptance criteria are satisfied. The implementation correctly handle (20391ms)
 - 2026-11-18 11:47:25 UTC — [ticket-993] tour 1 — reviewer terminé (22608ms)
 - 2026-11-18 11:47:25 UTC — [ticket-993] APPROVED après 1 tour(s)
+- 2026-11-18 11:48:38 UTC — [ticket-993] documentation: 0 fichier(s) (50765ms)
+- 2026-11-18 11:48:38 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-18 11:48:38 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-18 11:48:38 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
