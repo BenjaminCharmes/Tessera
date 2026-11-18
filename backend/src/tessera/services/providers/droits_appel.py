@@ -12,7 +12,7 @@ from pathlib import Path
 
 from tessera.config import settings
 from tessera.services.providers.droits_worktree import DroitsAgentRefuses, Icacls, _icacls_reel, poser_ecriture, retirer_ecriture
-from tessera.services.providers.processus_compte import ProcessusIllisibles, instantane_pids, processus_du_compte, processus_existe, sid_du_compte
+from tessera.services.providers.processus_compte import ProcessusIllisibles, processus_du_compte, processus_existe, sid_du_compte
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -23,8 +23,6 @@ Enumerer = Callable[[str], Awaitable[list[tuple[int, str]]]]
 Tuer = Callable[[int], Awaitable[None]]
 
 _ACTIFS: dict[Path, int] = {}
-#: PIDs présents à l'ouverture du premier appel de chaque worktree.
-_AVANT: dict[Path, frozenset[int]] = {}
 _VERROU = asyncio.Lock()
 
 
@@ -39,8 +37,7 @@ async def _executer(*args: str) -> tuple[int, str]:
 async def _enumerer_reel(compte: str) -> list[tuple[int, str]]:
     """The account's processes by token SID: in milliseconds, without resolving any account name (ticket-991)."""
     sid = await asyncio.to_thread(sid_du_compte, compte)
-    avant = frozenset().union(*_AVANT.values())
-    return await asyncio.to_thread(processus_du_compte, sid, avant)
+    return await asyncio.to_thread(processus_du_compte, sid)
 
 
 async def _tuer_reel(pid: int, existe: Callable[[int], bool] = processus_existe) -> None:
@@ -100,7 +97,6 @@ async def ouvrir_appel(cwd: str | Path, icacls: Icacls = _icacls_reel) -> Path |
     async with _VERROU:
         if _ACTIFS.get(racine, 0) == 0:
             await poser_ecriture(racine, compte, icacls)
-            _AVANT[racine] = await asyncio.to_thread(instantane_pids)
         _ACTIFS[racine] = _ACTIFS.get(racine, 0) + 1
     return racine
 
@@ -127,7 +123,6 @@ async def clore_appel(
                 await arreter_les_restants(compte, enumerer, tuer)
             except DroitsAgentRefuses as exc:
                 erreur = exc
-            _AVANT.clear()
         await retirer_ecriture(racine, compte, icacls)
         if erreur is not None:
             raise erreur

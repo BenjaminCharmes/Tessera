@@ -7,16 +7,18 @@ chaque processus : 87 s par appel sur le poste, payées par chaque étape de tes
 
 Ici, aucun nom n'est résolu : le SID du compte est lu une fois, puis comparé à
 celui du jeton de chaque processus. Un jeton qui ne s'ouvre pas est « illisible » : sans suite pour un processus
-déjà là au début de l'appel, mais suspect pour un processus apparu depuis (un
-processus du compte, sorti du job, qui a réécrit sa DACL) : `DroitsAgentRefuses`.
+sans suite, sauf s'il descend du backend ou d'un processus du compte (sorti du job,
+DACL réécrite) : `DroitsAgentRefuses`. La filiation vient de Toolhelp.
 """
 import ctypes
 import ntpath
+import os
 from collections.abc import Callable
 from ctypes import wintypes
 from typing import Any
 
 from tessera.services.providers.droits_worktree import DroitsAgentRefuses
+from tessera.services.providers.parentes_processus import descend_de, parents_toolhelp
 
 # `ctypes.WinDLL` n'existe que sous Windows : passer par `Any` garde mypy muet sous Linux.
 _CTYPES: Any = ctypes
@@ -127,24 +129,33 @@ def processus_par_sid(
     pids: Callable[[], list[int]] = _pids,
     sid_de: Callable[[int], bytes | None] = _sid_du_processus,
     image_de: Callable[[int], str | None] = _image_du_processus,
-    avant: frozenset[int] | None = None,
+    parents: Callable[[], dict[int, int]] = parents_toolhelp,
+    backend: int | None = None,
 ) -> list[tuple[int, str]]:
     """The (pid, image name) of every process whose token carries ``sid``.
 
-    With ``avant`` (the PIDs present when the call began), a process absent from it whose
-    token is unreadable raises ``ProcessusIllisibles``: it cannot be told apart from the account's.
+    A process whose token is unreadable is suspect only when its parent chain reaches the
+    backend or a process of the account; a system process (parent ``services.exe``…) is ignored.
     """
     trouves: list[tuple[int, str]] = []
-    suspects: list[int] = []
+    illisibles: list[int] = []
     for pid in pids():
         lu = sid_de(pid) if pid else None
         if lu == sid:
             trouves.append((pid, image_de(pid) or "?"))
-        elif lu == ILLISIBLE and avant is not None and pid not in avant:
-            suspects.append(pid)
+        elif lu == ILLISIBLE:
+            illisibles.append(pid)
+    suspects = _descendants(illisibles, {p for p, _ in trouves} | {os.getpid() if backend is None else backend}, parents)
     if suspects:
         raise ProcessusIllisibles(suspects, trouves)
     return trouves
+
+
+def _descendants(illisibles: list[int], racines: set[int], parents: Callable[[], dict[int, int]]) -> list[int]:
+    if not illisibles:
+        return []
+    liens = parents()
+    return [pid for pid in illisibles if descend_de(pid, racines, liens)]
 
 
 class ProcessusIllisibles(DroitsAgentRefuses):
@@ -155,14 +166,6 @@ class ProcessusIllisibles(DroitsAgentRefuses):
         self.trouves = trouves
 
 
-def instantane_pids() -> frozenset[int]:
-    """The PIDs present now; empty when the listing is unavailable."""
-    try:
-        return frozenset(_pids())
-    except (OSError, AttributeError, DroitsAgentRefuses):
-        return frozenset()
-
-
-def processus_du_compte(sid: bytes, avant: frozenset[int] | None = None) -> list[tuple[int, str]]:
+def processus_du_compte(sid: bytes) -> list[tuple[int, str]]:
     """The processes of the account whose SID is ``sid``, on this machine."""
-    return processus_par_sid(sid, avant=avant)
+    return processus_par_sid(sid)
