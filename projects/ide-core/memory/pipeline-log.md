@@ -9978,3 +9978,4 @@ error: Please commit or stash them.
 - 2026-11-18 13:57:38 UTC — [ticket-997] APPROVED après 2 tour(s)
 - 2026-11-18 13:58:59 UTC — [ticket-997] leçons: refusée — preuve absente du retour du run
 - 2026-11-18 13:59:37 UTC — [ticket-997] documentation: 0 fichier(s) (94ms)
+- 2026-11-18 14:00:30 UTC — [ticket-997] livraison: arrêt — Livraison interrompue : GitCommandError: git command failed (code 1): git -c core.hooksPath=C:\Users
