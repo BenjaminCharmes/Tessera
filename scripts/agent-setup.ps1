@@ -90,6 +90,9 @@ function Copy-Toolchain {
     }
     $nodeDir = Get-RealDir 'node'
     Sync-Tool $nodeDir "$Outils\node" ((& "$nodeDir\node.exe" --version) | Select-Object -First 1)
+    # Le npmrc integre, copie de scoop, vise le profil de l'utilisateur (ticket-988) :
+    # vide, ni prefix= ni cache= ne pointe sous C:\Users.
+    Set-Content -LiteralPath "$Outils\node\node_modules\npm\npmrc" -Value '' -Encoding ASCII
 
     $uvDir = Get-RealDir 'uv'
     $uvTmp = Join-Path $env:TEMP 'tessera-uv-src'

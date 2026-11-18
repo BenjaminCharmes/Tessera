@@ -101,3 +101,19 @@ def test_admin_script_stops_on_a_failed_icacls() -> None:
     texte = _ADMIN.read_text(encoding="ascii")
     assert "$LASTEXITCODE -ne 0" in texte
     assert "icacls $" not in texte  # tout passe par Invoke-Icacls
+
+
+def test_agent_setup_empties_the_npmrc_of_the_node_copy() -> None:
+    texte = _UTILISATEUR.read_text(encoding="utf-8-sig")
+    assert "node_modules" in texte and "npm" in texte and "npmrc" in texte
+    apres_node = texte.split("Sync-Tool $nodeDir", 1)[1]
+    assert apres_node.index("npmrc") < apres_node.index("$uvDir")
+    assert "-Value ''" in apres_node.split("$uvDir", 1)[0]
+
+
+def test_agent_doctor_runs_the_python_module_and_no_get_command() -> None:
+    texte = (_SCRIPTS / "tessera.ps1").read_text(encoding="utf-8-sig")
+    doctor = texte.split("function Invoke-AgentDoctor", 1)[1].split("function Get-ProcessusTessera", 1)[0]
+    assert "tessera.agent_doctor_cli" in doctor
+    assert "Get-Command" not in doctor
+    assert chr(9) not in texte

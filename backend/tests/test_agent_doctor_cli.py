@@ -17,18 +17,40 @@ class ProcessLent(ProcessDouble):
         return 0
 
 
+CACHE_AGENT = "C:/Users/tessera-agent/AppData/Local/npm-cache".replace("/", chr(92)).encode()
+
+
+class LanceurNeuf(LanceurDouble):
+    """Gives a fresh process per call, whose output is the npm cache folder."""
+
+    def __init__(self, cache: bytes = CACHE_AGENT) -> None:
+        super().__init__()
+        self._cache = cache
+
+    async def lancer(self, commande, **kwargs):  # type: ignore[no-untyped-def]
+        self.processus = ProcessDouble(sortie=self._cache)
+        return await super().lancer(commande, **kwargs)
+
+
 @pytest.fixture
 def compte(monkeypatch: pytest.MonkeyPatch, chaine: Path) -> None:
+    (chaine / "uv").mkdir()
+    (chaine / "uv" / "uv.exe").write_bytes(b"")
+    (chaine / "node" / "npm.cmd").write_bytes(b"")
     monkeypatch.setattr(settings, "agent_user", "tessera-agent")
     monkeypatch.setattr(settings, "agent_logon_password", SecretStr("pw-secret"))
 
 
 async def test_all_tools_ok(compte: None, tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
-    lanceur = LanceurDouble()
+    lanceur = LanceurNeuf()
     assert await verifier_outils(tmp_path, lanceur) == 0
     sortie = capsys.readouterr().out
-    assert [a["commande"][0].split(".")[0] for a in lanceur.appels] == ["node", "uv", "python"]
-    assert sortie.count(": ok") == 3
+    commandes = [a["commande"] for a in lanceur.appels]
+    assert [c[0].replace(chr(92), "/").rsplit("/", 1)[-1] for c in commandes] == [
+        "node.exe", "uv.exe", "uv.exe", "npm.cmd",
+    ]
+    assert commandes[2][1:] == ["run", "--no-project", "python", "--version"]
+    assert sortie.count(": ok") == 4
     assert "pw-secret" not in sortie
 
 
@@ -68,3 +90,17 @@ async def test_missing_password_fails_without_launching(
 async def test_missing_account_fails(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     monkeypatch.setattr(settings, "agent_user", "")
     assert await verifier_outils(tmp_path, LanceurDouble()) == 1
+
+
+async def test_npm_cache_under_the_user_profile_fails_naming_agent_setup(
+    compte: None, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    lanceur = LanceurNeuf("C:/Users/alice/AppData/Local/npm-cache".replace("/", chr(92)).encode())
+    assert await verifier_outils(tmp_path, lanceur) == 1
+    sortie = capsys.readouterr().out
+    assert "npm cache" in sortie and "profil" in sortie and "agent setup" in sortie
+
+
+async def test_npm_cache_in_a_sibling_profile_fails(compte: None, tmp_path: Path) -> None:
+    lanceur = LanceurNeuf("C:/Users/tessera-agent-2/npm-cache".replace("/", chr(92)).encode())
+    assert await verifier_outils(tmp_path, lanceur) == 1
