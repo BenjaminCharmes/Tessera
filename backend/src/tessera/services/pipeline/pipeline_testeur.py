@@ -1,6 +1,7 @@
 """Stage — the project's test suite (ticket-688, split from `pipeline_stages`)."""
 from typing import TYPE_CHECKING
 
+from tessera.services.git_workspace.liens import LienNonDeclare
 from tessera.services.noyau.diff_changements import lire_diff
 from tessera.services.noyau.pipeline_events import EventType, PipelineResult
 from tessera.services.pipeline.pipeline_outcomes import finish_timeout_expired
@@ -37,6 +38,8 @@ async def _diff_du_run(orch: "Orchestrator") -> list[str] | None:
     lire = getattr(orch._git_workspace, "diff_depuis_base", None)
     try:
         diff = await lire() if lire is not None else None
+    except LienNonDeclare:
+        raise  # aucun test ne se lance sur un arbre qui porte un lien (ticket-1005)
     except Exception as exc:  # noqa: BLE001 — un diff illisible ne bloque pas le testeur
         _logger.warning("diff_du_testeur_illisible", extra={"error": str(exc)})
         return None
@@ -128,6 +131,8 @@ async def run_tests(
         return bool(result.passed)
     except TestCommandNotFound:
         orch._log(f"[{run.ticket_id}] testeur: commande non détectée, ignoré")
+    except LienNonDeclare:
+        raise
     except Exception as exc:
         # Le lanceur lui-même a échoué : on ne transforme pas sa panne en
         # échec du ticket, sinon une commande mal configurée bloquerait tout.
