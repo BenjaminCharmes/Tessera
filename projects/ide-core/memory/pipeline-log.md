@@ -9931,3 +9931,23 @@ error: Please commit or stash them.
 - 2026-11-18 13:30:28 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
 - 2026-11-18 13:30:28 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
 - 2026-11-18 13:30:28 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-18 08:14:55 UTC — [ide-core] ticket-996 PR #1155 non reprise : merge après preuve réelle
+- 2026-11-18 08:14:55 UTC — [ide-core] ticket-995 PR #1153 non reprise : merge après preuve réelle
+- 2026-11-18 10:40:31 UTC — [ticket-997] branche ticket-997-an-agent-process-the-backend-cannot-inspect-block
+- 2026-11-18 10:40:35 UTC — [ticket-997] tour 1 — codeur démarré
+- 2026-11-18 10:42:39 UTC — [ticket-997] tour 1 — codeur terminé (123969ms)
+- 2026-11-18 10:43:58 UTC — [ticket-997] testeur: dur�es : ruff 0 s, mypy 19 s, pytest 28 s, mypy-linux 16 s ; impact depuis base : 13 fichier(s) de test
+- 2026-11-18 10:44:20 UTC — [ticket-997] securite: PASS — Le diff durcit le ménage des processus du compte agent. Un processus apparu pend (22125ms)
+- 2026-11-18 10:44:21 UTC — [ticket-997] tour 1 — reviewer démarré
+- 2026-11-18 10:44:54 UTC — [ticket-997] validateur: APPROVED — Les trois critères sont validés par des tests qui passent. Le code distingue les (33577ms)
+- 2026-11-18 10:45:13 UTC — [ticket-997] tour 1 — reviewer terminé (51766ms)
+- 2026-11-18 10:45:13 UTC — [ticket-997] CHANGES_REQUESTED tour 1: Reviewer : 1. Faux positif quasi certain. `processus_par_sid` lève `ProcessusIllisibles` pour tout PID apparu depuis l'ouverture de l'appel dont le jeton est illisible, quel que soit son propriétaire.
+- 2026-11-18 10:45:13 UTC — [ticket-997] tour 2 — codeur démarré
+- 2026-11-18 10:46:32 UTC — [ticket-997] tour 2 — codeur terminé (78937ms)
+- 2026-11-18 10:48:13 UTC — [ticket-997] testeur: dur�es : ruff 0 s, mypy 22 s, pytest 31 s, mypy-linux 15 s ; impact depuis base : 13 fichier(s) de test
+- 2026-11-18 10:48:37 UTC — [ticket-997] securite: PASS — Le diff renforce l'isolation : il détecte les processus récents dont le jeton es (24093ms)
+- 2026-11-18 10:48:38 UTC — [ticket-997] tour 2 — reviewer démarré
+- 2026-11-18 10:49:12 UTC — [ticket-997] validateur: APPROVED — Les trois critères sont validés par des tests unitaires dédiés qui passent (exit (32953ms)
+- 2026-11-18 10:49:29 UTC — [ticket-997] tour 2 — reviewer terminé (50781ms)
+- 2026-11-18 10:49:29 UTC — [ticket-997] APPROVED après 2 tour(s)
+- 2026-11-18 10:50:02 UTC — [ticket-997] leçons: fichier plein, à compacter à la main
