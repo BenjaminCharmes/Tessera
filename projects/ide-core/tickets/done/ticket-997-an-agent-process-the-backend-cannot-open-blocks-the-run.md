@@ -1,12 +1,13 @@
 ---
-id: ticket-997
-title: "An agent process the backend cannot inspect blocks the run"
-type: fix
-status: todo
-priority: high
 agent: codeur
 depends_on: []
+id: ticket-997
+pr_number: 1157
 preuve_reelle: true
+priority: high
+status: done
+title: An agent process the backend cannot inspect blocks the run
+type: fix
 ---
 
 ## Signalement

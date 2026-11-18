@@ -12,7 +12,7 @@ from pathlib import Path
 
 from tessera.config import settings
 from tessera.services.providers.droits_worktree import DroitsAgentRefuses, Icacls, _icacls_reel, poser_ecriture, retirer_ecriture
-from tessera.services.providers.processus_compte import processus_du_compte, sid_du_compte
+from tessera.services.providers.processus_compte import ProcessusIllisibles, processus_du_compte, processus_existe, sid_du_compte
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -40,9 +40,12 @@ async def _enumerer_reel(compte: str) -> list[tuple[int, str]]:
     return await asyncio.to_thread(processus_du_compte, sid)
 
 
-async def _tuer_reel(pid: int) -> None:
+async def _tuer_reel(pid: int, existe: Callable[[int], bool] = processus_existe) -> None:
     code, sortie = await _executer("taskkill", "/F", "/T", "/PID", str(pid))
     if code != 0:
+        if not await asyncio.to_thread(existe, pid):
+            _logger.info("processus_deja_disparu", extra={"pid": pid})
+            return
         raise DroitsAgentRefuses(f"taskkill a échoué sur {pid} (code {code}) : {sortie.strip()}")
 
 
@@ -66,9 +69,16 @@ def _sous_les_worktrees(racine: Path) -> bool:
 
 async def arreter_les_restants(compte: str, enumerer: Enumerer, tuer: Tuer) -> None:
     """Stop every process still owned by `compte`; log each image name."""
-    for pid, image in await enumerer(compte):
+    illisibles: ProcessusIllisibles | None = None
+    try:
+        trouves = await enumerer(compte)
+    except ProcessusIllisibles as exc:
+        trouves, illisibles = exc.trouves, exc
+    for pid, image in trouves:
         _logger.warning("processus_du_compte_restant", extra={"pid": pid, "image": image})
         await tuer(pid)
+    if illisibles is not None:
+        raise illisibles
 
 
 async def ouvrir_appel(cwd: str | Path, icacls: Icacls = _icacls_reel) -> Path | None:

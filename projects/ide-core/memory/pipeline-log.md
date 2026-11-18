@@ -9931,6 +9931,54 @@ error: Please commit or stash them.
 - 2026-11-18 13:30:28 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
 - 2026-11-18 13:30:28 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
 - 2026-11-18 13:30:28 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-18 08:14:55 UTC — [ide-core] ticket-996 PR #1155 non reprise : merge après preuve réelle
+- 2026-11-18 08:14:55 UTC — [ide-core] ticket-995 PR #1153 non reprise : merge après preuve réelle
+- 2026-11-18 10:40:31 UTC — [ticket-997] branche ticket-997-an-agent-process-the-backend-cannot-inspect-block
+- 2026-11-18 10:40:35 UTC — [ticket-997] tour 1 — codeur démarré
+- 2026-11-18 10:42:39 UTC — [ticket-997] tour 1 — codeur terminé (123969ms)
+- 2026-11-18 10:43:58 UTC — [ticket-997] testeur: dur�es : ruff 0 s, mypy 19 s, pytest 28 s, mypy-linux 16 s ; impact depuis base : 13 fichier(s) de test
+- 2026-11-18 10:44:20 UTC — [ticket-997] securite: PASS — Le diff durcit le ménage des processus du compte agent. Un processus apparu pend (22125ms)
+- 2026-11-18 10:44:21 UTC — [ticket-997] tour 1 — reviewer démarré
+- 2026-11-18 10:44:54 UTC — [ticket-997] validateur: APPROVED — Les trois critères sont validés par des tests qui passent. Le code distingue les (33577ms)
+- 2026-11-18 10:45:13 UTC — [ticket-997] tour 1 — reviewer terminé (51766ms)
+- 2026-11-18 10:45:13 UTC — [ticket-997] CHANGES_REQUESTED tour 1: Reviewer : 1. Faux positif quasi certain. `processus_par_sid` lève `ProcessusIllisibles` pour tout PID apparu depuis l'ouverture de l'appel dont le jeton est illisible, quel que soit son propriétaire.
+- 2026-11-18 10:45:13 UTC — [ticket-997] tour 2 — codeur démarré
+- 2026-11-18 10:46:32 UTC — [ticket-997] tour 2 — codeur terminé (78937ms)
+- 2026-11-18 10:48:13 UTC — [ticket-997] testeur: dur�es : ruff 0 s, mypy 22 s, pytest 31 s, mypy-linux 15 s ; impact depuis base : 13 fichier(s) de test
+- 2026-11-18 10:48:37 UTC — [ticket-997] securite: PASS — Le diff renforce l'isolation : il détecte les processus récents dont le jeton es (24093ms)
+- 2026-11-18 10:48:38 UTC — [ticket-997] tour 2 — reviewer démarré
+- 2026-11-18 10:49:12 UTC — [ticket-997] validateur: APPROVED — Les trois critères sont validés par des tests unitaires dédiés qui passent (exit (32953ms)
+- 2026-11-18 10:49:29 UTC — [ticket-997] tour 2 — reviewer terminé (50781ms)
+- 2026-11-18 10:49:29 UTC — [ticket-997] APPROVED après 2 tour(s)
+- 2026-11-18 10:50:02 UTC — [ticket-997] leçons: fichier plein, à compacter à la main
+- 2026-11-18 10:52:07 UTC — [ticket-997] documentation: 0 fichier(s) (102875ms)
+- 2026-11-18 10:52:07 UTC — documentation trop longue, titres seuls : docs/architecture.md (181178 caractères)
+- 2026-11-18 10:52:07 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-18 10:52:07 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-18 10:52:57 UTC — [ticket-997] livraison: rebase sur develop (563ms)
+- 2026-11-18 10:52:57 UTC — [ticket-997] livraison: PR #1157 ouverte (4984ms)
+- 2026-11-18 10:52:57 UTC — [ticket-997] livraison: arrêt — PR ouverte, merge après preuve réelle
+- 2026-11-18 13:47:59 UTC — [ide-core] ticket-1004 PR #1169 confiée au CIWatcher
+- 2026-11-18 13:48:18 UTC — [ticket-997] branche ticket-997-an-agent-process-the-backend-cannot-inspect-block
+- 2026-11-18 13:48:19 UTC — [ticket-997] fiche relue après l'avance de la base (afbfdead6ec9ee0758ec82db535f57c1b6b8b213 → 82b86ee6311f0deabff612965eae9d120a8d145e)
+- 2026-11-18 13:49:48 UTC — [ticket-997] testeur: dur�es : ruff 0 s, mypy 33 s, pytest 39 s, mypy-linux 24 s ; impact depuis base : 13 fichier(s) de test
+- 2026-11-18 13:49:48 UTC — [ticket-997] branche reprise (5 commit(s)) — tests green, codeur sauté
+- 2026-11-18 13:50:33 UTC — [ticket-997] securite: PASS — PASS : le diff durcit le contrôle. Un processus récent dont le jeton est illisib (25671ms)
+- 2026-11-18 13:50:34 UTC — [ticket-997] tour 1 — reviewer démarré
+- 2026-11-18 13:50:54 UTC — [ticket-997] tour 1 — reviewer terminé (19469ms)
+- 2026-11-18 13:51:21 UTC — [ticket-997] validateur: CHANGES_REQUESTED — Critères 3 et 4 validés : le buffer plein déclenche une énumération plus grande  (47296ms)
+- 2026-11-18 13:51:22 UTC — [ticket-997] CHANGES_REQUESTED tour 1: Reviewer : 1. La règle du suspect est exactement celle que la fiche a refusée. Tout processus absent de l'instantané `_AVANT` dont l'ouverture est refusée (ERROR_ACCESS_DENIED) devient suspect. Or, me
+- 2026-11-18 13:51:22 UTC — [ticket-997] tour 2 — codeur démarré
+- 2026-11-18 13:54:50 UTC — [ticket-997] tour 2 — codeur terminé (207781ms)
+- 2026-11-18 13:56:39 UTC — [ticket-997] testeur: dur�es : ruff 0 s, mypy 15 s, mypy-linux 15 s, pytest 52 s ; impact depuis base : 13 fichier(s) de test
+- 2026-11-18 13:57:03 UTC — [ticket-997] securite: PASS — Le diff renforce le ménage des processus du compte agent sans affaiblir aucune g (23578ms)
+- 2026-11-18 13:57:04 UTC — [ticket-997] tour 2 — reviewer démarré
+- 2026-11-18 13:57:29 UTC — [ticket-997] validateur: APPROVED — Les quatre critères d'acceptation sont tous couverts par des tests explicites qu (25593ms)
+- 2026-11-18 13:57:38 UTC — [ticket-997] tour 2 — reviewer terminé (33969ms)
+- 2026-11-18 13:57:38 UTC — [ticket-997] APPROVED après 2 tour(s)
+- 2026-11-18 13:58:59 UTC — [ticket-997] leçons: refusée — preuve absente du retour du run
+- 2026-11-18 13:59:37 UTC — [ticket-997] documentation: 0 fichier(s) (94ms)
+- 2026-11-18 14:00:30 UTC — [ticket-997] livraison: arrêt — Livraison interrompue : GitCommandError: git command failed (code 1): git -c core.hooksPath=C:\Users
 - 2026-11-18 13:53:32 UTC — [ide-core] ticket-1004 PR #1169 mergée (CI verte)
 - 2026-11-18 14:00:36 UTC — [ticket-998] branche ticket-998-design-the-agent-account-loses-its-rights-on-the
 - 2026-11-18 14:00:39 UTC — [ticket-998] tour 1 — codeur démarré
