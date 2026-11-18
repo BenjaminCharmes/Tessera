@@ -9842,3 +9842,17 @@ error: Please commit or stash them.
 - 2026-11-18 11:48:38 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
 - 2026-11-18 11:48:38 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
 - 2026-11-18 11:48:38 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-18 11:49:15 UTC — [ide-core] ticket-993 PR #1163 confiée au CIWatcher
+- 2026-11-18 11:49:20 UTC — [ticket-990] branche ticket-990-the-tester-log-names-the-failing-test-files
+- 2026-11-18 11:49:23 UTC — [ticket-990] tour 1 — codeur démarré
+- 2026-11-18 11:50:45 UTC — [ticket-990] tour 1 — codeur terminé (81858ms)
+- 2026-11-18 11:53:18 UTC — [ticket-990] testeur: dur�es : ruff 0 s, mypy 14 s, mypy-linux 17 s, pytest 112 s ; impact depuis base : 53 fichier(s) de test
+- 2026-11-18 11:53:26 UTC — [ticket-990] securite: PASS — Le diff ne touche qu'une ligne de journal, enrichie des noms de fichiers en éche (7218ms)
+- 2026-11-18 11:53:27 UTC — [ticket-990] tour 1 — reviewer démarré
+- 2026-11-18 11:53:42 UTC — [ticket-990] tour 1 — reviewer terminé (15625ms)
+- 2026-11-18 11:53:50 UTC — [ticket-990] validateur: APPROVED — Les trois critères sont couverts par les tests du fichier test_ligne_des_echecs. (23092ms)
+- 2026-11-18 11:53:50 UTC — [ticket-990] APPROVED après 1 tour(s)
+- 2026-11-18 11:56:43 UTC — [ticket-990] documentation: 0 fichier(s) (152062ms)
+- 2026-11-18 11:56:43 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-18 11:56:43 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-18 11:56:43 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)

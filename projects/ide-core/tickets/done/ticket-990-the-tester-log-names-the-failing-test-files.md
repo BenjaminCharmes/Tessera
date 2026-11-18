@@ -1,11 +1,12 @@
 ---
-id: ticket-990
-title: "The tester log names the failing test files"
-type: fix
-status: todo
-priority: medium
 agent: codeur
 depends_on: []
+id: ticket-990
+pr_number: 1164
+priority: medium
+status: done
+title: The tester log names the failing test files
+type: fix
 ---
 
 ## Signalement
