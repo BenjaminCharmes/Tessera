@@ -16,6 +16,8 @@ from tessera.services.pipeline.pipeline_production import _capture_diff
 from tessera.services.pipeline.pipeline_run import PipelineRun
 from tests.depot_worktree import git, lier
 
+LIEN = "docs/lien-x"
+
 
 @pytest.fixture
 def depot(tmp_path: Path) -> Path:
@@ -75,7 +77,8 @@ async def _preparer(depot: Path) -> tuple[_Orch, PipelineRun, Path]:
     run.branch = await workspace.create_branch("ticket-001", "t")
     cible = _cible(depot)
     (depot / "travail.txt").write_text("ok", encoding="utf-8")
-    lier(cible, depot / "lien")
+    (depot / "docs").mkdir()
+    lier(cible, depot / "docs" / "lien-x")
     return _Orch(depot, workspace), run, cible
 
 
@@ -88,20 +91,20 @@ async def test_a_refused_link_blocks_the_run_and_names_the_link(depot: Path) -> 
 
     assert resultat.final_status is TicketStatus.blocked
     assert resultat.approved is False
-    assert "lien" in (resultat.arret or "")
+    assert LIEN in (resultat.arret or "")
 
 
 async def test_the_work_is_committed_without_the_link_target(depot: Path) -> None:
     orch, run, cible = await _preparer(depot)
 
-    await finish_lien_refuse(orch, run, LienNonDeclare(["lien"]))  # type: ignore[arg-type]
+    await finish_lien_refuse(orch, run, LienNonDeclare([LIEN]))  # type: ignore[arg-type]
 
     assert "unapproved work" in git(depot, "log", "-1", "--format=%s")
     fichiers = git(depot, "ls-tree", "-r", "--name-only", "HEAD")
     assert "travail.txt" in fichiers
     assert "secret.txt" not in fichiers
     assert (cible / "secret.txt").read_text(encoding="utf-8") == "ne pas indexer"
-    assert not (depot / "lien").exists()
+    assert not (depot / "docs" / "lien-x").exists()
     assert git(depot, "status", "--porcelain") == ""
 
 
@@ -114,7 +117,7 @@ async def test_a_link_that_cannot_be_removed_is_named_and_nothing_is_committed(
         lambda racine, liens: [racine / liens[0]],
     )
 
-    resultat = await finish_lien_refuse(orch, run, LienNonDeclare(["lien"]))  # type: ignore[arg-type]
+    resultat = await finish_lien_refuse(orch, run, LienNonDeclare([LIEN]))  # type: ignore[arg-type]
 
     assert "non retiré" in (resultat.arret or "")
     assert resultat.commit_sha is None
@@ -138,4 +141,46 @@ async def test_other_diff_errors_keep_the_prose_fallback() -> None:
     orch = _Orch(Path("."), workspace)
 
     assert await _capture_diff(orch, _run(), "prose") == "prose"  # type: ignore[arg-type]
+
+
+async def test_a_link_left_by_the_coder_blocks_round_one_before_any_gate(
+    depot: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from unittest.mock import MagicMock
+
+    from tessera.services.pipeline import pipeline_controles, pipeline_production
+    from tessera.services.pipeline.orchestrator import Orchestrator
+
+    workspace = GitWorkspaceService(depot)
+    run = _run()
+    run.branch = await workspace.create_branch("ticket-001", "t")
+    cible = _cible(depot)
+    orch = Orchestrator(
+        runner=MagicMock(), ticket_service=_Tickets(),  # type: ignore[arg-type]
+        project_context="ctx", agent_configs=[],
+        pipeline_log_path=depot / "memory" / "log.md",
+        project_path=depot, git_workspace=workspace,
+    )
+
+    async def _coder(o: Orchestrator, r: PipelineRun, _ctx: str) -> None:
+        (depot / "travail.txt").write_text("ok", encoding="utf-8")
+        (depot / "docs").mkdir()
+        lier(cible, depot / "docs" / "lien-x")
+        await _capture_diff(o, r, "prose du codeur")  # lecture du diff, comme `run_coder`
+
+    gates = AsyncMock()
+    monkeypatch.setattr(pipeline_production, "run_coder", _coder)
+    monkeypatch.setattr(pipeline_controles, "run_security_audit", gates)
+    monkeypatch.setattr(pipeline_controles, "run_review_and_validation", gates)
+
+    with pytest.raises(LienNonDeclare) as lu:
+        await orch._run_rounds(run, "ticket-001")
+    resultat = await finish_lien_refuse(orch, run, lu.value)  # type: ignore[arg-type]
+
+    gates.assert_not_called()
+    assert run.round_num == 1
+    assert resultat.final_status is TicketStatus.blocked
+    assert LIEN in (resultat.arret or "")
+    assert "unapproved work" in git(depot, "log", "-1", "--format=%s")
+    assert (cible / "secret.txt").exists()
 
