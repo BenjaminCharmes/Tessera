@@ -10133,3 +10133,10 @@ error: Please commit or stash them.
 - 2026-11-18 18:01:47 UTC — [ticket-1011] leçons: fichier plein, à compacter à la main
 - 2026-11-18 18:02:21 UTC — [ticket-1011] documentation: 0 fichier(s) (905ms)
 - 2026-11-18 18:02:21 UTC — [ticket-1011] documentation: pas de diff retrouvable, non documenté
+- 2026-11-18 18:11:09 UTC — [ide-core] ticket-1011 PR #1178 confiée au CIWatcher
+- 2026-11-18 17:31:25 UTC — [ide-core] ticket-1010 PR #1177 mergée (CI verte)
+- 2026-11-18 18:11:17 UTC — [ticket-1006] branche ticket-1006-the-agent-account-gives-back-the-files-it-create
+- 2026-11-18 18:11:22 UTC — [ticket-1006] tour 1 — codeur démarré
+- 2026-11-18 18:13:29 UTC — [ticket-1006] tour 1 — codeur terminé (126672ms)
+- 2026-11-18 18:16:10 UTC — [ticket-1006] testeur: dur�es : ruff 0 s, mypy 24 s, mypy-linux 30 s, pytest 108 s ; impact depuis base : 17 fichier(s) de test
+- 2026-11-18 18:16:47 UTC — [ticket-1006] securite: BLOCK — BLOCK : le `/reset /T` ajouté dans `retirer_ecriture` efface, dès la fin du prem (36109ms)
