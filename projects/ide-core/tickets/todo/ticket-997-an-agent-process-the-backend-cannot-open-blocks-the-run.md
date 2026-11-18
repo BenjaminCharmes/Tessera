@@ -28,17 +28,43 @@ ménage et met le run en `blocked` à tort.
 
 ## Ce qu'il faut faire
 
-- Distinguer « jeton d'un autre compte » de « jeton illisible » : pour un
-  processus dont le jeton ne s'ouvre pas, lire son SID autrement s'il le faut
-  (ou traiter l'illisible comme suspect quand le processus a été créé après
-  le début de l'appel) ; un processus du compte qu'on ne peut pas arrêter met
-  le run en `blocked` (ADR-037).
+- Distinguer « jeton d'un autre compte » de « jeton illisible ». Un processus
+  au jeton illisible n'est suspect que s'il descend d'un processus de l'appel :
+  sa chaîne de parents (`CreateToolhelp32Snapshot`, `th32ParentProcessID`,
+  lisible sans ouvrir le processus) remonte au backend ou à un processus du
+  compte déjà vu pendant l'appel. Un processus du compte qu'on ne peut pas
+  arrêter met le run en `blocked` (ADR-037).
 - Agrandir le tampon d'`EnumProcesses` tant qu'il est plein.
 - `taskkill` qui échoue parce que le PID n'existe plus : succès, journalisé.
 
+## Refus du 18/11 (PR #1157, non mergée)
+
+Le premier passage tenait pour suspect **tout** processus apparu depuis le
+début de l'appel dont `OpenProcess` est refusé. Mesuré le 18/11 sur le poste,
+sans droits d'administrateur : 187 processus sur 533 refusent l'ouverture
+(System, services, csrss, winlogon, dwm, services de pilotes), et **3
+nouveaux en 3 minutes**, machine au repos. Un appel d'agent dure plusieurs
+minutes : presque chaque run aurait fini `blocked` à tort.
+
+Pistes écartées, vérifiées sur le poste :
+- `WTSEnumerateProcessesW` ne rend le SID d'aucun de ces 187 processus à un
+  non-administrateur.
+- La session ne suffit pas seule : 180 sont en session 0, mais 7 sont dans
+  la session de l'utilisateur (csrss, winlogon, dwm, services de pilotes).
+
+Vérifié le 18/11 : un processus lancé par `CreateProcessWithLogonW` a pour
+parent Toolhelp le processus appelant (le backend), pas le service seclogon.
+
+La branche `ticket-997-…` porte le premier passage : en garder le tampon
+agrandi et le `taskkill` sur PID disparu ; refaire la règle du suspect.
+
 ## Critères d'acceptation
 
-- [ ] Test : processus du compte au jeton illisible → `DroitsAgentRefuses`.
+- [ ] Test : processus du compte au jeton illisible, descendant d'un
+  processus de l'appel → `DroitsAgentRefuses`.
+- [ ] Test : processus au jeton illisible apparu pendant l'appel, dont la
+  chaîne de parents ne passe ni par le backend ni par un processus du compte
+  (un service, parent `services.exe`) → ignoré, aucune erreur.
 - [ ] Test : tampon plein → seconde énumération plus grande.
 - [ ] Test : PID disparu avant `taskkill` → pas d'erreur.
 
