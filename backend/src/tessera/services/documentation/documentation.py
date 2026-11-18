@@ -245,7 +245,7 @@ class DocumentationService:
                     system=systeme,
                     user=_brief_correction(
                         _user_du_disque(racine, tickets, matiere, claude_md, agents_md),
-                        str(reponse.content), motif, titres, fichiers
+                        str(reponse.content), motif, titres, fichiers, exc.extrait
                     ),
                     model=modele,
                     max_tokens=_MAX_TOKENS,

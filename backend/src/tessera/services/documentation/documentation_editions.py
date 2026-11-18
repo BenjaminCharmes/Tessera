@@ -11,6 +11,7 @@ from tessera.services.documentation import documentation_claude_md as claude_md_
 from tessera.services.documentation.documentation_base import EditionRefusee
 from tessera.services.documentation.documentation_base import normaliser_typo as _normaliser_typo
 from tessera.services.documentation.documentation_code import MatiereCode
+from tessera.services.documentation.documentation_extraits import occurrences_avec_contexte, passage_proche
 from tessera.services.documentation.documentation_preuve import ControleDePreuve
 
 #: Ce qu'un agent de documentation a le droit de toucher. Il documente ; le
@@ -158,16 +159,19 @@ def _localiser(avant: str, ancien: str, chemin: str) -> tuple[int, int]:
             debut = trouvees[0]
             dernier = pos_avant[debut + len(norm_ancien) - 1]
             return pos_avant[debut], dernier + 1
-        exactes = trouvees
+        # Reportées dans `avant`, pour numéroter les lignes du vrai fichier.
+        exactes = [pos_avant[p] for p in trouvees]
 
     if not exactes:
         raise EditionRefusee(
             f"{chemin} : texte introuvable — « {ancien[:60]} ». "
-            "L'agent a proposé une modification sur un texte qui n'existe pas."
+            "L'agent a proposé une modification sur un texte qui n'existe pas.",
+            passage_proche(avant, ancien),
         )
     raise EditionRefusee(
         f"{chemin} : texte présent {len(exactes)} fois — on ne devine pas "
-        "laquelle remplacer."
+        "laquelle remplacer.",
+        occurrences_avec_contexte(avant, exactes),
     )
 
 

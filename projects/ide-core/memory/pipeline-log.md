@@ -9856,3 +9856,18 @@ error: Please commit or stash them.
 - 2026-11-18 11:56:43 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
 - 2026-11-18 11:56:43 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
 - 2026-11-18 11:56:43 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-18 12:00:40 UTC — [ide-core] ticket-990 PR #1164 confiée au CIWatcher
+- 2026-11-18 11:55:01 UTC — [ide-core] ticket-993 PR #1163 mergée (CI verte)
+- 2026-11-18 12:00:45 UTC — [ticket-989] branche ticket-989-a-refused-doc-edit-shows-the-agent-where-its-anch
+- 2026-11-18 12:00:49 UTC — [ticket-989] tour 1 — codeur démarré
+- 2026-11-18 12:02:28 UTC — [ticket-989] tour 1 — codeur terminé (99265ms)
+- 2026-11-18 12:04:38 UTC — [ticket-989] testeur: dur�es : ruff 0 s, mypy 16 s, mypy-linux 22 s, pytest 62 s ; impact depuis base : 28 fichier(s) de test
+- 2026-11-18 12:04:52 UTC — [ticket-989] securite: PASS — Aucune faille bloquante : l'extrait joint au refus vient d'un fichier dont le ch (13828ms)
+- 2026-11-18 12:04:54 UTC — [ticket-989] tour 1 — reviewer démarré
+- 2026-11-18 12:05:16 UTC — [ticket-989] tour 1 — reviewer terminé (21671ms)
+- 2026-11-18 12:05:19 UTC — [ticket-989] validateur: APPROVED — Le diff implémente complètement le ticket : nouvelle classe `EditionRefusee` por (22765ms)
+- 2026-11-18 12:05:19 UTC — [ticket-989] APPROVED après 1 tour(s)
+- 2026-11-18 12:07:16 UTC — [ticket-989] documentation: 0 fichier(s) (93812ms)
+- 2026-11-18 12:07:16 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-18 12:07:16 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-18 12:07:16 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
