@@ -44,6 +44,7 @@ class IssueMerge:
     confirme_apres_reseau: bool = False
     erreur_reseau: str | None = None
     relu_pendant_s: float = 0.0
+    refus_ci: str | None = None
 
 
 async def relire_apres_erreur_reseau(
@@ -117,6 +118,9 @@ async def tenter_le_merge(
             return IssueMerge(merged=False)
         nom = f"HTTP {exc.response.status_code}"
     else:
+        refus = getattr(workflow, "refus_ci", None)
+        if not merged and isinstance(refus, str):
+            return IssueMerge(merged=False, refus_ci=refus)
         return IssueMerge(merged=merged)
     return await relire_apres_erreur_reseau(
         workflow, pr_number, nom, fenetre_s, intervalle_s, dormir
@@ -134,6 +138,12 @@ def arret_de_merge(pr_number: int, issue: IssueMerge) -> str:
         return (
             f"Le merge de la PR #{pr_number} a échoué sur une erreur réseau "
             f"({issue.erreur_reseau}).{duree} La PR reste ouverte."
+        )
+    if issue.refus_ci is not None:
+        # Tessera n'a pas tenté le merge : GitHub n'a rien refusé.
+        return (
+            f"Merge de la PR #{pr_number} non tenté : la CI est « "
+            f"{issue.refus_ci} ». La PR reste ouverte."
         )
     return f"GitHub a refusé le merge de la PR #{pr_number}."
 
@@ -157,3 +167,26 @@ async def tete_a_change(
         f"la tête de la PR #{pr_number} n'est plus le commit poussé : "
         f"{lue} au lieu de {sha_attendu[:7]}. La PR reste ouverte."
     )
+
+
+async def attendre_verdict_sans_ci(
+    etat_ci: Callable[[int], Awaitable[str]],
+    dormir: Callable[[float], Awaitable[None]],
+    pr_number: int,
+    attente_max_s: float,
+    intervalle_s: float,
+) -> str:
+    """Under `merge_without_ci`, waits only while the CI is `pending`.
+
+    `none` is returned at once (declared absence of CI holds); any other
+    state is a verdict. Same wait bound as the regular CI wait (ticket-1004).
+    """
+    ecoule = 0.0
+    while True:
+        etat = await etat_ci(pr_number)
+        if etat != "pending":
+            return etat
+        if ecoule >= attente_max_s:
+            return "pending"
+        await dormir(intervalle_s)
+        ecoule += intervalle_s

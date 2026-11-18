@@ -64,3 +64,21 @@ def arret_pr_en_conflit(pr_number: int, base_branch: str) -> str:
         f"PR #{pr_number} en conflit avec {base_branch} : "
         "à rebaser. La PR reste ouverte."
     )
+
+
+def arret_apres_ci(
+    ci: str, pr_number: int, base_branch: str, code_http: object
+) -> tuple[str, bool]:
+    """The stop line for a CI state that is not `passing`, and whether the PR
+    must be updated from its base."""
+    if ci == "pending":
+        return (
+            f"Fin de l'attente : la CI de la PR #{pr_number} n'a pas rendu de "
+            "verdict. La PR reste ouverte.",
+            False,
+        )
+    if ci == "unreadable":
+        return arret_ci_illisible(code_http, pr_number), False
+    if ci == "conflicting":
+        return arret_pr_en_conflit(pr_number, base_branch), True
+    return f"CI {ci} : la PR #{pr_number} reste ouverte.", False
