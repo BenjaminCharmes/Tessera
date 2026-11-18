@@ -4,7 +4,7 @@ created: '2026-11-17'
 depends_on: []
 id: ticket-1002
 priority: medium
-status: todo
+status: cancelled
 title: 'ci.yml illisible (EPERM) : documentation.test.ts échoue'
 type: fix
 ---
@@ -24,3 +24,9 @@ Dans le worktree ticket-009, ouvrir .github/workflows/ci.yml renvoie EPERM, mêm
 ## Critères d'acceptation
 
 - [ ] À écrire au triage
+
+## Annulé le 18/11
+
+Doublon du ticket-994 (mergé le 17/11), qui rend `ci.yml` lisible au compte
+agent ; prouvé le 18/11 (Serpent 009 : 20 tests verts sous le compte).
+Annulation décidée par Benjamin sur la page « À toi de jouer ».
