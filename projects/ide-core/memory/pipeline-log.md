@@ -9871,3 +9871,44 @@ error: Please commit or stash them.
 - 2026-11-18 12:07:16 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
 - 2026-11-18 12:07:16 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
 - 2026-11-18 12:07:16 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-18 12:15:02 UTC — [ticket-1005] branche ticket-1005-a-refused-link-ends-the-run-at-once-named-instea
+- 2026-11-18 12:15:05 UTC — [ticket-1005] tour 1 — codeur démarré
+- 2026-11-18 12:17:44 UTC — [ticket-1005] tour 1 — codeur terminé (158452ms)
+- 2026-11-18 12:23:35 UTC — [ticket-1005] testeur: 1 failed, 630 passed, 48 warnings in 311.26s (0:05:11)
+- 2026-11-18 12:23:36 UTC — [ticket-1005] tests rouges au tour 1
+- 2026-11-18 12:23:36 UTC — [ticket-1005] tour 2 — codeur démarré
+- 2026-11-18 12:27:14 UTC — [ticket-1005] tour 2 — codeur terminé (218358ms)
+- 2026-11-18 12:32:48 UTC — [ticket-1005] testeur: 1 failed, 1127 passed, 48 warnings in 291.29s (0:04:51)
+- 2026-11-18 12:32:48 UTC — [ticket-1005] tests rouges au tour 2
+- 2026-11-18 12:32:48 UTC — [ticket-1005] tour 3 — codeur démarré
+- 2026-11-18 12:34:20 UTC — [ticket-1005] tour 3 — codeur terminé (91655ms)
+- 2026-11-18 12:39:36 UTC — [ticket-1005] testeur: dur�es : ruff 0 s, mypy 17 s, mypy-linux 16 s, pytest 277 s ; impact depuis base : 108 fichier(s) de test
+- 2026-11-18 12:39:56 UTC — [ticket-1005] securite: PASS — PASS. Le diff fait remonter `LienNonDeclare` au lieu de retomber sur la prose du (19359ms)
+- 2026-11-18 12:39:56 UTC — [ticket-1005] tour 3 — reviewer démarré
+- 2026-11-18 12:40:32 UTC — [ticket-1005] tour 3 — reviewer terminé (35578ms)
+- 2026-11-18 12:40:32 UTC — [ticket-1005] validateur: APPROVED — Tous les critères sont satisfaits par le code et validés par les tests. Le pipel (35641ms)
+- 2026-11-18 12:40:32 UTC — [ticket-1005] CHANGES_REQUESTED tour 3: Reviewer : 1. Critère 1 non couvert. Il demande un run `blocked` au tour 1, sans aucun appel d'audit, de reviewer ni de validateur. `test_a_refused_link_blocks_the_run_and_names_the_link` appelle seul
+- 2026-11-18 12:40:32 UTC — [ticket-1005] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-18 12:40:54 UTC — [ide-core] file interrompue : ticket-1005 non approuvé
+- 2026-11-18 12:14:59 UTC — [ide-core] ticket-989 PR #1165 mergée (CI verte)
+- 2026-11-18 12:41:32 UTC — [ticket-1005] branche ticket-1005-a-refused-link-ends-the-run-at-once-named-instea
+- 2026-11-18 12:41:36 UTC — [ticket-1005] branche reprise (3 commit(s)) — refus précédent : revue, codeur en premier
+- 2026-11-18 12:41:36 UTC — [ticket-1005] tour 1 — codeur démarré
+- 2026-11-18 12:44:24 UTC — [ticket-1005] tour 1 — codeur terminé (168250ms)
+- 2026-11-18 12:51:43 UTC — [ticket-1005] testeur: dur�es : ruff 0 s, mypy 2 s, mypy-linux 4 s, pytest 397 s ; impact depuis base : 108 fichier(s) de test
+- 2026-11-18 12:52:02 UTC — [ticket-1005] securite: PASS — Verdict PASS. Le diff fait échouer le run fermé : un lien non déclaré met le run (18234ms)
+- 2026-11-18 12:52:02 UTC — [ticket-1005] tour 1 — reviewer démarré
+- 2026-11-18 12:52:34 UTC — [ticket-1005] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le code implémente correctemen (31640ms)
+- 2026-11-18 12:52:43 UTC — [ticket-1005] tour 1 — reviewer terminé (40812ms)
+- 2026-11-18 12:52:43 UTC — [ticket-1005] CHANGES_REQUESTED tour 1: Reviewer : 1. Critère 1 : « l'arrêt contient le chemin du lien » n'est pas vraiment testé. Les deux tests vérifient `"lien" in resultat.arret`, mais `arret` commence toujours par « lien non déclaré da
+- 2026-11-18 12:52:43 UTC — [ticket-1005] tour 2 — codeur démarré
+- 2026-11-18 12:53:16 UTC — [ticket-1005] tour 2 — codeur terminé (32407ms)
+- 2026-11-18 12:58:57 UTC — [ticket-1005] testeur: dur�es : ruff 0 s, mypy 3 s, mypy-linux 4 s, pytest 282 s ; impact depuis base : 108 fichier(s) de test
+- 2026-11-18 12:59:15 UTC — [ticket-1005] securite: PASS — PASS : aucune faille CRITICAL ni HIGH introduite, seulement un risque LOW de cou (16922ms)
+- 2026-11-18 12:59:15 UTC — [ticket-1005] tour 2 — reviewer démarré
+- 2026-11-18 12:59:30 UTC — [ticket-1005] tour 2 — reviewer terminé (14296ms)
+- 2026-11-18 12:59:55 UTC — [ticket-1005] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le code implémente bien le flu (40047ms)
+- 2026-11-18 12:59:56 UTC — [ticket-1005] APPROVED après 2 tour(s)
+- 2026-11-18 13:00:34 UTC — [ticket-1005] leçons: refusée — preuve absente du retour du run
+- 2026-11-18 13:00:57 UTC — [ticket-1005] documentation: 0 fichier(s) (437ms)
+- 2026-11-18 13:00:57 UTC — [ticket-1005] documentation: pas de diff retrouvable, non documenté

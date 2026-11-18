@@ -18,7 +18,7 @@ from tessera.services.livraison.livraison import Livraison
 from tessera.services.noyau.dialogue import DialogueChannel
 from tessera.services.noyau.journal_pipeline import ajouter_ligne
 from tessera.services.noyau.pipeline_events import EventCallback, EventType, OrchestratorEvent, PipelineResult
-from tessera.services.pipeline import pipeline_branche, pipeline_controles, pipeline_production, pipeline_testeur
+from tessera.services.pipeline import pipeline_branche, pipeline_controles, pipeline_lien_refuse, pipeline_production, pipeline_testeur
 from tessera.services.pipeline import pipeline_fin_de_file as fin_de_file
 from tessera.services.pipeline import pipeline_outcomes as outcomes
 from tessera.services.pipeline.file_vivante import est_termine
@@ -422,7 +422,7 @@ class Orchestrator:
                 return await outcomes.finish_quota_exhausted(
                     self, run, exc, resume_label(snapshot)
                 )
-            return await outcomes.finish_interrupted(self, run, exc)
+            return await pipeline_lien_refuse.finish_apres_panne(self, run, exc)
 
     def _avertir_du_build(self, ticket_id: str) -> None:
         """Journalise un test_command qui ne lance pas le build (ticket-454).

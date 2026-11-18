@@ -3,10 +3,12 @@ agent: codeur
 depends_on:
 - ticket-996
 id: ticket-1005
+pr_number: 1167
 preuve_reelle: true
 priority: high
-status: todo
-title: A refused link ends the run at once, named, instead of being read as an empty diff
+status: done
+title: A refused link ends the run at once, named, instead of being read as an empty
+  diff
 type: fix
 ---
 

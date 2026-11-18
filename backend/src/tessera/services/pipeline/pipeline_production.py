@@ -10,8 +10,8 @@ from typing import TYPE_CHECKING, Any
 from tessera.config import settings
 from tessera.models.agent import AgentResult, AgentRole
 from tessera.models.ticket import TicketStatus, TicketType
-from tessera.services.git_workspace import GitWorkspaceError
 from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent, PipelineResult
+from tessera.services.pipeline.pipeline_diff import lire_le_diff
 from tessera.services.pipeline.pipeline_empreinte import arret_fichier_protege, empreinte, noms_changes
 from tessera.services.pipeline.pipeline_run import PipelineRun, set_status
 from tessera.services.pipeline.signaler_du_run import signaler_for
@@ -259,11 +259,7 @@ async def _capture_diff(orch: "Orchestrator", run: PipelineRun, prose: str) -> s
     """
     if orch._git_workspace is None:
         return prose
-    try:
-        diff = await orch._git_workspace.diff_depuis_base()
-    except GitWorkspaceError as exc:
-        _logger.warning("diff_failed", extra={"error": str(exc)})
-        diff = ""  # échoue fermé : un diff inconnu vaut un diff vide
+    diff = await lire_le_diff(orch._git_workspace)
     run.diff_vide = not diff.strip()
     if run.diff_vide:
         _logger.info("diff_empty_fallback_to_prose", extra={"ticket_id": run.ticket_id})

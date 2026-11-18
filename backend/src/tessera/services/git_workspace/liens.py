@@ -137,3 +137,24 @@ async def refuser_les_liens(racine: Path) -> None:
     refuses = await liens_non_declares(racine)
     if refuses:
         raise LienNonDeclare(refuses)
+
+
+def retirer_ces_liens(racine: Path, liens: list[str]) -> list[Path]:
+    """Unlink the given links (paths relative to `racine`); return those that remain.
+
+    A link is removed as an entry, never entered: its target is left untouched.
+    """
+    restants: list[Path] = []
+    for lien in liens:
+        chemin = racine / lien
+        if not os.path.lexists(chemin):
+            continue
+        for retrait in (os.rmdir, os.unlink):
+            try:
+                retrait(chemin)
+            except OSError:
+                continue
+            break
+        else:
+            restants.append(chemin)
+    return restants
