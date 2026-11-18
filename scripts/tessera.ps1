@@ -168,7 +168,7 @@ function Test-DossierWorktreesAgent {
     # Un droit herite pour l'agent ou pour Users ouvre le dossier a plus que prevu.
     $agent = if ($env:AGENT_USER) { $env:AGENT_USER } else { 'tessera-agent' }
     $herites = @($acl.Access | Where-Object { $_.IsInherited -and $_.AccessControlType -eq 'Allow' } | Where-Object {
-        $nom = ($_.IdentityReference.Value -split '\')[-1]
+        $nom = ($_.IdentityReference.Value.Split('\'))[-1]
         $sid = try { $_.IdentityReference.Translate([System.Security.Principal.SecurityIdentifier]).Value } catch { '' }
         ($nom -eq $agent) -or ($sid -eq 'S-1-5-32-545')
     })

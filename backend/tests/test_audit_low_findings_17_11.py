@@ -102,6 +102,9 @@ async def test_explicit_rights_are_accepted(tmp_path: Path) -> None:
 def test_doctor_checks_inherited_rights() -> None:
     texte = (_RACINE / "scripts" / "tessera.ps1").read_text(encoding="utf-8-sig")
     assert "IsInherited" in texte and "S-1-5-32-545" in texte
+    # `-split '\'` est une regex invalide : le doctor planterait au lieu d'echouer
+    assert "-split '\\'" not in texte
+    assert "Split('\\')" in texte
 
 
 def test_unreadable_runs_database_is_not_read_as_no_open_run(tmp_path: Path) -> None:
