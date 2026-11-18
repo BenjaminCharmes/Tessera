@@ -67,7 +67,37 @@ async def preparer_dossier_agent(
     # Idempotent : un dossier créé avant ce droit le reçoit au prochain run.
     if settings.agent_user:
         await accorder_lecture_dossier(dossier, settings.agent_user, lanceur)
+        await refuser_droit_herite(dossier, settings.agent_user, lanceur)
     return dossier
+
+
+#: Les identités dont un droit hérité sur le dossier est refusé, en minuscules.
+_TROP_LARGES = ("users", "utilisateurs", "authenticated users", "utilisateurs authentifiés", "everyone", "tout le monde")
+
+
+def _droit_herite_refuse(sortie: str, compte: str) -> list[str]:
+    """Lines of an `icacls` listing that give `compte` or Users an inherited right."""
+    cibles = (compte.lower().rsplit("\\", 1)[-1], *_TROP_LARGES)
+    refus: list[str] = []
+    for ligne in sortie.splitlines():
+        identite, _, droits = ligne.strip().rpartition(":")
+        nom = identite.lower().rsplit("\\", 1)[-1].strip()
+        if "(I)" in droits and nom in cibles:
+            refus.append(ligne.strip())
+    return refus
+
+
+async def refuser_droit_herite(
+    dossier: Path, compte: str, lanceur: Icacls | None = None
+) -> None:
+    """Refuse a worktrees folder that carries an inherited right for the agent or Users."""
+    code, sortie = await (lanceur or _icacls_reel)([str(dossier)])
+    if code != 0:
+        raise DossierAgentRefuse(f"icacls a échoué (code {code}) sur {dossier} : {sortie.strip()}")
+    if _droit_herite_refuse(sortie, compte):
+        raise DossierAgentRefuse(
+            f"{dossier} porte un droit hérité pour {compte} ou Users : `icacls /inheritance:r` d'abord"
+        )
 
 
 async def _lancer(lanceur: Icacls, args: list[str], dossier: Path) -> None:

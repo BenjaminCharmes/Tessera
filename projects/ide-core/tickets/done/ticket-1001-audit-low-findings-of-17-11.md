@@ -1,12 +1,14 @@
 ---
-id: ticket-1001
-title: "Low findings of the 17/11 audit: declared env, relaunch arguments, setup script, hooks"
-type: fix
-status: todo
-priority: medium
 agent: codeur
 depends_on: []
+id: ticket-1001
+pr_number: 1174
 preuve_reelle: true
+priority: medium
+status: done
+title: 'Low findings of the 17/11 audit: declared env, relaunch arguments, setup script,
+  hooks'
+type: fix
 ---
 
 ## Signalement

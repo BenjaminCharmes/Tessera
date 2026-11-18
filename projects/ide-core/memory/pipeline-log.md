@@ -9994,3 +9994,34 @@ error: Please commit or stash them.
 - 2026-11-18 14:08:10 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
 - 2026-11-18 14:08:10 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
 - 2026-11-18 14:08:10 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-18 12:08:57 UTC — [ide-core] ticket-989 PR #1165 confiée au CIWatcher
+- 2026-11-18 12:06:41 UTC — [ide-core] ticket-990 PR #1164 mergée (CI verte)
+- 2026-11-18 12:09:02 UTC — [ticket-1001] branche ticket-1001-low-findings-of-the-17-11-audit-declared-env-rel
+- 2026-11-18 12:09:05 UTC — [ticket-1001] tour 1 — codeur démarré
+- 2026-11-18 12:12:36 UTC — [ticket-1001] tour 1 — codeur terminé (210468ms)
+- 2026-11-18 12:12:36 UTC — [ticket-1001] BLOCKED — fichier protégé modifié pendant un appel d'agent : scripts/hooks/pre-push
+- 2026-11-18 12:12:56 UTC — [ide-core] file interrompue : ticket-1001 non approuvé
+- 2026-11-18 14:59:38 UTC — [ide-core] ticket-983 PR #1172 non surveillée (livraison arrêtée)
+- 2026-11-18 14:13:59 UTC — [ticket-998] livraison: nouvelle tentative de la PR #1171 après une erreur réseau (ConnectTimeout), PR non mergée
+- 2026-11-18 14:14:23 UTC — [ide-core] ticket-998 PR #1171 mergée (CI verte)
+- 2026-11-18 14:59:45 UTC — [ticket-1001] branche ticket-1001-low-findings-of-the-17-11-audit-declared-env-rel
+- 2026-11-18 15:11:31 UTC — [ticket-1001] testeur: dur�es : ruff 0 s, mypy 17 s, mypy-linux 27 s, pytest 683 s ; impact depuis base : suite compl�te
+- 2026-11-18 15:11:31 UTC — [ticket-1001] branche reprise (3 commit(s)) — tests green, codeur sauté
+- 2026-11-18 15:12:14 UTC — [ticket-1001] securite: PASS — Le diff durcit le code : les secrets d'`extra` et `PATH` sont filtrés, les noms  (25203ms)
+- 2026-11-18 15:12:14 UTC — [ticket-1001] tour 1 — reviewer démarré
+- 2026-11-18 15:12:45 UTC — [ticket-1001] validateur: APPROVED — Le critère unique demandant un test par point (L1, L4, L6, L9, L10, réserve 973) (30922ms)
+- 2026-11-18 15:12:57 UTC — [ticket-1001] tour 1 — reviewer terminé (42702ms)
+- 2026-11-18 15:12:57 UTC — [ticket-1001] CHANGES_REQUESTED tour 1: Reviewer : 1. Dans `Test-DossierWorktreesAgent`, `($_.IdentityReference.Value -split '\')` utilise le motif regex `'\'` seul (une barre oblique inverse), qui est invalide : PowerShell lève « Illegal \
+- 2026-11-18 15:12:57 UTC — [ticket-1001] tour 2 — codeur démarré
+- 2026-11-18 15:15:08 UTC — [ticket-1001] tour 2 — codeur terminé (130203ms)
+- 2026-11-18 15:29:45 UTC — [ticket-1001] testeur: dur�es : ruff 1 s, mypy 10 s, mypy-linux 9 s, pytest 814 s ; impact depuis base : suite compl�te
+- 2026-11-18 15:30:05 UTC — [ticket-1001] securite: PASS — Le diff ne fait que durcir le code. Une base des runs illisible fait refuser la  (19421ms)
+- 2026-11-18 15:30:06 UTC — [ticket-1001] tour 2 — reviewer démarré
+- 2026-11-18 15:30:23 UTC — [ticket-1001] tour 2 — reviewer terminé (17343ms)
+- 2026-11-18 15:30:37 UTC — [ticket-1001] validateur: APPROVED — Le critère unique demandant un test par point de l'audit (L1, L4, L6, L9, L10, r (30782ms)
+- 2026-11-18 15:30:37 UTC — [ticket-1001] APPROVED après 2 tour(s)
+- 2026-11-18 15:31:31 UTC — [ticket-1001] leçons: fichier plein, à compacter à la main
+- 2026-11-18 15:34:15 UTC — [ticket-1001] documentation: 0 fichier(s) (139312ms) — après tour de correction
+- 2026-11-18 15:34:15 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-18 15:34:15 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-18 15:34:15 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)

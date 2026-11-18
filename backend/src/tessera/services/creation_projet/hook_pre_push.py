@@ -61,8 +61,15 @@ def installer_hook(
     return EtatHook.INSTALLE
 
 
+class BaseDesRunsIllisible(Exception):
+    """The runs database exists but cannot be read: no one knows which runs are open."""
+
+
 def projets_avec_run_ouvert(db_path: Path) -> frozenset[str]:
-    """Projects with an unfinished row in `pipeline_runs`; empty if there is no database."""
+    """Projects with an unfinished row in `pipeline_runs`; empty if there is no database.
+
+    Raises ``BaseDesRunsIllisible`` when the file exists but cannot be read.
+    """
     if not db_path.is_file():
         return frozenset()
     try:
@@ -72,7 +79,7 @@ def projets_avec_run_ouvert(db_path: Path) -> frozenset[str]:
             ).fetchall()
     except sqlite3.Error:
         _logger.warning("open_runs_unreadable", extra={"db": db_path.name})
-        return frozenset()
+        raise BaseDesRunsIllisible(db_path.name) from None
     return frozenset(str(ligne[0]) for ligne in lignes)
 
 
@@ -95,7 +102,11 @@ def installer_sur_tous(
 
 def main(workspace: Path, db_path: Path | None = None) -> int:
     """Print what was done for each project; exit 1 if one was skipped or left alone."""
-    occupes = projets_avec_run_ouvert(db_path) if db_path else frozenset()
+    try:
+        occupes = projets_avec_run_ouvert(db_path) if db_path else frozenset()
+    except BaseDesRunsIllisible:
+        sys.stdout.write("Base des runs illisible : aucun hook posé." + chr(10))
+        return 1
     resultats = installer_sur_tous(workspace, occupes)
     for nom, etat in resultats.items():
         sys.stdout.write(f"{nom} : {etat.value}" + chr(10))

@@ -71,15 +71,22 @@ Invoke-Icacls $Outils /grant:r "*S-1-5-18:(OI)(CI)F" "*S-1-5-32-544:(OI)(CI)F" `
 Invoke-Icacls $Outils /inheritance:r
 Write-Host "-> $Outils pret ($Proprietaire : modifier, $Compte : lecture-execution, heritage coupe)"
 
-# 5. Remise du mot de passe : le fichier est cree vide et verrouille AVANT d'y
-#    ecrire, pour n'etre jamais lisible par un autre compte, meme un instant.
-#    Ensuite lisible et supprimable par l'utilisateur seul (plus SYSTEM et les
-#    administrateurs).
-New-Item -ItemType File -Force -Path $Remise | Out-Null
-Invoke-Icacls $Remise /inheritance:r
-Invoke-Icacls $Remise /grant:r "*S-1-5-18:(F)" "*S-1-5-32-544:(F)"
-Set-Content -LiteralPath $Remise -Value $mdp -NoNewline -Encoding ASCII
+# 5. Remise du mot de passe : le fichier nait avec son ACL finale (heritage
+#    coupe ; SYSTEM et administrateurs, lecture-suppression pour l'utilisateur),
+#    jamais lisible par un autre compte, meme un instant, avant d'y ecrire.
+Remove-Item -LiteralPath $Remise -Force -ErrorAction SilentlyContinue
+$Sec = New-Object System.Security.AccessControl.FileSecurity
+$Sec.SetAccessRuleProtection($true, $false)
+foreach ($Sid in 'S-1-5-18', 'S-1-5-32-544') {
+    $Id = New-Object System.Security.Principal.SecurityIdentifier($Sid)
+    $Sec.AddAccessRule((New-Object System.Security.AccessControl.FileSystemAccessRule($Id, 'FullControl', 'Allow')))
+}
+$Sec.AddAccessRule((New-Object System.Security.AccessControl.FileSystemAccessRule($Proprietaire, 'Read,Delete', 'Allow')))
+$Flux = New-Object System.IO.FileStream($Remise, 'CreateNew', 'Write', 'None', 4096, 'None', $Sec)
+try {
+    $Octets = [System.Text.Encoding]::ASCII.GetBytes($mdp)
+    $Flux.Write($Octets, 0, $Octets.Length)
+} finally { $Flux.Dispose() }
 $mdp = $null
-Invoke-Icacls $Remise /grant:r "${Proprietaire}:(R,D)"
 Write-Host "-> mot de passe remis a $Proprietaire (fichier lu puis efface par agent-setup.ps1)"
 Write-Host '-> Partie admin terminee. Ferme cette fenetre et lance agent-setup.ps1 depuis ta fenetre normale.'

@@ -165,6 +165,14 @@ function Test-DossierWorktreesAgent {
         try { $_.IdentityReference.Translate([System.Security.Principal.SecurityIdentifier]).Value } catch { $null }
     })
     $droits = ($complets -contains 'S-1-5-18') -and ($complets -contains 'S-1-5-32-544')
+    # Un droit herite pour l'agent ou pour Users ouvre le dossier a plus que prevu.
+    $agent = if ($env:AGENT_USER) { $env:AGENT_USER } else { 'tessera-agent' }
+    $herites = @($acl.Access | Where-Object { $_.IsInherited -and $_.AccessControlType -eq 'Allow' } | Where-Object {
+        $nom = ($_.IdentityReference.Value.Split('\'))[-1]
+        $sid = try { $_.IdentityReference.Translate([System.Security.Principal.SecurityIdentifier]).Value } catch { '' }
+        ($nom -eq $agent) -or ($sid -eq 'S-1-5-32-545')
+    })
+    Test-Etape "dossier des worktrees agent ($dossier) sans droit herite pour $agent ou Users" ($herites.Count -eq 0) "icacls '$dossier' /inheritance:r"
     Test-Etape "dossier des worktrees agent ($dossier) sans heritage" (-not $heritage) "icacls '$dossier' /inheritance:r"
     Test-Etape 'dossier des worktrees agent : SYSTEM et Administrateurs (F)' $droits "icacls '$dossier' /grant:r *S-1-5-18:(OI)(CI)F *S-1-5-32-544:(OI)(CI)F"
 }
