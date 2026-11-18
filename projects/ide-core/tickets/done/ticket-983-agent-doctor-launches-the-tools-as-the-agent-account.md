@@ -1,12 +1,15 @@
 ---
-id: ticket-983
-preuve_reelle: true
-title: "agent doctor launches node, uv and python as the agent account"
-type: fix
-status: todo
-priority: high
 agent: codeur
-depends_on: [ticket-981, ticket-982]
+depends_on:
+- ticket-981
+- ticket-982
+id: ticket-983
+pr_number: 1172
+preuve_reelle: true
+priority: high
+status: done
+title: agent doctor launches node, uv and python as the agent account
+type: fix
 ---
 
 ## Contexte

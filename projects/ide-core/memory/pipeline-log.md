@@ -10025,3 +10025,60 @@ error: Please commit or stash them.
 - 2026-11-18 15:34:15 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
 - 2026-11-18 15:34:15 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
 - 2026-11-18 15:34:15 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-16 16:03:58 UTC — [ide-core] ticket-984 PR #1135 non surveillée (livraison arrêtée)
+- 2026-11-16 16:27:10 UTC — [ticket-983] branche ticket-983-agent-doctor-launches-node-uv-and-python-as-the-a
+- 2026-11-16 16:27:12 UTC — [ticket-983] tour 1 — codeur démarré
+- 2026-11-16 16:29:18 UTC — [ticket-983] tour 1 — codeur terminé (126125ms)
+- 2026-11-16 16:29:20 UTC — [ticket-983] ARRÊTÉ par l'utilisateur au tour 1
+- 2026-11-16 16:29:25 UTC — [ide-core] file interrompue : ticket-983 non approuvé
+- 2026-11-18 14:08:46 UTC — [ide-core] ticket-998 PR #1171 confiée au CIWatcher
+- 2026-11-18 14:09:01 UTC — [ticket-983] branche ticket-983-agent-doctor-launches-node-uv-and-python-as-the-a
+- 2026-11-18 14:09:01 UTC — [ticket-983] fiche relue après l'avance de la base (4bc65e2e6a3efa9deaa3c0d31cc4d11da0549e41 → b75b919f8f36a5d2486d1cb809c83c0a6dcd0800)
+- 2026-11-18 14:12:23 UTC — [ticket-983] testeur: 1 failed, 1963 passed, 3 skipped, 112 warnings in 178.60s (0:02:58)
+- 2026-11-18 14:12:23 UTC — [ticket-983] branche reprise (3 commit(s)) — tests red, codeur en premier
+- 2026-11-18 14:12:23 UTC — [ticket-983] tour 1 — codeur démarré
+- 2026-11-18 14:16:35 UTC — [ticket-983] tour 1 — codeur terminé (251280ms)
+- 2026-11-18 14:27:18 UTC — [ticket-983] testeur: 1 failed, 5106 passed, 3 skipped, 112 warnings in 610.02s (0:10:10)
+- 2026-11-18 14:27:18 UTC — [ticket-983] tests rouges au tour 1
+- 2026-11-18 14:27:18 UTC — [ticket-983] tour 2 — codeur démarré
+- 2026-11-18 14:27:41 UTC — [ticket-983] tour 2 — codeur terminé (22671ms)
+- 2026-11-18 14:41:15 UTC — [ticket-983] testeur: dur�es : ruff 0 s, mypy 19 s, mypy-linux 24 s, pytest 767 s ; impact depuis base : suite compl�te
+- 2026-11-18 14:41:34 UTC — [ticket-983] securite: PASS — PASS : le diff n'ajoute aucune injection, aucun secret dans le code ni aucun acc (18905ms)
+- 2026-11-18 14:41:35 UTC — [ticket-983] tour 2 — reviewer démarré
+- 2026-11-18 14:41:58 UTC — [ticket-983] tour 2 — reviewer terminé (23157ms)
+- 2026-11-18 14:42:08 UTC — [ticket-983] validateur: fichiers cités joints : agent-setup.ps1
+- 2026-11-18 14:42:08 UTC — [ticket-983] validateur: APPROVED — Le module `agent_doctor_cli` lance correctement les outils sous le compte agent  (33280ms)
+- 2026-11-18 14:42:09 UTC — [ticket-983] APPROVED après 2 tour(s)
+- 2026-11-18 14:43:24 UTC — [ticket-983] leçons: refusée — preuve absente du retour du run
+- 2026-11-18 14:46:05 UTC — [ticket-983] documentation: 0 fichier(s) (135578ms)
+- 2026-11-18 14:46:05 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-18 14:46:05 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-18 14:46:05 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-18 14:59:37 UTC — [ticket-983] livraison: rebase sur develop (1094ms)
+- 2026-11-18 14:59:37 UTC — [ticket-983] livraison: tests relancés après rebase : verts (dur�es : ruff 0 s, mypy 2 s, mypy-linux 4 s, pytest 774 s ; impact depuis base : suite compl�te) (774609ms)
+- 2026-11-18 14:59:37 UTC — [ticket-983] livraison: PR #1172 ouverte (6437ms)
+- 2026-11-18 14:59:37 UTC — [ticket-983] livraison: arrêt — PR ouverte, merge après preuve réelle
+- 2026-11-18 15:47:51 UTC — [ide-core] ticket-1001 PR #1174 non surveillée (livraison arrêtée)
+- 2026-11-18 15:47:51 UTC — [ticket-997] relivraison: échec — git command failed (code 1): git -c core.hooksPath=C:\Users\BENJAM~1.CHA\AppData\Local\Temp\tessera-
+- 2026-11-18 16:06:26 UTC — [ticket-983] branche ticket-983-agent-doctor-launches-node-uv-and-python-as-the-a
+- 2026-11-18 16:06:26 UTC — [ticket-983] fiche relue après l'avance de la base (fb12fbbef19676f667d5c4076e80acd613923c82 → 560ef279a3257da2173ed42fdfc66f8d0c0080dc)
+- 2026-11-18 16:16:57 UTC — [ticket-983] testeur: dur�es : ruff 0 s, mypy 7 s, mypy-linux 6 s, pytest 607 s ; impact depuis base : suite compl�te
+- 2026-11-18 16:16:57 UTC — [ticket-983] branche reprise (8 commit(s)) — tests green, codeur sauté
+- 2026-11-18 16:17:31 UTC — [ticket-983] securite: PASS — Aucune faille introduite par ce diff, d'où le PASS. Le nouveau CLI lance des com (14953ms)
+- 2026-11-18 16:17:33 UTC — [ticket-983] tour 1 — reviewer démarré
+- 2026-11-18 16:17:51 UTC — [ticket-983] tour 1 — reviewer terminé (18092ms)
+- 2026-11-18 16:19:09 UTC — [ticket-983] validateur: fichiers cités joints : agent-setup.ps1
+- 2026-11-18 16:19:09 UTC — [ticket-983] validateur: CHANGES_REQUESTED — Le diff laisse en place les trois défauts signalés par la PR précédente (refus d (96719ms)
+- 2026-11-18 16:19:09 UTC — [ticket-983] CHANGES_REQUESTED tour 1: Reviewer : 1. Défaut 1 du refus non corrigé : les outils se lancent toujours depuis le dossier courant. `main()` appelle `verifier_outils(Path.cwd())`, et `tessera.ps1` fait `Push-Location backend` ju
+- 2026-11-18 16:19:09 UTC — [ticket-983] tour 2 — codeur démarré
+- 2026-11-18 16:21:48 UTC — [ticket-983] tour 2 — codeur terminé (158687ms)
+- 2026-11-18 16:33:43 UTC — [ticket-983] testeur: dur�es : ruff 0 s, mypy 11 s, mypy-linux 13 s, pytest 675 s ; impact depuis base : suite compl�te
+- 2026-11-18 16:34:01 UTC — [ticket-983] securite: PASS — Verdict PASS : aucune faille CRITICAL ni HIGH introduite par ce diff. Le nouveau (17812ms)
+- 2026-11-18 16:34:02 UTC — [ticket-983] tour 2 — reviewer démarré
+- 2026-11-18 16:34:25 UTC — [ticket-983] validateur: fichiers cités joints : agent-setup.ps1
+- 2026-11-18 16:34:25 UTC — [ticket-983] validateur: APPROVED — Le diff adresse tous les défauts du refus précédent. Les outils se lancent désor (22969ms)
+- 2026-11-18 16:34:30 UTC — [ticket-983] tour 2 — reviewer terminé (28375ms)
+- 2026-11-18 16:34:30 UTC — [ticket-983] APPROVED après 2 tour(s)
+- 2026-11-18 16:35:48 UTC — [ticket-983] leçons: fichier plein, à compacter à la main
+- 2026-11-18 16:36:07 UTC — [ticket-983] documentation: 0 fichier(s) (125ms)
+- 2026-11-18 16:36:16 UTC — [ticket-983] livraison: arrêt — Livraison interrompue : GitCommandError: git command failed (code 1): git -c core.hooksPath=C:\Users
