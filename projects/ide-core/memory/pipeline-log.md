@@ -9927,3 +9927,7 @@ error: Please commit or stash them.
 - 2026-11-18 13:26:44 UTC — [ticket-1004] validateur: APPROVED — Tous les critères sont satisfaits. Les quatre tests couvrent exactement les cas  (76171ms)
 - 2026-11-18 13:26:44 UTC — [ticket-1004] APPROVED après 2 tour(s)
 - 2026-11-18 13:27:17 UTC — [ticket-1004] leçons: refusée — plus de 200 caractères
+- 2026-11-18 13:30:28 UTC — [ticket-1004] documentation: 0 fichier(s) (156140ms) — après tour de correction
+- 2026-11-18 13:30:28 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-18 13:30:28 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-18 13:30:28 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
