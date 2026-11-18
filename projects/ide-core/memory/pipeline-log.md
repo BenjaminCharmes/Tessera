@@ -9819,3 +9819,7 @@ error: Please commit or stash them.
 - 2026-11-18 11:10:32 UTC — [ticket-999] tour 2 — reviewer terminé (24250ms)
 - 2026-11-18 11:10:32 UTC — [ticket-999] APPROVED après 2 tour(s)
 - 2026-11-18 11:11:49 UTC — [ticket-999] leçons: fichier plein, à compacter à la main
+- 2026-11-18 11:14:26 UTC — [ticket-999] documentation: 1 fichier(s) (135032ms)
+- 2026-11-18 11:14:26 UTC — documentation trop longue, titres seuls : docs/architecture.md (181178 caractères)
+- 2026-11-18 11:14:26 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-18 11:14:26 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
