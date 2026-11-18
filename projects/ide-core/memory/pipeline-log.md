@@ -10108,3 +10108,26 @@ error: Please commit or stash them.
 - 2026-11-18 17:16:10 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
 - 2026-11-18 17:16:10 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
 - 2026-11-18 17:16:10 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-18 17:26:23 UTC — [ide-core] ticket-1010 PR #1177 confiée au CIWatcher
+- 2026-11-18 17:26:32 UTC — [ticket-1011] branche ticket-1011-a-link-found-at-the-final-commit-is-named-remove
+- 2026-11-18 17:26:37 UTC — [ticket-1011] tour 1 — codeur démarré
+- 2026-11-18 17:31:29 UTC — [ticket-1011] tour 1 — codeur terminé (291812ms)
+- 2026-11-18 17:39:25 UTC — [ticket-1011] testeur: 1 failed, 686 passed, 48 warnings in 417.43s (0:06:57) — fichiers en échec : tests/test_longueur_des_fichiers.py
+- 2026-11-18 17:39:25 UTC — [ticket-1011] tests rouges au tour 1
+- 2026-11-18 17:39:25 UTC — [ticket-1011] tour 2 — codeur démarré
+- 2026-11-18 17:41:20 UTC — [ticket-1011] tour 2 — codeur terminé (114453ms)
+- 2026-11-18 17:49:35 UTC — [ticket-1011] testeur: dur�es : ruff 0 s, mypy 22 s, mypy-linux 22 s, pytest 438 s ; impact depuis base : 110 fichier(s) de test
+- 2026-11-18 17:49:58 UTC — [ticket-1011] securite: PASS — Pas de faille bloquante. Si un lien apparaît dans le chemin approuvé après la le (21530ms)
+- 2026-11-18 17:49:59 UTC — [ticket-1011] tour 2 — reviewer démarré
+- 2026-11-18 17:50:28 UTC — [ticket-1011] validateur: APPROVED — Les deux critères sont satisfaits par le diff et les tests. Le code capture `Lie (28641ms)
+- 2026-11-18 17:50:35 UTC — [ticket-1011] tour 2 — reviewer terminé (35562ms)
+- 2026-11-18 17:50:35 UTC — [ticket-1011] CHANGES_REQUESTED tour 2: Reviewer : 1. Sur les sorties non approuvées, `commit_apres_lien` renvoie un sha et un arrêt non nul (« lien non déclaré retiré avant le commit : … ») même quand le commit réussit. Or la plupart des a
+- 2026-11-18 17:50:35 UTC — [ticket-1011] tour 3 — codeur démarré
+- 2026-11-18 17:52:07 UTC — [ticket-1011] tour 3 — codeur terminé (91233ms)
+- 2026-11-18 17:59:53 UTC — [ticket-1011] testeur: dur�es : ruff 0 s, mypy 26 s, mypy-linux 23 s, pytest 410 s ; impact depuis base : 110 fichier(s) de test
+- 2026-11-18 18:00:12 UTC — [ticket-1011] securite: PASS — Verdict PASS : aucune faille CRITICAL ou HIGH introduite. Sur une sortie non app (17405ms)
+- 2026-11-18 18:00:13 UTC — [ticket-1011] tour 3 — reviewer démarré
+- 2026-11-18 18:00:40 UTC — [ticket-1011] tour 3 — reviewer terminé (26390ms)
+- 2026-11-18 18:00:46 UTC — [ticket-1011] validateur: APPROVED — Les deux critères sont satisfaits. Le diff ajoute le chemin manquant pour les li (32500ms)
+- 2026-11-18 18:00:46 UTC — [ticket-1011] APPROVED après 3 tour(s)
+- 2026-11-18 18:01:47 UTC — [ticket-1011] leçons: fichier plein, à compacter à la main
