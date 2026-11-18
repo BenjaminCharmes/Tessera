@@ -10082,3 +10082,25 @@ error: Please commit or stash them.
 - 2026-11-18 16:35:48 UTC — [ticket-983] leçons: fichier plein, à compacter à la main
 - 2026-11-18 16:36:07 UTC — [ticket-983] documentation: 0 fichier(s) (125ms)
 - 2026-11-18 16:36:16 UTC — [ticket-983] livraison: arrêt — Livraison interrompue : GitCommandError: git command failed (code 1): git -c core.hooksPath=C:\Users
+- 2026-11-18 16:36:25 UTC — [ticket-1010] branche ticket-1010-a-resumed-branch-already-on-the-remote-is-delive
+- 2026-11-18 16:36:30 UTC — [ticket-1010] tour 1 — codeur démarré
+- 2026-11-18 16:43:30 UTC — [ticket-1010] tour 1 — codeur terminé (420296ms)
+- 2026-11-18 16:46:06 UTC — [ticket-1010] testeur: 1 failed, 194 passed, 8 warnings in 98.87s (0:01:38) — fichiers en échec : tests/test_longueur_des_fichiers.py
+- 2026-11-18 16:46:06 UTC — [ticket-1010] tests rouges au tour 1
+- 2026-11-18 16:46:06 UTC — [ticket-1010] tour 2 — codeur démarré
+- 2026-11-18 16:47:38 UTC — [ticket-1010] tour 2 — codeur terminé (91030ms)
+- 2026-11-18 16:50:40 UTC — [ticket-1010] testeur: dur�es : ruff 0 s, mypy 18 s, mypy-linux 17 s, pytest 126 s ; impact depuis base : 23 fichier(s) de test
+- 2026-11-18 16:51:11 UTC — [ticket-1010] securite: PASS — Le diff pousse sous un nom dérivé au lieu de forcer, sans `--force` et sans rien (29640ms)
+- 2026-11-18 16:51:12 UTC — [ticket-1010] tour 2 — reviewer démarré
+- 2026-11-18 16:51:50 UTC — [ticket-1010] validateur: APPROVED — Les trois critères sont couverts par des tests fonctionnels explicites dans le f (38516ms)
+- 2026-11-18 16:51:59 UTC — [ticket-1010] tour 2 — reviewer terminé (47015ms)
+- 2026-11-18 16:51:59 UTC — [ticket-1010] CHANGES_REQUESTED tour 2: Reviewer : 1. Le nom dérivé s'arrête à `open_pull_request`. Après l'ouverture, `LivraisonService._apres_ouverture` calcule `pushed_sha=await sha_pousse(self._git, branch)` avec le nom d'origine. Dans 
+- 2026-11-18 16:51:59 UTC — [ticket-1010] tour 3 — codeur démarré
+- 2026-11-18 16:58:47 UTC — [ticket-1010] tour 3 — codeur terminé (407250ms)
+- 2026-11-18 17:10:03 UTC — [ticket-1010] testeur: dur�es : ruff 1 s, mypy 35 s, mypy-linux 30 s, pytest 611 s ; impact depuis base : 158 fichier(s) de test
+- 2026-11-18 17:10:28 UTC — [ticket-1010] securite: PASS — Le diff ne force jamais un push. Il ne supprime rien sur le distant : un nom dér (23687ms)
+- 2026-11-18 17:10:29 UTC — [ticket-1010] tour 3 — reviewer démarré
+- 2026-11-18 17:10:56 UTC — [ticket-1010] tour 3 — reviewer terminé (26907ms)
+- 2026-11-18 17:10:56 UTC — [ticket-1010] validateur: APPROVED — Les trois critères sont couverts par des tests fonctionnels explicites et détail (27015ms)
+- 2026-11-18 17:10:56 UTC — [ticket-1010] APPROVED après 3 tour(s)
+- 2026-11-18 17:12:21 UTC — [ticket-1010] leçons: fichier plein, à compacter à la main
