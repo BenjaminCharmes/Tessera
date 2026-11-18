@@ -103,9 +103,8 @@ class LivraisonService:
     ) -> Livraison:
         """Rebase, push, and open the PR.
 
-        Returns a Livraison with pr_number set on success, or arret set if
-        anything prevents opening the PR (unapproved, commit level, conflict).
-        The CI wait and merge are handled by livrer_phase_2.
+        Returns a Livraison with pr_number set, or arret if anything prevents
+        opening the PR. The CI wait and merge are those of livrer_phase_2.
 
         An approved run needs a readable `approved_sha` (ticket-872), and every
         commit added since must be the pipeline's own bookkeeping; otherwise
@@ -143,14 +142,13 @@ class LivraisonService:
                 etapes=tuple(etapes), durees_ms=tuple(durees_ms), arret=arret_retest
             )
 
-        pr_number = await self._ouvrir_la_pr(
+        pr_number, tete = await self._ouvrir_la_pr(
             branch, ticket_id, ticket_title, ticket_body, ticket_type, etapes, durees_ms
         )
-        # La PR existe : toute exception à partir d'ici porte son numéro, pour
-        # que la phase 2 puisse quand même la reprendre (ticket-415).
+        # La PR existe : toute exception porte son numéro, pour la phase 2 (ticket-415).
         try:
             return await self._apres_ouverture(
-                ticket_id, pr_number, branch, tuple(etapes), tuple(durees_ms), resolus
+                ticket_id, pr_number, branch, tete, tuple(etapes), tuple(durees_ms), resolus
             )
         except Exception as exc:  # noqa: BLE001 — relevée avec le numéro de PR
             raise LivraisonInterrompue(pr_number, exc) from exc
@@ -272,18 +270,21 @@ class LivraisonService:
         ticket_type: str,
         etapes: list[str],
         durees_ms: list[float],
-    ) -> int:
-        """Open the PR and note it; a lost response or a 5xx is survived (ticket-455, 781)."""
+    ) -> tuple[int, str]:
+        """Open the PR and note it; a lost response or a 5xx is survived (ticket-455, 781); returns its number and head (ticket-1010)."""
         t0 = time.monotonic()
+        tetes = [branch]
 
         async def ouvrir() -> Any:
-            return await self._workflow.open_pull_request(
+            ouverte = await self._workflow.open_pull_request(
                 branch=branch,
                 ticket_id=ticket_id,
                 ticket_title=ticket_title,
                 ticket_body=ticket_body,
                 ticket_type=ticket_type,
             )
+            tetes.append(str(getattr(ouverte, "branch", None) or branch))
+            return ouverte
 
         pr_number, perdue = await ouvrir_avec_recours(
             ouvrir, self._workflow, branch, etapes, self._dormir
@@ -292,21 +293,20 @@ class LivraisonService:
             raise LivraisonInterrompue(pr_number, perdue) from perdue
         etapes.append(f"PR #{pr_number} ouverte")
         durees_ms.append((time.monotonic() - t0) * 1000)
-        return pr_number
+        return pr_number, tetes[-1]
 
     async def _apres_ouverture(
         self,
         ticket_id: str,
         pr_number: int,
         branch: str,
+        tete: str,
         etapes: tuple[str, ...],
         durees_ms: tuple[float, ...],
         resolus: list[str],
     ) -> Livraison:
         """What follows the PR opening: ticket note, then the verdict of phase 1."""
-        # Enregistre le pr_number dans le ticket, commite et pousse **avant**
-        # tout merge : garantit qu'aucun commit n'est laissé sur la branche
-        # locale après que la PR a été mergée (ticket-270).
+        # Note le pr_number et pousse avant tout merge (ticket-270) ; `tete` est celle de la PR.
         if self._post_pr_callback is not None:
             try:
                 await self._post_pr_callback(ticket_id, pr_number, branch)
@@ -320,7 +320,7 @@ class LivraisonService:
             durees_ms=durees_ms,
             pr_number=pr_number,
             arret=None,
-            pushed_sha=await sha_pousse(self._git, branch),
+            pushed_sha=await sha_pousse(self._git, tete),
         )
 
     async def livrer_phase_2(

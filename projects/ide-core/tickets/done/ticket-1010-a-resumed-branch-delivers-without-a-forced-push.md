@@ -2,9 +2,10 @@
 agent: codeur
 depends_on: []
 id: ticket-1010
+pr_number: 1177
 preuve_reelle: false
 priority: high
-status: todo
+status: done
 title: A resumed branch already on the remote is delivered without a forced push
 type: fix
 ---
