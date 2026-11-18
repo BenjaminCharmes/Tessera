@@ -9823,3 +9823,22 @@ error: Please commit or stash them.
 - 2026-11-18 11:14:26 UTC — documentation trop longue, titres seuls : docs/architecture.md (181178 caractères)
 - 2026-11-18 11:14:26 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
 - 2026-11-18 11:14:26 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-18 11:16:53 UTC — [ide-core] ticket-999 PR #1160 non surveillée (livraison arrêtée)
+- 2026-11-18 11:17:00 UTC — [ticket-993] branche ticket-993-an-empty-leftover-worktree-folder-does-not-block
+- 2026-11-18 11:17:05 UTC — [ticket-993] tour 1 — codeur démarré
+- 2026-11-18 11:18:58 UTC — [ticket-993] tour 1 — codeur terminé (111532ms)
+- 2026-11-18 11:19:17 UTC — [ticket-993] ARRÊTÉ par l'utilisateur au tour 1
+- 2026-11-18 11:19:38 UTC — [ide-core] file interrompue : ticket-993 non approuvé
+- 2026-11-18 11:20:33 UTC — [ide-core] ticket-999 PR #1160 non reprise : merge après preuve réelle
+- 2026-11-18 11:41:56 UTC — [ticket-993] branche ticket-993-an-empty-leftover-worktree-folder-does-not-block
+- 2026-11-18 11:46:18 UTC — [ticket-993] testeur: dur�es : ruff 0 s, mypy 13 s, mypy-linux 13 s, pytest 236 s ; impact depuis base : 88 fichier(s) de test
+- 2026-11-18 11:46:18 UTC — [ticket-993] branche reprise (3 commit(s)) — tests green, codeur sauté
+- 2026-11-18 11:47:02 UTC — [ticket-993] securite: PASS — PASS : rien de bloquant. Le diff ajoute seulement des `rmdir` non récursifs, et  (12078ms)
+- 2026-11-18 11:47:02 UTC — [ticket-993] tour 1 — reviewer démarré
+- 2026-11-18 11:47:23 UTC — [ticket-993] validateur: APPROVED — All three acceptance criteria are satisfied. The implementation correctly handle (20391ms)
+- 2026-11-18 11:47:25 UTC — [ticket-993] tour 1 — reviewer terminé (22608ms)
+- 2026-11-18 11:47:25 UTC — [ticket-993] APPROVED après 1 tour(s)
+- 2026-11-18 11:48:38 UTC — [ticket-993] documentation: 0 fichier(s) (50765ms)
+- 2026-11-18 11:48:38 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-18 11:48:38 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-18 11:48:38 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)

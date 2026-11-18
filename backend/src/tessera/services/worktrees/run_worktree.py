@@ -79,6 +79,10 @@ class RunWorktree:
 _TICKET_ID_RE = re.compile(r"ticket-[0-9]+|supervision-[0-9]{8}-[0-9]{6}")
 
 
+_ESSAIS_DOSSIER = 2
+_ATTENTE_DOSSIER_S = 0.2
+
+
 def _sous_le_dossier(racine: Path) -> Path:
     """`racine` resolved, or `CheminRefuse` when it leaves `ide_worktrees_dir`.
 
@@ -132,14 +136,35 @@ async def _projet_dans(racine: Path, depot: Path, project_path: Path) -> Path:
     return racine / relatif
 
 
-async def _reprendre(racine: Path, branche: str, extraites: dict[str, Path]) -> None:
-    """Accept a leftover folder only if it is this branch's worktree and holds nothing."""
+def _est_vide(dossier: Path) -> bool:
+    """True for a folder with no entry at all, not even a git-ignored one."""
+    return dossier.is_dir() and not any(dossier.iterdir())
+
+
+def _retirer_dossier_vide(racine: Path, extraites: dict[str, Path]) -> bool:
+    """Remove an empty folder that no worktree registers; `rmdir`, never recursive."""
+    if any(_meme_dossier(d, racine) for d in extraites.values()) or not _est_vide(racine):
+        return False
+    racine.rmdir()
+    _logger.info("run_worktree_dossier_vide_retire", extra={"racine": str(racine)})
+    return True
+
+
+async def _reprendre(racine: Path, branche: str, extraites: dict[str, Path]) -> bool:
+    """Accept a leftover folder only if it is this branch's worktree and holds nothing.
+
+    Returns False when the folder was empty and unregistered and has been removed:
+    the caller then creates the worktree (ticket-1003).
+    """
     ici = extraites.get(branche)
+    if ici is None and _retirer_dossier_vide(racine, extraites):
+        return False
     if ici is None or not _meme_dossier(ici, racine):
         raise WorktreeOccupe(f"{racine} existe mais n'est pas le worktree de « {branche} ».")
     if await _etat(racine):
         raise WorktreeOccupe(f"{racine} porte des changements non commités ; il n'est pas repris.")
     _logger.info("run_worktree_resumed", extra={"racine": str(racine), "branche": branche})
+    return True
 
 
 async def _ajouter(depot: Path, racine: Path, branche: str, base: str) -> None:
@@ -179,9 +204,7 @@ async def creer(
     ailleurs = extraites.get(branche)
     if ailleurs is not None and not _meme_dossier(ailleurs, racine):
         raise BrancheDejaExtraite(branche, ailleurs)
-    if racine.exists():
-        await _reprendre(racine, branche, extraites)
-    else:
+    if not (racine.exists() and await _reprendre(racine, branche, extraites)):
         await _ajouter(depot, racine, branche, base)
     if compte_agent and settings.agent_user:
         # Le dossier du projet : le compte y voit les noms, pas le contenu des autres tickets.
@@ -215,5 +238,26 @@ async def supprimer(wt: RunWorktree, depot: Path) -> None:
             # Propre et sans lien : ce que git a laissé se supprime sans rien atteindre ailleurs.
             # Hors de la boucle : un node_modules prend des minutes et gelait le backend (ticket-551).
             await asyncio.to_thread(shutil.rmtree, chemin_etendu(wt.racine))
+    await _retirer_dossier_restant(wt.racine)
     # Efface aussi l'enregistrement d'un worktree dont le dossier a disparu.
     await run_git(depot, "worktree", "prune")
+
+
+async def _retirer_dossier_restant(racine: Path) -> None:
+    """Drop an empty folder left behind, with a second try after a short wait.
+
+    A handle still open in the agent account can keep the folder alive a moment.
+    A failure is logged, never raised (ticket-1003).
+    """
+    for essai in range(_ESSAIS_DOSSIER):
+        if not _est_vide(racine):
+            return
+        try:
+            racine.rmdir()
+            return
+        except OSError as exc:
+            if essai == _ESSAIS_DOSSIER - 1:
+                extra = {"racine": str(racine), "erreur": str(exc)}
+                _logger.warning("run_worktree_dossier_restant", extra=extra)
+                return
+        await asyncio.sleep(_ATTENTE_DOSSIER_S)

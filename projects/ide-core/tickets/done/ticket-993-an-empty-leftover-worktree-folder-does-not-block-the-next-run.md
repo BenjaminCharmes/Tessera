@@ -1,11 +1,12 @@
 ---
-id: ticket-993
-title: "An empty leftover worktree folder does not block the next run"
-type: fix
-status: todo
-priority: medium
 agent: codeur
 depends_on: []
+id: ticket-993
+pr_number: 1163
+priority: medium
+status: done
+title: An empty leftover worktree folder does not block the next run
+type: fix
 ---
 
 ## Contexte
