@@ -9889,3 +9889,4 @@ error: Please commit or stash them.
 - 2026-11-18 12:40:32 UTC — [ticket-1005] validateur: APPROVED — Tous les critères sont satisfaits par le code et validés par les tests. Le pipel (35641ms)
 - 2026-11-18 12:40:32 UTC — [ticket-1005] CHANGES_REQUESTED tour 3: Reviewer : 1. Critère 1 non couvert. Il demande un run `blocked` au tour 1, sans aucun appel d'audit, de reviewer ni de validateur. `test_a_refused_link_blocks_the_run_and_names_the_link` appelle seul
 - 2026-11-18 12:40:32 UTC — [ticket-1005] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-18 12:40:54 UTC — [ide-core] file interrompue : ticket-1005 non approuvé
