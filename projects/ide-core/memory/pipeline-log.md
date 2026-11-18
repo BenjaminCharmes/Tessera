@@ -9823,3 +9823,8 @@ error: Please commit or stash them.
 - 2026-11-18 11:14:26 UTC — documentation trop longue, titres seuls : docs/architecture.md (181178 caractères)
 - 2026-11-18 11:14:26 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
 - 2026-11-18 11:14:26 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-18 11:16:53 UTC — [ide-core] ticket-999 PR #1160 non surveillée (livraison arrêtée)
+- 2026-11-18 11:17:00 UTC — [ticket-993] branche ticket-993-an-empty-leftover-worktree-folder-does-not-block
+- 2026-11-18 11:17:05 UTC — [ticket-993] tour 1 — codeur démarré
+- 2026-11-18 11:18:58 UTC — [ticket-993] tour 1 — codeur terminé (111532ms)
+- 2026-11-18 11:19:17 UTC — [ticket-993] ARRÊTÉ par l'utilisateur au tour 1
