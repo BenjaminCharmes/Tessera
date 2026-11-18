@@ -10,3 +10,4 @@ Une ligne par action : `- date | action | cible | sha | résumé`. Le service se
 - 2026-11-16 | a_toi | regle-7d3eaabe |  | decider : ADR-083 cité touche une porte ou un mot sensible
 - 2026-11-16 | a_toi | ticket-985 |  | trier : 2 échecs de suite : sortie du modèle absente : rien n'est écrit
 - 2026-11-16 | a_toi | ticket-985 |  | trier : plan refusé : signalement d'un projet professionnel : plus de détail que le signalement n'en porte
+- 2026-11-17 | a_toi | ticket-1002 |  | trier : Le signalement demande de rendre lisible .github/workflows/ci.yml dans le worktree. Cela touche .github/ et le garde-périmètre, deux portes que je ne propose pas d'ouvrir. La cause (droits du

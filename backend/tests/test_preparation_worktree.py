@@ -35,7 +35,8 @@ class _Lanceur:
 
     def __init__(
         self, cwd: str | None = None, timeout: int | None = None,
-        env: dict[str, str] | None = None,
+        env: dict[str, str] | None = None, compte_agent: bool = False,
+        lanceur: object | None = None,
     ) -> None:
         _Lanceur.construits.append({"cwd": cwd, "timeout": timeout, "env": env})
 

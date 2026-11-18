@@ -84,6 +84,18 @@ toujours disponible) et `agent_shell` vaut `true`.
 
 La solution déporte les valeurs longues (prompt, config MCP, réglages) vers des fichiers temporaires. Chaque appel reçoit un dossier `tessera-appel-*` lisible par le compte agent en lecture seule (droits via icacls `/grant <compte>:(OI)(CI)R`), où vivent les fichiers. Le CLI utilise alors `--system-prompt-file`, `--append-system-prompt-file` et autres options fichier. Le dossier est nettoyé après la fermeture du processus, même en erreur.
 
+#### Listing des processus par SID sans tasklist (ticket-991)
+
+Au lieu d'énumérer les processus par la commande `tasklist`, qui résout les noms de compte, les processus du compte agent sont énumérés en comparant le SID du jeton de chaque processus au SID du compte, sans appel système de résolution. L'implémentation utilise les APIs Windows natives (`EnumProcesses`, `OpenProcessToken`, `GetTokenInformation`).
+
+#### Relais CLI pour les commandes trop longues (ticket-992)
+
+Une commande CLI qui dépasse la limite pour `CreateProcessWithLogonW` passe par un relais Node : un script `relais.js` relit la commande depuis un fichier JSON et la lance sans shell. Cette approche permet aux outils qui ne supportent que des paramètres en ligne (comme `--json-schema`) de rester complets.
+
+#### Lecture des fichiers protégés sous le compte agent (ticket-994)
+
+Les fichiers protégés (agents.json, CLAUDE.md, etc.) refusent au compte agent les droits précis sans interdire la lecture. Les droits simples d'icacls portent aussi `SYNCHRONIZE`, qui interdit toute ouverture ; les droits précis (`WD`, `AD`, `WEA`, `WA`, `DE`) évitent ce piège.
+
 ### Enregistrement automatique des appels
 
 Chaque appel LLM d'un run est enregistré dans `agent_calls` avec `run_id`,

@@ -1,12 +1,13 @@
 ---
-id: ticket-995
-title: "The worktree setup runs under the agent account"
-type: fix
-status: todo
-priority: critical
 agent: codeur
 depends_on: []
+id: ticket-995
+pr_number: 1153
 preuve_reelle: true
+priority: critical
+status: done
+title: The worktree setup runs under the agent account
+type: fix
 ---
 
 ## Signalement
