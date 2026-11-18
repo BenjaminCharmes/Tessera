@@ -10054,3 +10054,7 @@ error: Please commit or stash them.
 - 2026-11-18 14:46:05 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
 - 2026-11-18 14:46:05 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
 - 2026-11-18 14:46:05 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-18 14:59:37 UTC — [ticket-983] livraison: rebase sur develop (1094ms)
+- 2026-11-18 14:59:37 UTC — [ticket-983] livraison: tests relancés après rebase : verts (dur�es : ruff 0 s, mypy 2 s, mypy-linux 4 s, pytest 774 s ; impact depuis base : suite compl�te) (774609ms)
+- 2026-11-18 14:59:37 UTC — [ticket-983] livraison: PR #1172 ouverte (6437ms)
+- 2026-11-18 14:59:37 UTC — [ticket-983] livraison: arrêt — PR ouverte, merge après preuve réelle
