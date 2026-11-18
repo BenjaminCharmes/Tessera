@@ -18,6 +18,7 @@ from pathlib import Path
 from tessera.config import settings
 from tessera.services.providers.env_agent import profil_de
 from tessera.services.providers.lanceur_agent import LanceurAgent
+from tessera.services.verification.chaine_python import CHAINE_PYTHON
 from tessera.services.verification.lancement_compte import EchecLancementCompte, compte_declare, lancer_sous_compte
 
 #: Les vérifications, dans l'ordre : aucun `python.exe` n'est sur le PATH du
@@ -30,6 +31,20 @@ OUTILS: tuple[tuple[str, ...], ...] = (
 )
 DELAI_S = 20.0
 _CONSEIL = "lancer `agent setup`"
+#: Dossier de lancement : hors de tout dépôt git, pour que `ouvrir_appel` ne
+#: pose aucun droit (ticket-999). Jamais le dossier courant, qui est `backend/`.
+DOSSIER_OUTILS = CHAINE_PYTHON.parent
+
+
+def _env_de(commande: Sequence[str]) -> dict[str, str] | None:
+    """The uv variables for the Python check: an absent toolchain fails, never downloads."""
+    if commande[0] != "uv" or "python" not in commande:
+        return None
+    return {
+        "UV_PYTHON_INSTALL_DIR": str(CHAINE_PYTHON),
+        "UV_PYTHON_PREFERENCE": "only-managed",
+        "UV_PYTHON_DOWNLOADS": "never",
+    }
 
 
 def _cause(message: str) -> str:
@@ -59,7 +74,7 @@ async def _verifier(commande: Sequence[str], dossier: Path, lanceur: LanceurAgen
     """Run the command under the account; return None on success, else the cause."""
     processus = None
     try:
-        processus = await lancer_sous_compte(list(commande), dossier, None, lanceur)
+        processus = await lancer_sous_compte(list(commande), dossier, _env_de(commande), lanceur)
         sortie, _ = await asyncio.wait_for(processus.communicate(), timeout=delai_s)
         if processus.returncode != 0:
             return f"code de sortie {processus.returncode}"
@@ -68,8 +83,10 @@ async def _verifier(commande: Sequence[str], dossier: Path, lanceur: LanceurAgen
         return None
     except TimeoutError:
         return f"délai de {delai_s:g} s dépassé"
-    except (EchecLancementCompte, OSError) as exc:
+    except EchecLancementCompte as exc:
         return _cause(str(exc))
+    except Exception as exc:  # noqa: BLE001 — tout échec de lancement devient une ligne, jamais une trace
+        return _cause(str(exc)) if isinstance(exc, OSError) else f"lancement refusé ({type(exc).__name__})"
     finally:
         if processus is not None:
             await processus.clore()
@@ -101,8 +118,8 @@ async def verifier_outils(
 
 
 def main() -> int:
-    """Entry point: check the tools from the current folder."""
-    return asyncio.run(verifier_outils(Path.cwd()))
+    """Entry point: check the tools from a folder outside any git repository."""
+    return asyncio.run(verifier_outils(DOSSIER_OUTILS))
 
 
 if __name__ == "__main__":

@@ -5,8 +5,12 @@ from pathlib import Path
 import pytest
 from pydantic import SecretStr
 
-from tessera.agent_doctor_cli import verifier_outils
+from tessera import agent_doctor_cli
+from tessera.agent_doctor_cli import DOSSIER_OUTILS, verifier_outils
 from tessera.config import settings
+from tessera.services.providers.droits_worktree import DroitsAgentRefuses
+from tessera.services.verification import lancement_compte
+from tessera.services.verification.chaine_python import CHAINE_PYTHON
 from tests.chaine_factice import chaine_factice  # noqa: F401
 from tests.doubles_compte import LanceurDouble, ProcessDouble
 
@@ -104,3 +108,54 @@ async def test_npm_cache_under_the_user_profile_fails_naming_agent_setup(
 async def test_npm_cache_in_a_sibling_profile_fails(compte: None, tmp_path: Path) -> None:
     lanceur = LanceurNeuf("C:/Users/tessera-agent-2/npm-cache".replace("/", chr(92)).encode())
     assert await verifier_outils(tmp_path, lanceur) == 1
+
+
+async def test_python_check_gets_the_shared_toolchain_variables(compte: None, tmp_path: Path) -> None:
+    lanceur = LanceurNeuf()
+    assert await verifier_outils(tmp_path, lanceur) == 0
+    env = lanceur.appels[2]["env"]
+    assert env["UV_PYTHON_INSTALL_DIR"] == str(CHAINE_PYTHON)
+    assert env["UV_PYTHON_PREFERENCE"] == "only-managed"
+    assert env["UV_PYTHON_DOWNLOADS"] == "never"
+    assert "UV_PYTHON_DOWNLOADS" not in lanceur.appels[0]["env"]
+
+
+async def test_droits_refused_becomes_a_failure_line(
+    compte: None, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    async def refuse(dossier: Path) -> Path:
+        raise DroitsAgentRefuses("pas un worktree")
+
+    monkeypatch.setattr(lancement_compte, "ouvrir_appel", refuse)
+    assert await verifier_outils(tmp_path, LanceurDouble()) == 1
+    sortie = capsys.readouterr().out
+    assert "ÉCHEC" in sortie and "agent setup" in sortie and "Traceback" not in sortie
+
+
+def test_main_launches_outside_any_git_repository(
+    compte: None, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    vus: list[Path] = []
+
+    async def espion(dossier: Path) -> int:
+        vus.append(dossier)
+        return 0
+
+    monkeypatch.chdir(Path(__file__).parent)  # le checkout : backend/tests
+    monkeypatch.setattr(agent_doctor_cli, "verifier_outils", espion)
+    assert agent_doctor_cli.main() == 0
+    assert vus == [DOSSIER_OUTILS]
+    assert not any((p / ".git").exists() for p in (DOSSIER_OUTILS, *DOSSIER_OUTILS.parents))
+
+
+async def test_ouvrir_appel_never_receives_the_repository_root(
+    compte: None, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    recus: list[Path] = []
+
+    async def espion(dossier: Path) -> None:
+        recus.append(Path(dossier))
+
+    monkeypatch.setattr(lancement_compte, "ouvrir_appel", espion)
+    assert await verifier_outils(DOSSIER_OUTILS, LanceurNeuf()) == 0
+    assert recus and all(d == DOSSIER_OUTILS for d in recus)
