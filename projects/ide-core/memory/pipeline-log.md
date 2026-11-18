@@ -9871,3 +9871,21 @@ error: Please commit or stash them.
 - 2026-11-18 12:07:16 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
 - 2026-11-18 12:07:16 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
 - 2026-11-18 12:07:16 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-18 12:15:02 UTC — [ticket-1005] branche ticket-1005-a-refused-link-ends-the-run-at-once-named-instea
+- 2026-11-18 12:15:05 UTC — [ticket-1005] tour 1 — codeur démarré
+- 2026-11-18 12:17:44 UTC — [ticket-1005] tour 1 — codeur terminé (158452ms)
+- 2026-11-18 12:23:35 UTC — [ticket-1005] testeur: 1 failed, 630 passed, 48 warnings in 311.26s (0:05:11)
+- 2026-11-18 12:23:36 UTC — [ticket-1005] tests rouges au tour 1
+- 2026-11-18 12:23:36 UTC — [ticket-1005] tour 2 — codeur démarré
+- 2026-11-18 12:27:14 UTC — [ticket-1005] tour 2 — codeur terminé (218358ms)
+- 2026-11-18 12:32:48 UTC — [ticket-1005] testeur: 1 failed, 1127 passed, 48 warnings in 291.29s (0:04:51)
+- 2026-11-18 12:32:48 UTC — [ticket-1005] tests rouges au tour 2
+- 2026-11-18 12:32:48 UTC — [ticket-1005] tour 3 — codeur démarré
+- 2026-11-18 12:34:20 UTC — [ticket-1005] tour 3 — codeur terminé (91655ms)
+- 2026-11-18 12:39:36 UTC — [ticket-1005] testeur: dur�es : ruff 0 s, mypy 17 s, mypy-linux 16 s, pytest 277 s ; impact depuis base : 108 fichier(s) de test
+- 2026-11-18 12:39:56 UTC — [ticket-1005] securite: PASS — PASS. Le diff fait remonter `LienNonDeclare` au lieu de retomber sur la prose du (19359ms)
+- 2026-11-18 12:39:56 UTC — [ticket-1005] tour 3 — reviewer démarré
+- 2026-11-18 12:40:32 UTC — [ticket-1005] tour 3 — reviewer terminé (35578ms)
+- 2026-11-18 12:40:32 UTC — [ticket-1005] validateur: APPROVED — Tous les critères sont satisfaits par le code et validés par les tests. Le pipel (35641ms)
+- 2026-11-18 12:40:32 UTC — [ticket-1005] CHANGES_REQUESTED tour 3: Reviewer : 1. Critère 1 non couvert. Il demande un run `blocked` au tour 1, sans aucun appel d'audit, de reviewer ni de validateur. `test_a_refused_link_blocks_the_run_and_names_the_link` appelle seul
+- 2026-11-18 12:40:32 UTC — [ticket-1005] BLOCKED après 3 tour(s) sans approbation
