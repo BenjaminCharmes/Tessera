@@ -9790,3 +9790,17 @@ error: Please commit or stash them.
 - 2026-11-17 16:03:15 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
 - 2026-11-17 16:03:15 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
 - 2026-11-17 16:03:15 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-18 10:52:58 UTC — [ide-core] ticket-997 PR #1157 non surveillée (livraison arrêtée)
+- 2026-11-18 10:53:03 UTC — [ticket-1000] branche ticket-1000-a-resumed-branch-in-a-worktree-reads-the-ticket
+- 2026-11-18 10:53:06 UTC — [ticket-1000] tour 1 — codeur démarré
+- 2026-11-18 10:54:46 UTC — [ticket-1000] tour 1 — codeur terminé (99093ms)
+- 2026-11-18 10:58:30 UTC — [ticket-1000] testeur: dur�es : ruff 1 s, mypy 30 s, mypy-linux 14 s, pytest 151 s ; impact depuis base : 50 fichier(s) de test
+- 2026-11-18 10:58:42 UTC — [ticket-1000] securite: PASS — Le diff retire l'exemption du worktree dans `relire_apres_branche` (ticket_apres (11344ms)
+- 2026-11-18 10:58:42 UTC — [ticket-1000] tour 1 — reviewer démarré
+- 2026-11-18 10:59:02 UTC — [ticket-1000] validateur: APPROVED — Les deux critères sont satisfaits. Le code change le comportement de `relire_apr (19343ms)
+- 2026-11-18 10:59:17 UTC — [ticket-1000] tour 1 — reviewer terminé (34484ms)
+- 2026-11-18 10:59:17 UTC — [ticket-1000] APPROVED après 1 tour(s)
+- 2026-11-18 11:00:49 UTC — [ticket-1000] documentation: 0 fichier(s) (69562ms)
+- 2026-11-18 11:00:49 UTC — documentation trop longue, titres seuls : docs/architecture.md (181178 caractères)
+- 2026-11-18 11:00:49 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-18 11:00:49 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)

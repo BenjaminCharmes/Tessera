@@ -1,12 +1,14 @@
 ---
-id: ticket-1000
-title: "A resumed branch in a worktree reads the ticket file of its base"
-type: fix
-status: todo
-priority: high
 agent: codeur
-depends_on: [ticket-987]
+depends_on:
+- ticket-987
+id: ticket-1000
+pr_number: 1159
 preuve_reelle: true
+priority: high
+status: done
+title: A resumed branch in a worktree reads the ticket file of its base
+type: fix
 ---
 
 ## Signalement
