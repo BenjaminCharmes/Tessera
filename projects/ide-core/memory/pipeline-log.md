@@ -9971,3 +9971,7 @@ error: Please commit or stash them.
 - 2026-11-18 14:42:08 UTC — [ticket-983] validateur: APPROVED — Le module `agent_doctor_cli` lance correctement les outils sous le compte agent  (33280ms)
 - 2026-11-18 14:42:09 UTC — [ticket-983] APPROVED après 2 tour(s)
 - 2026-11-18 14:43:24 UTC — [ticket-983] leçons: refusée — preuve absente du retour du run
+- 2026-11-18 14:46:05 UTC — [ticket-983] documentation: 0 fichier(s) (135578ms)
+- 2026-11-18 14:46:05 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-18 14:46:05 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-18 14:46:05 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
