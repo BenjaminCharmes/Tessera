@@ -622,3 +622,13 @@ Une ADR qu'aucune règle de `contraintes.md` ni aucun `CLAUDE.md` ne cite part d
 **Décision** : amende ADR-083 et ADR-085. node, npm, uv et Python lancés sous `AGENT_USER` viennent de `C:\ProgramData\Tessera\toolchain\`, copie posée par `agent setup` : écriture à l'utilisateur et aux administrateurs, lecture-exécution au compte. Le `PATH` de tout processus du compte (CLI, tests, app visuelle) est bâti de zéro : cette chaîne, puis les entrées système hors `C:\Users`. Les droits `RX` donnés sur le profil se retirent. `agent doctor` lance `node`, `uv` et `python --version` sous le compte.
 **Raison** : node ne résout pas son chemin sous un profil fermé (EPERM sur `scoop`) ; lire le profil rouvre ce que l'isolation ferme.
 **Alternative rejetée** : `Program Files` (installeur administrateur, versions du poste imposées) ; lecture d'un dossier du profil (ancêtres à traverser, droits orphelins).
+
+---
+
+## ADR-087 — Un appel sous le compte agent ne laisse ni droit ni profil derrière lui
+
+**Date** : 2026-11-18
+**Décision** : amende ADR-083. Le worktree porte une ACE héritable `OWNER RIGHTS` réduite à `RC` et une ACE `F` du backend ; à la fin du dernier appel, `/setowner` puis `/reset` sur l'arbre, échec fermé (ADR-037). Deux worktrees ne portent pas d'appel en même temps sous le compte, sauf `AGENT_CALLS_PARALLEL=true`. `HOME`, `APPDATA`, `LOCALAPPDATA` et `TEMP` visent `C:\ProgramData\Tessera\profil-agent\`, vidé hors caches `npm` et `uv` quand le compte est au repos ; plus de profil chargé (pas de ruche `HKCU`).
+**Raison** : le propriétaire réécrit la DACL de ce qu'il crée ; le profil persiste d'un projet à l'autre.
+**Alternative rejetée** : un compte par projet — mots de passe, droits sur la chaîne d'outils et setup multipliés.
+**Ne ferme pas** : une DACL posée à la création du fichier ; deux appels simultanés avec l'opt-out.
