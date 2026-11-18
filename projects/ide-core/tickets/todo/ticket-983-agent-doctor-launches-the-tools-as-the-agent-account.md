@@ -37,8 +37,41 @@ Serpent ticket-009.
 - Un agent n'exécute pas ce module : il lit le coffre (contrainte
   « secret de Tessera »), le garde de commande le refuse.
 
+## Refus du 18/11 (PR #1172, non mergée)
+
+Le premier passage, approuvé par le pipeline, a été exécuté en vrai sous
+`tessera-agent` le 18/11. Trois défauts, invisibles avec un lanceur factice :
+
+1. **Dossier de lancement** : `main()` lance chaque outil dans `Path.cwd()`,
+   c'est-à-dire `backend/` du checkout (`tessera.ps1` fait `Push-Location
+   backend`). `lancer_sous_compte` → `ouvrir_appel` y cherche la racine git et
+   tombe sur le dépôt Tessera. Depuis le ticket-999, la garde refuse : trace
+   Python `DroitsAgentRefuses: …\tessera n'est pas sous le dossier des
+   worktrees`. Sans le 999, le doctor aurait donné au compte agent le droit
+   d'écrire sur tout le dépôt Tessera. Lancer les outils depuis un dossier
+   **hors de tout dépôt git**, où `ouvrir_appel` ne pose rien (par exemple
+   `C:\ProgramData\Tessera\toolchain`).
+2. **Python hors de la chaîne** : `uv run --no-project python --version` est
+   lancé sans les variables de `chaine_python.env_du_setup`. Sous le compte,
+   uv ne voit pas `C:\ProgramData\Tessera\toolchain\python` et **télécharge
+   Python 3.14.6 depuis Internet** dans le profil de l'agent (relevé `uv -v`).
+   Passer `UV_PYTHON_INSTALL_DIR`, `UV_PYTHON_PREFERENCE=only-managed` et
+   `UV_PYTHON_DOWNLOADS=never` : une chaîne absente doit échouer, pas se
+   télécharger. Depuis un dossier qui porte un `pyproject.toml`, la même
+   commande sortait en code 2.
+3. **Exception non attrapée** : `_verifier` n'attrape que
+   `EchecLancementCompte` et `OSError`. `DroitsAgentRefuses` (et toute autre
+   exception du lancement) doit devenir une ligne d'échec, jamais une trace.
+
 ## Critères d'acceptation
 
+- [ ] Test : les outils se lancent dans un dossier hors dépôt git ; lancé
+      depuis le checkout, `ouvrir_appel` ne reçoit jamais la racine du dépôt.
+- [ ] Test : la commande Python reçoit `UV_PYTHON_INSTALL_DIR` (la chaîne
+      partagée), `UV_PYTHON_PREFERENCE=only-managed` et
+      `UV_PYTHON_DOWNLOADS=never`.
+- [ ] Test : un `DroitsAgentRefuses` levé au lancement donne une ligne
+      d'échec et le code 1, sans trace.
 - [ ] Test du module avec un lanceur factice : succès, échec d'un outil,
       délai dépassé, mot de passe absent.
 - [ ] Test : le module est refusé à un agent par le garde Bash.
