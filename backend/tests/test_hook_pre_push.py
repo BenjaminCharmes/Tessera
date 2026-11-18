@@ -426,7 +426,7 @@ def test_vault_runs_from_tessera_root_not_the_pushed_repo() -> None:
     racine = Path(__file__).resolve().parents[2]
     vus: dict[str, object] = {}
 
-    def lancer(cmd: list[str], **kw: object) -> "subprocess.CompletedProcess[str]":
+    def lancer(cmd: list[str], **kw: object) -> subprocess.CompletedProcess[str]:
         vus.update(kw)
         return subprocess.CompletedProcess(cmd, 0, "", "")
 
