@@ -31,8 +31,27 @@ Dans `services/providers/droits_worktree.py` et `droits_appel.py` :
   `blocked` (ADR-037). Pas de repli, pas de `/grant` forcé.
 - Le lanceur `icacls` reste injectable : les tests passent un faux.
 
+## Refus de l'audit sécurité du 18/11 (premier passage, file `d3de2519`)
+
+`securite: BLOCK` : le `/reset /T` ajouté à la fin du dernier appel efface
+aussi les refus d'écriture que `accorder_droits_agent`
+(`droits_worktree.py`) pose **une seule fois par run**, fichier par fichier
+(`/deny <compte>:…` sur `fichiers_proteges(wt, script)` : script de tests,
+configuration des tests…). Dès le deuxième appel, l'agent pourrait écrire
+ces fichiers. L'empreinte d'ADR-084 le verrait après coup, mais la première
+porte ne doit pas s'ouvrir.
+
+Ce qu'il faut en plus : après la remise à l'héritage, **reposer les refus**
+sur les mêmes fichiers protégés (ou les exclure du `/reset`), dans le même
+appel de clôture, échec fermé si un `/deny` échoue.
+
 ## Critères d'acceptation
 
+- [ ] Avec un faux `Icacls` : après `/setowner` et `/reset` de clôture, un
+  `/deny` est émis à nouveau pour chaque fichier de `fichiers_proteges`, et
+  un échec de ce `/deny` lève `DroitsAgentRefuses`.
+- [ ] Test (ACL réelle, Windows, ignoré ailleurs) : un fichier protégé porte
+  encore l'ACE de refus du compte après la clôture d'un appel.
 - [ ] Avec un faux `Icacls`, `poser_ecriture` émet l'ACE OWNER RIGHTS `(RC)` et l'ACE du backend.
 - [ ] `clore_appel` émet `/setowner` puis `/reset` une seule fois, au dernier appel d'une racine, pas aux appels intermédiaires.
 - [ ] Un code non nul sur `/setowner` ou `/reset` lève `DroitsAgentRefuses`.
