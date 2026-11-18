@@ -55,6 +55,15 @@ def racine_du_worktree(cwd: str | Path) -> Path | None:
     return None
 
 
+def _sous_les_worktrees(racine: Path) -> bool:
+    """Whether `racine` lies strictly below a worktrees folder (resolved)."""
+    for dossier in (settings.ide_worktrees_dir, settings.ide_worktrees_dir_agent):
+        base = Path(dossier).resolve()
+        if racine != base and racine.is_relative_to(base):
+            return True
+    return False
+
+
 async def arreter_les_restants(compte: str, enumerer: Enumerer, tuer: Tuer) -> None:
     """Stop every process still owned by `compte`; log each image name."""
     for pid, image in await enumerer(compte):
@@ -71,6 +80,10 @@ async def ouvrir_appel(cwd: str | Path, icacls: Icacls = _icacls_reel) -> Path |
     racine = racine_du_worktree(cwd) if compte else None
     if not compte or racine is None:
         return None
+    # Échec fermé : jamais de droit sur un dossier qui n'est pas un worktree de
+    # run, le checkout de l'utilisateur en tête (ticket-999, ADR-056).
+    if not _sous_les_worktrees(racine):
+        raise DroitsAgentRefuses(f"{racine} n'est pas sous le dossier des worktrees : aucun droit posé")
     async with _VERROU:
         if _ACTIFS.get(racine, 0) == 0:
             await poser_ecriture(racine, compte, icacls)

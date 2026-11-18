@@ -3,6 +3,7 @@ from fastapi import HTTPException
 from starlette.requests import Request
 
 from tessera.config import settings
+from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.github.github_service import GitHubService
 from tessera.utils.project_id import validate_project_id
 
@@ -37,3 +38,13 @@ async def require_valid_project_id(request: Request) -> None:
         return
     if not validate_project_id(project_id):
         raise HTTPException(status_code=404, detail="Project not found")
+
+
+async def refuser_projet_a_worktree(project_id: str) -> None:
+    """Refuse with a 409 a project that declares a worktree: the chat has none (ADR-056)."""
+    if PolitiqueRun.lire(settings.ide_workspace_dir / project_id).worktree is not None:
+        raise HTTPException(
+            status_code=409,
+            detail="Ce projet déclare un worktree : le chat ne peut pas lancer "
+            "de run dans son checkout. Lance le ticket depuis le pipeline.",
+        )

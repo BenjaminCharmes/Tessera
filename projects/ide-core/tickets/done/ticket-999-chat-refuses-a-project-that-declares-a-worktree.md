@@ -1,12 +1,13 @@
 ---
-id: ticket-999
-title: "The chat refuses to run a project that declares a worktree"
-type: fix
-status: todo
-priority: high
 agent: codeur
 depends_on: []
+id: ticket-999
+pr_number: 1160
 preuve_reelle: true
+priority: high
+status: done
+title: The chat refuses to run a project that declares a worktree
+type: fix
 ---
 
 ## Signalement

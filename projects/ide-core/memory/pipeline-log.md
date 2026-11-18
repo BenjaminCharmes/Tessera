@@ -9804,3 +9804,22 @@ error: Please commit or stash them.
 - 2026-11-18 11:00:49 UTC — documentation trop longue, titres seuls : docs/architecture.md (181178 caractères)
 - 2026-11-18 11:00:49 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
 - 2026-11-18 11:00:49 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-18 11:03:11 UTC — [ide-core] ticket-1000 PR #1159 non surveillée (livraison arrêtée)
+- 2026-11-18 11:03:22 UTC — [ticket-999] branche ticket-999-the-chat-refuses-to-run-a-project-that-declares-a
+- 2026-11-18 11:03:27 UTC — [ticket-999] tour 1 — codeur démarré
+- 2026-11-18 11:04:54 UTC — [ticket-999] tour 1 — codeur terminé (87030ms)
+- 2026-11-18 11:06:10 UTC — [ticket-999] testeur: 1 failed, 159 passed, 3 skipped, 8 warnings in 32.57s
+- 2026-11-18 11:06:10 UTC — [ticket-999] tests rouges au tour 1
+- 2026-11-18 11:06:10 UTC — [ticket-999] tour 2 — codeur démarré
+- 2026-11-18 11:08:34 UTC — [ticket-999] tour 2 — codeur terminé (143921ms)
+- 2026-11-18 11:09:52 UTC — [ticket-999] testeur: dur�es : ruff 0 s, mypy 10 s, mypy-linux 10 s, pytest 34 s ; impact depuis base : 27 fichier(s) de test
+- 2026-11-18 11:10:07 UTC — [ticket-999] securite: PASS — Le diff ajoute deux contrôles qui échouent fermés. Le chat refuse avec un 409 le (14875ms)
+- 2026-11-18 11:10:08 UTC — [ticket-999] tour 2 — reviewer démarré
+- 2026-11-18 11:10:28 UTC — [ticket-999] validateur: APPROVED — Les deux critères sont satisfaits. Le `/chat/run` refuse désormais les projets a (19890ms)
+- 2026-11-18 11:10:32 UTC — [ticket-999] tour 2 — reviewer terminé (24250ms)
+- 2026-11-18 11:10:32 UTC — [ticket-999] APPROVED après 2 tour(s)
+- 2026-11-18 11:11:49 UTC — [ticket-999] leçons: fichier plein, à compacter à la main
+- 2026-11-18 11:14:26 UTC — [ticket-999] documentation: 1 fichier(s) (135032ms)
+- 2026-11-18 11:14:26 UTC — documentation trop longue, titres seuls : docs/architecture.md (181178 caractères)
+- 2026-11-18 11:14:26 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-18 11:14:26 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)

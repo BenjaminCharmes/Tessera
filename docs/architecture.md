@@ -92,6 +92,12 @@ Au lieu d'énumérer les processus par la commande `tasklist`, qui résout les n
 
 Une commande CLI qui dépasse la limite pour `CreateProcessWithLogonW` passe par un relais Node : un script `relais.js` relit la commande depuis un fichier JSON et la lance sans shell. Cette approche permet aux outils qui ne supportent que des paramètres en ligne (comme `--json-schema`) de rester complets.
 
+##### Résolution du chemin du script sous le compte agent (ticket-1003)
+
+Sans le flag `--preserve-symlinks-main`, Node.js résout le chemin réel de son script en examinant (`lstat`) chaque dossier parent. Le dossier d'appel vit dans `TEMP` utilisateur, sous un profil inaccessible au compte agent : cette résolution échoue avec `EPERM` sur `AppData` et code de sortie 1, rendant l'audit sécurité indisponible.
+
+Le flag `--preserve-symlinks-main` (ticket-1003) demande à Node d'ouvrir le chemin fourni directement, sans résoudre les parents — une opération permise car les fichiers du relais (`relais.js`, `relais.json`) résident dans le dossier d'appel, accessible au compte agent. Le relais garde sa fonctionnalité intacte : le CLI exécute normalement, et les stages suivants du pipeline démarrent.
+
 #### Lecture des fichiers protégés sous le compte agent (ticket-994)
 
 Les fichiers protégés (agents.json, CLAUDE.md, etc.) refusent au compte agent les droits précis sans interdire la lecture. Les droits simples d'icacls portent aussi `SYNCHRONIZE`, qui interdit toute ouverture ; les droits précis (`WD`, `AD`, `WEA`, `WA`, `DE`) évitent ce piège.

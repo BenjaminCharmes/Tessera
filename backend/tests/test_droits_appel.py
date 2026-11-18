@@ -45,10 +45,28 @@ def compte(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 @pytest.fixture
-def worktree(tmp_path: Path) -> Path:
-    (tmp_path / ".git").mkdir()
-    (tmp_path / "backend").mkdir()
-    return tmp_path
+def worktree(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    dossier = tmp_path / "worktrees"
+    monkeypatch.setattr(settings, "ide_worktrees_dir", dossier)
+    monkeypatch.setattr(settings, "ide_worktrees_dir_agent", dossier)
+    arbre = dossier / "projet" / "ticket-1"
+    (arbre / ".git").mkdir(parents=True)
+    (arbre / "backend").mkdir()
+    return arbre
+
+
+async def test_a_checkout_outside_the_worktrees_folder_is_refused_without_icacls(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(settings, "ide_worktrees_dir", tmp_path / "worktrees")
+    monkeypatch.setattr(settings, "ide_worktrees_dir_agent", tmp_path / "worktrees")
+    checkout = tmp_path / "checkout"
+    (checkout / ".git").mkdir(parents=True)
+    icacls = Icacls()
+    with pytest.raises(DroitsAgentRefuses):
+        await ouvrir_appel(checkout, icacls)
+    assert icacls.appels == []
+    assert droits_appel._ACTIFS == {}
 
 
 async def test_right_is_withdrawn_after_a_call_and_set_again_before_the_next(worktree: Path) -> None:

@@ -9,7 +9,7 @@ from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisco
 from pydantic import BaseModel
 
 from tessera.config import settings
-from tessera.routers.dependencies import require_valid_project_id
+from tessera.routers.dependencies import refuser_projet_a_worktree, require_valid_project_id
 from tessera.services.agents.chat_service import ChatBudgetExceeded, ChatService
 from tessera.services.agents.chat_suggestion import summarize_conversation
 from tessera.services.git_workspace import GitWorkspaceService
@@ -329,7 +329,7 @@ def _with_conversation(project_context: str, summary: str) -> str:
 @router.post(
     "/{project_id}/chat/run",
     response_model=RunFromChatResponse,
-    dependencies=[Depends(require_valid_project_id)],
+    dependencies=[Depends(require_valid_project_id), Depends(refuser_projet_a_worktree)],
 )
 async def run_pipeline_from_chat(
     project_id: str, body: RunFromChatRequest
