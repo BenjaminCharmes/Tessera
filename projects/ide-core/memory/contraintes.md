@@ -10,6 +10,11 @@ Cette section n'est injectée dans aucun appel d'agent. Une règle nouvelle
 s'écrit ici, avec son ADR ; un humain l'accepte en la déplaçant dans sa
 section. (ADR-055)
 
+- **Le compte agent ne garde, d'un appel à l'autre, ni propriété ni droit
+  sur les fichiers qu'il a créés, ni profil** : à la fin du dernier appel,
+  propriété reprise et DACL remise à l'héritage ; un seul worktree à la fois
+  sous le compte, sauf `AGENT_CALLS_PARALLEL=true`. (ADR-087, ADR-083)
+
 ## Git et périmètre d'écriture
 
 - **Un projet qui déclare `worktree` exécute chaque run dans son worktree,

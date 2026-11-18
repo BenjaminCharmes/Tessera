@@ -1,11 +1,13 @@
 ---
-id: ticket-998
-title: "Design: the agent account loses its rights on the files it created at the end of a call"
-type: design
-status: todo
-priority: high
 agent: architect
 depends_on: []
+id: ticket-998
+pr_number: 1171
+priority: high
+status: done
+title: 'Design: the agent account loses its rights on the files it created at the
+  end of a call'
+type: design
 ---
 
 ## Signalement
