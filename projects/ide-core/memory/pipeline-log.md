@@ -9952,3 +9952,22 @@ error: Please commit or stash them.
 - 2026-11-16 16:29:18 UTC — [ticket-983] tour 1 — codeur terminé (126125ms)
 - 2026-11-16 16:29:20 UTC — [ticket-983] ARRÊTÉ par l'utilisateur au tour 1
 - 2026-11-16 16:29:25 UTC — [ide-core] file interrompue : ticket-983 non approuvé
+- 2026-11-18 14:08:46 UTC — [ide-core] ticket-998 PR #1171 confiée au CIWatcher
+- 2026-11-18 14:09:01 UTC — [ticket-983] branche ticket-983-agent-doctor-launches-node-uv-and-python-as-the-a
+- 2026-11-18 14:09:01 UTC — [ticket-983] fiche relue après l'avance de la base (4bc65e2e6a3efa9deaa3c0d31cc4d11da0549e41 → b75b919f8f36a5d2486d1cb809c83c0a6dcd0800)
+- 2026-11-18 14:12:23 UTC — [ticket-983] testeur: 1 failed, 1963 passed, 3 skipped, 112 warnings in 178.60s (0:02:58)
+- 2026-11-18 14:12:23 UTC — [ticket-983] branche reprise (3 commit(s)) — tests red, codeur en premier
+- 2026-11-18 14:12:23 UTC — [ticket-983] tour 1 — codeur démarré
+- 2026-11-18 14:16:35 UTC — [ticket-983] tour 1 — codeur terminé (251280ms)
+- 2026-11-18 14:27:18 UTC — [ticket-983] testeur: 1 failed, 5106 passed, 3 skipped, 112 warnings in 610.02s (0:10:10)
+- 2026-11-18 14:27:18 UTC — [ticket-983] tests rouges au tour 1
+- 2026-11-18 14:27:18 UTC — [ticket-983] tour 2 — codeur démarré
+- 2026-11-18 14:27:41 UTC — [ticket-983] tour 2 — codeur terminé (22671ms)
+- 2026-11-18 14:41:15 UTC — [ticket-983] testeur: dur�es : ruff 0 s, mypy 19 s, mypy-linux 24 s, pytest 767 s ; impact depuis base : suite compl�te
+- 2026-11-18 14:41:34 UTC — [ticket-983] securite: PASS — PASS : le diff n'ajoute aucune injection, aucun secret dans le code ni aucun acc (18905ms)
+- 2026-11-18 14:41:35 UTC — [ticket-983] tour 2 — reviewer démarré
+- 2026-11-18 14:41:58 UTC — [ticket-983] tour 2 — reviewer terminé (23157ms)
+- 2026-11-18 14:42:08 UTC — [ticket-983] validateur: fichiers cités joints : agent-setup.ps1
+- 2026-11-18 14:42:08 UTC — [ticket-983] validateur: APPROVED — Le module `agent_doctor_cli` lance correctement les outils sous le compte agent  (33280ms)
+- 2026-11-18 14:42:09 UTC — [ticket-983] APPROVED après 2 tour(s)
+- 2026-11-18 14:43:24 UTC — [ticket-983] leçons: refusée — preuve absente du retour du run
