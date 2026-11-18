@@ -9,6 +9,9 @@ from tessera.utils.logger import get_logger
 
 _logger = get_logger("tessera.services.git_workspace")
 
+# Nombre maximal de noms dérivés essayés (`-2` … `-9`) avant de laisser le refus remonter.
+_MAX_NOMS_DERIVES = 8
+
 # Signatures d'une erreur serveur passagère de GitHub (ticket-787), en minuscules.
 _SIGNES_ERREUR_SERVEUR = (
     "internal server error",
@@ -40,8 +43,11 @@ class GitPoussee(GitCore):
     # Délai avant le second essai après une erreur serveur (ticket-787).
     _delai_reessai_serveur_s: float = 5.0
 
-    async def push_branch(self, branch_name: str) -> None:
+    async def push_branch(self, branch_name: str) -> str:
         """Pousse `branch_name` sur `origin`, en suivi de branche.
+
+        Retourne le nom distant réellement poussé : `branch_name`, ou un nom
+        dérivé (`<branche>-2`…) quand la branche distante a divergé.
 
         C'était le maillon manquant : `create-pr` demandait à GitHub une
         branche `head` que rien n'avait jamais poussée, et GitHub refusait une
@@ -60,23 +66,71 @@ class GitPoussee(GitCore):
         Une erreur serveur de GitHub (`Internal Server Error`, 502…) suit le
         même principe (ticket-787) : le distant est relu, puis un seul
         nouvel essai après un court délai, toujours sans force. Un second
-        refus remonte ; tout autre refus (`non-fast-forward`…) aussi.
+        refus remonte.
+
+        Une branche distante divergente (la tête locale n'en descend pas)
+        n'est ni écrasée ni supprimée : la tête locale part sous un nom neuf,
+        `<branche>-2`, puis `-3`… (`_pousser_sous_nom_derive`).
         """
         try:
             await self._run("push", "--set-upstream", "origin", branch_name)
         except GitCommandError as refus:
             if _est_erreur_serveur(refus.stderr):
                 await self._rejouer_apres_erreur_serveur(branch_name, refus)
-                return
+                return branch_name
             if not await self._distant_rattrapable(branch_name):
+                if await self._distant_diverge(branch_name):
+                    return await self._pousser_sous_nom_derive(branch_name, refus)
                 raise
             if await self._distant_a_jour(branch_name):
-                return
+                return branch_name
             await self._run("push", "--set-upstream", "origin", branch_name)
             _logger.warning(
                 "push_rejoue_apres_course",
                 extra={"branche": branch_name, "erreur": refus.stderr.strip()},
             )
+        return branch_name
+
+    async def _distant_diverge(self, branch: str) -> bool:
+        """True when the remote branch exists and the local head is not its descendant."""
+        return (
+            await self._sha_distant_lu(branch) is not None
+            and await self._sha_local(branch) is not None
+        )
+
+    async def _pousser_sous_nom_derive(
+        self, branch: str, refus: GitCommandError
+    ) -> str:
+        """Pushes the local head as `<branch>-N`, the first name that takes it.
+
+        A derived name that already exists is reused when the local head
+        descends from it (a later push of the same work); otherwise the next
+        number is tried. Never forced, nothing on the remote is deleted.
+        """
+        local = await self._sha_local(branch)
+        for numero in range(2, _MAX_NOMS_DERIVES + 2):
+            nom = f"{branch}-{numero}"
+            distant = await self._sha_distant_lu(nom)
+            if distant is not None and not await self._tete_descend_de(local, distant):
+                continue
+            if distant != local:
+                await self._run("push", "--set-upstream", "origin", f"{branch}:{nom}")
+            _logger.warning(
+                "push_sous_nom_derive",
+                extra={"branche": branch, "nom": nom, "erreur": refus.stderr.strip()},
+            )
+            return nom
+        raise refus
+
+    async def _tete_descend_de(self, local: str | None, ancetre: str) -> bool:
+        """True when `local` is `ancetre` or one of its descendants."""
+        if local is None:
+            return False
+        try:
+            await self._run("merge-base", "--is-ancestor", ancetre, local)
+        except GitCommandError:
+            return False
+        return True
 
     async def _rejouer_apres_erreur_serveur(
         self, branch: str, refus: GitCommandError

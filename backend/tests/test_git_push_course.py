@@ -87,7 +87,7 @@ async def test_remote_behind_head_is_pushed_again_without_force(
     ).strip()
 
 
-async def test_diverged_remote_keeps_the_refusal(
+async def test_diverged_remote_is_never_overwritten(
     depot: tuple[Path, Path, str],
 ) -> None:
     project, remote, branch = depot
@@ -98,10 +98,9 @@ async def test_diverged_remote_keeps_the_refusal(
     await GitWorkspaceService(project).commit_all("feat: autre")
     service = _ServiceCourse(project)
 
-    with pytest.raises(GitCommandError):
-        await service.push_branch(branch)
+    # Ticket-1010 : la divergence part sous un nom dérivé, l'original reste intact.
+    assert await service.push_branch(branch) == f"{branch}-2"
 
-    assert service.pushes == 1
     assert (await _git(remote, "rev-parse", branch)).strip() == pousse
 
 

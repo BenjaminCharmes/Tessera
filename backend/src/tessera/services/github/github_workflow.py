@@ -45,7 +45,7 @@ class PullRequestResult:
 
 
 class _GitWorkspace(Protocol):
-    async def push_branch(self, branch_name: str) -> None: ...
+    async def push_branch(self, branch_name: str) -> str | None: ...
     async def current_diff(self) -> str: ...
     async def diff_de_branche(self, base: str, branch: str) -> str: ...
     async def commits_depuis_base(self, base: str, branch: str) -> list[CommitInfo]: ...
@@ -220,7 +220,7 @@ class GitHubWorkflowService:
         if refus := refus_secrets(diff):
             raise WorkflowError(refus)
 
-        await self._git.push_branch(branch)
+        tete = await self._git.push_branch(branch) or branch  # nom éventuellement dérivé
 
         pr_title = (
             f"{ticket_type}: {ticket_id} — {ticket_title}"
@@ -232,14 +232,14 @@ class GitHubWorkflowService:
             body=build_pr_body(
                 ticket_id, ticket_title, ticket_body, issue=self._issue_de(ticket_id)
             ),
-            head=branch,
+            head=tete,
             base=self._base_branch,
         )
         _logger.info(
             "pull_request_opened",
-            extra={"ticket_id": ticket_id, "pr_number": pr_number, "branch": branch},
+            extra={"ticket_id": ticket_id, "pr_number": pr_number, "branch": tete},
         )
-        return PullRequestResult(pr_number=pr_number, pr_url=pr_url, branch=branch)
+        return PullRequestResult(pr_number=pr_number, pr_url=pr_url, branch=tete)
 
     async def _verifier_termes_interdits(self, branch: str) -> None:
         """Bloque le push si un terme interdit est trouvé — ADR-048.
