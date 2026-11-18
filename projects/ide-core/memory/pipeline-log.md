@@ -9910,3 +9910,5 @@ error: Please commit or stash them.
 - 2026-11-18 12:59:55 UTC — [ticket-1005] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le code implémente bien le flu (40047ms)
 - 2026-11-18 12:59:56 UTC — [ticket-1005] APPROVED après 2 tour(s)
 - 2026-11-18 13:00:34 UTC — [ticket-1005] leçons: refusée — preuve absente du retour du run
+- 2026-11-18 13:00:57 UTC — [ticket-1005] documentation: 0 fichier(s) (437ms)
+- 2026-11-18 13:00:57 UTC — [ticket-1005] documentation: pas de diff retrouvable, non documenté
