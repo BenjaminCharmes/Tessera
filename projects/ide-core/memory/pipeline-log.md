@@ -9955,3 +9955,6 @@ error: Please commit or stash them.
 - 2026-11-18 10:52:07 UTC — documentation trop longue, titres seuls : docs/architecture.md (181178 caractères)
 - 2026-11-18 10:52:07 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
 - 2026-11-18 10:52:07 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-18 10:52:57 UTC — [ticket-997] livraison: rebase sur develop (563ms)
+- 2026-11-18 10:52:57 UTC — [ticket-997] livraison: PR #1157 ouverte (4984ms)
+- 2026-11-18 10:52:57 UTC — [ticket-997] livraison: arrêt — PR ouverte, merge après preuve réelle
