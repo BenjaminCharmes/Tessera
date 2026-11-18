@@ -10081,3 +10081,4 @@ error: Please commit or stash them.
 - 2026-11-18 16:34:30 UTC — [ticket-983] APPROVED après 2 tour(s)
 - 2026-11-18 16:35:48 UTC — [ticket-983] leçons: fichier plein, à compacter à la main
 - 2026-11-18 16:36:07 UTC — [ticket-983] documentation: 0 fichier(s) (125ms)
+- 2026-11-18 16:36:16 UTC — [ticket-983] livraison: arrêt — Livraison interrompue : GitCommandError: git command failed (code 1): git -c core.hooksPath=C:\Users
