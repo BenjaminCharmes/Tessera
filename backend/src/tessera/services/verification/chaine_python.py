@@ -1,10 +1,11 @@
 """The shared Python a worktree venv points at under the agent account — ticket-984.
 
 A venv made by `uv` records, in `pyvenv.cfg`, the interpreter that made it. The
-worktree setup runs under the backend's account (ADR-085) and alone decides
-where that interpreter lives: under `%APPDATA%\\uv\\python` it would be
-unreadable to the agent account. With `worktree.compte_agent`, the setup is
-given the shared toolchain (ADR-086); without it, nothing changes.
+worktree setup alone decides where that interpreter lives: under
+`%APPDATA%\\uv\\python` it would be unreadable to the agent account. With
+`worktree.compte_agent`, the setup runs under that account (ticket-995) and is
+given the shared toolchain (ADR-086); without it, it runs under the backend's
+account and nothing changes.
 """
 from collections.abc import Mapping
 from pathlib import Path

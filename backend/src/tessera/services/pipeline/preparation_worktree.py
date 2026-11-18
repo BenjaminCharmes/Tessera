@@ -19,6 +19,7 @@ from tessera.services.noyau.pipeline_events import EventType, PipelineResult
 from tessera.services.pipeline.pipeline_outcomes import commit_ou_bloquer
 from tessera.services.pipeline.pipeline_run import PipelineRun, emit, set_status
 from tessera.services.pipeline.pipeline_text import _unapproved_commit_message
+from tessera.services.providers.lanceur_agent import LanceurAgent
 from tessera.services.verification.chaine_python import ChaineAbsente, fusionner_env, verifier_chaine
 from tessera.services.verification.commande_effective import setup_effectif
 from tessera.services.verification.test_runner import TestResult, TestRunnerService
@@ -69,12 +70,16 @@ def preparation_du_run(
     env: dict[str, str] | None,
     timeout: int | None,
     runner: TestRunnerService | None = None,
+    lanceur: LanceurAgent | None = None,
 ) -> Preparation | None:
     """The setup of the run, or `None` when the project declares none.
 
     `racine` is the worktree root, `None` outside a worktree; `env` is the
     already-resolved `worktree.env`. Raises `PlaceholderInconnu`
-    when the command names a placeholder that does not exist.
+    when the command names a placeholder that does not exist. With
+    `worktree.compte_agent` and `AGENT_USER`, the setup starts under the agent
+    account, never under the backend's: a branch resumed from an earlier run
+    carries the agent's files (ticket-995).
     """
     if racine is None or politique.worktree is None:
         return None
@@ -82,7 +87,12 @@ def preparation_du_run(
     if commande is None:
         return None
     config = politique.worktree
-    lanceur = runner or TestRunnerService(cwd=None, timeout=timeout, env=fusionner_env(config, env))
+    # Sous le compte agent, `lancer_sous_compte` ouvre l'appel (droit d'écriture sur
+    # `node_modules` / `.venv`) et l'étape le clôt ; un échec n'a aucun repli.
+    executeur = runner or TestRunnerService(
+        cwd=None, timeout=timeout, env=fusionner_env(config, env),
+        compte_agent=config.compte_agent, lanceur=lanceur,
+    )
 
     async def preparer() -> ResultatPreparation:
         try:
@@ -92,12 +102,12 @@ def preparation_du_run(
             return ResultatPreparation(commande, 0, None, f"{_PREFIXE_ECHEC} `{commande}` — {exc}")
         # La racine du worktree, pas le dossier du projet : le gestionnaire de paquets
         # y cherche son fichier de verrou.
-        resultat = await lanceur.run_tests(racine, test_command=commande)
+        resultat = await executeur.run_tests(racine, test_command=commande)
         if not resultat.passed and resultat.expiree:
             # Un délai passager (charge d'un autre worktree) passe souvent au second
             # essai ; un code de sortie non nul, lui, ne se relance pas.
             _logger.warning("worktree_setup_relance", extra={"commande": commande})
-            resultat = await lanceur.run_tests(racine, test_command=commande)
+            resultat = await executeur.run_tests(racine, test_command=commande)
         code = resultat.etapes[-1].code if resultat.etapes else None
         if resultat.passed:
             return ResultatPreparation(commande, resultat.duration_ms, code, None)

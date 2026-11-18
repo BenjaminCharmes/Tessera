@@ -9751,3 +9751,20 @@ error: Please commit or stash them.
 - 2026-11-17 11:47:49 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
 - 2026-11-17 11:47:49 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
 - 2026-11-17 11:47:49 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-17 11:52:34 UTC — [ide-core] ticket-985 PR #1146 reprise par le CIWatcher après redémarrage
+- 2026-11-17 11:40:02 UTC — [ide-core] ticket-973 PR #1144 mergée (CI verte)
+- 2026-11-17 11:51:15 UTC — [ide-core] ticket-985 PR #1146 confiée au CIWatcher
+- 2026-11-17 11:55:54 UTC — [ide-core] ticket-985 PR #1146 mergée (CI verte)
+- 2026-11-17 15:55:46 UTC — [ticket-995] branche ticket-995-the-worktree-setup-runs-under-the-agent-account
+- 2026-11-17 15:55:50 UTC — [ticket-995] tour 1 — codeur démarré
+- 2026-11-17 15:57:47 UTC — [ticket-995] tour 1 — codeur terminé (117235ms)
+- 2026-11-17 15:59:35 UTC — [ticket-995] testeur: dur�es : ruff 0 s, mypy 24 s, mypy-linux 25 s, pytest 102 s ; impact depuis base : 51 fichier(s) de test
+- 2026-11-17 15:59:48 UTC — [ticket-995] securite: PASS — Le diff fait tourner la commande `setup` du worktree sous le compte agent quand  (12593ms)
+- 2026-11-17 15:59:49 UTC — [ticket-995] tour 1 — reviewer démarré
+- 2026-11-17 16:00:16 UTC — [ticket-995] tour 1 — reviewer terminé (27014ms)
+- 2026-11-17 16:00:17 UTC — [ticket-995] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits par les tests ajoutés. Le code m (28203ms)
+- 2026-11-17 16:00:17 UTC — [ticket-995] APPROVED après 1 tour(s)
+- 2026-11-17 16:03:15 UTC — [ticket-995] documentation: 1 fichier(s) (172766ms) — après tour de correction
+- 2026-11-17 16:03:15 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-17 16:03:15 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-17 16:03:15 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
