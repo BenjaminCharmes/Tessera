@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 from tessera.models.ticket import TicketStatus
 from tessera.services.git_workspace.liens import LienNonDeclare, retirer_ces_liens
 from tessera.services.noyau.pipeline_events import EventType, PipelineResult
+from tessera.services.pipeline import pipeline_outcomes as outcomes
 from tessera.services.pipeline.pipeline_outcomes import commit_ou_bloquer, finish_interrupted
 from tessera.services.pipeline.pipeline_run import PipelineRun, emit, set_status
 from tessera.services.pipeline.pipeline_text import _unapproved_commit_message
@@ -28,6 +29,29 @@ async def _retirer_les_liens_refuses(orch: "Orchestrator", exc: LienNonDeclare) 
         _logger.warning("liens_refuses_non_retires", extra={"error": str(erreur)})
         return list(exc.liens)
     return [str(chemin) for chemin in restants]
+
+
+async def commit_apres_lien(
+    orch: "Orchestrator", run: PipelineRun, message: str, exc: LienNonDeclare
+) -> tuple[str | None, str | None]:
+    """Unlink the refused links found at the final commit, then commit once more.
+
+    Le commit réussi rend `arret` à None : l'appelant garde ainsi la vraie
+    cause de sa sortie (`arret or raison`). Le lien se nomme dans le journal,
+    un événement ERROR et le message du commit. Un lien qui reste ou qui
+    revient fait échouer le commit, nommé dans `arret`, sans boucle.
+    """
+    liens = ", ".join(exc.liens)
+    restants = await _retirer_les_liens_refuses(orch, exc)
+    if restants:
+        return None, f"lien non déclaré non retiré : {', '.join(restants)}"
+    orch._log(f"[{run.ticket_id}] lien non déclaré retiré avant le commit : {liens}")
+    await emit(run, EventType.ERROR, reason="lien_non_declare", detail=liens)
+    try:
+        sha = await outcomes.commit_work(orch, run, f"{message} [lien retiré : {liens}]")
+    except (outcomes.CommitFailed, LienNonDeclare) as erreur:
+        return None, f"lien non déclaré : {liens} ; commit_failed: {str(erreur)[:200]}"
+    return sha, None
 
 
 async def finish_lien_refuse(

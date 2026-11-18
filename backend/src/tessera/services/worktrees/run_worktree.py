@@ -13,6 +13,7 @@ from pathlib import Path
 
 from tessera.config import settings
 from tessera.services.git_workspace import GitCommandError, GitWorkspaceError
+from tessera.services.git_workspace.liens import liens_non_declares
 from tessera.services.worktrees.dossier_agent import accorder_lecture_dossier, dossier_des_worktrees, preparer_dossier_agent
 from tessera.services.worktrees.run_worktree_populate import chemin_etendu, retirer_les_liens
 from tessera.services.worktrees.temporary_worktree import run_git
@@ -162,7 +163,11 @@ async def _reprendre(racine: Path, branche: str, extraites: dict[str, Path]) -> 
     if ici is None or not _meme_dossier(ici, racine):
         raise WorktreeOccupe(f"{racine} existe mais n'est pas le worktree de « {branche} ».")
     if await _etat(racine):
-        raise WorktreeOccupe(f"{racine} porte des changements non commités ; il n'est pas repris.")
+        liens = await liens_non_declares(racine)
+        nommes = f" Lien(s) non déclaré(s) : {', '.join(liens)}." if liens else ""
+        raise WorktreeOccupe(
+            f"{racine} porte des changements non commités ; il n'est pas repris.{nommes}"
+        )
     _logger.info("run_worktree_resumed", extra={"racine": str(racine), "branche": branche})
     return True
 
