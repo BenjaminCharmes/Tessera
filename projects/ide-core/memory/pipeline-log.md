@@ -9912,3 +9912,18 @@ error: Please commit or stash them.
 - 2026-11-18 13:00:34 UTC — [ticket-1005] leçons: refusée — preuve absente du retour du run
 - 2026-11-18 13:00:57 UTC — [ticket-1005] documentation: 0 fichier(s) (437ms)
 - 2026-11-18 13:00:57 UTC — [ticket-1005] documentation: pas de diff retrouvable, non documenté
+- 2026-11-18 13:01:34 UTC — [ide-core] ticket-1005 PR #1167 non surveillée (livraison arrêtée)
+- 2026-11-18 13:01:39 UTC — [ticket-1004] branche ticket-1004-a-project-that-merges-without-ci-still-waits-for
+- 2026-11-18 13:01:43 UTC — [ticket-1004] tour 1 — codeur démarré
+- 2026-11-18 13:03:11 UTC — [ticket-1004] tour 1 — codeur terminé (87546ms)
+- 2026-11-18 13:10:01 UTC — [ticket-1004] testeur: 1 failed, 1026 passed, 16 warnings in 369.81s (0:06:09)
+- 2026-11-18 13:10:01 UTC — [ticket-1004] tests rouges au tour 1
+- 2026-11-18 13:10:01 UTC — [ticket-1004] tour 2 — codeur démarré
+- 2026-11-18 13:12:26 UTC — [ticket-1004] tour 2 — codeur terminé (144765ms)
+- 2026-11-18 13:25:13 UTC — [ticket-1004] testeur: dur�es : ruff 0 s, mypy 13 s, mypy-linux 36 s, pytest 726 s ; impact depuis base : 155 fichier(s) de test
+- 2026-11-18 13:25:26 UTC — [ticket-1004] securite: PASS — Le diff rend la livraison plus stricte : avec `merge_without_ci`, une CI `pendin (12797ms)
+- 2026-11-18 13:25:28 UTC — [ticket-1004] tour 2 — reviewer démarré
+- 2026-11-18 13:25:58 UTC — [ticket-1004] tour 2 — reviewer terminé (30109ms)
+- 2026-11-18 13:26:44 UTC — [ticket-1004] validateur: APPROVED — Tous les critères sont satisfaits. Les quatre tests couvrent exactement les cas  (76171ms)
+- 2026-11-18 13:26:44 UTC — [ticket-1004] APPROVED après 2 tour(s)
+- 2026-11-18 13:27:17 UTC — [ticket-1004] leçons: refusée — plus de 200 caractères
