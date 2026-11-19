@@ -10291,3 +10291,19 @@ error: Please commit or stash them.
 - 2026-11-19 12:52:10 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
 - 2026-11-19 12:52:10 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
 - 2026-11-19 12:52:10 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-19 12:58:17 UTC — [ide-core] ticket-1017 PR #1191 mergée (CI verte)
+- 2026-11-19 12:59:59 UTC — [ticket-1016] branche ticket-1016-decide-how-to-close-what-the-agent-account-can-s
+- 2026-11-19 13:00:02 UTC — [ticket-1016] tour 1 — codeur démarré
+- 2026-11-19 13:01:38 UTC — [ticket-1016] tour 1 — architect terminé (95437ms)
+- 2026-11-19 13:02:31 UTC — [ticket-1016] testeur: 2 failed, 26 passed, 1 warning in 12.80s — fichiers en échec : tests/test_consignes_coherentes.py
+- 2026-11-19 13:02:31 UTC — [ticket-1016] tests rouges au tour 1
+- 2026-11-19 13:02:31 UTC — [ticket-1016] tour 2 — codeur démarré
+- 2026-11-19 13:03:05 UTC — [ticket-1016] tour 2 — architect terminé (33766ms)
+- 2026-11-19 13:03:58 UTC — [ticket-1016] testeur: OK (exit 0)
+- 2026-11-19 13:04:04 UTC — [ticket-1016] securite: PASS — Ce diff ne touche que de la documentation. Il ajoute l'ADR-088 dans `decisions.m (5844ms)
+- 2026-11-19 13:04:05 UTC — [ticket-1016] tour 2 — reviewer démarré
+- 2026-11-19 13:04:28 UTC — [ticket-1016] tour 2 — reviewer terminé (22530ms)
+- 2026-11-19 13:05:44 UTC — [ticket-1016] validateur: fichiers cités joints : memory/decisions.md (tronqué) ; non joints (budget épuisé) : tickets/todo/
+- 2026-11-19 13:05:44 UTC — [ticket-1016] validateur: APPROVED — ADR-088 successfully addresses all three architectural decision points (processe (99280ms)
+- 2026-11-19 13:05:46 UTC — [ticket-1016] APPROVED après 2 tour(s)
+- 2026-11-19 13:07:32 UTC — [ticket-1016] leçons: une leçon proposée
