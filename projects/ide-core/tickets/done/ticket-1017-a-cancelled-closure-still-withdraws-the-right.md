@@ -5,7 +5,7 @@ depends_on:
 - ticket-1014
 estimated_days: 1
 id: ticket-1017
-pr_number: null
+pr_number: 1191
 priority: medium
 status: done
 title: A cancelled closure still withdraws the right and closes the job
