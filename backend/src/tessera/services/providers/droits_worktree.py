@@ -75,7 +75,7 @@ _REFUSES: dict[Path, list[Path]] = {}
 
 
 async def _refuser(fichier: Path, compte: str, lanceur: Icacls) -> None:
-    await _lancer(lanceur, [str(fichier), "/deny", f"{compte}:{_REFUS_ECRITURE}"])
+    await _lancer(lanceur, [str(fichier), "/deny", f"{compte}:{_REFUS_ECRITURE}", "/L"])
 
 
 def compte_du_backend() -> str:
@@ -85,9 +85,9 @@ def compte_du_backend() -> str:
 
 async def _proteger_git(git: Path, compte: str, lanceur: Icacls) -> None:
     droit = "(OI)(CI)RX" if git.is_dir() else "RX"
-    await _lancer(lanceur, [str(git), "/inheritance:d"])
-    await _lancer(lanceur, [str(git), "/remove:g", compte])
-    await _lancer(lanceur, [str(git), "/grant:r", f"{compte}:{droit}"])
+    await _lancer(lanceur, [str(git), "/inheritance:d", "/L"])
+    await _lancer(lanceur, [str(git), "/remove:g", compte, "/L"])
+    await _lancer(lanceur, [str(git), "/grant:r", f"{compte}:{droit}", "/L"])
 
 
 async def poser_ecriture(
@@ -98,12 +98,12 @@ async def poser_ecriture(
     Adds an inheritable OWNER RIGHTS ACE (read control only) and full control for
     the backend account, so the agent cannot rewrite the DACL of its own files.
     """
-    await _lancer(lanceur, [str(racine), "/grant", f"{compte}:(OI)(CI)M"])
+    await _lancer(lanceur, [str(racine), "/grant", f"{compte}:(OI)(CI)M", "/L"])
     # L'ACE du backend d'abord : il est propriétaire de la racine et n'y a que
     # « modifier » par héritage. OWNER RIGHTS posée en premier lui retirait
     # WRITE_DAC, et son propre `/grant` suivant était refusé (preuve du 19/11).
-    await _lancer(lanceur, [str(racine), "/grant", f"{backend or compte_du_backend()}:(OI)(CI)F"])
-    await _lancer(lanceur, [str(racine), "/grant", _OWNER_RIGHTS])
+    await _lancer(lanceur, [str(racine), "/grant", f"{backend or compte_du_backend()}:(OI)(CI)F", "/L"])
+    await _lancer(lanceur, [str(racine), "/grant", _OWNER_RIGHTS, "/L"])
     git = racine / ".git"
     if git.exists():
         await _proteger_git(git, compte, lanceur)
@@ -124,8 +124,8 @@ async def retirer_ecriture(
     """
     git = racine / ".git"
     if git.exists():
-        await _lancer(lanceur, [str(git), "/remove:g", compte])
-    await _lancer(lanceur, [str(racine), "/remove:g", compte])
+        await _lancer(lanceur, [str(git), "/remove:g", compte, "/L"])
+    await _lancer(lanceur, [str(racine), "/remove:g", compte, "/L"])
     await _lancer(lanceur, [str(racine), "/setowner", backend or compte_du_backend(), "/T", "/C", "/L"])
     await _lancer(lanceur, [str(racine), "/reset", "/T", "/C", "/L"])
     if git.exists():

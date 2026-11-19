@@ -152,7 +152,7 @@ def test_main_launches_outside_any_git_repository(
     assert not any((p / ".git").exists() for p in (DOSSIER_OUTILS, *DOSSIER_OUTILS.parents))
 
 
-async def test_ouvrir_appel_never_receives_the_repository_root(
+async def test_doctor_never_asks_for_a_write_right(
     compte: None, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     recus: list[Path] = []
@@ -162,7 +162,7 @@ async def test_ouvrir_appel_never_receives_the_repository_root(
 
     monkeypatch.setattr(lancement_compte, "ouvrir_appel", espion)
     assert await verifier_outils(DOSSIER_OUTILS, LanceurNeuf()) == 0
-    assert recus and all(d == DOSSIER_OUTILS for d in recus)
+    assert recus == []
 
 
 async def test_missing_profile_folder_fails_naming_agent_setup(

@@ -128,8 +128,12 @@ async def lancer_sous_compte(
     dossier: Path,
     env: Mapping[str, str] | None = None,
     lanceur: LanceurAgent | None = None,
+    sans_droits: bool = False,
 ) -> ProcessusDuCompte:
-    """Start ``args`` in ``dossier`` under ``AGENT_USER``; never under the backend's."""
+    """Start ``args`` in ``dossier`` under ``AGENT_USER``; never under the backend's.
+
+    `sans_droits` : le dossier n'est pas un worktree (le docteur d'outils), aucun droit n'est posé.
+    """
     compte = settings.agent_user
     mot_de_passe = settings.agent_logon_password.get_secret_value()
     if not compte:
@@ -140,7 +144,7 @@ async def lancer_sous_compte(
         lance = lanceur or fabriquer_lanceur()
     except ProviderIndisponible as exc:
         raise EchecLancementCompte(str(exc)) from exc
-    racine_droits = await ouvrir_appel(dossier)
+    racine_droits = None if sans_droits else await ouvrir_appel(dossier)
     try:
         return await _lancer_les_formes(lance, args, dossier, env, racine_droits)
     except BaseException:

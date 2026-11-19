@@ -56,21 +56,33 @@ async def _tuer_reel(pid: int, existe: Callable[[int], bool] = processus_existe)
 
 
 def racine_du_worktree(cwd: str | Path) -> Path | None:
-    """The nearest folder, from `cwd` upwards, that holds a `.git`."""
+    """The run worktree of `cwd`: its ancestor that is a direct child of `<worktrees>/<project>/`.
+
+    No `.git` lookup: a folder an agent creates cannot move the root (ticket-1015).
+    `None` when `cwd` is not at least two levels below a worktrees folder.
+    """
     chemin = Path(cwd).resolve()
-    for dossier in (chemin, *chemin.parents):
-        if (dossier / ".git").exists():
-            return dossier
+    for dossier in (settings.ide_worktrees_dir, settings.ide_worktrees_dir_agent):
+        base = Path(dossier).resolve()
+        if chemin.is_relative_to(base):
+            parties = chemin.relative_to(base).parts
+            if len(parties) >= 2:
+                return base / parties[0] / parties[1]
     return None
 
 
-def _sous_les_worktrees(racine: Path) -> bool:
-    """Whether `racine` lies strictly below a worktrees folder (resolved)."""
-    for dossier in (settings.ide_worktrees_dir, settings.ide_worktrees_dir_agent):
-        base = Path(dossier).resolve()
-        if racine != base and racine.is_relative_to(base):
-            return True
-    return False
+_REPARSE_POINT = 0x400
+
+
+def _verifier_git_sans_lien(racine: Path) -> None:
+    """Refuse a `.git` of the root that is a reparse point (junction) or a symlink."""
+    git = racine / ".git"
+    try:
+        etat = git.lstat()
+    except FileNotFoundError:
+        return
+    if getattr(etat, "st_file_attributes", 0) & _REPARSE_POINT or git.is_symlink():
+        raise DroitsAgentRefuses(f"{git} est un lien : aucun droit posé")
 
 
 async def arreter_les_restants(compte: str, enumerer: Enumerer, tuer: Tuer) -> None:
@@ -114,16 +126,17 @@ async def ouvrir_appel(cwd: str | Path, icacls: Icacls = _icacls_reel) -> Path |
     the same root overlap). `AGENT_CALLS_PARALLEL=true` lifts the wait. A test
     command or the visual-check app counts as a call: the app holds the account
     for as long as it runs.
-    `None` sans `AGENT_USER` ou hors d'un dépôt : rien n'est posé, rien ne sera retiré.
+    `None` sans `AGENT_USER` : rien n'est posé, rien ne sera retiré.
     """
     compte = settings.agent_user
-    racine = racine_du_worktree(cwd) if compte else None
-    if not compte or racine is None:
+    if not compte:
         return None
     # Échec fermé : jamais de droit sur un dossier qui n'est pas un worktree de
     # run, le checkout de l'utilisateur en tête (ticket-999, ADR-056).
-    if not _sous_les_worktrees(racine):
-        raise DroitsAgentRefuses(f"{racine} n'est pas sous le dossier des worktrees : aucun droit posé")
+    racine = racine_du_worktree(cwd)
+    if racine is None:
+        raise DroitsAgentRefuses(f"{cwd} n'est pas sous le dossier des worktrees : aucun droit posé")
+    _verifier_git_sans_lien(racine)
     jeton = object()
     async with _VERROU:
         _FILE.append(jeton)
