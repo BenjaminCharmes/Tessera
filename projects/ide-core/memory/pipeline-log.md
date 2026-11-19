@@ -10312,3 +10312,15 @@ error: Please commit or stash them.
 - 2026-11-19 13:09:30 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
 - 2026-11-19 13:09:30 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
 - 2026-11-19 13:09:30 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-19 13:15:48 UTC — [ide-core] ticket-1016 PR #1192 reprise par le CIWatcher après redémarrage
+- 2026-11-19 13:15:56 UTC — [ide-core] ticket-1016 PR #1192 mergée (CI verte)
+- 2026-11-19 13:26:10 UTC — [ticket-1021] branche ticket-1021-a-protected-file-created-in-a-subfolder-refuses
+- 2026-11-19 13:26:14 UTC — [ticket-1021] tour 1 — codeur démarré
+- 2026-11-19 13:27:49 UTC — [ticket-1021] tour 1 — codeur terminé (95000ms)
+- 2026-11-19 13:31:03 UTC — [ticket-1021] testeur: dur�es : ruff 0 s, mypy 12 s, mypy-linux 12 s, pytest 153 s ; impact depuis base : 53 fichier(s) de test
+- 2026-11-19 13:31:22 UTC — [ticket-1021] securite: PASS — PASS : le diff renforce une porte existante. Les fichiers protégés créés dans un (18093ms)
+- 2026-11-19 13:31:23 UTC — [ticket-1021] tour 1 — reviewer démarré
+- 2026-11-19 13:31:54 UTC — [ticket-1021] validateur: fichiers cités joints : CLAUDE.md ; absents : sous/dossier/, .mcp.json
+- 2026-11-19 13:31:54 UTC — [ticket-1021] validateur: APPROVED — La mise en œuvre ajoute la détection des fichiers protégés créés en sous-dossier (31514ms)
+- 2026-11-19 13:31:56 UTC — [ticket-1021] tour 1 — reviewer terminé (32764ms)
+- 2026-11-19 13:31:56 UTC — [ticket-1021] APPROVED après 1 tour(s)
