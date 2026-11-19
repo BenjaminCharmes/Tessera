@@ -10328,3 +10328,14 @@ error: Please commit or stash them.
 - 2026-11-19 13:35:30 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
 - 2026-11-19 13:35:30 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
 - 2026-11-19 13:35:30 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-19 13:41:22 UTC — [ticket-1019] branche ticket-1019-the-uv-cache-is-copied-and-read-only-for-the-age
+- 2026-11-19 13:41:23 UTC — [ticket-1019] fiche relue après l'avance de la base (290e7573c54a04859f721d5157e2d65d1f44b5c5 → 9506f3c7aad61b50c7c35f1465baa7da29ee81ba)
+- 2026-11-19 13:41:26 UTC — [ticket-1019] tour 1 — codeur démarré
+- 2026-11-19 13:42:34 UTC — [ticket-1019] tour 1 — codeur terminé (68219ms)
+- 2026-11-19 13:45:29 UTC — [ticket-1019] testeur: dur�es : ruff 0 s, mypy 15 s, mypy-linux 15 s, pytest 137 s ; impact depuis base : 136 fichier(s) de test
+- 2026-11-19 13:45:41 UTC — [ticket-1019] securite: PASS — Le diff durcit l'isolation du compte agent. Le cache uv n'est plus gardé : il pa (11670ms)
+- 2026-11-19 13:45:42 UTC — [ticket-1019] tour 1 — reviewer démarré
+- 2026-11-19 13:45:58 UTC — [ticket-1019] tour 1 — reviewer terminé (16640ms)
+- 2026-11-19 13:46:13 UTC — [ticket-1019] validateur: fichiers cités joints : profil_agent.py ; absents : uv/cache/, npm-cache/
+- 2026-11-19 13:46:13 UTC — [ticket-1019] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les trois tests attendus ont ét (31250ms)
+- 2026-11-19 13:46:13 UTC — [ticket-1019] APPROVED après 1 tour(s)
