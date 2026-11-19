@@ -10374,3 +10374,7 @@ error: Please commit or stash them.
 - 2026-11-19 14:36:12 UTC — [ticket-1018] validateur: APPROVED — Les quatre critères sont satisfaits. Le nouveau module `taches_compte.py` implém (49469ms)
 - 2026-11-19 14:36:13 UTC — [ticket-1018] APPROVED après 3 tour(s)
 - 2026-11-19 14:37:34 UTC — [ticket-1018] leçons: refusée — preuve absente du retour du run
+- 2026-11-19 14:39:56 UTC — [ticket-1018] documentation: 0 fichier(s) (113889ms)
+- 2026-11-19 14:39:56 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-19 14:39:56 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-19 14:39:56 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
