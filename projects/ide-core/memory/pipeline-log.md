@@ -10232,3 +10232,4 @@ error: Please commit or stash them.
 - 2026-11-19 11:35:53 UTC — [ticket-1015] testeur: dur�es : ruff 0 s, pytest 240 s ; impact depuis base : 140 fichier(s) de test
 - 2026-11-19 11:35:54 UTC — [ticket-1015] tests rouges au tour 3
 - 2026-11-19 11:35:54 UTC — [ticket-1015] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-19 11:36:15 UTC — [ide-core] file interrompue : ticket-1015 non approuvé
