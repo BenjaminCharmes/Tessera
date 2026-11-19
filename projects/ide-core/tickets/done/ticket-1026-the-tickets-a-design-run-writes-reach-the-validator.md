@@ -1,14 +1,14 @@
 ---
-id: ticket-1026
-title: "The tickets a design run writes are committed with it and reach the validator"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-11-19
 depends_on: []
 estimated_days: 1
-created: 2026-11-19
+id: ticket-1026
+pr_number: 1206
+priority: high
+status: done
+title: The tickets a design run writes are committed with it and reach the validator
+type: fix
 ---
 
 # ticket-1026 — Les tickets écrits par un run de conception se commitent avec lui et arrivent au validateur

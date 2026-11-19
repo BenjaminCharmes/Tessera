@@ -10435,3 +10435,18 @@ error: Please commit or stash them.
 - 2026-11-19 15:17:25 UTC — [ticket-944] CHANGES_REQUESTED tour 3: Validateur : Le ticket de conception a rempli son rôle : ADR-089 choisit la piste (station + bureau dédiés en défense en profondeur) et énonce ses limites. Les deux tickets d'implémentation qui en déc
 - 2026-11-19 15:17:26 UTC — [ticket-944] BLOCKED après 3 tour(s) sans approbation
 - 2026-11-19 15:17:58 UTC — [ticket-944] fichiers non suivis laissés par le run : tickets/todo/ticket-1023-the-agent-account-launches-on-a-dedicated-window-station.md, tickets/todo/ticket-1024-the-agent-call-job-limits-the-user-interface.md (à ignorer dans .gitignore ?)
+- 2026-11-19 15:46:00 UTC — [ticket-1026] branche ticket-1026-the-tickets-a-design-run-writes-are-committed-wi
+- 2026-11-19 15:46:05 UTC — [ticket-1026] tour 1 — codeur démarré
+- 2026-11-19 15:48:39 UTC — [ticket-1026] tour 1 — codeur terminé (153905ms)
+- 2026-11-19 15:51:04 UTC — [ticket-1026] testeur: dur�es : ruff 0 s, mypy 34 s, mypy-linux 42 s, pytest 85 s ; impact depuis base : 9 fichier(s) de test
+- 2026-11-19 15:51:28 UTC — [ticket-1026] securite: PASS — Verdict PASS : le diff fait commiter et afficher dans le diff de revue les fiche (22750ms)
+- 2026-11-19 15:51:31 UTC — [ticket-1026] tour 1 — reviewer démarré
+- 2026-11-19 15:51:58 UTC — [ticket-1026] validateur: fichiers cités joints : tickets/todo/ (dossier, 5 fichiers) ; absents : tickets/todo/ticket-900-x.md
+- 2026-11-19 15:51:58 UTC — [ticket-1026] validateur: APPROVED — Les trois critères testent l'intégration de fiches créées sous `tickets/todo/` d (28062ms)
+- 2026-11-19 15:52:11 UTC — [ticket-1026] tour 1 — reviewer terminé (39859ms)
+- 2026-11-19 15:52:12 UTC — [ticket-1026] APPROVED après 1 tour(s)
+- 2026-11-19 15:54:41 UTC — [ticket-1026] documentation: 0 fichier(s) (113670ms)
+- 2026-11-19 15:54:41 UTC — [ticket-944] documentation: pas de diff retrouvable, non documenté
+- 2026-11-19 15:54:41 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-19 15:54:41 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-19 15:54:41 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)

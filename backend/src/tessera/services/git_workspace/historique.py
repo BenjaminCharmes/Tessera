@@ -3,7 +3,7 @@
 import posixpath
 
 from tessera.services.gardes.termes_interdits import CommitInfo
-from tessera.services.git_workspace.chemins import _JOURNAL_PIPELINE, _is_orchestrator_artifact_path, _relatif_au_projet
+from tessera.services.git_workspace.chemins import _FICHES_NOUVELLES, _JOURNAL_PIPELINE, _is_orchestrator_artifact_path, _relatif_au_projet
 from tessera.services.git_workspace.erreurs import GitCommandError
 from tessera.services.git_workspace.poussee import GitPoussee
 from tessera.utils.logger import get_logger
@@ -58,7 +58,21 @@ class GitHistory(GitPoussee):
             for chemin in presents
             if chemin not in self._preexisting_untracked
             and chemin != _JOURNAL_PIPELINE
+            and not chemin.startswith(_FICHES_NOUVELLES)
         )
+
+    def _fiches_parmi(self, non_suivis: tuple[str, ...]) -> tuple[str, ...]:
+        """Tickets the run created under ``tickets/todo/``, among `non_suivis` (ticket-1026)."""
+        return tuple(
+            chemin
+            for chemin in non_suivis
+            if chemin.startswith(_FICHES_NOUVELLES)
+            and chemin not in self._preexisting_untracked
+        )
+
+    async def fiches_creees_par_le_run(self) -> tuple[str, ...]:
+        """New ticket files under ``tickets/todo/``: the deliverable of a design run."""
+        return self._fiches_parmi(await self._untracked_files())
 
     async def head_sha(self) -> str:
         """Full SHA of the branch head (ticket-492). A failure raises."""
