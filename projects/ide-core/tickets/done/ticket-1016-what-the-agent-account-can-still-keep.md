@@ -4,7 +4,7 @@ created: 2026-11-19
 depends_on: []
 estimated_days: 1
 id: ticket-1016
-pr_number: null
+pr_number: 1192
 priority: high
 status: done
 title: Decide how to close what the agent account can still keep between runs
