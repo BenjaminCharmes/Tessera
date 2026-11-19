@@ -36,14 +36,29 @@ Changer d'abonnement : `.\scripts\tessera.ps1 agent jeton`.
 
 ## Variables d'environnement du compte
 
-Les fichiers temporaires (`TEMP`, `TMP`) et le cache npm de l'IDE sont configurés pour vivre dans le profil du compte agent, pas celui du backend. Cela évite les erreurs `EPERM` quand le compte agent essaie de créer des fichiers dans le profil d'un autre utilisateur.
+Le compte agent `tessera-agent` a un profil unique chez `C:\ProgramData\Tessera\profil-agent`, géré par l'IDE. Entre deux appels du compte, ce profil est entièrement vidé sauf deux caches :
+- `npm-cache/` : npm peut réutiliser les dépendances installées
+- `uv\cache/` : uv peut réutiliser ses wheels
+
+Cela permet aux worktrees de démarrer rapidement — `npm install` ou `uv sync` vérifieront l'intégrité des lockfiles mais utiliseront les archives en cache si elles sont saines.
 
 Concrètement, quand `vitest` ou `npm ci` tourne sous le compte agent :
-- `TEMP` = `C:\Users\tessera-agent\AppData\Local\Temp`
-- `TMP` = `C:\Users\tessera-agent\AppData\Local\Temp`
-- `npm_config_cache` = `C:\Users\tessera-agent\AppData\Local\npm-cache`
+- `HOME` = `C:\ProgramData\Tessera\profil-agent`
+- `TEMP` = `C:\ProgramData\Tessera\profil-agent\AppData\Local\Temp`
+- `APPDATA` = `C:\ProgramData\Tessera\profil-agent\AppData\Roaming`
+- `LOCALAPPDATA` = `C:\ProgramData\Tessera\profil-agent\AppData\Local`
+- `npm_config_cache` = `C:\ProgramData\Tessera\profil-agent\npm-cache`
+- `UV_CACHE_DIR` = `C:\ProgramData\Tessera\profil-agent\uv\cache`
+
+**Aucune pollution entre appels** : un `.bashrc`, `.npmrc` ou fichier Python `.pth` qu'un appel aurait écrit n'existe plus au suivant. Le profil vierge repart à chaque fois.
 
 **Tu n'as rien à faire.** L'IDE gère cela automatiquement quand il lance les outils sous le compte agent.
+
+## La ruche Windows n'est pas chargée
+
+Le compte agent démarre ses processus **sans charger la ruche HKCU** (`HKEY_CURRENT_USER`). Cela empêche un `AutoRun` ou toute autre clé de l'environment de survivre d'un appel à l'autre.
+
+L'environnement du compte est bâti de zéro à chaque appel — aucune pollution Registry, aucune persistance involontaire.
 
 ## `agent doctor`
 
