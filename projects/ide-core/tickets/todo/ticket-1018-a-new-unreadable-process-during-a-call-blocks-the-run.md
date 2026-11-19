@@ -1,54 +1,75 @@
 ---
 id: ticket-1018
-title: "A new unreadable process during a call blocks the run"
-type: feat
+title: "Scheduled tasks of the agent account are removed when its last call ends"
+type: fix
 status: todo
-priority: high
+pr_number: null
+priority: medium
 agent: codeur
+depends_on: []
 preuve_reelle: true
+estimated_days: 1
+created: 2026-11-19
 ---
 
-# ticket-1018 — Un processus illisible né pendant un appel bloque le run
+# ticket-1018 — Les tâches planifiées du compte agent se retirent à la fin du dernier appel
 
 ## Objectif
 
-ADR-088, point 1. `processus_par_sid` (`services/providers/processus_compte.py`)
-ne soupçonne un processus au jeton illisible que s'il descend du backend ou
-d'un processus du compte. Un processus sorti du job n'a plus cette filiation.
+ADR-088, point 1, recadré par les essais. Rien de ce que le compte agent
+planifie ne doit attendre un run suivant.
+
+## Essais faits le 19/11, avant de coder
+
+Sous le compte, dans un appel réel (job, sans ruche) :
+
+- **WMI** (`Win32_Process.Create`) : refusé, code de retour 8. Aucun
+  processus créé.
+- **Tâche planifiée** (`schtasks /create`) : **créée**. `schtasks /run` répond
+  « réussi », mais la tâche reste à l'état « Prêt » et aucun processus du
+  compte n'apparaît, ni pendant l'appel ni après la fermeture du job. Le
+  compte la supprime lui-même par `schtasks /delete`.
+- Aucune voie de sortie du job n'a abouti. L'inventaire des processus au
+  jeton illisible, prévu d'abord, n'est donc pas réalisé : il reprendrait les
+  faux positifs du ticket-997 (première version : trois processus système
+  nouveaux en trois minutes), et une liste blanche par nom d'image se
+  contourne en nommant un programme comme un processus système.
+
+Ce qui reste : une tâche planifiée créée par un appel survit à la clôture.
+Elle ne s'est pas exécutée pendant les essais, mais elle n'a rien à faire là.
 
 ## Ce qu'il faut faire
 
-- Prendre, au début de l'appel (`droits_appel.py`), l'inventaire des PID au
-  jeton illisible, avec le nom d'image de Toolhelp (lisible même quand
-  l'ouverture est refusée).
-- À la clôture, tout PID illisible absent de l'inventaire, hors liste blanche
-  d'images système fixée par la preuve ci-dessous, lève `ProcessusIllisibles` :
-  le run finit `blocked` avec commit (ADR-037), le motif nomme PID et image.
-- Un PID réutilisé ne passe pas pour un ancien : l'inventaire garde
-  (PID, image) et la filiation de `parentes_processus` reste un signal en plus.
+- Nouveau module `services/providers/taches_compte.py` : `retirer_les_taches`
+  lance, **sous le compte** (`lancer_sous_compte`, dossier hors worktree,
+  `sans_droits=True`), `schtasks /query /fo csv /nh`, puis
+  `schtasks /delete /tn <nom> /f` pour chaque tâche listée dont le nom ne
+  commence pas par `\Microsoft\`. Le backend, non administrateur, ne voit pas
+  les tâches d'un autre compte : c'est pourquoi la commande part sous le
+  compte, avec des arguments fixés par le backend.
+- Appelé par `clore_appel` au dernier appel, avant l'arrêt des processus
+  restants (`services/providers/droits_appel.py`), et au démarrage du backend.
+- Un code de sortie non nul sur une suppression lève `DroitsAgentRefuses`
+  (ADR-037). Une liste vide n'émet aucune suppression.
+- Le lanceur s'injecte, pour les tests.
 
 ## Critères d'acceptation
 
-- [ ] Un test injecte un processus illisible sans filiation, absent de
-  l'inventaire : la clôture lève `ProcessusIllisibles`.
-- [ ] Un test injecte un processus illisible présent dans l'inventaire de
-  départ, ou d'une image de la liste blanche : rien n'est levé.
-- [ ] Un test couvre le PID réutilisé sous une autre image.
+- [ ] Avec un faux lanceur qui rend deux tâches, dont une sous `\Microsoft\` :
+  une seule suppression est émise, pour l'autre.
+- [ ] Avec un faux lanceur dont la suppression rend un code non nul :
+  `DroitsAgentRefuses`.
+- [ ] `clore_appel` appelle `retirer_les_taches` au dernier appel seulement,
+  jamais tant qu'un autre appel est actif.
+- [ ] Sans `AGENT_USER`, rien n'est lancé.
 
 ## Preuve réelle
 
-À faire sur le poste, hors dépôt (`~/.tessera/worktrees/manuel/`), **avant de
-coder** puis après :
-
-1. Sous le compte agent, tenter de créer un processus hors du job : WMI
-   (`Win32_Process.Create`), tâche planifiée, BITS. Noter lesquels aboutissent.
-2. Pour chacun, lire la DACL du processus créé : l'ouverture en lecture
-   limitée est-elle refusée ?
-3. Lancer un run complet sans rien d'anormal : relever les processus illisibles
-   nés pendant l'appel (candidats de liste blanche). Aucun faux `blocked`.
-4. Après le code : rejouer l'étape 1, constater un run `blocked`.
+Sous le compte : un appel crée une tâche planifiée ; après sa clôture, un
+second appel liste les tâches du compte et n'en trouve aucune.
 
 ## Ce que ça ne fait pas
 
-- Ne tue pas le processus (sa DACL l'interdit au backend) ; ne ferme aucune
-  voie de sortie du job.
+- N'empêche pas la création d'une tâche : cela demande un droit
+  d'administrateur sur le planificateur (décision de l'utilisateur).
+- Ne cherche pas d'autres voies de sortie du job (BITS, non essayé).
