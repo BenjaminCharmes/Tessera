@@ -24,6 +24,7 @@ from tessera.config import settings
 from tessera.models.agent import EffortLevel
 from tessera.services.noyau.groupe_de_processus import creer_groupe, fermer_le_groupe, rattacher_au_groupe
 from tessera.services.providers.base import ProviderResult, StreamCallback, ToolEventCallback
+from tessera.services.providers.droits_worktree import DroitsAgentRefuses
 from tessera.services.providers.duree_max import borner
 from tessera.services.providers.env_agent import CLI_PARTAGE, env_de_l_agent
 from tessera.services.providers.env_sdk import env_du_sous_processus
@@ -304,9 +305,7 @@ class ClaudeAgentSDKProvider:
             signaler=signaler, session=session, schema=schema,
         )
 
-    async def _run_ou_reprendre(
-        self, *, session: str | None, **kwargs: Any
-    ) -> ProviderResult:
+    async def _run_ou_reprendre(self, *, session: str | None, **kwargs: Any) -> ProviderResult:
         """Resumes ``session`` when given, and falls back to a fresh call if
         that resume fails (ticket-187).
 
@@ -319,10 +318,10 @@ class ClaudeAgentSDKProvider:
             return await self._run(**kwargs)
         try:
             return await self._run(resume=session, **kwargs)
+        except DroitsAgentRefuses:
+            raise  # une clôture refusée n'est pas une session perdue : le run s'arrête
         except Exception as exc:  # noqa: BLE001 — le repli est le comportement d'avant
-            _logger.warning(
-                "session_resume_failed", extra={"session": session, "error": str(exc)}
-            )
+            _logger.warning("session_resume_failed", extra={"session": session, "error": str(exc)})
             return await self._run(**kwargs)
 
     async def _run(self, **kwargs: Any) -> ProviderResult:
