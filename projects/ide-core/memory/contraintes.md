@@ -10,6 +10,8 @@ Cette section n'est injectée dans aucun appel d'agent. Une règle nouvelle
 s'écrit ici, avec son ADR ; un humain l'accepte en la déplaçant dans sa
 section. (ADR-055)
 
+- **Un processus au jeton illisible, né pendant un appel sous le compte agent, met le run en `blocked`** ; le cache uv est en lecture seule pour le compte, et un fichier protégé créé en sous-dossier refuse le run. (ADR-088, ADR-087, ADR-084)
+
 ## Git et périmètre d'écriture
 
 - **Un projet qui déclare `worktree` exécute chaque run dans son worktree, jamais dans le checkout.** Sous `IDE_WORKTREES_DIR/<projet>/<ticket>`, depuis `origin/<base>` : la racine d'écriture du run, sans session humaine. (ADR-056)

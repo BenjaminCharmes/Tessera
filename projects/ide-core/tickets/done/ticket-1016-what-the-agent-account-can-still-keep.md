@@ -1,14 +1,14 @@
 ---
-id: ticket-1016
-title: "Decide how to close what the agent account can still keep between runs"
-type: design
-status: todo
-pr_number: null
-priority: high
 agent: architect
+created: 2026-11-19
 depends_on: []
 estimated_days: 1
-created: 2026-11-19
+id: ticket-1016
+pr_number: 1192
+priority: high
+status: done
+title: Decide how to close what the agent account can still keep between runs
+type: design
 ---
 
 ## Signalement
