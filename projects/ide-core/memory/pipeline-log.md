@@ -10362,3 +10362,7 @@ error: Please commit or stash them.
 - 2026-11-19 14:04:00 UTC — [ticket-1022] validateur: APPROVED — Les trois critères sont satisfaits. Le code refactorise `run_tests` pour ouvrir  (34030ms)
 - 2026-11-19 14:04:00 UTC — [ticket-1022] APPROVED après 2 tour(s)
 - 2026-11-19 14:06:27 UTC — [ticket-1022] leçons: une leçon proposée
+- 2026-11-19 14:07:51 UTC — [ticket-1022] documentation: 0 fichier(s) (60265ms)
+- 2026-11-19 14:07:51 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-19 14:07:51 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-19 14:07:51 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
