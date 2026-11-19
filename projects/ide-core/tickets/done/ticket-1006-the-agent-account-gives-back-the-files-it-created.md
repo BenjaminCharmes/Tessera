@@ -70,6 +70,24 @@ ordinaire montre le backend propriétaire et la DACL héritée. Mesurer la duré
 `clore_appel` sur un worktree avec un `node_modules` de ~8 000 fichiers (attendu :
 quelques secondes) et la noter dans le ticket.
 
+### Faite le 19/11, sur le poste, sous le compte agent
+
+- Premier essai : `poser_ecriture` refusé au troisième `icacls` (code 5).
+  L'ACE OWNER RIGHTS, posée avant celle du backend, retirait `WRITE_DAC` au
+  backend, propriétaire de la racine, qui n'y a que « modifier » par héritage.
+  Corrigé à la main : l'ACE du backend d'abord, et le test d'ordre le fixe.
+- Un fichier créé par un appel : `icacls /inheritance:r` puis `/grant` lancés
+  par l'agent sont refusés (code 5).
+- À la clôture : le fichier a le backend pour propriétaire et une DACL
+  entièrement héritée ; le `.git` garde le compte en lecture seule.
+- `clore_appel` : 8,9 s sur un worktree de 9 240 entrées (`node_modules`
+  de Serpent).
+- Non reproduit : le fichier à DACL explicite posée à la création. Sous le
+  compte, `CreateFileW` avec un descripteur de sécurité est refusé (erreur 5)
+  pour cinq descripteurs essayés, protégés ou non ; le même script aboutit
+  sous le compte du backend. Le refus `DroitsAgentRefuses` sur un code non
+  nul n'est donc couvert que par les tests à faux `icacls`.
+
 ## Ce que ça ne fait pas
 
 - Ne traite pas le profil (ticket-1008) ni la concurrence (ticket-1007).

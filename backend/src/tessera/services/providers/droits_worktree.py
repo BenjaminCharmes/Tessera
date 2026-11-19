@@ -99,8 +99,11 @@ async def poser_ecriture(
     the backend account, so the agent cannot rewrite the DACL of its own files.
     """
     await _lancer(lanceur, [str(racine), "/grant", f"{compte}:(OI)(CI)M"])
-    await _lancer(lanceur, [str(racine), "/grant", _OWNER_RIGHTS])
+    # L'ACE du backend d'abord : il est propriétaire de la racine et n'y a que
+    # « modifier » par héritage. OWNER RIGHTS posée en premier lui retirait
+    # WRITE_DAC, et son propre `/grant` suivant était refusé (preuve du 19/11).
     await _lancer(lanceur, [str(racine), "/grant", f"{backend or compte_du_backend()}:(OI)(CI)F"])
+    await _lancer(lanceur, [str(racine), "/grant", _OWNER_RIGHTS])
     git = racine / ".git"
     if git.exists():
         await _proteger_git(git, compte, lanceur)

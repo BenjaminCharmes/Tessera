@@ -56,8 +56,9 @@ async def test_rights_are_set_in_order(wt: RunWorktree, monkeypatch: pytest.Monk
     appels = icacls.appels
     assert appels[0] == [str(wt.racine), "/grant", f"{COMPTE}:(OI)(CI)M"]
     git = str(wt.racine / ".git")
-    assert appels[1] == [str(wt.racine), "/grant", "*S-1-3-4:(OI)(CI)(RC)"]
-    assert appels[2] == [str(wt.racine), "/grant", f"{getpass.getuser()}:(OI)(CI)F"]
+    # Le backend d'abord : propriétaire de la racine, il perdrait WRITE_DAC dès l'ACE OWNER RIGHTS.
+    assert appels[1] == [str(wt.racine), "/grant", f"{getpass.getuser()}:(OI)(CI)F"]
+    assert appels[2] == [str(wt.racine), "/grant", "*S-1-3-4:(OI)(CI)(RC)"]
     assert appels[3:6] == [
         [git, "/inheritance:d"],
         [git, "/remove:g", COMPTE],
