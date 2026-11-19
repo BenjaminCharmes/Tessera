@@ -10324,3 +10324,7 @@ error: Please commit or stash them.
 - 2026-11-19 13:31:54 UTC — [ticket-1021] validateur: APPROVED — La mise en œuvre ajoute la détection des fichiers protégés créés en sous-dossier (31514ms)
 - 2026-11-19 13:31:56 UTC — [ticket-1021] tour 1 — reviewer terminé (32764ms)
 - 2026-11-19 13:31:56 UTC — [ticket-1021] APPROVED après 1 tour(s)
+- 2026-11-19 13:35:30 UTC — [ticket-1021] documentation: 0 fichier(s) (189733ms) — après tour de correction
+- 2026-11-19 13:35:30 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-19 13:35:30 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-19 13:35:30 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
