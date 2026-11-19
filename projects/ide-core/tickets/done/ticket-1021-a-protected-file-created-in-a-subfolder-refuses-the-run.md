@@ -1,6 +1,7 @@
 ---
 agent: codeur
 id: ticket-1021
+pr_number: 1195
 priority: medium
 status: done
 title: A protected file created in a subfolder refuses the run
