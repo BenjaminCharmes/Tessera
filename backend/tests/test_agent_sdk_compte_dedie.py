@@ -10,7 +10,7 @@ from pydantic import SecretStr
 from tessera.coffre import NOMS_SECRETS
 from tessera.config import settings
 from tessera.services.providers.agent_sdk import _build_options
-from tessera.services.providers.env_agent import CLES_AUTORISEES, CLI_PARTAGE, env_de_l_agent
+from tessera.services.providers.env_agent import CLES_AUTORISEES, CLI_PARTAGE, PROFIL_AGENT, env_de_l_agent
 from tessera.services.providers.lanceur_windows import message_de_logon, texte_d_environnement
 from tessera.services.providers.noms import ProviderIndisponible
 from tessera.services.providers.transport_agent import TransportCompteAgent, transport_du_compte
@@ -88,7 +88,7 @@ def test_agent_user_sets_cli_path_and_environment(compte: None) -> None:
     options = _options()
     assert str(options.cli_path) == CLI_PARTAGE
     assert options.env["CLAUDE_CODE_OAUTH_TOKEN"] == "jeton-factice"
-    assert options.env["USERPROFILE"] == rf"C:\Users\{COMPTE}"
+    assert options.env["USERPROFILE"] == PROFIL_AGENT
 
 
 def test_agent_environment_holds_no_backend_variable(
@@ -139,7 +139,7 @@ async def test_transport_passes_account_and_environment_to_the_launcher(compte: 
     assert isinstance(env, dict) and isinstance(commande, list)
     assert appel["compte"] == COMPTE
     assert commande[0] == CLI_PARTAGE
-    assert env["USERPROFILE"] == rf"C:\Users\{COMPTE}"
+    assert env["USERPROFILE"] == PROFIL_AGENT
     assert env["CLAUDE_CODE_OAUTH_TOKEN"] == "jeton-factice"
     assert "STATIC_TOKEN" not in env and "AGENT_LOGON_PASSWORD" not in env
     assert env["PATH"].startswith(str(chaine / "node"))
@@ -165,7 +165,7 @@ def test_project_without_compte_agent_keeps_the_backend_account(compte: None) ->
     options = _options(compte_agent=False)
     assert options.cli_path is None
     assert "CLAUDE_CODE_OAUTH_TOKEN" not in options.env
-    assert options.env.get("USERPROFILE") != rf"C:\Users\{COMPTE}"
+    assert options.env.get("USERPROFILE") != PROFIL_AGENT
     assert transport_du_compte("p", options, LanceurDouble()) is None
 
 

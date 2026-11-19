@@ -21,7 +21,7 @@ class ProcessLent(ProcessDouble):
         return 0
 
 
-CACHE_AGENT = "C:/Users/tessera-agent/AppData/Local/npm-cache".replace("/", chr(92)).encode()
+CACHE_AGENT = "C:/ProgramData/Tessera/profil-agent/npm-cache".replace("/", chr(92)).encode()
 
 
 class LanceurNeuf(LanceurDouble):
@@ -37,7 +37,9 @@ class LanceurNeuf(LanceurDouble):
 
 
 @pytest.fixture
-def compte(monkeypatch: pytest.MonkeyPatch, chaine: Path) -> None:
+def compte(monkeypatch: pytest.MonkeyPatch, chaine: Path, tmp_path: Path) -> None:
+    (tmp_path / "profil-agent").mkdir()
+    monkeypatch.setattr(agent_doctor_cli, "DOSSIER_PROFIL", tmp_path / "profil-agent")
     (chaine / "uv").mkdir()
     (chaine / "uv" / "uv.exe").write_bytes(b"")
     (chaine / "node" / "npm.cmd").write_bytes(b"")
@@ -83,6 +85,7 @@ async def test_timeout_fails(compte: None, tmp_path: Path, capsys: pytest.Captur
 async def test_missing_password_fails_without_launching(
     monkeypatch: pytest.MonkeyPatch, chaine: Path, tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
+    monkeypatch.setattr(agent_doctor_cli, "DOSSIER_PROFIL", tmp_path)
     monkeypatch.setattr(settings, "agent_user", "tessera-agent")
     monkeypatch.setattr(settings, "agent_logon_password", SecretStr(""))
     lanceur = LanceurDouble()
@@ -106,7 +109,7 @@ async def test_npm_cache_under_the_user_profile_fails_naming_agent_setup(
 
 
 async def test_npm_cache_in_a_sibling_profile_fails(compte: None, tmp_path: Path) -> None:
-    lanceur = LanceurNeuf("C:/Users/tessera-agent-2/npm-cache".replace("/", chr(92)).encode())
+    lanceur = LanceurNeuf("C:/ProgramData/Tessera/profil-agent-2/npm-cache".replace("/", chr(92)).encode())
     assert await verifier_outils(tmp_path, lanceur) == 1
 
 
@@ -159,3 +162,14 @@ async def test_ouvrir_appel_never_receives_the_repository_root(
     monkeypatch.setattr(lancement_compte, "ouvrir_appel", espion)
     assert await verifier_outils(DOSSIER_OUTILS, LanceurNeuf()) == 0
     assert recus and all(d == DOSSIER_OUTILS for d in recus)
+
+
+async def test_missing_profile_folder_fails_naming_agent_setup(
+    compte: None, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    monkeypatch.setattr(agent_doctor_cli, "DOSSIER_PROFIL", tmp_path / "absent")
+    lanceur = LanceurDouble()
+    assert await verifier_outils(tmp_path, lanceur) == 1
+    assert lanceur.appels == []
+    sortie = capsys.readouterr().out
+    assert "profil agent" in sortie and "agent setup" in sortie

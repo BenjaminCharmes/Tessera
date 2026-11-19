@@ -52,6 +52,8 @@ from tessera.services.pipeline.reprise_orphelin import reprendre_depots_orphelin
 from tessera.services.pipeline.reprise_worktrees import reprendre_worktrees_orphelins
 from tessera.services.pipeline.run_registry import RUN_REGISTRY
 from tessera.services.pipeline.signalements_en_attente import migrer_ancien_fichier
+from tessera.services.providers.droits_worktree import DroitsAgentRefuses
+from tessera.services.providers.profil_agent import reinitialiser_profil
 from tessera.services.supervision.anomalies.detecteur import DetecteurDAnomalies, arreter_le_detecteur
 from tessera.services.supervision.superviseur_collecte_livraison import boucle_du_superviseur
 from tessera.services.verification.process_registry import PROCESS_REGISTRY
@@ -93,6 +95,16 @@ async def _rouvrir_une_file(project_id: str, ticket_ids: list[str]) -> str:
     return demarre.run_id
 
 
+async def _reinitialiser_le_profil_agent() -> None:
+    """Wipe the agent profile left by a stop (ticket-1008); a refusal is logged, the next call retries."""
+    if not settings.agent_user:
+        return
+    try:
+        await reinitialiser_profil(settings.agent_user)
+    except DroitsAgentRefuses:
+        _logger.exception("profil_agent_non_nettoye")
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     # Avant toute requête : sans jeton, l'API refuse tout (ticket-878).
@@ -123,6 +135,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         settings.ide_workspace_dir, settings.ide_worktrees_dir,
         settings.ide_worktrees_dir_agent,
     )
+    await _reinitialiser_le_profil_agent()
     await _reprendre_les_surveillances()
     # Les services que l'utilisateur avait lancés (ticket-890, ADR-082).
     await reprendre_les_services(settings.ide_db_path, get_sonde(), PROCESS_REGISTRY)

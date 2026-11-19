@@ -1,12 +1,12 @@
 ---
-id: ticket-1008
-title: "The agent profile folder is wiped when the account is idle"
-type: fix
-status: todo
-priority: medium
 agent: codeur
 depends_on: []
+id: ticket-1008
 preuve_reelle: true
+priority: medium
+status: done
+title: The agent profile folder is wiped when the account is idle
+type: fix
 ---
 
 ## Signalement
@@ -44,6 +44,27 @@ preuve_reelle: true
 Faire écrire `~/.bashrc` et `%APPDATA%\uv\uv.toml` par un appel ; au suivant,
 constater qu'ils n'existent plus ; constater que `npm install` d'un projet connu
 réutilise le cache.
+
+### Faite le 19/11, sur le poste, sous le compte agent
+
+Le run s'est bloqué au troisième tour sur une remarque juste du reviewer
+(`Path` sur des chemins Windows, faux sous Linux). Fini à la main : `ntpath`
+dans `_recreer`, un test, et le contrôle total du propriétaire sur le dossier
+dans `agent-setup-admin.ps1` (il y repose le droit du compte à chaque
+nettoyage, ce que « modifier » ne permet pas à qui n'est pas propriétaire).
+
+- Un appel écrit `~/.bashrc`, `~/.npmrc` et `uv.toml` sous `%APPDATA%` : à sa
+  clôture ils n'existent plus, et l'appel suivant ne les voit pas. Le dossier
+  temporaire est recréé.
+- `npm ci` de Serpent : 29 s, cache vide. Le cache (1 484 entrées) survit à
+  la clôture ; `npm ci --offline` aboutit ensuite, sans réseau.
+- Sur ce poste, le dossier `profil-agent` a été créé à la main sous le
+  dossier partagé de Tessera, avec les droits du script : `agent setup`
+  n'est pas à relancer.
+
+Limite relevée : un fichier dont l'agent a refermé les droits dans un
+sous-dossier qu'il a créé fait échouer le nettoyage. Le run passe en
+`blocked` (échec fermé) et le fichier se retire à la main.
 
 ## Ce que ça ne fait pas
 

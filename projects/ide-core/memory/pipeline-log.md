@@ -10192,3 +10192,27 @@ error: Please commit or stash them.
 - 2026-11-19 09:31:40 UTC — [ticket-1007] livraison: rebase sur develop (563ms)
 - 2026-11-19 09:31:40 UTC — [ticket-1007] livraison: PR #1183 ouverte (5672ms)
 - 2026-11-19 09:31:40 UTC — [ticket-1007] livraison: arrêt — PR ouverte, merge après preuve réelle
+- 2026-11-19 09:44:22 UTC — [ticket-1008] branche ticket-1008-the-agent-profile-folder-is-wiped-when-the-accou
+- 2026-11-19 09:44:25 UTC — [ticket-1008] tour 1 — codeur démarré
+- 2026-11-19 09:49:20 UTC — [ticket-1008] tour 1 — codeur terminé (294280ms)
+- 2026-11-19 09:52:10 UTC — [ticket-1008] testeur: 1 failed, 1905 passed, 3 skipped, 113 warnings in 129.40s (0:02:09) — fichiers en échec : tests/test_agent_sdk_compte_dedie.py
+- 2026-11-19 09:52:11 UTC — [ticket-1008] tests rouges au tour 1
+- 2026-11-19 09:52:11 UTC — [ticket-1008] tour 2 — codeur démarré
+- 2026-11-19 09:53:40 UTC — [ticket-1008] tour 2 — codeur terminé (88594ms)
+- 2026-11-19 10:03:01 UTC — [ticket-1008] testeur: dur�es : ruff 0 s, mypy 9 s, mypy-linux 27 s, pytest 522 s ; impact depuis base : suite compl�te
+- 2026-11-19 10:03:44 UTC — [ticket-1008] securite: PASS — PASS : le diff ne contient aucune faille CRITICAL ou HIGH. J'ai relevé deux MEDI (42202ms)
+- 2026-11-19 10:03:46 UTC — [ticket-1008] tour 2 — reviewer démarré
+- 2026-11-19 10:04:26 UTC — [ticket-1008] tour 2 — reviewer terminé (39250ms)
+- 2026-11-19 10:04:33 UTC — [ticket-1008] validateur: fichiers cités joints : aucun ; absents : uv.toml
+- 2026-11-19 10:04:33 UTC — [ticket-1008] validateur: APPROVED — Toutes les exigences du ticket sont implémentées et testées. Le profil agent a q (48078ms)
+- 2026-11-19 10:04:33 UTC — [ticket-1008] CHANGES_REQUESTED tour 2: Reviewer : 1. Après `reinitialiser_profil`, le dossier vers lequel pointent `TEMP` et `TMP` (`PROFIL_AGENT\AppData\Local\Temp`, défini dans `env_du_profil`) n'existe plus. `APPDATA` et `LOCALAPPDATA` 
+- 2026-11-19 10:04:33 UTC — [ticket-1008] tour 3 — codeur démarré
+- 2026-11-19 10:07:00 UTC — [ticket-1008] tour 3 — codeur terminé (146936ms)
+- 2026-11-19 10:16:49 UTC — [ticket-1008] testeur: dur�es : ruff 0 s, mypy 12 s, mypy-linux 21 s, pytest 551 s ; impact depuis base : suite compl�te
+- 2026-11-19 10:17:26 UTC — [ticket-1008] securite: PASS — PASS : aucune faille CRITICAL ou HIGH introduite. Le vidage du profil ne suit ni (35764ms)
+- 2026-11-19 10:17:26 UTC — [ticket-1008] tour 3 — reviewer démarré
+- 2026-11-19 10:17:56 UTC — [ticket-1008] tour 3 — reviewer terminé (29765ms)
+- 2026-11-19 10:18:10 UTC — [ticket-1008] validateur: fichiers cités joints : aucun ; absents : uv.toml
+- 2026-11-19 10:18:10 UTC — [ticket-1008] validateur: APPROVED — Le ticket ticket-1008 est entièrement satisfait. Le profil agent a été migré de  (43813ms)
+- 2026-11-19 10:18:11 UTC — [ticket-1008] CHANGES_REQUESTED tour 3: Reviewer : 1. `_recreer` construit `Path(env[cle]).relative_to(PROFIL_AGENT)` sur des chaînes séparées par des backslashs. Sous Linux, `Path` est un `PosixPath` : `C:\ProgramData\...\AppData\Local\Tem
+- 2026-11-19 10:18:11 UTC — [ticket-1008] BLOCKED après 3 tour(s) sans approbation

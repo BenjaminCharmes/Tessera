@@ -14,6 +14,7 @@ from pathlib import Path
 from tessera.config import settings
 from tessera.services.providers.droits_worktree import DroitsAgentRefuses, Icacls, _icacls_reel, poser_ecriture, retirer_ecriture
 from tessera.services.providers.processus_compte import ProcessusIllisibles, processus_du_compte, processus_existe, sid_du_compte
+from tessera.services.providers.profil_agent import reinitialiser_profil
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -168,6 +169,8 @@ async def _clore_sous_verrou(
     if not _ACTIFS:
         try:
             await arreter_les_restants(compte, enumerer, tuer)
+            # Processus arrêtés : plus rien ne tient un fichier du profil (ticket-1008).
+            await reinitialiser_profil(compte, icacls)
         except DroitsAgentRefuses as exc:
             erreur = exc
     await retirer_ecriture(racine, compte, icacls)
