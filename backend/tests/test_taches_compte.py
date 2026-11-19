@@ -11,7 +11,20 @@ from tessera.services.providers.droits_worktree import DroitsAgentRefuses
 from tessera.services.providers.noms import ProviderIndisponible
 from tessera.services.providers.taches_compte import noms_de_taches, retirer_les_taches
 
-SORTIE = '"\\Nettoyage","N/A","Prêt"\n"\\Microsoft\\Windows\\Defrag","N/A","Prêt"\n'
+
+def _ligne(nom: str, compte: str, auteur: str | None = None) -> str:
+    """One row of the verbose listing: name in column 1, author in column 7, "run as" account in column 14."""
+    cellules = ["POSTE", nom, *["N/A"] * 5, compte if auteur is None else auteur, *["N/A"] * 6, compte, *["N/A"] * 13]
+    return ",".join(f'"{c}"' for c in cellules) + "\n"
+
+
+# Ce qu'un compte ordinaire voit : sa tâche (deux déclencheurs), celle d'un éditeur, celle de l'utilisateur.
+SORTIE = (
+    _ligne("\\Nettoyage", "tessera-agent") + _ligne("\\Nettoyage", "tessera-agent")
+    + _ligne("\\Adobe Acrobat Update Task", "INTERACTIF")
+    + _ligne("\\SoftLanding\\Tache", "Benjamin")
+    + _ligne("\\Microsoft\\Windows\\Defrag", "Système")
+)
 
 
 class Faux:
@@ -32,12 +45,21 @@ def compte(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(settings, "agent_user", "tessera-agent")
 
 
-async def test_only_the_non_windows_task_is_deleted() -> None:
+async def test_only_the_task_that_runs_as_the_account_is_deleted() -> None:
     faux = Faux()
     await retirer_les_taches(faux)
     suppressions = [a for a in faux.appels if "/delete" in a]
     assert len(suppressions) == 1
     assert suppressions[0][2:] == ["/tn", "\\Nettoyage", "/f"]
+
+
+async def test_a_refused_deletion_of_a_task_the_account_did_not_author_is_logged_not_raised() -> None:
+    """Windows creates tasks for the account (OneDrive) that it can neither change nor delete."""
+    sortie = _ligne("\\OneDrive Startup Task", "tessera-agent", auteur="Microsoft Corporation")
+    faux = Faux(suppression=1, sortie=sortie)
+    await retirer_les_taches(faux)
+    assert [a for a in faux.appels if "/delete" in a]
+    assert not taches_compte.taches_en_echec()
 
 
 async def test_a_failed_deletion_raises() -> None:
@@ -58,8 +80,19 @@ async def test_without_agent_user_nothing_runs(monkeypatch: pytest.MonkeyPatch) 
     assert faux.appels == []
 
 
-def test_names_exclude_windows_tasks() -> None:
-    assert noms_de_taches(SORTIE) == ["\\Nettoyage"]
+def test_names_keep_only_the_tasks_of_the_account() -> None:
+    assert noms_de_taches(SORTIE, "tessera-agent") == ["\\Nettoyage"]
+
+
+def test_a_machine_prefix_on_the_account_still_matches() -> None:
+    sortie = _ligne("\\A", "POSTE\\tessera-agent") + _ligne("\\B", "autre-tessera-agent")
+    assert noms_de_taches(sortie, "tessera-agent") == ["\\A"]
+
+
+async def test_the_listing_is_asked_in_verbose_form() -> None:
+    faux = Faux()
+    await retirer_les_taches(faux)
+    assert faux.appels[0][1:] == ["/query", "/fo", "csv", "/nh", "/v"]
 
 
 async def test_close_removes_tasks_only_at_the_last_call(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

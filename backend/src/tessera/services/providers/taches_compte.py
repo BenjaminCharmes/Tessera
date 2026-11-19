@@ -3,8 +3,12 @@
 ADR-088. Le compte peut créer une tâche planifiée (`schtasks /create`) : elle
 survivrait à la clôture de l'appel. Les commandes partent sous le compte, car le
 backend, non administrateur, ne voit pas les tâches d'un autre compte ; leurs
-arguments sont fixés ici. Les tâches sous `\\Microsoft\\` sont celles de
-Windows : elles restent. Un échec est une `DroitsAgentRefuses` (ADR-037).
+arguments sont fixés ici. Un compte ordinaire lit aussi les tâches des autres
+(Adobe, OneDrive, celles de l'utilisateur) : seules celles dont le compte
+d'exécution est le compte agent se retirent. Windows en crée pour lui (OneDrive)
+qu'il ne peut ni modifier ni supprimer : un refus sur une tâche dont il n'est
+pas l'auteur se journalise, sans bloquer (preuve du 19/11). Un refus sur une
+tâche dont il est l'auteur est une `DroitsAgentRefuses` (ADR-037).
 """
 import csv
 import importlib
@@ -24,7 +28,11 @@ _logger = get_logger(__name__)
 #: Lance une commande sous le compte : code de sortie et sortie.
 LanceurTaches = Callable[[list[str]], Awaitable[tuple[int, str]]]
 
-_PREFIXE_WINDOWS = "\\Microsoft\\"
+#: Colonnes de `schtasks /query /fo csv /nh /v`, fixes quelle que soit la langue :
+#: le nom de la tâche et son compte d'exécution.
+_COL_NOM = 1
+_COL_AUTEUR = 7
+_COL_COMPTE = 14
 
 
 def _schtasks() -> str:
@@ -42,14 +50,33 @@ async def _lanceur_reel(args: list[str]) -> tuple[int, str]:
         code: int = processus.returncode or 0
     finally:
         await processus.clore()
-    return code, (sortie + erreur).decode("utf-8", errors="replace")
+    # `schtasks` écrit dans la page de codes de la console, pas en UTF-8.
+    return code, (sortie + erreur).decode("oem" if os.name == "nt" else "utf-8", errors="replace")
 
 
-def noms_de_taches(sortie: str) -> list[str]:
-    """Task names of a `schtasks /query /fo csv /nh` output, Windows' own excluded."""
+def _est_le_compte(valeur: str, compte: str) -> bool:
+    """Whether a "run as" cell names `compte`, with or without its machine prefix."""
+    nu = valeur.strip().lower()
+    return nu == compte.lower() or nu.endswith(chr(92) + compte.lower())
+
+
+def taches_du_compte(sortie: str, compte: str) -> dict[str, bool]:
+    """Tasks that run as `compte` in a `schtasks /query /fo csv /nh /v` output: name → authored by `compte`.
+
+    Une tâche revient une fois par déclencheur : chaque nom n'est rendu qu'une fois.
+    Une ligne trop courte (message d'information) est ignorée.
+    """
     lignes = [ligne for ligne in sortie.splitlines() if ligne.startswith('"')]
-    noms = [ligne_csv[0] for ligne_csv in csv.reader(lignes) if ligne_csv]
-    return [nom for nom in noms if not nom.startswith(_PREFIXE_WINDOWS)]
+    taches: dict[str, bool] = {}
+    for cellules in csv.reader(lignes):
+        if len(cellules) > _COL_COMPTE and _est_le_compte(cellules[_COL_COMPTE], compte):
+            taches.setdefault(cellules[_COL_NOM], _est_le_compte(cellules[_COL_AUTEUR], compte))
+    return taches
+
+
+def noms_de_taches(sortie: str, compte: str) -> list[str]:
+    """Names of the tasks that run as `compte`, in listing order."""
+    return list(taches_du_compte(sortie, compte))
 
 
 async def _lancer(lanceur: LanceurTaches, args: list[str]) -> tuple[int, str]:
@@ -87,11 +114,15 @@ async def retirer_les_taches(lanceur: LanceurTaches | None = None) -> None:
 
 
 async def _supprimer_les_taches(lanceur: LanceurTaches) -> None:
-    code, sortie = await _lancer(lanceur, [_schtasks(), "/query", "/fo", "csv", "/nh"])
+    code, sortie = await _lancer(lanceur, [_schtasks(), "/query", "/fo", "csv", "/nh", "/v"])
     if code != 0:
         raise DroitsAgentRefuses(f"liste des tâches planifiées du compte illisible (code {code})")
-    for nom in noms_de_taches(sortie):
+    for nom, du_compte in taches_du_compte(sortie, settings.agent_user).items():
         code, retour = await _lancer(lanceur, [_schtasks(), "/delete", "/tn", nom, "/f"])
-        if code != 0:
+        if code == 0:
+            _logger.warning("tache_planifiee_retiree", extra={"tache": nom})
+        elif du_compte:
             raise DroitsAgentRefuses(f"tâche planifiée {nom} non supprimée (code {code}) : {retour.strip()}")
-        _logger.warning("tache_planifiee_retiree", extra={"tache": nom})
+        else:
+            # Créée par Windows pour le compte : il ne peut pas la supprimer, donc pas la détourner.
+            _logger.warning("tache_du_compte_non_supprimable", extra={"tache": nom, "code": code})
