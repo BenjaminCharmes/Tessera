@@ -10347,3 +10347,26 @@ error: Please commit or stash them.
 - 2026-11-19 13:50:58 UTC — [ticket-1019] livraison: tests relancés après rebase : verts (dur�es : ruff 0 s, mypy 11 s, mypy-linux 11 s, pytest 120 s ; impact depuis base : 136 fichier(s) de test) (120937ms)
 - 2026-11-19 13:50:58 UTC — [ticket-1019] livraison: PR #1197 ouverte (5297ms)
 - 2026-11-19 13:50:58 UTC — [ticket-1019] livraison: arrêt — PR ouverte, merge après preuve réelle
+- 2026-11-19 13:41:27 UTC — [ide-core] ticket-1021 PR #1195 mergée (CI verte)
+- 2026-11-19 13:52:41 UTC — [ticket-1022] branche ticket-1022-a-test-command-opens-one-call-for-all-its-steps
+- 2026-11-19 13:52:45 UTC — [ticket-1022] tour 1 — codeur démarré
+- 2026-11-19 13:54:58 UTC — [ticket-1022] tour 1 — codeur terminé (133046ms)
+- 2026-11-19 13:57:46 UTC — [ticket-1022] testeur: 2 failed, 496 passed, 120 warnings in 125.98s (0:02:05) — fichiers en échec : tests/test_preparation_compte.py, tests/test_longueur_des_fichiers.py
+- 2026-11-19 13:57:47 UTC — [ticket-1022] tests rouges au tour 1
+- 2026-11-19 13:57:47 UTC — [ticket-1022] tour 2 — codeur démarré
+- 2026-11-19 13:59:18 UTC — [ticket-1022] tour 2 — codeur terminé (90562ms)
+- 2026-11-19 14:03:11 UTC — [ticket-1022] testeur: dur�es : ruff 0 s, mypy 9 s, mypy-linux 9 s, pytest 194 s ; impact depuis base : 87 fichier(s) de test
+- 2026-11-19 14:03:25 UTC — [ticket-1022] securite: PASS — Le diff regroupe les étapes d'une commande de test dans un seul appel englobant  (14264ms)
+- 2026-11-19 14:03:26 UTC — [ticket-1022] tour 2 — reviewer démarré
+- 2026-11-19 14:03:45 UTC — [ticket-1022] tour 2 — reviewer terminé (19327ms)
+- 2026-11-19 14:04:00 UTC — [ticket-1022] validateur: APPROVED — Les trois critères sont satisfaits. Le code refactorise `run_tests` pour ouvrir  (34030ms)
+- 2026-11-19 14:04:00 UTC — [ticket-1022] APPROVED après 2 tour(s)
+- 2026-11-19 14:06:27 UTC — [ticket-1022] leçons: une leçon proposée
+- 2026-11-19 14:07:51 UTC — [ticket-1022] documentation: 0 fichier(s) (60265ms)
+- 2026-11-19 14:07:51 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-19 14:07:51 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-19 14:07:51 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-19 14:13:27 UTC — [ticket-1022] livraison: rebase sur develop (1828ms)
+- 2026-11-19 14:13:27 UTC — [ticket-1022] livraison: tests relancés après rebase : verts (dur�es : ruff 0 s, mypy 17 s, mypy-linux 21 s, pytest 294 s ; impact depuis base : 87 fichier(s) de test) (295375ms)
+- 2026-11-19 14:13:27 UTC — [ticket-1022] livraison: PR #1199 ouverte (6109ms)
+- 2026-11-19 14:13:27 UTC — [ticket-1022] livraison: arrêt — PR ouverte, merge après preuve réelle
