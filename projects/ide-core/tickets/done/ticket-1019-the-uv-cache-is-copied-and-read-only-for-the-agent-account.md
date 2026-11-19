@@ -56,6 +56,16 @@ Sous le compte, sur le poste : `agent doctor` reste vert sur ses cinq lignes ;
 après la clôture d'un appel, le dossier du cache uv du profil est vide ou
 absent, et `npm-cache` est toujours là.
 
+### Faite le 19/11, sur le poste, sous le compte agent
+
+- `agent doctor` sur la branche : cinq lignes vertes.
+- Un appel `uv run` sous le compte lit `UV_LINK_MODE=copy` dans son
+  environnement. Pendant l'appel, le cache uv du profil contient
+  `interpreter-v4` et `sdists-v9` ; après la clôture, le dossier `uv` n'existe
+  plus, et `npm-cache` garde ses 1 692 entrées.
+- Constat annexe : sans cache gardé ni variables de la chaîne Python, cet
+  appel a retéléchargé un interpréteur (21,5 Mio), reparti à la clôture.
+
 ## Ce que ça ne fait pas
 
 - Ne remplit pas le cache par le backend : un projet sous le compte qui
