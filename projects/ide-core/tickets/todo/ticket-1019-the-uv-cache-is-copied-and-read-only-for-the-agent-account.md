@@ -1,54 +1,64 @@
 ---
 id: ticket-1019
-title: "The uv cache is copied and read-only for the agent account"
-type: feat
+title: "The uv cache is copied and no longer survives the profile wipe"
+type: fix
 status: todo
+pr_number: null
 priority: high
 agent: codeur
+depends_on: []
 preuve_reelle: true
+estimated_days: 1
+created: 2026-11-19
 ---
 
-# ticket-1019 — Le cache uv se copie et passe en lecture seule pour le compte
+# ticket-1019 — Le cache uv se copie et ne survit plus au nettoyage du profil
 
 ## Objectif
 
 ADR-088, point 2. `uv` ne revérifie pas un paquet déjà décompressé, et le
-cache `uv\cache` survit au nettoyage du profil (ticket-1008). En mode lien
-physique, écrire dans un `.venv` modifie aussi l'entrée du cache.
+cache de uv survit au nettoyage du profil (ticket-1008) : un fichier modifié
+par un run y attend le run suivant.
+
+## Essais faits le 19/11, avant de coder
+
+- Le compte écrit le cache uv dès `uv run --no-project python --version`
+  (la ligne « python (uv run) » d'`agent doctor`) : après un `agent doctor`,
+  le dossier contient `interpreter-v4` et `sdists-v9`.
+- Un cache en lecture seule pour le compte, prévu d'abord, ferait donc
+  échouer `agent doctor` et toute commande `uv run`. C'est le repli prévu par
+  l'ADR-088 qui s'applique : le cache uv ne se garde plus.
 
 ## Ce qu'il faut faire
 
-- `env_du_profil` (`services/providers/env_agent.py`) ajoute
-  `UV_LINK_MODE=copy` à l'environnement du compte.
-- Le cache uv n'est plus écrit par le compte : ACL en lecture-exécution pour
-  lui, contrôle total au backend, rempli par le backend lors du setup du
-  worktree (ADR-085). `UV_CACHE_DIR` reste celui d'`env_agent`.
-- Le cache npm reste tel quel (accepté, ADR-088) : une ligne le dit dans la
-  docstring de `profil_agent.py`.
-- Si la preuve montre que `uv run` sous le compte écrit dans le cache, le
-  repli est de retirer `uv\cache` des `_GARDES` de `profil_agent.py` : ce
-  choix se note dans la PR, pas en silence.
+- `services/providers/env_agent.py`, `env_du_profil` : ajouter
+  `UV_LINK_MODE=copy` (jamais de lien physique entre un `.venv` et le cache),
+  et la clé à `CLES_AUTORISEES`.
+- `services/providers/profil_agent.py` : `_GARDES` ne garde plus que le cache
+  npm. Le cache uv part avec le reste du profil à chaque nettoyage.
+- Les docstrings de `profil_de` et de `profil_agent.py` disent pourquoi : npm
+  vérifie l'intégrité de ce qu'il sort de son cache, uv non.
+- `CACHE_UV` et `UV_CACHE_DIR` restent : le cache vit toujours dans le profil,
+  le temps d'un appel.
 
 ## Critères d'acceptation
 
-- [ ] Un test vérifie `UV_LINK_MODE=copy` dans l'environnement bâti pour le
-  compte.
-- [ ] Un test vérifie que les ACL du cache uv passent par `Icacls` (lecture
-  seule du compte, `F` du backend) et que l'échec est une `DroitsAgentRefuses`.
-- [ ] `agent doctor` signale un cache uv que le compte peut encore écrire.
+- [ ] Un test vérifie que `env_du_profil` rend `UV_LINK_MODE` égal à `copy`,
+  et que la clé est dans `CLES_AUTORISEES`.
+- [ ] Un test : après `reinitialiser_profil`, un fichier posé sous
+  `uv/cache/` du profil n'existe plus, et un fichier posé sous `npm-cache/`
+  existe encore.
+- [ ] La docstring de `profil_agent.py` ne dit plus que le cache uv survit.
 
 ## Preuve réelle
 
-Sur le poste, hors dépôt :
-
-1. **Avant de coder** : lancer sous le compte la commande de test d'un projet
-   (`uv run pytest`) et constater si le cache uv est écrit (horodatages).
-2. Constater le mode de liaison de uv : un fichier du `.venv` est-il un lien
-   physique du cache (`fsutil hardlink list`) ?
-3. Après le code : sous le compte, tenter d'écrire dans le cache uv, constater
-   le refus ; relancer les tests d'un projet, constater qu'ils passent.
+Sous le compte, sur le poste : `agent doctor` reste vert sur ses cinq lignes ;
+après la clôture d'un appel, le dossier du cache uv du profil est vide ou
+absent, et `npm-cache` est toujours là.
 
 ## Ce que ça ne fait pas
 
-- Ne vérifie pas l'intégrité d'un cache que le backend aurait rempli depuis
-  une source compromise.
+- Ne remplit pas le cache par le backend : un projet sous le compte qui
+  utilise uv retélécharge ses paquets à chaque run. Aucun n'en utilise
+  aujourd'hui.
+- Ne touche pas au cache npm (accepté, ADR-088).

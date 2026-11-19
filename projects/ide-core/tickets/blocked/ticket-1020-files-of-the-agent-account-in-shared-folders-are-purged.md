@@ -2,7 +2,7 @@
 id: ticket-1020
 title: "Files of the agent account in shared folders are purged"
 type: feat
-status: todo
+status: blocked
 priority: medium
 agent: codeur
 preuve_reelle: true
@@ -15,6 +15,32 @@ preuve_reelle: true
 ADR-088, point 3. Le compte agent est membre du groupe des utilisateurs : il
 crée des fichiers dans les dossiers ouverts à tout utilisateur, que le
 nettoyage du profil (ticket-1008) ne touche pas.
+
+## Essais faits le 19/11, avant de coder : le ticket est à redéfinir
+
+Sous le compte, dans un appel réel :
+
+| Dossier | Le compte y crée un fichier | Le backend le supprime |
+|---|---|---|
+| Dossier public des utilisateurs, et son sous-dossier Documents | oui | oui |
+| Dossier temporaire de Windows | oui | non : le backend ne peut même pas le lire |
+| Racine du dossier des données de programmes | oui | non : accès refusé |
+| Racine du lecteur, dossier partagé de Tessera | non | sans objet |
+
+La purge par le backend, non administrateur, ne couvre donc que le dossier
+public. Ailleurs, « un fichier que le backend ne peut pas supprimer lève
+`DroitsAgentRefuses` » bloquerait chaque run sur un simple fichier posé par
+un agent, sans que personne ne puisse le retirer sans droit
+d'administrateur.
+
+Deux issues, à trancher par l'utilisateur :
+
+1. **Refuser la création** : `agent-setup-admin.ps1` pose, une fois, un refus
+   de création pour le compte sur ces dossiers. L'ADR-088 l'a écarté
+   (modifier l'ACL d'un dossier système) ; c'est pourtant la seule fermeture
+   réelle.
+2. **Accepter** : un fichier laissé là n'atteint ni un worktree ni un secret,
+   et rien ne l'exécute. Le noter dans l'ADR-088 et annuler ce ticket.
 
 ## Ce qu'il faut faire
 
