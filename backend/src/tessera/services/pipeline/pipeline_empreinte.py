@@ -21,6 +21,7 @@ from typing import TYPE_CHECKING, TypeVar
 from tessera.services.git_workspace.git_runner import git
 from tessera.services.noyau.git_commande import build_command
 from tessera.services.noyau.pipeline_events import PipelineResult
+from tessera.services.pipeline.pipeline_ajouts import ajouts_proteges
 from tessera.services.pipeline.pipeline_contraintes import bloquer
 from tessera.services.pipeline.pipeline_run import PipelineRun
 from tessera.services.providers.chemins_proteges import motif_de_protection
@@ -157,7 +158,10 @@ async def empreinte(orch: "Orchestrator") -> Empreinte:
     for dossier in dossiers:
         candidats += _candidats_git(dossier)
     script = script_de_verification(projet, orch._test_command)
-    return await asyncio.to_thread(_hacher, candidats, projet, racine, dossiers, script)
+    connus = await asyncio.to_thread(_hacher, candidats, projet, racine, dossiers, script)
+    # Les fichiers protégés créés hors des candidats (sous-dossier) : ticket-1021.
+    ajoutes = await ajouts_proteges(projet, racine, script)
+    return {**ajoutes, **connus}
 
 
 def noms_changes(avant: Empreinte, apres: Empreinte) -> list[str]:

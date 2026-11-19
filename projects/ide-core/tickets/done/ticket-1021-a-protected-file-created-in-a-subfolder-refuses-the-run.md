@@ -1,10 +1,11 @@
 ---
-id: ticket-1021
-title: "A protected file created in a subfolder refuses the run"
-type: feat
-status: todo
-priority: medium
 agent: codeur
+id: ticket-1021
+pr_number: 1195
+priority: medium
+status: done
+title: A protected file created in a subfolder refuses the run
+type: feat
 ---
 
 # ticket-1021 — Un fichier protégé créé en sous-dossier refuse le run
