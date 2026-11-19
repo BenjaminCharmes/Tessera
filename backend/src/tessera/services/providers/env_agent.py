@@ -11,7 +11,8 @@ CLI_PARTAGE = r"C:\ProgramData\Tessera\bin\claude.exe"
 
 #: Le profil unique du compte agent, hors de `C:\Users` (ticket-1008).
 PROFIL_AGENT = r"C:\ProgramData\Tessera\profil-agent"
-#: Les deux caches qui survivent au nettoyage du profil, relatifs à `PROFIL_AGENT`.
+#: Le cache npm survit au nettoyage du profil ; celui de uv vit le temps d'un appel.
+#: Chemins relatifs à `PROFIL_AGENT`.
 CACHE_NPM = "npm-cache"
 CACHE_UV = r"uv\cache"
 
@@ -22,7 +23,7 @@ CLES_AUTORISEES: frozenset[str] = frozenset({
     "LOCALAPPDATA", "CLAUDE_CODE_OAUTH_TOKEN", "GH_CONFIG_DIR",
     "GIT_CONFIG_COUNT", "GIT_CONFIG_KEY_0", "GIT_CONFIG_VALUE_0",
     "GIT_TERMINAL_PROMPT", "CLAUDE_CODE_GIT_BASH_PATH", "PYTHONDONTWRITEBYTECODE",
-    "npm_config_cache", "UV_CACHE_DIR",
+    "npm_config_cache", "UV_CACHE_DIR", "UV_LINK_MODE",
 })
 
 
@@ -30,9 +31,10 @@ def profil_de(compte: str) -> str:
     """Returns the profile folder of ``compte``: one shared folder, wiped between calls (ticket-1008).
 
     Le compte n'a plus de profil sous le dossier des utilisateurs : `HOME`, `APPDATA`,
-    `TEMP`... en dérivent. Seuls `npm-cache` et `uv/cache` y survivent au nettoyage
-    (`profil_agent.reinitialiser_profil`), pour que l'installation d'un worktree
-    reste rapide et que npm et uv vérifient l'intégrité des lockfiles.
+    `TEMP`... en dérivent. Seul `npm-cache` survit au nettoyage
+    (`profil_agent.reinitialiser_profil`) : npm vérifie l'intégrité de ce qu'il
+    sort de son cache, uv ne revérifie pas un paquet déjà décompressé, donc son
+    cache part avec le reste du profil (ADR-088).
     """
     return PROFIL_AGENT
 
@@ -43,7 +45,8 @@ def env_du_profil(compte: str) -> dict[str, str]:
     Partagées par le CLI et les commandes du run (ticket-988) : celles du
     backend visent le profil de l'utilisateur, où le compte ne crée rien.
     `npm_config_cache` passe devant le `npmrc` copié de scoop avec la chaîne
-    d'outils, qui vise lui aussi un profil ; `UV_CACHE_DIR` fixe le cache de uv.
+    d'outils, qui vise lui aussi un profil ; `UV_CACHE_DIR` fixe le cache de uv ;
+    `UV_LINK_MODE=copy` interdit tout lien physique entre un `.venv` et ce cache.
     """
     profil = profil_de(compte)
     local = rf"{profil}\AppData\Local"
@@ -56,6 +59,7 @@ def env_du_profil(compte: str) -> dict[str, str]:
         "LOCALAPPDATA": local,
         "npm_config_cache": rf"{profil}\{CACHE_NPM}",
         "UV_CACHE_DIR": rf"{profil}\{CACHE_UV}",
+        "UV_LINK_MODE": "copy",
     }
 
 

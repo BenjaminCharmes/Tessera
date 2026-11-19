@@ -2,9 +2,11 @@
 
 ADR-087. `~/.bashrc`, `~/.npmrc`, `uv.toml` ou un `.pth` écrits par un appel ne
 doivent pas survivre jusqu'au suivant. Tout le dossier de profil est supprimé,
-sauf `npm-cache` et `uv\\cache` ; le dossier est recréé et le compte retrouve
+sauf `npm-cache` ; le dossier est recréé et le compte retrouve
 `M` dessus. Aucun lien (jonction, lien symbolique) n'est suivi : il se retire
-lui-même. Un échec est une `DroitsAgentRefuses` (ADR-037). Avant la purge, le dossier
+lui-même. npm vérifie l'intégrité de ce qu'il sort de son cache, donc il
+survit ; uv ne revérifie pas un paquet décompressé, son cache part (ticket-1019,
+ADR-088). Un échec est une `DroitsAgentRefuses` (ADR-037). Avant la purge, le dossier
 revient au backend (`/setowner`, `/reset`) : le compte, propriétaire de ce qu'il
 crée, ne peut pas piéger la purge (ticket-1014).
 """
@@ -15,7 +17,7 @@ import stat
 from pathlib import Path
 
 from tessera.services.providers.droits_worktree import OWNER_RIGHTS, DroitsAgentRefuses, Icacls, _icacls_reel, _lancer, compte_du_backend
-from tessera.services.providers.env_agent import CACHE_NPM, CACHE_UV, PROFIL_AGENT, env_du_profil
+from tessera.services.providers.env_agent import CACHE_NPM, PROFIL_AGENT, env_du_profil
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -25,7 +27,7 @@ DOSSIER_PROFIL = Path(PROFIL_AGENT)
 _REPARSE_POINT = 0x400
 #: Chemins relatifs qui survivent au nettoyage.
 _GARDES: tuple[tuple[str, ...], ...] = (
-    (CACHE_NPM,), tuple(CACHE_UV.split("\\")),
+    (CACHE_NPM,),
 )
 
 
@@ -60,7 +62,7 @@ def _purger(dossier: Path, gardes: tuple[tuple[str, ...], ...]) -> None:
         if not suite or _est_un_lien(enfant):
             _retirer(enfant)
         elif all(suite) and enfant.is_dir():
-            # Un garde plus profond (`uv\cache`) : on descend, le reste part.
+            # Un garde plus profond (`a\b`) : on descend, le reste part.
             _purger(enfant, tuple(suite))
         # Sinon le chemin entier est gardé (`suite` contient ()).
 
@@ -127,7 +129,7 @@ async def _redonner_au_compte(dossier: Path, compte: str, icacls: Icacls, backen
 async def reinitialiser_profil(
     compte: str, icacls: Icacls = _icacls_reel, profil: Path | None = None, backend: str | None = None,
 ) -> None:
-    """Take the agent profile back, wipe it except the two caches, recreate it, give `compte` its rights.
+    """Take the agent profile back, wipe it except the npm cache, recreate it, give `compte` its rights.
 
     Un dossier absent est une `DroitsAgentRefuses` : l'appel suivant partirait
     avec un `HOME` qui n'existe pas. Tout échec lève le drapeau
