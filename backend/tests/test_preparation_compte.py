@@ -6,11 +6,10 @@ import pytest
 from pydantic import SecretStr
 
 from tessera.config import settings
-from tessera.services.verification import lancement_compte
 from tessera.models.worktree_config import ConfigWorktree
 from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.pipeline.preparation_worktree import preparation_du_run
-from tessera.services.verification import chaine_python
+from tessera.services.verification import chaine_python, lancement_compte
 from tests.chaine_factice import chaine_factice  # noqa: F401
 from tests.doubles_compte import LanceurDouble, ProcessDouble
 

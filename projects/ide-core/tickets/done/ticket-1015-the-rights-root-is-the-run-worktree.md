@@ -7,7 +7,7 @@ id: ticket-1015
 pr_number: null
 preuve_reelle: true
 priority: high
-status: blocked
+status: done
 title: The rights of a call are set on the run worktree, never on a folder found by
   walking up
 type: fix
@@ -62,6 +62,21 @@ Sous `AGENT_USER`, dans un worktree jetable de Serpent : créer `sous/.git`,
 lancer un appel depuis `sous`, et constater que le droit est posé puis retiré
 sur la racine du worktree, et qu'un fichier protégé de la racine garde son
 refus d'écriture après la clôture.
+
+### Faite le 19/11, sur le poste, sous le compte agent
+
+Le run s'est bloqué au troisième tour sur une erreur de lint (ordre des
+imports d'un test) ; la suite complète était verte. Corrigé à la main.
+
+- Un `.git` créé dans `sous/`, appel lancé depuis `sous/` : la racine
+  calculée reste le worktree. Pendant l'appel, le compte a « modifier » sur
+  la racine ; après la clôture, plus aucune entrée du compte, ni sur la
+  racine ni sur `sous/`.
+- L'agent tente d'écrire dans un fichier protégé de la racine pendant
+  l'appel : « Accès refusé ». Le refus d'écriture est toujours là après la
+  clôture.
+- Le `.git` de la racine remplacé par une jonction : `DroitsAgentRefuses`,
+  aucun droit posé.
 
 ## Ce que ça ne fait pas
 

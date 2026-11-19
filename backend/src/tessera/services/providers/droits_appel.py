@@ -58,7 +58,7 @@ async def _tuer_reel(pid: int, existe: Callable[[int], bool] = processus_existe)
 def racine_du_worktree(cwd: str | Path) -> Path | None:
     """The run worktree of `cwd`: its ancestor that is a direct child of `<worktrees>/<project>/`.
 
-    No `.git` lookup: a folder an agent creates cannot move the root (ticket-1010).
+    No `.git` lookup: a folder an agent creates cannot move the root (ticket-1015).
     `None` when `cwd` is not at least two levels below a worktrees folder.
     """
     chemin = Path(cwd).resolve()
