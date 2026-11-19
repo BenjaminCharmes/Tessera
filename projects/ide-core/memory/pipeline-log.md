@@ -10216,3 +10216,19 @@ error: Please commit or stash them.
 - 2026-11-19 10:18:10 UTC — [ticket-1008] validateur: APPROVED — Le ticket ticket-1008 est entièrement satisfait. Le profil agent a été migré de  (43813ms)
 - 2026-11-19 10:18:11 UTC — [ticket-1008] CHANGES_REQUESTED tour 3: Reviewer : 1. `_recreer` construit `Path(env[cle]).relative_to(PROFIL_AGENT)` sur des chaînes séparées par des backslashs. Sous Linux, `Path` est un `PosixPath` : `C:\ProgramData\...\AppData\Local\Tem
 - 2026-11-19 10:18:11 UTC — [ticket-1008] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-19 11:08:59 UTC — [ide-core] ticket-1013 PR #1188 confiée au CIWatcher
+- 2026-11-19 11:09:03 UTC — [ticket-1015] branche ticket-1015-the-rights-of-a-call-are-set-on-the-run-worktree
+- 2026-11-19 11:09:06 UTC — [ticket-1015] tour 1 — codeur démarré
+- 2026-11-19 11:11:14 UTC — [ticket-1015] tour 1 — codeur terminé (127563ms)
+- 2026-11-19 11:13:29 UTC — [ticket-1015] testeur: 1 failed, 463 passed, 3 skipped, 9 warnings in 100.21s (0:01:40) — fichiers en échec : tests/test_agent_doctor_cli.py
+- 2026-11-19 11:13:29 UTC — [ticket-1015] tests rouges au tour 1
+- 2026-11-19 11:13:29 UTC — [ticket-1015] tour 2 — codeur démarré
+- 2026-11-19 11:24:52 UTC — [ticket-1015] codeur: outil Read refusé par le CLI
+- 2026-11-19 11:24:52 UTC — [ticket-1015] tour 2 — codeur terminé (682625ms)
+- 2026-11-19 11:27:49 UTC — [ticket-1015] testeur: 1 failed, 551 passed, 3 skipped, 104 warnings in 136.37s (0:02:16) — fichiers en échec : tests/test_app_du_run_compte.py
+- 2026-11-19 11:27:49 UTC — [ticket-1015] tests rouges au tour 2
+- 2026-11-19 11:27:49 UTC — [ticket-1015] tour 3 — codeur démarré
+- 2026-11-19 11:31:11 UTC — [ticket-1015] tour 3 — codeur terminé (201827ms)
+- 2026-11-19 11:35:53 UTC — [ticket-1015] testeur: dur�es : ruff 0 s, pytest 240 s ; impact depuis base : 140 fichier(s) de test
+- 2026-11-19 11:35:54 UTC — [ticket-1015] tests rouges au tour 3
+- 2026-11-19 11:35:54 UTC — [ticket-1015] BLOCKED après 3 tour(s) sans approbation
