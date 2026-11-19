@@ -54,6 +54,11 @@ def compte(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     # Une condition se lie à la boucle de son premier `wait` : une neuve par test.
     monkeypatch.setattr(droits_appel, "_VERROU", asyncio.Condition())
 
+    async def aucune_tache() -> None:
+        return None
+
+    monkeypatch.setattr(droits_appel, "retirer_les_taches", aucune_tache)
+
 
 @pytest.fixture
 def worktree(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:

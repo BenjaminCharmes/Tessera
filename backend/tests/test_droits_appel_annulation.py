@@ -25,6 +25,11 @@ def cadre(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Path:
     droits_appel._ACTIFS.clear()
     droits_appel._FILE.clear()
     monkeypatch.setattr(droits_appel, "_VERROU", asyncio.Condition())
+
+    async def aucune_tache() -> None:
+        return None
+
+    monkeypatch.setattr(droits_appel, "retirer_les_taches", aucune_tache)
     dossier = tmp_path / "worktrees"
     monkeypatch.setattr(settings, "ide_worktrees_dir", dossier)
     monkeypatch.setattr(settings, "ide_worktrees_dir_agent", dossier)

@@ -23,6 +23,11 @@ def icacls(monkeypatch: pytest.MonkeyPatch, tmp_path: Path, chaine: Path) -> Ica
     (tmp_path / "profil-vide").mkdir()
     monkeypatch.setattr(profil_agent, "DOSSIER_PROFIL", tmp_path / "profil-vide")
     monkeypatch.setattr(profil_agent, "_NETTOYAGE_ECHOUE", False)
+    # Les tâches planifiées du compte (ticket-1018) partent d'un vrai lanceur : hors sujet ici.
+    async def aucune_tache() -> None:
+        return None
+
+    monkeypatch.setattr(droits_appel, "retirer_les_taches", aucune_tache)
     droits_appel._ACTIFS.clear()
     droits_appel._FILE.clear()
     monkeypatch.setattr(droits_appel, "_VERROU", asyncio.Condition())

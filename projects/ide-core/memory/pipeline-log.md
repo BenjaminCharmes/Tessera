@@ -10347,6 +10347,40 @@ error: Please commit or stash them.
 - 2026-11-19 13:50:58 UTC — [ticket-1019] livraison: tests relancés après rebase : verts (dur�es : ruff 0 s, mypy 11 s, mypy-linux 11 s, pytest 120 s ; impact depuis base : 136 fichier(s) de test) (120937ms)
 - 2026-11-19 13:50:58 UTC — [ticket-1019] livraison: PR #1197 ouverte (5297ms)
 - 2026-11-19 13:50:58 UTC — [ticket-1019] livraison: arrêt — PR ouverte, merge après preuve réelle
+- 2026-11-19 14:13:29 UTC — [ide-core] ticket-1022 PR #1199 non surveillée (livraison arrêtée)
+- 2026-11-19 14:13:39 UTC — [ticket-1018] branche ticket-1018-scheduled-tasks-of-the-agent-account-are-removed
+- 2026-11-19 14:13:43 UTC — [ticket-1018] tour 1 — codeur démarré
+- 2026-11-19 14:15:50 UTC — [ticket-1018] tour 1 — codeur terminé (126359ms)
+- 2026-11-19 14:20:11 UTC — [ticket-1018] testeur: dur�es : ruff 0 s, mypy 22 s, mypy-linux 23 s, pytest 210 s ; impact depuis base : 109 fichier(s) de test
+- 2026-11-19 14:20:44 UTC — [ticket-1018] securite: PASS — PASS : rien de CRITICAL ni de HIGH n'est introduit. Les noms de tâches viennent  (32342ms)
+- 2026-11-19 14:20:45 UTC — [ticket-1018] tour 1 — reviewer démarré
+- 2026-11-19 14:21:12 UTC — [ticket-1018] validateur: APPROVED — Le diff implémente complètement le module `taches_compte.py` avec `retirer_les_t (26563ms)
+- 2026-11-19 14:21:26 UTC — [ticket-1018] tour 1 — reviewer terminé (40546ms)
+- 2026-11-19 14:21:26 UTC — [ticket-1018] CHANGES_REQUESTED tour 1: Reviewer : 1. `retirer_les_taches` passe par `lancer_sous_compte`, qui lève `EchecLancementCompte` quand le mot de passe manque ou que le lanceur est indisponible (`ProviderIndisponible` emballé). Or 
+- 2026-11-19 14:21:26 UTC — [ticket-1018] tour 2 — codeur démarré
+- 2026-11-19 14:22:54 UTC — [ticket-1018] tour 2 — codeur terminé (86969ms)
+- 2026-11-19 14:27:14 UTC — [ticket-1018] testeur: dur�es : ruff 0 s, mypy 21 s, mypy-linux 21 s, pytest 207 s ; impact depuis base : 109 fichier(s) de test
+- 2026-11-19 14:27:40 UTC — [ticket-1018] securite: PASS — Le diff ajoute la suppression des tâches planifiées du compte agent. Les command (25594ms)
+- 2026-11-19 14:27:41 UTC — [ticket-1018] tour 2 — reviewer démarré
+- 2026-11-19 14:28:12 UTC — [ticket-1018] tour 2 — reviewer terminé (30922ms)
+- 2026-11-19 14:28:13 UTC — [ticket-1018] validateur: APPROVED — Les quatre critères d'acceptation sont satisfaits. L'implémentation de `taches_c (31359ms)
+- 2026-11-19 14:28:13 UTC — [ticket-1018] CHANGES_REQUESTED tour 2: Reviewer : 1. Dans `_clore_sous_verrou`, `retirer_les_taches()` est appelé en tête du même bloc `try` que `arreter_les_restants` et `reinitialiser_profil`. Si la liste ou une suppression de tâche lève
+- 2026-11-19 14:28:13 UTC — [ticket-1018] tour 3 — codeur démarré
+- 2026-11-19 14:30:16 UTC — [ticket-1018] tour 3 — codeur terminé (122578ms)
+- 2026-11-19 14:34:40 UTC — [ticket-1018] testeur: dur�es : ruff 0 s, mypy 22 s, mypy-linux 22 s, pytest 209 s ; impact depuis base : 109 fichier(s) de test
+- 2026-11-19 14:35:22 UTC — [ticket-1018] securite: PASS — Aucune faille CRITICAL ou HIGH introduite, donc PASS. Les commandes schtasks par (40829ms)
+- 2026-11-19 14:35:23 UTC — [ticket-1018] tour 3 — reviewer démarré
+- 2026-11-19 14:35:49 UTC — [ticket-1018] tour 3 — reviewer terminé (25969ms)
+- 2026-11-19 14:36:12 UTC — [ticket-1018] validateur: APPROVED — Les quatre critères sont satisfaits. Le nouveau module `taches_compte.py` implém (49469ms)
+- 2026-11-19 14:36:13 UTC — [ticket-1018] APPROVED après 3 tour(s)
+- 2026-11-19 14:37:34 UTC — [ticket-1018] leçons: refusée — preuve absente du retour du run
+- 2026-11-19 14:39:56 UTC — [ticket-1018] documentation: 0 fichier(s) (113889ms)
+- 2026-11-19 14:39:56 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-19 14:39:56 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-19 14:39:56 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-19 14:40:45 UTC — [ticket-1018] livraison: rebase sur develop (1016ms)
+- 2026-11-19 14:40:45 UTC — [ticket-1018] livraison: PR #1200 ouverte (7328ms)
+- 2026-11-19 14:40:45 UTC — [ticket-1018] livraison: arrêt — PR ouverte, merge après preuve réelle
 - 2026-11-19 13:41:27 UTC — [ide-core] ticket-1021 PR #1195 mergée (CI verte)
 - 2026-11-19 13:52:41 UTC — [ticket-1022] branche ticket-1022-a-test-command-opens-one-call-for-all-its-steps
 - 2026-11-19 13:52:45 UTC — [ticket-1022] tour 1 — codeur démarré
