@@ -54,6 +54,7 @@ from tessera.services.pipeline.run_registry import RUN_REGISTRY
 from tessera.services.pipeline.signalements_en_attente import migrer_ancien_fichier
 from tessera.services.providers.droits_worktree import DroitsAgentRefuses
 from tessera.services.providers.profil_agent import reinitialiser_profil
+from tessera.services.providers.taches_compte import retirer_les_taches
 from tessera.services.supervision.anomalies.detecteur import DetecteurDAnomalies, arreter_le_detecteur
 from tessera.services.supervision.superviseur_collecte_livraison import boucle_du_superviseur
 from tessera.services.verification.process_registry import PROCESS_REGISTRY
@@ -99,6 +100,11 @@ async def _reinitialiser_le_profil_agent() -> None:
     """Wipe the agent profile left by a stop (ticket-1008); a refusal is logged, the next call retries."""
     if not settings.agent_user:
         return
+    # Chaque étape tourne même si l'autre échoue ; les deux marquent leur échec.
+    try:
+        await retirer_les_taches()
+    except DroitsAgentRefuses:
+        _logger.exception("taches_agent_non_retirees")
     try:
         await reinitialiser_profil(settings.agent_user)
     except DroitsAgentRefuses:
