@@ -10307,3 +10307,8 @@ error: Please commit or stash them.
 - 2026-11-19 13:05:44 UTC — [ticket-1016] validateur: APPROVED — ADR-088 successfully addresses all three architectural decision points (processe (99280ms)
 - 2026-11-19 13:05:46 UTC — [ticket-1016] APPROVED après 2 tour(s)
 - 2026-11-19 13:07:32 UTC — [ticket-1016] leçons: une leçon proposée
+- 2026-11-19 13:07:58 UTC — [ticket-1016] fichiers non suivis laissés par le run : tickets/todo/ticket-1018-a-new-unreadable-process-during-a-call-blocks-the-run.md, tickets/todo/ticket-1019-the-uv-cache-is-copied-and-read-only-for-the-agent-account.md, tickets/todo/ticket-1020-files-of-the-agent-account-in-shared-folders-are-purged.md, tickets/todo/ticket-1021-a-protected-file-created-in-a-subfolder-refuses-the-run.md (à ignorer dans .gitignore ?)
+- 2026-11-19 13:09:30 UTC — [ticket-1016] documentation: 0 fichier(s) (91750ms)
+- 2026-11-19 13:09:30 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-19 13:09:30 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-19 13:09:30 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
