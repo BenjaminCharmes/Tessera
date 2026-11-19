@@ -7,7 +7,7 @@ id: ticket-944
 pr_number: null
 preuve_reelle: true
 priority: high
-status: blocked
+status: done
 title: 'Design: the agent account runs on its own window station and desktop'
 type: design
 ---

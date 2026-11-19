@@ -10400,3 +10400,4 @@ error: Please commit or stash them.
 - 2026-11-19 15:17:25 UTC — [ticket-944] validateur: CHANGES_REQUESTED — Le ticket de conception a rempli son rôle : ADR-089 choisit la piste (station +  (32860ms)
 - 2026-11-19 15:17:25 UTC — [ticket-944] CHANGES_REQUESTED tour 3: Validateur : Le ticket de conception a rempli son rôle : ADR-089 choisit la piste (station + bureau dédiés en défense en profondeur) et énonce ses limites. Les deux tickets d'implémentation qui en déc
 - 2026-11-19 15:17:26 UTC — [ticket-944] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-19 15:17:58 UTC — [ticket-944] fichiers non suivis laissés par le run : tickets/todo/ticket-1023-the-agent-account-launches-on-a-dedicated-window-station.md, tickets/todo/ticket-1024-the-agent-call-job-limits-the-user-interface.md (à ignorer dans .gitignore ?)
