@@ -1,12 +1,14 @@
 """The agent account gets exactly what a run needs on its worktree — ticket-895."""
 import getpass
 import json
+import sys
 from pathlib import Path
 
 import pytest
 
 from tessera.config import settings
-from tessera.services.providers.droits_worktree import DroitsAgentRefuses, accorder_droits_agent
+from tessera.services.providers import droits_worktree
+from tessera.services.providers.droits_worktree import DroitsAgentRefuses, accorder_droits_agent, retirer_ecriture
 from tessera.services.worktrees.run_worktree import RunWorktree
 
 COMPTE = "tessera-agent"
@@ -93,3 +95,47 @@ async def test_protected_files_stay_readable(wt: RunWorktree, monkeypatch: pytes
         drapeaux = droit.split(":", 1)[1].strip("()").split(",")
         assert "W" not in drapeaux and "D" not in drapeaux and "F" not in drapeaux and "M" not in drapeaux
         assert {"WD", "AD", "DE"} <= set(drapeaux)
+
+
+class EchecSurDeny(Enregistreur):
+    async def __call__(self, args: list[str]) -> tuple[int, str]:
+        await super().__call__(args)
+        return (5, "refusé") if "/deny" in args else (0, "")
+
+
+async def test_closing_lays_the_denials_again_after_the_reset(
+    wt: RunWorktree, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(settings, "agent_user", COMPTE)
+    await accorder_droits_agent(wt, "python scripts/verif.py", Enregistreur())
+    icacls = Enregistreur()
+    await retirer_ecriture(wt.racine, COMPTE, icacls)
+    noms = [a[1] for a in icacls.appels]
+    dernier_reset = max(i for i, n in enumerate(noms) if n == "/reset")
+    refuses = {Path(a[0]).name for a in icacls.appels[dernier_reset:] if a[1] == "/deny"}
+    assert refuses == {"agents.json", "CLAUDE.md", "verif.py"}
+    assert all(a[2] == f"{COMPTE}:(WD,AD,WEA,WA,DE)" for a in icacls.appels if a[1] == "/deny")
+
+
+async def test_a_failed_denial_at_closing_raises(
+    wt: RunWorktree, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(settings, "agent_user", COMPTE)
+    await accorder_droits_agent(wt, "python scripts/verif.py", Enregistreur())
+    with pytest.raises(DroitsAgentRefuses):
+        await retirer_ecriture(wt.racine, COMPTE, EchecSurDeny())
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="real ACLs need Windows")
+async def test_a_protected_file_keeps_its_denial_after_a_real_closing(tmp_path: Path) -> None:
+    guests = "*S-1-5-32-546"
+    racine = tmp_path / "wt"
+    (racine / "app").mkdir(parents=True)
+    protege = racine / "app" / "agents.json"
+    protege.write_text("{}", encoding="utf-8")
+    droits_worktree._REFUSES[racine.resolve()] = [protege]
+    await droits_worktree._refuser(protege, guests, droits_worktree._icacls_reel)
+    await retirer_ecriture(racine, guests)
+    code, sortie = await droits_worktree._icacls_reel([str(protege)])
+    assert code == 0
+    assert "(DENY)" in sortie

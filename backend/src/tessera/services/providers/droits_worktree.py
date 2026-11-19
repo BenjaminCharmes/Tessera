@@ -69,6 +69,15 @@ def fichiers_proteges(wt: RunWorktree, script: Path | None) -> list[Path]:
 _OWNER_RIGHTS = "*S-1-3-4:(OI)(CI)(RC)"
 
 
+#: Fichiers protégés par racine de worktree, notés quand le refus est posé (une
+#: fois par run) : le `/reset` de clôture les efface, on les refuse de nouveau.
+_REFUSES: dict[Path, list[Path]] = {}
+
+
+async def _refuser(fichier: Path, compte: str, lanceur: Icacls) -> None:
+    await _lancer(lanceur, [str(fichier), "/deny", f"{compte}:{_REFUS_ECRITURE}"])
+
+
 def compte_du_backend() -> str:
     """Name of the account the backend runs under."""
     return getpass.getuser()
@@ -105,7 +114,9 @@ async def retirer_ecriture(
     Called at the end of the last call on `racine`: after the `/remove:g`, the
     owner goes back to the backend and every DACL to inheritance (`.git` included).
     Choice: `/reset` covers `.git` too, which then gets its `inheritance:d` + `RX`
-    again, so the account keeps read-only access there. A non-zero exit (a file
+    again, so the account keeps read-only access there. The write refusals set on
+    the protected files by `accorder_droits_agent` are laid again after the reset,
+    in the same call (fail closed). A non-zero exit (a file
     created with a protected DACL) raises `DroitsAgentRefuses`; no fallback.
     """
     git = racine / ".git"
@@ -116,6 +127,8 @@ async def retirer_ecriture(
     await _lancer(lanceur, [str(racine), "/reset", "/T", "/C", "/L"])
     if git.exists():
         await _proteger_git(git, compte, lanceur)
+    for fichier in _REFUSES.get(racine.resolve(), []):
+        await _refuser(fichier, compte, lanceur)
 
 
 async def accorder_droits_agent(
@@ -129,6 +142,8 @@ async def accorder_droits_agent(
         return
     await poser_ecriture(wt.racine, compte, lanceur)
     script = script_de_verification(wt.projet, commande_de_tests)
-    for fichier in fichiers_proteges(wt, script):
-        await _lancer(lanceur, [str(fichier), "/deny", f"{compte}:{_REFUS_ECRITURE}"])
+    proteges = fichiers_proteges(wt, script)
+    _REFUSES[wt.racine.resolve()] = proteges
+    for fichier in proteges:
+        await _refuser(fichier, compte, lanceur)
     _logger.info("droits_agent_poses", extra={"racine": str(wt.racine)})
