@@ -132,6 +132,23 @@ async def _retenter_le_nettoyage(compte: str, icacls: Icacls) -> None:
     await reinitialiser_profil(compte, icacls)
 
 
+async def _poser_ou_retirer(racine: Path, compte: str, icacls: Icacls) -> None:
+    """Set the right; on cancellation or failure before the counter exists, withdraw it (no counter would ever do)."""
+    try:
+        await poser_ecriture(racine, compte, icacls)
+    except BaseException:
+        await asyncio.shield(_retirer_sans_masquer(racine, compte, icacls))
+        raise
+
+
+async def _retirer_sans_masquer(racine: Path, compte: str, icacls: Icacls) -> None:
+    """Withdraw the right; a refusal is logged so it never hides the original error."""
+    try:
+        await retirer_ecriture(racine, compte, icacls)
+    except DroitsAgentRefuses:
+        _logger.exception("retrait_du_droit_en_echec", extra={"racine": str(racine)})
+
+
 async def ouvrir_appel(cwd: str | Path, icacls: Icacls = _icacls_reel) -> Path | None:
     """Give the account its write right on the worktree of `cwd`; returns its root.
 
@@ -158,7 +175,7 @@ async def ouvrir_appel(cwd: str | Path, icacls: Icacls = _icacls_reel) -> Path |
             await _attendre_son_tour(racine, jeton)
             await _retenter_le_nettoyage(compte, icacls)
             if _ACTIFS.get(racine, 0) == 0:
-                await poser_ecriture(racine, compte, icacls)
+                await _poser_ou_retirer(racine, compte, icacls)
             _ACTIFS[racine] = _ACTIFS.get(racine, 0) + 1
         finally:
             # Annulé ou refusé pendant l'attente : la place se libère, aucun compteur posé.
@@ -175,6 +192,24 @@ async def clore_appel(
     compte = settings.agent_user
     if racine is None or not compte:
         return
+    tache = asyncio.ensure_future(_clore_avec_verrou(racine, compte, icacls, enumerer, tuer))
+    try:
+        await asyncio.shield(tache)
+    except asyncio.CancelledError:
+        # La clôture va à son terme (le droit se retire), puis l'annulation repart.
+        while not tache.done():
+            try:
+                await asyncio.wait({tache})
+            except asyncio.CancelledError:
+                continue
+        if not tache.cancelled() and tache.exception() is not None:
+            _logger.error("cloture_en_echec_apres_annulation", extra={"racine": str(racine)})
+        raise
+
+
+async def _clore_avec_verrou(
+    racine: Path, compte: str, icacls: Icacls, enumerer: Enumerer, tuer: Tuer,
+) -> None:
     async with _VERROU:
         try:
             await _clore_sous_verrou(racine, compte, icacls, enumerer, tuer)
