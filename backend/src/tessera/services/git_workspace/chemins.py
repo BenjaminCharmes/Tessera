@@ -20,6 +20,9 @@ _ORCHESTRATOR_ARTIFACT_PATHS: tuple[str, ...] = (
 )
 
 
+#: Dossier où un run de conception écrit ses fiches : c'est son livrable (ticket-1026).
+_FICHES_NOUVELLES = "tickets/todo/"
+
 #: Journal du pipeline, relatif au dossier du projet.
 _JOURNAL_PIPELINE = "memory/pipeline-log.md"
 

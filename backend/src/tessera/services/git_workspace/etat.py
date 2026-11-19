@@ -44,9 +44,11 @@ class GitState(GitIgnores, GitHistory):
             ":/" if self._travaille_dans_le_parent() else ".",
             *await self._exclude_pathspecs(),
         )
+        fiches = self._fiches_parmi(non_suivis)
         try:
             return _resumer_lockfiles(
                 await self._run("diff", base, "--", *pathspec)
+                + await self._diff_fiches(base, fiches)
             )
         finally:
             await self._oublier_dans_l_index(non_suivis)
@@ -85,12 +87,21 @@ class GitState(GitIgnores, GitHistory):
             ":/" if self._travaille_dans_le_parent() else ".",
             *await self._exclude_pathspecs(),
         )
+        fiches = self._fiches_parmi(non_suivis)
         try:
-            if await self._has_head():
-                return await self._run("diff", "HEAD", "--", *pathspec)
-            return await self._run("diff", _EMPTY_TREE_SHA, "--", *pathspec)
+            base = "HEAD" if await self._has_head() else _EMPTY_TREE_SHA
+            return (
+                await self._run("diff", base, "--", *pathspec)
+                + await self._diff_fiches(base, fiches)
+            )
         finally:
             await self._oublier_dans_l_index(non_suivis)
+
+    async def _diff_fiches(self, base: str, fiches: tuple[str, ...]) -> str:
+        """Full content of the tickets a run created, which `tickets/` exclusion hides (ticket-1026)."""
+        if not fiches:
+            return ""
+        return await self._run("diff", base, "--", *fiches)
 
     async def _oublier_dans_l_index(self, chemins: tuple[str, ...]) -> None:
         """Retire de l'index des chemins qui n'y étaient pas avant.

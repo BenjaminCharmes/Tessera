@@ -71,6 +71,11 @@ class GitCommits(GitState):
             *await self._exclude_pathspecs(),
             *(f":(exclude){path}" for path in self._preexisting_untracked),
         )
+        # Les fiches qu'un run de conception crée sous `tickets/todo/` sont son
+        # livrable : le pathspec ci-dessus exclut `tickets/`, on les nomme (ticket-1026).
+        fiches = await self.fiches_creees_par_le_run()
+        if fiches:
+            await self._run("add", "--", *fiches)
         # Retire de l'index les fichiers devenus ignorés après le `git add -A`.
         # `git add -A` ne dé-stage pas automatiquement des fichiers déjà dans
         # l'index dont le chemin est maintenant couvert par `.gitignore` — par
