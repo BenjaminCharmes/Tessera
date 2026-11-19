@@ -1,15 +1,15 @@
 ---
-id: ticket-1019
-title: "The uv cache is copied and no longer survives the profile wipe"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
-depends_on: []
-preuve_reelle: true
-estimated_days: 1
 created: 2026-11-19
+depends_on: []
+estimated_days: 1
+id: ticket-1019
+pr_number: 1197
+preuve_reelle: true
+priority: high
+status: done
+title: The uv cache is copied and no longer survives the profile wipe
+type: fix
 ---
 
 # ticket-1019 — Le cache uv se copie et ne survit plus au nettoyage du profil
@@ -55,6 +55,16 @@ par un run y attend le run suivant.
 Sous le compte, sur le poste : `agent doctor` reste vert sur ses cinq lignes ;
 après la clôture d'un appel, le dossier du cache uv du profil est vide ou
 absent, et `npm-cache` est toujours là.
+
+### Faite le 19/11, sur le poste, sous le compte agent
+
+- `agent doctor` sur la branche : cinq lignes vertes.
+- Un appel `uv run` sous le compte lit `UV_LINK_MODE=copy` dans son
+  environnement. Pendant l'appel, le cache uv du profil contient
+  `interpreter-v4` et `sdists-v9` ; après la clôture, le dossier `uv` n'existe
+  plus, et `npm-cache` garde ses 1 692 entrées.
+- Constat annexe : sans cache gardé ni variables de la chaîne Python, cet
+  appel a retéléchargé un interpréteur (21,5 Mio), reparti à la clôture.
 
 ## Ce que ça ne fait pas
 

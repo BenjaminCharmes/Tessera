@@ -48,7 +48,7 @@ def profil(tmp_path: Path) -> Path:
     return dossier
 
 
-async def test_user_files_are_removed_and_both_caches_kept(profil: Path) -> None:
+async def test_user_files_are_removed_and_only_the_npm_cache_is_kept(profil: Path) -> None:
     (profil / ".bashrc").write_text("evil")
     (profil / ".npmrc").write_text("evil")
     (profil / "AppData" / "Roaming" / "uv").mkdir(parents=True)
@@ -56,10 +56,9 @@ async def test_user_files_are_removed_and_both_caches_kept(profil: Path) -> None
     (profil / "uv" / "uv.toml").write_text("evil")
     icacls = Icacls()
     await reinitialiser_profil("tessera-agent", icacls, profil)
-    assert sorted(p.name for p in profil.iterdir()) == ["AppData", "npm-cache", "uv"]
-    assert [p.name for p in (profil / "uv").iterdir()] == ["cache"]
+    assert sorted(p.name for p in profil.iterdir()) == ["AppData", "npm-cache"]
     assert (profil / "npm-cache" / "_cacache" / "index").read_text() == "i"
-    assert (profil / "uv" / "cache" / "wheel").read_text() == "w"
+    assert not (profil / "uv").exists()
     assert icacls.appels == _ATTENDU(profil)
 
 
