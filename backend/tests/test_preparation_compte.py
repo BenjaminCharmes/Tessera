@@ -6,6 +6,7 @@ import pytest
 from pydantic import SecretStr
 
 from tessera.config import settings
+from tessera.services.verification import lancement_compte
 from tessera.models.worktree_config import ConfigWorktree
 from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.pipeline.preparation_worktree import preparation_du_run
@@ -18,6 +19,11 @@ from tests.doubles_compte import LanceurDouble, ProcessDouble
 def compte(monkeypatch: pytest.MonkeyPatch, chaine: Path, tmp_path: Path) -> None:
     monkeypatch.setattr(settings, "agent_user", "tessera-agent")
     monkeypatch.setattr(settings, "agent_logon_password", SecretStr("pw"))
+    async def sans_droits(dossier: Path) -> None:
+        return None
+
+    # Ces tests ne portent pas sur les droits : le dossier n'est pas un worktree.
+    monkeypatch.setattr(lancement_compte, "ouvrir_appel", sans_droits)
     python = tmp_path / "python"
     python.mkdir()
     monkeypatch.setattr(chaine_python, "CHAINE_PYTHON", python)

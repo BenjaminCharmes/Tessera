@@ -33,8 +33,8 @@ OUTILS: tuple[tuple[str, ...], ...] = (
 )
 DELAI_S = 20.0
 _CONSEIL = "lancer `agent setup`"
-#: Dossier de lancement : hors de tout dépôt git, pour que `ouvrir_appel` ne
-#: pose aucun droit (ticket-999). Jamais le dossier courant, qui est `backend/`.
+#: Dossier de lancement : hors des worktrees : le docteur lance sans droit
+#: (`sans_droits`, ticket-999). Jamais le dossier courant, qui est `backend/`.
 DOSSIER_OUTILS = CHAINE_PYTHON.parent
 
 
@@ -76,7 +76,7 @@ async def _verifier(commande: Sequence[str], dossier: Path, lanceur: LanceurAgen
     """Run the command under the account; return None on success, else the cause."""
     processus = None
     try:
-        processus = await lancer_sous_compte(list(commande), dossier, _env_de(commande), lanceur)
+        processus = await lancer_sous_compte(list(commande), dossier, _env_de(commande), lanceur, sans_droits=True)
         sortie, _ = await asyncio.wait_for(processus.communicate(), timeout=delai_s)
         if processus.returncode != 0:
             return f"code de sortie {processus.returncode}"

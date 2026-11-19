@@ -54,18 +54,19 @@ async def test_rights_are_set_in_order(wt: RunWorktree, monkeypatch: pytest.Monk
     icacls = Enregistreur()
     await accorder_droits_agent(wt, "python scripts/verif.py", icacls)
     appels = icacls.appels
-    assert appels[0] == [str(wt.racine), "/grant", f"{COMPTE}:(OI)(CI)M"]
+    assert appels[0] == [str(wt.racine), "/grant", f"{COMPTE}:(OI)(CI)M", "/L"]
     git = str(wt.racine / ".git")
     # Le backend d'abord : propriétaire de la racine, il perdrait WRITE_DAC dès l'ACE OWNER RIGHTS.
-    assert appels[1] == [str(wt.racine), "/grant", f"{getpass.getuser()}:(OI)(CI)F"]
-    assert appels[2] == [str(wt.racine), "/grant", "*S-1-3-4:(OI)(CI)(RC)"]
+    assert appels[1] == [str(wt.racine), "/grant", f"{getpass.getuser()}:(OI)(CI)F", "/L"]
+    assert appels[2] == [str(wt.racine), "/grant", "*S-1-3-4:(OI)(CI)(RC)", "/L"]
     assert appels[3:6] == [
-        [git, "/inheritance:d"],
-        [git, "/remove:g", COMPTE],
-        [git, "/grant:r", f"{COMPTE}:(OI)(CI)RX"],
+        [git, "/inheritance:d", "/L"],
+        [git, "/remove:g", COMPTE, "/L"],
+        [git, "/grant:r", f"{COMPTE}:(OI)(CI)RX", "/L"],
     ]
-    refuses = {Path(a[0]).name for a in appels[6:] if a[1:] == ["/deny", f"{COMPTE}:(WD,AD,WEA,WA,DE)"]}
+    refuses = {Path(a[0]).name for a in appels[6:] if a[1:3] == ["/deny", f"{COMPTE}:(WD,AD,WEA,WA,DE)"]}
     assert refuses == {"agents.json", "CLAUDE.md", "verif.py"}
+    assert all("/L" in a for a in appels)
     assert len(appels) == 6 + 3
 
 

@@ -6,6 +6,7 @@ import pytest
 from pydantic import SecretStr
 
 from tessera.config import settings
+from tessera.services.verification import lancement_compte
 from tessera.services.verification.test_runner import TestRunnerService
 from tests.chaine_factice import chaine_factice  # noqa: F401
 from tests.doubles_compte import LanceurDouble, ProcessDouble
@@ -15,6 +16,11 @@ from tests.doubles_compte import LanceurDouble, ProcessDouble
 def compte(monkeypatch: pytest.MonkeyPatch, chaine: Path) -> None:
     monkeypatch.setattr(settings, "agent_user", "tessera-agent")
     monkeypatch.setattr(settings, "agent_logon_password", SecretStr("pw"))
+    async def sans_droits(dossier: Path) -> None:
+        return None
+
+    # Ces tests ne portent pas sur les droits : le dossier n'est pas un worktree.
+    monkeypatch.setattr(lancement_compte, "ouvrir_appel", sans_droits)
 
 
 async def test_command_goes_through_the_account_launcher(compte: None, tmp_path: Path) -> None:

@@ -1,6 +1,8 @@
 """The agent account writes in a worktree only during a call — ticket-943."""
 import asyncio
 import getpass
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -80,22 +82,22 @@ async def test_right_is_withdrawn_after_a_call_and_set_again_before_the_next(wor
     icacls, procs = Icacls(), Processus([])
     racine = await ouvrir_appel(worktree / "backend", icacls)
     assert racine == worktree.resolve()
-    assert [str(worktree.resolve()), "/grant", f"{COMPTE}:(OI)(CI)M"] in icacls.appels
+    assert [str(worktree.resolve()), "/grant", f"{COMPTE}:(OI)(CI)M", "/L"] in icacls.appels
     icacls.appels.clear()
     await clore_appel(racine, icacls, procs.enumerer, procs.tuer)
     racine_s, git = str(worktree.resolve()), str(worktree.resolve() / ".git")
     assert icacls.appels == [
-        [git, "/remove:g", COMPTE],
-        [racine_s, "/remove:g", COMPTE],
+        [git, "/remove:g", COMPTE, "/L"],
+        [racine_s, "/remove:g", COMPTE, "/L"],
         [racine_s, "/setowner", getpass.getuser(), "/T", "/C", "/L"],
         [racine_s, "/reset", "/T", "/C", "/L"],
-        [git, "/inheritance:d"],
-        [git, "/remove:g", COMPTE],
-        [git, "/grant:r", f"{COMPTE}:(OI)(CI)RX"],
+        [git, "/inheritance:d", "/L"],
+        [git, "/remove:g", COMPTE, "/L"],
+        [git, "/grant:r", f"{COMPTE}:(OI)(CI)RX", "/L"],
     ]
     icacls.appels.clear()
     await ouvrir_appel(worktree, icacls)
-    assert [str(worktree.resolve()), "/grant", f"{COMPTE}:(OI)(CI)M"] in icacls.appels
+    assert [str(worktree.resolve()), "/grant", f"{COMPTE}:(OI)(CI)M", "/L"] in icacls.appels
 
 
 async def test_overlapping_calls_withdraw_the_right_once_at_the_last(worktree: Path) -> None:
@@ -142,7 +144,7 @@ async def test_a_failed_stop_still_withdraws_the_right_then_raises(worktree: Pat
     icacls.appels.clear()
     with pytest.raises(DroitsAgentRefuses):
         await clore_appel(racine, icacls, Processus([(11, "node.exe")]).enumerer, tuer)
-    assert [str(worktree.resolve()), "/remove:g", COMPTE] in icacls.appels
+    assert [str(worktree.resolve()), "/remove:g", COMPTE, "/L"] in icacls.appels
 
 
 async def test_without_agent_user_nothing_is_set_or_removed(
@@ -155,13 +157,50 @@ async def test_without_agent_user_nothing_is_set_or_removed(
     assert icacls.appels == []
 
 
-async def test_folder_outside_a_repository_gets_no_right(tmp_path: Path) -> None:
-    icacls = Icacls()
+async def test_folder_outside_the_worktrees_gets_no_right(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(settings, "ide_worktrees_dir", tmp_path / "worktrees")
+    monkeypatch.setattr(settings, "ide_worktrees_dir_agent", tmp_path / "worktrees")
     sans_depot = tmp_path / "x"
     sans_depot.mkdir()
-    if droits_appel.racine_du_worktree(sans_depot) is None:
-        assert await ouvrir_appel(sans_depot, icacls) is None
-        assert icacls.appels == []
+    icacls = Icacls()
+    with pytest.raises(DroitsAgentRefuses):
+        await ouvrir_appel(sans_depot, icacls)
+    assert icacls.appels == []
+
+
+def test_root_is_the_run_worktree_even_with_a_git_in_a_subfolder(worktree: Path) -> None:
+    sous = worktree / "sous"
+    (sous / ".git").mkdir(parents=True)
+    assert droits_appel.racine_du_worktree(sous) == worktree.resolve()
+    assert droits_appel.racine_du_worktree(worktree) == worktree.resolve()
+
+
+def test_a_project_folder_alone_is_not_a_root(worktree: Path) -> None:
+    assert droits_appel.racine_du_worktree(worktree.parent) is None
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="junctions are a Windows feature")
+async def test_a_junction_git_is_refused(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    dossier = tmp_path / "worktrees"
+    monkeypatch.setattr(settings, "ide_worktrees_dir", dossier)
+    monkeypatch.setattr(settings, "ide_worktrees_dir_agent", dossier)
+    arbre = dossier / "projet" / "ticket-1"
+    arbre.mkdir(parents=True)
+    cible = tmp_path / "cible"
+    cible.mkdir()
+    subprocess.run(["cmd", "/c", "mklink", "/J", str(arbre / ".git"), str(cible)], check=True, capture_output=True)
+    icacls = Icacls()
+    with pytest.raises(DroitsAgentRefuses):
+        await ouvrir_appel(arbre, icacls)
+    assert icacls.appels == []
+
+
+async def test_every_icacls_call_carries_l(worktree: Path) -> None:
+    icacls = Icacls()
+    racine = await ouvrir_appel(worktree, icacls)
+    await clore_appel(racine, icacls, Processus([]).enumerer, Processus([]).tuer)
+    assert icacls.appels
+    assert all("/L" in a for a in icacls.appels)
 
 
 async def test_step_group_ends_the_call_of_its_process() -> None:
