@@ -2,7 +2,7 @@
 id: ticket-1009
 title: "The agent process starts without loading its registry profile"
 type: fix
-status: todo
+status: done
 priority: medium
 agent: codeur
 depends_on: [ticket-1008]
@@ -38,6 +38,20 @@ preuve_reelle: true
 Sous `AGENT_USER`, faire tenter à un appel `reg add "HKCU\Software\Microsoft\Command Processor" /v AutoRun /d calc` :
 constater l'échec d'accès. Lancer ensuite un run complet (CLI, tests, `npm run`) et
 constater qu'il aboutit.
+
+### Faite le 19/11, sur le poste, sous le compte agent
+
+Chemin pris : **le drapeau est retiré**, aucune ruche n'est chargée. Fait à
+la main par la session ide-core, la preuve avant bascule ne pouvant venir
+d'aucun agent.
+
+- Avant bascule (drapeau forcé à 0 dans un script) puis sur la branche :
+  `node`, `npm`, `uv`, le CLI partagé et `cmd.exe` démarrent ; `agent doctor`
+  est vert sur ses cinq lignes, CLI compris.
+- `reg add` sur la clé `Command Processor` de `HKCU` et sur
+  `HKCU\Environment` : « Accès refusé ».
+- Le run complet (CLI, tests, `npm run`) se constate sur Serpent après le
+  redémarrage du backend qui charge ce code.
 
 ## Ce que ça ne fait pas
 

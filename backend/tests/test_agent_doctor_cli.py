@@ -53,10 +53,11 @@ async def test_all_tools_ok(compte: None, tmp_path: Path, capsys: pytest.Capture
     sortie = capsys.readouterr().out
     commandes = [a["commande"] for a in lanceur.appels]
     assert [c[0].replace(chr(92), "/").rsplit("/", 1)[-1] for c in commandes] == [
-        "node.exe", "uv.exe", "uv.exe", "npm.cmd",
+        "node.exe", "uv.exe", "uv.exe", "npm.cmd", "claude.exe",
     ]
     assert commandes[2][1:] == ["run", "--no-project", "python", "--version"]
-    assert sortie.count(": ok") == 4
+    assert sortie.count(": ok") == 5
+    assert "claude : ok" in sortie
     assert "pw-secret" not in sortie
 
 

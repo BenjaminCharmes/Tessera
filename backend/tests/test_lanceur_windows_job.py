@@ -75,3 +75,25 @@ def test_a_refused_logon_touches_no_job() -> None:
     ok, _ = _lancer(appels)
     assert not ok
     assert appels.ordre == ["create"]
+
+
+class AppelsAvecLogon(Appels):
+    """Also records the logon flags handed to ``CreateProcessWithLogonW``."""
+
+    logon = -1
+
+    def CreateProcessWithLogonW(self, *args: Any) -> bool:  # noqa: N802
+        self.logon = args[3]
+        return super().CreateProcessWithLogonW(*args)
+
+
+def test_the_process_starts_without_loading_the_registry_profile() -> None:
+    appels = AppelsAvecLogon()
+    _lancer(appels)
+    assert appels.logon == 0
+
+
+def test_the_logon_with_profile_flag_does_not_come_back_without_a_decision() -> None:
+    """LOGON_WITH_PROFILE (0x1) loads the account's HKCU, writable by the agent: removed by ticket-1009."""
+    assert lanceur_windows._LOGON_SANS_PROFIL == 0
+    assert not hasattr(lanceur_windows, "_LOGON_WITH_PROFILE")
