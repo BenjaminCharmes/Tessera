@@ -73,7 +73,9 @@ Write-Host "-> $Outils pret ($Proprietaire : modifier, $Compte : lecture-executi
 
 # 4 ter. Profil unique de l'agent (HOME, TEMP, caches npm et uv) : le
 #    compte y ecrit, le backend le vide entre deux appels sauf les deux caches.
-#    Heritage coupe, droits poses par SID (ticket-1008).
+#    Heritage coupe, droits poses par SID (ticket-1008). Le proprietaire a le
+#    controle total : il y repose le droit du compte apres chaque nettoyage, et
+#    supprime ce que l'agent y laisse meme si l'agent en a referme les droits.
 $Profil = Join-Path $Partage 'profil-agent'
 New-Item -ItemType Directory -Force -Path $Profil | Out-Null
 # Les dossiers que TEMP et les variables du profil visent existent des le premier appel.
@@ -82,9 +84,9 @@ foreach ($Sous in 'Local\Temp', 'Roaming') {
     New-Item -ItemType Directory -Force -Path (Join-Path $Profil $Sous) | Out-Null
 }
 Invoke-Icacls $Profil /grant:r "*S-1-5-18:(OI)(CI)F" "*S-1-5-32-544:(OI)(CI)F" `
-    "${Proprietaire}:(OI)(CI)M" "${Compte}:(OI)(CI)M"
+    "${Proprietaire}:(OI)(CI)F" "${Compte}:(OI)(CI)M"
 Invoke-Icacls $Profil /inheritance:r
-Write-Host "-> $Profil pret ($Proprietaire et $Compte : modifier, heritage coupe)"
+Write-Host "-> $Profil pret ($Proprietaire : controle total, $Compte : modifier, heritage coupe)"
 
 # 5. Remise du mot de passe : le fichier nait avec son ACL finale (heritage
 #    coupe ; SYSTEM et administrateurs, lecture-suppression pour l'utilisateur),

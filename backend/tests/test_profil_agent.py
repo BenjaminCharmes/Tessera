@@ -89,3 +89,12 @@ async def test_temp_and_appdata_folders_exist_after_the_reset(profil: Path) -> N
     assert (profil / "AppData" / "Local" / "Temp").is_dir()
     assert not (profil / "AppData" / "Local" / "Temp" / "junk").exists()
     assert (profil / "AppData" / "Roaming").is_dir()
+
+
+def test_the_recreated_folders_are_the_ones_the_environment_points_to(tmp_path: Path) -> None:
+    """Windows paths are split with ntpath, so the same folders come back under Linux too."""
+    from tessera.services.providers.profil_agent import _recreer
+
+    _recreer(tmp_path)
+    assert (tmp_path / "AppData" / "Local" / "Temp").is_dir()
+    assert (tmp_path / "AppData" / "Roaming").is_dir()

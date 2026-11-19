@@ -7,6 +7,7 @@ sauf `npm-cache` et `uv\\cache` ; le dossier est recréé et le compte retrouve
 lui-même. Un échec est une `DroitsAgentRefuses` (ADR-037).
 """
 import asyncio
+import ntpath
 import os
 import stat
 from pathlib import Path
@@ -74,7 +75,9 @@ def _recreer(profil: Path) -> None:
     env = env_du_profil("")
     try:
         for cle in ("TEMP", "APPDATA", "LOCALAPPDATA"):
-            (profil / Path(env[cle]).relative_to(PROFIL_AGENT)).mkdir(parents=True, exist_ok=True)
+            # Chemins Windows, lus aussi sous Linux (CI) : `ntpath`, jamais `Path`.
+            relatif = ntpath.relpath(env[cle], PROFIL_AGENT).split("\\")
+            profil.joinpath(*relatif).mkdir(parents=True, exist_ok=True)
     except OSError as exc:
         raise DroitsAgentRefuses(f"profil de l'agent non recréé ({profil}) : {exc}") from exc
 
