@@ -10231,3 +10231,7 @@ error: Please commit or stash them.
 - 2026-11-19 11:04:51 UTC — [ticket-1013] validateur: APPROVED — Le codeur a implémenté les deux changements requis : `_arreter` et `_run_ou_repr (46313ms)
 - 2026-11-19 11:04:51 UTC — [ticket-1013] APPROVED après 2 tour(s)
 - 2026-11-19 11:06:36 UTC — [ticket-1013] leçons: refusée — preuve absente du retour du run
+- 2026-11-19 11:08:23 UTC — [ticket-1013] documentation: 1 fichier(s) (87046ms)
+- 2026-11-19 11:08:23 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-19 11:08:23 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-19 11:08:23 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
