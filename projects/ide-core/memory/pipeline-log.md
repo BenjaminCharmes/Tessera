@@ -10185,3 +10185,7 @@ error: Please commit or stash them.
 - 2026-11-19 09:27:47 UTC — [ticket-1007] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente une file d'a (42453ms)
 - 2026-11-19 09:28:04 UTC — [ticket-1007] tour 1 — reviewer terminé (59702ms)
 - 2026-11-19 09:28:04 UTC — [ticket-1007] APPROVED après 1 tour(s)
+- 2026-11-19 09:31:05 UTC — [ticket-1007] documentation: 0 fichier(s) (161594ms) — après tour de correction
+- 2026-11-19 09:31:05 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-19 09:31:05 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-19 09:31:05 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
