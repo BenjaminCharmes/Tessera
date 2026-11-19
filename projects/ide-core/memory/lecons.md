@@ -3,6 +3,7 @@
 Pièges observés sur ce projet, une ligne chacun. Le service écrit sous `## Proposées` ; un humain déplace une leçon sous `## En vigueur` pour qu'elle atteigne le codeur et le reviewer.
 
 ## Proposées
+- Quand on ajoute une gestion de ressources autour d'une logique complexe, il faut l'extraire dans une sous-fonction avant d'atteindre la limite de 300 lignes. (source : ticket-1022, 2026-11-19)
 
 ## En vigueur
 - Quand tu écris des données de test pour un module sensible, vérifie qu'elles ne déclenchent pas le contrôle de traces professionnelles. (source : ticket-933, 2026-11-11)

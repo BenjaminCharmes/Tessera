@@ -9,7 +9,7 @@ from tessera.config import settings
 from tessera.models.worktree_config import ConfigWorktree
 from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.pipeline.preparation_worktree import preparation_du_run
-from tessera.services.verification import chaine_python, lancement_compte
+from tessera.services.verification import chaine_python, lancement_compte, test_runner
 from tests.chaine_factice import chaine_factice  # noqa: F401
 from tests.doubles_compte import LanceurDouble, ProcessDouble
 
@@ -23,6 +23,7 @@ def compte(monkeypatch: pytest.MonkeyPatch, chaine: Path, tmp_path: Path) -> Non
 
     # Ces tests ne portent pas sur les droits : le dossier n'est pas un worktree.
     monkeypatch.setattr(lancement_compte, "ouvrir_appel", sans_droits)
+    monkeypatch.setattr(test_runner, "ouvrir_appel", sans_droits)
     python = tmp_path / "python"
     python.mkdir()
     monkeypatch.setattr(chaine_python, "CHAINE_PYTHON", python)

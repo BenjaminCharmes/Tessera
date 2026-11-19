@@ -9,9 +9,12 @@ from pathlib import Path
 from typing import Any
 
 from tessera.services.noyau.lancement import essais_de_commande
+from tessera.services.providers.droits_appel import clore_appel, ouvrir_appel
+from tessera.services.providers.droits_worktree import DroitsAgentRefuses
 from tessera.services.providers.lanceur_agent import LanceurAgent
 from tessera.services.verification.commande_chainee import decouper
 from tessera.services.verification.detail_du_delai import noter_la_coupure
+from tessera.services.verification.echec_d_etape import echec_de_lancement, marquer_panne_d_environnement
 from tessera.services.verification.env_du_code_de_projet import env_du_code_de_projet
 from tessera.services.verification.erreur_de_sortie import detail_avec_erreur
 from tessera.services.verification.groupe_d_etape import GroupeDEtape
@@ -204,56 +207,78 @@ class TestRunnerService:
 
         # Créneau pris ici : l'attente ne compte pas dans le délai (ticket-348).
         async with _acquis(en_attente):
-            start = time.monotonic()
-            etapes: list[EtapeTest] = []
-            sorties: list[str] = []
-            relances: list[Relance] = []
-            code = 0
-            for args in etapes_args:
-                debut_etape = time.monotonic()
-                issue = await self._executer(args, dossier, cmd, timeout, start)
-                issue = await relancer_apres_refus(
-                    issue, partial(self._executer, args, dossier, cmd, timeout, start), dossier, project_path)
-                duree_etape_ms = int((time.monotonic() - debut_etape) * 1000)
-                if isinstance(issue, TestResult):
-                    issue.etapes = etapes
-                    if issue.expiree:
-                        # Coupée par le minuteur : sa durée est déjà posée.
-                        coupee = issue.etape_coupee
-                        duree = coupee.duree_ms if coupee else duree_etape_ms
-                        noter_la_coupure(issue, args, duree, timeout)
-                    return issue
-                code, sortie = issue
-                if code != 0 and fichiers_du_diff is not None:
-                    # Seule une expiration hors du diff se relance, une fois (ticket-971).
-                    code, sortie, relance = await reprendre_l_etape(
-                        code, sortie, fichiers_du_diff, dossier, project_path,
-                        lambda a, d: self._executer(a, d, cmd, timeout, start))
-                    relances += [relance] if relance else []
-                etapes.append(
-                    EtapeTest(
-                        commande=shlex.join(args), code=code, duree_ms=duree_etape_ms
-                    )
-                )
-                sorties.append(sortie)
-                if code != 0:
-                    break
+            # Un appel englobant : les étapes ne font plus que compter, le coût de la
+            # clôture complète (droits, profil) se paie une fois (ticket-1022).
+            try:
+                racine = await ouvrir_appel(dossier) if self._sous_compte else None
+            except DroitsAgentRefuses as exc:
+                return echec_de_lancement(EchecLancementCompte(str(exc)), cmd, [cmd], time.monotonic())
+            try:
+                return await self._enchainer(
+                    etapes_args, dossier, project_path, cmd, timeout, fichiers_du_diff)
+            finally:
+                await clore_appel(racine)
 
-            duration_ms = int((time.monotonic() - start) * 1000)
-            if code != 0:
-                # Seule la sortie de l'étape en échec est lue : les étapes
-                # précédentes, vertes, masquaient son résumé (ticket-401).
-                result = _parse_failed_step(
-                    etapes[-1], sorties[-1].strip(), duration_ms, len(etapes_args) > 1
+    async def _enchainer(
+        self,
+        etapes_args: list[list[str]],
+        dossier: Path,
+        project_path: Path,
+        cmd: str,
+        timeout: int,
+        fichiers_du_diff: Sequence[str] | None,
+    ) -> TestResult:
+        """Run the steps in order, stopping at the first red one."""
+        start = time.monotonic()
+        etapes: list[EtapeTest] = []
+        sorties: list[str] = []
+        relances: list[Relance] = []
+        code = 0
+        for args in etapes_args:
+            debut_etape = time.monotonic()
+            issue = await self._executer(args, dossier, cmd, timeout, start)
+            issue = await relancer_apres_refus(
+                issue, partial(self._executer, args, dossier, cmd, timeout, start), dossier, project_path)
+            duree_etape_ms = int((time.monotonic() - debut_etape) * 1000)
+            if isinstance(issue, TestResult):
+                issue.etapes = etapes
+                if issue.expiree:
+                    # Coupée par le minuteur : sa durée est déjà posée.
+                    coupee = issue.etape_coupee
+                    duree = coupee.duree_ms if coupee else duree_etape_ms
+                    noter_la_coupure(issue, args, duree, timeout)
+                return issue
+            code, sortie = issue
+            if code != 0 and fichiers_du_diff is not None:
+                # Seule une expiration hors du diff se relance, une fois (ticket-971).
+                code, sortie, relance = await reprendre_l_etape(
+                    code, sortie, fichiers_du_diff, dossier, project_path,
+                    lambda a, d: self._executer(a, d, cmd, timeout, start))
+                relances += [relance] if relance else []
+            etapes.append(
+                EtapeTest(
+                    commande=shlex.join(args), code=code, duree_ms=duree_etape_ms
                 )
-                outil = outil_introuvable(sorties[-1], dossier, project_path)
-                if outil:
-                    _marquer_panne_d_environnement(result, etapes[-1], outil)
-            else:
-                result = _parse_output(code, "\n".join(sorties).strip(), duration_ms)
-            result.etapes = etapes
-            noter_les_relances(result, relances)
-            return result
+            )
+            sorties.append(sortie)
+            if code != 0:
+                break
+
+        duration_ms = int((time.monotonic() - start) * 1000)
+        if code != 0:
+            # Seule la sortie de l'étape en échec est lue : les étapes
+            # précédentes, vertes, masquaient son résumé (ticket-401).
+            result = _parse_failed_step(
+                etapes[-1], sorties[-1].strip(), duration_ms, len(etapes_args) > 1
+            )
+            outil = outil_introuvable(sorties[-1], dossier, project_path)
+            if outil:
+                marquer_panne_d_environnement(result, etapes[-1], outil)
+        else:
+            result = _parse_output(code, "\n".join(sorties).strip(), duration_ms)
+        result.etapes = etapes
+        noter_les_relances(result, relances)
+        return result
 
     async def _executer(
         self, args: list[str], dossier: Path, cmd: str, timeout: int, start: float
@@ -307,7 +332,7 @@ class TestRunnerService:
                 await groupe.terminer(proc)
                 return _resultat_expire(cmd, args, timeout, start, debut, minuteur)
             except Exception as exc:  # noqa: BLE001 — traité par `_echec_de_lancement`
-                return _echec_de_lancement(exc, cmd, args, start)
+                return echec_de_lancement(exc, cmd, args, start)
             if minuteur is not None and minuteur.coupee_a is not None:
                 return _resultat_expire(cmd, args, timeout, start, debut, minuteur)
         finally:
@@ -353,77 +378,6 @@ def _resultat_expire(
             commande=shlex.join(args), duree_ms=int((fin - debut) * 1000)
         )
     return result
-
-
-def _echec_de_lancement(
-    exc: Exception, cmd: str, args: list[str], start: float
-) -> TestResult:
-    """Build the result of a step that could not run at all."""
-    duration_ms = int((time.monotonic() - start) * 1000)
-    if isinstance(exc, EchecLancementCompte):
-        # Panne d'environnement, pas un test rouge ; aucun repli sous le compte
-        # du backend (ticket-934, ADR-085).
-        _logger.warning("test_runner_compte_agent_echec", extra={"error": str(exc)})
-        return TestResult(
-            passed=False,
-            demarree=False,
-            total=0,
-            failed=0,
-            output_summary=(
-                f"La commande de test n'a pas démarré sous le compte dédié : {exc}. "
-                "Panne d'environnement, ce n'est pas un test en échec."
-            ),
-            errors=[str(exc)],
-            duration_ms=duration_ms,
-        )
-    if isinstance(exc, FileNotFoundError):
-        # Pas un test rouge : la commande n'a pas démarré. Le dire
-        # explicitement évite au codeur de corriger du code qui n'est pas
-        # en cause (ticket-157).
-        _logger.warning(
-            "test_runner_commande_introuvable", extra={"cmd": cmd, "error": str(exc)}
-        )
-        return TestResult(
-            passed=False,
-            demarree=False,
-            total=0,
-            failed=0,
-            output_summary=(
-                f"La commande de test n'a pas démarré : « {shlex.join(args)} » — "
-                "exécutable introuvable. Ce n'est pas un test en échec."
-            ),
-            errors=[str(exc)],
-            duration_ms=duration_ms,
-        )
-    _logger.warning("test_runner_exec_failed", extra={"error": str(exc)})
-    return TestResult(
-        passed=False,
-        total=0,
-        failed=0,
-        output_summary=f"Erreur d'exécution : {exc}",
-        errors=[str(exc)],
-        duration_ms=duration_ms,
-    )
-
-
-def _marquer_panne_d_environnement(
-    result: TestResult, etape: EtapeTest, outil: str
-) -> None:
-    """Turn a red step into an environment failure: the tool, not the code, is missing.
-
-    Le détail de l'échec reste : c'est la sortie qui prouve le diagnostic
-    (ticket-496).
-    """
-    _logger.warning(
-        "test_runner_outil_introuvable", extra={"outil": outil, "etape": etape.commande}
-    )
-    result.demarree = False
-    result.output_summary = (
-        f"étape `{etape.commande}` — panne d'environnement : outil `{outil}` "
-        "introuvable. Réinstaller les dépendances du projet. "
-        "Ce n'est pas un test en échec."
-    )
-    result.errors = [result.output_summary]
 
 
 def _parse_failed_step(
