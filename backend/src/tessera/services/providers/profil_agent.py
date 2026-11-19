@@ -4,7 +4,9 @@ ADR-087. `~/.bashrc`, `~/.npmrc`, `uv.toml` ou un `.pth` écrits par un appel ne
 doivent pas survivre jusqu'au suivant. Tout le dossier de profil est supprimé,
 sauf `npm-cache` et `uv\\cache` ; le dossier est recréé et le compte retrouve
 `M` dessus. Aucun lien (jonction, lien symbolique) n'est suivi : il se retire
-lui-même. Un échec est une `DroitsAgentRefuses` (ADR-037).
+lui-même. Un échec est une `DroitsAgentRefuses` (ADR-037). Avant la purge, le dossier
+revient au backend (`/setowner`, `/reset`) : le compte, propriétaire de ce qu'il
+crée, ne peut pas piéger la purge (ticket-1014).
 """
 import asyncio
 import ntpath
@@ -12,7 +14,7 @@ import os
 import stat
 from pathlib import Path
 
-from tessera.services.providers.droits_worktree import DroitsAgentRefuses, Icacls, _icacls_reel, _lancer
+from tessera.services.providers.droits_worktree import OWNER_RIGHTS, DroitsAgentRefuses, Icacls, _icacls_reel, _lancer, compte_du_backend
 from tessera.services.providers.env_agent import CACHE_NPM, CACHE_UV, PROFIL_AGENT, env_du_profil
 from tessera.utils.logger import get_logger
 
@@ -65,7 +67,7 @@ def _purger(dossier: Path, gardes: tuple[tuple[str, ...], ...]) -> None:
 
 def _vider(profil: Path) -> None:
     try:
-        _purger(profil, _GARDES)
+        _purger(_prefixe_long(profil), _GARDES)
     except OSError as exc:
         raise DroitsAgentRefuses(f"profil de l'agent non nettoyé ({profil}) : {exc}") from exc
 
@@ -82,16 +84,66 @@ def _recreer(profil: Path) -> None:
         raise DroitsAgentRefuses(f"profil de l'agent non recréé ({profil}) : {exc}") from exc
 
 
-async def reinitialiser_profil(compte: str, icacls: Icacls = _icacls_reel, profil: Path | None = None) -> None:
-    """Wipe the agent profile except the two caches, recreate it, give `compte` modify on it.
+def nettoyage_en_echec() -> bool:
+    """Whether the last profile wipe failed (ticket-1014): the next call is refused."""
+    return _NETTOYAGE_ECHOUE
 
-    Un dossier absent (installation non faite) se journalise : `agent doctor` le
-    signale, et aucun droit n'est posé sur un chemin que `agent setup` n'a pas créé.
+
+#: Tant que le dernier nettoyage a échoué, `ouvrir_appel` refuse : un profil
+#: piégé ne sert jamais à un autre run. Remis à zéro par un nettoyage réussi.
+_NETTOYAGE_ECHOUE = False
+
+
+_PREFIXE_LONG = "\\\\?\\"
+
+
+def _prefixe_long(chemin: Path) -> Path:
+    """The extended-length form of `chemin` under Windows (reserved names, over 260 characters); unchanged elsewhere."""
+    if os.name != "nt":
+        return chemin
+    absolu = os.path.abspath(chemin)
+    return chemin if absolu.startswith(_PREFIXE_LONG) else Path(_PREFIXE_LONG + absolu)
+
+
+async def _reprendre_la_main(dossier: Path, compte: str, icacls: Icacls, backend: str) -> None:
+    """Owner back to the backend, DACLs back to inheritance: the account cannot have closed anything for it."""
+    await _lancer(icacls, [str(dossier), "/setowner", backend, "/T", "/C", "/L"])
+    await _lancer(icacls, [str(dossier), "/reset", "/T", "/C", "/L"])
+
+
+async def _redonner_au_compte(dossier: Path, compte: str, icacls: Icacls, backend: str) -> None:
+    """Lay the rights again: backend first (OWNER RIGHTS would take its WRITE_DAC), then the account, then OWNER RIGHTS.
+
+    Le compte ne porte `M` que sur le contenu ; sur le dossier lui-même, lecture
+    et création, sans `DELETE` : il ne peut pas le déplacer.
     """
+    cible = str(dossier)
+    await _lancer(icacls, [cible, "/grant", f"{backend}:(OI)(CI)F", "/L"])
+    await _lancer(icacls, [cible, "/grant", f"{compte}:(OI)(CI)(IO)M", "/L"])
+    await _lancer(icacls, [cible, "/grant", f"{compte}:(RX,WD,AD)", "/L"])
+    await _lancer(icacls, [cible, "/grant", OWNER_RIGHTS, "/L"])
+
+
+async def reinitialiser_profil(
+    compte: str, icacls: Icacls = _icacls_reel, profil: Path | None = None, backend: str | None = None,
+) -> None:
+    """Take the agent profile back, wipe it except the two caches, recreate it, give `compte` its rights.
+
+    Un dossier absent est une `DroitsAgentRefuses` : l'appel suivant partirait
+    avec un `HOME` qui n'existe pas. Tout échec lève le drapeau
+    `nettoyage_en_echec`, qu'un nettoyage réussi remet à zéro.
+    """
+    global _NETTOYAGE_ECHOUE
     dossier = profil or DOSSIER_PROFIL
-    if not dossier.is_dir():
-        _logger.warning("profil_agent_absent", extra={"dossier": str(dossier)})
-        return
-    await asyncio.to_thread(_vider, dossier)
-    await asyncio.to_thread(_recreer, dossier)
-    await _lancer(icacls, [str(dossier), "/grant", f"{compte}:(OI)(CI)M", "/L"])
+    try:
+        if not dossier.is_dir():
+            raise DroitsAgentRefuses(f"profil de l'agent absent ({dossier}) : agent setup à relancer")
+        proprietaire = backend or compte_du_backend()
+        await _reprendre_la_main(dossier, compte, icacls, proprietaire)
+        await asyncio.to_thread(_vider, dossier)
+        await asyncio.to_thread(_recreer, dossier)
+        await _redonner_au_compte(dossier, compte, icacls, proprietaire)
+    except DroitsAgentRefuses:
+        _NETTOYAGE_ECHOUE = True
+        raise
+    _NETTOYAGE_ECHOUE = False

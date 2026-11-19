@@ -1,15 +1,15 @@
 ---
-id: ticket-1014
-title: "The agent profile wipe cannot be bypassed and fails closed"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
-depends_on: []
-preuve_reelle: true
-estimated_days: 1
 created: 2026-11-19
+depends_on: []
+estimated_days: 1
+id: ticket-1014
+pr_number: 1190
+preuve_reelle: true
+priority: high
+status: done
+title: The agent profile wipe cannot be bypassed and fails closed
+type: fix
 ---
 
 ## Signalement
@@ -67,6 +67,21 @@ tous les droits sauf les siens, puis un fichier `x.`. Constater le refus de
 la DACL (OWNER RIGHTS) ou, à défaut, que la clôture reprend et supprime le
 tout ; puis qu'un profil renommé à la main bloque l'appel suivant avec
 `DroitsAgentRefuses` nommé.
+
+### Faite le 19/11, sur le poste, sous le compte agent
+
+Ajouté à la main avant la preuve : une ouverture d'appel retente le
+nettoyage quand le dernier a échoué (aucun autre appel en cours), au lieu de
+tout refuser jusqu'au redémarrage du backend.
+
+- Un appel crée un dossier dans son profil et tente d'en couper l'héritage :
+  refusé (code 5, OWNER RIGHTS). Il crée un fichier `x.` et un chemin de
+  344 caractères : tout est purgé à la clôture, il ne reste que `AppData`,
+  `npm-cache` et `uv`. Il tente de déplacer le profil : refusé.
+- Profil renommé à la main : l'appel lève `DroitsAgentRefuses` (« profil de
+  l'agent absent »), et le suivant est refusé de même.
+- Profil remis en place : l'appel suivant retente le nettoyage et passe,
+  sans redémarrage.
 
 ## Ce que ça ne fait pas
 

@@ -66,7 +66,7 @@ def fichiers_proteges(wt: RunWorktree, script: Path | None) -> list[Path]:
 
 #: OWNER RIGHTS (S-1-3-4) : le propriétaire d'un fichier ne garde que la lecture
 #: des droits, donc ni WRITE_DAC ni WRITE_OWNER sur ce que l'agent crée.
-_OWNER_RIGHTS = "*S-1-3-4:(OI)(CI)(RC)"
+OWNER_RIGHTS = "*S-1-3-4:(OI)(CI)(RC)"
 
 
 #: Fichiers protégés par racine de worktree, notés quand le refus est posé (une
@@ -103,7 +103,7 @@ async def poser_ecriture(
     # « modifier » par héritage. OWNER RIGHTS posée en premier lui retirait
     # WRITE_DAC, et son propre `/grant` suivant était refusé (preuve du 19/11).
     await _lancer(lanceur, [str(racine), "/grant", f"{backend or compte_du_backend()}:(OI)(CI)F", "/L"])
-    await _lancer(lanceur, [str(racine), "/grant", _OWNER_RIGHTS, "/L"])
+    await _lancer(lanceur, [str(racine), "/grant", OWNER_RIGHTS, "/L"])
     git = racine / ".git"
     if git.exists():
         await _proteger_git(git, compte, lanceur)

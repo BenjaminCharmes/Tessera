@@ -45,8 +45,10 @@ class Processus:
 @pytest.fixture(autouse=True)
 def compte(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     monkeypatch.setattr(settings, "agent_user", COMPTE)
-    # Jamais le vrai profil de l'agent : un dossier absent n'est pas touché (ticket-1008).
-    monkeypatch.setattr(profil_agent, "DOSSIER_PROFIL", tmp_path / "profil-absent")
+    # Jamais le vrai profil de l'agent (ticket-1008) ; un profil absent refuse (ticket-1014).
+    (tmp_path / "profil-vide").mkdir()
+    monkeypatch.setattr(profil_agent, "DOSSIER_PROFIL", tmp_path / "profil-vide")
+    monkeypatch.setattr(profil_agent, "_NETTOYAGE_ECHOUE", False)
     droits_appel._ACTIFS.clear()
     droits_appel._FILE.clear()
     # Une condition se lie à la boucle de son premier `wait` : une neuve par test.
@@ -86,7 +88,8 @@ async def test_right_is_withdrawn_after_a_call_and_set_again_before_the_next(wor
     icacls.appels.clear()
     await clore_appel(racine, icacls, procs.enumerer, procs.tuer)
     racine_s, git = str(worktree.resolve()), str(worktree.resolve() / ".git")
-    assert icacls.appels == [
+    # Les appels du profil (ticket-1014) sont testés dans test_profil_agent.
+    assert [a for a in icacls.appels if "profil-vide" not in a[0]] == [
         [git, "/remove:g", COMPTE, "/L"],
         [racine_s, "/remove:g", COMPTE, "/L"],
         [racine_s, "/setowner", getpass.getuser(), "/T", "/C", "/L"],
@@ -108,8 +111,9 @@ async def test_overlapping_calls_withdraw_the_right_once_at_the_last(worktree: P
     await clore_appel(premier, icacls, procs.enumerer, procs.tuer)
     assert icacls.appels == []
     await clore_appel(second, icacls, procs.enumerer, procs.tuer)
-    assert sum(1 for a in icacls.appels if "/setowner" in a) == 1
-    assert sum(1 for a in icacls.appels if "/reset" in a) == 1
+    sur_racine = [a for a in icacls.appels if "profil-vide" not in a[0]]
+    assert sum(1 for a in sur_racine if "/setowner" in a) == 1
+    assert sum(1 for a in sur_racine if "/reset" in a) == 1
 
 
 async def test_a_failed_withdrawal_raises_so_the_run_is_blocked(worktree: Path) -> None:
@@ -305,7 +309,7 @@ async def test_profile_is_reset_at_the_last_call_only(worktree: Path, tmp_path: 
     assert (profil / ".bashrc").exists()
     await clore_appel(second, icacls, procs.enumerer, procs.tuer)
     assert not (profil / ".bashrc").exists()
-    assert [str(profil), "/grant", f"{COMPTE}:(OI)(CI)M", "/L"] in icacls.appels
+    assert [str(profil), "/grant", f"{COMPTE}:(OI)(CI)(IO)M", "/L"] in icacls.appels
 
 
 async def test_profile_is_not_reset_while_another_worktree_is_active(
@@ -336,3 +340,21 @@ async def test_profile_is_untouched_without_agent_user(worktree: Path, tmp_path:
     racine = await ouvrir_appel(worktree, Icacls())
     await clore_appel(racine, Icacls())
     assert (profil / ".bashrc").exists()
+
+
+async def test_a_failed_wipe_refuses_the_next_call_until_one_succeeds(
+    worktree: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    profil = tmp_path / "profil-vide"
+    icacls, procs = Icacls(), Processus([])
+    racine = await ouvrir_appel(worktree, icacls)
+    profil.rmdir()
+    with pytest.raises(DroitsAgentRefuses):
+        await clore_appel(racine, icacls, procs.enumerer, procs.tuer)
+    with pytest.raises(DroitsAgentRefuses):
+        await ouvrir_appel(worktree, icacls)
+    # Le dossier revenu, l'ouverture suivante retente le nettoyage elle-même : pas de redémarrage.
+    profil.mkdir()
+    (profil / ".bashrc").write_text("x")
+    assert await ouvrir_appel(worktree, icacls) is not None
+    assert not (profil / ".bashrc").exists()

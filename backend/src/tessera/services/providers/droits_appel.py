@@ -14,7 +14,7 @@ from pathlib import Path
 from tessera.config import settings
 from tessera.services.providers.droits_worktree import DroitsAgentRefuses, Icacls, _icacls_reel, poser_ecriture, retirer_ecriture
 from tessera.services.providers.processus_compte import ProcessusIllisibles, processus_du_compte, processus_existe, sid_du_compte
-from tessera.services.providers.profil_agent import reinitialiser_profil
+from tessera.services.providers.profil_agent import nettoyage_en_echec, reinitialiser_profil
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -118,6 +118,20 @@ async def _attendre_son_tour(racine: Path, jeton: object) -> None:
                 _logger.warning("appel_agent_en_attente", extra={"racine": str(racine), "actifs": len(_ACTIFS)})
 
 
+async def _retenter_le_nettoyage(compte: str, icacls: Icacls) -> None:
+    """A failed profile wipe is tried again before a call opens (lock held); still failing, the call is refused.
+
+    Sans cette tentative, un nettoyage raté une fois refusait tous les appels
+    jusqu'au redémarrage du backend (ticket-1014). Jamais pendant un autre appel :
+    le profil qu'il utilise ne se vide pas sous lui.
+    """
+    if not nettoyage_en_echec():
+        return
+    if _ACTIFS:
+        raise DroitsAgentRefuses("le dernier nettoyage du profil de l'agent a échoué : aucun appel avant un nettoyage réussi")
+    await reinitialiser_profil(compte, icacls)
+
+
 async def ouvrir_appel(cwd: str | Path, icacls: Icacls = _icacls_reel) -> Path | None:
     """Give the account its write right on the worktree of `cwd`; returns its root.
 
@@ -142,6 +156,7 @@ async def ouvrir_appel(cwd: str | Path, icacls: Icacls = _icacls_reel) -> Path |
         _FILE.append(jeton)
         try:
             await _attendre_son_tour(racine, jeton)
+            await _retenter_le_nettoyage(compte, icacls)
             if _ACTIFS.get(racine, 0) == 0:
                 await poser_ecriture(racine, compte, icacls)
             _ACTIFS[racine] = _ACTIFS.get(racine, 0) + 1
