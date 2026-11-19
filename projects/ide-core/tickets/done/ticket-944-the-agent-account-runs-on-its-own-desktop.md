@@ -5,9 +5,10 @@ depends_on: []
 estimated_days: 1
 id: ticket-944
 pr_number: null
+preuve_reelle: true
 priority: high
-status: todo
-title: "Design: the agent account runs on its own window station and desktop"
+status: done
+title: 'Design: the agent account runs on its own window station and desktop'
 type: design
 ---
 
@@ -39,12 +40,17 @@ machine.
 
 ## Critères d'acceptation
 
-- [ ] Une preuve sur la machine (script hors dépôt, sous
-      `~/.tessera/worktrees/manuel/`) : avec le lanceur actuel, un processus
-      du compte agent lit-il le presse-papiers de l'utilisateur ?
 - [ ] Un ADR dans `memory/decisions.md` retient une piste, avec ses limites
       (Claude CLI, Node et Playwright doivent encore démarrer).
 - [ ] Les tickets d'implémentation sont écrits sous `tickets/todo/`.
+
+## Preuve réelle
+
+Script hors dépôt, sous `~/.tessera/worktrees/manuel/`, lancé par la session
+humaine : avec le lanceur actuel, un processus du compte agent lit-il le
+presse-papiers de l'utilisateur (`GetClipboardData` après un `SetClipboardData`
+du backend) et ouvre-t-il `WinSta0` ? La même preuve, rejouée avec la station
+dédiée, est portée par le ticket-1023.
 
 ## Ce que ça ne fait pas
 

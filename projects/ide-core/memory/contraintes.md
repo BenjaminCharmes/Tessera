@@ -11,6 +11,7 @@ s'écrit ici, avec son ADR ; un humain l'accepte en la déplaçant dans sa
 section. (ADR-055)
 
 - **Rien de planifié ni de caché ne survit au compte agent** : ses tâches planifiées se retirent au dernier appel, le cache uv part avec le profil, et un fichier protégé ajouté pendant un appel met le run en `blocked`. (ADR-088, ADR-087, ADR-084)
+- **Un processus du compte agent ne part jamais sur `WinSta0\Default`** : il tourne sur une window station et un bureau créés pour l'appel, accessibles au seul compte agent ; sans eux, le lancement échoue, sans repli. (ADR-089, ADR-083, ADR-037)
 
 ## Git et périmètre d'écriture
 
