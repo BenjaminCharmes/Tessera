@@ -11,6 +11,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from tessera.services.providers.droits_worktree import DroitsAgentRefuses
 from tessera.services.verification.app_du_run import (
     AppLancee,
     DemarrageEchoue,
@@ -58,6 +59,8 @@ async def _arreter(app: AppLancee | None) -> None:
         return
     try:
         await app.arreter()
+    except DroitsAgentRefuses:
+        raise  # clôture refusée : le run doit finir blocked (ADR-037)
     except Exception as exc:  # noqa: BLE001 — un arrêt raté ne défait pas le run
         _logger.warning("arret_app_du_run_non_confirme", extra={"erreur": str(exc)})
 

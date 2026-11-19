@@ -10216,3 +10216,22 @@ error: Please commit or stash them.
 - 2026-11-19 10:18:10 UTC — [ticket-1008] validateur: APPROVED — Le ticket ticket-1008 est entièrement satisfait. Le profil agent a été migré de  (43813ms)
 - 2026-11-19 10:18:11 UTC — [ticket-1008] CHANGES_REQUESTED tour 3: Reviewer : 1. `_recreer` construit `Path(env[cle]).relative_to(PROFIL_AGENT)` sur des chaînes séparées par des backslashs. Sous Linux, `Path` est un `PosixPath` : `C:\ProgramData\...\AppData\Local\Tem
 - 2026-11-19 10:18:11 UTC — [ticket-1008] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-19 10:58:07 UTC — [ticket-1013] branche ticket-1013-a-refused-closure-of-an-agent-call-is-never-swal
+- 2026-11-19 10:58:10 UTC — [ticket-1013] tour 1 — codeur démarré
+- 2026-11-19 10:59:28 UTC — [ticket-1013] tour 1 — codeur terminé (78125ms)
+- 2026-11-19 11:01:13 UTC — [ticket-1013] testeur: 1 failed, 1464 passed, 3 skipped, 8 warnings in 66.24s (0:01:06) — fichiers en échec : tests/test_longueur_des_fichiers.py
+- 2026-11-19 11:01:14 UTC — [ticket-1013] tests rouges au tour 1
+- 2026-11-19 11:01:14 UTC — [ticket-1013] tour 2 — codeur démarré
+- 2026-11-19 11:02:15 UTC — [ticket-1013] tour 2 — codeur terminé (61250ms)
+- 2026-11-19 11:03:56 UTC — [ticket-1013] testeur: dur�es : ruff 0 s, mypy 9 s, mypy-linux 10 s, pytest 66 s ; impact depuis base : 90 fichier(s) de test
+- 2026-11-19 11:04:04 UTC — [ticket-1013] securite: PASS — Ce diff durcit la gestion d'erreur. `DroitsAgentRefuses` remonte désormais de `_ (7156ms)
+- 2026-11-19 11:04:05 UTC — [ticket-1013] tour 2 — reviewer démarré
+- 2026-11-19 11:04:22 UTC — [ticket-1013] tour 2 — reviewer terminé (17780ms)
+- 2026-11-19 11:04:51 UTC — [ticket-1013] validateur: fichiers cités joints : etape_de_capture.py, agent_sdk.py (tronqué)
+- 2026-11-19 11:04:51 UTC — [ticket-1013] validateur: APPROVED — Le codeur a implémenté les deux changements requis : `_arreter` et `_run_ou_repr (46313ms)
+- 2026-11-19 11:04:51 UTC — [ticket-1013] APPROVED après 2 tour(s)
+- 2026-11-19 11:06:36 UTC — [ticket-1013] leçons: refusée — preuve absente du retour du run
+- 2026-11-19 11:08:23 UTC — [ticket-1013] documentation: 1 fichier(s) (87046ms)
+- 2026-11-19 11:08:23 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-19 11:08:23 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-19 11:08:23 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
