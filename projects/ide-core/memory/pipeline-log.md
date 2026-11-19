@@ -10339,3 +10339,7 @@ error: Please commit or stash them.
 - 2026-11-19 13:46:13 UTC — [ticket-1019] validateur: fichiers cités joints : profil_agent.py ; absents : uv/cache/, npm-cache/
 - 2026-11-19 13:46:13 UTC — [ticket-1019] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les trois tests attendus ont ét (31250ms)
 - 2026-11-19 13:46:13 UTC — [ticket-1019] APPROVED après 1 tour(s)
+- 2026-11-19 13:48:23 UTC — [ticket-1019] documentation: 0 fichier(s) (108327ms) — après tour de correction
+- 2026-11-19 13:48:23 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-19 13:48:23 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-19 13:48:23 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
