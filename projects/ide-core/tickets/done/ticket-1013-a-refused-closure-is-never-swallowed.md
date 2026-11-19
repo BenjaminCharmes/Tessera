@@ -4,7 +4,7 @@ created: 2026-11-19
 depends_on: []
 estimated_days: 1
 id: ticket-1013
-pr_number: null
+pr_number: 1188
 priority: high
 status: done
 title: A refused closure of an agent call is never swallowed
