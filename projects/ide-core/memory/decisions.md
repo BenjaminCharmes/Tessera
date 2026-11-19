@@ -635,10 +635,9 @@ Une ADR qu'aucune règle de `contraintes.md` ni aucun `CLAUDE.md` ne cite part d
 
 ---
 
-## ADR-088 — Fermer le cache uv, détecter le reste du compte agent
+## ADR-088 — Ce que le compte agent garde encore : retiré, fermé ou à trancher
 
 **Date** : 2026-11-19
-**Décision** : amende ADR-087. (1) Processus sorti du job : **détecté**, un jeton illisible absent de l'inventaire du début d'appel met le run `blocked`. (2) Cache uv : **fermé**, `UV_LINK_MODE=copy`, lecture seule pour le compte ; cache npm **accepté** (intégrité vérifiée). (3) Dossiers ouverts à tout utilisateur : **détectés**, fichier du compte purgé ou `blocked`. (4) Fichier protégé créé en sous-dossier : `motif_de_protection` s'applique à chaque fichier ajouté.
-**Raison** : le propriétaire réécrit sa DACL ; uv ne revérifie pas son cache.
-**Alternative rejetée** : intégrité basse ou jeton restreint, qui cassent node et uv.
-**Essais d'abord** : sortie du job, DACL du logon secondaire, cache écrit par `uv run`, dossiers où le compte crée un fichier.
+**Décision** : amende ADR-087, après essais sous le compte. (1) Sortie du job : aucune voie trouvée (WMI refusé ; une tâche planifiée se crée sans s'exécuter). Ses tâches planifiées se **retirent** au dernier appel ; pas d'inventaire des processus illisibles (faux positifs du ticket-997). (2) Cache uv : le compte l'écrit dès `uv run`, donc `UV_LINK_MODE=copy` et le cache **part** avec le profil ; cache npm **accepté** (intégrité vérifiée). (3) Dossiers ouverts à tous : le backend ne purge que le dossier public ; **à trancher** par l'utilisateur, refus à l'installation ou acceptation (ticket-1020). (4) Fichier protégé ajouté pendant un appel : il entre dans l'empreinte, run `blocked`.
+**Raison** : uv ne revérifie pas son cache ; le backend, non administrateur, ne lit pas tous les dossiers partagés.
+**Alternative écartée sans essai** : intégrité basse ou jeton restreint.
