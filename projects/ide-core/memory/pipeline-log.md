@@ -10378,3 +10378,6 @@ error: Please commit or stash them.
 - 2026-11-19 14:39:56 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
 - 2026-11-19 14:39:56 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
 - 2026-11-19 14:39:56 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-19 14:40:45 UTC — [ticket-1018] livraison: rebase sur develop (1016ms)
+- 2026-11-19 14:40:45 UTC — [ticket-1018] livraison: PR #1200 ouverte (7328ms)
+- 2026-11-19 14:40:45 UTC — [ticket-1018] livraison: arrêt — PR ouverte, merge après preuve réelle
