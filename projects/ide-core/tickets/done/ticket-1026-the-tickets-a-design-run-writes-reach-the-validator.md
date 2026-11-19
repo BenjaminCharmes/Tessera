@@ -4,7 +4,7 @@ created: 2026-11-19
 depends_on: []
 estimated_days: 1
 id: ticket-1026
-pr_number: null
+pr_number: 1206
 priority: high
 status: done
 title: The tickets a design run writes are committed with it and reach the validator
