@@ -1,14 +1,14 @@
 ---
-id: ticket-1013
-title: "A refused closure of an agent call is never swallowed"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-11-19
 depends_on: []
 estimated_days: 1
-created: 2026-11-19
+id: ticket-1013
+pr_number: 1188
+priority: high
+status: done
+title: A refused closure of an agent call is never swallowed
+type: fix
 ---
 
 ## Signalement
