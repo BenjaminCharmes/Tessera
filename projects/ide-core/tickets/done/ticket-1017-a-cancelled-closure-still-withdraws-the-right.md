@@ -1,14 +1,15 @@
 ---
-id: ticket-1017
-title: "A cancelled closure still withdraws the right and closes the job"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
-depends_on: ["ticket-1014"]
-estimated_days: 1
 created: 2026-11-19
+depends_on:
+- ticket-1014
+estimated_days: 1
+id: ticket-1017
+pr_number: 1191
+priority: medium
+status: done
+title: A cancelled closure still withdraws the right and closes the job
+type: fix
 ---
 
 ## Signalement

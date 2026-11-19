@@ -114,9 +114,11 @@ class TransportCompteAgent(SubprocessCLITransport):
         """Closes the CLI and its job, removes the call's files, withdraws the write right."""
         process = self._process
         try:
-            await super().close()
-            if isinstance(process, ProcessAgent):
-                await process.aclose()
+            try:
+                await super().close()
+            finally:
+                if isinstance(process, ProcessAgent):
+                    await process.aclose()
         finally:
             supprimer_dossier_d_appel(self._dossier_d_appel)
             self._dossier_d_appel = None

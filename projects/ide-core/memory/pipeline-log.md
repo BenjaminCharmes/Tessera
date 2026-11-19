@@ -10278,3 +10278,16 @@ error: Please commit or stash them.
 - 2026-11-19 12:33:49 UTC — [ticket-1014] livraison: rebase sur develop (609ms)
 - 2026-11-19 12:33:49 UTC — [ticket-1014] livraison: PR #1190 ouverte (5563ms)
 - 2026-11-19 12:33:49 UTC — [ticket-1014] livraison: arrêt — PR ouverte, merge après preuve réelle
+- 2026-11-19 12:45:13 UTC — [ticket-1017] branche ticket-1017-a-cancelled-closure-still-withdraws-the-right-an
+- 2026-11-19 12:45:16 UTC — [ticket-1017] tour 1 — codeur démarré
+- 2026-11-19 12:47:34 UTC — [ticket-1017] tour 1 — codeur terminé (137656ms)
+- 2026-11-19 12:48:47 UTC — [ticket-1017] testeur: dur�es : ruff 0 s, mypy 8 s, mypy-linux 8 s, pytest 30 s ; impact depuis base : 45 fichier(s) de test
+- 2026-11-19 12:49:05 UTC — [ticket-1017] securite: PASS — Le diff ferme une fuite de droit d'écriture : un appel annulé pendant la pose du (17250ms)
+- 2026-11-19 12:49:05 UTC — [ticket-1017] tour 1 — reviewer démarré
+- 2026-11-19 12:49:36 UTC — [ticket-1017] tour 1 — reviewer terminé (30936ms)
+- 2026-11-19 12:49:40 UTC — [ticket-1017] validateur: APPROVED — Les trois critères sont satisfaits. Le code ajoute la protection par `asyncio.sh (35219ms)
+- 2026-11-19 12:49:41 UTC — [ticket-1017] APPROVED après 1 tour(s)
+- 2026-11-19 12:52:10 UTC — [ticket-1017] documentation: 0 fichier(s) (126296ms) — après tour de correction — refusé : doc-technique : README.md : règle « preuve » — la ligne « Le backend Tessera écoute sur le port **8100**, jamais sur 8000 : ce dernier est le port par défaut d'
+- 2026-11-19 12:52:10 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-19 12:52:10 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-19 12:52:10 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
