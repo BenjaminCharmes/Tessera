@@ -10271,3 +10271,7 @@ error: Please commit or stash them.
 - 2026-11-19 12:29:00 UTC — [ticket-1014] validateur: APPROVED — All five acceptance criteria are satisfied. The implementation properly hardens  (51218ms)
 - 2026-11-19 12:29:00 UTC — [ticket-1014] APPROVED après 3 tour(s)
 - 2026-11-19 12:31:06 UTC — [ticket-1014] leçons: une leçon proposée
+- 2026-11-19 12:33:11 UTC — [ticket-1014] documentation: 1 fichier(s) (101625ms)
+- 2026-11-19 12:33:11 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-19 12:33:11 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-19 12:33:11 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
