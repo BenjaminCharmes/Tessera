@@ -14,7 +14,7 @@ from pathlib import Path
 from tessera.config import settings
 from tessera.services.providers.droits_worktree import DroitsAgentRefuses, Icacls, _icacls_reel, poser_ecriture, retirer_ecriture
 from tessera.services.providers.processus_compte import ProcessusIllisibles, processus_du_compte, processus_existe, sid_du_compte
-from tessera.services.providers.profil_agent import reinitialiser_profil
+from tessera.services.providers.profil_agent import nettoyage_en_echec, reinitialiser_profil
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -131,6 +131,8 @@ async def ouvrir_appel(cwd: str | Path, icacls: Icacls = _icacls_reel) -> Path |
     compte = settings.agent_user
     if not compte:
         return None
+    if nettoyage_en_echec():
+        raise DroitsAgentRefuses("le dernier nettoyage du profil de l'agent a échoué : aucun appel avant un nettoyage réussi")
     # Échec fermé : jamais de droit sur un dossier qui n'est pas un worktree de
     # run, le checkout de l'utilisateur en tête (ticket-999, ADR-056).
     racine = racine_du_worktree(cwd)

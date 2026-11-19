@@ -3,6 +3,7 @@
 Pièges observés sur ce projet, une ligne chacun. Le service écrit sous `## Proposées` ; un humain déplace une leçon sous `## En vigueur` pour qu'elle atteigne le codeur et le reviewer.
 
 ## Proposées
+- Quand un nettoyage échoue, les runs suivants sont tous refusés — aucun déblocage possible sans redémarrage. (source : ticket-1014, 2026-11-19)
 
 ## En vigueur
 - Quand tu écris des données de test pour un module sensible, vérifie qu'elles ne déclenchent pas le contrôle de traces professionnelles. (source : ticket-933, 2026-11-11)

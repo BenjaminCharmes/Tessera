@@ -84,9 +84,9 @@ foreach ($Sous in 'Local\Temp', 'Roaming') {
     New-Item -ItemType Directory -Force -Path (Join-Path $Profil $Sous) | Out-Null
 }
 Invoke-Icacls $Profil /grant:r "*S-1-5-18:(OI)(CI)F" "*S-1-5-32-544:(OI)(CI)F" `
-    "${Proprietaire}:(OI)(CI)F" "${Compte}:(OI)(CI)M"
+    "${Proprietaire}:(OI)(CI)F" "${Compte}:(OI)(CI)(IO)M" "${Compte}:(RX,WD,AD)"
 Invoke-Icacls $Profil /inheritance:r
-Write-Host "-> $Profil pret ($Proprietaire : controle total, $Compte : modifier, heritage coupe)"
+Write-Host "-> $Profil pret ($Proprietaire : controle total, $Compte : modifier le contenu seulement, sans DELETE sur le dossier, heritage coupe)"
 
 # 5. Remise du mot de passe : le fichier nait avec son ACL finale (heritage
 #    coupe ; SYSTEM et administrateurs, lecture-suppression pour l'utilisateur),

@@ -6,8 +6,9 @@ from pathlib import Path
 
 import pytest
 
+from tessera.services.providers import profil_agent
 from tessera.services.providers.droits_worktree import DroitsAgentRefuses
-from tessera.services.providers.profil_agent import reinitialiser_profil
+from tessera.services.providers.profil_agent import nettoyage_en_echec, reinitialiser_profil
 
 
 class Icacls:
@@ -17,6 +18,24 @@ class Icacls:
     async def __call__(self, args: list[str]) -> tuple[int, str]:
         self.appels.append(args)
         return 0, ""
+
+
+def _ATTENDU(profil: Path) -> list[list[str]]:
+    p = str(profil)
+    return [
+        [p, "/setowner", "backend", "/T", "/C", "/L"],
+        [p, "/reset", "/T", "/C", "/L"],
+        [p, "/grant", "backend:(OI)(CI)F", "/L"],
+        [p, "/grant", "tessera-agent:(OI)(CI)(IO)M", "/L"],
+        [p, "/grant", "tessera-agent:(RX,WD,AD)", "/L"],
+        [p, "/grant", "*S-1-3-4:(OI)(CI)(RC)", "/L"],
+    ]
+
+
+@pytest.fixture(autouse=True)
+def _remise_a_zero(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(profil_agent, "_NETTOYAGE_ECHOUE", False)
+    monkeypatch.setattr(profil_agent, "compte_du_backend", lambda: "backend")
 
 
 @pytest.fixture
@@ -41,7 +60,7 @@ async def test_user_files_are_removed_and_both_caches_kept(profil: Path) -> None
     assert [p.name for p in (profil / "uv").iterdir()] == ["cache"]
     assert (profil / "npm-cache" / "_cacache" / "index").read_text() == "i"
     assert (profil / "uv" / "cache" / "wheel").read_text() == "w"
-    assert icacls.appels == [[str(profil), "/grant", "tessera-agent:(OI)(CI)M", "/L"]]
+    assert icacls.appels == _ATTENDU(profil)
 
 
 async def test_read_only_file_is_removed(profil: Path) -> None:
@@ -75,11 +94,58 @@ async def test_a_failed_removal_raises_droits_refuses(profil: Path, monkeypatch:
         await reinitialiser_profil("tessera-agent", Icacls(), profil)
 
 
-async def test_an_absent_folder_is_left_alone(tmp_path: Path) -> None:
+async def test_the_account_is_dispossessed_before_the_purge(profil: Path) -> None:
+    """`/setowner` then `/reset` come before the first deletion."""
+    (profil / "piege.txt").write_text("x")
+    vu: list[bool] = []
+
+    class Espion(Icacls):
+        async def __call__(self, args: list[str]) -> tuple[int, str]:
+            if args[1] == "/reset":
+                vu.append((profil / "piege.txt").exists())
+            return await super().__call__(args)
+
+    await reinitialiser_profil("tessera-agent", Espion(), profil)
+    assert vu == [True]
+    assert not (profil / "piege.txt").exists()
+
+
+async def test_an_absent_profile_raises_droits_refuses(tmp_path: Path) -> None:
     icacls = Icacls()
-    await reinitialiser_profil("tessera-agent", icacls, tmp_path / "absent")
+    with pytest.raises(DroitsAgentRefuses):
+        await reinitialiser_profil("tessera-agent", icacls, tmp_path / "absent")
     assert icacls.appels == []
-    assert not (tmp_path / "absent").exists()
+    assert nettoyage_en_echec()
+
+
+async def test_a_successful_wipe_clears_the_failure_flag(profil: Path, tmp_path: Path) -> None:
+    with pytest.raises(DroitsAgentRefuses):
+        await reinitialiser_profil("tessera-agent", Icacls(), tmp_path / "absent")
+    await reinitialiser_profil("tessera-agent", Icacls(), profil)
+    assert not nettoyage_en_echec()
+
+
+async def test_a_failing_icacls_raises_the_flag(profil: Path) -> None:
+    class Refus(Icacls):
+        async def __call__(self, args: list[str]) -> tuple[int, str]:
+            return 5, "refusé"
+
+    with pytest.raises(DroitsAgentRefuses):
+        await reinitialiser_profil("tessera-agent", Refus(), profil)
+    assert nettoyage_en_echec()
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="extended-length paths")
+async def test_a_reserved_name_and_a_very_long_path_are_removed(profil: Path) -> None:
+    sep = os.sep
+    prefixe = sep * 2 + "?" + sep + str(profil.resolve())
+    os.makedirs(prefixe + sep + sep.join(["d" * 50] * 7))
+    reserve = prefixe + sep + "x."
+    with open(reserve, "w") as f:
+        f.write("x")
+    await reinitialiser_profil("tessera-agent", Icacls(), profil)
+    assert not os.path.exists(reserve)
+    assert not os.path.exists(prefixe + sep + "d" * 50)
 
 
 async def test_temp_and_appdata_folders_exist_after_the_reset(profil: Path) -> None:
