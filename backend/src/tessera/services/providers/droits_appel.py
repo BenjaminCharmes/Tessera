@@ -7,6 +7,7 @@ son droit est retiré ; le suivant le repose. Un échec est une
 `DroitsAgentRefuses` : le run passe en `blocked` (ADR-037).
 """
 import asyncio
+from collections import deque
 from collections.abc import Awaitable, Callable
 from pathlib import Path
 
@@ -23,7 +24,11 @@ Enumerer = Callable[[str], Awaitable[list[tuple[int, str]]]]
 Tuer = Callable[[int], Awaitable[None]]
 
 _ACTIFS: dict[Path, int] = {}
-_VERROU = asyncio.Lock()
+_VERROU = asyncio.Condition()
+#: Appels en attente d'une autre racine, dans l'ordre d'arrivée.
+_FILE: deque[object] = deque()
+#: Au-delà, l'attente est journalisée (secondes).
+_ATTENTE_JOURNALISEE_S = 5.0
 
 
 async def _executer(*args: str) -> tuple[int, str]:
@@ -81,9 +86,33 @@ async def arreter_les_restants(compte: str, enumerer: Enumerer, tuer: Tuer) -> N
         raise illisibles
 
 
+def _peut_passer(racine: Path, jeton: object) -> bool:
+    """Whether a call on `racine` may start now: same root as the active ones, or nobody active and first in line."""
+    if settings.agent_calls_parallel or racine in _ACTIFS:
+        return True
+    return not _ACTIFS and _FILE[0] is jeton
+
+
+async def _attendre_son_tour(racine: Path, jeton: object) -> None:
+    """Wait (lock held on entry) until `_peut_passer`; log the wait once past a few seconds."""
+    journalise = False
+    while not _peut_passer(racine, jeton):
+        try:
+            await asyncio.wait_for(_VERROU.wait(), _ATTENTE_JOURNALISEE_S)
+        except TimeoutError:
+            if not journalise:
+                journalise = True
+                _logger.warning("appel_agent_en_attente", extra={"racine": str(racine), "actifs": len(_ACTIFS)})
+
+
 async def ouvrir_appel(cwd: str | Path, icacls: Icacls = _icacls_reel) -> Path | None:
     """Give the account its write right on the worktree of `cwd`; returns its root.
 
+    One worktree at a time carries calls under the account: a call on another
+    root waits, in arrival order, for the active ones to end (several calls on
+    the same root overlap). `AGENT_CALLS_PARALLEL=true` lifts the wait. A test
+    command or the visual-check app counts as a call: the app holds the account
+    for as long as it runs.
     `None` sans `AGENT_USER` ou hors d'un dépôt : rien n'est posé, rien ne sera retiré.
     """
     compte = settings.agent_user
@@ -94,10 +123,18 @@ async def ouvrir_appel(cwd: str | Path, icacls: Icacls = _icacls_reel) -> Path |
     # run, le checkout de l'utilisateur en tête (ticket-999, ADR-056).
     if not _sous_les_worktrees(racine):
         raise DroitsAgentRefuses(f"{racine} n'est pas sous le dossier des worktrees : aucun droit posé")
+    jeton = object()
     async with _VERROU:
-        if _ACTIFS.get(racine, 0) == 0:
-            await poser_ecriture(racine, compte, icacls)
-        _ACTIFS[racine] = _ACTIFS.get(racine, 0) + 1
+        _FILE.append(jeton)
+        try:
+            await _attendre_son_tour(racine, jeton)
+            if _ACTIFS.get(racine, 0) == 0:
+                await poser_ecriture(racine, compte, icacls)
+            _ACTIFS[racine] = _ACTIFS.get(racine, 0) + 1
+        finally:
+            # Annulé ou refusé pendant l'attente : la place se libère, aucun compteur posé.
+            _FILE.remove(jeton)
+            _VERROU.notify_all()
     return racine
 
 
@@ -110,19 +147,29 @@ async def clore_appel(
     if racine is None or not compte:
         return
     async with _VERROU:
-        restant = _ACTIFS.get(racine, 1) - 1
-        if restant > 0:
-            _ACTIFS[racine] = restant
-            return
-        _ACTIFS.pop(racine, None)
-        erreur: DroitsAgentRefuses | None = None
-        # Un appel en cours sur un autre worktree, sous le même compte : rien n'est
-        # tué (le job de chaque appel a déjà fermé le sien).
-        if not _ACTIFS:
-            try:
-                await arreter_les_restants(compte, enumerer, tuer)
-            except DroitsAgentRefuses as exc:
-                erreur = exc
-        await retirer_ecriture(racine, compte, icacls)
-        if erreur is not None:
-            raise erreur
+        try:
+            await _clore_sous_verrou(racine, compte, icacls, enumerer, tuer)
+        finally:
+            _VERROU.notify_all()
+
+
+async def _clore_sous_verrou(
+    racine: Path, compte: str, icacls: Icacls, enumerer: Enumerer, tuer: Tuer,
+) -> None:
+    """Body of `clore_appel`, the condition lock held."""
+    restant = _ACTIFS.get(racine, 1) - 1
+    if restant > 0:
+        _ACTIFS[racine] = restant
+        return
+    _ACTIFS.pop(racine, None)
+    erreur: DroitsAgentRefuses | None = None
+    # Un appel en cours sur un autre worktree, sous le même compte : rien n'est
+    # tué (le job de chaque appel a déjà fermé le sien).
+    if not _ACTIFS:
+        try:
+            await arreter_les_restants(compte, enumerer, tuer)
+        except DroitsAgentRefuses as exc:
+            erreur = exc
+    await retirer_ecriture(racine, compte, icacls)
+    if erreur is not None:
+        raise erreur

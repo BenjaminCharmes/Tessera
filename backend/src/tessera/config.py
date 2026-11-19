@@ -87,6 +87,9 @@ class Settings(BaseSettings):
     # backend, comme avant. Mot de passe et jeton OAuth vivent au coffre.
     agent_user: str = ""
     agent_logon_password: SecretStr = SecretStr("")
+    # Vrai : les appels de worktrees différents se recouvrent sous le compte ;
+    # faux (défaut), un seul worktree à la fois (ADR-087).
+    agent_calls_parallel: bool = False
     agent_oauth_token: SecretStr = SecretStr("")
     # Identifiant d'équipe Vercel : pas un secret.
     vercel_team_id: str = ""

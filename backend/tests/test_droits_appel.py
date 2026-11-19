@@ -1,4 +1,5 @@
 """The agent account writes in a worktree only during a call — ticket-943."""
+import asyncio
 import getpass
 from pathlib import Path
 
@@ -43,6 +44,9 @@ class Processus:
 def compte(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(settings, "agent_user", COMPTE)
     droits_appel._ACTIFS.clear()
+    droits_appel._FILE.clear()
+    # Une condition se lie à la boucle de son premier `wait` : une neuve par test.
+    monkeypatch.setattr(droits_appel, "_VERROU", asyncio.Condition())
 
 
 @pytest.fixture
@@ -169,3 +173,80 @@ async def test_step_group_ends_the_call_of_its_process() -> None:
     groupe.rattacher(1, Compte(None))  # type: ignore[arg-type]
     await groupe.fermer_et_clore()
     assert Compte.clos == 1
+
+
+@pytest.fixture
+def deux_worktrees(worktree: Path) -> tuple[Path, Path]:
+    autre = worktree.parent / "ticket-2"
+    (autre / ".git").mkdir(parents=True)
+    return worktree, autre
+
+
+async def _laisser_tourner() -> None:
+    for _ in range(5):
+        await asyncio.sleep(0)
+
+
+async def test_a_call_on_another_root_waits_for_the_first_to_close(deux_worktrees: tuple[Path, Path]) -> None:
+    premier, second = deux_worktrees
+    icacls, processus = Icacls(), Processus([])
+    racine = await ouvrir_appel(premier, icacls)
+    tache = asyncio.create_task(ouvrir_appel(second, icacls))
+    await _laisser_tourner()
+    assert not tache.done()
+    await clore_appel(racine, icacls, processus.enumerer, processus.tuer)
+    assert await asyncio.wait_for(tache, 1) == second.resolve()
+
+
+async def test_a_call_on_the_same_root_passes(worktree: Path) -> None:
+    icacls = Icacls()
+    await ouvrir_appel(worktree, icacls)
+    await asyncio.wait_for(ouvrir_appel(worktree, icacls), 1)
+    assert droits_appel._ACTIFS[worktree.resolve()] == 2
+
+
+async def test_parallel_setting_lets_both_roots_through(
+    deux_worktrees: tuple[Path, Path], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(settings, "agent_calls_parallel", True)
+    icacls = Icacls()
+    await ouvrir_appel(deux_worktrees[0], icacls)
+    await asyncio.wait_for(ouvrir_appel(deux_worktrees[1], icacls), 1)
+    assert len(droits_appel._ACTIFS) == 2
+
+
+async def test_cancel_while_waiting_leaves_no_counter(deux_worktrees: tuple[Path, Path]) -> None:
+    icacls = Icacls()
+    await ouvrir_appel(deux_worktrees[0], icacls)
+    tache = asyncio.create_task(ouvrir_appel(deux_worktrees[1], icacls))
+    await _laisser_tourner()
+    tache.cancel()
+    with pytest.raises(asyncio.CancelledError):
+        await tache
+    assert list(droits_appel._ACTIFS) == [deux_worktrees[0].resolve()]
+    assert not droits_appel._FILE
+
+
+async def test_waiters_are_served_in_arrival_order(deux_worktrees: tuple[Path, Path]) -> None:
+    premier, second = deux_worktrees
+    troisieme = premier.parent / "ticket-3"
+    (troisieme / ".git").mkdir(parents=True)
+    icacls, processus = Icacls(), Processus([])
+    racine = await ouvrir_appel(premier, icacls)
+    t2 = asyncio.create_task(ouvrir_appel(second, icacls))
+    await _laisser_tourner()
+    t3 = asyncio.create_task(ouvrir_appel(troisieme, icacls))
+    await _laisser_tourner()
+    await clore_appel(racine, icacls, processus.enumerer, processus.tuer)
+    await _laisser_tourner()
+    assert t2.done() and not t3.done()
+    await clore_appel(await t2, icacls, processus.enumerer, processus.tuer)
+    assert await asyncio.wait_for(t3, 1) == troisieme.resolve()
+
+
+async def test_without_agent_user_there_is_no_wait(
+    deux_worktrees: tuple[Path, Path], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(settings, "agent_user", "")
+    assert await asyncio.wait_for(ouvrir_appel(deux_worktrees[0]), 1) is None
+    assert await asyncio.wait_for(ouvrir_appel(deux_worktrees[1]), 1) is None
