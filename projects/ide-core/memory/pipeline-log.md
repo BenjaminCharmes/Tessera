@@ -10252,3 +10252,22 @@ error: Please commit or stash them.
 - 2026-11-19 11:08:23 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
 - 2026-11-19 11:08:23 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
 - 2026-11-19 11:08:23 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-19 11:14:29 UTC — [ide-core] ticket-1013 PR #1188 mergée (CI verte)
+- 2026-11-19 12:01:05 UTC — [ticket-1014] branche ticket-1014-the-agent-profile-wipe-cannot-be-bypassed-and-fa
+- 2026-11-19 12:01:08 UTC — [ticket-1014] tour 1 — codeur démarré
+- 2026-11-19 12:05:36 UTC — [ticket-1014] tour 1 — codeur terminé (267640ms)
+- 2026-11-19 12:08:22 UTC — [ticket-1014] testeur: 1 failed, 1767 passed, 3 skipped, 113 warnings in 123.81s (0:02:03) — fichiers en échec : tests/test_agent_setup_scripts.py
+- 2026-11-19 12:08:22 UTC — [ticket-1014] tests rouges au tour 1
+- 2026-11-19 12:08:22 UTC — [ticket-1014] tour 2 — codeur démarré
+- 2026-11-19 12:08:46 UTC — [ticket-1014] tour 2 — codeur terminé (23890ms)
+- 2026-11-19 12:17:12 UTC — [ticket-1014] testeur: 1 failed, 5087 passed, 3 skipped, 113 warnings in 462.42s (0:07:42) — fichiers en échec : tests/test_ruff_propre.py
+- 2026-11-19 12:17:12 UTC — [ticket-1014] tests rouges au tour 2
+- 2026-11-19 12:17:13 UTC — [ticket-1014] tour 3 — codeur démarré
+- 2026-11-19 12:17:53 UTC — [ticket-1014] tour 3 — codeur terminé (39811ms)
+- 2026-11-19 12:27:35 UTC — [ticket-1014] testeur: dur�es : ruff 0 s, mypy 13 s, mypy-linux 18 s, pytest 543 s ; impact depuis base : suite compl�te
+- 2026-11-19 12:28:08 UTC — [ticket-1014] securite: PASS — PASS : rien de CRITICAL ni de HIGH introduit. Le diff durcit le nettoyage du pro (32140ms)
+- 2026-11-19 12:28:08 UTC — [ticket-1014] tour 3 — reviewer démarré
+- 2026-11-19 12:28:44 UTC — [ticket-1014] tour 3 — reviewer terminé (35859ms)
+- 2026-11-19 12:29:00 UTC — [ticket-1014] validateur: APPROVED — All five acceptance criteria are satisfied. The implementation properly hardens  (51218ms)
+- 2026-11-19 12:29:00 UTC — [ticket-1014] APPROVED après 3 tour(s)
+- 2026-11-19 12:31:06 UTC — [ticket-1014] leçons: une leçon proposée
