@@ -10445,3 +10445,8 @@ error: Please commit or stash them.
 - 2026-11-19 15:51:58 UTC — [ticket-1026] validateur: APPROVED — Les trois critères testent l'intégration de fiches créées sous `tickets/todo/` d (28062ms)
 - 2026-11-19 15:52:11 UTC — [ticket-1026] tour 1 — reviewer terminé (39859ms)
 - 2026-11-19 15:52:12 UTC — [ticket-1026] APPROVED après 1 tour(s)
+- 2026-11-19 15:54:41 UTC — [ticket-1026] documentation: 0 fichier(s) (113670ms)
+- 2026-11-19 15:54:41 UTC — [ticket-944] documentation: pas de diff retrouvable, non documenté
+- 2026-11-19 15:54:41 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-19 15:54:41 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-19 15:54:41 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
