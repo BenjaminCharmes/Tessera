@@ -10176,3 +10176,19 @@ error: Please commit or stash them.
 - 2026-11-19 09:00:47 UTC — [ticket-1006] livraison: rebase sur develop (563ms)
 - 2026-11-19 09:00:47 UTC — [ticket-1006] livraison: PR #1182 ouverte (5265ms)
 - 2026-11-19 09:00:47 UTC — [ticket-1006] livraison: arrêt — PR ouverte, merge après preuve réelle
+- 2026-11-19 09:17:02 UTC — [ticket-1007] branche ticket-1007-two-worktrees-never-carry-a-call-under-the-agent
+- 2026-11-19 09:17:05 UTC — [ticket-1007] tour 1 — codeur démarré
+- 2026-11-19 09:18:33 UTC — [ticket-1007] tour 1 — codeur terminé (87530ms)
+- 2026-11-19 09:26:44 UTC — [ticket-1007] testeur: dur�es : ruff 0 s, mypy 15 s, mypy-linux 15 s, pytest 447 s ; impact depuis base : 307 fichier(s) de test
+- 2026-11-19 09:27:04 UTC — [ticket-1007] securite: PASS — Le diff ne fait que sérialiser par défaut les appels du compte agent par worktre (19422ms)
+- 2026-11-19 09:27:04 UTC — [ticket-1007] tour 1 — reviewer démarré
+- 2026-11-19 09:27:47 UTC — [ticket-1007] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente une file d'a (42453ms)
+- 2026-11-19 09:28:04 UTC — [ticket-1007] tour 1 — reviewer terminé (59702ms)
+- 2026-11-19 09:28:04 UTC — [ticket-1007] APPROVED après 1 tour(s)
+- 2026-11-19 09:31:05 UTC — [ticket-1007] documentation: 0 fichier(s) (161594ms) — après tour de correction
+- 2026-11-19 09:31:05 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-19 09:31:05 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-19 09:31:05 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-19 09:31:40 UTC — [ticket-1007] livraison: rebase sur develop (563ms)
+- 2026-11-19 09:31:40 UTC — [ticket-1007] livraison: PR #1183 ouverte (5672ms)
+- 2026-11-19 09:31:40 UTC — [ticket-1007] livraison: arrêt — PR ouverte, merge après preuve réelle

@@ -1,12 +1,13 @@
 ---
-id: ticket-1007
-title: "Two worktrees never carry a call under the agent account at the same time"
-type: fix
-status: todo
-priority: high
 agent: codeur
 depends_on: []
+id: ticket-1007
+pr_number: 1183
 preuve_reelle: true
+priority: high
+status: done
+title: Two worktrees never carry a call under the agent account at the same time
+type: fix
 ---
 
 ## Signalement
@@ -45,6 +46,19 @@ Lancer deux runs de deux projets à la fois sous `AGENT_USER` ; constater dans l
 journal que les appels du second attendent ceux du premier, que les deux runs
 aboutissent, et que `AGENT_CALLS_PARALLEL=true` les fait se recouvrir. Noter la
 durée totale comparée.
+
+### Faite le 19/11, sur le poste, sous le compte agent
+
+Deux worktrees de Serpent, un appel de cinq secondes dans chacun, demandés
+ensemble (Serpent est le seul projet sous le compte : deux runs de deux
+projets ne sont pas encore possibles).
+
+- Défaut : le second appel attend la clôture du premier (`appel_agent_en_attente`
+  au journal), puis part ; les deux aboutissent. Durée totale : 11,4 s.
+- `AGENT_CALLS_PARALLEL=true` : les deux se recouvrent. Durée totale : 6,0 s.
+
+Limite relevée : l'attente n'a pas de délai. Un appel jamais clos ferait
+attendre tous les autres worktrees ; chaque appelant clôt dans un `finally`.
 
 ## Ce que ça ne fait pas
 
