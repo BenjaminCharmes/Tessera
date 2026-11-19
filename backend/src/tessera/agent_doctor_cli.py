@@ -16,7 +16,7 @@ from collections.abc import Sequence
 from pathlib import Path
 
 from tessera.config import settings
-from tessera.services.providers.env_agent import profil_de
+from tessera.services.providers.env_agent import CLI_PARTAGE, profil_de
 from tessera.services.providers.lanceur_agent import LanceurAgent
 from tessera.services.providers.profil_agent import DOSSIER_PROFIL
 from tessera.services.verification.chaine_python import CHAINE_PYTHON
@@ -29,6 +29,7 @@ OUTILS: tuple[tuple[str, ...], ...] = (
     ("uv", "--version"),
     ("uv", "run", "--no-project", "python", "--version"),
     ("npm", "config", "get", "cache"),
+    (CLI_PARTAGE, "--version"),
 )
 DELAI_S = 20.0
 _CONSEIL = "lancer `agent setup`"
@@ -97,6 +98,8 @@ def _libelle(commande: Sequence[str]) -> str:
     """Name a check on its output line."""
     if commande[0] == "npm":
         return "npm cache"
+    if commande[0] == CLI_PARTAGE:
+        return "claude"
     return "python (uv run)" if "python" in commande else commande[0]
 
 

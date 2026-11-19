@@ -23,7 +23,11 @@ from tessera.services.providers.process_agent import ProcessAgent
 # dynamiquement, le module s'importe et se type aussi sous Linux (CI, mypy-linux).
 _CTYPES: Any = ctypes
 
-_LOGON_WITH_PROFILE = 0x1
+#: Aucun drapeau de logon : la ruche du compte n'est pas chargée, `HKCU` n'est pas
+#: inscriptible par l'agent (un `AutoRun` de `cmd.exe` y survivait d'un appel à
+#: l'autre). L'environnement est bâti de zéro (ADR-085), le profil de fichiers
+#: vient du ticket-1008. Constante, pas réglage (ticket-1009).
+_LOGON_SANS_PROFIL = 0
 _CREATE_UNICODE_ENVIRONMENT = 0x400
 _CREATE_NO_WINDOW = 0x08000000
 _CREATE_SUSPENDED = 0x4
@@ -141,7 +145,7 @@ def lancer_dans_un_job(
     compte, mot_de_passe, ligne, env, cwd = cible
     si, info = structures
     ok = adv.CreateProcessWithLogonW(
-        compte, ".", mot_de_passe, _LOGON_WITH_PROFILE, None, ligne,
+        compte, ".", mot_de_passe, _LOGON_SANS_PROFIL, None, ligne,
         _CREATE_UNICODE_ENVIRONMENT | _CREATE_NO_WINDOW | _CREATE_SUSPENDED, env,
         cwd, ctypes.byref(si), ctypes.byref(info),
     )
