@@ -15,6 +15,7 @@ from tessera.config import settings
 from tessera.services.providers.droits_worktree import DroitsAgentRefuses, Icacls, _icacls_reel, poser_ecriture, retirer_ecriture
 from tessera.services.providers.processus_compte import ProcessusIllisibles, processus_du_compte, processus_existe, sid_du_compte
 from tessera.services.providers.profil_agent import nettoyage_en_echec, reinitialiser_profil
+from tessera.services.providers.taches_compte import retirer_les_taches, taches_en_echec
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -125,10 +126,11 @@ async def _retenter_le_nettoyage(compte: str, icacls: Icacls) -> None:
     jusqu'au redémarrage du backend (ticket-1014). Jamais pendant un autre appel :
     le profil qu'il utilise ne se vide pas sous lui.
     """
-    if not nettoyage_en_echec():
+    if not (nettoyage_en_echec() or taches_en_echec()):
         return
     if _ACTIFS:
-        raise DroitsAgentRefuses("le dernier nettoyage du profil de l'agent a échoué : aucun appel avant un nettoyage réussi")
+        raise DroitsAgentRefuses("le dernier nettoyage du compte de l'agent a échoué : aucun appel avant un nettoyage réussi")
+    await retirer_les_taches()
     await reinitialiser_profil(compte, icacls)
 
 
@@ -230,12 +232,25 @@ async def _clore_sous_verrou(
     # Un appel en cours sur un autre worktree, sous le même compte : rien n'est
     # tué (le job de chaque appel a déjà fermé le sien).
     if not _ACTIFS:
-        try:
-            await arreter_les_restants(compte, enumerer, tuer)
-            # Processus arrêtés : plus rien ne tient un fichier du profil (ticket-1008).
-            await reinitialiser_profil(compte, icacls)
-        except DroitsAgentRefuses as exc:
-            erreur = exc
+        erreur = await _nettoyer_le_compte(compte, icacls, enumerer, tuer)
     await retirer_ecriture(racine, compte, icacls)
     if erreur is not None:
         raise erreur
+
+
+async def _nettoyer_le_compte(
+    compte: str, icacls: Icacls, enumerer: Enumerer, tuer: Tuer,
+) -> DroitsAgentRefuses | None:
+    """Remove the tasks, stop the leftovers, wipe the profile: each step runs whatever the others do; the first refusal is returned."""
+    premiere: DroitsAgentRefuses | None = None
+    try:
+        await retirer_les_taches()
+    except DroitsAgentRefuses as exc:
+        premiere = exc
+    try:
+        await arreter_les_restants(compte, enumerer, tuer)
+        # Processus arrêtés : plus rien ne tient un fichier du profil (ticket-1008).
+        await reinitialiser_profil(compte, icacls)
+    except DroitsAgentRefuses as exc:
+        premiere = premiere or exc
+    return premiere

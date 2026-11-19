@@ -10347,6 +10347,40 @@ error: Please commit or stash them.
 - 2026-11-19 13:50:58 UTC — [ticket-1019] livraison: tests relancés après rebase : verts (dur�es : ruff 0 s, mypy 11 s, mypy-linux 11 s, pytest 120 s ; impact depuis base : 136 fichier(s) de test) (120937ms)
 - 2026-11-19 13:50:58 UTC — [ticket-1019] livraison: PR #1197 ouverte (5297ms)
 - 2026-11-19 13:50:58 UTC — [ticket-1019] livraison: arrêt — PR ouverte, merge après preuve réelle
+- 2026-11-19 14:13:29 UTC — [ide-core] ticket-1022 PR #1199 non surveillée (livraison arrêtée)
+- 2026-11-19 14:13:39 UTC — [ticket-1018] branche ticket-1018-scheduled-tasks-of-the-agent-account-are-removed
+- 2026-11-19 14:13:43 UTC — [ticket-1018] tour 1 — codeur démarré
+- 2026-11-19 14:15:50 UTC — [ticket-1018] tour 1 — codeur terminé (126359ms)
+- 2026-11-19 14:20:11 UTC — [ticket-1018] testeur: dur�es : ruff 0 s, mypy 22 s, mypy-linux 23 s, pytest 210 s ; impact depuis base : 109 fichier(s) de test
+- 2026-11-19 14:20:44 UTC — [ticket-1018] securite: PASS — PASS : rien de CRITICAL ni de HIGH n'est introduit. Les noms de tâches viennent  (32342ms)
+- 2026-11-19 14:20:45 UTC — [ticket-1018] tour 1 — reviewer démarré
+- 2026-11-19 14:21:12 UTC — [ticket-1018] validateur: APPROVED — Le diff implémente complètement le module `taches_compte.py` avec `retirer_les_t (26563ms)
+- 2026-11-19 14:21:26 UTC — [ticket-1018] tour 1 — reviewer terminé (40546ms)
+- 2026-11-19 14:21:26 UTC — [ticket-1018] CHANGES_REQUESTED tour 1: Reviewer : 1. `retirer_les_taches` passe par `lancer_sous_compte`, qui lève `EchecLancementCompte` quand le mot de passe manque ou que le lanceur est indisponible (`ProviderIndisponible` emballé). Or 
+- 2026-11-19 14:21:26 UTC — [ticket-1018] tour 2 — codeur démarré
+- 2026-11-19 14:22:54 UTC — [ticket-1018] tour 2 — codeur terminé (86969ms)
+- 2026-11-19 14:27:14 UTC — [ticket-1018] testeur: dur�es : ruff 0 s, mypy 21 s, mypy-linux 21 s, pytest 207 s ; impact depuis base : 109 fichier(s) de test
+- 2026-11-19 14:27:40 UTC — [ticket-1018] securite: PASS — Le diff ajoute la suppression des tâches planifiées du compte agent. Les command (25594ms)
+- 2026-11-19 14:27:41 UTC — [ticket-1018] tour 2 — reviewer démarré
+- 2026-11-19 14:28:12 UTC — [ticket-1018] tour 2 — reviewer terminé (30922ms)
+- 2026-11-19 14:28:13 UTC — [ticket-1018] validateur: APPROVED — Les quatre critères d'acceptation sont satisfaits. L'implémentation de `taches_c (31359ms)
+- 2026-11-19 14:28:13 UTC — [ticket-1018] CHANGES_REQUESTED tour 2: Reviewer : 1. Dans `_clore_sous_verrou`, `retirer_les_taches()` est appelé en tête du même bloc `try` que `arreter_les_restants` et `reinitialiser_profil`. Si la liste ou une suppression de tâche lève
+- 2026-11-19 14:28:13 UTC — [ticket-1018] tour 3 — codeur démarré
+- 2026-11-19 14:30:16 UTC — [ticket-1018] tour 3 — codeur terminé (122578ms)
+- 2026-11-19 14:34:40 UTC — [ticket-1018] testeur: dur�es : ruff 0 s, mypy 22 s, mypy-linux 22 s, pytest 209 s ; impact depuis base : 109 fichier(s) de test
+- 2026-11-19 14:35:22 UTC — [ticket-1018] securite: PASS — Aucune faille CRITICAL ou HIGH introduite, donc PASS. Les commandes schtasks par (40829ms)
+- 2026-11-19 14:35:23 UTC — [ticket-1018] tour 3 — reviewer démarré
+- 2026-11-19 14:35:49 UTC — [ticket-1018] tour 3 — reviewer terminé (25969ms)
+- 2026-11-19 14:36:12 UTC — [ticket-1018] validateur: APPROVED — Les quatre critères sont satisfaits. Le nouveau module `taches_compte.py` implém (49469ms)
+- 2026-11-19 14:36:13 UTC — [ticket-1018] APPROVED après 3 tour(s)
+- 2026-11-19 14:37:34 UTC — [ticket-1018] leçons: refusée — preuve absente du retour du run
+- 2026-11-19 14:39:56 UTC — [ticket-1018] documentation: 0 fichier(s) (113889ms)
+- 2026-11-19 14:39:56 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-19 14:39:56 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-19 14:39:56 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-19 14:40:45 UTC — [ticket-1018] livraison: rebase sur develop (1016ms)
+- 2026-11-19 14:40:45 UTC — [ticket-1018] livraison: PR #1200 ouverte (7328ms)
+- 2026-11-19 14:40:45 UTC — [ticket-1018] livraison: arrêt — PR ouverte, merge après preuve réelle
 - 2026-11-19 13:41:27 UTC — [ide-core] ticket-1021 PR #1195 mergée (CI verte)
 - 2026-11-19 13:52:41 UTC — [ticket-1022] branche ticket-1022-a-test-command-opens-one-call-for-all-its-steps
 - 2026-11-19 13:52:45 UTC — [ticket-1022] tour 1 — codeur démarré
@@ -10370,3 +10404,34 @@ error: Please commit or stash them.
 - 2026-11-19 14:13:27 UTC — [ticket-1022] livraison: tests relancés après rebase : verts (dur�es : ruff 0 s, mypy 17 s, mypy-linux 21 s, pytest 294 s ; impact depuis base : 87 fichier(s) de test) (295375ms)
 - 2026-11-19 14:13:27 UTC — [ticket-1022] livraison: PR #1199 ouverte (6109ms)
 - 2026-11-19 14:13:27 UTC — [ticket-1022] livraison: arrêt — PR ouverte, merge après preuve réelle
+- 2026-11-19 14:40:48 UTC — [ide-core] ticket-1018 PR #1200 non surveillée (livraison arrêtée)
+- 2026-11-19 15:08:08 UTC — [ticket-944] branche ticket-944-design-the-agent-account-runs-on-its-own-window-s
+- 2026-11-19 15:08:13 UTC — [ticket-944] tour 1 — codeur démarré
+- 2026-11-19 15:10:36 UTC — [ticket-944] tour 1 — architect terminé (143077ms)
+- 2026-11-19 15:11:51 UTC — [ticket-944] testeur: OK (exit 0)
+- 2026-11-19 15:12:00 UTC — [ticket-944] securite: PASS — Le diff ne touche que de la documentation : il ajoute une règle sous `## Proposé (7905ms)
+- 2026-11-19 15:12:01 UTC — [ticket-944] tour 1 — reviewer démarré
+- 2026-11-19 15:12:42 UTC — [ticket-944] tour 1 — reviewer terminé (41000ms)
+- 2026-11-19 15:13:03 UTC — [ticket-944] validateur: fichiers cités joints : memory/decisions.md (tronqué) ; non joints (budget épuisé) : tickets/todo/
+- 2026-11-19 15:13:03 UTC — [ticket-944] validateur: CHANGES_REQUESTED — Le ticket de conception a rempli son rôle : il a choisi la piste (window station (62203ms)
+- 2026-11-19 15:13:04 UTC — [ticket-944] CHANGES_REQUESTED tour 1: Validateur : Le ticket de conception a rempli son rôle : il a choisi la piste (window station + bureau dédiés en défense en profondeur), écrit l'ADR-089 correspondante avec ses limites bien énoncées, 
+- 2026-11-19 15:13:04 UTC — [ticket-944] tour 2 — codeur démarré
+- 2026-11-19 15:13:14 UTC — [ticket-944] tour 2 — architect terminé (10015ms)
+- 2026-11-19 15:14:32 UTC — [ticket-944] testeur: OK (exit 0)
+- 2026-11-19 15:14:41 UTC — [ticket-944] securite: PASS — Le diff ne touche que de la documentation : une ADR-089 ajoutée à decisions.md e (8015ms)
+- 2026-11-19 15:14:42 UTC — [ticket-944] tour 2 — reviewer démarré
+- 2026-11-19 15:15:07 UTC — [ticket-944] tour 2 — reviewer terminé (24952ms)
+- 2026-11-19 15:15:17 UTC — [ticket-944] validateur: fichiers cités joints : memory/decisions.md (tronqué) ; non joints (budget épuisé) : tickets/todo/
+- 2026-11-19 15:15:17 UTC — [ticket-944] validateur: CHANGES_REQUESTED — Le ticket de conception a rempli son rôle : il a tranché entre les trois pistes  (35295ms)
+- 2026-11-19 15:15:17 UTC — [ticket-944] CHANGES_REQUESTED tour 2: Validateur : Le ticket de conception a rempli son rôle : il a tranché entre les trois pistes (window station + bureau dédiés), écrit l'ADR-089 correspondante avec ses limites explicitées, et créé deux
+- 2026-11-19 15:15:17 UTC — [ticket-944] tour 3 — codeur démarré
+- 2026-11-19 15:15:26 UTC — [ticket-944] tour 3 — architect terminé (7547ms)
+- 2026-11-19 15:16:41 UTC — [ticket-944] testeur: OK (exit 0)
+- 2026-11-19 15:16:51 UTC — [ticket-944] securite: PASS — PASS : le diff ne change que de la documentation. Il ajoute une règle sous « Pro (9094ms)
+- 2026-11-19 15:16:52 UTC — [ticket-944] tour 3 — reviewer démarré
+- 2026-11-19 15:17:14 UTC — [ticket-944] tour 3 — reviewer terminé (22015ms)
+- 2026-11-19 15:17:25 UTC — [ticket-944] validateur: fichiers cités joints : memory/decisions.md (tronqué) ; non joints (budget épuisé) : tickets/todo/
+- 2026-11-19 15:17:25 UTC — [ticket-944] validateur: CHANGES_REQUESTED — Le ticket de conception a rempli son rôle : ADR-089 choisit la piste (station +  (32860ms)
+- 2026-11-19 15:17:25 UTC — [ticket-944] CHANGES_REQUESTED tour 3: Validateur : Le ticket de conception a rempli son rôle : ADR-089 choisit la piste (station + bureau dédiés en défense en profondeur) et énonce ses limites. Les deux tickets d'implémentation qui en déc
+- 2026-11-19 15:17:26 UTC — [ticket-944] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-19 15:17:58 UTC — [ticket-944] fichiers non suivis laissés par le run : tickets/todo/ticket-1023-the-agent-account-launches-on-a-dedicated-window-station.md, tickets/todo/ticket-1024-the-agent-call-job-limits-the-user-interface.md (à ignorer dans .gitignore ?)

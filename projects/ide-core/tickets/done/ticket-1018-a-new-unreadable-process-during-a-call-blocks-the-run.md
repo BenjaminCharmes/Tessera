@@ -1,15 +1,15 @@
 ---
-id: ticket-1018
-title: "Scheduled tasks of the agent account are removed when its last call ends"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
-depends_on: []
-preuve_reelle: true
-estimated_days: 1
 created: 2026-11-19
+depends_on: []
+estimated_days: 1
+id: ticket-1018
+pr_number: 1200
+preuve_reelle: true
+priority: medium
+status: done
+title: Scheduled tasks of the agent account are removed when its last call ends
+type: fix
 ---
 
 # ticket-1018 — Les tâches planifiées du compte agent se retirent à la fin du dernier appel
@@ -67,6 +67,31 @@ Elle ne s'est pas exécutée pendant les essais, mais elle n'a rien à faire là
 
 Sous le compte : un appel crée une tâche planifiée ; après sa clôture, un
 second appel liste les tâches du compte et n'en trouve aucune.
+
+### Faite le 19/11, sur le poste, sous le compte agent
+
+Deux défauts trouvés par la preuve et corrigés à la main avant merge :
+
+- `schtasks /query` lancé par un compte ordinaire liste aussi les tâches des
+  autres (200 lisibles sur le poste : Adobe, OneDrive, celles de
+  l'utilisateur). Le filtre « hors `\Microsoft\` » aurait tenté de toutes les
+  supprimer. Le filtre porte maintenant sur le compte d'exécution, lu dans la
+  liste détaillée (`/v`).
+- Windows a créé pour le compte deux tâches OneDrive qu'il ne peut pas
+  supprimer (« Accès refusé ») : chaque clôture aurait levé
+  `DroitsAgentRefuses`. Un refus sur une tâche dont le compte n'est pas
+  l'auteur se journalise sans bloquer ; un refus sur une tâche dont il est
+  l'auteur bloque toujours.
+
+Constaté ensuite : une tâche créée par le compte est retenue par le filtre,
+avec les deux tâches OneDrive du compte ; `retirer_les_taches` la supprime,
+journalise les deux autres, ne lève rien ; la liste suivante ne contient
+plus la tâche créée, et aucune tâche d'un autre compte n'a été touchée
+(200 lisibles avant, 199 après).
+
+Limite : une tâche que le compte enregistrerait avec un autre auteur et des
+droits qui lui interdisent de la supprimer resterait, journalisée à chaque
+clôture. Pendant les essais, aucune tâche du compte ne s'est exécutée.
 
 ## Ce que ça ne fait pas
 
