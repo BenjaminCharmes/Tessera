@@ -353,6 +353,8 @@ async def test_a_failed_wipe_refuses_the_next_call_until_one_succeeds(
         await clore_appel(racine, icacls, procs.enumerer, procs.tuer)
     with pytest.raises(DroitsAgentRefuses):
         await ouvrir_appel(worktree, icacls)
+    # Le dossier revenu, l'ouverture suivante retente le nettoyage elle-même : pas de redémarrage.
     profil.mkdir()
-    await profil_agent.reinitialiser_profil(COMPTE, icacls)
+    (profil / ".bashrc").write_text("x")
     assert await ouvrir_appel(worktree, icacls) is not None
+    assert not (profil / ".bashrc").exists()
