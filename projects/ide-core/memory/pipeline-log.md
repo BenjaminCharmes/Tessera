@@ -10169,3 +10169,7 @@ error: Please commit or stash them.
 - 2026-11-19 08:57:56 UTC — [ticket-1006] validateur: APPROVED — Le diff implémente correctement le refus itéré des fichiers protégés après la re (59452ms)
 - 2026-11-19 08:57:56 UTC — [ticket-1006] APPROVED après 1 tour(s)
 - 2026-11-19 08:58:40 UTC — [ticket-1006] leçons: rien à retenir
+- 2026-11-19 09:00:13 UTC — [ticket-1006] documentation: 0 fichier(s) (71219ms)
+- 2026-11-19 09:00:13 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-19 09:00:13 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-19 09:00:13 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
