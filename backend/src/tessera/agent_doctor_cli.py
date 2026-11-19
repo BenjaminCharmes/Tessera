@@ -18,6 +18,7 @@ from pathlib import Path
 from tessera.config import settings
 from tessera.services.providers.env_agent import profil_de
 from tessera.services.providers.lanceur_agent import LanceurAgent
+from tessera.services.providers.profil_agent import DOSSIER_PROFIL
 from tessera.services.verification.chaine_python import CHAINE_PYTHON
 from tessera.services.verification.lancement_compte import EchecLancementCompte, compte_declare, lancer_sous_compte
 
@@ -106,6 +107,9 @@ async def verifier_outils(
     """Check each command in turn, print one line each, and stop at the first failure."""
     if not compte_declare():
         sys.stdout.write(f"AGENT_USER absent : {_CONSEIL}" + chr(10))
+        return 1
+    if not DOSSIER_PROFIL.is_dir():
+        sys.stdout.write(f"profil agent : ÉCHEC, {DOSSIER_PROFIL} introuvable ; {_CONSEIL}" + chr(10))
         return 1
     for commande in outils:
         libelle = _libelle(commande)

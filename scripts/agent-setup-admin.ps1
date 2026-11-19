@@ -71,6 +71,21 @@ Invoke-Icacls $Outils /grant:r "*S-1-5-18:(OI)(CI)F" "*S-1-5-32-544:(OI)(CI)F" `
 Invoke-Icacls $Outils /inheritance:r
 Write-Host "-> $Outils pret ($Proprietaire : modifier, $Compte : lecture-execution, heritage coupe)"
 
+# 4 ter. Profil unique de l'agent (HOME, TEMP, caches npm et uv) : le
+#    compte y ecrit, le backend le vide entre deux appels sauf les deux caches.
+#    Heritage coupe, droits poses par SID (ticket-1008).
+$Profil = Join-Path $Partage 'profil-agent'
+New-Item -ItemType Directory -Force -Path $Profil | Out-Null
+# Les dossiers que TEMP et les variables du profil visent existent des le premier appel.
+foreach ($Sous in 'Local\Temp', 'Roaming') {
+    $Sous = Join-Path ('App' + 'Data') $Sous
+    New-Item -ItemType Directory -Force -Path (Join-Path $Profil $Sous) | Out-Null
+}
+Invoke-Icacls $Profil /grant:r "*S-1-5-18:(OI)(CI)F" "*S-1-5-32-544:(OI)(CI)F" `
+    "${Proprietaire}:(OI)(CI)M" "${Compte}:(OI)(CI)M"
+Invoke-Icacls $Profil /inheritance:r
+Write-Host "-> $Profil pret ($Proprietaire et $Compte : modifier, heritage coupe)"
+
 # 5. Remise du mot de passe : le fichier nait avec son ACL finale (heritage
 #    coupe ; SYSTEM et administrateurs, lecture-suppression pour l'utilisateur),
 #    jamais lisible par un autre compte, meme un instant, avant d'y ecrire.

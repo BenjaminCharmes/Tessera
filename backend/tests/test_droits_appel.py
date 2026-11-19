@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 from tessera.config import settings
-from tessera.services.providers import droits_appel
+from tessera.services.providers import droits_appel, profil_agent
 from tessera.services.providers.droits_appel import clore_appel, ouvrir_appel
 from tessera.services.providers.droits_worktree import DroitsAgentRefuses
 from tessera.services.verification.groupe_d_etape import GroupeDEtape
@@ -41,8 +41,10 @@ class Processus:
 
 
 @pytest.fixture(autouse=True)
-def compte(monkeypatch: pytest.MonkeyPatch) -> None:
+def compte(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     monkeypatch.setattr(settings, "agent_user", COMPTE)
+    # Jamais le vrai profil de l'agent : un dossier absent n'est pas touché (ticket-1008).
+    monkeypatch.setattr(profil_agent, "DOSSIER_PROFIL", tmp_path / "profil-absent")
     droits_appel._ACTIFS.clear()
     droits_appel._FILE.clear()
     # Une condition se lie à la boucle de son premier `wait` : une neuve par test.
@@ -250,3 +252,48 @@ async def test_without_agent_user_there_is_no_wait(
     monkeypatch.setattr(settings, "agent_user", "")
     assert await asyncio.wait_for(ouvrir_appel(deux_worktrees[0]), 1) is None
     assert await asyncio.wait_for(ouvrir_appel(deux_worktrees[1]), 1) is None
+
+
+async def test_profile_is_reset_at_the_last_call_only(worktree: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    profil = tmp_path / "profil"
+    profil.mkdir()
+    (profil / ".bashrc").write_text("x")
+    monkeypatch.setattr(profil_agent, "DOSSIER_PROFIL", profil)
+    icacls, procs = Icacls(), Processus([])
+    premier = await ouvrir_appel(worktree, icacls)
+    second = await ouvrir_appel(worktree, icacls)
+    await clore_appel(premier, icacls, procs.enumerer, procs.tuer)
+    assert (profil / ".bashrc").exists()
+    await clore_appel(second, icacls, procs.enumerer, procs.tuer)
+    assert not (profil / ".bashrc").exists()
+    assert [str(profil), "/grant", f"{COMPTE}:(OI)(CI)M", "/L"] in icacls.appels
+
+
+async def test_profile_is_not_reset_while_another_worktree_is_active(
+    worktree: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    profil = tmp_path / "profil"
+    profil.mkdir()
+    (profil / ".npmrc").write_text("x")
+    monkeypatch.setattr(profil_agent, "DOSSIER_PROFIL", profil)
+    monkeypatch.setattr(settings, "agent_calls_parallel", True)
+    autre = worktree.parent / "ticket-2"
+    (autre / ".git").mkdir(parents=True)
+    icacls, procs = Icacls(), Processus([])
+    a = await ouvrir_appel(worktree, icacls)
+    b = await ouvrir_appel(autre, icacls)
+    await clore_appel(a, icacls, procs.enumerer, procs.tuer)
+    assert (profil / ".npmrc").exists()
+    await clore_appel(b, icacls, procs.enumerer, procs.tuer)
+    assert not (profil / ".npmrc").exists()
+
+
+async def test_profile_is_untouched_without_agent_user(worktree: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    profil = tmp_path / "profil"
+    profil.mkdir()
+    (profil / ".bashrc").write_text("x")
+    monkeypatch.setattr(profil_agent, "DOSSIER_PROFIL", profil)
+    monkeypatch.setattr(settings, "agent_user", "")
+    racine = await ouvrir_appel(worktree, Icacls())
+    await clore_appel(racine, Icacls())
+    assert (profil / ".bashrc").exists()

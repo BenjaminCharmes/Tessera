@@ -117,3 +117,9 @@ def test_agent_doctor_runs_the_python_module_and_no_get_command() -> None:
     assert "tessera.agent_doctor_cli" in doctor
     assert "Get-Command" not in doctor
     assert chr(9) not in texte
+
+
+def test_admin_setup_creates_the_agent_profile_folder() -> None:
+    texte = (_SCRIPTS / "agent-setup-admin.ps1").read_text(encoding="utf-8-sig")
+    assert "profil-agent" in texte
+    assert "(OI)(CI)M" in texte.split("profil-agent", 1)[1]
