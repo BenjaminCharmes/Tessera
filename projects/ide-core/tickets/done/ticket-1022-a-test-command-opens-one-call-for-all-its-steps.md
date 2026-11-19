@@ -1,15 +1,15 @@
 ---
-id: ticket-1022
-title: "A test command opens one call for all its steps under the agent account"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
-depends_on: []
-preuve_reelle: true
-estimated_days: 1
 created: 2026-11-19
+depends_on: []
+estimated_days: 1
+id: ticket-1022
+pr_number: 1199
+preuve_reelle: true
+priority: high
+status: done
+title: A test command opens one call for all its steps under the agent account
+type: fix
 ---
 
 # ticket-1022 — Une commande de test ouvre un seul appel pour toutes ses étapes
@@ -63,6 +63,25 @@ fait que décrémenter.
 Un run Serpent complet sous le compte : relever dans le journal la durée de
 chaque étape du testeur, constater qu'aucun « délai dépassé » n'apparaît, et
 noter les durées dans le ticket, à côté de celles du 19/11 ci-dessus.
+
+### Faite le 19/11, sur le poste, sous le compte agent
+
+Même worktree jetable de Serpent, même commande, lancée par
+`TestRunnerService` sous le compte, d'abord avec le code de `develop`, puis
+avec celui de la branche :
+
+| Étape | develop | branche |
+|---|---|---|
+| typecheck | 39 s | 5 s |
+| lint | 44 s | 8 s |
+| test | 48 s | 16 s |
+| build | 49 s | 11 s |
+| durée du testeur | 182 s | 42 s |
+| total, ouverture et clôture comprises | 183 s | 89 s |
+
+Aucun délai dépassé avec la branche. Il reste environ 45 s d'ouverture et de
+clôture pour l'appel englobant : c'est le coût d'une clôture complète
+(droits du worktree, profil), que chaque appel d'agent paie encore.
 
 ## Ce que ça ne fait pas
 
