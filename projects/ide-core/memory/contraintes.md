@@ -10,7 +10,7 @@ Cette section n'est injectée dans aucun appel d'agent. Une règle nouvelle
 s'écrit ici, avec son ADR ; un humain l'accepte en la déplaçant dans sa
 section. (ADR-055)
 
-- **Un processus au jeton illisible, né pendant un appel sous le compte agent, met le run en `blocked`** ; le cache uv est en lecture seule pour le compte, et un fichier protégé créé en sous-dossier refuse le run. (ADR-088, ADR-087, ADR-084)
+- **Rien de planifié ni de caché ne survit au compte agent** : ses tâches planifiées se retirent au dernier appel, le cache uv part avec le profil, et un fichier protégé ajouté pendant un appel met le run en `blocked`. (ADR-088, ADR-087, ADR-084)
 
 ## Git et périmètre d'écriture
 
