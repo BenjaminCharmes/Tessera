@@ -10133,3 +10133,46 @@ error: Please commit or stash them.
 - 2026-11-18 18:01:47 UTC — [ticket-1011] leçons: fichier plein, à compacter à la main
 - 2026-11-18 18:02:21 UTC — [ticket-1011] documentation: 0 fichier(s) (905ms)
 - 2026-11-18 18:02:21 UTC — [ticket-1011] documentation: pas de diff retrouvable, non documenté
+- 2026-11-18 18:11:09 UTC — [ide-core] ticket-1011 PR #1178 confiée au CIWatcher
+- 2026-11-18 17:31:25 UTC — [ide-core] ticket-1010 PR #1177 mergée (CI verte)
+- 2026-11-18 18:11:17 UTC — [ticket-1006] branche ticket-1006-the-agent-account-gives-back-the-files-it-create
+- 2026-11-18 18:11:22 UTC — [ticket-1006] tour 1 — codeur démarré
+- 2026-11-18 18:13:29 UTC — [ticket-1006] tour 1 — codeur terminé (126672ms)
+- 2026-11-18 18:16:10 UTC — [ticket-1006] testeur: dur�es : ruff 0 s, mypy 24 s, mypy-linux 30 s, pytest 108 s ; impact depuis base : 17 fichier(s) de test
+- 2026-11-18 18:16:47 UTC — [ticket-1006] securite: BLOCK — BLOCK : le `/reset /T` ajouté dans `retirer_ecriture` efface, dès la fin du prem (36109ms)
+- 2026-11-18 18:17:19 UTC — [ide-core] file interrompue : ticket-1006 non approuvé
+- 2026-11-18 19:01:49 UTC — [ticket-1011] livraison: arrêt — PR #1178 non mergée : délai dépassé (2400s)
+- 2026-11-19 08:35:51 UTC — [ticket-1006] branche ticket-1006-the-agent-account-gives-back-the-files-it-create
+- 2026-11-19 08:35:52 UTC — [ticket-1006] fiche relue après l'avance de la base (46c2683040d50f03260d9ff84f6954bbce2f45a1 → a5c2d3ed2fe9ee327eaab6ffdc9fd673b3fa7694)
+- 2026-11-19 08:35:55 UTC — [ticket-1006] branche reprise (3 commit(s)) — refus précédent : securite, codeur en premier
+- 2026-11-19 08:35:55 UTC — [ticket-1006] tour 1 — codeur démarré
+- 2026-11-19 08:37:25 UTC — [ticket-1006] tour 1 — codeur terminé (89297ms)
+- 2026-11-19 08:38:59 UTC — [ticket-1006] testeur: 2 failed, 155 passed, 8 warnings in 43.50s — fichiers en échec : tests/test_processus_compte.py
+- 2026-11-19 08:38:59 UTC — [ticket-1006] tests rouges au tour 1
+- 2026-11-19 08:38:59 UTC — [ticket-1006] tour 2 — codeur démarré
+- 2026-11-19 08:39:26 UTC — [ticket-1006] tour 2 — codeur terminé (26405ms)
+- 2026-11-19 08:40:41 UTC — [ticket-1006] testeur: 2 failed, 156 passed, 8 warnings in 33.60s — fichiers en échec : tests/test_processus_compte.py
+- 2026-11-19 08:40:41 UTC — [ticket-1006] tests rouges au tour 2
+- 2026-11-19 08:40:41 UTC — [ticket-1006] tour 3 — codeur démarré
+- 2026-11-19 08:41:09 UTC — [ticket-1006] tour 3 — codeur terminé (28094ms)
+- 2026-11-19 08:42:48 UTC — [ticket-1006] testeur: 2 failed, 155 passed, 8 warnings in 61.15s (0:01:01) — fichiers en échec : tests/test_processus_compte.py
+- 2026-11-19 08:42:48 UTC — [ticket-1006] tests rouges au tour 3
+- 2026-11-19 08:42:48 UTC — [ticket-1006] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-19 08:53:12 UTC — [ticket-1006] branche ticket-1006-the-agent-account-gives-back-the-files-it-create
+- 2026-11-19 08:53:14 UTC — [ticket-1006] branche reprise (5 commit(s)) — refus précédent : revue, codeur en premier
+- 2026-11-19 08:53:14 UTC — [ticket-1006] tour 1 — codeur démarré
+- 2026-11-19 08:54:14 UTC — [ticket-1006] tour 1 — codeur terminé (60077ms)
+- 2026-11-19 08:55:41 UTC — [ticket-1006] testeur: dur�es : ruff 0 s, mypy 8 s, mypy-linux 9 s, pytest 51 s ; impact depuis base : 18 fichier(s) de test
+- 2026-11-19 08:56:55 UTC — [ticket-1006] securite: PASS — PASS : le diff durcit les droits (ACE OWNER RIGHTS limité à RC, propriété repris (74077ms)
+- 2026-11-19 08:56:56 UTC — [ticket-1006] tour 1 — reviewer démarré
+- 2026-11-19 08:57:31 UTC — [ticket-1006] tour 1 — reviewer terminé (35375ms)
+- 2026-11-19 08:57:56 UTC — [ticket-1006] validateur: APPROVED — Le diff implémente correctement le refus itéré des fichiers protégés après la re (59452ms)
+- 2026-11-19 08:57:56 UTC — [ticket-1006] APPROVED après 1 tour(s)
+- 2026-11-19 08:58:40 UTC — [ticket-1006] leçons: rien à retenir
+- 2026-11-19 09:00:13 UTC — [ticket-1006] documentation: 0 fichier(s) (71219ms)
+- 2026-11-19 09:00:13 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-19 09:00:13 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-19 09:00:13 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-19 09:00:47 UTC — [ticket-1006] livraison: rebase sur develop (563ms)
+- 2026-11-19 09:00:47 UTC — [ticket-1006] livraison: PR #1182 ouverte (5265ms)
+- 2026-11-19 09:00:47 UTC — [ticket-1006] livraison: arrêt — PR ouverte, merge après preuve réelle

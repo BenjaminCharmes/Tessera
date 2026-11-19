@@ -7,6 +7,7 @@ existing file that `motif_de_protection` designates (policy files, test script).
 Without `AGENT_USER`, nothing is set.
 """
 import asyncio
+import getpass
 import os
 from collections.abc import Awaitable, Callable
 from pathlib import Path
@@ -63,26 +64,74 @@ def fichiers_proteges(wt: RunWorktree, script: Path | None) -> list[Path]:
     return trouves
 
 
-async def poser_ecriture(racine: Path, compte: str, lanceur: Icacls = _icacls_reel) -> None:
-    """Give `compte` modify on `racine` and read-only on its `.git` (before each call)."""
+#: OWNER RIGHTS (S-1-3-4) : le propriétaire d'un fichier ne garde que la lecture
+#: des droits, donc ni WRITE_DAC ni WRITE_OWNER sur ce que l'agent crée.
+_OWNER_RIGHTS = "*S-1-3-4:(OI)(CI)(RC)"
+
+
+#: Fichiers protégés par racine de worktree, notés quand le refus est posé (une
+#: fois par run) : le `/reset` de clôture les efface, on les refuse de nouveau.
+_REFUSES: dict[Path, list[Path]] = {}
+
+
+async def _refuser(fichier: Path, compte: str, lanceur: Icacls) -> None:
+    await _lancer(lanceur, [str(fichier), "/deny", f"{compte}:{_REFUS_ECRITURE}"])
+
+
+def compte_du_backend() -> str:
+    """Name of the account the backend runs under."""
+    return getpass.getuser()
+
+
+async def _proteger_git(git: Path, compte: str, lanceur: Icacls) -> None:
+    droit = "(OI)(CI)RX" if git.is_dir() else "RX"
+    await _lancer(lanceur, [str(git), "/inheritance:d"])
+    await _lancer(lanceur, [str(git), "/remove:g", compte])
+    await _lancer(lanceur, [str(git), "/grant:r", f"{compte}:{droit}"])
+
+
+async def poser_ecriture(
+    racine: Path, compte: str, lanceur: Icacls = _icacls_reel, backend: str | None = None
+) -> None:
+    """Give `compte` modify on `racine` and read-only on its `.git` (before each call).
+
+    Adds an inheritable OWNER RIGHTS ACE (read control only) and full control for
+    the backend account, so the agent cannot rewrite the DACL of its own files.
+    """
     await _lancer(lanceur, [str(racine), "/grant", f"{compte}:(OI)(CI)M"])
+    # L'ACE du backend d'abord : il est propriétaire de la racine et n'y a que
+    # « modifier » par héritage. OWNER RIGHTS posée en premier lui retirait
+    # WRITE_DAC, et son propre `/grant` suivant était refusé (preuve du 19/11).
+    await _lancer(lanceur, [str(racine), "/grant", f"{backend or compte_du_backend()}:(OI)(CI)F"])
+    await _lancer(lanceur, [str(racine), "/grant", _OWNER_RIGHTS])
     git = racine / ".git"
     if git.exists():
-        droit = "(OI)(CI)RX" if git.is_dir() else "RX"
-        await _lancer(lanceur, [str(git), "/inheritance:d"])
-        await _lancer(lanceur, [str(git), "/remove:g", compte])
-        await _lancer(lanceur, [str(git), "/grant:r", f"{compte}:{droit}"])
+        await _proteger_git(git, compte, lanceur)
 
 
-async def retirer_ecriture(racine: Path, compte: str, lanceur: Icacls = _icacls_reel) -> None:
-    """Withdraw every grant of `compte` on `racine` and its `.git` (ticket-943).
+async def retirer_ecriture(
+    racine: Path, compte: str, lanceur: Icacls = _icacls_reel, backend: str | None = None
+) -> None:
+    """Withdraw every grant of `compte` and take the files back (ticket-943, ticket-1006).
 
-    Les refus posés fichier par fichier restent : ils ne donnent rien au compte.
+    Called at the end of the last call on `racine`: after the `/remove:g`, the
+    owner goes back to the backend and every DACL to inheritance (`.git` included).
+    Choice: `/reset` covers `.git` too, which then gets its `inheritance:d` + `RX`
+    again, so the account keeps read-only access there. The write refusals set on
+    the protected files by `accorder_droits_agent` are laid again after the reset,
+    in the same call (fail closed). A non-zero exit (a file
+    created with a protected DACL) raises `DroitsAgentRefuses`; no fallback.
     """
     git = racine / ".git"
     if git.exists():
         await _lancer(lanceur, [str(git), "/remove:g", compte])
     await _lancer(lanceur, [str(racine), "/remove:g", compte])
+    await _lancer(lanceur, [str(racine), "/setowner", backend or compte_du_backend(), "/T", "/C", "/L"])
+    await _lancer(lanceur, [str(racine), "/reset", "/T", "/C", "/L"])
+    if git.exists():
+        await _proteger_git(git, compte, lanceur)
+    for fichier in _REFUSES.get(racine.resolve(), []):
+        await _refuser(fichier, compte, lanceur)
 
 
 async def accorder_droits_agent(
@@ -96,6 +145,8 @@ async def accorder_droits_agent(
         return
     await poser_ecriture(wt.racine, compte, lanceur)
     script = script_de_verification(wt.projet, commande_de_tests)
-    for fichier in fichiers_proteges(wt, script):
-        await _lancer(lanceur, [str(fichier), "/deny", f"{compte}:{_REFUS_ECRITURE}"])
+    proteges = fichiers_proteges(wt, script)
+    _REFUSES[wt.racine.resolve()] = proteges
+    for fichier in proteges:
+        await _refuser(fichier, compte, lanceur)
     _logger.info("droits_agent_poses", extra={"racine": str(wt.racine)})
