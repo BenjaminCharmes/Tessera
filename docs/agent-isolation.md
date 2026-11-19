@@ -60,6 +60,24 @@ Le compte agent démarre ses processus **sans charger la ruche HKCU** (`HKEY_CUR
 
 L'environnement du compte est bâti de zéro à chaque appel — aucune pollution Registry, aucune persistance involontaire.
 
+## Protection du profil et des worktrees
+
+Le compte agent dispose de plusieurs protections contre les contournements de droits et les tentatives de redéfinition de l'isolation :
+
+**Nettoyage du profil**
+
+Après chaque appel, le profil du compte est entièrement vidé sauf deux caches (npm et uv). Le nettoyage restaure les droits via `icacls /setowner` suivi de `/reset /T /C /L`, qui remet une DACL propre. Les droits du compte et une ACE `OWNER RIGHTS` sont ensuite reposés. Si le nettoyage échoue — par exemple, parce qu'un fichier reste inaccessible — l'IDE refuse tout appel suivant sous le compte. `agent doctor` le détecte et propose de réinitialiser le profil.
+
+**Isolation stricte du worktree**
+
+La racine d'un run n'est jamais calculée en remontant à la recherche d'un `.git`. Elle est définie comme l'enfant direct du dossier des worktrees du projet : `<dossier des worktrees>/<projet>/<ticket>`. Un agent qui crée un `.git` dans un sous-dossier ne peut donc pas redéfinir où les droits s'appliquent. Si le `.git` de la racine est une jonction NTFS ou un symlink, l'IDE refuse l'appel. Cela empêche un agent de créer un lien vers le profil d'un utilisateur ou un autre emplacement sensible.
+
+**Icacls sans suivi de jonctions**
+
+Tous les appels `icacls` portent le flag `/L` pour opérer sur le lien lui-même, jamais sur sa cible. Un agent ne peut donc pas modifier les droits d'un profil d'utilisateur en créant une jonction vers lui.
+
+Sans `AGENT_USER` configuré, aucune de ces protections ne s'applique : l'IDE tourne sous ton compte, avec tes droits.
+
 ## `agent doctor`
 
 Il liste chaque point avec son remède : compte présent, mot de passe et jeton
