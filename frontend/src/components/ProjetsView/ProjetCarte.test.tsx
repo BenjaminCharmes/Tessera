@@ -164,4 +164,11 @@ describe("ProjetCarte footer", () => {
       expect(screen.getByRole("button", { name: nom })).toHaveClass("h-[26px]");
     }
   });
+
+  it("draws the card with a 10px radius", () => {
+    afficher(projet());
+    const carte = screen.getByLabelText("Serpent");
+    expect(carte).toHaveClass("rounded-[10px]");
+    expect(carte).not.toHaveClass("rounded-sm");
+  });
 });
