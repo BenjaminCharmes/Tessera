@@ -10650,3 +10650,7 @@ error: Please commit or stash them.
 - 2026-11-20 15:58:57 UTC — [ticket-1033] validateur: APPROVED — Tous les critères d'acceptation du ticket 1033 sont satisfaits. Le modèle `Quoti (38406ms)
 - 2026-11-20 15:58:58 UTC — [ticket-1033] APPROVED après 2 tour(s)
 - 2026-11-20 15:59:46 UTC — [ticket-1033] leçons: une leçon proposée
+- 2026-11-20 16:03:14 UTC — [ticket-1033] documentation: 0 fichier(s) (188532ms)
+- 2026-11-20 16:03:14 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-20 16:03:14 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-20 16:03:14 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
