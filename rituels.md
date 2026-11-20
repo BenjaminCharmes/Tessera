@@ -8,6 +8,14 @@ rituels:
     detail: Lire le résumé de la semaine écoulée.
     projets: [vigie]
 
+  - id: radar-hebdo
+    titre: Radar de la semaine
+    rythme: { type: hebdo, jour: lundi, heure: "09:30" }
+    duree_min: 30
+    phrase: radar hebdo
+    detail: Candidats du radar confrontés à chaque dépôt, tickets écrits pour ceux qui tiennent, aucune file lancée.
+    projets: [vigie]
+
   - id: point-revenus
     titre: Point revenus
     rythme: { type: hebdo, jour: lundi, heure: "18:30" }
@@ -85,7 +93,7 @@ tant qu'un rituel en retard n'est ni fait ni reporté.
 |---|---|
 | `id` | identifiant stable, en kebab-case : l'état « fait » s'y rattache |
 | `titre` | ce que montre Tessera |
-| `rythme` | `hebdo` (`jour` : lundi…dimanche, `heure`), `mensuel` (`jour` : 1-28, `heure`, `avant` facultatif : jour limite), `unique` (`du`, `au` : dates) |
+| `rythme` | `hebdo` (`jour` : lundi…dimanche, `heure`), `mensuel` (`jour` : 1-28, `heure`, `avant` facultatif : jour limite), `quotidien` (`heure`, `jours` facultatif : `tous` ou `ouvres`), `unique` (`du`, `au` : dates) |
 | `duree_min` | durée indicative, en minutes |
 | `phrase` | ce qu'on dit à Claude pour le lancer |
 | `detail` | une phrase sur ce qu'il faut faire |
