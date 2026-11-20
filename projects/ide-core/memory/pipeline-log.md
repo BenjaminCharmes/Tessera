@@ -10540,3 +10540,7 @@ error: Please commit or stash them.
 - 2026-11-20 11:13:33 UTC — [ticket-1029] validateur: APPROVED — Les cinq critères d'acceptation sont satisfaits. Le code remplace correctement l (106343ms)
 - 2026-11-20 11:13:33 UTC — [ticket-1029] APPROVED après 3 tour(s)
 - 2026-11-20 11:14:03 UTC — [ticket-1029] leçons: une leçon proposée
+- 2026-11-20 11:15:14 UTC — [ticket-1029] documentation: 0 fichier(s) (47452ms)
+- 2026-11-20 11:15:14 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-20 11:15:14 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-20 11:15:14 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
