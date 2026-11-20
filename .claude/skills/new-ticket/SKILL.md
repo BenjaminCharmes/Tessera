@@ -116,6 +116,13 @@ déjà vrai dans un CSS que le run ne touche pas, se refuse ;
 « `main.css` donne `overflow-x: auto` à la grille » se vérifie (démineur,
 ticket-033).
 
+**Un critère qui cite un verrou de dépendances est jugé sur son diff.**
+`package-lock.json`, `pnpm-lock.yaml`, `uv.lock` et leurs pareils pèsent des
+centaines de milliers de caractères : le validateur reçoit ce que le run y a
+changé, jamais le fichier (ticket-1030). Écrire donc ce que le diff doit
+montrer (« le diff de `package-lock.json` porte `paquet` en version X »), pas
+un état du fichier entier (« le verrou ne contient plus Y »).
+
 **Pas de critère négatif sur tout le code.** « Rien n'appelle encore X » ou
 « aucun chemin n'atteint Y » ne se prouve pas sur un diff : le validateur le
 juge invérifiable et refuse, trois tours de suite (tickets 522 et 525, le
