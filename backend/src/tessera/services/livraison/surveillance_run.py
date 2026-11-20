@@ -51,9 +51,9 @@ def surveillance_pour(
     tâche de fond via `CI_WATCHER.surveiller`. Retourne immédiatement, sans
     attendre la fin de la CI.
 
-    Avec un worktree (ADR-056), la phase 2 ne lit ni n'écrit aucun arbre : le
-    worktree est supprimé avant qu'elle ne finisse, et le checkout n'appartient
-    pas au run. Ni réalignement de la base locale, ni ligne de journal sur disque.
+    Avec un worktree (ADR-056), la phase 2 ne lit ni n'écrit le worktree, supprimé
+    avant qu'elle ne finisse : pas de ligne de journal sur disque. Le checkout du
+    projet, lui, se réaligne sur sa base après le merge (ticket-978).
 
     Une PR que la CI rend conflictuelle se met à jour une fois par le watcher,
     sur la base de la politique (ticket-733). Aucun retest local : celui du run
@@ -93,7 +93,8 @@ def surveillance_pour(
 
     lecture = workflow_de_lecture(project_id, politique)
     pipeline_log_path_ci = None if wt is not None else project_path / "memory" / "pipeline-log.md"
-    realignement = None if wt is not None else Realignement(project_path, base_branch)
+    # Avec un worktree, la cible reste le checkout du projet, jamais le worktree.
+    realignement = Realignement(project_path, base_branch, projet_a_worktree=wt is not None)
 
     async def surveiller(
         p_id: str,

@@ -11,9 +11,12 @@ from fastapi import APIRouter, Depends, HTTPException
 from tessera.config import settings
 from tessera.routers.dependencies import require_valid_project_id
 from tessera.routers.services_running import get_sonde
+from tessera.services.gardes.politique_run import PolitiqueRun
+from tessera.services.livraison.realignement_base import realigner_base
 from tessera.services.noyau.event_hub import EVENT_HUB
 from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.noyau.services_demandes import demander, retirer
+from tessera.services.pipeline.run_registry import RUN_REGISTRY
 from tessera.services.projets.project_loader import load_services_config
 from tessera.services.supervision.inventaire_apps import inventaire
 from tessera.services.supervision.sonde_systeme import SondeSysteme
@@ -111,6 +114,19 @@ def _refuser_un_port_de_tessera(
             )
 
 
+async def _avancer_le_checkout(project_id: str, racine: Path) -> None:
+    """Fast-forward the checkout so `agents.json` is read at its base (ticket-978).
+
+    Un run qui occupe un projet sans worktree travaille dans ce checkout : on n'y
+    touche pas. Un refus ne bloque rien, les services partent sur l'arbre tel quel.
+    """
+    politique = PolitiqueRun.lire(racine)
+    if politique.worktree is None and RUN_REGISTRY.projet_occupe(project_id):
+        return
+    base = politique.base_branch or settings.github_base_branch
+    await realigner_base(racine, base, project_id)
+
+
 async def lancer_les_services(
     project_id: str, sonde: SondeSysteme, registre: ProcessRegistry = PROCESS_REGISTRY
 ) -> ServicesDemarres:
@@ -119,6 +135,7 @@ async def lancer_les_services(
     Shared by the `start` route and the resume at backend startup (ticket-890).
     """
     racine = _racine(project_id)
+    await _avancer_le_checkout(project_id, racine)
     declares = load_services_config(racine)
     if not declares:
         raise HTTPException(

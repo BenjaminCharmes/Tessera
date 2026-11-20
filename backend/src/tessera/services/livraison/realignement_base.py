@@ -25,6 +25,9 @@ class Realignement:
 
     racine: Path
     base_branch: str
+    # Un projet à worktree : le checkout n'est pas l'arbre de travail des runs,
+    # un run en cours ne l'occupe donc pas (ticket-978).
+    projet_a_worktree: bool = False
 
 _JOURNAL = (Path("memory") / "pipeline-log.md").as_posix()
 
