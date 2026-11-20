@@ -10634,3 +10634,19 @@ error: Please commit or stash them.
 - 2026-11-20 14:53:06 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
 - 2026-11-20 14:53:06 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
 - 2026-11-20 14:53:06 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-20 14:58:57 UTC — [ide-core] ticket-1032 PR #1231 mergée (CI verte)
+- 2026-11-20 15:44:35 UTC — [ticket-1033] branche ticket-1033-a-ritual-can-be-daily
+- 2026-11-20 15:44:45 UTC — [ticket-1033] tour 1 — codeur démarré
+- 2026-11-20 15:47:39 UTC — [ticket-1033] tour 1 — codeur terminé (172640ms)
+- 2026-11-20 15:52:35 UTC — [ticket-1033] testeur: 1 failed, 79 passed, 8 warnings in 23.39s — fichiers en échec : tests/test_openapi_export.py
+- 2026-11-20 15:52:35 UTC — [ticket-1033] tests rouges au tour 1
+- 2026-11-20 15:52:35 UTC — [ticket-1033] tour 2 — codeur démarré
+- 2026-11-20 15:53:31 UTC — [ticket-1033] tour 2 — codeur terminé (55547ms)
+- 2026-11-20 15:58:10 UTC — [ticket-1033] testeur: dur�es : ruff 0 s, mypy 5 s, mypy-linux 5 s, pytest 23 s, tsc 29 s, eslint 42 s, vitest 172 s ; impact depuis base : 7 fichier(s) de test
+- 2026-11-20 15:58:18 UTC — [ticket-1033] securite: PASS — Le diff ajoute un rythme « quotidien » au calcul des échéances des rituels. Côté (6906ms)
+- 2026-11-20 15:58:19 UTC — [ticket-1033] tour 2 — reviewer démarré
+- 2026-11-20 15:58:38 UTC — [ticket-1033] tour 2 — reviewer terminé (18828ms)
+- 2026-11-20 15:58:57 UTC — [ticket-1033] validateur: fichiers cités joints : backend/tests/test_rituels.py, rituels.md, frontend/src/components/RituelsView/format.test.ts
+- 2026-11-20 15:58:57 UTC — [ticket-1033] validateur: APPROVED — Tous les critères d'acceptation du ticket 1033 sont satisfaits. Le modèle `Quoti (38406ms)
+- 2026-11-20 15:58:58 UTC — [ticket-1033] APPROVED après 2 tour(s)
+- 2026-11-20 15:59:46 UTC — [ticket-1033] leçons: une leçon proposée
