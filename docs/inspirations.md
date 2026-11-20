@@ -37,7 +37,7 @@ une consigne (garde ajoutée dans « Comment écrire »). La version reprise res
 | --- | --- |
 | Dépôt | `pbakaus/impeccable` |
 | Version reprise | `cli-v4.8.0` du 26/10/2026, commit `df3a4abe7d08` |
-| Version relue | `skill-v4.8.2` du 09/11/2026, relue le 11/11/2026 (ticket-924) |
+| Version relue | `skill-v4.10.0` du 18/11/2026, relue le 20/11/2026 (ticket-1035) |
 | Date de reprise | 30/10/2026 (ticket-715) |
 | Mode | `idées réécrites` |
 | Licence | à confirmer sur le dépôt ; sans effet tant que rien n'est recopié |
@@ -51,5 +51,15 @@ Suivre les tags `skill-v` : ils portent la guidance de design ; `cli-v`,
 `engine-v` et `loop-v` portent l'outil, les binaires et la boucle. `cli-v4.8.0`
 et `skill-v4.8.0` sont la même publication. `skill-v4.8.2` (09/11/2026) relue
 le 11/11/2026 sur ses notes de version (ticket-924) : outillage seulement, rien
-à reprendre. La comparaison des fichiers de guidance reste à faire en local à
+à reprendre.
+
+`skill-v4.9.0` (13/11/2026), `skill-v4.9.1` (14/11/2026) et `skill-v4.10.0`
+(18/11/2026) relues le 20/11/2026 sur leurs notes de version (ticket-1035).
+Presque tout est de l'outillage (sauvegarde des rapports, commandes nouvelles,
+barre Live). Deux idées touchent la guidance : une marque citée dans la demande
+fixe le niveau de qualité sans imposer son style, et un long fichier de design
+se donne à l'agent comme une carte courte qu'il consulte à la demande. Aucune
+n'est reprise : les notes ne donnent le texte d'aucune règle, et la seconde
+recoupe ce que `contraintes.md` fait déjà par rôle. La version reprise reste
+`cli-v4.8.0`. La comparaison des fichiers de guidance reste à faire en local à
 la prochaine version.
