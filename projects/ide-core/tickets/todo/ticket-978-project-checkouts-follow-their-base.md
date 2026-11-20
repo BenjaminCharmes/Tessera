@@ -14,49 +14,61 @@ type: feat
 - Projets sources : vigie (signalement API du 16/11) et affut (idée du même
   jour, même cause)
 - Nature : idée
-- **À lancer après la clôture de la stabilisation** (aucune fonctionnalité
-  nouvelle d'ici là)
 
 ## Contexte
 
-Depuis que les runs partent d'`origin/<base>` (ticket-923), rien n'avance le
-checkout d'un projet sans worktree, et les sessions ont pour consigne de ne
-pas y lancer git. Tout ce qui lit le checkout voit des fichiers périmés :
+Depuis que les runs partent d'`origin/<base>` (ticket-923), le checkout d'un
+projet n'avance que dans un cas : après un merge par `CIWatcher`, pour un
+projet **sans** worktree (`realigner_base`, ticket-422, appelé par
+`CIWatcher._realigner_si_libre`). Deux trous restent, relus dans le code le
+20/11 :
 
-- Le 16/11, `projects/kadoomi/package.json` porte next 16.3.8 alors
-  qu'`origin/develop` est en 16.4.6. Le radar de Vigie en a tiré une fausse
-  version installée.
-- `POST /services/start` lit `agents.json` dans le checkout. Affût et Vigie
-  ont dû faire un `merge --ff-only` à la main, sur exception, pour que leur
-  correctif de port soit lu.
-- Le ticket-977 traite le cas du texte d'un ticket lu en retard ; celui-ci
-  traite le reste du checkout.
+- `surveillance_run.py` ne donne aucun `Realignement` à `CIWatcher` quand le
+  run a un worktree (`realignement = None if wt is not None`). Le checkout d'un
+  projet à worktree ne suit donc jamais sa base : le 16/11,
+  `projects/kadoomi/package.json` portait next 16.3.8 alors qu'`origin/develop`
+  était en 16.4.6, et le radar de Vigie en a tiré une fausse version installée ;
+  le 20/11, le checkout de Serpent avait sept commits de retard.
+- `lancer_les_services` (`routers/services.py`) lit `agents.json` dans le
+  checkout sans l'avancer. Affût et Vigie ont dû faire un `merge --ff-only` à
+  la main pour que leur correctif de port soit lu.
 
 ## Ce qu'il faut faire
 
-Un service avance le checkout d'un projet en `merge --ff-only` sur
-`origin/<base>` quand **toutes** ces conditions tiennent : le projet ne
-déclare pas `worktree` ; aucun run n'est ouvert sur lui (`RunLock`) ; la
-branche courante est la base ; l'arbre est propre (`git status --porcelain`
-vide). Sinon, il ne fait rien et journalise la raison.
+Réutiliser `realigner_base` (`services/livraison/realignement_base.py`), qui
+refuse déjà tout arbre qui n'est pas sur la base ou qui porte une modification
+hors du journal, ne lève jamais et journalise `realignement_ignore` avec sa
+raison. Ne pas écrire un second service.
 
-Il est appelé à deux moments : après le merge d'une PR du projet par
-`CIWatcher`, et au début de `lancer_les_services`, avant la lecture
-d'`agents.json`.
+- `surveillance_run.py` : un run à worktree donne lui aussi un `Realignement`
+  sur le checkout du projet (`project_path`), pas sur le worktree.
+- `CIWatcher._realigner_si_libre` : le refus « un run occupe le projet » ne
+  vaut que pour un projet sans worktree ; le checkout d'un projet à worktree
+  n'est pas l'arbre de travail des runs.
+- `lancer_les_services` : avant `load_services_config`, appeler
+  `realigner_base` sur la racine du projet et sa branche de base, sauf si un
+  run occupe un projet sans worktree. Un refus ne bloque rien : les services
+  démarrent sur l'arbre tel quel.
 
 ## Critères d'acceptation
 
-- [ ] Test : dépôt de test en retard d'un commit sur `origin/<base>`, arbre
-      propre, sur la base, sans run : le checkout est avancé.
-- [ ] Tests : run ouvert, arbre sale, branche autre que la base, projet à
-      worktree → le checkout ne bouge pas, la raison est journalisée.
-- [ ] Test : `lancer_les_services` lit l'`agents.json` du commit avancé.
-- [ ] Test : un merge par `CIWatcher` déclenche l'avance.
-- [ ] Une avance refusée par git (non fast-forward) ne lève pas : elle se
-      journalise, et les services démarrent sur l'arbre tel quel.
+- [ ] Test : `surveillance_run` passe à `CIWatcher` un `Realignement` dont la
+      racine est le checkout du projet quand le run a un worktree.
+- [ ] Test : après un merge, `_realigner_si_libre` appelle `realigner_base`
+      pour un projet à worktree même si un run l'occupe, et ne l'appelle pas
+      pour un projet sans worktree occupé.
+- [ ] Test : `lancer_les_services` lit l'`agents.json` du commit avancé (dépôt
+      de test en retard d'un commit sur `origin/<base>`, arbre propre).
+- [ ] Test : `lancer_les_services` démarre les services quand `realigner_base`
+      refuse (arbre sur une autre branche).
+- [ ] Aucun nouveau module qui lance `git merge` ou `git pull` : le diff
+      n'ajoute aucun appel à ces commandes hors de `realignement_base.py`.
 
 ## Ce que ça ne fait pas
 
-- Ne fait jamais de merge, de rebase, de reset ni de checkout de branche.
-- Ne touche pas aux projets à worktree, dont le checkout n'est pas l'arbre
-  de travail des runs.
+- Ne fait jamais de merge non fast-forward, de rebase, de reset ni de checkout
+  de branche.
+- Ne réaligne pas un checkout resté sur une autre branche que la base, ni un
+  arbre modifié.
+- N'ajoute aucune tâche périodique : le checkout n'avance qu'après un merge et
+  au lancement des services.

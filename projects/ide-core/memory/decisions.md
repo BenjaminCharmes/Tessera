@@ -647,7 +647,7 @@ Une ADR qu'aucune règle de `contraintes.md` ni aucun `CLAUDE.md` ne cite part d
 ## ADR-089 — Le compte agent tourne sur une window station et un bureau dédiés
 
 **Date** : 2026-11-19
-**Décision** : amende ADR-083. Le backend crée, par appel, une window station et un bureau nommés, dont la DACL ne vise que le compte agent et lui-même ; `lpDesktop` les nomme. Le job d'appel y ajoute `JOB_OBJECT_UILIMIT_*` en défense en profondeur. Station impossible à créer ou lancement refusé : `EchecLancementCompte`, jamais de repli sur `WinSta0\Default` (ADR-037).
+**Décision** : amende ADR-083. Le backend inscrit le compte agent sur la station non interactive de sa session (en nommer une exige un administrateur) et crée, par appel, un bureau dont la DACL ne vise qu'eux deux ; `lpDesktop` les nomme. Le job d'appel y ajoute `JOB_OBJECT_UILIMIT_*` en défense en profondeur. Station impossible à créer ou lancement refusé : `EchecLancementCompte`, jamais de repli sur `WinSta0\Default` (ADR-037).
 **Raison** : presse-papiers, atomes et hooks sont propres à la station ; `SendInput` et la capture dépendent du bureau, hors de portée d'un job.
 **Alternative rejetée** : `UILIMIT` seul (ni frappes simulées ni capture) ; session 0 par tâche ou service (administrateur, tuyaux stdio perdus, sortie du job d'ADR-088).
 **Ne ferme pas** : Node, Playwright ou le CLI peuvent refuser une station non interactive ; preuve avant câblage (ticket-1023).
