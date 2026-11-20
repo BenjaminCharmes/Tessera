@@ -10489,3 +10489,16 @@ error: Please commit or stash them.
 - 2026-11-20 09:22:34 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
 - 2026-11-20 09:22:34 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
 - 2026-11-20 09:22:34 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-20 09:30:09 UTC — [ticket-1024] branche ticket-1024-the-agent-call-job-limits-the-user-interface
+- 2026-11-20 09:30:12 UTC — [ticket-1024] tour 1 — codeur démarré
+- 2026-11-20 09:31:19 UTC — [ticket-1024] tour 1 — codeur terminé (66250ms)
+- 2026-11-20 09:33:07 UTC — [ticket-1024] testeur: dur�es : ruff 0 s, mypy 19 s, mypy-linux 15 s, pytest 63 s ; impact depuis base : 57 fichier(s) de test
+- 2026-11-20 09:33:23 UTC — [ticket-1024] securite: PASS — Le diff durcit le lanceur : le job de l'agent reçoit les huit restrictions `JOB_ (14344ms)
+- 2026-11-20 09:33:23 UTC — [ticket-1024] tour 1 — reviewer démarré
+- 2026-11-20 09:33:40 UTC — [ticket-1024] tour 1 — reviewer terminé (16500ms)
+- 2026-11-20 09:33:52 UTC — [ticket-1024] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le paramètre `restrictions_ui`  (28108ms)
+- 2026-11-20 09:33:53 UTC — [ticket-1024] APPROVED après 1 tour(s)
+- 2026-11-20 09:36:16 UTC — [ticket-1024] documentation: 0 fichier(s) (122656ms) — après tour de correction
+- 2026-11-20 09:36:16 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-20 09:36:16 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-20 09:36:16 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)

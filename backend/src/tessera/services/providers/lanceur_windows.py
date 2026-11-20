@@ -197,7 +197,10 @@ class LanceurWindows:
         k32 = _CTYPES.WinDLL("kernel32", use_last_error=True)
         adv = _CTYPES.WinDLL("advapi32", use_last_error=True)
         # Le job d'abord : sans lui, rien ne démarre (ticket-943, ADR-037).
-        groupe = creer_groupe()
+        try:
+            groupe = creer_groupe(restrictions_ui=True)
+        except OSError as exc:
+            raise ProviderIndisponible(f"restrictions du job impossibles : {exc}") from exc
         if groupe is None:
             raise ProviderIndisponible("job object impossible à créer : l'agent ne démarre pas sans lui")
         try:
