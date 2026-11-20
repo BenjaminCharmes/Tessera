@@ -10576,3 +10576,7 @@ error: Please commit or stash them.
 - 2026-11-20 11:43:45 UTC — [ticket-978] validateur: fichiers cités joints : agents.json, realignement_base.py
 - 2026-11-20 11:43:45 UTC — [ticket-978] validateur: APPROVED — Le codeur a correctement implémenté la réutilisation de `realigner_base` pour su (58155ms)
 - 2026-11-20 11:43:46 UTC — [ticket-978] APPROVED après 1 tour(s)
+- 2026-11-20 11:44:53 UTC — [ticket-978] documentation: 0 fichier(s) (43282ms)
+- 2026-11-20 11:44:53 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-20 11:44:53 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-20 11:44:53 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
