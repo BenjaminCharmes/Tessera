@@ -37,7 +37,7 @@ from tessera.services.documentation.documentation_contenu import contenu_et_redu
 from tessera.services.documentation.documentation_description import appliquer_description
 from tessera.services.documentation.documentation_editions import appliquer_editions
 from tessera.services.documentation.documentation_preuve import fichiers_de_la_matiere
-from tessera.services.documentation.documentation_reponse import donnees_de, editions_de, editions_depuis
+from tessera.services.documentation.documentation_reponse import donnees_de, editions_de, editions_depuis, refuser
 from tessera.services.documentation.documentation_selection import MARQUEUR, TicketADocumenter, consigner_lot, marquer_documente, tickets_a_documenter
 from tessera.services.documentation.documentation_titres import brief_correction as _brief_correction
 from tessera.services.documentation.documentation_titres import titres_fichiers_vises as _titres_fichiers_vises
@@ -254,18 +254,18 @@ class DocumentationService:
                 editions2 = editions_de(str(reponse2.content), role)
                 if not editions2:
                     continue
+                ecartees: list[str] = []
                 try:
                     ecrits2 = appliquer_editions(
-                        racine, editions2, claude_md, matiere, intentions, agents_md
+                        racine, editions2, claude_md, matiere, intentions, agents_md,
+                        ecartees,
                     )
                     modifies.extend(ecrits2)
                     _journaliser_editions(role, ecrits2)
+                    refuser(role, ecartees, refus)
                 except EditionRefusee as exc2:
                     # Deuxième refus : comportement courant (ticket-395).
-                    _logger.warning(
-                        "editions_refusees", extra={"role": role, "motif": str(exc2)}
-                    )
-                    refus.append(f"{role} : {exc2}")
+                    refuser(role, [str(exc2)], refus)
 
         # Le marqueur avance si une édition est appliquée ou si aucune n'est
         # proposée ; un lot refusé est compté, abandonné au 2e refus (t.940).
