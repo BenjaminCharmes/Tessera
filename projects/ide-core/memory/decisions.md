@@ -651,3 +651,12 @@ Une ADR qu'aucune règle de `contraintes.md` ni aucun `CLAUDE.md` ne cite part d
 **Raison** : presse-papiers, atomes et hooks sont propres à la station ; `SendInput` et la capture dépendent du bureau, hors de portée d'un job.
 **Alternative rejetée** : `UILIMIT` seul (ni frappes simulées ni capture) ; session 0 par tâche ou service (administrateur, tuyaux stdio perdus, sortie du job d'ADR-088).
 **Ne ferme pas** : Node, Playwright ou le CLI peuvent refuser une station non interactive ; preuve avant câblage (ticket-1023).
+
+---
+
+## ADR-091 — Clore un appel ne reprend que ce que le compte possède
+
+**Date** : 2026-11-20
+**Décision** : amende ADR-087. Le droit du compte se pose à l'ouverture d'un appel et se retire à sa clôture, jamais au-delà. Une fois par racine : `OWNER RIGHTS`, contrôle du backend, `.git` protégé. Par appel : `/grant` du compte (4,8 s→1,6 s), `/remove:g` (1,7 s), reprise ciblée en `ctypes` des seules entrées du compte ou à DACL protégée (16 s→0,6 s ; 4,2 s après `npm ci`). Tâches en `/xml` (2,0 s→0,2 s). Profil : même reprise, à mesurer.
+**Raison** : sans `WRITE_DAC` ni `WRITE_OWNER`, le compte ne change que ce qu'il possède ; le reste n'hérite que de la racine. Entrée illisible ou non reprise : `DroitsAgentRefuses`, `blocked` (ADR-037). Un lien se reprend par son handle, jamais sa cible ; les refus des fichiers protégés survivent, sans reset.
+**Alternative rejetée** : droit tenu le temps du run.
