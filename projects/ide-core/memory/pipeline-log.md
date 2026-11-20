@@ -10674,3 +10674,7 @@ error: Please commit or stash them.
 - 2026-11-20 20:37:59 UTC — [ticket-1036] validateur: APPROVED — Le ticket satisfait tous les critères. Le nouveau fichier `test_documentation_ec (42202ms)
 - 2026-11-20 20:37:59 UTC — [ticket-1036] APPROVED après 3 tour(s)
 - 2026-11-20 20:38:48 UTC — [ticket-1036] leçons: une leçon proposée
+- 2026-11-20 20:41:40 UTC — [ticket-1036] documentation: 0 fichier(s) (150000ms)
+- 2026-11-20 20:41:40 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-20 20:41:40 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-20 20:41:40 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
