@@ -10619,3 +10619,14 @@ error: Please commit or stash them.
 - 2026-11-20 14:28:13 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
 - 2026-11-20 14:28:13 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
 - 2026-11-20 14:28:13 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-20 14:34:27 UTC — [ide-core] ticket-1031 PR #1228 mergée (CI verte)
+- 2026-11-20 14:45:12 UTC — [ticket-1032] branche ticket-1032-stops-states-and-project-cards-follow-the-charte
+- 2026-11-20 14:45:15 UTC — [ticket-1032] tour 1 — codeur démarré
+- 2026-11-20 14:46:41 UTC — [ticket-1032] tour 1 — codeur terminé (85078ms)
+- 2026-11-20 14:51:12 UTC — [ticket-1032] testeur: dur�es : tsc 20 s, eslint 42 s, vitest 172 s
+- 2026-11-20 14:51:20 UTC — [ticket-1032] securite: PASS — Le diff ne touche que du style : classes Tailwind de ProjetCarte, RemoveProjectM (6483ms)
+- 2026-11-20 14:51:22 UTC — [ticket-1032] tour 1 — reviewer démarré
+- 2026-11-20 14:51:36 UTC — [ticket-1032] tour 1 — reviewer terminé (14375ms)
+- 2026-11-20 14:52:05 UTC — [ticket-1032] validateur: fichiers cités joints : frontend/src/components/Sidebar/RemoveProjectModal.test.tsx, frontend/src/components/Sidebar/ticketCardTables.ts, frontend/src/components/Toast.test.tsx, frontend/src/components/ProjetsView/ProjetCarte.test.tsx, frontend/src/design/coherence.test.ts (tronqué) ; absents : bg-red-500/12
+- 2026-11-20 14:52:05 UTC — [ticket-1032] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le codeur a implémenté les quat (44639ms)
+- 2026-11-20 14:52:05 UTC — [ticket-1032] APPROVED après 1 tour(s)
