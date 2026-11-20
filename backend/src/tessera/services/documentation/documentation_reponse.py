@@ -31,3 +31,10 @@ def editions_depuis(donnees: dict[str, object]) -> list[dict[str, object]]:
 def editions_de(contenu: str, role: str) -> list[dict[str, object]]:
     """Les modifications que l'agent propose, ou rien si sa réponse est illisible."""
     return editions_depuis(donnees_de(contenu, role))
+
+
+def refuser(role: str, motifs: list[str], refus: list[str]) -> None:
+    """Journalise les éditions refusées et les verse à ``refus``."""
+    if motifs:
+        _logger.warning("editions_refusees", extra={"role": role, "motif": motifs})
+        refus.extend(f"{role} : {m}" for m in motifs)

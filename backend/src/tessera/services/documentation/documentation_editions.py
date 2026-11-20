@@ -37,6 +37,7 @@ def appliquer_editions(
     matiere: MatiereCode | None = None,
     tickets: str = "",
     agents_md: Path | None = None,
+    ecartees: list[str] | None = None,
 ) -> list[str]:
     """Applique toutes les modifications, ou aucune.
 
@@ -56,6 +57,10 @@ def appliquer_editions(
     et ses jetons vérifiables doivent y figurer (ticket-542, ADR-057). Sans
     elle, rien n'est contrôlé : seul le service sait ce que l'agent a reçu, et
     il la passe toujours.
+
+    ``ecartees``, si fourni, change le sort des seuls refus du contrôle de
+    preuve : l'édition est écartée seule, son motif ajouté à la liste, et les
+    autres s'appliquent. Tout autre refus lève, comme sans liste.
     """
     resultat: dict[Path, str] = {}
     controle = None if matiere is None else ControleDePreuve(matiere, tickets)
@@ -75,7 +80,14 @@ def appliquer_editions(
             fichier = racine / chemin
 
         if controle is not None:
-            controle.verifier(edition, chemin)
+            try:
+                controle.verifier(edition, chemin)
+            except EditionRefusee as exc:
+                if ecartees is None:
+                    raise
+                # Tour de correction : cette édition tombe seule (ticket-1036).
+                ecartees.append(str(exc))
+                continue
 
         if "contenu" in edition:
             if fichier in resultat or fichier.exists():
