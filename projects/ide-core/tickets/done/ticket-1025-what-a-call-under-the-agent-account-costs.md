@@ -4,7 +4,7 @@ created: 2026-11-19
 depends_on: []
 estimated_days: 1
 id: ticket-1025
-pr_number: null
+pr_number: 1211
 priority: high
 status: done
 title: 'Design: a call under the agent account costs a few seconds, the right still
