@@ -10450,3 +10450,17 @@ error: Please commit or stash them.
 - 2026-11-19 15:54:41 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
 - 2026-11-19 15:54:41 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
 - 2026-11-19 15:54:41 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-20 08:45:16 UTC — [ticket-1025] branche ticket-1025-design-a-call-under-the-agent-account-costs-a-fe
+- 2026-11-20 08:45:19 UTC — [ticket-1025] tour 1 — codeur démarré
+- 2026-11-20 08:49:35 UTC — [ticket-1025] tour 1 — architect terminé (254640ms)
+- 2026-11-20 08:50:38 UTC — [ticket-1025] testeur: OK (exit 0)
+- 2026-11-20 08:51:04 UTC — [ticket-1025] securite: PASS — Le diff ne contient que de la documentation (une règle sous « Proposées », l'ADR (24468ms)
+- 2026-11-20 08:51:05 UTC — [ticket-1025] tour 1 — reviewer démarré
+- 2026-11-20 08:51:51 UTC — [ticket-1025] validateur: fichiers cités joints : projects/ide-core/memory/decisions.md (tronqué) ; non joints (budget épuisé) : droits_worktree.py, projects/ide-core/tickets/todo/, profil_agent.py, taches_compte.py, projects/ide-core/tickets/, projects/ide-core/memory/
+- 2026-11-20 08:51:51 UTC — [ticket-1025] validateur: APPROVED — Conception complète et conforme. L'ADR-091 retient une stratégie combinée (repri (46561ms)
+- 2026-11-20 08:51:52 UTC — [ticket-1025] tour 1 — reviewer terminé (46875ms)
+- 2026-11-20 08:51:53 UTC — [ticket-1025] APPROVED après 1 tour(s)
+- 2026-11-20 08:53:15 UTC — [ticket-1025] documentation: 0 fichier(s) (61046ms)
+- 2026-11-20 08:53:15 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-20 08:53:15 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-20 08:53:15 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)

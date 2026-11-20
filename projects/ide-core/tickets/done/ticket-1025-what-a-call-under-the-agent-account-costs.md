@@ -1,14 +1,15 @@
 ---
-id: ticket-1025
-title: "Design: a call under the agent account costs a few seconds, the right still lasts one call"
-type: design
-status: todo
-pr_number: null
-priority: high
 agent: architect
+created: 2026-11-19
 depends_on: []
 estimated_days: 1
-created: 2026-11-19
+id: ticket-1025
+pr_number: 1211
+priority: high
+status: done
+title: 'Design: a call under the agent account costs a few seconds, the right still
+  lasts one call'
+type: design
 ---
 
 # ticket-1025 — Conception : un appel sous le compte agent coûte quelques secondes, le droit dure toujours un appel
