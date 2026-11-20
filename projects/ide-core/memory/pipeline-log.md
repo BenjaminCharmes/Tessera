@@ -10460,3 +10460,7 @@ error: Please commit or stash them.
 - 2026-11-20 08:51:51 UTC — [ticket-1025] validateur: APPROVED — Conception complète et conforme. L'ADR-091 retient une stratégie combinée (repri (46561ms)
 - 2026-11-20 08:51:52 UTC — [ticket-1025] tour 1 — reviewer terminé (46875ms)
 - 2026-11-20 08:51:53 UTC — [ticket-1025] APPROVED après 1 tour(s)
+- 2026-11-20 08:53:15 UTC — [ticket-1025] documentation: 0 fichier(s) (61046ms)
+- 2026-11-20 08:53:15 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-20 08:53:15 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-20 08:53:15 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
