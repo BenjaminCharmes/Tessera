@@ -1,12 +1,13 @@
 ---
-id: ticket-1023
-title: "The agent account launches on a dedicated window station and desktop"
-type: feat
-status: todo
-priority: high
 agent: codeur
 depends_on: []
+id: ticket-1023
+pr_number: 1214
 preuve_reelle: true
+priority: high
+status: done
+title: The agent account launches on a dedicated window station and desktop
+type: feat
 ---
 
 # ticket-1023 — Le compte agent part sur une window station et un bureau dédiés

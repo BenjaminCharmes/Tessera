@@ -8,7 +8,7 @@ import ctypes
 import importlib
 import os
 import subprocess
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from ctypes import wintypes
 from typing import Any, BinaryIO, cast
 
@@ -16,8 +16,11 @@ import anyio
 from anyio.abc import Process
 
 from tessera.services.noyau.groupe_de_processus import creer_groupe, fermer_le_groupe
+from tessera.services.providers.droits_worktree import DroitsAgentRefuses
 from tessera.services.providers.noms import ProviderIndisponible
 from tessera.services.providers.process_agent import ProcessAgent
+from tessera.services.providers.processus_compte import sid_du_compte
+from tessera.services.providers.station_agent import BureauAgent, OuvreurBureau, ouvrir_bureau
 
 # `WinDLL`, `get_last_error` et `msvcrt` n'existent que sous Windows : lus
 # dynamiquement, le module s'importe et se type aussi sous Linux (CI, mypy-linux).
@@ -164,7 +167,19 @@ def lancer_dans_un_job(
 
 
 class LanceurWindows:
-    """``LanceurAgent`` over ``CreateProcessWithLogonW``."""
+    """``LanceurAgent`` over ``CreateProcessWithLogonW``, on a desktop of its own (ADR-089)."""
+
+    def __init__(
+        self, ouvreur: OuvreurBureau = ouvrir_bureau, sid_de: Callable[[str], bytes] = sid_du_compte,
+    ) -> None:
+        self._ouvreur = ouvreur
+        self._sid_de = sid_de
+
+    def _bureau(self, compte: str) -> BureauAgent:
+        try:
+            return self._ouvreur(self._sid_de(compte))
+        except DroitsAgentRefuses as exc:
+            raise ProviderIndisponible(f"bureau de l'agent : {exc}") from exc
 
     async def lancer(
         self, commande: Sequence[str], *, compte: str, mot_de_passe: str,
@@ -185,6 +200,22 @@ class LanceurWindows:
         groupe = creer_groupe()
         if groupe is None:
             raise ProviderIndisponible("job object impossible à créer : l'agent ne démarre pas sans lui")
+        try:
+            bureau = self._bureau(compte)  # jamais de repli sur WinSta0\Default (ADR-037)
+        except ProviderIndisponible:
+            fermer_le_groupe(groupe)
+            raise
+        try:
+            return self._demarrer(k32, adv, groupe, bureau, (compte, mot_de_passe, texte_ligne, env, cwd), avec_stderr)
+        except BaseException:
+            bureau.fermer()
+            raise
+
+    def _demarrer(
+        self, k32: Any, adv: Any, groupe: Any, bureau: BureauAgent,
+        cible: tuple[str, str, str, Mapping[str, str], str | None], avec_stderr: bool,
+    ) -> Process:
+        compte, mot_de_passe, texte_ligne, env, cwd = cible
         in_enfant, in_parent = _tuyau(k32, parent_lit=False)
         out_enfant, out_parent = _tuyau(k32, parent_lit=True)
         err_enfant, err_parent = _tuyau(k32, True) if avec_stderr else (_nul(k32), 0)
@@ -192,6 +223,7 @@ class LanceurWindows:
         si = _StartupInfo()
         si.cb = ctypes.sizeof(_StartupInfo)
         si.dwFlags = _STARTF_USESTDHANDLES
+        si.lpDesktop = bureau.nom
         si.hStdInput, si.hStdOutput, si.hStdError = in_enfant, out_enfant, err_enfant
         ligne = ctypes.create_unicode_buffer(texte_ligne)
         ok, code = False, 0
@@ -209,10 +241,12 @@ class LanceurWindows:
                         k32.CloseHandle(h)
         if not ok:
             raise ProviderIndisponible(message_de_logon(code, compte))
-        return self._process(k32, info, groupe, in_parent, out_parent, err_parent)
+        return self._process(k32, info, groupe, in_parent, out_parent, err_parent, bureau)
 
     @staticmethod
-    def _process(k32: Any, info: _ProcessInfo, groupe: Any, i: int, o: int, e: int) -> Process:
+    def _process(
+        k32: Any, info: _ProcessInfo, groupe: Any, i: int, o: int, e: int, bureau: BureauAgent | None = None,
+    ) -> Process:
         proc = info.hProcess
         ferme: list[bool] = []
 
@@ -221,6 +255,8 @@ class LanceurWindows:
             if not ferme:
                 ferme.append(True)
                 fermer_le_groupe(groupe)
+                if bureau is not None:
+                    bureau.fermer()
 
         def arreter() -> None:
             k32.TerminateProcess(proc, 1)
