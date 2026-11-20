@@ -10502,3 +10502,12 @@ error: Please commit or stash them.
 - 2026-11-20 09:36:16 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
 - 2026-11-20 09:36:16 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
 - 2026-11-20 09:36:16 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-20 09:46:34 UTC — [ticket-1027] branche ticket-1027-a-call-sets-its-right-alone-and-takes-back-only
+- 2026-11-20 09:46:44 UTC — [ticket-1027] tour 1 — codeur démarré
+- 2026-11-20 10:27:21 UTC — [ticket-1027] tour 1 — codeur terminé (2437406ms)
+- 2026-11-20 10:42:37 UTC — [ticket-1027] testeur: dur�es : ruff 0 s, mypy 26 s, mypy-linux 49 s, pytest 870 s ; impact depuis base : suite compl�te
+- 2026-11-20 10:43:36 UTC — [ticket-1027] securite: PASS — PASS : aucune faille CRITICAL ou HIGH introduite ; deux remarques mineures (LOW  (57828ms)
+- 2026-11-20 10:43:37 UTC — [ticket-1027] tour 1 — reviewer démarré
+- 2026-11-20 10:44:27 UTC — [ticket-1027] tour 1 — reviewer terminé (49671ms)
+- 2026-11-20 10:45:21 UTC — [ticket-1027] validateur: APPROVED — Le ticket 1027 réalise complètement l'ADR-091 : séparation claire entre `poser_b (104469ms)
+- 2026-11-20 10:45:22 UTC — [ticket-1027] APPROVED après 1 tour(s)
