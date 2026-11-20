@@ -10654,3 +10654,23 @@ error: Please commit or stash them.
 - 2026-11-20 16:03:14 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
 - 2026-11-20 16:03:14 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
 - 2026-11-20 16:03:14 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-20 16:09:02 UTC — [ide-core] ticket-1033 PR #1234 mergée (CI verte)
+- 2026-11-20 20:28:19 UTC — [ticket-1036] branche ticket-1036-a-refused-edition-no-longer-drops-the-whole-docu
+- 2026-11-20 20:28:23 UTC — [ticket-1036] tour 1 — codeur démarré
+- 2026-11-20 20:29:47 UTC — [ticket-1036] tour 1 — codeur terminé (83406ms)
+- 2026-11-20 20:31:02 UTC — [ticket-1036] testeur: 1 failed, 316 passed, 8 warnings in 34.57s — fichiers en échec : tests/test_longueur_des_fichiers.py
+- 2026-11-20 20:31:03 UTC — [ticket-1036] tests rouges au tour 1
+- 2026-11-20 20:31:03 UTC — [ticket-1036] tour 2 — codeur démarré
+- 2026-11-20 20:32:45 UTC — [ticket-1036] tour 2 — codeur terminé (101327ms)
+- 2026-11-20 20:34:00 UTC — [ticket-1036] testeur: 1 failed, 269 passed, 8 warnings in 34.77s — fichiers en échec : tests/test_documentation_relecture.py
+- 2026-11-20 20:34:01 UTC — [ticket-1036] tests rouges au tour 2
+- 2026-11-20 20:34:01 UTC — [ticket-1036] tour 3 — codeur démarré
+- 2026-11-20 20:35:48 UTC — [ticket-1036] tour 3 — codeur terminé (107031ms)
+- 2026-11-20 20:37:03 UTC — [ticket-1036] testeur: dur�es : ruff 0 s, mypy 9 s, mypy-linux 10 s, pytest 41 s ; impact depuis base : 29 fichier(s) de test
+- 2026-11-20 20:37:15 UTC — [ticket-1036] securite: PASS — Verdict PASS : le diff ne fait que garder les éditions valides du tour de correc (11453ms)
+- 2026-11-20 20:37:17 UTC — [ticket-1036] tour 3 — reviewer démarré
+- 2026-11-20 20:37:34 UTC — [ticket-1036] tour 3 — reviewer terminé (17156ms)
+- 2026-11-20 20:37:59 UTC — [ticket-1036] validateur: fichiers cités joints : backend/tests/test_documentation.py (tronqué)
+- 2026-11-20 20:37:59 UTC — [ticket-1036] validateur: APPROVED — Le ticket satisfait tous les critères. Le nouveau fichier `test_documentation_ec (42202ms)
+- 2026-11-20 20:37:59 UTC — [ticket-1036] APPROVED après 3 tour(s)
+- 2026-11-20 20:38:48 UTC — [ticket-1036] leçons: une leçon proposée
