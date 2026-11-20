@@ -3,9 +3,9 @@
 Pièges observés sur ce projet, une ligne chacun. Le service écrit sous `## Proposées` ; un humain déplace une leçon sous `## En vigueur` pour qu'elle atteigne le codeur et le reviewer.
 
 ## Proposées
-- Quand un verrou protège un état global partagé, intégrer un test de sa présence pour prévenir sa suppression accidentelle. (source : ticket-1023, 2026-11-20)
 
 ## En vigueur
+- Quand un verrou protège un état global partagé, intégrer un test de sa présence pour prévenir sa suppression accidentelle. (source : ticket-1023, 2026-11-20)
 - Quand tu écris des données de test pour un module sensible, vérifie qu'elles ne déclenchent pas le contrôle de traces professionnelles. (source : ticket-933, 2026-11-11)
 - Quand tu raccourcis des commentaires pour loger du code, c'est que tu ajoutes trop : extrais un module au lieu d'éroder la doc. (source : ticket-915, 2026-11-11)
 - Quand tu rattrapes les exceptions d'une bibliothèque de parsing, nomme les types réellement levés, sans supposer qu'ils héritent de ValueError. (source : ticket-902, 2026-11-10)

@@ -12,7 +12,6 @@ section. (ADR-055)
 
 - **Rien de planifié ni de caché ne survit au compte agent** : ses tâches planifiées se retirent au dernier appel, le cache uv part avec le profil, et un fichier protégé ajouté pendant un appel met le run en `blocked`. (ADR-088, ADR-087, ADR-084)
 - **Un processus du compte agent ne part jamais sur `WinSta0\Default`** : il tourne sur la station non interactive de la session du backend, sur un bureau créé pour l'appel, ouvert au seul compte agent et au backend ; sans eux, le lancement échoue, sans repli. (ADR-089, ADR-083, ADR-037)
-- **La clôture d'un appel sous le compte agent ne reprend que les entrées dont le compte est propriétaire ou à DACL protégée, jamais par le chemin d'un lien** ; une entrée illisible ou non reprise met le run en `blocked`. (ADR-091, ADR-087, ADR-037)
 
 ## Git et périmètre d'écriture
 
@@ -44,6 +43,7 @@ section. (ADR-055)
 - **Un worktree qui porte du travail non commité ne se supprime pas** ; orphelin au démarrage, il se commite comme un run non approuvé, puis se supprime. (ADR-056, ADR-037)
 - **Le détecteur d'anomalies observe sans gouverner** : sans LLM, `git` ni `gh`, il ne touche ni run ni dépôt, et son échec n'en atteint aucun. (ADR-078, ADR-037)
 - **Un appel d'agent qui change un fichier protégé, un hook ou la config git met le run en `blocked`** (empreinte avant/après). (ADR-084, ADR-037)
+- **Clore un appel ne reprend que ce que le compte agent possède ou à DACL protégée, liens non suivis**, sinon `blocked`. (ADR-091)
 - **Un projet ne porte qu'un run à la fois** (`RunLock`, 409) ; deux projets tournent en parallèle. (ADR-038)
 - **L'audit sécurité et le validateur échouent fermés.** Provider indisponible, réponse illisible ou exception → `BLOCK` / `CHANGES_REQUESTED`. Une faille `CRITICAL` ou `HIGH` bloque quel que soit le verdict LLM. (ADR-039)
 - **En mode autonome, vérifier dépense estimée et quota réel entre deux tickets, jamais au milieu** ; un quota inconnu ne bloque pas. (ADR-020)
