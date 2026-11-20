@@ -10630,3 +10630,7 @@ error: Please commit or stash them.
 - 2026-11-20 14:52:05 UTC — [ticket-1032] validateur: fichiers cités joints : frontend/src/components/Sidebar/RemoveProjectModal.test.tsx, frontend/src/components/Sidebar/ticketCardTables.ts, frontend/src/components/Toast.test.tsx, frontend/src/components/ProjetsView/ProjetCarte.test.tsx, frontend/src/design/coherence.test.ts (tronqué) ; absents : bg-red-500/12
 - 2026-11-20 14:52:05 UTC — [ticket-1032] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le codeur a implémenté les quat (44639ms)
 - 2026-11-20 14:52:05 UTC — [ticket-1032] APPROVED après 1 tour(s)
+- 2026-11-20 14:53:06 UTC — [ticket-1032] documentation: 0 fichier(s) (41625ms)
+- 2026-11-20 14:53:06 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-20 14:53:06 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-20 14:53:06 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
