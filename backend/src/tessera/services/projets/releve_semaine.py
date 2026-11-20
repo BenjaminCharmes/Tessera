@@ -13,6 +13,7 @@ from datetime import date
 from pathlib import Path
 
 from tessera.services.noyau.git_commande import build_command
+from tessera.services.projets.releve_base import FichesBase, lire_fichier_base, reference_distante, titre_de_fiche
 
 # Les motifs du journal, nommés : le format peut évoluer (ticket-910). Une PR
 # mergée s'écrit sous deux formes : l'ancienne (`[ticket-N] livraison: PR #N
@@ -25,7 +26,6 @@ LIGNE_PR_MERGEE = re.compile(
     r"(?:\[ticket-\d+\] livraison: |\[[^\]]+\] ticket-\d+ )PR #(?P<pr>\d+) mergée"
 )
 LIGNE_FAIT = re.compile(r"^- (?P<jour>\d{4}-\d{2}-\d{2}) — (?P<texte>.+)$")
-TITRE_TICKET = re.compile(r"^#\s+ticket-\d+\s*[—-]\s*(?P<titre>.+)$", re.MULTILINE)
 
 
 @dataclass
@@ -58,27 +58,43 @@ def _config(projet: Path) -> dict[str, object]:
     return brut if isinstance(brut, dict) else {}
 
 
-def _titre_ticket(projet: Path, numero: str) -> str:
-    """Read the title in the ticket file, else say it is missing."""
+def _titre_ticket(projet: Path, numero: str, fiches: FichesBase | None = None) -> str:
+    """Read the title on the remote base, else in the ticket files, else say it is missing."""
+    titre = fiches.titre(numero) if fiches else None
+    if titre:
+        return titre
     for fichier in sorted((projet / "tickets").glob(f"**/ticket-{numero}-*.md")):
-        trouve = TITRE_TICKET.search(fichier.read_text(encoding="utf-8", errors="replace"))
-        if trouve:
-            return trouve.group("titre").strip()
+        titre = titre_de_fiche(fichier.read_text(encoding="utf-8", errors="replace"))
+        if titre:
+            return titre
     return "titre introuvable"
 
 
-def _lire_journal(projet: Path, du: date, au: date, releve: ReleveProjet) -> None:
-    chemin = projet / "memory" / "pipeline-log.md"
+def _lignes_journal(projet: Path, ref: str | None) -> list[str] | None:
+    """Base lines then the local ones not already there; ``None`` if neither is readable."""
+    de_base = lire_fichier_base(projet, ref, "memory/pipeline-log.md") if ref else None
+    lignes = de_base.splitlines() if de_base else []
     try:
-        lignes = chemin.read_text(encoding="utf-8").splitlines()
-    except OSError as exc:
-        releve.illisibles.append(f"memory/pipeline-log.md ({exc.__class__.__name__})")
+        locales = (projet / "memory" / "pipeline-log.md").read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return lignes if de_base is not None else None
+    vues = set(lignes)
+    return lignes + [ligne for ligne in locales if ligne not in vues]
+
+
+def _lire_journal(
+    projet: Path, du: date, au: date, releve: ReleveProjet, ref: str | None = None
+) -> None:
+    lignes = _lignes_journal(projet, ref)
+    if lignes is None:
+        releve.illisibles.append("memory/pipeline-log.md (OSError)")
         return
+    fiches = FichesBase(projet, ref) if ref else None
     for ligne in lignes:
         ok = LIGNE_APPROUVE.match(ligne)
         if ok and _dans_periode(ok.group("jour"), du, au):
             numero = ok.group("ticket")
-            releve.tickets.append((numero, _titre_ticket(projet, numero)))
+            releve.tickets.append((numero, _titre_ticket(projet, numero, fiches)))
         pr = LIGNE_PR_MERGEE.match(ligne)
         if pr and _dans_periode(pr.group("jour"), du, au) and pr.group("pr") not in releve.prs:
             releve.prs.append(pr.group("pr"))
@@ -115,11 +131,13 @@ def _compter_commits(projet: Path, du: date, au: date, base: str) -> int:
 
 def _lire_projet(projet: Path, du: date, au: date) -> ReleveProjet:
     releve = ReleveProjet(nom=projet.name)
-    _lire_journal(projet, du, au, releve)
-    releve.faits = _lire_faits(projet, du, au)
     base = _config(projet).get("base_branch")
+    ref = reference_distante(projet, base)
+    _lire_journal(projet, du, au, releve, ref)
+    releve.faits = _lire_faits(projet, du, au)
+    cible = ref or (base if isinstance(base, str) else "HEAD")
     try:
-        releve.commits = _compter_commits(projet, du, au, base if isinstance(base, str) else "HEAD")
+        releve.commits = _compter_commits(projet, du, au, cible)
     except OSError as exc:
         releve.illisibles.append(f"dépôt ({exc})")
     return releve

@@ -136,3 +136,74 @@ def test_both_pr_formats_read_and_deduplicated(tmp_path: Path) -> None:
     )
     _projet(tmp_path, "p", journal)
     assert "PR mergées : #9, #10" in releve_semaine(tmp_path, DU, AU)
+
+
+def _git(cwd: Path, *args: str) -> None:
+    ident = ["-c", "user.name=Exemple", "-c", "user.email=exemple@example.com"]
+    subprocess.run(["git", *ident, *args], cwd=cwd, check=True, capture_output=True)
+
+
+def _clone_en_retard(tmp_path: Path, journal_local: str = "") -> Path:
+    """A clone whose ``origin/main`` is ahead of its checkout (fetched, not merged)."""
+    origine = tmp_path / "origine"
+    origine.mkdir()
+    _git(origine, "init", "-b", "main")
+    (origine / "CLAUDE.md").write_text("# p\n", encoding="utf-8")
+    (origine / "agents.json").write_text('{"base_branch": "main"}', encoding="utf-8")
+    (origine / "memory").mkdir()
+    (origine / "memory" / "pipeline-log.md").write_text("", encoding="utf-8")
+    _git(origine, "add", ".")
+    _git(origine, "commit", "-m", "init")
+    racine = tmp_path / "racine"
+    racine.mkdir()
+    _git(tmp_path, "clone", str(origine), str(racine / "p"))
+    (origine / "memory" / "pipeline-log.md").write_text(_journal("2026-11-04", "55"), encoding="utf-8")
+    (origine / "tickets" / "done").mkdir(parents=True)
+    (origine / "tickets" / "done" / "ticket-55-x.md").write_text(
+        "---\nid: ticket-55\ntitle: \"Titre distant\"\n---\n\n## Signalement\n", encoding="utf-8"
+    )
+    _git(origine, "add", ".")
+    _git(origine, "commit", "-m", "livraison")
+    clone = racine / "p"
+    _git(clone, "fetch", "origin")
+    if journal_local:
+        (clone / "memory" / "pipeline-log.md").write_text(journal_local, encoding="utf-8")
+    return racine
+
+
+def test_clone_behind_remote_base_reads_remote_log_and_titles(tmp_path: Path) -> None:
+    racine = _clone_en_retard(tmp_path)
+    assert not (racine / "p" / "tickets").exists()
+    out = releve_semaine(racine, DU, AU)
+    assert "ticket-55 — Titre distant" in out
+    assert "PR mergées : #7" in out
+
+
+def test_local_only_lines_added_and_shared_lines_counted_once(tmp_path: Path) -> None:
+    local = _journal("2026-11-04", "55") + _journal("2026-11-05", "56", "8")
+    racine = _clone_en_retard(tmp_path, local)
+    out = releve_semaine(racine, DU, AU)
+    assert out.count("ticket-55 —") == 1
+    assert "ticket-56 — titre introuvable" in out
+    assert "PR mergées : #7, #8" in out
+
+
+def test_project_without_base_branch_reads_files(tmp_path: Path) -> None:
+    dossier = _projet(tmp_path, "p", _journal("2026-11-04", "910"))
+    (dossier / "tickets" / "done" / "ticket-910-x.md").write_text(
+        "# ticket-910 — Titre local\n", encoding="utf-8"
+    )
+    out = releve_semaine(tmp_path, DU, AU)
+    assert "ticket-910 — Titre local" in out
+    assert "source illisible : dépôt" in out
+
+
+def test_title_falls_back_on_frontmatter_then_missing(tmp_path: Path) -> None:
+    dossier = _projet(tmp_path, "p", _journal("2026-11-04", "1") + _journal("2026-11-04", "2", "8"))
+    (dossier / "tickets" / "done" / "ticket-1-a.md").write_text(
+        "---\ntitle: Depuis le frontmatter\n---\n\n## Signalement\n", encoding="utf-8"
+    )
+    (dossier / "tickets" / "done" / "ticket-2-b.md").write_text("## Signalement\n", encoding="utf-8")
+    out = releve_semaine(tmp_path, DU, AU)
+    assert "ticket-1 — Depuis le frontmatter" in out
+    assert "ticket-2 — titre introuvable" in out
