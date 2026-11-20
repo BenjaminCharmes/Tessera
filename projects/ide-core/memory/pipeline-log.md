@@ -10615,3 +10615,7 @@ error: Please commit or stash them.
 - 2026-11-20 14:25:20 UTC — [ticket-1031] validateur: APPROVED — Le codeur a satisfait tous les critères d'acceptation. Les deux nouveaux modules (80000ms)
 - 2026-11-20 14:25:21 UTC — [ticket-1031] APPROVED après 3 tour(s)
 - 2026-11-20 14:26:11 UTC — [ticket-1031] leçons: refusée — preuve absente du retour du run
+- 2026-11-20 14:28:13 UTC — [ticket-1031] documentation: 0 fichier(s) (99531ms)
+- 2026-11-20 14:28:13 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-20 14:28:13 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-20 14:28:13 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
