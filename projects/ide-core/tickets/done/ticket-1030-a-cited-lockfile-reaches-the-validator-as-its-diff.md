@@ -2,6 +2,7 @@
 agent: codeur
 depends_on: []
 id: ticket-1030
+pr_number: 1224
 priority: medium
 status: done
 title: A lockfile cited by a criterion reaches the validator as its diff
