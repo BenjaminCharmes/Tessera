@@ -51,6 +51,9 @@ de services s'écrivent en police normale.
 - **Pastille d'état** : fond teinté à 12 % de la famille de l'état, texte
   clair de la même famille, rayon 4 px, toujours un mot (jamais la couleur
   seule). Même composant dans Kanban, Historique, Supervision, En cours.
+- **Toast** : il flotte au-dessus du contenu, donc fond opaque zinc-900
+  bordé de zinc-700, et la teinte à 12 % de la famille par-dessus.
+- **Carte de projet** : rayon de 10 px.
 - **Listes et tableaux** : lignes de 36 px, en-tête en légende majuscule,
   filet zinc-800, ligne choisie sur fond surface-haute (pas de bordure
   violette dans une liste), montants alignés à droite.

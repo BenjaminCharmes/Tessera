@@ -58,7 +58,6 @@ Pages de 1440 px de large, sauf mention. « En vigueur » : l'écran existe dans
 | `coup-de-pinceau/Tickets.dc.html` | kanban en français, projet actif visible | oui |
 | `coup-de-pinceau/Projets.dc.html` | cartes de projet égales | oui |
 | `Bureau.dc.html` | Bureau des agents : une pièce par projet | oui |
-| `Bureau-Compact.dc.html` | Bureau compact, une rangée par projet au-delà de six | **non implémenté** : seule la bascule Liste / Bureau existe |
 | `Notifications.dc.html` | cloche : historique du jour et réglages | oui |
 | `Bureau-vivant.dc.html` | Bureau animé, interactif (les boutons « Démo » et le panneau « Qui fait quoi » n'existent que dans la maquette ; dans l'app, les événements réels déclenchent les scènes) | oui |
 | `Salle-des-serveurs-v2.dc.html` | En cours : une salle par projet | oui |
@@ -96,19 +95,14 @@ sans ticket. `Composants.dc.html` les détaille brique par brique.
 - Bande d'en-tête : 12 px majuscules et barre de 3 px dessinées ; `RegionTitle`
   écrit en casse normale, barre de 2 px (la fenêtre Mettre en ligne suit la
   maquette).
-- Cartes de projet : rayon de 10 px et 196 px de haut dessinés ; rayon de 2 px
-  et hauteur au contenu dans l'app.
+- Cartes de projet : 196 px de haut dessinés ; hauteur au contenu dans l'app.
 - Fenêtre Mettre en ligne : 480 px dessinés, 34 rem dans l'app.
-- Statut d'un ticket : fonds pleins -900 dans l'app, pastille à 12 % dans la
-  charte.
 - Étapes de mise en ligne : « déjà là » et « ton action requise » ont une
   nuance dessinée que l'app ne reprend pas.
 - Toasts, menu de catégorie, puces de filtre, compteurs : dans l'app seulement,
   dessinés d'après le code dans `Composants.dc.html`.
 - États vide, chargement, erreur : encadrés dans la charte, sans cadre dans
   l'app.
-- Modale de retrait d'un projet : bouton de confirmation rouge plein, contraire
-  à « un arrêt n'est jamais plein ».
 - Tableau des runs : la charte fixe des lignes de 36 px et des montants à
   droite ; l'app laisse la hauteur à `py-2`.
 
