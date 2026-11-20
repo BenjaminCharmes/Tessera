@@ -1,12 +1,13 @@
 ---
-id: ticket-1027
-title: "A call sets its right alone and takes back only what the account owns"
-type: refactor
-status: todo
-priority: high
 agent: codeur
 depends_on: []
+id: ticket-1027
+pr_number: 1219
 preuve_reelle: true
+priority: high
+status: done
+title: A call sets its right alone and takes back only what the account owns
+type: refactor
 ---
 
 # ticket-1027 — Un appel pose son droit seul et ne reprend que ce que le compte possède

@@ -1,9 +1,10 @@
-"""The rights of the agent account on a run worktree — ticket-895.
+"""The rights of the agent account on a run worktree — ticket-895, ticket-1027.
 
-ADR-083. The CLI runs under `AGENT_USER`; the worktree belongs to the backend's
-account. Three rules, set with `icacls`, never `F` (it includes deleting children):
-modify on the worktree, read-only `.git`, write and delete (fine-grained rights, reading kept) refused on each
-existing file that `motif_de_protection` designates (policy files, test script).
+ADR-083, ADR-091. The CLI runs under `AGENT_USER`; the worktree belongs to the
+backend's account. Rules set with `icacls`, never `F` (it includes deleting
+children): modify on the worktree for the length of a call, read-only `.git`,
+write and delete (fine-grained rights, reading kept) refused on each existing
+file that `motif_de_protection` designates (policy files, test script).
 Without `AGENT_USER`, nothing is set.
 """
 import asyncio
@@ -16,6 +17,7 @@ from tessera.config import settings
 from tessera.services.git_workspace import GitWorkspaceError
 from tessera.services.providers.chemins_proteges import motif_de_protection
 from tessera.services.providers.script_verification import script_de_verification
+from tessera.services.providers.securite_fichiers import SecuriteFichiers, securite_par_defaut
 from tessera.services.worktrees.run_worktree import RunWorktree
 from tessera.utils.logger import get_logger
 
@@ -70,8 +72,12 @@ OWNER_RIGHTS = "*S-1-3-4:(OI)(CI)(RC)"
 
 
 #: Fichiers protégés par racine de worktree, notés quand le refus est posé (une
-#: fois par run) : le `/reset` de clôture les efface, on les refuse de nouveau.
+#: fois par run) : la reprise d'un fichier du compte l'efface, on le refuse de nouveau.
 _REFUSES: dict[Path, list[Path]] = {}
+
+#: Racines dont la base est posée, par (chemin résolu, st_ctime_ns) : un worktree
+#: recréé au même chemin a une autre date de création et repasse par la base.
+_BASES: set[tuple[Path, int]] = set()
 
 
 async def _refuser(fichier: Path, compte: str, lanceur: Icacls) -> None:
@@ -90,48 +96,57 @@ async def _proteger_git(git: Path, compte: str, lanceur: Icacls) -> None:
     await _lancer(lanceur, [str(git), "/grant:r", f"{compte}:{droit}", "/L"])
 
 
-async def poser_ecriture(
+def _cle_base(racine: Path) -> tuple[Path, int]:
+    return racine.resolve(), racine.stat().st_ctime_ns
+
+
+async def poser_base(
     racine: Path, compte: str, lanceur: Icacls = _icacls_reel, backend: str | None = None
 ) -> None:
-    """Give `compte` modify on `racine` and read-only on its `.git` (before each call).
+    """Set once per root what gives `compte` no write right: backend control, OWNER RIGHTS, read-only `.git`.
 
-    Adds an inheritable OWNER RIGHTS ACE (read control only) and full control for
-    the backend account, so the agent cannot rewrite the DACL of its own files.
+    L'ACE du backend d'abord : il est propriétaire de la racine et n'y a que
+    « modifier » par héritage. OWNER RIGHTS posée en premier lui retirait
+    WRITE_DAC, et son propre `/grant` suivant était refusé (preuve du 19/11).
+    Idempotente : mémorisée par (chemin résolu, st_ctime_ns de la racine).
     """
-    await _lancer(lanceur, [str(racine), "/grant", f"{compte}:(OI)(CI)M", "/L"])
-    # L'ACE du backend d'abord : il est propriétaire de la racine et n'y a que
-    # « modifier » par héritage. OWNER RIGHTS posée en premier lui retirait
-    # WRITE_DAC, et son propre `/grant` suivant était refusé (preuve du 19/11).
+    cle = _cle_base(racine)
+    if cle in _BASES:
+        return
     await _lancer(lanceur, [str(racine), "/grant", f"{backend or compte_du_backend()}:(OI)(CI)F", "/L"])
     await _lancer(lanceur, [str(racine), "/grant", OWNER_RIGHTS, "/L"])
     git = racine / ".git"
     if git.exists():
         await _proteger_git(git, compte, lanceur)
+    _BASES.add(cle)
+
+
+async def poser_ecriture(racine: Path, compte: str, lanceur: Icacls = _icacls_reel) -> None:
+    """Give `compte` modify on `racine` (before each call): the only right that lasts one call."""
+    await _lancer(lanceur, [str(racine), "/grant", f"{compte}:(OI)(CI)M", "/L"])
 
 
 async def retirer_ecriture(
-    racine: Path, compte: str, lanceur: Icacls = _icacls_reel, backend: str | None = None
+    racine: Path, compte: str, lanceur: Icacls = _icacls_reel, backend: str | None = None,
+    securite: SecuriteFichiers | None = None,
 ) -> None:
-    """Withdraw every grant of `compte` and take the files back (ticket-943, ticket-1006).
+    """Withdraw the grant of `compte`, then take back what it owns (ticket-943, ticket-1027).
 
-    Called at the end of the last call on `racine`: after the `/remove:g`, the
-    owner goes back to the backend and every DACL to inheritance (`.git` included).
-    Choice: `/reset` covers `.git` too, which then gets its `inheritance:d` + `RX`
-    again, so the account keeps read-only access there. The write refusals set on
-    the protected files by `accorder_droits_agent` are laid again after the reset,
-    in the same call (fail closed). A non-zero exit (a file
-    created with a protected DACL) raises `DroitsAgentRefuses`; no fallback.
+    Le `/remove:g` passe d'abord : le droit est retiré même si la reprise échoue.
+    La reprise est ciblée (`reprise_ciblee`) ; le `.git` de la racine reste en
+    lecture seule, sans y toucher. Le refus d'écriture d'un fichier protégé que
+    la reprise a remis à l'héritage est reposé (fail closed).
     """
-    git = racine / ".git"
-    if git.exists():
-        await _lancer(lanceur, [str(git), "/remove:g", compte, "/L"])
+    # Import local : `reprise_ciblee` importe `DroitsAgentRefuses` de ce module.
+    from tessera.services.providers.reprise_ciblee import reprendre_arbre
+
     await _lancer(lanceur, [str(racine), "/remove:g", compte, "/L"])
-    await _lancer(lanceur, [str(racine), "/setowner", backend or compte_du_backend(), "/T", "/C", "/L"])
-    await _lancer(lanceur, [str(racine), "/reset", "/T", "/C", "/L"])
-    if git.exists():
-        await _proteger_git(git, compte, lanceur)
+    reprises = await reprendre_arbre(
+        racine, compte, backend or compte_du_backend(), securite or securite_par_defaut(), {racine / ".git"}
+    )
     for fichier in _REFUSES.get(racine.resolve(), []):
-        await _refuser(fichier, compte, lanceur)
+        if fichier in reprises:
+            await _refuser(fichier, compte, lanceur)
 
 
 async def accorder_droits_agent(
@@ -139,10 +154,11 @@ async def accorder_droits_agent(
     commande_de_tests: str | None,
     lanceur: Icacls = _icacls_reel,
 ) -> None:
-    """Set the three rules on `wt` when `AGENT_USER` is set; otherwise do nothing."""
+    """Set the rules on `wt` when `AGENT_USER` is set; otherwise do nothing."""
     compte = settings.agent_user
     if not compte:
         return
+    await poser_base(wt.racine, compte, lanceur)
     await poser_ecriture(wt.racine, compte, lanceur)
     script = script_de_verification(wt.projet, commande_de_tests)
     proteges = fichiers_proteges(wt, script)

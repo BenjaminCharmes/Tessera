@@ -8,11 +8,12 @@ import pytest
 from pydantic import SecretStr
 
 from tessera.config import settings
-from tessera.services.providers import droits_appel, profil_agent
+from tessera.services.providers import droits_appel, droits_worktree, profil_agent
 from tessera.services.verification import lancement_compte, test_runner
 from tessera.services.verification.test_runner import TestRunnerService
 from tests.chaine_factice import chaine_factice  # noqa: F401
 from tests.doubles_compte import LanceurDouble, ProcessDouble
+from tests.faux_securite import FauxSecurite
 from tests.test_droits_appel import COMPTE, Icacls, Processus
 
 
@@ -28,6 +29,7 @@ def icacls(monkeypatch: pytest.MonkeyPatch, tmp_path: Path, chaine: Path) -> Ica
         return None
 
     monkeypatch.setattr(droits_appel, "retirer_les_taches", aucune_tache)
+    monkeypatch.setattr(droits_worktree, "securite_par_defaut", lambda: FauxSecurite())
     droits_appel._ACTIFS.clear()
     droits_appel._FILE.clear()
     monkeypatch.setattr(droits_appel, "_VERROU", asyncio.Condition())
@@ -64,7 +66,7 @@ class IcaclsDate(Icacls):
         return await super().__call__(args)
 
 
-async def test_setowner_is_emitted_once_after_the_last_step(
+async def test_the_grant_is_withdrawn_once_after_the_last_step(
     icacls: Icacls, worktree: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     lanceur = LanceurDouble(ProcessDouble(b"ok", b"", code=0))
@@ -80,10 +82,10 @@ async def test_setowner_is_emitted_once_after_the_last_step(
     result = await runner.run_tests(worktree / "backend", test_command="node a.js && node b.js && node c.js")
     assert [e.code for e in result.etapes] == [0, 0, 0]
     apres = [
-        n for n, a in zip(datee.etapes_lancees, datee.appels, strict=True) if "/setowner" in a and a[0] == str(worktree.resolve()) and n == 3
+        n for n, a in zip(datee.etapes_lancees, datee.appels, strict=True) if "/remove:g" in a and a[0] == str(worktree.resolve()) and n == 3
     ]
     assert len(apres) == 1
-    assert sum("/setowner" in a and a[0] == str(worktree.resolve()) for a in datee.appels) == 1
+    assert sum("/remove:g" in a and a[0] == str(worktree.resolve()) for a in datee.appels) == 1
     assert droits_appel._ACTIFS == {}
 
 
