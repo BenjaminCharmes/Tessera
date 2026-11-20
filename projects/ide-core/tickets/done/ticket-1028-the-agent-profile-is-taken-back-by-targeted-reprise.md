@@ -1,12 +1,14 @@
 ---
-id: ticket-1028
-title: "The agent profile is taken back by targeted reprise"
-type: refactor
-status: todo
-priority: medium
 agent: codeur
-depends_on: [ticket-1027]
+depends_on:
+- ticket-1027
+id: ticket-1028
+pr_number: 1222
 preuve_reelle: true
+priority: medium
+status: done
+title: The agent profile is taken back by targeted reprise
+type: refactor
 ---
 
 # ticket-1028 — Le profil de l'agent se reprend par reprise ciblée

@@ -298,7 +298,8 @@ async def test_profile_is_reset_at_the_last_call_only(worktree: Path, tmp_path: 
     assert (profil / ".bashrc").exists()
     await clore_appel(second, icacls, procs.enumerer, procs.tuer)
     assert not (profil / ".bashrc").exists()
-    assert [str(profil), "/grant", f"{COMPTE}:(OI)(CI)(IO)M", "/L"] in icacls.appels
+    # La racine du profil garde sa DACL : rien ne se repose (ticket-1028).
+    assert [str(profil), "/grant", f"{COMPTE}:(OI)(CI)(IO)M", "/L"] not in icacls.appels
 
 
 async def test_profile_is_not_reset_while_another_worktree_is_active(

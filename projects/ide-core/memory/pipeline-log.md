@@ -10544,3 +10544,25 @@ error: Please commit or stash them.
 - 2026-11-20 11:15:14 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
 - 2026-11-20 11:15:14 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
 - 2026-11-20 11:15:14 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-20 11:18:16 UTC — [ticket-1028] branche ticket-1028-the-agent-profile-is-taken-back-by-targeted-repr
+- 2026-11-20 11:18:19 UTC — [ticket-1028] tour 1 — codeur démarré
+- 2026-11-20 11:19:58 UTC — [ticket-1028] tour 1 — codeur terminé (97890ms)
+- 2026-11-20 11:22:49 UTC — [ticket-1028] testeur: dur�es : ruff 0 s, mypy 9 s, mypy-linux 9 s, pytest 130 s ; impact depuis base : 103 fichier(s) de test
+- 2026-11-20 11:23:06 UTC — [ticket-1028] securite: PASS — J'ai lu `reprendre_arbre` (reprise_ciblee.py) : la reprise ciblée récupère tout  (16421ms)
+- 2026-11-20 11:23:07 UTC — [ticket-1028] tour 1 — reviewer démarré
+- 2026-11-20 11:23:34 UTC — [ticket-1028] tour 1 — reviewer terminé (26750ms)
+- 2026-11-20 11:23:37 UTC — [ticket-1028] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. La fonction `_reprendre_la_main (29343ms)
+- 2026-11-20 11:23:37 UTC — [ticket-1028] CHANGES_REQUESTED tour 1: Reviewer : 1. Le test du lien non parcouru ne peut pas échouer. Son assertion `cible / "dedans" not in securite.lus` vérifie le mauvais chemin. Si `reprendre_arbre` parcourait le lien, `_entrees` cons
+- 2026-11-20 11:23:37 UTC — [ticket-1028] tour 2 — codeur démarré
+- 2026-11-20 11:23:59 UTC — [ticket-1028] tour 2 — codeur terminé (21625ms)
+- 2026-11-20 11:26:39 UTC — [ticket-1028] testeur: dur�es : ruff 0 s, mypy 2 s, mypy-linux 2 s, pytest 119 s ; impact depuis base : 103 fichier(s) de test
+- 2026-11-20 11:27:00 UTC — [ticket-1028] securite: PASS — Le profil n'est plus repris par `/setowner /T` puis `/reset /T` : il passe par ` (19719ms)
+- 2026-11-20 11:27:01 UTC — [ticket-1028] tour 2 — reviewer démarré
+- 2026-11-20 11:27:20 UTC — [ticket-1028] tour 2 — reviewer terminé (19577ms)
+- 2026-11-20 11:27:50 UTC — [ticket-1028] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. La fonction `_reprendre_la_main (49125ms)
+- 2026-11-20 11:27:50 UTC — [ticket-1028] APPROVED après 2 tour(s)
+- 2026-11-20 11:28:14 UTC — [ticket-1028] leçons: refusée — preuve absente du retour du run
+- 2026-11-20 11:32:11 UTC — [ticket-1028] documentation: 0 fichier(s) (213139ms) — après tour de correction
+- 2026-11-20 11:32:11 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-20 11:32:11 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-20 11:32:11 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
