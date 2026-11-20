@@ -10562,3 +10562,7 @@ error: Please commit or stash them.
 - 2026-11-20 11:27:50 UTC — [ticket-1028] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. La fonction `_reprendre_la_main (49125ms)
 - 2026-11-20 11:27:50 UTC — [ticket-1028] APPROVED après 2 tour(s)
 - 2026-11-20 11:28:14 UTC — [ticket-1028] leçons: refusée — preuve absente du retour du run
+- 2026-11-20 11:32:11 UTC — [ticket-1028] documentation: 0 fichier(s) (213139ms) — après tour de correction
+- 2026-11-20 11:32:11 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-20 11:32:11 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-20 11:32:11 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
