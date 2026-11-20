@@ -10594,3 +10594,28 @@ error: Please commit or stash them.
 - 2026-11-20 12:00:00 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
 - 2026-11-20 12:00:00 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
 - 2026-11-20 12:00:00 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-20 11:54:21 UTC — [ide-core] ticket-978 PR #1223 mergée (CI verte)
+- 2026-11-20 12:09:17 UTC — [ide-core] ticket-1030 PR #1224 mergée (CI verte)
+- 2026-11-20 14:18:24 UTC — [ticket-1031] branche ticket-1031-the-weekly-report-reads-the-remote-base-and-fron
+- 2026-11-20 14:18:28 UTC — [ticket-1031] tour 1 — codeur démarré
+- 2026-11-20 14:19:56 UTC — [ticket-1031] tour 1 — codeur terminé (87671ms)
+- 2026-11-20 14:20:56 UTC — [ticket-1031] testeur: 1 failed, 67 passed, 8 warnings in 15.66s — fichiers en échec : tests/test_aucune_trace_professionnelle.py
+- 2026-11-20 14:20:56 UTC — [ticket-1031] tests rouges au tour 1
+- 2026-11-20 14:20:56 UTC — [ticket-1031] tour 2 — codeur démarré
+- 2026-11-20 14:21:28 UTC — [ticket-1031] tour 2 — codeur terminé (31203ms)
+- 2026-11-20 14:22:23 UTC — [ticket-1031] testeur: dur�es : ruff 0 s, pytest 17 s ; impact depuis base : 6 fichier(s) de test
+- 2026-11-20 14:22:23 UTC — [ticket-1031] tests rouges au tour 2
+- 2026-11-20 14:22:23 UTC — [ticket-1031] tour 3 — codeur démarré
+- 2026-11-20 14:22:54 UTC — [ticket-1031] tour 3 — codeur terminé (29952ms)
+- 2026-11-20 14:23:46 UTC — [ticket-1031] testeur: dur�es : ruff 0 s, mypy 4 s, mypy-linux 3 s, pytest 16 s ; impact depuis base : 6 fichier(s) de test
+- 2026-11-20 14:23:59 UTC — [ticket-1031] securite: PASS — Le diff lit seulement le dépôt local (git rev-parse, ls-tree et show, sans shell (13000ms)
+- 2026-11-20 14:24:00 UTC — [ticket-1031] tour 3 — reviewer démarré
+- 2026-11-20 14:24:30 UTC — [ticket-1031] tour 3 — reviewer terminé (29093ms)
+- 2026-11-20 14:25:20 UTC — [ticket-1031] validateur: fichiers cités joints : backend/tests/test_releve_semaine.py
+- 2026-11-20 14:25:20 UTC — [ticket-1031] validateur: APPROVED — Le codeur a satisfait tous les critères d'acceptation. Les deux nouveaux modules (80000ms)
+- 2026-11-20 14:25:21 UTC — [ticket-1031] APPROVED après 3 tour(s)
+- 2026-11-20 14:26:11 UTC — [ticket-1031] leçons: refusée — preuve absente du retour du run
+- 2026-11-20 14:28:13 UTC — [ticket-1031] documentation: 0 fichier(s) (99531ms)
+- 2026-11-20 14:28:13 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-20 14:28:13 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-20 14:28:13 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
