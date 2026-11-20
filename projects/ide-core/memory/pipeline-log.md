@@ -10498,3 +10498,7 @@ error: Please commit or stash them.
 - 2026-11-20 09:33:40 UTC — [ticket-1024] tour 1 — reviewer terminé (16500ms)
 - 2026-11-20 09:33:52 UTC — [ticket-1024] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le paramètre `restrictions_ui`  (28108ms)
 - 2026-11-20 09:33:53 UTC — [ticket-1024] APPROVED après 1 tour(s)
+- 2026-11-20 09:36:16 UTC — [ticket-1024] documentation: 0 fichier(s) (122656ms) — après tour de correction
+- 2026-11-20 09:36:16 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-20 09:36:16 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-20 09:36:16 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
