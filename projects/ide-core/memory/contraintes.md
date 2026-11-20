@@ -10,8 +10,6 @@ Cette section n'est injectée dans aucun appel d'agent. Une règle nouvelle
 s'écrit ici, avec son ADR ; un humain l'accepte en la déplaçant dans sa
 section. (ADR-055)
 
-- **Rien de planifié ni de caché ne survit au compte agent** : ses tâches planifiées se retirent au dernier appel, le cache uv part avec le profil, et un fichier protégé ajouté pendant un appel met le run en `blocked`. (ADR-088, ADR-087, ADR-084)
-
 ## Git et périmètre d'écriture
 
 - **Un projet qui déclare `worktree` exécute chaque run dans son worktree, jamais dans le checkout.** Sous `IDE_WORKTREES_DIR/<projet>/<ticket>`, depuis `origin/<base>` : la racine d'écriture du run, sans session humaine. (ADR-056)
@@ -41,7 +39,7 @@ section. (ADR-055)
 - **Toute exception en production termine le run en `blocked` avec commit.** Jamais une erreur serveur, jamais un arbre sale. (ADR-037)
 - **Un worktree qui porte du travail non commité ne se supprime pas** ; orphelin au démarrage, il se commite comme un run non approuvé, puis se supprime. (ADR-056, ADR-037)
 - **Le détecteur d'anomalies observe sans gouverner** : sans LLM, `git` ni `gh`, il ne touche ni run ni dépôt, et son échec n'en atteint aucun. (ADR-078, ADR-037)
-- **Un appel d'agent qui change un fichier protégé, un hook ou la config git met le run en `blocked`**. (ADR-084, ADR-037)
+- **Un appel d'agent qui change ou ajoute un fichier protégé, un hook ou la config git met le run en `blocked`**. (ADR-084, ADR-037)
 - **Clore un appel ne reprend que ce que le compte agent possède ou à DACL protégée, liens non suivis**, sinon `blocked`. (ADR-091)
 - **Un projet ne porte qu'un run à la fois** (`RunLock`, 409) ; deux projets tournent en parallèle. (ADR-038)
 - **L'audit sécurité et le validateur échouent fermés.** Provider indisponible, réponse illisible ou exception → `BLOCK` / `CHANGES_REQUESTED`. Une faille `CRITICAL` ou `HIGH` bloque quel que soit le verdict LLM. (ADR-039)
@@ -62,7 +60,7 @@ section. (ADR-055)
 
 - **Les services passent par `LLMProvider` (`complete`/`stream`), jamais par le SDK.** (ADR-017)
 - **Chaque rôle déclare `provider`, `model` et `fallback` dans `agents.json`** (défaut `agent_sdk`). Le repli ne part que sur indisponibilité (`provider_fallback`), run `rapide` ou prompt au-delà du `fallback_above_chars` d'un rôle `ollama`, jamais sur une réponse illisible. (ADR-046, ADR-059, ADR-071)
-- **Avec `worktree.compte_agent` et `AGENT_USER`, CLI, tests et app du contrôle visuel partent sous ce compte, sans repli, aux seuls outils de `C:\ProgramData\Tessera\toolchain\`** : ni `PATH` ni droit sous `C:\Users`, ni droit ni profil gardé entre deux appels, jamais sur `WinSta0\Default`, un worktree à la fois sauf `AGENT_CALLS_PARALLEL=true`. (ADR-083, ADR-085, ADR-086, ADR-087, ADR-089)
+- **Avec `worktree.compte_agent` et `AGENT_USER`, CLI, tests et app du contrôle visuel partent sous ce compte, sans repli, aux seuls outils de `C:\ProgramData\Tessera\toolchain\`** : ni `PATH` ni droit sous `C:\Users`, ni droit, profil ou tâche planifiée gardé entre deux appels, jamais sur `WinSta0\Default`, un worktree à la fois sauf `AGENT_CALLS_PARALLEL=true`. (ADR-083, ADR-085, ADR-086, ADR-087, ADR-088, ADR-089)
 - **Un rôle `"web": true` reçoit `WebFetch` et `WebSearch` et perd `Bash`.** (ADR-049)
 
 *(architect, codeur, reviewer)*
@@ -107,4 +105,4 @@ section. (ADR-055)
 *(codeur)*
 
 - **Tests frontend : Vitest + React Testing Library, pas Jest. Monaco vient de `monaco-editor` via Vite, sans CDN.** (ADR-014, ADR-012)
-- **Pas de gestionnaire d'état global (Zustand, Jotai) tant que l'état partagé tient dans `useActiveProject` et `runStore.ts`** ; à revoir au-delà de 5 états globaux. (ADR-013)
+- **Pas de gestionnaire d'état global (Zustand, Jotai) tant que l'état partagé tient dans `useActiveProject` et `runStore.ts`**. (ADR-013)
