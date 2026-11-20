@@ -10590,3 +10590,7 @@ error: Please commit or stash them.
 - 2026-11-20 11:54:24 UTC — [ticket-1030] validateur: fichiers cités joints : package-lock.json (tronqué)
 - 2026-11-20 11:54:24 UTC — [ticket-1030] validateur: APPROVED — Tous les critères sont satisfaits. Le codeur a implémenté le traitement des verr (30437ms)
 - 2026-11-20 11:54:24 UTC — [ticket-1030] APPROVED après 1 tour(s)
+- 2026-11-20 12:00:00 UTC — [ticket-1030] documentation: 0 fichier(s) (313186ms) — après tour de correction
+- 2026-11-20 12:00:00 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-20 12:00:00 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-20 12:00:00 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
