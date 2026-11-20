@@ -10464,3 +10464,24 @@ error: Please commit or stash them.
 - 2026-11-20 08:53:15 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
 - 2026-11-20 08:53:15 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
 - 2026-11-20 08:53:15 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-20 08:59:35 UTC — [ide-core] ticket-1025 PR #1211 mergée (CI verte)
+- 2026-11-20 09:09:37 UTC — [ticket-1023] branche ticket-1023-the-agent-account-launches-on-a-dedicated-window
+- 2026-11-20 09:09:41 UTC — [ticket-1023] tour 1 — codeur démarré
+- 2026-11-20 09:12:21 UTC — [ticket-1023] tour 1 — codeur terminé (160046ms)
+- 2026-11-20 09:13:28 UTC — [ticket-1023] testeur: dur�es : ruff 0 s, pytest 15 s, mypy 15 s, mypy-linux 12 s ; impact depuis base : 14 fichier(s) de test
+- 2026-11-20 09:14:02 UTC — [ticket-1023] securite: PASS — Le diff durcit l'isolement : chaque appel d'agent tourne sur un bureau à lui, sa (33296ms)
+- 2026-11-20 09:14:03 UTC — [ticket-1023] tour 1 — reviewer démarré
+- 2026-11-20 09:14:41 UTC — [ticket-1023] validateur: fichiers cités joints : station_agent.py
+- 2026-11-20 09:14:41 UTC — [ticket-1023] validateur: APPROVED — Le code crée un module `station_agent.py` strictement typé de 187 lignes, sans p (37750ms)
+- 2026-11-20 09:14:41 UTC — [ticket-1023] tour 1 — reviewer terminé (37485ms)
+- 2026-11-20 09:14:41 UTC — [ticket-1023] CHANGES_REQUESTED tour 1: Reviewer : 1. Le passage par `SetProcessWindowStation` dans `_creer_bureau` n'est protégé par aucun verrou. Le ticket l'exige pourtant (« se fait sous un verrou »). `_lancer` tourne dans `anyio.to_thr
+- 2026-11-20 09:14:41 UTC — [ticket-1023] tour 2 — codeur démarré
+- 2026-11-20 09:15:40 UTC — [ticket-1023] tour 2 — codeur terminé (58234ms)
+- 2026-11-20 09:16:32 UTC — [ticket-1023] testeur: dur�es : ruff 0 s, mypy 9 s, pytest 15 s, mypy-linux 9 s ; impact depuis base : 14 fichier(s) de test
+- 2026-11-20 09:17:04 UTC — [ticket-1023] securite: PASS — Le diff isole l'agent sur un bureau créé par appel, dont la DACL ne nomme que le (31016ms)
+- 2026-11-20 09:17:05 UTC — [ticket-1023] tour 2 — reviewer démarré
+- 2026-11-20 09:17:31 UTC — [ticket-1023] tour 2 — reviewer terminé (25078ms)
+- 2026-11-20 09:17:46 UTC — [ticket-1023] validateur: fichiers cités joints : station_agent.py
+- 2026-11-20 09:17:46 UTC — [ticket-1023] validateur: APPROVED — Tous les critères sont satisfaits. Le module `station_agent.py` (191 lignes) exp (40688ms)
+- 2026-11-20 09:17:46 UTC — [ticket-1023] APPROVED après 2 tour(s)
+- 2026-11-20 09:19:01 UTC — [ticket-1023] leçons: une leçon proposée
