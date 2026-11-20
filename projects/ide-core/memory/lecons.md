@@ -3,6 +3,7 @@
 Pièges observés sur ce projet, une ligne chacun. Le service écrit sous `## Proposées` ; un humain déplace une leçon sous `## En vigueur` pour qu'elle atteigne le codeur et le reviewer.
 
 ## Proposées
+- Quand un verrou protège un état global partagé, intégrer un test de sa présence pour prévenir sa suppression accidentelle. (source : ticket-1023, 2026-11-20)
 
 ## En vigueur
 - Quand tu écris des données de test pour un module sensible, vérifie qu'elles ne déclenchent pas le contrôle de traces professionnelles. (source : ticket-933, 2026-11-11)
