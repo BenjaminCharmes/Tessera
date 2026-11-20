@@ -128,7 +128,7 @@ export default function ProjetCarte({
       onClick={onSelect}
       onKeyDown={surClavier}
       data-services={etatServices(projet)}
-      className={`flex cursor-pointer flex-col gap-2 rounded-sm border bg-zinc-900 p-3 outline-hidden transition-colors hover:bg-zinc-800/60 focus-visible:border-zinc-500 ${
+      className={`flex cursor-pointer flex-col gap-2 rounded-[10px] border bg-zinc-900 p-3 outline-hidden transition-colors hover:bg-zinc-800/60 focus-visible:border-zinc-500 ${
         // L'app qui tourne se voit de loin : bordure bleue (ADR-026 : `blue`
         // pour l'activité). Lançable mais à l'arrêt : bordure plus claire que
         // celle d'un projet sans rien à lancer.

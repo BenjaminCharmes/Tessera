@@ -160,4 +160,24 @@ describe("RemoveProjectModal", () => {
 
     expect(onClose).not.toHaveBeenCalled();
   });
+
+  it("draws the confirm button as a red outline, never solid", async () => {
+    vi.spyOn(api.git, "removalPlan").mockResolvedValue({
+      project_id: "mon-projet",
+      real_path: "/w/mon-projet",
+      is_symlink: false,
+      unpushed_commits: 0,
+    });
+    const user = userEvent.setup();
+    render(
+      <RemoveProjectModal project={project} onClose={() => {}} onRemoved={() => {}} />,
+    );
+    await user.click(
+      await screen.findByRole("button", { name: /Supprimer définitivement/ }),
+    );
+    const bouton = screen.getByRole("button", { name: "Confirmer la suppression" });
+    expect(bouton).toHaveClass("border-red-500/60");
+    expect(bouton).not.toHaveClass("bg-red-800");
+    expect(bouton).not.toHaveClass("bg-red-700");
+  });
 });

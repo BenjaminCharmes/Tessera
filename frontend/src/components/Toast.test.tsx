@@ -65,4 +65,12 @@ describe("ToastContainer", () => {
     await userEvent.click(screen.getByLabelText("Fermer"));
     expect(onDismiss).toHaveBeenCalledWith("t1");
   });
+
+  it("tints an error toast on an opaque container", () => {
+    render(<ToastContainer toasts={[ERROR_TOAST]} onDismiss={vi.fn()} />);
+    const status = screen.getByRole("status");
+    expect(status).toHaveClass("bg-zinc-900");
+    expect(status.querySelector('[class~="bg-red-500/12"]')).not.toBeNull();
+    expect(document.querySelector(".bg-red-800")).toBeNull();
+  });
 });

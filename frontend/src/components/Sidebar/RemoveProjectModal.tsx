@@ -126,7 +126,7 @@ export default function RemoveProjectModal({
                 type="button"
                 onClick={() => void run("remove")}
                 disabled={busy}
-                className="rounded-sm bg-red-800 px-3 py-1 text-red-50 hover:bg-red-700 disabled:opacity-40"
+                className="rounded-sm border border-red-500/60 px-3 py-1 text-red-300 hover:bg-red-950/40 disabled:opacity-40"
               >
                 Confirmer la suppression
               </button>
