@@ -4,6 +4,7 @@ created: 2026-11-20
 depends_on: []
 estimated_days: 1
 id: ticket-1032
+pr_number: 1231
 priority: low
 status: done
 title: Stops, states and project cards follow the charter
