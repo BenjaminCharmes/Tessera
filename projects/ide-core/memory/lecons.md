@@ -3,6 +3,7 @@
 Pièges observés sur ce projet, une ligne chacun. Le service écrit sous `## Proposées` ; un humain déplace une leçon sous `## En vigueur` pour qu'elle atteigne le codeur et le reviewer.
 
 ## Proposées
+- Quand un validateur énumère plusieurs cas (A/B/C) et qu'un manque après refactorisation, tous les chemins doivent être traités ensemble. (source : ticket-1029, 2026-11-20)
 
 ## En vigueur
 - Quand un verrou protège un état global partagé, intégrer un test de sa présence pour prévenir sa suppression accidentelle. (source : ticket-1023, 2026-11-20)
