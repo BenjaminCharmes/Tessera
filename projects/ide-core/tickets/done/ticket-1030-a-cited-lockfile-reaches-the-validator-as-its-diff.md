@@ -1,11 +1,12 @@
 ---
-id: ticket-1030
-title: "A lockfile cited by a criterion reaches the validator as its diff"
-type: fix
-status: todo
-priority: medium
 agent: codeur
 depends_on: []
+id: ticket-1030
+pr_number: 1224
+priority: medium
+status: done
+title: A lockfile cited by a criterion reaches the validator as its diff
+type: fix
 ---
 
 # ticket-1030 — Un verrou cité par un critère arrive au validateur par son diff
