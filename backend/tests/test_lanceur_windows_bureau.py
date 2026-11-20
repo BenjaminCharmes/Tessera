@@ -42,7 +42,7 @@ def faux(monkeypatch: pytest.MonkeyPatch) -> Fixture:
     f = Fixture()
     monkeypatch.setattr(lanceur_windows, "_CTYPES", SimpleNamespace(
         WinDLL=lambda *a, **k: f.noyau, get_last_error=lambda: 0))
-    monkeypatch.setattr(lanceur_windows, "creer_groupe", lambda: object())
+    monkeypatch.setattr(lanceur_windows, "creer_groupe", lambda **k: object())
     monkeypatch.setattr(lanceur_windows, "fermer_le_groupe",
                         lambda g: f.evenements.append("ferme-job") or True)
     monkeypatch.setattr(lanceur_windows, "_fichier", lambda h, m: io.BytesIO())

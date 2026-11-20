@@ -29,6 +29,12 @@ _logger = get_logger(__name__)
 _CLASSE_LIMITES_ETENDUES = 9
 _TUER_A_LA_FERMETURE = 0x2000
 
+#: `JobObjectBasicUIRestrictions` et ses huit drapeaux `JOB_OBJECT_UILIMIT_*` :
+#: HANDLES, READCLIPBOARD, WRITECLIPBOARD, SYSTEMPARAMETERS, DISPLAYSETTINGS,
+#: GLOBALATOMS, DESKTOP, EXITWINDOWS.
+_CLASSE_RESTRICTIONS_UI = 4
+RESTRICTIONS_UI = 0x01 | 0x02 | 0x04 | 0x08 | 0x10 | 0x20 | 0x40 | 0x80
+
 #: Le job du process, gardé ouvert pour toute sa vie : c'est la fermeture du
 #: dernier handle qui déclenche la mise à mort, donc le lâcher trop tôt
 #: reviendrait à ne rien faire.
@@ -109,16 +115,51 @@ def _construire_le_job() -> Any | None:
     return job
 
 
-def creer_groupe() -> Any | None:
+def _poser_restrictions_ui(kernel32: Any, job: Any) -> None:
+    """Pose `JobObjectBasicUIRestrictions` ; un échec lève, l'appelant ferme le job."""
+    import ctypes
+    from ctypes import wintypes
+
+    class _UI_RESTRICTIONS(ctypes.Structure):
+        _fields_ = [("UIRestrictionsClass", wintypes.DWORD)]
+
+    restrictions = _UI_RESTRICTIONS(RESTRICTIONS_UI)
+    if not kernel32.SetInformationJobObject(
+        job,
+        _CLASSE_RESTRICTIONS_UI,
+        ctypes.byref(restrictions),
+        ctypes.sizeof(restrictions),
+    ):
+        raise OSError(_derniere_erreur(), "SetInformationJobObject(UIRestrictions)")
+
+
+def _groupe_avec_restrictions_ui() -> Any:
+    """Un job tueur dont l'interface est restreinte ; sans les restrictions, il n'existe pas."""
+    job = _construire_le_job()
+    try:
+        _poser_restrictions_ui(_kernel32(), job)
+    except BaseException:
+        fermer_le_groupe(job)
+        raise
+    return job
+
+
+def creer_groupe(restrictions_ui: bool = False) -> Any | None:
     """Un groupe propre à un service, qu'on fermera pour tuer tout son arbre.
 
     `taskkill /T` ne suit que la filiation **déclarée** par Windows. Or
     `npm.cmd` lance `node` puis se termine : les petits-enfants perdent leur
     parent, et trois processus survivaient à l'arrêt (ticket-153). Un job,
     lui, est hérité par toute la descendance quelle que soit la généalogie.
+
+    With `restrictions_ui`, the job also carries the UI limits of an agent call
+    (ADR-089): a failure to set them closes the job and raises, never a
+    degraded job (ADR-037).
     """
     if not groupe_disponible():
         return None
+    if restrictions_ui:
+        return _groupe_avec_restrictions_ui()
     try:
         return _construire_le_job()
     except Exception as exc:  # noqa: BLE001
