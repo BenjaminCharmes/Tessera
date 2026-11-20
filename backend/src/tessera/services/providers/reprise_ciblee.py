@@ -11,7 +11,7 @@ from collections.abc import Collection, Iterator
 from pathlib import Path
 
 from tessera.services.providers.droits_worktree import DroitsAgentRefuses
-from tessera.services.providers.securite_fichiers import InfoSecurite, SecuriteFichiers
+from tessera.services.providers.securite_fichiers import InfoSecurite, SecuriteFichiers, chemin_long
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -30,14 +30,14 @@ def _est_lien(entree: os.DirEntry[str]) -> bool:
 def _entrees(dossier: Path, ignorer: Collection[Path]) -> Iterator[tuple[Path, bool, bool]]:
     """Children of `dossier` as (path, is_link, is_directory); a vanished folder yields nothing."""
     try:
-        with os.scandir(dossier) as it:
+        with os.scandir(chemin_long(dossier)) as it:
             liste = list(it)
     except FileNotFoundError:
         return
     except OSError as exc:
         raise DroitsAgentRefuses(f"dossier illisible : {dossier} ({type(exc).__name__})") from exc
     for entree in liste:
-        chemin = Path(entree.path)
+        chemin = dossier / entree.name
         if chemin in ignorer:
             continue
         try:

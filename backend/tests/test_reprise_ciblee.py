@@ -133,3 +133,22 @@ async def test_real_security_reads_the_backend_as_owner_of_its_own_files(tmp_pat
     await reprendre_arbre(tmp_path, moi_nom, moi_nom, securite)
     apres = securite.lire(fichier)
     assert apres.dacl_protegee is False
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="real ACLs need Windows")
+async def test_real_security_reads_an_entry_beyond_260_characters(tmp_path: Path) -> None:
+    import getpass
+
+    from tessera.services.providers.securite_fichiers import chemin_long
+
+    profond = tmp_path
+    while len(str(profond)) < 300:
+        profond = profond / ("d" * 40)
+    Path(chemin_long(profond)).mkdir(parents=True)
+    fichier = profond / "f.txt"
+    Path(chemin_long(fichier)).write_text("x", encoding="utf-8")
+    securite = securite_par_defaut()
+    # Lue, et non prise pour une entrée disparue.
+    assert securite.lire(fichier).dacl_protegee is False
+    moi = getpass.getuser()
+    assert fichier in await reprendre_arbre(tmp_path, moi, moi, securite)

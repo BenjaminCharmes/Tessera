@@ -59,6 +59,18 @@ class SecuriteNulle:
         return None
 
 
+def chemin_long(chemin: Path) -> str:
+    """The path as Windows opens it beyond 260 characters: absolute, extended-length prefix.
+
+    Sans lui, une entrée profonde (un `node_modules`) se lisait « absente » et
+    restait au compte, sans bruit (preuve du 20/11).
+    """
+    texte = str(chemin)
+    if sys.platform != "win32" or texte.startswith("\\\\") or not chemin.is_absolute():
+        return texte
+    return "\\\\?\\" + texte
+
+
 def _erreur(chemin: Path, action: str) -> OSError:
     code = int(_CTYPES.get_last_error())
     if code in _ERREUR_FICHIER_ABSENT:
@@ -85,7 +97,7 @@ class SecuriteWindows:
         self._adv.GetSecurityDescriptorControl.argtypes = [ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p]
 
     def _ouvrir(self, chemin: Path, acces: int) -> int:
-        poignee = self._k32.CreateFileW(str(chemin), acces, _SHARE_TOUT, None, _OPEN_EXISTING,
+        poignee = self._k32.CreateFileW(chemin_long(chemin), acces, _SHARE_TOUT, None, _OPEN_EXISTING,
                                         _BACKUP_SEMANTICS | _OPEN_REPARSE_POINT, None)
         if poignee in (None, wintypes.HANDLE(-1).value):
             raise _erreur(chemin, "ouverture")
