@@ -73,7 +73,7 @@ async def test_colliding_migration_is_renumbered_and_logged(
     assert not (repo / _MIG / "0005_x").exists()
     assert (repo / _MIG / "0005_y" / "migration.sql").is_file()
     lignes = [r for r in caplog.records if r.getMessage() == "migration_renumerotee"]
-    assert [(getattr(r, "ancien"), getattr(r, "nouveau")) for r in lignes] == [
+    assert [(r.ancien, r.nouveau) for r in lignes] == [
         (f"{_MIG}/0005_x", f"{_MIG}/0006_x")
     ]
     assert service.migrations_renumerotees == ((f"{_MIG}/0005_x", f"{_MIG}/0006_x"),)

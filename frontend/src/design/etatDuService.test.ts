@@ -15,6 +15,8 @@ function service(over: Partial<ServiceActif> = {}): ServiceActif {
     demarre_a: new Date().toISOString(),
     en_cours: true,
     code_de_sortie: null,
+    sortie: [],
+    arrete_a_la_main: false,
     ...over,
   };
 }

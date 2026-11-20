@@ -3,7 +3,6 @@
 import re
 from pathlib import Path
 
-
 #: Lockfile names whose diff content is replaced by a one-line summary when
 #: fed to reviewing agents.  The commit itself is not affected — lockfiles are
 #: committed in full.  A single entry here covers every subdirectory

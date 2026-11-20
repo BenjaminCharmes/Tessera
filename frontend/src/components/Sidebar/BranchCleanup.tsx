@@ -3,6 +3,7 @@ import InfoTip from "../../design/InfoTip";
 import { api } from "../../lib/api";
 import { useResource } from "../../hooks/useResource";
 import type { PlanDeNettoyage } from "../../types/api";
+import Button from "../../design/ui/Button";
 
 /**
  * Retirer les branches que Tessera a laissées derrière lui (ticket-070).
@@ -71,14 +72,12 @@ export default function BranchCleanup({ projectId }: BranchCleanupProps) {
             ))}
           </ul>
           <div className="mb-2 flex items-center gap-2">
-            <button
-              type="button"
+            <Button taille="compact"
               onClick={() => void supprimer()}
               disabled={enCours}
-              className="rounded-sm border border-zinc-700 px-2 py-1 text-mini text-zinc-300 transition-colors hover:border-zinc-500 hover:text-zinc-100 disabled:opacity-50"
             >
               {enCours ? "Suppression…" : `Supprimer ${plan.nettoyables.length}`}
-            </button>
+            </Button>
             <InfoTip>
               Elles ne contiennent rien qui ne soit déjà dans la base.
             </InfoTip>

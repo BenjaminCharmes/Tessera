@@ -1,14 +1,7 @@
 """Chaque agent ne reçoit que les contraintes qui le concernent — tickets 087 et 311."""
 from pathlib import Path
 
-from tessera.services.adr import (
-    adr_pertinents,
-    adr_pour,
-    contraintes_pour,
-    decouper,
-    lire_contraintes,
-    portee_de,
-)
+from tessera.services.projets.adr import adr_pertinents, adr_pour, contraintes_pour, decouper, lire_contraintes, portee_de
 
 _FICHIER = """# Décisions
 
@@ -129,10 +122,13 @@ _CHOIX_PASSES = {
 
 
 def test_les_choix_passes_portent_une_portee() -> None:
-    reel = Path(__file__).parent.parent.parent / "projects/ide-core/memory/decisions.md"
-    contenu = reel.read_text(encoding="utf-8")
-
-    annotes = {b.numero for b in decouper(contenu) if portee_de(b) is not None}
+    # Celles qu'aucune règle ne cite sont parties dans l'archive (ticket-830) :
+    # leur portée se lit toujours, dans l'un ou l'autre fichier.
+    memoire = Path(__file__).parent.parent.parent / "projects/ide-core/memory"
+    annotes: set[str] = set()
+    for nom in ("decisions.md", "decisions-archive.md"):
+        contenu = (memoire / nom).read_text(encoding="utf-8")
+        annotes |= {b.numero for b in decouper(contenu) if portee_de(b) is not None}
 
     assert _CHOIX_PASSES <= annotes, sorted(_CHOIX_PASSES - annotes)
 
@@ -185,7 +181,7 @@ def test_le_prompt_du_codeur_ne_porte_pas_les_adr_de_l_architecte(
 ) -> None:
     # Un filtre écrit mais jamais branché ne filtre rien : c'est exactement
     # l'erreur que le test des hooks d'ADR-027 empêchait déjà ailleurs.
-    from tessera.services.agent_runner import AgentRunner
+    from tessera.services.agents.agent_runner import AgentRunner
 
     runner = AgentRunner(provider=None, registry=None)  # type: ignore[arg-type]
     contexte = f"# projet\n\n## Décisions récentes\n{_FICHIER}"
@@ -201,7 +197,7 @@ def test_le_prompt_du_codeur_ne_porte_pas_les_adr_de_l_architecte(
 def test_un_contexte_sans_section_de_decisions_traverse_intact(
     tmp_path: Path,
 ) -> None:
-    from tessera.services.agent_runner import AgentRunner
+    from tessera.services.agents.agent_runner import AgentRunner
 
     runner = AgentRunner(provider=None, registry=None)  # type: ignore[arg-type]
 
@@ -348,7 +344,7 @@ def test_le_prompt_du_codeur_contient_une_regle_de_contraintes_et_non_le_titre_d
         encoding="utf-8",
     )
 
-    from tessera.services.agent_runner import AgentRunner
+    from tessera.services.agents.agent_runner import AgentRunner
     runner = AgentRunner(provider=None, registry=None)  # type: ignore[arg-type]
     contenu = lire_contraintes(memory)
     contexte = f"# projet\n\n## Décisions récentes\n{contenu}"
@@ -367,7 +363,7 @@ def test_une_regle_scoped_n_atteint_pas_le_validateur(tmp_path: Path) -> None:
         encoding="utf-8",
     )
 
-    from tessera.services.agent_runner import AgentRunner
+    from tessera.services.agents.agent_runner import AgentRunner
     runner = AgentRunner(provider=None, registry=None)  # type: ignore[arg-type]
     contenu = lire_contraintes(memory)
     contexte = f"# projet\n\n## Décisions récentes\n{contenu}"
@@ -386,7 +382,7 @@ def test_sans_contraintes_md_le_prompt_recoit_decisions_md(tmp_path: Path) -> No
         encoding="utf-8",
     )
 
-    from tessera.services.agent_runner import AgentRunner
+    from tessera.services.agents.agent_runner import AgentRunner
     runner = AgentRunner(provider=None, registry=None)  # type: ignore[arg-type]
     contenu = lire_contraintes(memory)
     contexte = f"# projet\n\n## Décisions récentes\n{contenu}"
@@ -468,12 +464,7 @@ def test_le_format_contraintes_md_donne_le_meme_resultat_qu_avant() -> None:
 
 
 def _ticket():  # type: ignore[no-untyped-def]
-    from tessera.models.ticket import (
-        Ticket,
-        TicketPriority,
-        TicketStatus,
-        TicketType,
-    )
+    from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
 
     return Ticket(
         id="ticket-001",

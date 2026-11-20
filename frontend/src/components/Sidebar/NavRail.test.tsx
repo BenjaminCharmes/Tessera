@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { api } from "../../lib/api";
 import NavRail from "./NavRail";
 import type { ReglageDesNotifications } from "./ReglageNotifications";
 import type { SidebarPanel } from "./panels";
@@ -22,10 +21,10 @@ describe("NavRail", () => {
     expect(nom.className).not.toMatch(/text-violet-/);
   });
 
-  it("rend les neuf destinations sans regression", () => {
+  it("rend les dix destinations sans regression", () => {
     render(<NavRail activePanel="projects" onChangePanel={() => {}} />);
     const tabs = screen.getAllByRole("tab");
-    expect(tabs).toHaveLength(9);
+    expect(tabs).toHaveLength(10);
   });
 
   it("place En cours juste apres Projets", () => {
@@ -35,13 +34,14 @@ describe("NavRail", () => {
     expect(noms[1]).toMatch(/En cours/);
   });
 
-  it("ordonne les neuf destinations par groupe", () => {
+  it("ordonne les dix destinations par groupe", () => {
     render(<NavRail activePanel="projects" onChangePanel={() => {}} />);
     const noms = screen.getAllByRole("tab").map((t) => t.textContent ?? "");
     const attendu = [
       "Projets",
       "En cours",
       "Supervision",
+      "Rituels",
       "Tickets",
       "Fichiers",
       "Historique",
@@ -58,7 +58,7 @@ describe("NavRail", () => {
     const ordre = (a: Node, b: Node): boolean =>
       Boolean(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
     const groupes: Array<[string, RegExp, RegExp]> = [
-      ["Pilotage", /Projets/, /Supervision/],
+      ["Pilotage", /Projets/, /Rituels/],
       ["Projet", /Tickets/, /Historique/],
       ["Outils", /Agents/, /Chat/],
     ];
@@ -76,7 +76,7 @@ describe("NavRail", () => {
   it("nomme chaque groupe comme une liste a part", () => {
     render(<NavRail activePanel="projects" onChangePanel={() => {}} />);
     for (const [titre, nombre] of [
-      ["Pilotage", 3],
+      ["Pilotage", 4],
       ["Projet", 3],
       ["Outils", 3],
     ] as const) {
@@ -213,82 +213,59 @@ describe("NavRail", () => {
   });
 });
 
-describe("NavRail — le bouton Réglages (ticket-441)", () => {
+describe("NavRail — la cloche porte aussi le réglage global des notifications (ticket-779)", () => {
   const notifications: ReglageDesNotifications = {
     active: true,
     etat: "bloquees",
     onChange: () => {},
   };
+  const cloche: DonneesDeLaCloche = {
+    historique: [],
+    nonLus: 0,
+    toutMarquerLu: vi.fn(),
+    reglages: reglagesParDefaut(),
+    setReglage: vi.fn(),
+    ouvrir: vi.fn(),
+  };
 
   beforeEach(() => {
     vi.restoreAllMocks();
-    vi.spyOn(api.orchestrator, "limits").mockResolvedValue({
-      run_max_budget_usd: 1.5,
-      llm_max_budget_usd: 0,
-    });
   });
 
-  function rendre() {
-    render(
-      <NavRail
-        activePanel="projects"
-        onChangePanel={() => {}}
-        notifications={notifications}
-      />,
-    );
-  }
+  it("renders_the_settings_button_below_the_bell_outside_the_tablist", () => {
+    // Ticket-810 : le bouton retiré par le ticket-779 revient, pour les réglages globaux.
+    render(<NavRail activePanel="projects" onChangePanel={() => {}} notifications={notifications} cloche={cloche} />);
 
-  it("offers a Réglages button, outside the tab list", () => {
-    rendre();
-
-    const bouton = screen.getByRole("button", { name: "Réglages" });
-    expect(bouton).toBeInTheDocument();
-    expect(bouton).toHaveAttribute("aria-expanded", "false");
-    expect(screen.getAllByRole("tab")).toHaveLength(9);
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    const reglages = screen.getByRole("button", { name: "Réglages" });
+    const cloc = screen.getByRole("button", { name: "Notifications" });
+    expect(cloc.compareDocumentPosition(reglages) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.getByRole("tablist", { name: "Navigation principale" })).not.toContainElement(reglages);
+    expect(screen.getAllByRole("tab")).toHaveLength(10);
   });
 
-  it("opens the panel holding the notification setting and the spending caps", async () => {
-    rendre();
+  it("shows the global switch at the top of the bell's Réglages tab", async () => {
+    render(<NavRail activePanel="projects" onChangePanel={() => {}} notifications={notifications} cloche={cloche} />);
 
-    await userEvent.click(screen.getByRole("button", { name: "Réglages" }));
+    await userEvent.click(screen.getByRole("button", { name: "Notifications" }));
+    await userEvent.click(screen.getByRole("tab", { name: "Réglages" }));
 
-    const panneau = screen.getByRole("dialog", { name: "Réglages" });
-    expect(
-      within(panneau).getByLabelText("Notifications système"),
-    ).toBeInTheDocument();
+    const panneau = screen.getByRole("dialog", { name: "Notifications" });
+    expect(within(panneau).getByLabelText("Notifications système")).toBeInTheDocument();
     expect(within(panneau).getByText(/bloquées par le navigateur/)).toBeInTheDocument();
-    expect(await within(panneau).findByText("$1.50")).toBeInTheDocument();
   });
 
-  it("closes the panel on Escape", async () => {
-    rendre();
-    await userEvent.click(screen.getByRole("button", { name: "Réglages" }));
-
-    await userEvent.keyboard("{Escape}");
-
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-  });
-
-  it("closes the panel on a click outside", async () => {
-    rendre();
-    await userEvent.click(screen.getByRole("button", { name: "Réglages" }));
-
-    await userEvent.click(screen.getByRole("tab", { name: /Agents/ }));
-
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-  });
-
-  it("relays a change of the notification setting", async () => {
+  it("relays a change of the global switch from the bell", async () => {
     const onChange = vi.fn();
     render(
       <NavRail
         activePanel="projects"
         onChangePanel={() => {}}
         notifications={{ ...notifications, etat: "actives", onChange }}
+        cloche={cloche}
       />,
     );
-    await userEvent.click(screen.getByRole("button", { name: "Réglages" }));
+    await userEvent.click(screen.getByRole("button", { name: "Notifications" }));
+    await userEvent.click(screen.getByRole("tab", { name: "Réglages" }));
 
     await userEvent.click(screen.getByLabelText("Notifications système"));
 
@@ -308,12 +285,24 @@ describe("NavRail — le bouton Réglages (ticket-441)", () => {
 
     expect(screen.getByRole("button", { name: "Notifications, 4 non lues" })).toBeInTheDocument();
     expect(screen.getByText("4")).toBeInTheDocument();
-    expect(screen.getAllByRole("tab")).toHaveLength(9);
+    expect(screen.getAllByRole("tab")).toHaveLength(10);
   });
 
   it("shows no bell without notification data", () => {
     render(<NavRail activePanel="projects" onChangePanel={() => {}} />);
     expect(screen.queryByRole("button", { name: /^Notifications/ })).not.toBeInTheDocument();
   });
-});
 
+  it("montre sur Rituels le nombre de rituels en retard", () => {
+    render(<NavRail activePanel="projects" onChangePanel={() => {}} rituelsEnRetard={2} />);
+    const onglet = screen.getByRole("tab", { name: /Rituels/ });
+    expect(within(onglet).getByText("2")).toBeInTheDocument();
+  });
+
+  it("n'affiche aucune pastille sur Rituels quand rien n'est en retard", () => {
+    render(<NavRail activePanel="projects" onChangePanel={() => {}} rituelsEnRetard={0} />);
+    const onglet = screen.getByRole("tab", { name: /Rituels/ });
+    expect(within(onglet).queryByText("0")).not.toBeInTheDocument();
+    expect(onglet.querySelector("span[title]")).toBeNull();
+  });
+});

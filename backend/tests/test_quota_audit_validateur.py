@@ -10,15 +10,9 @@ from typing import Any
 import pytest
 
 from tessera.models.ticket import TicketStatus
-from tessera.services.security_auditor import SecurityAuditorService
-from tessera.services.validator import ValidatorService
-from tests.test_orchestrator import (
-    _FakeGit,
-    _make_orchestrator,
-    _make_ticket,
-    _noop,
-    _RecordingRunner,
-)
+from tessera.services.verdicts.security_auditor import SecurityAuditorService
+from tessera.services.verdicts.validator import ValidatorService
+from tests.test_orchestrator import _FakeGit, _make_orchestrator, _make_ticket, _noop, _RecordingRunner
 from tests.test_providers_base import FakeProvider
 
 _PROMPTS = Path(__file__).resolve().parents[2] / "agents" / "prompts"

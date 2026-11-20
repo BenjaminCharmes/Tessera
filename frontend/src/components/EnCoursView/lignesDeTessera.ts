@@ -27,6 +27,14 @@ export function lignesDesRuns(salle: SalleTessera, suivants = SUIVANTS_AU_MUR): 
   for (const run of salle.runs) {
     const ou = [run.ticket_id, run.agent ?? run.etape].filter(Boolean).join(" · ");
     lignes.push({ cle: `${run.project_id}:run`, texte: `${run.project_id} · ${ou}`, ton: "text-blue-300" });
+    // ADR-078 : le compte du détecteur, en ambre (une attente à vérifier, ADR-026) ; rien à zéro.
+    if (run.anomalies > 0) {
+      lignes.push({
+        cle: `${run.project_id}:anomalies`,
+        texte: `${run.anomalies} ${run.anomalies > 1 ? "anomalies" : "anomalie"}`,
+        ton: "text-amber-300",
+      });
+    }
     for (const suivant of run.suivants.slice(0, suivants)) {
       lignes.push({ cle: `${run.project_id}:${suivant}`, texte: `puis ${suivant}`, ton: "text-zinc-300" });
     }

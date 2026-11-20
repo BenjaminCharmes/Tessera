@@ -1,7 +1,11 @@
 import type { OccupantDePause } from "../../lib/bureau/salles";
+import Agrandi from "../../design/bureau/Agrandi";
+import AgentDebout from "../../design/bureau/AgentDebout";
 import Canape from "../../design/bureau/Canape";
 import Frigo from "../../design/bureau/Frigo";
 import MachineACafe from "../../design/bureau/MachineACafe";
+import { nomDuPoste } from "../../lib/bureau/libelleDuPoste";
+import { visiteur } from "../../lib/bureau/noms";
 import type { WeekEmployee } from "../../lib/bureau/weekEmployee";
 import CadreDeLEmploye from "./CadreDeLEmploye";
 import Salle from "./Salle";
@@ -46,6 +50,21 @@ export default function SallePause({ occupants, maintenant, employe = null }: Sa
           <span className={TON[pause.motif]}>{pause.libelle}</span>
         </li>
       ))}
-    />
+    >
+      {occupants.flatMap(({ projet, pause, postes }) =>
+        postes.map(({ poste, pr }) => (
+          <li
+            key={`${projet}-${poste}`}
+            data-agent={poste}
+            data-objet={pr ? "pr" : undefined}
+            title={`${visiteur(projet, poste, nomDuPoste(poste))} — ${pause.libelle}`}
+          >
+            <Agrandi>
+              <AgentDebout projet={projet} role={poste} feuille={pr} sansTasse={pr} />
+            </Agrandi>
+          </li>
+        )),
+      )}
+    </Salle>
   );
 }

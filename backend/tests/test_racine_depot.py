@@ -5,10 +5,8 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services.politique_run import PolitiqueRun
-from tessera.services.providers.perimetre import racine_autorisee
-from tessera.services.project_overview import find_icon
-from tessera.services.racine_depot import (
+from tessera.services.gardes.politique_run import PolitiqueRun
+from tessera.services.projets.racine_depot import (
     GIT_ROOT_ANCESTOR,
     declare_ancestor,
     depot_au_dessus,
@@ -17,6 +15,8 @@ from tessera.services.racine_depot import (
     est_un_depot,
     racine_ecriture_projet,
 )
+from tessera.services.providers.perimetre import racine_autorisee
+from tessera.services.supervision.project_overview import _racine_ancestrale, find_icon
 
 _SRC = Path(__file__).resolve().parents[1] / "src" / "tessera"
 
@@ -81,7 +81,7 @@ def test_depot_au_dessus_is_none_without_repository(
 ) -> None:
     # Un dossier dont aucun ancêtre ne porte `.git` : `est_un_depot` est
     # forcé à faux pour ne pas dépendre de l'emplacement du dossier temporaire.
-    monkeypatch.setattr("tessera.services.racine_depot.est_un_depot", lambda _d: False)
+    monkeypatch.setattr("tessera.services.projets.racine_depot.est_un_depot", lambda _d: False)
 
     assert depot_au_dessus(tmp_path) is None
     assert depot_le_plus_proche(tmp_path) is None
@@ -102,6 +102,29 @@ def test_a_git_file_is_a_repository_root_everywhere(tmp_path: Path) -> None:
     assert trouvee is not None and trouvee[0].name == "favicon.svg"
 
 
+def test_racine_ancestrale_finds_a_parent_whose_git_is_a_file(tmp_path: Path) -> None:
+    _worktree_lie(tmp_path)
+    projet = _projet(tmp_path, GIT_ROOT_ANCESTOR)
+
+    assert _racine_ancestrale(projet) == tmp_path.resolve()
+
+
+def test_racine_ancestrale_returns_the_parent_not_the_projects_own_git(
+    tmp_path: Path,
+) -> None:
+    (tmp_path / ".git").mkdir()
+    projet = _projet(tmp_path, GIT_ROOT_ANCESTOR)
+    (projet / ".git").mkdir()
+
+    assert _racine_ancestrale(projet) == tmp_path.resolve()
+
+
+def test_racine_ancestrale_is_none_without_the_declaration(tmp_path: Path) -> None:
+    (tmp_path / ".git").mkdir()
+
+    assert _racine_ancestrale(_projet(tmp_path, None)) is None
+
+
 def test_racine_ecriture_projet_without_ancestor_is_the_project(tmp_path: Path) -> None:
     (tmp_path / ".git").mkdir()
     projet = _projet(tmp_path, None)
@@ -112,7 +135,7 @@ def test_racine_ecriture_projet_without_ancestor_is_the_project(tmp_path: Path) 
 def test_racine_ecriture_projet_falls_back_on_the_parent(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    monkeypatch.setattr("tessera.services.racine_depot.est_un_depot", lambda _d: False)
+    monkeypatch.setattr("tessera.services.projets.racine_depot.est_un_depot", lambda _d: False)
     projet = _projet(tmp_path, GIT_ROOT_ANCESTOR)
 
     assert racine_ecriture_projet(projet, True) == projet.resolve().parent
@@ -133,4 +156,4 @@ def test_ancestor_is_compared_in_one_module_only() -> None:
         if litteral.search(chemin.read_text(encoding="utf-8"))
     ]
 
-    assert fautifs == [str(Path("services") / "racine_depot.py")]
+    assert fautifs == [str(Path("services") / "projets" / "racine_depot.py")]

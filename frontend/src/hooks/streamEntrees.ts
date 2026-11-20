@@ -92,8 +92,24 @@ export interface EntreeTesteur {
   isDone: true;
 }
 
-/** Une entrée du fil chronologique : agent, sécurité, validateur ou testeur. */
-export type EntreeFil = PassageAgent | EntreeSecurite | EntreeValidateur | EntreeTesteur;
+/**
+ * Entrée du détecteur d'anomalies dans le fil chronologique (ticket-840).
+ *
+ * Ajoutée par `run_anomaly` : un constat, jamais modifié. Elle ne porte jamais
+ * l'`input` d'un outil : le backend ne l'envoie pas (ADR-078).
+ */
+export interface EntreeAnomalie {
+  genre: "anomalie";
+  id: string;
+  /** Clé de dédoublonnage de l'épisode. */
+  cle: string;
+  regle: string;
+  message: string;
+  isDone: true;
+}
+
+/** Une entrée du fil chronologique : agent, sécurité, validateur, testeur ou anomalie. */
+export type EntreeFil = PassageAgent | EntreeSecurite | EntreeValidateur | EntreeTesteur | EntreeAnomalie;
 
 /** Le dernier appel d'outil d'un agent, tel que `agent_tool_use` l'a annoncé (ticket-601). */
 export interface DernierOutil {

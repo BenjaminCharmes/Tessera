@@ -5,18 +5,12 @@ import pytest
 
 from tessera.models.agent import AgentConfig, AgentResult, AgentRole
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services.orchestrator import (
-    EventType,
-    Orchestrator,
-    OrchestratorEvent,
-    PipelineResult,
-)
-
-from tests.revue_structuree import revue_depuis_texte
 from tessera.services.git_workspace import GitWorkspaceError, NotAGitRepository
-from tessera.services.security_auditor import SecurityAuditResult, SecurityIssue
-from tessera.services.validator import ValidationResult
-
+from tessera.services.pipeline.orchestrator import EventType, Orchestrator, OrchestratorEvent, PipelineResult
+from tessera.services.verdicts.security_auditor import SecurityAuditResult, SecurityIssue
+from tessera.services.verdicts.validator import ValidationResult
+from tests.doubles_git import GitWorkspaceDouble
+from tests.revue_structuree import revue_depuis_texte
 
 # ------------------------------------------------------------------
 # Helpers
@@ -135,21 +129,13 @@ async def _noop(event: OrchestratorEvent) -> None:
 DIFF_REEL = "diff --git a/src/foo.py b/src/foo.py\n+SECRET = 'hunter2'\n"
 
 
-class _FakeGit:
+class _FakeGit(GitWorkspaceDouble):
     """GitWorkspaceService double returning a controlled diff."""
 
     def __init__(self, diff: str = DIFF_REEL) -> None:
         self._diff = diff
         self.commits: list[str] = []
         self.base_ref_advances = 0
-
-    async def commit_bookkeeping(self) -> None:
-        pass
-
-    async def initialiser_base_ref(
-        self, base_branch: str | None = None, *, exiger_distant: bool = False
-    ) -> str | None:
-        return None
 
     async def create_branch(self, ticket_id: str, slug: str) -> str:
         return f"{ticket_id}-slug"
@@ -159,14 +145,6 @@ class _FakeGit:
 
     async def diff_depuis_base(self) -> str:
         return self._diff
-
-    async def is_clean(self) -> bool:
-        return True
-
-    async def lire_ticket_sur_la_base(
-        self, ticket_id: str, *, fetch: bool = True
-    ) -> tuple[str, str] | None:
-        return None
 
     async def commit_all(self, message: str) -> str | None:
         self.commits.append(message)
@@ -197,7 +175,7 @@ class _RecordingRunner:
 
 
 def test_agent_tool_use_event_existe() -> None:
-    from tessera.services.orchestrator import EventType
+    from tessera.services.pipeline.orchestrator import EventType
 
     assert EventType.AGENT_TOOL_USE.value == "agent_tool_use"
 
@@ -331,33 +309,13 @@ async def test_run_pipeline_cree_une_branche_et_emet_l_event(tmp_path: Path) -> 
     """The branch is created before the first round, and announced."""
     events: list[OrchestratorEvent] = []
 
-    class FakeGit:
+    class FakeGit(GitWorkspaceDouble):
         def __init__(self) -> None:
             self.created: list[tuple[str, str]] = []
-
-        async def commit_bookkeeping(self) -> None:
-            pass
-
-        async def initialiser_base_ref(
-            self, base_branch: str | None = None, *, exiger_distant: bool = False
-        ) -> str | None:
-            return None
 
         async def create_branch(self, ticket_id: str, slug: str) -> str:
             self.created.append((ticket_id, slug))
             return f"{ticket_id}-{slug}"
-
-        async def current_diff(self) -> str:
-            return ""
-
-        async def diff_depuis_base(self) -> str:
-            return ""
-
-        async def is_clean(self) -> bool:
-            return True
-
-        async def commit_all(self, message: str) -> str | None:
-            return None
 
     git = FakeGit()
     ticket = _make_ticket()
@@ -396,29 +354,8 @@ async def test_pipeline_done_porte_la_branche_du_run(tmp_path: Path) -> None:
     # grisé — alors que la branche existait bel et bien (ticket-123).
     events: list[OrchestratorEvent] = []
 
-    class FakeGit:
-        async def commit_bookkeeping(self) -> None:
-            pass
-
-        async def initialiser_base_ref(
-            self, base_branch: str | None = None, *, exiger_distant: bool = False
-        ) -> str | None:
-            return None
-
-        async def create_branch(self, ticket_id: str, slug: str) -> str:
-            return f"{ticket_id}-{slug}"
-
-        async def current_diff(self) -> str:
-            return ""
-
-        async def diff_depuis_base(self) -> str:
-            return ""
-
-        async def is_clean(self) -> bool:
-            return True
-
-        async def commit_all(self, message: str) -> str | None:
-            return None
+    class FakeGit(GitWorkspaceDouble):
+        pass
 
     ticket = _make_ticket()
     svc = AsyncMock()
@@ -1148,7 +1085,9 @@ class _FailingDiffGit(_FakeGit):
         raise GitWorkspaceError("git diff failed")
 
 
-async def test_diff_en_echec_retombe_sur_la_prose_et_termine(tmp_path: Path) -> None:
+async def test_diff_en_echec_retombe_sur_la_prose_et_ne_s_approuve_pas(
+    tmp_path: Path,
+) -> None:
     runner = _RecordingRunner()
     git = _FailingDiffGit()
 
@@ -1157,7 +1096,7 @@ async def test_diff_en_echec_retombe_sur_la_prose_et_termine(tmp_path: Path) -> 
     )
     result = await orchestrator.run_pipeline("projet", "ticket-001", _noop)
 
-    assert result.approved is True
+    assert result.approved is False
     reviewer_calls = [c for c in runner.calls if c["role"] == AgentRole.reviewer]
     assert "prose du codeur" in str(reviewer_calls[0]["project_context"])
 
@@ -1167,7 +1106,7 @@ async def test_diff_en_echec_retombe_sur_la_prose_et_termine(tmp_path: Path) -> 
 # ------------------------------------------------------------------
 
 
-class _DirtyingGit:
+class _DirtyingGit(GitWorkspaceDouble):
     """Simulates a real repo: refuses (unapproved) work leaves the tree
     dirty; commits reset it clean. is_clean() reports the real state so
     the orchestrator's dirty-tree guard can be exercised end-to-end."""
@@ -1177,14 +1116,6 @@ class _DirtyingGit:
         self.commits: list[str] = []
         self.branches_created: list[str] = []
         self.base_ref_advances = 0
-
-    async def commit_bookkeeping(self) -> None:
-        pass
-
-    async def initialiser_base_ref(
-        self, base_branch: str | None = None, *, exiger_distant: bool = False
-    ) -> str | None:
-        return None
 
     async def create_branch(self, ticket_id: str, slug: str) -> str:
         self.branches_created.append(ticket_id)
@@ -1420,8 +1351,8 @@ async def test_reviewer_et_validateur_tournent_en_parallele(tmp_path: Path) -> N
     orchestrator = _make_orchestrator(tmp_path, runner=_RecordingRunner(), git_workspace=_FakeGit())
 
     with (
-        patch("tessera.services.pipeline_controles.run_review", fake_review),
-        patch("tessera.services.pipeline_controles.run_validation", fake_validation),
+        patch("tessera.services.pipeline.pipeline_controles.run_review", fake_review),
+        patch("tessera.services.pipeline.pipeline_controles.run_validation", fake_validation),
     ):
         result = await orchestrator.run_pipeline("projet", "ticket-001", _noop)
 
@@ -1460,8 +1391,8 @@ async def test_audit_block_ne_demarre_ni_reviewer_ni_validateur(tmp_path: Path) 
     )
 
     with (
-        patch("tessera.services.pipeline_controles.run_review", spy_review),
-        patch("tessera.services.pipeline_controles.run_validation", spy_validation),
+        patch("tessera.services.pipeline.pipeline_controles.run_review", spy_review),
+        patch("tessera.services.pipeline.pipeline_controles.run_validation", spy_validation),
     ):
         result = await orchestrator.run_pipeline("projet", "ticket-001", _noop)
 
@@ -1472,7 +1403,7 @@ async def test_audit_block_ne_demarre_ni_reviewer_ni_validateur(tmp_path: Path) 
 
 async def test_reviewer_approuve_et_validateur_refuse_donne_un_refus(tmp_path: Path) -> None:
     """The turn is refused when the reviewer approves but the validator does not."""
-    from tessera.services.validator import ValidationResult, CriterionResult
+    from tessera.services.verdicts.validator import CriterionResult, ValidationResult
 
     class _RefusingValidator:
         async def validate(
@@ -1511,7 +1442,7 @@ async def test_double_refus_inclut_les_deux_motifs_avec_auteur(tmp_path: Path) -
     with their author label.  Two rounds are needed: round 1 produces the
     combined feedback, round 2 lets us intercept the coder context before it runs.
     """
-    from tessera.services.validator import ValidationResult, CriterionResult
+    from tessera.services.verdicts.validator import CriterionResult, ValidationResult
 
     class _RefusingValidator:
         async def validate(

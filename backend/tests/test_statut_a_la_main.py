@@ -10,8 +10,8 @@ from fastapi.testclient import TestClient
 
 from tessera.config import settings
 from tessera.main import app
-from tessera.services.event_hub import EVENT_HUB
-from tessera.services.pipeline_events import EventType
+from tessera.services.noyau.event_hub import EVENT_HUB
+from tessera.services.noyau.pipeline_events import EventType
 
 _TICKET_MD = """---
 id: ticket-001

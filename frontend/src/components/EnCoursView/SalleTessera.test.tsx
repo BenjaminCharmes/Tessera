@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import EnCoursView from "./index";
 import { api } from "../../lib/api";
@@ -21,7 +21,7 @@ function salle(over: Partial<SalleTessera> = {}): SalleTessera {
     ],
     ollama: { url: "http://127.0.0.1:11434", refroidissement_s: null },
     runs: [
-      { project_id: "ide-core", ticket_id: "ticket-677", agent: "codeur", etape: "production", file_index: 4, file_total: 38, suivants: ["ticket-708", "ticket-713"] },
+      { project_id: "ide-core", ticket_id: "ticket-677", agent: "codeur", etape: "production", file_index: 4, file_total: 38, suivants: ["ticket-708", "ticket-713"], anomalies: 0 },
     ],
     ci_en_attente: { curio: ["ticket-070"] },
     journal: [
@@ -95,6 +95,17 @@ describe("the Tessera server room (ticket-726)", () => {
     expect(screen.getByRole("group", { name: "Ollama : en refroidissement" })).toBeInTheDocument();
   });
 
+  it("does not claim Ollama is available when it has merely never been cut", async () => {
+    vi.mocked(lireLaSalleTessera).mockResolvedValue(salle());
+    rendre();
+
+    const baie = await screen.findByRole("group", { name: /^Ollama/ });
+    await userEvent.hover(baie);
+    const infobulle = await screen.findByRole("tooltip");
+    expect(infobulle.textContent).not.toMatch(/disponible/i);
+    expect(baie).not.toHaveAttribute("aria-label", expect.stringMatching(/disponible/i));
+  });
+
   it("reads the quota, the agents at work, today's runs and the database size", async () => {
     vi.mocked(lireLaSalleTessera).mockResolvedValue(salle());
     rendre();
@@ -115,6 +126,47 @@ describe("the Tessera server room (ticket-726)", () => {
     expect(await screen.findByText("(aucun run)")).toBeInTheDocument();
     expect(screen.getByText("(aucune PR en attente)")).toBeInTheDocument();
     expect(screen.getByText("(journal vide)")).toBeInTheDocument();
+  });
+
+  it("stays rendered when a later read of the room fails (ticket-767)", async () => {
+    vi.mocked(lireLaSalleTessera).mockResolvedValueOnce(salle());
+    const etat = (lueA: number): UseAppsEnCoursResult => ({
+      apps: [], lueA, erreur: null,
+      arreter: vi.fn(), rafraichir: vi.fn(), arreterProjet: vi.fn(), lancer: vi.fn(),
+      enArret: () => false, enLancement: () => false,
+    });
+    const { rerender } = render(<EnCoursView appsEnCours={etat(1)} vueInitiale="salles" />);
+    await screen.findByRole("article", { name: "Salle Tessera" });
+
+    vi.mocked(lireLaSalleTessera).mockRejectedValue(new Error("backend coupé"));
+    rerender(<EnCoursView appsEnCours={etat(2)} vueInitiale="salles" />);
+    await waitFor(() => expect(vi.mocked(lireLaSalleTessera)).toHaveBeenCalledTimes(2));
+    // Laisse la lecture rejetée se résoudre avant de regarder la salle.
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 0));
+    });
+
+    expect(screen.getByRole("article", { name: "Salle Tessera" })).toBeInTheDocument();
+    expect(screen.getByText("tessera.db 122,0 Mo")).toBeInTheDocument();
+  });
+
+  it("shows the room when its first answer arrives after lueA was renewed (ticket-771)", async () => {
+    let repondre!: (valeur: SalleTessera) => void;
+    vi.mocked(lireLaSalleTessera).mockImplementationOnce(() => new Promise<SalleTessera>((r) => { repondre = r; }));
+    vi.mocked(lireLaSalleTessera).mockImplementation(() => new Promise<SalleTessera>(() => undefined));
+    const etat = (lueA: number): UseAppsEnCoursResult => ({
+      apps: [], lueA, erreur: null,
+      arreter: vi.fn(), rafraichir: vi.fn(), arreterProjet: vi.fn(), lancer: vi.fn(),
+      enArret: () => false, enLancement: () => false,
+    });
+    const { rerender } = render(<EnCoursView appsEnCours={etat(1)} vueInitiale="salles" />);
+    rerender(<EnCoursView appsEnCours={etat(2)} vueInitiale="salles" />);
+    await act(async () => {
+      repondre(salle());
+      await new Promise((r) => setTimeout(r, 0));
+    });
+
+    expect(screen.getByRole("article", { name: "Salle Tessera" })).toBeInTheDocument();
   });
 
   it("is left out of the list view", async () => {
@@ -168,6 +220,33 @@ describe("the Tessera server room (ticket-726)", () => {
     expect(screen.getByText("curio · ticket-070 · refusé · 1,50 $ · 40 min")).toHaveClass("text-red-300");
     expect(screen.getByText("1 / 2 approuvés")).toBeInTheDocument();
     expect(vi.mocked(api.usage.recentRuns)).toHaveBeenCalledWith(7, null, 20, "");
+  });
+
+  describe("the latest runs indicator light", () => {
+    const run = { id: "r1", project_id: "ide-core", ticket_id: "ticket-677", started_at: "2026-10-30T14:17:00Z", finished_at: null, final_status: null, cost_usd: 0, input_tokens: 0, output_tokens: 0, duration_ms: 0 };
+
+    async function voyant(approved: boolean | null): Promise<Element | null> {
+      vi.mocked(api.usage.recentRuns).mockResolvedValue([{ ...run, approved }]);
+      vi.mocked(lireLaSalleTessera).mockResolvedValue(salle());
+      rendre();
+      const ecran = await screen.findByRole("button", { name: /derniers runs/ });
+      await screen.findByText(`${approved === true ? 1 : 0} / 1 approuvés`);
+      return ecran.parentElement?.lastElementChild ?? null;
+    }
+
+    it("is green only for an approved run", async () => {
+      expect(await voyant(true)).toHaveClass("bg-green-500");
+    });
+
+    it("is zinc for a run without a verdict", async () => {
+      const lumiere = await voyant(null);
+      expect(lumiere).toHaveClass("bg-zinc-600");
+      expect(lumiere).not.toHaveClass("bg-green-500");
+    });
+
+    it("is red for a refused run", async () => {
+      expect(await voyant(false)).toHaveClass("bg-red-500");
+    });
   });
 });
 

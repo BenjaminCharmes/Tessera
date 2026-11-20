@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services.documentation_code import MatiereCode, matiere_du_lot
+from tessera.services.documentation.documentation_code import MatiereCode, matiere_du_lot
 
 
 async def _git(cwd: Path, *args: str) -> str:

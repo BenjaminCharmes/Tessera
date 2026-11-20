@@ -8,12 +8,12 @@ from fastapi.testclient import TestClient
 from tessera.config import settings
 from tessera.main import app
 from tessera.models.ticket import TicketStatus
-from tessera.services.database_events import save_event
-from tessera.services.database_runs import create_run, finish_run
-from tessera.services.pipeline_events import EventType, OrchestratorEvent, PipelineResult
-from tessera.services.run_executor import _suivre
-from tessera.services.run_registry import RUN_REGISTRY
-from tessera.services.run_status import statut_d_un_run_termine
+from tessera.services.noyau.database_events import save_event
+from tessera.services.noyau.database_runs import create_run, finish_run
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent, PipelineResult
+from tessera.services.pipeline.run_executor import _suivre
+from tessera.services.pipeline.run_registry import RUN_REGISTRY
+from tessera.services.pipeline.run_status import statut_d_un_run_termine
 
 _TS = "2026-10-14T10:00:00+00:00"
 
@@ -65,6 +65,14 @@ def client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Iterator[TestClie
     projet = tmp_path / "workspace" / "projet-file"
     projet.mkdir(parents=True)
     (projet / "CLAUDE.md").write_text("# projet-file\n", encoding="utf-8")
+    # Une file ne s'ouvre que sur des tickets que le projet porte (ticket-849).
+    (projet / "tickets" / "todo").mkdir(parents=True)
+    for numero in ("001", "002", "003"):
+        (projet / "tickets" / "todo" / f"ticket-{numero}.md").write_text(
+            f"---\nid: ticket-{numero}\ntitle: \"T {numero}\"\ntype: feat\n"
+            "status: todo\npriority: medium\nagent: codeur\n---\n\n# T\n",
+            encoding="utf-8",
+        )
     monkeypatch.setattr(settings, "ide_workspace_dir", tmp_path / "workspace")
 
     async def _build(project_id: str) -> _FileDoublee:

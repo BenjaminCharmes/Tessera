@@ -41,6 +41,10 @@ interface BureauViewProps {
   onRanger?: (runId: string) => void;
   /** Choisit un projet et ouvre son onglet Tickets : la porte de sa pièce (ticket-602). */
   onOpenProject?: (projet: string) => void;
+  /** Les leçons proposées par projet (ticket-831), que « À toi » invite à valider. */
+  leconsAValider?: Readonly<Record<string, number>>;
+  /** Les cas du superviseur à relire par projet (ticket-861). */
+  casSuperviseur?: Readonly<Record<string, number>>;
 }
 
 /** Une demande de visite datée : deux gestes dans la même milliseconde se distinguent quand même. */
@@ -65,6 +69,8 @@ export default function BureauView({
   onOuvrir,
   onRanger,
   onOpenProject,
+  leconsAValider,
+  casSuperviseur,
 }: BureauViewProps) {
   const maintenant = useSanteDuBureau();
   // L'agent choisi : seul le couple est retenu, ses lignes se relisent à chaque rendu.
@@ -92,7 +98,7 @@ export default function BureauView({
     runsClos,
   );
 
-  const aToi = contenuAToi(projets, maintenant);
+  const aToi = contenuAToi(projets, maintenant, leconsAValider, casSuperviseur);
   useAlerteSonore(
     aToi.questions.map((q) => q.projet),
     son.actif,

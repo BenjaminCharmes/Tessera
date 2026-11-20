@@ -9,12 +9,7 @@ from typing import Any
 import pytest
 
 from tessera import config
-from tessera.utils.logger import (
-    _JsonFormatter,
-    configure_file_logging,
-    get_logger,
-    install_asyncio_exception_handler,
-)
+from tessera.utils.logger import _JsonFormatter, configure_file_logging, get_logger, install_asyncio_exception_handler
 
 
 def _record(**extra: Any) -> logging.LogRecord:
@@ -179,3 +174,17 @@ def test_un_chemin_de_journal_dans_la_racine_est_garde(tmp_path: Path) -> None:
     dedans = racine / "sous" / "a.log"
 
     assert configure_file_logging(dedans, racine=racine) == dedans
+
+
+def test_a_github_token_is_masked_in_a_log_line() -> None:
+    # ticket-796 : seuls les cinq jetons de mise en ligne étaient masqués.
+    from tessera.utils.logger import inscrire_les_secrets
+
+    reglages = config.Settings(  # type: ignore[call-arg]
+        _env_file=None, github_token="ghp_FactIceJetonDeLog0042"
+    )
+    inscrire_les_secrets(reglages)
+
+    ligne = _JsonFormatter().format(_record(detail="Bearer ghp_FactIceJetonDeLog0042"))
+
+    assert "ghp_FactIceJetonDeLog0042" not in ligne

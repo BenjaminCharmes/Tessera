@@ -107,3 +107,21 @@ describe("the wall scale", () => {
     expect(lampe()?.getAttribute("data-allume")).not.toBe(avant);
   });
 });
+
+describe("the run room scale", () => {
+  it("scales the run room furniture beyond the shared scale on a laptop", () => {
+    const largeur = window.innerWidth;
+    Object.defineProperty(window, "innerWidth", { configurable: true, value: 1536 });
+    try {
+      const facteurDeLaFenetre = (racine: HTMLElement): number =>
+        Number(racine.querySelector('[data-sprite="fenetre"]')?.closest("[data-agrandi]")?.getAttribute("data-agrandi"));
+      const piece = facteurDeLaFenetre(rendrePiece());
+      const salle = facteurDeLaFenetre(rendreSalle());
+
+      expect(salle).toBeGreaterThan(0);
+      expect(piece).toBeGreaterThan(salle);
+    } finally {
+      Object.defineProperty(window, "innerWidth", { configurable: true, value: largeur });
+    }
+  });
+});

@@ -3,7 +3,6 @@ import asyncio
 import json
 import os
 import subprocess
-from collections.abc import Callable
 from datetime import datetime
 from pathlib import Path
 
@@ -12,8 +11,8 @@ from fastapi.testclient import TestClient
 
 from tessera.config import settings
 from tessera.main import app
-from tessera.services.project_overview import clear_overview_cache
-from tessera.services.run_registry import RUN_REGISTRY
+from tessera.services.pipeline.run_registry import RUN_REGISTRY
+from tessera.services.supervision.project_overview import clear_overview_cache
 
 _BASE = "/api/v1/projects"
 
@@ -215,7 +214,9 @@ def test_overview_flags_an_active_run(
 ) -> None:
     _project(plain_workspace, "alpha")
     _project(plain_workspace, "beta")
-    occupe: Callable[[str], bool] = lambda project_id: project_id == "alpha"
+    def occupe(project_id: str) -> bool:
+        return project_id == "alpha"
+
     monkeypatch.setattr(RUN_REGISTRY, "projet_occupe", occupe)
 
     body = _overview()
@@ -228,7 +229,7 @@ def test_tessera_icon_wins_and_next_and_root_favicons_are_found(plain_workspace:
     """Ticket-404: `.tessera/icon.svg` (projects without a web app) comes first;
     a Next.js `src/app/icon.svg`, a root `favicon.svg` (static games) and a
     `frontend/public/logo.svg` are found too."""
-    from tessera.services.project_overview import find_icon
+    from tessera.services.supervision.project_overview import find_icon
 
     svg = "<svg xmlns='http://www.w3.org/2000/svg'/>"
     profil = _project(plain_workspace, "profil")
@@ -255,7 +256,7 @@ def test_tessera_icon_wins_and_next_and_root_favicons_are_found(plain_workspace:
 def test_ancestor_project_uses_the_repository_icon(repo_workspace: Path) -> None:
     """Ticket-404: a `git_root: ancestor` project (ide-core) shows the icon of
     the repository that contains it — the IDE's own; a plain project does not."""
-    from tessera.services.project_overview import find_icon
+    from tessera.services.supervision.project_overview import find_icon
 
     public = repo_workspace / "frontend" / "public"
     public.mkdir(parents=True)

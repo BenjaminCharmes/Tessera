@@ -39,7 +39,9 @@ def construire(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     git(repo, "config", "user.name", "Test")
     git(repo, "config", "user.email", "test@example.com")
     git(repo, "config", "commit.gpgsign", "false")
-    _commit(repo, ".gitignore", "node_modules/\ncache/\nsecret.cfg\n")
+    # Sans « / » final : un lien symbolique (CI Linux) n'est pas un dossier pour git,
+    # un motif « cache/ » ne l'ignorerait pas ; une jonction Windows, si.
+    _commit(repo, ".gitignore", "node_modules\ncache\nsecret.cfg\n")
     _commit(repo, "suivi.txt", "suivi")
     git(repo, "remote", "add", "origin", str(origin))
     git(repo, "push", "origin", "develop")

@@ -99,6 +99,23 @@ la machine.
 
 ---
 
+### Authentification - Jeton de session
+
+Quand tu lances Tessera pour la première fois, l'interface te demande un jeton de session pour chaque nouvel onglet.
+
+Où trouver ton jeton :
+
+- **Si tu as défini `STATIC_TOKEN` dans `.env`** : utilise sa valeur.
+- **Sinon** : Tessera a écrit un jeton dans un fichier :
+  - Windows : `~\AppData\Local\Tessera\jeton-de-session`
+  - macOS/Linux : `~/.local/state/tessera/jeton-de-session`
+
+Ouvre ce fichier et copie le jeton qu'il contient.
+
+**Sauvegarder pour la prochaine fois** : Après avoir saisi le jeton, le navigateur peut le sauvegarder — à la prochaine ouverture d'onglet, il se remplira automatiquement. Le jeton reste valide jusqu'à la fermeture de l'onglet ; tu n'as rien à faire pour le renouveler sur la même session.
+
+Le jeton n'est jamais affiché à l'écran et jamais enregistré sur le disque : il vit dans le coffre du navigateur.
+
 ## 2. Ajouter un projet
 
 Un **projet** est un dossier contenant du code, des tickets et un `CLAUDE.md` qui
@@ -311,6 +328,15 @@ Une confirmation s'affiche sur la carte : « Lancer N tickets ? » Clique **« L
 - Si un run tourne déjà sur ce projet, le bouton est grisé et tu vois l'infobulle « Un run est en cours ».
 - Si le lancement échoue (par exemple, un autre run a démarré pendant que tu confirmais), un message d'erreur court s'affiche en rouge.
 
+
+### Lancer une revue du projet
+
+Clique sur le bouton « Revue du projet » depuis la fiche de tout projet. L'IDE affiche le coût estimé, plafonné à 3 $, et demande une confirmation. Annuler n'envoie rien.
+
+Le bouton se grise si un run occupe le projet ; le message affiche le ticket en cours.
+
+Une fois lancée, la revue s'observe dans le fil comme un run normal.
+
 ### Sélectionner un projet
 
 Clique sur une carte pour la sélectionner. La zone centrale passe au Kanban de ce projet, comme si tu l'avais choisi dans la barre latérale.
@@ -351,6 +377,15 @@ Chaque carte a un menu accessible (trois points verticaux). Clique dessus pour :
 - Retirer la catégorie
 
 La liste se recharge, et la barre latérale s'actualise.
+
+### Leçons du projet
+
+Après qu'un run approuvé a corrigé quelque chose, l'agent propose une leçon dans `memory/lecons.md`. Un compteur sur la carte du projet indique les leçons en attente de ta relecture. Celles que tu approuves, tu les déplaces sous `## En vigueur` — elles deviennent une consigne pour les agents à venir.
+
+Un run qui essaierait de modifier ce fichier est bloqué : seul le service écrit dedans.
+
+
+Le nombre de leçons qui attendent ta validation apparaît dans la colonne « À toi » du Bureau, sous chaque projet — tu vois tout de suite s'il y a quelque chose à relire sans aller ouvrir `memory/lecons.md`.
 
 ### États de la vue
 
@@ -427,6 +462,10 @@ Elle s'arrête si tu navigues ailleurs.
   été lancée.
 - **Chargement** : la liste est en cours de lecture.
 - **Erreur** : quelque chose a échoué ; l'écran affiche le message.
+
+### Faux positifs d'erreur dans le journal
+
+Une ligne du journal qui dit « ✓ built, 0 error » ou « 0 errors » s'affiche en blanc (info), non en rouge. Seules les lignes qui affirment un vrai problème (« Error: boom ») rougissent. Les services très bavards — en particulier les compilateurs affichant le décompte des erreurs — ne produisent pas d'alerte visuelle sur un bilan sain.
 
 ## 2 ter. Vue « En cours »
 
@@ -516,6 +555,65 @@ Si un port déclaré par le projet est occupé par un processus **étranger** �
 
 Le projet qui fait tourner l'IDE lui-même n'a jamais d'app externe dans son inventaire.
 
+## 2 quater. Rituels : suivi des actions récurrentes
+
+### Accéder à la vue
+
+Clique sur « Rituels » dans le groupe Pilotage de la barre latérale. Si un ou plusieurs rituels sont en retard, une pastille ambre s'affiche avec le nombre ; elle disparaît quand tout est à jour.
+
+### Ce que tu vois
+
+La vue affiche trois sections :
+
+- **À faire** : rituels en retard sous forme de cartes, avec le titre, le temps écoulé (en rouge si urgent), le rythme et la durée, et une phrase à dire à Claude.
+- **À venir** : une ligne par rituel, avec sa prochaine échéance.
+- **Faits récemment** : les rituels que tu viens de marquer comme faits.
+
+Une erreur de l'API, s'il y en a une, s'affiche en haut.
+
+### Marquer comme fait
+
+Clique sur « Fait » dans une carte. Le rituel part dans « Faits récemment » et la pastille se met à jour en direct.
+
+### Reporter à demain
+
+Clique sur « Reporter à demain ». Le rituel sort de « À faire » et repasse « À venir » avec une nouvelle échéance.
+
+### Copier la phrase
+
+Dans une carte, clique sur « Copier » pour mettre la phrase suggérée dans ton presse-papiers. Utile pour la coller dans le chat avec un agent.
+
+### Ouvrir un projet
+
+Si le rituel est lié à un projet, un bouton « Ouvrir <projet> » bascule vers ce projet dans la barre latérale.
+
+### Mise à jour
+
+La liste des rituels se relit toutes les 5 minutes. Si tu marques un rituel ailleurs (autre machine, API externe), la vue se met à jour au prochain refresh.
+
+### Ce que ça ne fait pas
+
+Tu ne peux pas créer ou modifier des rituels depuis l'IDE. Ils sont déclarés dans une configuration du projet.
+
+## 2 quart. Les Rituels
+
+### Accéder à la vue Rituels
+
+Dans la rail de navigation à gauche, groupe **Pilotage**, clique sur **Rituels** (icône d'horloge). Une pastille ambre portant le nombre apparaît si des rituels sont en retard — elle disparaît quand tous les rituels sont à jour.
+
+### Actions dans la vue
+
+Pour chaque rituel en retard :
+
+- **Fait** : marque le rituel exécuté et met à jour son compteur
+- **Reporter à demain** : repousse la date limite sans marquer le rituel comme exécuté
+- **Copier** : envoie une phrase préremplie au presse-papiers, prête à donner à Claude
+- **Ouvrir <projet>** : sélectionne un projet lié au rituel dans Tessera
+
+### Rafraîchissement
+
+La vue se met à jour toutes les 5 minutes et chaque fois que tu l'ouvres.
+
 ## 3. Écrire des tickets
 
 Un ticket est un **fichier Markdown**. Pas de base de données propriétaire : tu peux
@@ -583,6 +681,19 @@ La file n'attend pas — elle s'arrête. Si le ticket A (que B dépend de) écho
 
 Résolvez A (conflit, rebase, relance manuelle) avant de relancer la file.
 
+#### Passation au planificateur
+
+Optionnel : ajoute `plan: true` dans le frontmatter pour faire passer ton ticket par un tour de planification (lecture seule) avant que le codeur ne le prenne. C'est un appel supplémentaire au modèle, à réserver aux tickets dont l'approche n'est pas évidente.
+
+
+#### Tickets qui demandent une preuve réelle
+
+Optionnel : ajoute `preuve_reelle: true` au frontmatter si ton ticket touche les processus système, les comptes utilisateur, les droits d'accès ou l'OS. Tu dois alors écrire une section `## Preuve réelle` — décris exactement ce qu'il faut lancer sur ta machine et ce qu'il faut constater.
+
+Quand un tel ticket est approuvé, le run ouvre sa pull request puis s'arrête, même si ton projet est en autonomie `merge`. La session ide-core fait elle-même la vérification, puis fusionne. Aucun agent n'écrit la preuve : seul tu la lis et la valides.
+
+N'écris jamais la preuve dans les critères d'acceptation. Les agents ne peuvent pas la remplir, et le validateur la refusera trois fois.
+
 ### Critères d'acceptation obligatoires pour le code
 
 Pour tout ticket `feat`, `fix` ou `refactor`, tu dois ajouter une section `## Critères d'acceptation`. C'est là que tu énumères les comportements ou résultats que le validateur vérifiera.
@@ -602,6 +713,22 @@ Le validateur joindra la liste des fichiers du dossier et pourra vérifier qu'il
 
 Le validateur vérifie l'existence du dossier, pas son contenu. Pour un critère de contenu (« la classe X existe »), cite le fichier spécifique plutôt que le dossier.
 
+#### Critères sur les tests
+
+**Pas de « `uv run pytest` passe » ni de « `npm run test` passe »** tant que le testeur est désactivé sur le projet : le validateur ne reçoit alors aucun résultat de test, juge le critère invérifiable, et un critère invérifiable fait refuser le run. Nomme plutôt le test qui doit exister ; faire tourner les suites relève de la vérification avant merge. Testeur actif, le validateur voit chaque étape de la `test_command` et son code de sortie : « `npm run build` passe » ne se vérifie que si `build` en fait partie.
+
+#### Fichiers cités en backticks
+
+**Un critère satisfait par du code déjà là nomme son fichier entre backticks.** Le validateur ne voit que le diff, plus les fichiers que les critères citent ainsi. « La grille porte `overflow-x: auto` », déjà vrai dans un CSS que le run ne touche pas, se refuse ; « `main.css` donne `overflow-x: auto` à la grille » se vérifie.
+
+#### Pas de critères négatifs
+
+**Pas de critère négatif sur tout le code.** « Rien n'appelle encore X » ou « aucun chemin n'atteint Y » ne se prouve pas sur un diff : le validateur le juge invérifiable et refuse. Ramène le critère au diff (« le diff ne modifie ni `a.py` ni `b.py` ») ou à un test (« un test vérifie, avec des doubles, que … »).
+
+#### Numéros figés dans les critères
+
+**Pas de numéro d'ADR ni de ticket figé dans un critère.** « ADR-012 est écrit » se refuse dès qu'un autre ticket de la file a pris ce numéro avant. Écris plutôt « une ADR au prochain numéro libre de `memory/decisions.md` décrit … ».
+
 ### Fichiers qu'un agent ne peut pas modifier
 
 Certains fichiers définissent le projet lui-même et restent hors d'atteinte des agents : `CLAUDE.md`, `CLAUDE.local.md`, `agents.json`, `.claude/`, `.github/workflows/`, `.git/`.
@@ -618,6 +745,19 @@ Reformule le critère pour qu'il ignore ces fichiers, ou fais la modification à
 Ton script de vérification est aussi protégé en écriture. Si ton projet déclare `test_command` et désigne un fichier sur disque (par exemple `../scripts/verifier.py`), aucun agent ne peut le modifier — tu verras la tentative refusée avec un message clair. L'idée est d'empêcher un ticket d'affaiblir le test qui doit le juger.
 
 Quand un ticket modifie la configuration des tests — `conftest.py`, `vitest.config.ts`, `eslint.config.js`, la clé `scripts` de `package.json`, ou les sections `[tool.pytest*]` et `[tool.mypy]` de `pyproject.toml` —, le reviewer en reçoit un avertissement au début de son message. À lui de vérifier qu'aucune étape de vérification n'a été retirée ou désactivée.
+
+Aucun agent ne peut écrire dans les chemins suivants, même si un ticket l'autorise explicitement :
+
+- `.github/workflows/` — la CI
+- `.claude/` (`settings*.json`, `skills/`, `commands/`, `agents/`) — la configuration Claude Code
+- `.git/` — l'historique git
+- `agents.json` — la déclaration des agents
+- `CLAUDE.md` et `CLAUDE.local.md` — les règles du projet
+- `memory/contraintes.md` — les contraintes vivantes
+
+Un ticket dont le livrable vit là se fait **à la main** : lancé dans le pipeline, il tourne trois tours sur un diff vide et se bloque. Tu peux écrire la partie autorisée — un test, du code — et dire que le reste est manuel.
+
+**« Ce ticket autorise la modification de `CLAUDE.md` » n'ouvre pas le garde-fou.** Seul le droit de décision suffit : un agent qui lit cette phrase comme une permission et contourne le refus contrevient aux règles. La partie `CLAUDE.md` d'un tel ticket se fait à la main, après le merge.
 
     ## Critères d'acceptation
     
@@ -720,6 +860,10 @@ pour que le vrai changement reste visible. Le commit, lui, les contient intégra
 Il renvoie `CHANGES_REQUESTED` avec sa raison, et le codeur repart pour un tour en
 tenant compte du retour. Au bout de **3 tours** sans approbation, le ticket passe en
 `blocked/` — et le travail produit est **quand même commité** (voir plus bas).
+
+### Si aucun fichier n'a changé
+
+Quand un codeur décrit le travail attendu mais n'écrit rien sur disque, le tour est automatiquement refusé même si le reviewer et le validateur approuvent. Un message demande d'écrire réellement les fichiers. Le codeur repart pour un tour où il doit modifier le code.
 
 ### Si l'audit de sécurité bloque
 
@@ -922,6 +1066,23 @@ Une file qui s'arrête prématurément — sur budget, ticket non approuvé, ou 
 
 Quand le quota Claude de ton abonnement s'épuise, la file s'arrête gracieusement — y compris si c'est pendant l'audit de sécurité. Le journal affiche « quota épuisé — reprise vers HH:MM » (heure locale estimée), le ticket courant repasse en `todo`, et tu peux relancer la file une fois ton quota renouvelé. Ce n'est jamais un blocage d'agent : c'est un arrêt normal de ressource.
 
+### Quand le détecteur d'anomalies prévient
+
+Un détecteur observe les runs en cours et le dit dans la cloche, le fil du run et le Bureau. Il prévient quand il repère un pattern anormal : plus de 15 minutes sans événement, outil appelé quatre fois identiquement de suite, dernier tour de revue, étape ou coût bien au-delà de la normale du projet, ou blocages répétés pour la même cause. Il n'arrête, ne relance ni ne modifie aucun run — c'est un témoin.
+
+La notification apparaît comme une alerte de type « anomalie ». Sur le Bureau, le poste du codeur affiche un petit marqueur montrant le nombre d'anomalies détectées.
+
+Si tu veux désactiver ce détecteur, mets `ANOMALIES_ACTIVES=false` dans `.env`.
+
+Le détecteur observe tes runs toutes les cinq minutes et signale les situations anormales : silence prolongé, séries d'appels d'outils identiques, tours de revue qui dépassent le seuil, étapes ou coûts anormalement élevés. Une anomalie n'arrête pas le run — c'est un témoin, il te prévient sans intervenir.
+
+Tu reçois une notification quand le détecteur détecte quelque chose : cloche, son, notification système, selon tes réglages. Si tu ignores la notification, tu la retrouves dans le fil du run, en ambre, avec le message du détecteur. La même anomalie sur le même run n'est signalée qu'une fois : s'il s'arrête et reprend, tu la reverras.
+
+Tu peux désactiver les notifications d'anomalie dans la cloche, sans arrêter l'observation du run. L'anomalie reste visible dans le fil. Si le détecteur ralentit ton IDE ou te gêne, tu peux le désactiver complètement : mets `ANOMALIES_ACTIVES=false` dans `.env`.
+
+
+- **Documentation refusée en série** : les trois derniers lots ont tous été refusés sans aucun fichier modifié. Cela indique un problème systématique de génération — par exemple, une description toujours trop proche de celle de Tessera, ou une revue qui refuse régulièrement.
+
 ## 5 bis. Se repérer dans l'écran
 
 Tessera n'essaie pas d'être un éditeur. Monaco est là pour **lire**, pas pour
@@ -1069,6 +1230,8 @@ Une file affiche les tickets en quatre groupes :
 - **Courant** : le ticket en traitement
 
 Si un ticket est arrêté, son motif te guide pour le corriger et le relancer.
+
+Chaque anomalie détectée apparaît comme une ligne dans le fil, avec son libellé (la règle qui l'a déclenchée) et son message explicatif. Elle est marquée en ambre pour la distinguer des verdicts de l'agent.
 
 ### Runs récents — chercher et afficher plus
 
@@ -1225,6 +1388,10 @@ Après un redémarrage du backend, Tessera cherche aussi les pull requests ouver
 
 Si ton projet n'a pas de dépôt GitHub ou si son autonomie est `pull`, Tessera reprend uniquement les tickets marqués `in-review` localement.
 
+### Erreur GitHub 500 — Retry automatique
+
+Une erreur serveur 500 de GitHub lors de l'ouverture de la PR n'arrête plus la livraison : le pipeline cherche d'abord si la PR a malgré tout été créée malgré l'erreur, puis retente l'ouverture une fois après une courte attente. L'étape du journal affiche « nouvelle tentative d'ouverture de la PR après l'erreur 500 » ou « PR #N reprise malgré l'erreur 500 » si la PR existait déjà.
+
 ## Le Bureau — vue de supervision
 
 Supervision affiche maintenant le **Bureau** par défaut (au lieu de la précédente Liste).
@@ -1266,6 +1433,9 @@ La boîte aux lettres devient cliquable quand la pull request existe : un clic l
 La baie de serveurs s'ouvre sur l'adresse que le service lancé a annoncée, si elle existe : un clic dans un nouvel onglet. Sinon, elle reste un meuble et le lancement se fait depuis l'en-tête du projet.
 
 Chaque bouton d'accès au service nomme le service qu'il ouvre — par exemple « Ouvrir backend :8026 » ou « Ouvrir frontend :5196 ». Cela évite toute ambiguïté quand plusieurs services tournent sur des ports différents.
+
+
+Quand un run détecte une anomalie, le Bureau marque l'agent d'un symbole en ambre. Le nombre d'anomalies figure dans le nom du marqueur pour les lecteurs d'écran. La salle Tessera affiche aussi, pour chaque run vivant, le nombre d'anomalies détectées — en texte ambre quand ce nombre est > 0.
 
 ## 5 quart. L'onglet Historique
 
@@ -1336,6 +1506,16 @@ L'historique s'efface à minuit (fin du jour). Le jour suivant, tu repartiras de
 
 ### L'onglet « Réglages »
 
+Tu accèdes aux réglages par le bouton d'engrenage de la barre latérale. Cinq paramètres y sont affichés, chacun avec son défaut de `.env`, ses bornes, et deux boutons (**Appliquer** ou **Revenir au défaut**) :
+
+- **Plafond de dépense d'un run** (USD) — le run s'arrête au-delà ; vaut au prochain run.
+- **Plafond de dépense d'un appel** (USD) — un appel qui le dépasse met le run en échec.
+- **Délai de reprise** (secondes) — l'agent reprend avec une hypothèse après ce délai. Vaut au prochain run.
+- **Suites de tests simultanées** — maximum en parallèle ; change immédiatement pour le prochain créneau.
+- **Machine éveillée pendant un run** (Windows) — l'écran peut s'éteindre, le système reste éveillé. Vaut au prochain run.
+
+Si tu changes un réglage pendant qu'une file tourne, un texte t'indique combien de runs gardent l'ancienne valeur. Les runs ouverts gelent leurs réglages à l'ouverture — seul le suivant les applique.
+
 Pour chaque type d'événement, deux cases à cocher :
 
 - **Question** : un agent te demande confirmation
@@ -1349,6 +1529,21 @@ Pour chaque type d'événement, deux cases à cocher :
 **Système** : l'événement s'affiche-t-il comme notification du système d'exploitation ? Activé par défaut.
 
 **Son** : l'événement doit-il émettre un son ? Par défaut, seules la **Question** et la **CI rouge** sonnent.
+
+Clique sur l'engrenage au pied du rail pour ouvrir le panneau des réglages globaux. Tu y lis et changes en direct, sans créer de ticket, les cinq réglages qui s'appliquent à tous les runs.
+
+Chaque réglage affiche sa valeur actuelle, son défaut de `.env`, ses limites, et l'effet du changement : « au prochain run » (au lancement du ticket suivant), « dès la prochaine suite de tests » (immédiat), ou « à l'ouverture du prochain premier run ».
+
+Pour changer une valeur, tape ou coche, puis clique « Appliquer ». Si elle sort des limites (p. ex., zéro pour un plafond) ou si le type est mauvais, le panneau te montre l'erreur.
+
+Si tu as changé la valeur, clique « Revenir au défaut » pour revenir à celle de `.env`.
+
+Quand tu changes un réglage « au prochain run » pendant que d'autres runs tournent, le panneau te dit combien gardent l'ancienne valeur : « 2 runs gardent l'ancienne valeur ». Ces runs continueront avec leur valeur figée, pas celle nouvellement posée.
+
+Erreurs possibles :
+- **403** : l'interface doit être servie depuis une `Origin` déclarée. L'administrateur doit l'ajouter à `ALLOWED_ORIGINS` dans `.env`.
+- **404** : ce réglage n'existe pas.
+- **422** : la valeur sort des limites. Le message dit laquelle.
 
 ### Ce que ça ne fait pas
 
@@ -1860,6 +2055,21 @@ en boucle. Ne les augmente qu'en connaissance de cause.
 > est ouverte — c'est acceptable en local, pas ailleurs.
 
 ---
+
+
+### Secrets et coffre du système
+
+Neuf secrets vivent maintenant dans le coffre de ta machine (Gestionnaire d'identification Windows, Trousseau macOS, Secret Service Linux) : ANTHROPIC_API_KEY, GITHUB_TOKEN, VERCEL_TOKEN, NEON_API_KEY, RESEND_API_KEY, STRIPE_API_KEY, CLOUDFLARE_API_TOKEN, STATIC_TOKEN et FORBIDDEN_TERMS.
+
+Par défaut (`SECRETS_SOURCE=auto`), Tessera lit le coffre d'abord, puis `.env` en repli avec un avertissement. Si le coffre ne répond pas mais qu'une ligne de `.env` dit qu'un secret y est rangé (ligne `# NOM : dans le coffre`), Tessera refuse de démarrer : un secret migré ne doit jamais rester vide en silence.
+
+Trois modes au choix :
+
+- **auto** (défaut) : coffre s'il répond, sinon `.env` avec un avertissement. Refus si un secret migré manque dans les deux.
+- **coffre** : refus sans coffre ; sur une machine sans trousseau, utilise `env`.
+- **env** : jamais de coffre, même s'il existe (CI, Docker, machines sans trousseau).
+
+Renseigne `SECRETS_SOURCE` dans `.env` ou en variable d'environnement pour déclarer le mode.
 
 ## 12. Problèmes fréquents
 

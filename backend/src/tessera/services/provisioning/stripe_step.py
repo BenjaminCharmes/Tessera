@@ -10,14 +10,9 @@ result detail, a log or an event. An existing price, product or webhook is
 never modified, and nothing is deleted.
 """
 from dataclasses import dataclass, field
-from typing import Optional
 
 from tessera.services.provisioning.online_config import StripeConfig
-from tessera.services.provisioning.steps import (
-    ProvisioningContext,
-    StepResult,
-    StepState,
-)
+from tessera.services.provisioning.steps import ProvisioningContext, StepResult, StepState
 from tessera.services.provisioning.stripe_client import StripeClient
 from tessera.utils.logger import get_logger
 from tessera.utils.secrets import SECRETS, SecretRegistry
@@ -89,7 +84,7 @@ class StripeStep:
         await self._product_and_price(ctx, config, write, report)
         return await self._webhook(ctx, config, secret_present, write, report)
 
-    def _refusal(self, config: StripeConfig) -> Optional[StepResult]:
+    def _refusal(self, config: StripeConfig) -> StepResult | None:
         """Refuse before any request when the key and the declared mode disagree."""
         if config.price_cents is not None and not config.product:
             return StepResult(StepState.FAILED, "price_cents needs a product name; nothing was sent")

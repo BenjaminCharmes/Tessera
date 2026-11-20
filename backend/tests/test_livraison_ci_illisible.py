@@ -2,7 +2,7 @@
 import json
 from pathlib import Path
 
-from tessera.services.livraison import LivraisonService
+from tessera.services.livraison.livraison import LivraisonService
 
 
 class _FauxGit:

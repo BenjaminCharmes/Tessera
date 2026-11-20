@@ -2,7 +2,7 @@ import { IconCheck } from "../../design/icons";
 import { useState } from "react";
 import type { Project } from "../../types/api";
 import { api } from "../../lib/api";
-import Modale from "../../design/ui/Modale";
+import Modale, { TitreDeModale } from "../../design/ui/Modale";
 
 interface CreateProjectModalProps {
   onClose: () => void;
@@ -170,9 +170,9 @@ export default function CreateProjectModal({
   return (
     <Modale onFermer={fermer} aria-label="Créer un projet">
       <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-6 w-full max-w-md shadow-xl">
-        <h2 className="text-zinc-100 text-base font-semibold mb-4">
+        <TitreDeModale className="mb-4">
           Nouveau projet
-        </h2>
+        </TitreDeModale>
         <form onSubmit={handleSubmit} noValidate>
           <div className="mb-4">
             <p className="text-xs text-zinc-400 mb-2">Type de projet</p>

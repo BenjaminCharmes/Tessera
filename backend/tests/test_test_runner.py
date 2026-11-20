@@ -3,15 +3,15 @@
 import asyncio
 import os
 import sys
-from typing import Any
 from pathlib import Path
+from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from tests.conftest import requires_symlinks
-
-from tessera.services.test_runner import (
+from tessera.services.verification.sortie_de_test import extract_failure_details as _extract_failure_details
+from tessera.services.verification.sortie_de_test import extract_summary_line as _extract_summary_line
+from tessera.services.verification.test_runner import (
     EtapeTest,
     TestCommandNotFound,
     TestResult,
@@ -20,13 +20,7 @@ from tessera.services.test_runner import (
     _parse_failed_step,
     reset_semaphore_for_tests,
 )
-from tessera.services.sortie_de_test import (
-    extract_failure_details as _extract_failure_details,
-    extract_pytest_failures_section as _extract_pytest_failures_section,
-    extract_pytest_short_summary as _extract_pytest_short_summary,
-    extract_summary_line as _extract_summary_line,
-    extract_vitest_failures as _extract_vitest_failures,
-)
+from tests.conftest import requires_symlinks
 
 
 @pytest.fixture
@@ -170,7 +164,7 @@ class TestRunTests:
     ) -> None:
         mock_proc = MagicMock()
         mock_proc.kill = MagicMock()
-        mock_proc.communicate = AsyncMock(side_effect=asyncio.TimeoutError())
+        mock_proc.communicate = AsyncMock(side_effect=TimeoutError())
 
         with patch("asyncio.create_subprocess_exec", return_value=mock_proc):
             result = await service.run_tests(
@@ -189,7 +183,7 @@ class TestRunTests:
         mock_proc = MagicMock()
         mock_proc.kill = MagicMock()
         mock_proc.wait = AsyncMock()
-        mock_proc.communicate = AsyncMock(side_effect=asyncio.TimeoutError())
+        mock_proc.communicate = AsyncMock(side_effect=TimeoutError())
 
         with patch("asyncio.create_subprocess_exec", return_value=mock_proc):
             await service.run_tests(python_project, test_command="uv run pytest", timeout=1)
@@ -281,7 +275,7 @@ class TestExpired:
         mock_proc = MagicMock()
         mock_proc.kill = MagicMock()
         mock_proc.wait = AsyncMock()
-        mock_proc.communicate = AsyncMock(side_effect=asyncio.TimeoutError())
+        mock_proc.communicate = AsyncMock(side_effect=TimeoutError())
 
         with patch("asyncio.create_subprocess_exec", return_value=mock_proc):
             result = await service.run_tests(
@@ -323,7 +317,7 @@ class TestCommandeNonDemarree:
         # testeur lance sans shell, et `npm` n'existe pas sous Windows — c'est
         # `npm.cmd`. La reprise existait dans `ProcessRegistry` depuis le
         # ticket-149 et n'avait pas été portée ici (ticket-157).
-        from tessera.services.lancement import essais_de_commande
+        from tessera.services.noyau.lancement import essais_de_commande
 
         essais = essais_de_commande(["npm", "run", "test"])
 
@@ -334,7 +328,7 @@ class TestCommandeNonDemarree:
             assert essais == [["npm", "run", "test"]]
 
     async def test_une_commande_deja_suffixee_n_est_pas_redoublee(self) -> None:
-        from tessera.services.lancement import essais_de_commande
+        from tessera.services.noyau.lancement import essais_de_commande
 
         assert essais_de_commande(["npm.cmd", "test"]) == [["npm.cmd", "test"]]
 
@@ -479,7 +473,7 @@ class TestSemaphore:
         mock_ko = MagicMock()
         mock_ko.kill = MagicMock()
         mock_ko.wait = AsyncMock()
-        mock_ko.communicate = AsyncMock(side_effect=asyncio.TimeoutError())
+        mock_ko.communicate = AsyncMock(side_effect=TimeoutError())
 
         runner = TestRunnerService()
 
@@ -843,9 +837,10 @@ class TestEnvironnementDeclare:
 
         assert result.passed is True
 
-    async def test_without_env_the_process_gets_no_environment_argument(
-        self, tmp_path: Path
+    async def test_without_env_the_process_gets_the_inherited_environment(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
+        monkeypatch.setenv("TESSERA_888_ORDINAIRE", "herite")
         proc = MagicMock()
         proc.returncode = 0
         proc.communicate = AsyncMock(return_value=(b"1 passed", b""))
@@ -853,4 +848,4 @@ class TestEnvironnementDeclare:
         with patch("asyncio.create_subprocess_exec", return_value=proc) as lance:
             await TestRunnerService().run_tests(tmp_path, test_command="make test")
 
-        assert lance.call_args.kwargs["env"] is None
+        assert lance.call_args.kwargs["env"]["TESSERA_888_ORDINAIRE"] == "herite"

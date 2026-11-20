@@ -1,20 +1,19 @@
 import asyncio
+import json
 from pathlib import Path
 
 import pytest
 
-import json
-
-from tessera.services.run_worktree import RunWorktree
 from tessera.services.git_workspace import (
     GitCommandError,
     GitWorkspaceService,
     InvalidSlugError,
     NotAGitRepository,
     _resumer_lockfiles,
-    _union_lines,
     _union_json_lists,
+    _union_lines,
 )
+from tessera.services.worktrees.run_worktree import RunWorktree
 
 
 async def _git(cwd: Path, *args: str) -> None:
@@ -710,6 +709,26 @@ async def test_what_a_push_publishes_is_read_from_the_commits(repo: Path) -> Non
     (commit,) = await service.commits_depuis_base("develop", branche)
     assert "un corps de message" in commit.message
     assert "c@example.com" in commit.auteur
+
+
+async def test_branch_diff_forces_the_a_and_b_prefixes(
+    repo: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    service = GitWorkspaceService(repo)
+    lancees: list[tuple[str, ...]] = []
+
+    async def _enregistrer(*args: str) -> str:
+        lancees.append(args)
+        return ""
+
+    monkeypatch.setattr(service, "_run", _enregistrer)
+
+    await service.diff_de_branche("develop", "ticket-030")
+
+    (commande,) = lancees
+    assert commande[0] == "diff"
+    assert "--src-prefix=a/" in commande
+    assert "--dst-prefix=b/" in commande
 
 
 # ---------------------------------------------------------------------------
@@ -1835,7 +1854,7 @@ async def test_rebase_journal_pipeline_log_resolves_as_union(repo: Path) -> None
     await _git(repo, "add", "memory/pipeline-log.md")
     await _git(repo, "commit", "-q", "-m", "chore: init log")
 
-    base = (await asyncio.create_subprocess_exec(
+    __base = (await asyncio.create_subprocess_exec(
         "git", "rev-parse", "--abbrev-ref", "HEAD",
         cwd=str(repo), stdout=asyncio.subprocess.PIPE,
     )).stdout  # type: ignore[union-attr]
@@ -2187,9 +2206,6 @@ class _OrchDeDepart:
         self._base_branch = "develop"
         self.logs: list[str] = []
 
-    async def _sur_la_base(self) -> bool:
-        return await self._git_workspace.branche_courante() == self._base_branch
-
     def _log(self, message: str) -> None:
         self.logs.append(message)
 
@@ -2201,9 +2217,9 @@ async def test_la_branche_du_ticket_part_du_commit_distant_et_garde_le_journal(
     the run realigns it first, so the ticket branch forks from the remote
     commit and the log line survives (the state the CIWatcher leaves behind)."""
     from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-    from tessera.services import pipeline_branche
-    from tessera.services.pipeline_events import OrchestratorEvent
-    from tessera.services.pipeline_run import PipelineRun
+    from tessera.services.noyau.pipeline_events import OrchestratorEvent
+    from tessera.services.pipeline import pipeline_branche
+    from tessera.services.pipeline.pipeline_run import PipelineRun
 
     local, bare = repo_avec_distant
     journal = local / "memory" / "pipeline-log.md"

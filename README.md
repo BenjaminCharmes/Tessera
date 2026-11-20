@@ -27,17 +27,22 @@ Trois choix le distinguent d'un assistant de code classique :
   un commit, approuvé ou non. Rien n'est perdu, rien ne bloque le ticket
   suivant.
 - **Vous décidez jusqu'où il va.** Chaque projet déclare son niveau : s'arrêter
-  au commit, ouvrir la PR, ou merger — et seulement si la CI est verte.
+  au commit, ouvrir la PR, ou merger — et seulement si la CI est verte. Les tickets
+  qui demandent une preuve manuelle (`preuve_reelle: true` dans le frontmatter) ouvrent
+  leur PR mais la retiennent en attente de vérification sur la machine, même en
+  autonomie `merge` — seule la session ide-core procède au merge après la preuve.
 - **Les fichiers sensibles restent protégés.** Les agents ne peuvent pas
-  modifier les règles de votre IDE (`CLAUDE.md`, `agents.json`, `.github/workflows/`,
-  `.git/`) ni sa configuration locale (`.claude/`). Ils ne peuvent pas non plus
+  modifier les règles de votre IDE (`CLAUDE.md`, `CLAUDE.local.md`, `agents.json`, `.github/workflows/`,
+  `.git/`) ni les fichiers de configuration de développement (`.claude/settings*.json`, `.claude/skills/`, `.claude/commands/`, `.claude/agents/`). Ils ne peuvent pas non plus
   modifier les contraintes communes (`memory/contraintes.md`) directement : les
   nouvelles règles y sont proposées d'abord, en attente d'acceptation. Le script
   de vérification (celui de `test_command`) est aussi protégé : un codeur ne peut
   pas affaiblir la vérification qui juge son code. Un diff qui touche la
   configuration des tests est signalé au reviewer pour vérification. Si un ticket
   exige une telle modification, le run s'arrête avant le premier tour avec un
-  message clair.
+  message clair. Quand un run se corrige après un premier refus, une leçon est
+  proposée — un pattern observé à valider. Les leçons approuvées renforcent le
+  contexte des futurs codeurs et reviewers sur ce projet.
 
 Après un run approuvé, seul le commit que le reviewer et le validateur ont lu
 est mergé : Tessera rejette d'office tout changement introduit ultérieurement
@@ -123,6 +128,10 @@ Voir la [configuration](docs/configuration.md#ollama) pour régler ces délais.
 Les décisions d'architecture en vigueur sont dans
 [`projects/ide-core/memory/contraintes.md`](projects/ide-core/memory/contraintes.md) :
 ce sont des contraintes, pas des archives.
+
+Chaque agent reçoit `memory/contraintes.md` de son projet lors de chaque appel,
+filtré selon son rôle. `memory/decisions.md` reste la source complète — elle
+ne voyage que sur demande ou comme repli si les contraintes sont vides.
 
 ## Self-hosting
 

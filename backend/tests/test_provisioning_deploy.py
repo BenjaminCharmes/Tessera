@@ -1,20 +1,11 @@
 """The Vercel deployment step — ticket-489. A fake Vercel behind MockTransport, no network."""
 import json
-from typing import Optional
 
 import httpx
 import pytest
 
 from tessera.config import settings
-from tessera.services.provisioning import (
-    OnlineConfig,
-    ProvisioningContext,
-    ServiceError,
-    StepState,
-    VercelClient,
-    VercelEnvWriter,
-    VercelRedeployStep,
-)
+from tessera.services.provisioning import OnlineConfig, ProvisioningContext, ServiceError, StepState, VercelClient, VercelEnvWriter, VercelRedeployStep
 from tessera.services.provisioning.github_repo import GitHubRepoLookup
 from tessera.services.provisioning.vercel_deployments import VercelDeployment, deployment_from
 
@@ -26,8 +17,8 @@ _BUILD_LOG = "npm ERR! secret-build-log-line"
 class FakeVercel:
     """A Vercel project with a configurable newest production deployment."""
 
-    def __init__(self, listed: Optional[dict[str, object]] = None,
-                 created: Optional[dict[str, object]] = None, project: bool = True) -> None:
+    def __init__(self, listed: dict[str, object] | None = None,
+                 created: dict[str, object] | None = None, project: bool = True) -> None:
         self.listed, self.created, self.project = listed, created or {}, project
         self.requests: list[httpx.Request] = []
 
@@ -56,21 +47,21 @@ class FakeVercel:
 class FakeRepos:
     """A repository id source that remembers what it was asked."""
 
-    def __init__(self, repo_id: Optional[int] = 4242) -> None:
+    def __init__(self, repo_id: int | None = 4242) -> None:
         self.repo_id_value = repo_id
         self.asked: list[str] = []
 
-    async def repo_id(self, repo: str) -> Optional[int]:
+    async def repo_id(self, repo: str) -> int | None:
         self.asked.append(repo)
         return self.repo_id_value
 
 
-def _step(fake: FakeVercel, repos: Optional[FakeRepos] = None) -> VercelRedeployStep:
+def _step(fake: FakeVercel, repos: FakeRepos | None = None) -> VercelRedeployStep:
     client = VercelClient(_TOKEN, "", httpx.MockTransport(fake))
     return VercelRedeployStep(client, repos or FakeRepos())
 
 
-def _ctx(remote: Optional[str] = "owner/demo", base: str = "") -> ProvisioningContext:
+def _ctx(remote: str | None = "owner/demo", base: str = "") -> ProvisioningContext:
     online = OnlineConfig(domain="example.com", resources=["vercel"])
     writer = VercelEnvWriter(VercelClient(_TOKEN), "demo")
     return ProvisioningContext("demo", online, writer, github_remote=remote, base_branch=base)

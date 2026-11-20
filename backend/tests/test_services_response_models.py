@@ -1,7 +1,7 @@
 """Response models of the services routes — ticket-679."""
 import json
 import re
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
@@ -9,12 +9,8 @@ from fastapi.testclient import TestClient
 
 from tessera.config import settings
 from tessera.main import app
-from tessera.services.process_registry import PROCESS_REGISTRY, Service
-from tessera.services.service_etat import (
-    ServiceEtat,
-    ServicesArretes,
-    ServicesDemarres,
-)
+from tessera.services.verification.process_registry import PROCESS_REGISTRY, Service
+from tessera.services.verification.service_etat import ServiceEtat, ServicesArretes, ServicesDemarres
 
 _BASE = "/api/v1/projects/mon-projet/services"
 _API_TS = Path(__file__).resolve().parents[2] / "frontend/src/types/projets.ts"
@@ -41,7 +37,7 @@ def _service() -> Service:
         project_id="mon-projet",
         pid=4242,
         processus=_FakeProcess(None),
-        demarre_a=datetime(2026, 10, 30, 8, 0, 0, tzinfo=timezone.utc),
+        demarre_a=datetime(2026, 10, 30, 8, 0, 0, tzinfo=UTC),
         sortie=["ready on http://localhost:5175/"],
     )
 
@@ -56,7 +52,7 @@ def test_model_keys_match_the_front_interface() -> None:
     assert set(ServiceEtat.model_fields) == _interface_keys("ServiceActif")
 
 
-def test_list_route_json_is_unchanged_byte_for_byte() -> None:
+def test_list_route_json_is_stable_byte_for_byte() -> None:
     PROCESS_REGISTRY._services = {"mon-projet": [_service()]}
 
     resp = TestClient(app).get(_BASE)
@@ -65,7 +61,7 @@ def test_list_route_json_is_unchanged_byte_for_byte() -> None:
         b'[{"nom":"web","project_id":"mon-projet","pid":4242,'
         b'"demarre_a":"2026-10-30T08:00:00+00:00","en_cours":true,'
         b'"code_de_sortie":null,"sortie":["ready on http://localhost:5175/"],'
-        b'"arrete_a_la_main":false}]'
+        b'"lignes_ecartees":0,"arrete_a_la_main":false}]'
     )
     assert resp.status_code == 200
     assert resp.content == expected

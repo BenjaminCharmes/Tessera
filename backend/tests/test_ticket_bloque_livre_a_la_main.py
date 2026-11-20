@@ -11,13 +11,13 @@ import pytest
 import respx
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services import pipeline_branche
 from tessera.services.git_workspace import GitWorkspaceService
-from tessera.services.github_service import GitHubService
-from tessera.services.github_workflow import GitHubWorkflowService
-from tessera.services.pipeline_events import OrchestratorEvent
-from tessera.services.pipeline_run import PipelineRun
-from tessera.services.ticket_service import TicketService
+from tessera.services.github.github_service import GitHubService
+from tessera.services.github.github_workflow import GitHubWorkflowService
+from tessera.services.noyau.pipeline_events import OrchestratorEvent
+from tessera.services.pipeline import pipeline_branche
+from tessera.services.pipeline.pipeline_run import PipelineRun
+from tessera.services.projets.ticket_service import TicketService
 
 _JOURNAL = "memory/pipeline-log.md"
 
@@ -71,9 +71,6 @@ class _Orch:
         if isinstance(trouve, Exception):
             raise trouve
         return trouve
-
-    async def _sur_la_base(self) -> bool:
-        return await self._git_workspace.branche_courante() == self._base_branch
 
     def _log(self, message: str) -> None:
         self.logs.append(message)

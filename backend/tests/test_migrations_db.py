@@ -4,9 +4,9 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services import database
-from tessera.services.database import init_db, version_du_schema
-from tessera.services.database_runs import create_run
+from tessera.services.noyau import database
+from tessera.services.noyau.database import init_db, version_du_schema
+from tessera.services.noyau.database_runs import create_run
 
 
 def _version(db_path: Path) -> int:
@@ -109,6 +109,18 @@ async def test_cache_creation_tokens_column_is_added_with_zero(tmp_path: Path) -
         "SELECT run_id, input_tokens, cache_creation_tokens FROM agent_calls"
     ).fetchall()
     assert lignes == [("r", 10, 0)]
+
+
+async def test_migration_11_creates_the_reglages_table(tmp_path: Path) -> None:
+    db = tmp_path / "tessera.db"
+
+    await init_db(db)
+
+    colonnes = [
+        r[1] for r in sqlite3.connect(str(db)).execute("PRAGMA table_info(reglages)")
+    ]
+    assert colonnes == ["nom", "valeur", "modifie_le"]
+    assert version_du_schema() >= 11
 
 
 async def test_le_schema_de_base_ne_bouge_plus(tmp_path: Path) -> None:

@@ -19,14 +19,10 @@ from contextvars import ContextVar
 from pathlib import Path
 from typing import Any
 
-from tessera.services.cost_calculator import calculate_cost
-from tessera.services.agent_calls import save_agent_call
-from tessera.services.providers.base import (
-    LLMProvider,
-    ProviderResult,
-    StreamCallback,
-    ToolEventCallback,
-)
+from tessera.services.noyau.cost_calculator import calculate_cost
+from tessera.services.providers.base import LLMProvider, ProviderResult, StreamCallback, ToolEventCallback
+from tessera.services.providers.signaler import ContexteSignal
+from tessera.services.usage.agent_calls import save_agent_call
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -101,6 +97,7 @@ class ProviderEnregistrant:
         max_tokens: int,
         cwd: Path | None = None,
         ask_user: Callable[[str], Awaitable[str]] | None = None,
+        signaler: ContexteSignal | None = None,
         session: str | None = None,
         schema: dict[str, Any] | None = None,
     ) -> ProviderResult:
@@ -110,6 +107,8 @@ class ProviderEnregistrant:
             kw["cwd"] = cwd
         if ask_user is not None:
             kw["ask_user"] = ask_user
+        if signaler is not None:
+            kw["signaler"] = signaler
         if session is not None:
             kw["session"] = session
         if schema is not None:
@@ -133,6 +132,7 @@ class ProviderEnregistrant:
         on_token: StreamCallback | None = None,
         on_tool_use: ToolEventCallback | None = None,
         ask_user: Callable[[str], Awaitable[str]] | None = None,
+        signaler: ContexteSignal | None = None,
         session: str | None = None,
         schema: dict[str, Any] | None = None,
     ) -> ProviderResult:
@@ -146,6 +146,8 @@ class ProviderEnregistrant:
             kw["on_tool_use"] = on_tool_use
         if ask_user is not None:
             kw["ask_user"] = ask_user
+        if signaler is not None:
+            kw["signaler"] = signaler
         if session is not None:
             kw["session"] = session
         if schema is not None:

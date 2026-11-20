@@ -1,6 +1,6 @@
 # Configuration
 
-Le backend Tessera écoute sur le port **8100**.
+Le backend Tessera écoute sur le port **8100**, jamais sur 8000 : ce dernier est le port par défaut d'uvicorn, et d'autres applications locales l'occupent souvent.
 
 Toutes les variables sont dans `.env` (copie de `.env.example`) :
 
@@ -17,12 +17,14 @@ Toutes les variables sont dans `.env` (copie de `.env.example`) :
 | `LLM_MAX_BUDGET_USD` | | `2.0` | Plafond de dépense d'un seul appel agent. Un dépassement n'est plus une erreur : le run se termine non approuvé et commite son travail (ADR-037) |
 | `LLM_DUREE_MAX_ROLE_TEXTE_S` | | `900` | Durée totale maximale d'un appel de rôle texte (validateur, sécurité, documentation), attente de créneau Ollama comprise (en secondes, `0` = aucune borne, ticket-518). Dépassée, l'appel est indisponible : le repli joue, et la ligne `<rôle>: repli vers …` s'écrit dans `pipeline-log.md` |
 | `AGENT_SILENCE_MAX_S` | | `1200` | Délai maximum sans message du flux d'un agent avant interruption du processus (en secondes, ticket-381) |
+| `BASH_SILENCE_MAX_S` | | `660` | Même borne, tant qu'un appel Bash attend son résultat : la limite du CLI plus une minute (ticket-957). 0 la désactive. |
 | `RUN_MAX_BUDGET_USD` | | `5.0` | Plafond de dépense d'un run autonome (`0` = aucun). En mode file, le plafond est multiplié par le nombre de tickets, sauf si la requête fixe `budget_usd` |
 | `CHAT_MAX_CONVERSATION_USD` | | `2.0` | Plafond cumulé d'une conversation du chat |
 | `KEEP_AWAKE_DURING_RUNS` | | `true` | Maintient le système éveillé tant qu'un run est ouvert (Windows uniquement — no-op ailleurs). L'écran peut s'éteindre ; seule la mise en veille du système est empêchée. Désactiver si un outil externe gère déjà la veille (ticket-394) |
 | `IDE_WORKSPACE_DIR` | | `~/tessera-workspace` | Dossier des projets |
-| `IDE_STATE_DIR` | | `%LOCALAPPDATA%\Tessera` (Windows); `~/.local/state/tessera` (macOS/Linux) | Dossier hors du dépôt pour l'état persistant de l'IDE (signalements en attente). Créé au besoin |
+| `IDE_STATE_DIR` | | `%LOCALAPPDATA%\Tessera` (Windows); `~/.local/state/tessera` (macOS/Linux) | Dossier hors du dépôt pour l'état persistant de l'IDE (signalements en attente, journaux de lancement). Créé au besoin. Les logs du backend et Vite y vont dans un sous-dossier `logs/` |
 | `IDE_WORKTREES_DIR` | | `~/.tessera/worktrees` | Racine des worktrees de run, `<projet>/<ticket>` dessous (ADR-056). Hors de tout dépôt ; la garder courte, Windows limitant la longueur des chemins. Ne sert qu'aux projets qui déclarent `worktree` dans `agents.json` |
+| `IDE_WORKTREES_DIR_AGENT` | | `C:\ProgramData\Tessera\worktrees` | Racine des worktrees d'un projet à `worktree.compte_agent` quand `AGENT_USER` est renseigné : le CLI du compte ne résout pas les chemins du profil. Créée au premier usage, ACL sans héritage (SYSTEM et Administrateurs `F`, utilisateur du backend `M`) ; `agent doctor` la vérifie |
 | `IDE_PROMPTS_DIR` | | `agents/prompts/` | Dossier des system prompts |
 | `IDE_LOG_LEVEL` | | `INFO` | Niveau de log |
 | `GITHUB_TOKEN` | | `""` | Token GitHub (sync issues, clone, PRs) |
@@ -34,7 +36,9 @@ Toutes les variables sont dans `.env` (copie de `.env.example`) :
 | `ATTENTE_MERGE_MAX_S` | | `600` | Pour les projets avec `merge_without_ci: true`, délai maximum d'attente du merge du ticket précédent avant de lancer le ticket suivant d'une file (en secondes, ticket-382) |
 | `CI_GRACE_S` | | `300` | Délai de grâce avant de conclure que les checks CI ne s'enregistreront pas (`none` → achèvement). Si des workflows sont déclarés dans le dépôt, le statut reste `pending` jusqu'à `attente_ci_max_s` (ticket-405) |
 | `IDE_DB_PATH` | | `tessera.db` | Base SQLite des runs, coûts et événements |
-| `IDE_STATE_DIR` | | `%LOCALAPPDATA%\Tessera` (Windows) ou `~/.local/state/tessera` (autres) | Répertoire pour les fichiers d'état en dehors du dépôt : signalements en attente, etc. Créé au démarrage s'il n'existe pas. |
+
+| `SECRETS_SOURCE` | | `auto` | Mode de lecture des neuf secrets du coffre du système : `auto` (coffre s'il répond, sinon `.env` avec avertissement), `coffre` (refus sans coffre), `env` (jamais de coffre, CI/Docker). |
+| `OLLAMA_MAX_CONCURRENT` | | `1` | Nombre maximum de requêtes parallèles au serveur Ollama. Au-delà, les requêtes attendent leur créneau |
 | `FORBIDDEN_TERMS` | | `""` | Termes interdits au push et en CI, virgules comme séparateurs. Correspondance insensible à la casse, accents normalisés (ADR-048, ADR-050). |
 | `VERCEL_TOKEN` | | `""` | Jeton Vercel pour déployer. Portée minimale : `read` sur les projects, `write` sur les deployments. À définir avec une date d'expiration. |
 | `VERCEL_TEAM_ID` | | `""` | Identifiant du team Vercel (trouvé dans les settings du team). Utilisé par le client Vercel pour créer ou chercher des projets. |
@@ -49,7 +53,20 @@ Toutes les variables sont dans `.env` (copie de `.env.example`) :
 | `OLLAMA_COOLDOWN_S` | | `600` | Durée du repos du serveur Ollama après un dépassement de délai, avant nouvelle tentative (en secondes) |
 | `STATIC_TOKEN` | | `""` | Si renseignée, **toutes** les requêtes — HTTP et WebSocket — exigent le token (voir ci-dessous). Vide, l'API est ouverte : `make dev` et `make run` ne la servent que sur `127.0.0.1` |
 | `ALLOWED_HOSTS` | | `""` | Noms de `Host` admis en plus du loopback, séparés par des virgules (voir ci-dessous). Vide : `127.0.0.1`, `localhost` et `[::1]` seuls |
+| `ALLOWED_ORIGINS` | | `""` | Origines admises en plus des défauts pour ouvrir une WebSocket, séparées par des virgules. Défauts : `localhost` et `127.0.0.1` sur les ports `5173` à `5176`, et les origines Tauri (voir ci-dessous) |
 | `KEEP_AWAKE_DURING_RUNS` | | `true` | Maintient le système éveillé tant qu'un run est ouvert (Windows uniquement — no-op ailleurs). L'écran peut s'éteindre ; seule la mise en veille du système est empêchée. Désactiver si un outil externe gère déjà la veille (ticket-394) |
+
+## Coffre du système et secrets (ADR-073)
+
+Neuf secrets — `ANTHROPIC_API_KEY`, `GITHUB_TOKEN`, `VERCEL_TOKEN`, `NEON_API_KEY`, `RESEND_API_KEY`, `STRIPE_API_KEY`, `CLOUDFLARE_API_TOKEN`, `STATIC_TOKEN`, `FORBIDDEN_TERMS` — vivent dans le coffre du système (Credential Manager Windows, Keychain macOS, Secret Service Linux) plutôt que dans `.env`. Le backend lit en cet ordre : variable d'environnement, coffre, `.env`.
+
+**Migration** : `./scripts/tessera.ps1 secrets migrer` (ou `python -m tessera.coffre_cli migrer`) transfère les secrets de `.env` au coffre et les y efface, sans jamais les laisser en clair dans un fichier temporaire. Les sous-commandes `set <NOM>`, `supprimer <NOM>` et `lister` gèrent les entrées individuellement.
+
+**Masquage** : tous les secrets sauf `FORBIDDEN_TERMS` sont masqués dans les logs (8 secrets) et vidés de l'environnement du CLI. `FORBIDDEN_TERMS` reste une liste ; elle n'est jamais masquée.
+
+**Lecture en worktree** : le hook `pre-push` lit `FORBIDDEN_TERMS` via le backend au lieu de `.env` directement, ce qui fonctionne depuis tout worktree et depuis la CI.
+
+**Agents** : aucun agent ne peut lancer les commandes qui lisent le coffre (`keyring`, `cmdkey`, `vaultcmd`, `secret-tool`, etc.). Une garde lexicale les refuse.
 
 ## Budget et limites
 
@@ -93,11 +110,20 @@ sur l'API locale :
   `127.0.0.1`, `localhost`, `[::1]` ou l'un des noms de `ALLOWED_HOSTS`
   (`ALLOWED_HOSTS=tessera.lan,poste.local`). Sinon : `403` en HTTP, fermeture
   de la WebSocket ;
-- **un `Origin` étranger** : s'il est présent, il doit être une origine
-  loopback (`http://localhost:<port>`, `http://127.0.0.1:<port>`, tout port —
-  le Vite de dev et ceux des worktrees) ou une origine de l'app Tauri
-  (`tauri://localhost`, `http://tauri.localhost`, `https://tauri.localhost`).
-  Sinon : `403` en HTTP, fermeture de la WebSocket en code `4403`.
+- **un `Origin` étranger** : s'il est présent, il doit être admis.
+  - *WebSocket* : seules les origines déclarées passent — `http://localhost:<port>`
+    et `http://127.0.0.1:<port>` pour les ports `5173` à `5176`, les origines de
+    l'app Tauri (`tauri://localhost`, `http://tauri.localhost`,
+    `https://tauri.localhost`), et celles de `ALLOWED_ORIGINS`. Une page servie
+    sur un autre port loopback — une app qu'un agent a écrite — est fermée en
+    code `4403` : elle ne peut ni observer les runs ni répondre à un agent.
+  - *HTTP* : toute origine loopback (tout port) ou Tauri ; sinon `403`. Le
+    préflight CORS, qui n'admet que `http://localhost:5173`, garde les autres
+    pages hors des requêtes JSON.
+
+`ALLOWED_ORIGINS` s'ajoute à ces défauts, origines complètes séparées par des
+virgules (`ALLOWED_ORIGINS=http://tessera.lan:5173,http://localhost:5199`) ;
+vide par défaut.
 
 Sans `Origin` (curl, outils, tests), la requête passe. `/health` reste ouvert.
 Le contrôle ne protège pas contre un processus local : le loopback reste de

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { BAND } from "../../design/layout";
 import RegionTitle from "../../design/RegionTitle";
+import { Chargement, Erreur, Vide } from "../../design/ui/ViewState";
 import ViewSwitcher, { type OptionVue } from "../../design/ui/ViewSwitcher";
 import type { PipelineRun, Project, Ticket } from "../../types/api";
 import DetailDuRun from "./DetailDuRun";
@@ -29,14 +30,6 @@ const VUES: OptionVue<Vue>[] = [
   { valeur: "detail", libelle: "Détail du run" },
   { valeur: "tous", libelle: "Tous les runs" },
 ];
-
-function Message({ children, erreur = false }: { children: string; erreur?: boolean }) {
-  return (
-    <p className={`px-8 py-6 text-sm ${erreur ? "text-red-400" : "text-zinc-500"}`}>
-      {children}
-    </p>
-  );
-}
 
 /**
  * The History tab's centre: the detail of one run, or the table of all of
@@ -82,11 +75,11 @@ export default function HistoriqueView({
       </div>
 
       {error ? (
-        <Message erreur>{error}</Message>
+        <Erreur message={error} onRetry={() => window.location.reload()} />
       ) : loading && runs.length === 0 ? (
-        <Message>Chargement des runs…</Message>
+        <Chargement />
       ) : run === null ? (
-        <Message>Aucun run sur ce projet</Message>
+        <Vide titre="Aucun run sur ce projet" phrase="Lancez un ticket pour voir son historique ici." />
       ) : vue === "detail" ? (
         <DetailDuRun run={run} ticket={ticket} project={project} />
       ) : (

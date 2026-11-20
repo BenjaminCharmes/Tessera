@@ -1,8 +1,8 @@
 import type { ReactElement } from "react";
 import type { AlerteDeSupervision, SidebarPanel } from "./panels";
 import Pastille from "./Pastille";
-import BoutonReglages from "./BoutonReglages";
 import Cloche from "./Cloche";
+import BoutonReglages from "./BoutonReglages";
 import type { DonneesDeLaCloche } from "../../hooks/useNotificationsSysteme";
 import type { ReglageDesNotifications } from "./ReglageNotifications";
 import { BAND } from "../../design/layout";
@@ -10,6 +10,7 @@ import {
   IconActivity,
   IconChart,
   IconChat,
+  IconClock,
   IconFolder,
   IconHistory,
   IconLayers,
@@ -42,9 +43,11 @@ interface NavRailProps {
   runsActifs?: number;
   /** Combien d'apps de projet tournent sur la machine (ticket-417). */
   appsEnCours?: number;
+  /** Combien de rituels sont en retard : pastille ambre, absente à zéro (ticket-903). */
+  rituelsEnRetard?: number;
   /** Ce qui mérite d'être vu avant le reste, quand c'est le cas. */
   alerte?: AlerteDeSupervision;
-  /** Le réglage des notifications système, ouvert par « Réglages » (ticket-441). */
+  /** Le réglage global des notifications système, en tête des réglages de la cloche (ticket-779). */
   notifications?: ReglageDesNotifications;
   /** L'historique du jour et les réglages par type, derrière la cloche (ticket-554). */
   cloche?: DonneesDeLaCloche;
@@ -80,6 +83,7 @@ const GROUPES: Groupe[] = [
         label: "Supervision",
         icon: <IconRadar size={20} />,
       },
+      { panel: "rituels", label: "Rituels", icon: <IconClock size={20} /> },
     ],
   },
   {
@@ -109,6 +113,7 @@ export default function NavRail({
   onChangePanel,
   runsActifs = 0,
   appsEnCours = 0,
+  rituelsEnRetard = 0,
   alerte = null,
   notifications,
   cloche,
@@ -171,6 +176,14 @@ export default function NavRail({
                       {panel === "supervision" ? (
                         <Pastille nombre={runsActifs} alerte={alerte} />
                       ) : null}
+                      {panel === "rituels" ? (
+                        <Pastille
+                          nombre={rituelsEnRetard}
+                          alerte="attente"
+                          unite="rituel"
+                          titre={`${rituelsEnRetard} en retard`}
+                        />
+                      ) : null}
                       {panel === "running" ? (
                         <Pastille nombre={appsEnCours} unite="app" />
                       ) : null}
@@ -186,9 +199,10 @@ export default function NavRail({
           </div>
         ))}
       </nav>
-      {/* Hors du `tablist` : ce ne sont pas des destinations, mais la cloche et un réglage. */}
-      {cloche ? <Cloche cloche={cloche} /> : null}
-      <BoutonReglages notifications={notifications} />
+      {/* Hors du `tablist` : la cloche n'est pas une destination ; elle porte aussi le réglage global (ticket-779). */}
+      {cloche ? <Cloche cloche={cloche} notifications={notifications} /> : null}
+      {/* Sous la cloche, hors du `tablist` aussi : un popover pour les réglages globaux (ticket-810). */}
+      <BoutonReglages />
     </div>
   );
 }

@@ -14,9 +14,9 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from tessera.services.git_clone import GitCloneService
+from tessera.services.creation_projet.git_clone import GitCloneService
 from tessera.services.git_workspace import GitWorkspaceService
-from tessera.services.livraison import Livraison, LivraisonService
+from tessera.services.livraison.livraison import Livraison, LivraisonService
 
 _BRANCHE = "ticket-001-slug"
 _REFSPEC_COMPLET = "+refs/heads/*:refs/remotes/origin/*"
@@ -126,8 +126,8 @@ class _WorkflowQuiPousse:
     async def open_pull_request(self, **kwargs: str | None) -> MagicMock:
         branche = kwargs["branch"]
         assert branche is not None
-        await self._git.push_branch(branche)
-        return MagicMock(pr_number=7)
+        pousse = await self._git.push_branch(branche)
+        return MagicMock(pr_number=7, branch=pousse)
 
 
 class _GitSansRebase:
@@ -167,8 +167,37 @@ async def test_delivery_on_reduced_refspec_records_pushed_sha(
 
     livraison: Livraison = await service.livrer_phase_1(
         ticket_id="ticket-001", ticket_title="Du travail", ticket_body="",
-        branch=_BRANCHE, approuve=True,
+        branch=_BRANCHE, approuve=True, approved_sha=tete,
     )
 
     assert livraison.pr_number == 7
     assert livraison.pushed_sha == tete
+
+
+async def test_delivery_of_a_diverged_branch_records_the_derived_head(
+    clone_reduit: Path,
+) -> None:
+    """Ticket-1010: `pushed_sha` is the head of `<branch>-2`, where the PR starts."""
+    reel = GitWorkspaceService(clone_reduit)
+    await _commit(clone_reduit, "code.py", "x = 1\n")
+    await reel.push_branch(_BRANCHE)
+    ancienne = await _git(clone_reduit, "rev-parse", "HEAD")
+    await _git(clone_reduit, "commit", "--amend", "-q", "-m", "rejoue")
+    tete = await _git(clone_reduit, "rev-parse", "HEAD")
+    (clone_reduit / "agents.json").write_text('{"autonomy": "pr"}', encoding="utf-8")
+    service = LivraisonService(
+        git_workspace=_GitSansRebase(reel),
+        workflow=_WorkflowQuiPousse(reel),  # type: ignore[arg-type]
+        project_path=clone_reduit,
+        base_branch="main",
+    )
+
+    livraison: Livraison = await service.livrer_phase_1(
+        ticket_id="ticket-001", ticket_title="Du travail", ticket_body="",
+        branch=_BRANCHE, approuve=True, approved_sha=tete,
+    )
+
+    assert livraison.pr_number == 7
+    assert livraison.pushed_sha == tete != ancienne
+    assert await reel.sha_distant(_BRANCHE) == ancienne
+    assert await reel.sha_distant(f"{_BRANCHE}-2") == tete

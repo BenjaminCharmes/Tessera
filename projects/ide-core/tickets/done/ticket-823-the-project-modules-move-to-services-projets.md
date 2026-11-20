@@ -1,0 +1,54 @@
+---
+id: ticket-823
+title: "The project modules move to services/projets"
+type: refactor
+status: done
+pr_number: null
+priority: low
+agent: codeur
+depends_on: [ticket-822]
+estimated_days: 1
+created: 2026-11-05
+---
+
+# ticket-823 — Les modules de projet passent dans `services/projets/`
+
+## Objectif
+
+Les onze modules du domaine `projets` (manifeste, tickets, ADR, artefacts, autonomie, déclaration
+de mise en ligne) vivent dans `services/projets/`, à comportement constant.
+
+## Contexte
+
+ADR-076 ; section `projets` de `memory/services-domaines.md`. `manifeste` est le lecteur unique de
+`agents.json` (ADR-068) et `project_loader` est importé presque partout : ce déplacement réécrit le
+plus de lignes d'import, d'où sa place tardive. Le dossier et le module `manifeste` ne se
+confondent pas (`projets` / `manifeste`).
+
+## Ce que le ticket fait
+
+- Lance `scripts/deplacer_domaine.py projets`, relit le diff, lance la suite.
+- Réécrit `Makefile` et `scripts/tessera.ps1`, qui lancent `python -m tessera.services.ticket_check`
+  (désormais `tessera.services.projets.ticket_check`), et vérifie que la commande répond.
+- Vérifie `scripts/prochain_numero.py` : il importe `numerotation`, qui bougera au ticket-824.
+
+## Critères d'acceptation
+
+- [x] Les onze modules de la section `projets` sont sous `services/projets/`, aucun n'est resté à plat
+- [x] `make` (cible de vérification des tickets) et `scripts/tessera.ps1` appellent le nouveau chemin
+- [x] `A_DEPLACER` n'a plus d'entrée `projets`, `ECARTS_DOMAINES` n'a grandi d'aucune ligne
+- [x] Aucune occurrence des anciens chemins pointés ne reste dans `backend/src`, `backend/tests`,
+      `scripts/`, `Makefile`
+- [x] Le diff n'est que des renommages et des lignes d'import ou de chaîne ; la suite passe
+
+## Ce que ça ne fait pas
+
+Aucun changement de comportement, aucune lecture de manifeste modifiée.
+
+## Risques
+
+`project_loader` est patché par chaîne dans les tests de routeurs : relire les restes de chemins.
+
+## Notes de réalisation
+
+Le domaine compte quinze modules, pas onze : `scripts/domaines_services.py` fait foi. `Makefile` et `scripts/tessera.ps1` sont réécrits par le script ; `python -m tessera.services.projets.ticket_check ide-core` répond « 0 problème(s) », code 0. Retouche à la main : `test_racine_depot.py:159` attend `services/projets/racine_depot.py`. `scripts/prochain_numero.py` importe `numerotation`, qui bouge au ticket-824. `docs/architecture.md` suit `adr` et `project_loader` ; `decisions-archive.md` et les documents historiques restent tels quels.

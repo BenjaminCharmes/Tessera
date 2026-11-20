@@ -5,6 +5,7 @@ import Button from "../../design/ui/Button";
 import StatusPill from "../../design/ui/StatusPill";
 import { LIBELLE_SANTE } from "../../lib/santeAgent";
 import type { ContenuAToi, QuestionAToi } from "../../lib/bureau/aToi";
+import GroupeSuperviseur from "./GroupeSuperviseur";
 
 export interface ReglageSon {
   actif: boolean;
@@ -91,10 +92,11 @@ function InterrupteurSon({ son }: { son: ReglageSon }) {
   );
 }
 
-/** Ce qui attend une action humaine : questions, agents figés, PR à relire. */
+/** Ce qui attend une action humaine : questions, agents figés, PR à relire, leçons à valider. */
 export default function ColonneAToi({ contenu, maintenant, onAnswer, son }: ColonneAToiProps) {
-  const { questions, figes, prs } = contenu;
-  const vide = questions.length + figes.length + prs.length === 0;
+  const { questions, figes, prs, lecons, superviseur = [] } = contenu;
+  const vide =
+    questions.length + figes.length + prs.length + lecons.length + superviseur.length === 0;
 
   return (
     <aside
@@ -148,6 +150,24 @@ export default function ColonneAToi({ contenu, maintenant, onAnswer, son }: Colo
           }
         />
       )}
+      {lecons.length > 0 && (
+        <Groupe
+          titre="Leçons"
+          enfants={
+            <ul className="flex flex-col gap-1.5">
+              {lecons.map(({ projet, nombre }) => (
+                <li key={projet} className="flex flex-col text-xs text-zinc-300">
+                  <span>{projet}</span>
+                  <span className="text-micro text-zinc-500">
+                    {`${nombre} ${nombre > 1 ? "leçons" : "leçon"} à valider`} · memory/lecons.md
+                  </span>
+                </li>
+              ))}
+            </ul>
+          }
+        />
+      )}
+      <GroupeSuperviseur cas={superviseur} />
     </aside>
   );
 }

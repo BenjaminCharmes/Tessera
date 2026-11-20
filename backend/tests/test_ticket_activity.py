@@ -7,8 +7,8 @@ from fastapi.testclient import TestClient
 
 from tessera.config import settings
 from tessera.main import app
-from tessera.services.database import init_db
-from tessera.services.database_runs import create_run, finish_run
+from tessera.services.noyau.database import init_db
+from tessera.services.noyau.database_runs import create_run, finish_run
 
 _TICKET = """---
 id: {id}
@@ -150,7 +150,7 @@ def test_ouvrir_une_pr_pousse_puis_cree(
         "tessera.services.git_workspace.GitWorkspaceService.diff_de_branche", _diff
     )
     monkeypatch.setattr(
-        "tessera.services.github_service.GitHubService.create_pull_request", _create
+        "tessera.services.github.github_service.GitHubService.create_pull_request", _create
     )
 
     resp = _client().post(
@@ -213,7 +213,7 @@ def test_merger_est_refuse_sans_declaration(
         merges.append(pr_number)
 
     monkeypatch.setattr(
-        "tessera.services.github_service.GitHubService.merge_pull_request",
+        "tessera.services.github.github_service.GitHubService.merge_pull_request",
         _merge,
         raising=False,
     )

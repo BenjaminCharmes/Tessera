@@ -1,334 +1,3 @@
-- 2026-06-20 21:01:25 UTC — [ticket-016] tour 1 — codeur démarré
-- 2026-06-20 21:01:27 UTC — [ticket-016] tour 1 — codeur démarré
-- 2026-06-20 21:01:29 UTC — [ticket-016] tour 1 — codeur démarré
-- 2026-06-20 21:01:34 UTC — [ticket-016] tour 1 — codeur démarré
-- 2026-09-21 11:22:20 UTC — [ticket-101] branche ticket-101-la-marque-se-lit-l-o-elle-est-pos-e
-- 2026-09-21 11:22:20 UTC — [ticket-101] tour 1 — codeur démarré
-- 2026-09-28 10:09:08 UTC — [ticket-203] branche ticket-203-reformuler-les-adr-qui-racontent-un-usage-r-el-au
-- 2026-09-28 10:09:08 UTC — [ticket-203] tour 1 — codeur démarré
-- 2026-09-28 10:13:48 UTC — [ticket-203] tour 1 — codeur terminé (280531ms)
-- 2026-09-28 10:13:49 UTC — [ticket-203] tour 1 — reviewer démarré
-- 2026-09-28 10:15:41 UTC — [ticket-203] tour 1 — reviewer terminé (111735ms)
-- 2026-09-28 10:15:41 UTC — [ticket-203] APPROVED après 1 tour(s)
-- 2026-09-28 10:15:46 UTC — [ticket-204] branche ticket-204-refuser-de-publier-un-terme-interdit-sur-tous-les
-- 2026-09-28 10:15:46 UTC — [ticket-204] tour 1 — codeur démarré
-- 2026-09-28 10:20:01 UTC — [ticket-204] tour 1 — architect terminé (255031ms)
-- 2026-09-28 10:20:02 UTC — [ticket-204] tour 1 — reviewer démarré
-- 2026-09-28 10:22:07 UTC — [ticket-204] tour 1 — reviewer terminé (124608ms)
-- 2026-09-28 10:22:07 UTC — [ticket-204] APPROVED après 1 tour(s)
-- 2026-09-28 12:56:39 UTC — [ticket-209] branche ticket-209-le-validateur-n-approuve-que-s-il-a-jug-chaque-cr
-- 2026-09-28 12:56:39 UTC — [ticket-209] tour 1 — codeur démarré
-- 2026-09-28 12:59:32 UTC — [ticket-209] tour 1 — codeur terminé (173593ms)
-- 2026-09-28 12:59:51 UTC — [ticket-209] securite: PASS — Aucune vulnérabilité détectée. Le diff modifie le prompt du validateur et refact
-- 2026-09-28 12:59:51 UTC — [ticket-209] tour 1 — reviewer démarré
-- 2026-09-28 13:00:55 UTC — [ticket-209] tour 1 — reviewer terminé (63656ms)
-- 2026-09-28 13:00:55 UTC — [ticket-209] APPROVED après 1 tour(s)
-- 2026-09-28 13:19:34 UTC — [ticket-214] branche ticket-214-un-crit-re-d-acceptation-crit-sur-plusieurs-ligne
-- 2026-09-28 13:19:34 UTC — [ticket-214] tour 1 — codeur démarré
-- 2026-09-28 13:21:04 UTC — [ticket-214] tour 1 — codeur terminé (90280ms)
-- 2026-09-28 13:21:26 UTC — [ticket-214] securite: PASS — Audit de sécurité du diff terminé. Aucune vulnérabilité critique, haute ou moyen
-- 2026-09-28 13:21:26 UTC — [ticket-214] tour 1 — reviewer démarré
-- 2026-09-28 13:22:21 UTC — [ticket-214] tour 1 — reviewer terminé (55157ms)
-- 2026-09-28 13:22:21 UTC — [ticket-214] APPROVED après 1 tour(s)
-- 2026-09-28 14:09:15 UTC — [ticket-208] branche ticket-208-relancer-un-ticket-fait-relire-tout-le-travail-de
-- 2026-09-28 14:09:15 UTC — [ticket-208] tour 1 — codeur démarré
-- 2026-09-29 07:23:43 UTC — [ticket-220] branche ticket-220-reprendre-une-branche-de-ticket-ne-duplique-pas-l
-- 2026-09-29 07:23:43 UTC — [ticket-220] tour 1 — codeur démarré
-- 2026-09-29 07:28:00 UTC — [ticket-220] tour 1 — codeur terminé (256875ms)
-- 2026-09-29 07:28:30 UTC — [ticket-220] securite: PASS — Audit complet du diff : aucune vulnérabilité détectée.
-
-**Résumé des changements
-- 2026-09-29 07:28:30 UTC — [ticket-220] tour 1 — reviewer démarré
-- 2026-09-29 07:29:54 UTC — [ticket-220] tour 1 — reviewer terminé (83875ms)
-- 2026-09-29 07:31:13 UTC — [ticket-220] validateur: APPROVED — Les deux critères d'acceptation sont satisfaits. Le code gère correctement la co
-- 2026-09-29 07:31:13 UTC — [ticket-220] APPROVED après 1 tour(s)
-- 2026-09-29 07:37:14 UTC — [ticket-218] branche ticket-218-la-raison-d-un-run-bloqu-se-voit-sur-la-carte-et
-- 2026-09-29 07:37:14 UTC — [ticket-218] tour 1 — codeur démarré
-- 2026-09-29 07:42:55 UTC — [ticket-218] tour 1 — codeur terminé (340312ms)
-- 2026-09-29 07:43:42 UTC — [ticket-218] securite: PASS — Audit de sécurité du diff ticket-218 (exposition de la cause d'un blocage). Aucu
-- 2026-09-29 07:43:42 UTC — [ticket-218] tour 1 — reviewer démarré
-- 2026-09-29 07:44:59 UTC — [ticket-218] tour 1 — reviewer terminé (77547ms)
-- 2026-09-29 07:44:59 UTC — [ticket-218] CHANGES_REQUESTED tour 1: 
-- 2026-09-29 07:44:59 UTC — [ticket-218] tour 2 — codeur démarré
-- 2026-09-29 07:49:45 UTC — [ticket-218] tour 2 — codeur terminé (286203ms)
-- 2026-09-29 07:50:28 UTC — [ticket-218] securite: PASS — Audit complet du diff ticket-218. Aucune vulnérabilité de sécurité détectée selo
-- 2026-09-29 07:50:28 UTC — [ticket-218] tour 2 — reviewer démarré
-- 2026-09-29 07:51:20 UTC — [ticket-218] tour 2 — reviewer terminé (51891ms)
-- 2026-09-29 07:54:01 UTC — [ticket-218] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits : le champ 'arret' est correctem
-- 2026-09-29 07:54:01 UTC — [ticket-218] APPROVED après 2 tour(s)
-- 2026-09-29 07:59:56 UTC — [ticket-215] branche ticket-215-github-remote-se-normalise-en-propri-taire-d-p-t
-- 2026-09-29 07:59:56 UTC — [ticket-215] tour 1 — codeur démarré
-- 2026-09-29 08:08:44 UTC — [ticket-215] tour 1 — codeur terminé (527500ms)
-- 2026-09-29 08:09:27 UTC — [ticket-215] securite: PASS — Audit terminé. Le diff normalise la parsing des URLs GitHub en slugs simples (ow
-- 2026-09-29 08:09:27 UTC — [ticket-215] tour 1 — reviewer démarré
-- 2026-09-29 08:11:06 UTC — [ticket-215] tour 1 — reviewer terminé (98718ms)
-- 2026-09-29 08:13:12 UTC — [ticket-215] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente une normalis
-- 2026-09-29 08:13:12 UTC — [ticket-215] APPROVED après 1 tour(s)
-- 2026-09-29 08:26:19 UTC — [ticket-228] branche ticket-228-les-agents-de-documentation-re-oivent-les-fichier
-- 2026-09-29 08:26:19 UTC — [ticket-228] tour 1 — codeur démarré
-- 2026-09-29 08:31:20 UTC — [ticket-228] tour 1 — codeur terminé (301422ms)
-- 2026-09-29 08:32:05 UTC — [ticket-228] securite: PASS — Audit du diff git : aucune vulnérabilité critique, HIGH ou MEDIUM détectée. 
-
-Le
-- 2026-09-29 08:32:05 UTC — [ticket-228] tour 1 — reviewer démarré
-- 2026-09-29 08:33:55 UTC — [ticket-228] tour 1 — reviewer terminé (110030ms)
-- 2026-09-29 08:35:35 UTC — [ticket-228] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement
-- 2026-09-29 08:35:35 UTC — [ticket-228] APPROVED après 1 tour(s)
-- 2026-09-29 08:42:05 UTC — [ticket-210] branche ticket-210-un-fichier-de-ticket-illisible-se-signale-au-lieu
-- 2026-09-29 08:42:05 UTC — [ticket-210] tour 1 — codeur démarré
-- 2026-09-29 08:48:45 UTC — [ticket-210] tour 1 — codeur terminé (400187ms)
-- 2026-09-29 08:50:54 UTC — [ticket-210] securite: PASS — No CRITICAL or HIGH severity vulnerabilities introduced by this diff. The change
-- 2026-09-29 08:50:54 UTC — [ticket-210] tour 1 — reviewer démarré
-- 2026-09-29 08:52:17 UTC — [ticket-210] tour 1 — reviewer terminé (83342ms)
-- 2026-09-29 08:55:34 UTC — [ticket-210] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code traite correctement les 
-- 2026-09-29 08:55:34 UTC — [ticket-210] APPROVED après 1 tour(s)
-- 2026-09-29 09:08:19 UTC — [ticket-211] branche ticket-211-les-appels-des-r-les-sans-outils-s-enregistrent-d
-- 2026-09-29 09:08:19 UTC — [ticket-211] tour 1 — codeur démarré
-- 2026-09-29 09:21:32 UTC — [ticket-211] tour 1 — codeur terminé (792984ms)
-- 2026-09-29 09:22:25 UTC — [ticket-211] securite: PASS — Le diff introduit un wrapper `ProviderEnregistrant` pour l'enregistrement centra
-- 2026-09-29 09:22:25 UTC — [ticket-211] tour 1 — reviewer démarré
-- 2026-09-29 09:24:31 UTC — [ticket-211] tour 1 — reviewer terminé (125437ms)
-- 2026-09-29 09:28:57 UTC — [ticket-211] validateur: APPROVED — Tous les critères sont satisfaits. Le code implémente un wrapper `ProviderEnregi
-- 2026-09-29 09:28:57 UTC — [ticket-211] APPROVED après 1 tour(s)
-- 2026-09-29 09:44:22 UTC — [ticket-216] branche ticket-216-le-compte-rendu-du-codeur-reste-visible-apr-s-son
-- 2026-09-29 09:44:23 UTC — [ticket-216] tour 1 — codeur démarré
-- 2026-09-29 09:47:20 UTC — [ticket-216] tour 1 — codeur terminé (176983ms)
-- 2026-09-29 09:47:39 UTC — [ticket-216] securite: PASS — Aucune vulnérabilité détectée. Le code TypeScript suit les bonnes pratiques Reac
-- 2026-09-29 09:47:39 UTC — [ticket-216] tour 1 — reviewer démarré
-- 2026-09-29 09:49:01 UTC — [ticket-216] tour 1 — reviewer terminé (81453ms)
-- 2026-09-29 09:50:26 UTC — [ticket-216] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le composant AgentBlock gère cor
-- 2026-09-29 09:50:26 UTC — [ticket-216] APPROVED après 1 tour(s)
-- 2026-09-29 09:54:52 UTC — [ticket-222] branche ticket-222-le-panneau-agents-garde-les-tours-pr-c-dents-d-un
-- 2026-09-29 09:54:52 UTC — [ticket-222] tour 1 — codeur démarré
-- 2026-09-29 10:03:49 UTC — [ticket-222] tour 1 — codeur terminé (537141ms)
-- 2026-09-29 10:04:16 UTC — [ticket-222] securite: PASS — Audit de sécurité du diff : aucune vulnérabilité détectée.
-
-**Analyse effectuée 
-- 2026-09-29 10:04:16 UTC — [ticket-222] tour 1 — reviewer démarré
-- 2026-09-29 10:06:18 UTC — [ticket-222] tour 1 — reviewer terminé (121687ms)
-- 2026-09-29 10:06:18 UTC — [ticket-222] CHANGES_REQUESTED tour 1: `VerdictBanner` filtre-t-elle "Ajoute des tests" au point que le test du critère 3 échoue ?L'analyse
-- 2026-09-29 10:06:18 UTC — [ticket-222] tour 2 — codeur démarré
-- 2026-09-29 10:07:37 UTC — [ticket-222] tour 2 — codeur terminé (79078ms)
-- 2026-09-29 10:08:19 UTC — [ticket-222] securite: PASS — Aucune vulnérabilité de sécurité détectée dans ce diff. Le code refactorise l'af
-- 2026-09-29 10:08:19 UTC — [ticket-222] tour 2 — reviewer démarré
-- 2026-09-29 10:09:46 UTC — [ticket-222] tour 2 — reviewer terminé (87593ms)
-- 2026-09-29 10:13:41 UTC — [ticket-222] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests Vitest couvrent les c
-- 2026-09-29 10:13:41 UTC — [ticket-222] APPROVED après 2 tour(s)
-- 2026-09-29 10:20:47 UTC — [ticket-224] branche ticket-224-le-backend-liste-les-conversations-du-chat-d-un-p
-- 2026-09-29 10:20:48 UTC — [ticket-224] tour 1 — codeur démarré
-- 2026-09-29 10:23:29 UTC — [ticket-224] tour 1 — codeur terminé (161140ms)
-- 2026-09-29 10:24:03 UTC — [ticket-224] securite: PASS — Aucune vulnérabilité de sécurité détectée. Le diff ajoute un endpoint de listing
-- 2026-09-29 10:24:03 UTC — [ticket-224] tour 1 — reviewer démarré
-- 2026-09-29 10:25:37 UTC — [ticket-224] tour 1 — reviewer terminé (93906ms)
-- 2026-09-29 10:25:37 UTC — [ticket-224] CHANGES_REQUESTED tour 1: 
-- 2026-09-29 10:25:37 UTC — [ticket-224] tour 2 — codeur démarré
-- 2026-09-29 10:26:10 UTC — [ticket-224] tour 2 — codeur terminé (33327ms)
-- 2026-09-29 10:26:53 UTC — [ticket-224] securite: PASS — Audit complet du diff ticket-224 (conversations listing) : aucune vulnérabilité 
-- 2026-09-29 10:26:53 UTC — [ticket-224] tour 2 — reviewer démarré
-- 2026-09-29 10:28:17 UTC — [ticket-224] tour 2 — reviewer terminé (83625ms)
-- 2026-09-29 10:29:45 UTC — [ticket-224] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente une nouvelle 
-- 2026-09-29 10:29:45 UTC — [ticket-224] APPROVED après 2 tour(s)
-- 2026-09-29 10:37:08 UTC — [ticket-223] branche ticket-223-le-chat-a-sa-propre-vue-la-colonne-de-droite-disp
-- 2026-09-29 10:37:08 UTC — [ticket-223] tour 1 — codeur démarré
-- 2026-09-29 10:46:31 UTC — [ticket-223] tour 1 — codeur terminé (563171ms)
-- 2026-09-29 10:46:51 UTC — [ticket-223] securite: PASS — Refactorisation UI frontend (TypeScript/React) : suppression du panneau latéral 
-- 2026-09-29 10:46:51 UTC — [ticket-223] tour 1 — reviewer démarré
-- 2026-09-29 10:47:53 UTC — [ticket-223] tour 1 — reviewer terminé (62828ms)
-- 2026-09-29 10:50:45 UTC — [ticket-223] validateur: CHANGES_REQUESTED — Les tests pour les fonctionnalités liées au Chat sont présents et vérifiés. Le c
-- 2026-09-29 10:50:45 UTC — [ticket-223] CHANGES_REQUESTED tour 1: Les tests pour les fonctionnalités liées au Chat sont présents et vérifiés. Le composant App a été m
-- 2026-09-29 10:50:45 UTC — [ticket-223] tour 2 — codeur démarré
-- 2026-09-29 10:52:06 UTC — [ticket-223] tour 2 — codeur terminé (80405ms)
-- 2026-09-29 10:52:21 UTC — [ticket-223] securite: PASS — Audit de sécurité du diff App.tsx / tests frontend — aucune vulnérabilité détect
-- 2026-09-29 10:52:21 UTC — [ticket-223] tour 2 — reviewer démarré
-- 2026-09-29 10:53:29 UTC — [ticket-223] tour 2 — reviewer terminé (68405ms)
-- 2026-09-29 10:55:07 UTC — [ticket-223] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les tests Vitest ont été ajoutés
-- 2026-09-29 10:55:07 UTC — [ticket-223] APPROVED après 2 tour(s)
-- 2026-09-29 11:05:57 UTC — [ticket-225] branche ticket-225-le-chat-s-organise-par-conversation-liste-nouvell
-- 2026-09-29 11:05:57 UTC — [ticket-225] tour 1 — codeur démarré
-- 2026-09-29 11:10:40 UTC — [ticket-225] tour 1 — codeur terminé (283421ms)
-- 2026-09-29 11:11:06 UTC — [ticket-225] securite: PASS — Frontend code is secure. HTML auto-escaping in React prevents XSS (line Conversa
-- 2026-09-29 11:11:06 UTC — [ticket-225] tour 1 — reviewer démarré
-- 2026-09-29 11:12:45 UTC — [ticket-225] tour 1 — reviewer terminé (98390ms)
-- 2026-09-29 11:12:45 UTC — [ticket-225] CHANGES_REQUESTED tour 1: 
-- 2026-09-29 11:12:45 UTC — [ticket-225] tour 2 — codeur démarré
-- 2026-09-29 11:14:06 UTC — [ticket-225] tour 2 — codeur terminé (81594ms)
-- 2026-09-29 11:14:44 UTC — [ticket-225] securite: PASS — Audit de la feature ticket-225 (conversations multi-projets) : aucune vulnérabil
-- 2026-09-29 11:14:44 UTC — [ticket-225] tour 2 — reviewer démarré
-- 2026-09-29 11:16:23 UTC — [ticket-225] tour 2 — reviewer terminé (98562ms)
-- 2026-09-29 11:18:22 UTC — [ticket-225] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits par les tests ajoutés. Le compos
-- 2026-09-29 11:18:22 UTC — [ticket-225] APPROVED après 2 tour(s)
-- 2026-09-30 07:52:19 UTC — [ticket-253] branche ticket-253-stats-column-holds-the-view-s-settings-period-sco
-- 2026-09-30 07:52:19 UTC — [ticket-253] tour 1 — codeur démarré
-- 2026-09-30 07:59:43 UTC — [ticket-253] tour 1 — codeur terminé (443483ms)
-- 2026-09-30 08:00:12 UTC — [ticket-253] securite: PASS — Audit complet : aucune vulnérabilité détectée.
-
-Le diff refactorise la gestion d
-- 2026-09-30 08:00:12 UTC — [ticket-253] tour 1 — reviewer démarré
-- 2026-09-30 08:03:13 UTC — [ticket-253] tour 1 — reviewer terminé (180781ms)
-- 2026-09-30 08:08:07 UTC — [ticket-253] validateur: CHANGES_REQUESTED — Les critères liés au déplacement du sélecteur de période et à la gestion de la p
-- 2026-09-30 08:08:07 UTC — [ticket-253] CHANGES_REQUESTED tour 1: Les critères liés au déplacement du sélecteur de période et à la gestion de la portée des statistiqu
-- 2026-09-30 08:08:07 UTC — [ticket-253] tour 2 — codeur démarré
-- 2026-09-30 08:09:50 UTC — [ticket-253] tour 2 — codeur terminé (103186ms)
-- 2026-09-30 08:10:21 UTC — [ticket-253] securite: PASS — Analyse complète du diff : aucune vulnérabilité détectée.
-
-**Points positifs :**
-- 2026-09-30 08:10:21 UTC — [ticket-253] tour 2 — reviewer démarré
-- 2026-09-30 08:11:33 UTC — [ticket-253] tour 2 — reviewer terminé (72811ms)
-- 2026-09-30 08:15:11 UTC — [ticket-253] validateur: CHANGES_REQUESTED — La majorité des critères sont satisfaits : le sélecteur de période a été déplacé
-- 2026-09-30 08:15:11 UTC — [ticket-253] CHANGES_REQUESTED tour 2: La majorité des critères sont satisfaits : le sélecteur de période a été déplacé dans la colonne lat
-- 2026-09-30 08:15:11 UTC — [ticket-253] tour 3 — codeur démarré
-- 2026-09-30 08:17:03 UTC — [ticket-253] tour 3 — codeur terminé (112452ms)
-- 2026-09-30 08:17:27 UTC — [ticket-253] securite: PASS — Aucune vulnérabilité détectée. Le diff porte un refactoring frontend (state lift
-- 2026-09-30 08:17:27 UTC — [ticket-253] tour 3 — reviewer démarré
-- 2026-09-30 08:20:02 UTC — [ticket-253] tour 3 — reviewer terminé (154422ms)
-- 2026-09-30 08:23:52 UTC — [ticket-253] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le sélecteur de période a été dé
-- 2026-09-30 08:23:52 UTC — [ticket-253] APPROVED après 3 tour(s)
-- 2026-09-30 08:28:38 UTC — [ticket-254] branche ticket-254-chat-send-button-sits-beside-the-input-instead-of
-- 2026-09-30 08:28:38 UTC — [ticket-254] tour 1 — codeur démarré
-- 2026-09-30 08:33:01 UTC — [ticket-254] tour 1 — codeur terminé (263453ms)
-- 2026-09-30 08:33:22 UTC — [ticket-254] securite: PASS — Audit sécurité du diff frontend (ChatPanel, TicketList, icons) : aucune vulnérab
-- 2026-09-30 08:33:22 UTC — [ticket-254] tour 1 — reviewer démarré
-- 2026-09-30 08:34:21 UTC — [ticket-254] tour 1 — reviewer terminé (59530ms)
-- 2026-09-30 08:36:10 UTC — [ticket-254] validateur: CHANGES_REQUESTED — Les critères liés à l'export d'`IconSend`, au design du bouton d'envoi et à la s
-- 2026-09-30 08:36:10 UTC — [ticket-254] CHANGES_REQUESTED tour 1: Les critères liés à l'export d'`IconSend`, au design du bouton d'envoi et à la soumission par Entrée
-- 2026-09-30 08:36:10 UTC — [ticket-254] tour 2 — codeur démarré
-- 2026-09-30 08:39:16 UTC — [ticket-254] tour 2 — codeur terminé (186000ms)
-- 2026-09-30 08:39:31 UTC — [ticket-254] securite: PASS — Diff de frontend (ChatPanel, TicketList, icônes) : réorganisation UI, ajout de t
-- 2026-09-30 08:39:31 UTC — [ticket-254] tour 2 — reviewer démarré
-- 2026-09-30 08:40:46 UTC — [ticket-254] tour 2 — reviewer terminé (75218ms)
-- 2026-09-30 08:42:01 UTC — [ticket-254] validateur: CHANGES_REQUESTED — Le critère sur l'export d'`IconSend` et la mise à jour de l'interface du chat so
-- 2026-09-30 08:42:01 UTC — [ticket-254] CHANGES_REQUESTED tour 2: Le critère sur l'export d'`IconSend` et la mise à jour de l'interface du chat sont respectés. Cepend
-- 2026-09-30 08:42:01 UTC — [ticket-254] tour 3 — codeur démarré
-- 2026-09-30 08:46:15 UTC — [ticket-254] tour 3 — codeur terminé (253250ms)
-- 2026-09-30 08:46:28 UTC — [ticket-254] securite: PASS — Audit complet — aucune vulnérabilité détectée. Le diff porte sur du code fronten
-- 2026-09-30 08:46:28 UTC — [ticket-254] tour 3 — reviewer démarré
-- 2026-09-30 08:47:52 UTC — [ticket-254] tour 3 — reviewer terminé (84467ms)
-- 2026-09-30 08:49:14 UTC — [ticket-254] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le bouton d'envoi du chat a été 
-- 2026-09-30 08:49:14 UTC — [ticket-254] APPROVED après 3 tour(s)
-- 2026-09-30 08:55:35 UTC — [ticket-259] branche ticket-259-pull-requests-opened-by-delivery-carry-the-ticket
-- 2026-09-30 08:55:35 UTC — [ticket-259] tour 1 — codeur démarré
-- 2026-09-30 08:59:14 UTC — [ticket-259] tour 1 — codeur terminé (219516ms)
-- 2026-09-30 09:00:12 UTC — [ticket-259] securite: PASS — Le diff ajoute le champ `ticket_type` aux appels de création de PR, construit vi
-- 2026-09-30 09:00:12 UTC — [ticket-259] tour 1 — reviewer démarré
-- 2026-09-30 09:00:55 UTC — [ticket-259] tour 1 — reviewer terminé (43592ms)
-- 2026-09-30 09:02:02 UTC — [ticket-259] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le paramètre `ticket_type` est c
-- 2026-09-30 09:02:02 UTC — [ticket-259] APPROVED après 1 tour(s)
-- 2026-09-30 09:03:23 UTC — [ticket-260] branche ticket-260-delivery-waits-for-ci-checks-to-register-before-r
-- 2026-09-30 09:03:23 UTC — [ticket-260] tour 1 — codeur démarré
-- 2026-09-30 09:06:54 UTC — [ticket-260] tour 1 — codeur terminé (211062ms)
-- 2026-09-30 09:07:43 UTC — [ticket-260] securite: PASS — Audit de sécurité terminé sur le diff du service de livraison (ticket-260, délai
-- 2026-09-30 09:07:43 UTC — [ticket-260] tour 1 — reviewer démarré
-- 2026-09-30 09:09:02 UTC — [ticket-260] tour 1 — reviewer terminé (79750ms)
-- 2026-09-30 09:11:16 UTC — [ticket-260] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement
-- 2026-09-30 09:11:16 UTC — [ticket-260] APPROVED après 1 tour(s)
-- 2026-09-30 09:23:30 UTC — [ticket-262] branche ticket-262-charts-screen-reader-tables-no-longer-stretch-the
-- 2026-09-30 09:23:30 UTC — [ticket-262] tour 1 — codeur démarré
-- 2026-09-30 09:24:46 UTC — [ticket-262] tour 1 — codeur terminé (76641ms)
-- 2026-09-30 09:25:01 UTC — [ticket-262] securite: PASS — Ce diff concerne un refactoring de composants React pour améliorer l'accessibili
-- 2026-09-30 09:25:01 UTC — [ticket-262] tour 1 — reviewer démarré
-- 2026-09-30 09:25:31 UTC — [ticket-262] tour 1 — reviewer terminé (29563ms)
-- 2026-09-30 09:26:40 UTC — [ticket-262] validateur: APPROVED — Les trois critères d'acceptation sont respectés : la classe `sr-only` est correc
-- 2026-09-30 09:26:40 UTC — [ticket-262] APPROVED après 1 tour(s)
-- 2026-09-30 09:30:18 UTC — [ticket-265] branche ticket-265-delivery-merges-ticket-pull-requests-with-the-pro
-- 2026-09-30 09:30:18 UTC — [ticket-265] tour 1 — codeur démarré
-- 2026-09-30 09:36:48 UTC — [ticket-265] tour 1 — codeur terminé (390125ms)
-- 2026-09-30 09:37:12 UTC — [ticket-265] securite: PASS — Aucune vulnérabilité détectée. Le diff implémente correctement la prise en charg
-- 2026-09-30 09:37:12 UTC — [ticket-265] tour 1 — reviewer démarré
-- 2026-09-30 09:38:18 UTC — [ticket-265] tour 1 — reviewer terminé (65469ms)
-- 2026-09-30 09:40:00 UTC — [ticket-265] validateur: CHANGES_REQUESTED — Tous les critères d'acceptation sont satisfaits. Les tests couvrent les différen
-- 2026-09-30 09:40:00 UTC — [ticket-265] CHANGES_REQUESTED tour 1: Tous les critères d'acceptation sont satisfaits. Les tests couvrent les différents cas de merge_meth
-- 2026-09-30 09:40:00 UTC — [ticket-265] tour 2 — codeur démarré
-- 2026-09-30 09:40:09 UTC — [ticket-265] tour 2 — codeur terminé (8672ms)
-- 2026-09-30 09:40:52 UTC — [ticket-265] securite: PASS — Audit de sécurité complet : aucune vulnérabilité détectée. La modification est c
-- 2026-09-30 09:40:52 UTC — [ticket-265] tour 2 — reviewer démarré
-- 2026-09-30 09:41:34 UTC — [ticket-265] tour 2 — reviewer terminé (42233ms)
-- 2026-09-30 09:42:14 UTC — [ticket-265] validateur: CHANGES_REQUESTED — Tous les critères d'acceptation sont satisfaits. Les tests couvrent explicitemen
-- 2026-09-30 09:42:14 UTC — [ticket-265] CHANGES_REQUESTED tour 2: Tous les critères d'acceptation sont satisfaits. Les tests couvrent explicitement les comportements 
-- 2026-09-30 09:42:15 UTC — [ticket-265] tour 3 — codeur démarré
-- 2026-09-30 09:42:22 UTC — [ticket-265] tour 3 — codeur terminé (7281ms)
-- 2026-09-30 09:42:53 UTC — [ticket-265] securite: PASS — No critical or high-severity vulnerabilities detected. The implementation correc
-- 2026-09-30 09:42:53 UTC — [ticket-265] tour 3 — reviewer démarré
-- 2026-09-30 09:43:33 UTC — [ticket-265] tour 3 — reviewer terminé (39406ms)
-- 2026-09-30 09:45:01 UTC — [ticket-265] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests couvrent explicitemen
-- 2026-09-30 09:45:01 UTC — [ticket-265] APPROVED après 3 tour(s)
-- 2026-09-30 09:59:22 UTC — [ticket-268] branche ticket-268-validator-matches-verdicts-to-criteria-by-number
-- 2026-09-30 09:59:22 UTC — [ticket-268] tour 1 — codeur démarré
-- 2026-09-30 10:04:27 UTC — [ticket-268] tour 1 — codeur terminé (304891ms)
-- 2026-09-30 10:04:43 UTC — [ticket-268] securite: PASS — Aucune vulnérabilité de sécurité détectée. Le diff améliore la robustesse du val
-- 2026-09-30 10:04:43 UTC — [ticket-268] tour 1 — reviewer démarré
-- 2026-09-30 10:05:56 UTC — [ticket-268] tour 1 — reviewer terminé (72172ms)
-- 2026-09-30 10:07:44 UTC — [ticket-268] validateur: APPROVED — Tous les critères sont satisfaits. Le code implémente un mécanisme de correspond
-- 2026-09-30 10:07:44 UTC — [ticket-268] APPROVED après 1 tour(s)
-- 2026-09-30 11:24:28 UTC — [ticket-270] branche ticket-270-bookkeeping-written-after-delivery-is-no-longer-s
-- 2026-09-30 11:25:03 UTC — [ticket-270] plan : échec, le run continue sans (Claude Code returned an error result: Reached maximum number of turns (10) (exit code: 1))
-- 2026-09-30 11:25:03 UTC — [ticket-270] tour 1 — codeur démarré
-- 2026-09-30 11:42:29 UTC — [ticket-270] tour 1 — codeur terminé (1046265ms)
-- 2026-09-30 11:42:54 UTC — [ticket-270] securite: PASS — Le diff introduit un mécanisme de callback pour enregistrer le PR number avant l
-- 2026-09-30 11:42:54 UTC — [ticket-270] tour 1 — reviewer démarré
-- 2026-09-30 11:44:34 UTC — [ticket-270] tour 1 — reviewer terminé (100468ms)
-- 2026-09-30 11:47:23 UTC — [ticket-270] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Les tests montrent que les com
-- 2026-09-30 11:47:23 UTC — [ticket-270] APPROVED après 1 tour(s)
-- 2026-09-30 11:54:29 UTC — [ticket-271] branche ticket-271-switching-project-keeps-the-active-tab
-- 2026-09-30 11:54:29 UTC — [ticket-271] tour 1 — codeur démarré
-- 2026-09-30 11:56:28 UTC — [ticket-271] tour 1 — codeur terminé (118875ms)
-- 2026-09-30 11:56:44 UTC — [ticket-271] securite: PASS — Code sain : refactorisation TypeScript d'une logique de panneau. Fonction pure, 
-- 2026-09-30 11:56:44 UTC — [ticket-271] tour 1 — reviewer démarré
-- 2026-09-30 11:57:09 UTC — [ticket-271] tour 1 — reviewer terminé (25672ms)
-- 2026-09-30 11:58:08 UTC — [ticket-271] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le code implémente la fonction
-- 2026-09-30 11:58:08 UTC — [ticket-271] APPROVED après 1 tour(s)
-- 2026-09-30 12:08:44 UTC — [ticket-272] branche ticket-272-lockfiles-are-summarized-not-pasted-in-the-diff-g
-- 2026-09-30 12:08:44 UTC — [ticket-272] tour 1 — codeur démarré
-- 2026-09-30 12:12:59 UTC — [ticket-272] tour 1 — codeur terminé (254437ms)
-- 2026-09-30 12:13:31 UTC — [ticket-272] securite: PASS — Le diff ajoute une fonction `_resumer_lockfiles()` pour résumer les modification
-- 2026-09-30 12:13:31 UTC — [ticket-272] tour 1 — reviewer démarré
-- 2026-09-30 12:14:31 UTC — [ticket-272] tour 1 — reviewer terminé (60266ms)
-- 2026-09-30 12:16:39 UTC — [ticket-272] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les tests montrent que le conte
-- 2026-09-30 12:16:39 UTC — [ticket-272] APPROVED après 1 tour(s)
-- 2026-09-30 12:26:48 UTC — [ticket-275] branche ticket-275-a-depends-on-written-as-a-string-is-read-as-ticke
-- 2026-09-30 12:26:48 UTC — [ticket-275] tour 1 — codeur démarré
-- 2026-09-30 12:28:19 UTC — [ticket-275] tour 1 — codeur terminé (90780ms)
-- 2026-09-30 12:28:33 UTC — [ticket-275] securite: PASS — Audit de sécurité du diff ticket-275 : aucune vulnérabilité détectée.
-
-La nouvel
-- 2026-09-30 12:28:33 UTC — [ticket-275] tour 1 — reviewer démarré
-- 2026-09-30 12:29:28 UTC — [ticket-275] tour 1 — reviewer terminé (54514ms)
-- 2026-09-30 12:30:55 UTC — [ticket-275] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement
-- 2026-09-30 12:30:55 UTC — [ticket-275] APPROVED après 1 tour(s)
-- 2026-09-30 13:17:29 UTC — [ticket-266] branche ticket-266-a-run-waiting-for-an-answer-comes-first-in-superv
-- 2026-09-30 13:17:29 UTC — [ticket-266] tour 1 — codeur démarré
-- 2026-09-30 13:27:37 UTC — [ticket-266] tour 1 — codeur terminé (608063ms)
-- 2026-09-30 13:28:02 UTC — [ticket-266] securite: PASS — Aucune vulnérabilité de sécurité détectée.
-
-Le diff modifie la SupervisionView p
-- 2026-09-30 13:28:02 UTC — [ticket-266] tour 1 — reviewer démarré
-- 2026-09-30 13:30:18 UTC — [ticket-266] tour 1 — reviewer terminé (135844ms)
-- 2026-09-30 13:32:49 UTC — [ticket-266] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement
-- 2026-09-30 13:32:49 UTC — [ticket-266] APPROVED après 1 tour(s)
-- 2026-09-30 13:41:42 UTC — [ticket-267] branche ticket-267-run-summary-working-close-in-supervision-ticket-i
-- 2026-09-30 13:41:42 UTC — [ticket-267] tour 1 — codeur démarré
-- 2026-09-30 13:50:52 UTC — [ticket-267] tour 1 — codeur terminé (550718ms)
-- 2026-09-30 13:51:15 UTC — [ticket-267] securite: PASS — Audit de sécurité du diff — Aucune vulnérabilité détectée.
-
-Le changement concer
-- 2026-09-30 13:51:15 UTC — [ticket-267] tour 1 — reviewer démarré
-- 2026-09-30 13:52:13 UTC — [ticket-267] tour 1 — reviewer terminé (57391ms)
-- 2026-09-30 13:54:49 UTC — [ticket-267] validateur: APPROVED — Tous les critères sont respectés. Le code implémente correctement la logique de 
-- 2026-09-30 13:54:49 UTC — [ticket-267] APPROVED après 1 tour(s)
-- 2026-09-30 14:09:10 UTC — [ticket-274] branche ticket-274-design-tickets-on-local-artifact-projects-show-th
-- 2026-09-30 14:10:16 UTC — [ticket-274] plan : échec, le run continue sans (Claude Code returned an error result: Reached maximum number of turns (10) (exit code: 1))
-- 2026-09-30 14:10:16 UTC — [ticket-274] tour 1 — codeur démarré
-- 2026-09-30 14:20:04 UTC — [ticket-274] tour 1 — codeur terminé (587920ms)
-- 2026-09-30 14:20:34 UTC — [ticket-274] securite: PASS — Code de snapshot et diff d'artefacts (ticket-274). Analyse complète : pas de vul
-- 2026-09-30 14:20:34 UTC — [ticket-274] tour 1 — reviewer démarré
-- 2026-09-30 14:23:05 UTC — [ticket-274] tour 1 — reviewer terminé (150468ms)
-- 2026-09-30 14:26:12 UTC — [ticket-274] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement
-- 2026-09-30 14:26:12 UTC — [ticket-274] APPROVED après 1 tour(s)
-- 2026-09-30 14:50:45 UTC — [ticket-273] branche ticket-273-explanations-move-into-an-info-tooltip-states-and
-- 2026-09-30 14:50:45 UTC — [ticket-273] tour 1 — codeur démarré
-- 2026-09-30 15:00:54 UTC — [ticket-273] tour 1 — codeur terminé (608297ms)
-- 2026-09-30 15:01:17 UTC — [ticket-273] securite: PASS — Audit complet : pas de vulnérabilité détectée. Ce diff refactorise l'UI React/Ty
-- 2026-09-30 15:01:17 UTC — [ticket-273] tour 1 — reviewer démarré
-- 2026-09-30 15:02:05 UTC — [ticket-273] tour 1 — reviewer terminé (47766ms)
 - 2026-10-01 06:09:04 UTC — [ticket-273] validateur: APPROVED — Tous les critères sont satisfaits. Le composant `InfoTip` est bien implémenté av
 - 2026-10-01 06:09:04 UTC — [ticket-273] APPROVED après 1 tour(s)
 - 2026-10-01 06:21:30 UTC — [ticket-269] branche ticket-269-opening-a-pr-from-the-ide-targets-the-project-s-d
@@ -7259,3 +6928,3525 @@ error: fetching ref refs/remotes/origin/develop failed: incorrect old value prov
 - 2026-11-03 14:34:03 UTC — [ticket-733] livraison: conflit résolu : backend/src/tessera/services/ci_watcher.py, backend/src/tessera/services/controle_tete.py, backend/tests/test_longueur_des_fichiers.py (0ms)
 - 2026-11-03 14:34:03 UTC — [ticket-733] livraison: tests relancés après rebase : rouges (FAILED tests/test_ci_watcher_reprise.py::test_network_error_then_open_pr_replays_phase_2_and_succeeds !!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!! !!!!!!!!!!!! xdist.dsession.Interrupted: stopping after 1 failures !!!!!!!!!!!! 1 failed, 2302 passed, 64 warnings in ) (978953ms)
 - 2026-11-03 14:34:03 UTC — [ticket-733] livraison: arrêt — Tests rouges après rebase sur develop : rien n'est poussé. La base a avancé pendant le run et le tra
+- 2026-11-03 15:38:07 UTC — [ticket-742] branche ticket-742-git-workspace-test-doubles-share-a-base-with-no-o
+- 2026-11-03 15:38:09 UTC — [ticket-742] tour 1 — codeur démarré
+- 2026-11-03 15:42:12 UTC — [ticket-742] tour 1 — codeur terminé (243468ms)
+- 2026-11-03 15:50:55 UTC — [ticket-742] testeur: OK (exit 0)
+- 2026-11-03 15:51:25 UTC — [ticket-742] securite: PASS — Le diff introduit une classe de base pour les doubles de test du `GitWorkspaceSe (30234ms)
+- 2026-11-03 15:51:25 UTC — [ticket-742] tour 1 — reviewer démarré
+- 2026-11-03 15:51:55 UTC — [ticket-742] tour 1 — reviewer terminé (29891ms)
+- 2026-11-03 15:56:26 UTC — [ticket-742] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-03 15:56:50 UTC — [ticket-742] validateur: fichiers cités joints : backend/tests/doubles_git.py, services/orchestrator.py, backend/src/ (dossier, 0 fichiers)
+- 2026-11-03 15:56:50 UTC — [ticket-742] validateur: APPROVED — La classe de base `GitWorkspaceDouble` est créée avec toutes les méthodes asynch (325062ms)
+- 2026-11-03 15:56:50 UTC — [ticket-742] APPROVED après 1 tour(s)
+- 2026-11-03 15:58:16 UTC — [ticket-742] documentation: 0 fichier(s) (80092ms)
+- 2026-11-03 16:07:55 UTC — [ide-core] ticket-742 PR #853 confiée au CIWatcher
+- 2026-11-03 16:08:01 UTC — [ticket-740] branche ticket-740-a-red-retest-after-a-rebase-puts-the-branch-back
+- 2026-11-03 16:08:02 UTC — [ticket-740] tour 1 — codeur démarré
+- 2026-11-03 16:11:28 UTC — [ticket-740] tour 1 — codeur terminé (205156ms)
+- 2026-11-03 16:14:50 UTC — [ide-core] ticket-742 PR #853 mergée (CI verte)
+- 2026-11-03 16:19:55 UTC — [ticket-740] testeur: 1 failed, 2297 passed, 64 warnings in 503.75s (0:08:23)
+- 2026-11-03 16:19:55 UTC — [ticket-740] tests rouges au tour 1
+- 2026-11-03 16:19:55 UTC — [ticket-740] tour 2 — codeur démarré
+- 2026-11-03 16:20:56 UTC — [ticket-740] tour 2 — codeur terminé (61187ms)
+- 2026-11-03 16:30:22 UTC — [ticket-740] testeur: OK (exit 0)
+- 2026-11-03 16:32:17 UTC — [ticket-740] securite: PASS — Audit de ticket-740 : récupération après rebase échoué. Le code introduit trois  (115110ms)
+- 2026-11-03 16:32:17 UTC — [ticket-740] tour 2 — reviewer démarré
+- 2026-11-03 16:32:36 UTC — [ticket-740] tour 2 — reviewer terminé (18264ms)
+- 2026-11-03 16:35:42 UTC — [ticket-740] validateur: APPROVED — Tous les critères d'acceptation ont été vérifiés via les tests unitaires fournis (204547ms)
+- 2026-11-03 16:35:42 UTC — [ticket-740] APPROVED après 2 tour(s)
+- 2026-11-03 16:38:15 UTC — [ticket-740] documentation: 0 fichier(s) (146641ms)
+- 2026-11-03 16:54:06 UTC — [ide-core] ticket-740 PR #856 mergée (CI verte)
+- 2026-11-03 16:54:08 UTC — [ide-core] ticket-740 : base réalignée sur develop
+- 2026-11-03 16:54:08 UTC — [ide-core] ticket-740 PR #856 confiée au CIWatcher
+- 2026-11-03 16:54:13 UTC — [ticket-741] branche ticket-741-a-phase-one-delivery-stop-marks-the-ticket-blocke
+- 2026-11-03 16:54:15 UTC — [ticket-741] tour 1 — codeur démarré
+- 2026-11-03 16:56:52 UTC — [ticket-741] tour 1 — codeur terminé (157016ms)
+- 2026-11-03 17:03:56 UTC — [ticket-741] testeur: 1 failed, 3522 passed, 64 warnings in 420.69s (0:07:00)
+- 2026-11-03 17:03:56 UTC — [ticket-741] tests rouges au tour 1
+- 2026-11-03 17:03:56 UTC — [ticket-741] tour 2 — codeur démarré
+- 2026-11-03 17:05:08 UTC — [ticket-741] tour 2 — codeur terminé (72172ms)
+- 2026-11-03 17:13:26 UTC — [ticket-741] testeur: OK (exit 0)
+- 2026-11-03 17:16:37 UTC — [ticket-741] securite: PASS — The diff adds a new field `arret_voulu` and property `bloque_le_ticket` to disti (191750ms)
+- 2026-11-03 17:16:37 UTC — [ticket-741] tour 2 — reviewer démarré
+- 2026-11-03 17:17:05 UTC — [ticket-741] tour 2 — reviewer terminé (28077ms)
+- 2026-11-03 17:18:47 UTC — [ticket-741] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits : les tests couvrent les différe (129953ms)
+- 2026-11-03 17:18:47 UTC — [ticket-741] APPROVED après 2 tour(s)
+- 2026-11-03 17:20:30 UTC — [ticket-741] documentation: 0 fichier(s) (96811ms)
+- 2026-11-03 17:20:53 UTC — [ide-core] ticket-741 PR #857 confiée au CIWatcher
+- 2026-11-03 17:20:58 UTC — [ticket-743] branche ticket-743-an-observer-closed-by-its-browser-is-logged-as-in
+- 2026-11-03 17:20:59 UTC — [ticket-743] tour 1 — codeur démarré
+- 2026-11-03 17:22:42 UTC — [ticket-743] tour 1 — codeur terminé (102514ms)
+- 2026-11-03 17:27:48 UTC — [ide-core] ticket-741 PR #857 mergée (CI verte)
+- 2026-11-03 17:30:59 UTC — [ticket-743] testeur: OK (exit 0)
+- 2026-11-03 17:32:06 UTC — [ticket-743] securite: PASS — Le diff améliore la gestion des erreurs WebSocket en distinguant les fermetures  (67453ms)
+- 2026-11-03 17:32:06 UTC — [ticket-743] tour 1 — reviewer démarré
+- 2026-11-03 17:32:22 UTC — [ticket-743] tour 1 — reviewer terminé (15577ms)
+- 2026-11-03 17:33:48 UTC — [ticket-743] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le code implémente correctemen (101375ms)
+- 2026-11-03 17:33:48 UTC — [ticket-743] APPROVED après 1 tour(s)
+- 2026-11-03 17:34:56 UTC — [ticket-743] documentation: 0 fichier(s) (62187ms)
+- 2026-11-03 17:45:58 UTC — [ide-core] ticket-743 PR #858 confiée au CIWatcher
+- 2026-11-03 17:46:04 UTC — [ticket-744] branche ticket-744-stopping-a-service-whose-process-is-already-gone
+- 2026-11-03 17:46:05 UTC — [ticket-744] tour 1 — codeur démarré
+- 2026-11-03 17:47:05 UTC — [ticket-744] tour 1 — codeur terminé (59734ms)
+- 2026-11-03 17:51:46 UTC — [ide-core] ticket-743 PR #858 mergée (CI verte)
+- 2026-11-03 17:54:13 UTC — [ticket-744] testeur: 1 failed, 2209 passed, 64 warnings in 424.13s (0:07:04)
+- 2026-11-03 17:54:13 UTC — [ticket-744] tests rouges au tour 1
+- 2026-11-03 17:54:13 UTC — [ticket-744] tour 2 — codeur démarré
+- 2026-11-03 17:56:04 UTC — [ticket-744] tour 2 — codeur terminé (111437ms)
+- 2026-11-03 18:04:27 UTC — [ticket-744] testeur: OK (exit 0)
+- 2026-11-03 18:05:19 UTC — [ticket-744] securite: PASS — This diff safely refactors process termination error handling in Tessera's servi (51531ms)
+- 2026-11-03 18:05:19 UTC — [ticket-744] tour 2 — reviewer démarré
+- 2026-11-03 18:05:43 UTC — [ticket-744] tour 2 — reviewer terminé (24391ms)
+- 2026-11-03 18:06:45 UTC — [ticket-744] validateur: APPROVED — Les deux critères d'acceptation sont satisfaits. Le code implémente correctement (86000ms)
+- 2026-11-03 18:06:45 UTC — [ticket-744] APPROVED après 2 tour(s)
+- 2026-11-03 18:07:54 UTC — [ticket-744] documentation: 0 fichier(s) (62641ms)
+- 2026-11-03 18:17:18 UTC — [ide-core] ticket-744 PR #859 confiée au CIWatcher
+- 2026-11-03 18:17:23 UTC — [ticket-745] branche ticket-745-unknown-git-global-options-and-git-grep-open-are
+- 2026-11-03 18:17:24 UTC — [ticket-745] tour 1 — codeur démarré
+- 2026-11-03 18:18:30 UTC — [ticket-745] tour 1 — codeur terminé (65485ms)
+- 2026-11-03 18:24:28 UTC — [ide-core] ticket-744 PR #859 mergée (CI verte)
+- 2026-11-03 18:28:30 UTC — [ticket-745] testeur: OK (exit 0)
+- 2026-11-03 18:30:39 UTC — [ticket-745] securite: PASS — This diff hardens the git command guard by transitioning from a blacklist of dan (129047ms)
+- 2026-11-03 18:30:39 UTC — [ticket-745] tour 1 — reviewer démarré
+- 2026-11-03 18:31:04 UTC — [ticket-745] tour 1 — reviewer terminé (25281ms)
+- 2026-11-03 18:32:30 UTC — [ticket-745] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code modifié gère correctemen (111030ms)
+- 2026-11-03 18:32:30 UTC — [ticket-745] APPROVED après 1 tour(s)
+- 2026-11-03 18:35:11 UTC — [ticket-745] documentation: 0 fichier(s) (155562ms)
+- 2026-11-03 18:52:47 UTC — [ide-core] ticket-745 PR #860 mergée (CI verte)
+- 2026-11-03 18:52:50 UTC — [ide-core] ticket-745 : base réalignée sur develop
+- 2026-11-03 18:52:50 UTC — [ide-core] ticket-745 PR #860 confiée au CIWatcher
+- 2026-11-03 18:52:55 UTC — [ticket-746] branche ticket-746-git-environment-assignments-before-git-or-gh-are
+- 2026-11-03 18:52:56 UTC — [ticket-746] tour 1 — codeur démarré
+- 2026-11-03 18:54:30 UTC — [ticket-746] tour 1 — codeur terminé (94422ms)
+- 2026-11-03 19:05:27 UTC — [ticket-746] testeur: OK (exit 0)
+- 2026-11-03 19:07:55 UTC — [ticket-746] securite: PASS — Ticket-746 strengthens the git security guard (ADR-067) by detecting and refusin (147859ms)
+- 2026-11-03 19:07:55 UTC — [ticket-746] tour 1 — reviewer démarré
+- 2026-11-03 19:08:09 UTC — [ticket-746] tour 1 — reviewer terminé (13844ms)
+- 2026-11-03 19:09:28 UTC — [ticket-746] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Les tests ont été ajoutés pour (93342ms)
+- 2026-11-03 19:09:28 UTC — [ticket-746] APPROVED après 1 tour(s)
+- 2026-11-03 19:10:32 UTC — [ticket-746] documentation: 0 fichier(s) (58108ms)
+- 2026-11-03 19:18:07 UTC — [ide-core] ticket-746 PR #861 mergée (CI verte)
+- 2026-11-03 19:18:10 UTC — [ide-core] ticket-746 : base réalignée sur develop
+- 2026-11-03 19:18:10 UTC — [ide-core] ticket-746 PR #861 confiée au CIWatcher
+- 2026-11-03 19:18:15 UTC — [ticket-747] branche ticket-747-protected-names-are-compared-after-windows-name-n
+- 2026-11-03 19:18:17 UTC — [ticket-747] tour 1 — codeur démarré
+- 2026-11-03 19:20:42 UTC — [ticket-747] tour 1 — codeur terminé (145077ms)
+- 2026-11-03 19:29:54 UTC — [ticket-747] testeur: OK (exit 0)
+- 2026-11-03 19:33:37 UTC — [ticket-747] securite: PASS — Le diff ticket-747 implémente correctement la normalisation des noms Windows pou (222921ms)
+- 2026-11-03 19:33:37 UTC — [ticket-747] tour 1 — reviewer démarré
+- 2026-11-03 19:34:14 UTC — [ticket-747] tour 1 — reviewer terminé (36547ms)
+- 2026-11-03 19:36:38 UTC — [ticket-747] validateur: fichiers cités joints : .claude/settings.local.json, routers/fs.py ; absents : .claude/settings.json., .Claude/Settings.json, sub/CLAUDE.md., .GitHub/Workflows/x.yml, settings.md, notes/claude-notes.md
+- 2026-11-03 19:36:38 UTC — [ticket-747] validateur: APPROVED — Tous les critères d'acceptation ont été satisfaits. Le code a été modifié pour n (180827ms)
+- 2026-11-03 19:36:38 UTC — [ticket-747] APPROVED après 1 tour(s)
+- 2026-11-03 19:38:21 UTC — [ticket-747] documentation: 0 fichier(s) (96328ms)
+- 2026-11-03 19:45:06 UTC — [ide-core] ticket-747 PR #862 mergée (CI verte)
+- 2026-11-03 19:45:09 UTC — [ide-core] ticket-747 : base réalignée sur develop
+- 2026-11-03 19:45:09 UTC — [ide-core] ticket-747 PR #862 confiée au CIWatcher
+- 2026-11-03 19:45:14 UTC — [ticket-748] branche ticket-748-the-test-configuration-gate-knows-every-configura
+- 2026-11-03 19:45:16 UTC — [ticket-748] tour 1 — codeur démarré
+- 2026-11-03 19:47:34 UTC — [ticket-748] tour 1 — codeur terminé (138483ms)
+- 2026-11-03 19:58:51 UTC — [ticket-748] testeur: OK (exit 0)
+- 2026-11-03 20:00:20 UTC — [ticket-748] securite: PASS — Le ticket améliore la porte de configuration des tests en exigeant le chemin com (88812ms)
+- 2026-11-03 20:00:20 UTC — [ticket-748] tour 1 — reviewer démarré
+- 2026-11-03 20:00:48 UTC — [ticket-748] tour 1 — reviewer terminé (27703ms)
+- 2026-11-03 20:03:56 UTC — [ticket-748] validateur: fichiers cités joints : frontend/vite.config.ts, frontend/src/x/vitest.config.ts, frontend/vitest.config.ts, projects/ide-core/memory/contraintes.md ; absents : backend/pytest.ini
+- 2026-11-03 20:03:56 UTC — [ticket-748] validateur: APPROVED — Tous les critères d'acceptation ont été satisfaits. Les tests couvrent les cas d (215796ms)
+- 2026-11-03 20:03:56 UTC — [ticket-748] APPROVED après 1 tour(s)
+- 2026-11-03 20:06:45 UTC — [ticket-748] documentation: 0 fichier(s) (162171ms)
+- 2026-11-03 20:07:08 UTC — [ide-core] ticket-748 PR #863 confiée au CIWatcher
+- 2026-11-03 20:07:13 UTC — [ticket-759] branche ticket-759-an-unreadable-agents-json-is-never-rewritten-and
+- 2026-11-03 20:07:14 UTC — [ticket-759] tour 1 — codeur démarré
+- 2026-11-03 20:08:52 UTC — [ticket-759] tour 1 — codeur terminé (97906ms)
+- 2026-11-03 20:14:34 UTC — [ide-core] ticket-748 PR #863 mergée (CI verte)
+- 2026-11-04 02:23:29 UTC — [ticket-759] testeur: délai dépassé, suite relancée
+- 2026-11-04 02:23:29 UTC — [ticket-759] testeur: délai dépassé (1500 s, durée réelle 22475 s) — ../scripts/verifier.py coupé après 22475 s
+- 2026-11-04 08:16:18 UTC — [ticket-759] testeur: délai dépassé (1500 s, durée réelle 21168 s) — ../scripts/verifier.py coupé après 21169 s
+- 2026-11-04 08:16:20 UTC — [ticket-759] BLOCKED — testeur: délai dépassé deux fois
+- 2026-11-04 08:16:56 UTC — [ide-core] file interrompue : ticket-759 non approuvé
+- 2026-11-04 08:18:00 UTC — [ticket-759] branche ticket-759-an-unreadable-agents-json-is-never-rewritten-and
+- 2026-11-04 08:29:15 UTC — [ticket-759] testeur: OK (exit 0)
+- 2026-11-04 08:29:15 UTC — [ticket-759] branche reprise (3 commit(s)) — tests green, codeur sauté
+- 2026-11-04 08:33:24 UTC — [ticket-759] securite: PASS — No security vulnerabilities introduced. The diff improves error handling and dat (247375ms)
+- 2026-11-04 08:33:24 UTC — [ticket-759] tour 1 — reviewer démarré
+- 2026-11-04 08:33:49 UTC — [ticket-759] tour 1 — reviewer terminé (24516ms)
+- 2026-11-04 08:35:51 UTC — [ticket-759] validateur: APPROVED — Tous les critères d'acceptation ont été satisfaits. Les tests couvrent les cas d (146280ms)
+- 2026-11-04 08:35:51 UTC — [ticket-759] APPROVED après 1 tour(s)
+- 2026-11-04 08:37:01 UTC — [ticket-759] documentation: 0 fichier(s) (64280ms)
+- 2026-11-04 08:48:51 UTC — [ide-core] ticket-759 PR #866 confiée au CIWatcher
+- 2026-11-04 08:48:57 UTC — [ticket-762] branche ticket-762-a-declared-service-started-by-hand-shows-as-runni
+- 2026-11-04 08:48:58 UTC — [ticket-762] tour 1 — codeur démarré
+- 2026-11-04 08:50:51 UTC — [ticket-762] tour 1 — codeur terminé (113375ms)
+- 2026-11-04 08:53:49 UTC — [ticket-762] testeur: OK (exit 0)
+- 2026-11-04 08:55:09 UTC — [ide-core] ticket-759 PR #866 mergée (CI verte)
+- 2026-11-04 08:55:33 UTC — [ticket-762] securite: PASS — The diff refactors the baies service display logic and adds test coverage. All c (103827ms)
+- 2026-11-04 08:55:33 UTC — [ticket-762] tour 1 — reviewer démarré
+- 2026-11-04 08:55:49 UTC — [ticket-762] tour 1 — reviewer terminé (16703ms)
+- 2026-11-04 08:57:40 UTC — [ticket-762] validateur: APPROVED — Les trois critères d'acceptation sont respectés. Les tests ont été ajoutés pour  (127016ms)
+- 2026-11-04 08:57:40 UTC — [ticket-762] APPROVED après 1 tour(s)
+- 2026-11-04 08:59:05 UTC — [ticket-762] documentation: 0 fichier(s) (78703ms)
+- 2026-11-04 09:42:58 UTC — [ticket-750] branche ticket-750-glued-redirections-every-tee-argument-and-cp-mv-r
+- 2026-11-04 09:43:00 UTC — [ticket-750] tour 1 — codeur démarré
+- 2026-11-04 09:45:18 UTC — [ticket-750] tour 1 — codeur terminé (137937ms)
+- 2026-11-04 09:58:49 UTC — [ticket-750] testeur: OK (exit 0)
+- 2026-11-04 10:01:44 UTC — [ticket-750] securite: BLOCK — Le diff introduit un bug CRITICAL ligne 122 : l'indexage `[0]` du tuple retourné (174750ms)
+- 2026-11-04 10:01:50 UTC — [ide-core] file interrompue : ticket-750 non approuvé
+- 2026-11-04 09:02:20 UTC — [ide-core] ticket-762 PR #867 confiée au CIWatcher
+- 2026-11-04 09:02:25 UTC — [ticket-749] branche ticket-749-common-windows-and-git-bash-wrappers-are-unwrappe
+- 2026-11-04 09:02:27 UTC — [ticket-749] tour 1 — codeur démarré
+- 2026-11-04 09:04:35 UTC — [ticket-749] tour 1 — codeur terminé (128328ms)
+- 2026-11-04 09:09:42 UTC — [ide-core] ticket-762 PR #867 mergée (CI verte)
+- 2026-11-04 09:17:05 UTC — [ticket-749] testeur: OK (exit 0)
+- 2026-11-04 09:19:56 UTC — [ticket-749] securite: PASS — Ticket-749 améliore la sécurité du gardien git sans introduire de vulnérabilités (170921ms)
+- 2026-11-04 09:19:56 UTC — [ticket-749] tour 1 — reviewer démarré
+- 2026-11-04 09:20:31 UTC — [ticket-749] tour 1 — reviewer terminé (34842ms)
+- 2026-11-04 09:23:34 UTC — [ticket-749] validateur: APPROVED — Les trois critères d'acceptation ont été satisfaits. Le code modifié implémente  (218671ms)
+- 2026-11-04 09:23:34 UTC — [ticket-749] APPROVED après 1 tour(s)
+- 2026-11-04 09:27:39 UTC — [ticket-749] documentation: 1 fichier(s) (237765ms) — après tour de correction
+- 2026-11-04 10:05:13 UTC — [ticket-752] branche ticket-752-the-token-guard-reads-globs-and-whole-folders-tha
+- 2026-11-04 10:05:14 UTC — [ticket-752] tour 1 — codeur démarré
+- 2026-11-04 10:06:45 UTC — [ticket-752] tour 1 — codeur terminé (91655ms)
+- 2026-11-04 10:19:10 UTC — [ticket-752] testeur: OK (exit 0)
+- 2026-11-04 10:23:01 UTC — [ticket-752] securite: PASS — Le diff renforce la protection du fichier `.env` de Tessera par trois vecteurs : (231000ms)
+- 2026-11-04 10:23:01 UTC — [ticket-752] tour 1 — reviewer démarré
+- 2026-11-04 10:23:25 UTC — [ticket-752] tour 1 — reviewer terminé (24108ms)
+- 2026-11-04 10:25:18 UTC — [ticket-752] validateur: fichiers cités joints : backend/src (dossier, 0 fichiers)
+- 2026-11-04 10:25:18 UTC — [ticket-752] validateur: APPROVED — Les trois critères d'acceptation ont été implémentés avec succès. Le code détect (137422ms)
+- 2026-11-04 10:25:18 UTC — [ticket-752] APPROVED après 1 tour(s)
+- 2026-11-04 10:26:28 UTC — [ticket-752] documentation: 0 fichier(s) (63546ms)
+- 2026-11-04 10:40:37 UTC — [ide-core] ticket-752 PR #876 confiée au CIWatcher
+- 2026-11-04 10:40:43 UTC — [ticket-753] branche ticket-753-captures-send-the-session-token-only-to-a-loopbac
+- 2026-11-04 10:40:44 UTC — [ticket-753] tour 1 — codeur démarré
+- 2026-11-04 10:41:54 UTC — [ticket-753] tour 1 — codeur terminé (69765ms)
+- 2026-11-04 10:46:25 UTC — [ticket-753] testeur: 1 failed, 1581 passed, 64 warnings in 265.09s (0:04:25)
+- 2026-11-04 10:46:25 UTC — [ticket-753] tests rouges au tour 1
+- 2026-11-04 10:46:25 UTC — [ticket-753] tour 2 — codeur démarré
+- 2026-11-04 10:46:54 UTC — [ticket-753] tour 2 — codeur terminé (29703ms)
+- 2026-11-04 10:46:57 UTC — [ticket-752] livraison: arrêt — PR #876 non mergée : Le merge de la PR #876 a échoué sur une erreur réseau (ReadTimeout, la PR est lue « open »). La PR reste ouverte.
+- 2026-11-04 11:00:15 UTC — [ticket-753] testeur: OK (exit 0)
+- 2026-11-04 11:02:04 UTC — [ticket-753] securite: PASS — This diff implements a critical security fix (ticket-753) preventing session tok (109000ms)
+- 2026-11-04 11:02:04 UTC — [ticket-753] tour 2 — reviewer démarré
+- 2026-11-04 11:02:43 UTC — [ticket-753] tour 2 — reviewer terminé (38452ms)
+- 2026-11-04 11:03:59 UTC — [ticket-753] validateur: fichiers cités joints : aucun ; absents : https://exemple.org
+- 2026-11-04 11:03:59 UTC — [ticket-753] validateur: APPROVED — Les deux critères d'acceptation sont satisfaits : le jeton de session n’est plus (114609ms)
+- 2026-11-04 11:03:59 UTC — [ticket-753] APPROVED après 2 tour(s)
+- 2026-11-04 11:06:09 UTC — [ticket-753] documentation: 0 fichier(s) (123469ms)
+- 2026-11-04 11:17:40 UTC — [ticket-753] livraison: arrêt — Livraison interrompue : GitCommandError: git command failed (code 1): git -c core.hooksPath=C:\Users
+- 2026-11-04 11:17:47 UTC — [ticket-754] branche ticket-754-the-observation-socket-trusts-only-declared-origi
+- 2026-11-04 11:17:48 UTC — [ticket-754] tour 1 — codeur démarré
+- 2026-11-04 11:19:11 UTC — [ticket-754] tour 1 — codeur terminé (83266ms)
+- 2026-11-04 11:32:20 UTC — [ticket-754] testeur: OK (exit 0)
+- 2026-11-04 11:34:13 UTC — [ticket-754] securite: PASS — Le diff introduit un contrôle d'origine strict pour les WebSockets, une améliora (113750ms)
+- 2026-11-04 11:34:13 UTC — [ticket-754] tour 1 — reviewer démarré
+- 2026-11-04 11:34:29 UTC — [ticket-754] tour 1 — reviewer terminé (15781ms)
+- 2026-11-04 11:37:23 UTC — [ticket-754] validateur: fichiers cités joints : docs/configuration.md
+- 2026-11-04 11:37:23 UTC — [ticket-754] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits : un test vérifie le refus des o (188921ms)
+- 2026-11-04 11:37:23 UTC — [ticket-754] APPROVED après 1 tour(s)
+- 2026-11-04 11:38:54 UTC — [ticket-754] documentation: 0 fichier(s) (84265ms)
+- 2026-11-04 11:58:39 UTC — [ide-core] ticket-754 PR #881 mergée (CI verte)
+- 2026-11-04 11:58:41 UTC — [ide-core] ticket-754 : base réalignée sur develop
+- 2026-11-04 11:58:41 UTC — [ide-core] ticket-754 PR #881 confiée au CIWatcher
+- 2026-11-04 11:58:46 UTC — [ticket-755] branche ticket-755-a-red-retest-followed-by-no-test-command-still-st
+- 2026-11-04 11:58:47 UTC — [ticket-755] tour 1 — codeur démarré
+- 2026-11-04 11:59:50 UTC — [ticket-755] tour 1 — codeur terminé (62358ms)
+- 2026-11-04 12:11:25 UTC — [ticket-755] testeur: OK (exit 0)
+- 2026-11-04 12:12:34 UTC — [ticket-755] securite: PASS — Le diff corrige une logique d'arrêt de livraison en préservant le résultat du pr (68985ms)
+- 2026-11-04 12:12:34 UTC — [ticket-755] tour 1 — reviewer démarré
+- 2026-11-04 12:12:48 UTC — [ticket-755] tour 1 — reviewer terminé (14562ms)
+- 2026-11-04 12:14:18 UTC — [ticket-755] validateur: APPROVED — Les deux critères d'acceptation sont satisfaits. Le code a été mis à jour pour g (104546ms)
+- 2026-11-04 12:14:18 UTC — [ticket-755] APPROVED après 1 tour(s)
+- 2026-11-04 12:15:35 UTC — [ticket-755] documentation: 0 fichier(s) (69828ms)
+- 2026-11-04 12:16:00 UTC — [ide-core] ticket-755 PR #882 confiée au CIWatcher
+- 2026-11-04 12:16:06 UTC — [ticket-751] branche ticket-751-the-interpreter-net-covers-node-e-and-python-name
+- 2026-11-04 12:16:07 UTC — [ticket-751] tour 1 — codeur démarré
+- 2026-11-04 12:18:43 UTC — [ticket-751] tour 1 — codeur terminé (156171ms)
+- 2026-11-04 12:23:05 UTC — [ide-core] ticket-755 PR #882 mergée (CI verte)
+- 2026-11-04 12:31:45 UTC — [ticket-751] testeur: OK (exit 0)
+- 2026-11-04 12:34:11 UTC — [ticket-751] securite: PASS — Ce diff améliore le système de détection des écritures non autorisées via shell  (146766ms)
+- 2026-11-04 12:34:11 UTC — [ticket-751] tour 1 — reviewer démarré
+- 2026-11-04 12:34:29 UTC — [ticket-751] tour 1 — reviewer terminé (17202ms)
+- 2026-11-04 12:36:07 UTC — [ticket-751] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code a été mis à jour pour dé (115828ms)
+- 2026-11-04 12:36:07 UTC — [ticket-751] APPROVED après 1 tour(s)
+- 2026-11-04 12:38:13 UTC — [ticket-751] documentation: 0 fichier(s) (119203ms)
+- 2026-11-04 12:50:42 UTC — [ide-core] ticket-751 PR #883 confiée au CIWatcher
+- 2026-11-04 12:50:47 UTC — [ticket-760] branche ticket-760-every-git-write-goes-through-the-shared-runner-sy
+- 2026-11-04 12:50:49 UTC — [ticket-760] tour 1 — codeur démarré
+- 2026-11-04 12:52:24 UTC — [ticket-760] tour 1 — codeur terminé (95671ms)
+- 2026-11-04 12:58:04 UTC — [ide-core] ticket-751 PR #883 mergée (CI verte)
+- 2026-11-04 13:06:10 UTC — [ticket-760] testeur: OK (exit 0)
+- 2026-11-04 13:08:11 UTC — [ticket-760] securite: PASS — Le diff centralise l'exécution git via un runner unique et durcit le contrôle de (121046ms)
+- 2026-11-04 13:08:11 UTC — [ticket-760] tour 1 — reviewer démarré
+- 2026-11-04 13:08:28 UTC — [ticket-760] tour 1 — reviewer terminé (17202ms)
+- 2026-11-04 13:10:33 UTC — [ticket-760] validateur: fichiers cités joints : git_link.py
+- 2026-11-04 13:10:33 UTC — [ticket-760] validateur: APPROVED — Les trois critères d'acceptation sont respectés. Le code modifié permet de s'ass (141765ms)
+- 2026-11-04 13:10:33 UTC — [ticket-760] APPROVED après 1 tour(s)
+- 2026-11-04 13:11:41 UTC — [ticket-760] documentation: 0 fichier(s) (60968ms)
+- 2026-11-04 13:26:21 UTC — [ide-core] ticket-760 PR #884 confiée au CIWatcher
+- 2026-11-04 13:26:26 UTC — [ticket-763] branche ticket-763-project-icons-and-run-captures-never-carry-the-to
+- 2026-11-04 13:26:27 UTC — [ticket-763] tour 1 — codeur démarré
+- 2026-11-04 13:30:17 UTC — [ticket-763] tour 1 — codeur terminé (229780ms)
+- 2026-11-04 13:32:56 UTC — [ticket-763] testeur: OK (exit 0)
+- 2026-11-04 13:33:28 UTC — [ide-core] ticket-760 PR #884 mergée (CI verte)
+- 2026-11-04 13:35:48 UTC — [ticket-763] securite: PASS — Le diff retire les tokens des URLs et les passe en Authorization header (annoncé (172360ms)
+- 2026-11-04 13:35:48 UTC — [ticket-763] tour 1 — reviewer démarré
+- 2026-11-04 13:36:07 UTC — [ticket-763] tour 1 — reviewer terminé (18733ms)
+- 2026-11-04 13:38:20 UTC — [ticket-763] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Des tests ont été ajoutés pour (152219ms)
+- 2026-11-04 13:38:20 UTC — [ticket-763] APPROVED après 1 tour(s)
+- 2026-11-04 13:40:01 UTC — [ticket-763] documentation: 0 fichier(s) (92342ms)
+- 2026-11-04 13:43:46 UTC — [ide-core] ticket-763 PR #886 confiée au CIWatcher
+- 2026-11-04 13:43:52 UTC — [ticket-764] branche ticket-764-the-shared-modal-traps-focus-and-gives-it-back-wh
+- 2026-11-04 13:43:54 UTC — [ticket-764] tour 1 — codeur démarré
+- 2026-11-04 13:46:03 UTC — [ticket-764] tour 1 — codeur terminé (129282ms)
+- 2026-11-04 13:49:09 UTC — [ticket-764] testeur: OK (exit 0)
+- 2026-11-04 13:49:45 UTC — [ticket-764] securite: PASS — Le diff ajoute une gestion sécurisée du focus pour la navigation Tab dans les mo (36094ms)
+- 2026-11-04 13:49:45 UTC — [ticket-764] tour 1 — reviewer démarré
+- 2026-11-04 13:50:11 UTC — [ticket-764] tour 1 — reviewer terminé (25780ms)
+- 2026-11-04 13:50:53 UTC — [ide-core] ticket-763 PR #886 mergée (CI verte)
+- 2026-11-04 13:52:08 UTC — [ticket-764] validateur: APPROVED — Les critères d'acceptation sont tous satisfaits. Le code implémente correctement (142593ms)
+- 2026-11-04 13:52:08 UTC — [ticket-764] APPROVED après 1 tour(s)
+- 2026-11-04 13:53:37 UTC — [ticket-764] documentation: 0 fichier(s) (76265ms)
+- 2026-11-04 13:57:03 UTC — [ide-core] ticket-764 PR #888 confiée au CIWatcher
+- 2026-11-04 13:57:10 UTC — [ticket-765] branche ticket-765-the-route-contract-test-checks-field-types-and-ca
+- 2026-11-04 13:57:12 UTC — [ticket-765] tour 1 — codeur démarré
+- 2026-11-04 14:02:53 UTC — [ide-core] ticket-764 PR #888 mergée (CI verte)
+- 2026-11-04 14:05:46 UTC — [ticket-765] tour 1 — codeur terminé (514062ms)
+- 2026-11-04 14:08:51 UTC — [ticket-765] testeur: OK (exit 0)
+- 2026-11-04 14:10:24 UTC — [ticket-765] securite: PASS — This diff improves type safety and test infrastructure with no security vulnerab (93391ms)
+- 2026-11-04 14:10:24 UTC — [ticket-765] tour 1 — reviewer démarré
+- 2026-11-04 14:10:41 UTC — [ticket-765] tour 1 — reviewer terminé (16500ms)
+- 2026-11-04 14:15:03 UTC — [ticket-765] validateur: APPROVED — Les quatre critères d'acceptation sont respectés. Le code implémente un garde de (279327ms)
+- 2026-11-04 14:15:03 UTC — [ticket-765] APPROVED après 1 tour(s)
+- 2026-11-04 14:16:32 UTC — [ticket-765] documentation: 0 fichier(s) (80703ms)
+- 2026-11-04 14:19:56 UTC — [ide-core] ticket-765 PR #889 confiée au CIWatcher
+- 2026-11-04 14:20:01 UTC — [ticket-766] branche ticket-766-the-tessera-server-room-shows-only-what-it-knows
+- 2026-11-04 14:20:03 UTC — [ticket-766] tour 1 — codeur démarré
+- 2026-11-04 14:21:50 UTC — [ticket-766] tour 1 — codeur terminé (107296ms)
+- 2026-11-04 14:27:04 UTC — [ide-core] ticket-765 PR #889 mergée (CI verte)
+- 2026-11-04 14:40:06 UTC — [ticket-766] testeur: OK (exit 0)
+- 2026-11-04 14:41:56 UTC — [ticket-766] securite: PASS — All changes use safe practices: parameterized SQL queries, static strings, and R (109625ms)
+- 2026-11-04 14:41:56 UTC — [ticket-766] tour 1 — reviewer démarré
+- 2026-11-04 14:42:12 UTC — [ticket-766] tour 1 — reviewer terminé (16296ms)
+- 2026-11-04 14:44:35 UTC — [ticket-766] validateur: APPROVED — Les trois critères d'acceptation ont été satisfaits. Le code a été modifié pour  (158391ms)
+- 2026-11-04 14:44:35 UTC — [ticket-766] APPROVED après 1 tour(s)
+- 2026-11-04 14:47:29 UTC — [ticket-766] documentation: 0 fichier(s) (165485ms) — après tour de correction
+- 2026-11-04 15:12:10 UTC — [ide-core] ticket-766 PR #892 mergée (CI verte)
+- 2026-11-04 15:12:12 UTC — [ide-core] ticket-766 : base réalignée sur develop
+- 2026-11-04 15:12:12 UTC — [ide-core] ticket-766 PR #892 confiée au CIWatcher
+- 2026-11-04 15:12:18 UTC — [ticket-767] branche ticket-767-a-shared-resource-sends-one-request-at-a-time-and
+- 2026-11-04 15:12:19 UTC — [ticket-767] tour 1 — codeur démarré
+- 2026-11-04 15:14:31 UTC — [ticket-767] tour 1 — codeur terminé (132375ms)
+- 2026-11-04 15:17:25 UTC — [ticket-767] testeur: OK (exit 0)
+- 2026-11-04 15:19:25 UTC — [ticket-767] securite: PASS — Le diff introduit une déduplication des requêtes en vol (ticket-767) et une réte (120187ms)
+- 2026-11-04 15:19:25 UTC — [ticket-767] tour 1 — reviewer démarré
+- 2026-11-04 15:19:56 UTC — [ticket-767] tour 1 — reviewer terminé (30592ms)
+- 2026-11-04 15:22:03 UTC — [ticket-767] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le code implémente un mécanism (157952ms)
+- 2026-11-04 15:22:03 UTC — [ticket-767] APPROVED après 1 tour(s)
+- 2026-11-04 15:23:24 UTC — [ticket-767] documentation: 0 fichier(s) (72375ms)
+- 2026-11-04 16:01:43 UTC — [ide-core] ticket-756 PR #895 confiée au CIWatcher
+- 2026-11-04 16:01:48 UTC — [ticket-757] branche ticket-757-a-documentation-proof-excerpt-must-be-delivered-c
+- 2026-11-04 16:01:50 UTC — [ticket-757] tour 1 — codeur démarré
+- 2026-11-04 16:06:07 UTC — [ticket-757] tour 1 — codeur terminé (256812ms)
+- 2026-11-04 16:17:53 UTC — [ticket-756] livraison: arrêt — PR #895 non mergée : Fin de l'attente : la CI de la PR #895 n'a pas rendu de verdict. La PR reste ouverte.
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-758 retiré de la file
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-761 retiré de la file
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-768 retiré de la file
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-769 retiré de la file
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-770 retiré de la file
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-771 retiré de la file
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-773 retiré de la file
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-772 retiré de la file
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-774 retiré de la file
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-775 retiré de la file
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-776 retiré de la file
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-781 retiré de la file
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-782 retiré de la file
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-780 retiré de la file
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-783 retiré de la file
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-786 retiré de la file
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-787 retiré de la file
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-788 retiré de la file
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-789 retiré de la file
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-790 retiré de la file
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-791 retiré de la file
+- 2026-11-04 16:18:33 UTC — [ide-core] ticket-792 retiré de la file
+- 2026-11-04 16:20:41 UTC — [ticket-757] testeur: OK (exit 0)
+- 2026-11-04 16:23:08 UTC — [ticket-757] securite: PASS — Le refactoring implémente ADR-057 en corrigeant un bug où le code supprimé pouva (146812ms)
+- 2026-11-04 16:23:08 UTC — [ticket-757] tour 1 — reviewer démarré
+- 2026-11-04 16:23:30 UTC — [ticket-757] tour 1 — reviewer terminé (21266ms)
+- 2026-11-04 16:26:20 UTC — [ticket-757] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Les tests ont été ajoutés pour (191984ms)
+- 2026-11-04 16:26:20 UTC — [ticket-757] APPROVED après 1 tour(s)
+- 2026-11-04 16:27:36 UTC — [ticket-757] documentation: 0 fichier(s) (66109ms)
+- 2026-11-04 15:31:04 UTC — [ide-core] ticket-767 PR #893 mergée (CI verte)
+- 2026-11-04 15:31:11 UTC — [ide-core] ticket-767 : base réalignée sur develop
+- 2026-11-04 15:31:11 UTC — [ide-core] ticket-767 PR #893 confiée au CIWatcher
+- 2026-11-04 15:31:29 UTC — [ticket-756] branche ticket-756-link-roots-are-bounded-wherever-the-file-api-read
+- 2026-11-04 15:31:32 UTC — [ticket-756] tour 1 — codeur démarré
+- 2026-11-04 15:37:54 UTC — [ticket-756] tour 1 — codeur terminé (382703ms)
+- 2026-11-04 15:55:58 UTC — [ticket-756] testeur: OK (exit 0)
+- 2026-11-04 15:58:00 UTC — [ticket-756] securite: PASS — Symlink hardening is correctly implemented. The `is_too_broad()` check prevents  (121562ms)
+- 2026-11-04 15:58:00 UTC — [ticket-756] tour 1 — reviewer démarré
+- 2026-11-04 15:58:19 UTC — [ticket-756] tour 1 — reviewer terminé (18983ms)
+- 2026-11-04 15:59:50 UTC — [ticket-756] validateur: fichiers cités joints : aucun ; absents : Path.home()/f.txt
+- 2026-11-04 15:59:50 UTC — [ticket-756] validateur: APPROVED — Les deux critères d'acceptation sont satisfaits. Le code implémente une vérifica (110625ms)
+- 2026-11-04 15:59:50 UTC — [ticket-756] APPROVED après 1 tour(s)
+- 2026-11-04 16:01:19 UTC — [ticket-756] documentation: 0 fichier(s) (80312ms)
+- 2026-11-04 16:43:05 UTC — [ide-core] ticket-757 PR #896 confiée au CIWatcher
+- 2026-11-04 16:43:11 UTC — [ticket-793] branche ticket-793-the-retest-after-rebase-runs-only-the-backend-tes
+- 2026-11-04 16:43:12 UTC — [ticket-793] tour 1 — codeur démarré
+- 2026-11-04 16:44:53 UTC — [ticket-793] tour 1 — codeur terminé (101296ms)
+- 2026-11-04 16:55:36 UTC — [ticket-757] livraison: nouvelle tentative de la PR #896 après une erreur réseau (ConnectError: [Errno 11001] getaddrinfo failed), PR non mergée
+- 2026-11-04 16:55:36 UTC — [ticket-757] livraison: arrêt — PR #896 non mergée : tête de la PR #896 illisible (ConnectError: [Errno 11001] getaddrinfo failed) : elle reste ouverte
+- 2026-11-04 22:47:27 UTC — [ticket-793] testeur: délai dépassé, suite relancée
+- 2026-11-04 22:47:27 UTC — [ticket-793] testeur: délai dépassé (1500 s, durée réelle 21751 s) — ../scripts/verifier.py coupé après 21751 s
+- 2026-11-05 07:35:57 UTC — [ticket-793] testeur: délai dépassé (1500 s, durée réelle 31709 s) — ../scripts/verifier.py coupé après 31710 s
+- 2026-11-05 07:36:08 UTC — [ticket-793] BLOCKED — testeur: délai dépassé deux fois
+- 2026-11-05 07:36:34 UTC — [ide-core] file interrompue : ticket-793 non approuvé
+- 2026-11-05 07:38:06 UTC — [ticket-793] branche ticket-793-the-retest-after-rebase-runs-only-the-backend-tes
+- 2026-11-05 07:53:06 UTC — [ticket-793] testeur: dur�es : mypy 8 s, mypy-linux 6 s, pytest 895 s
+- 2026-11-05 07:53:06 UTC — [ticket-793] branche reprise (3 commit(s)) — tests green, codeur sauté
+- 2026-11-05 07:55:42 UTC — [ticket-793] securite: PASS — Le diff ajoute une méthode `merge_base()` et une logique pour lancer les tests i (154342ms)
+- 2026-11-05 07:55:42 UTC — [ticket-793] tour 1 — reviewer démarré
+- 2026-11-05 07:55:59 UTC — [ticket-793] tour 1 — reviewer terminé (16625ms)
+- 2026-11-05 07:59:10 UTC — [ide-core] ticket-768 retiré de la file
+- 2026-11-05 07:59:10 UTC — [ide-core] ticket-769 retiré de la file
+- 2026-11-05 07:59:10 UTC — [ide-core] ticket-791 retiré de la file
+- 2026-11-05 07:59:10 UTC — [ide-core] ticket-787 retiré de la file
+- 2026-11-05 07:59:10 UTC — [ide-core] ticket-773 retiré de la file
+- 2026-11-05 07:59:15 UTC — [ticket-793] validateur: fichiers cités joints : retest_apres_rebase.py
+- 2026-11-05 07:59:15 UTC — [ticket-793] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le code implémente correctemen (212967ms)
+- 2026-11-05 07:59:15 UTC — [ticket-793] APPROVED après 1 tour(s)
+- 2026-11-05 08:06:05 UTC — [ticket-793] documentation: 0 fichier(s) (403515ms) — après tour de correction
+- 2026-11-05 08:07:30 UTC — [ide-core] ticket-782 retiré de la file
+- 2026-11-05 08:16:50 UTC — [ide-core] ticket-792 retiré de la file
+- 2026-11-05 08:20:21 UTC — [ide-core] ticket-781 retiré de la file
+- 2026-11-05 08:20:21 UTC — [ide-core] ticket-788 retiré de la file
+- 2026-11-05 08:22:57 UTC — [ide-core] ticket-786 retiré de la file
+- 2026-11-05 08:22:57 UTC — [ide-core] ticket-789 retiré de la file
+- 2026-11-05 08:28:12 UTC — [ide-core] ticket-770 retiré de la file
+- 2026-11-05 08:28:12 UTC — [ide-core] ticket-771 retiré de la file
+- 2026-11-05 08:57:28 UTC — [ticket-793] livraison: rebase sur develop (4594ms)
+- 2026-11-05 08:57:28 UTC — [ticket-793] livraison: tests relancés après rebase : rouges (Timeout après 1500s) (3000234ms)
+- 2026-11-05 08:57:28 UTC — [ticket-793] livraison: arrêt — Tests rouges après rebase sur develop : rien n'est poussé. La base a avancé pendant le run et le tra
+- 2026-11-05 08:58:06 UTC — [ticket-758] branche ticket-758-hardening-no-token-in-access-logs-or-remote-urls
+- 2026-11-05 08:58:11 UTC — [ticket-758] tour 1 — codeur démarré
+- 2026-11-05 09:04:04 UTC — [ticket-758] tour 1 — codeur terminé (352749ms)
+- 2026-11-05 09:17:03 UTC — [ticket-758] testeur: 1 failed, 2500 passed, 64 warnings in 772.62s (0:12:52)
+- 2026-11-05 09:17:03 UTC — [ticket-758] tests rouges au tour 1
+- 2026-11-05 09:17:03 UTC — [ticket-758] tour 2 — codeur démarré
+- 2026-11-05 09:18:00 UTC — [ticket-758] tour 2 — codeur terminé (57218ms)
+- 2026-11-05 09:22:53 UTC — [ide-core] ticket-761 retiré de la file
+- 2026-11-05 09:22:53 UTC — [ide-core] ticket-772 retiré de la file
+- 2026-11-05 09:22:53 UTC — [ide-core] ticket-774 retiré de la file
+- 2026-11-05 09:22:53 UTC — [ide-core] ticket-775 retiré de la file
+- 2026-11-05 09:22:53 UTC — [ide-core] ticket-776 retiré de la file
+- 2026-11-05 09:22:53 UTC — [ide-core] ticket-780 retiré de la file
+- 2026-11-05 09:22:53 UTC — [ide-core] ticket-783 retiré de la file
+- 2026-11-05 09:22:53 UTC — [ide-core] ticket-790 retiré de la file
+- 2026-11-05 09:22:53 UTC — [ide-core] ticket-773 retiré de la file
+- 2026-11-05 09:32:21 UTC — [ticket-758] testeur: dur�es : mypy 2 s, mypy-linux 6 s, pytest 858 s
+- 2026-11-05 09:34:50 UTC — [ticket-758] securite: PASS — Le diff renforce la sécurité en redactant les tokens WebSocket des logs uvicorn, (148641ms)
+- 2026-11-05 09:34:50 UTC — [ticket-758] tour 2 — reviewer démarré
+- 2026-11-05 09:35:07 UTC — [ticket-758] tour 2 — reviewer terminé (17437ms)
+- 2026-11-05 09:38:01 UTC — [ticket-758] validateur: fichiers cités joints : git_clone.py
+- 2026-11-05 09:38:01 UTC — [ticket-758] validateur: APPROVED — Tous les critères d'acceptation sont respectés : le jeton WebSocket n'apparaît p (191219ms)
+- 2026-11-05 09:38:01 UTC — [ticket-758] APPROVED après 2 tour(s)
+- 2026-11-05 09:42:02 UTC — [ticket-758] documentation: 1 fichier(s) (232953ms)
+- 2026-11-05 09:57:06 UTC — [ide-core] ticket-758 PR #908 confiée au CIWatcher
+- 2026-11-05 09:58:18 UTC — [ticket-761] branche ticket-761-dead-code-and-stale-notes-left-by-the-30-10-refac
+- 2026-11-05 09:58:19 UTC — [ticket-761] tour 1 — codeur démarré
+- 2026-11-05 10:03:55 UTC — [ticket-761] tour 1 — codeur terminé (335358ms)
+- 2026-11-05 10:04:29 UTC — [ide-core] ticket-758 PR #908 mergée (CI verte)
+- 2026-11-05 10:07:51 UTC — [ticket-761] testeur: dur�es : mypy 5 s, mypy-linux 8 s, pytest 233 s
+- 2026-11-05 10:09:04 UTC — [ticket-761] securite: PASS — Le diff est une refactorisation mineure et sûre : suppression de code inutilisé  (73125ms)
+- 2026-11-05 10:09:04 UTC — [ticket-761] tour 1 — reviewer démarré
+- 2026-11-05 10:09:23 UTC — [ticket-761] tour 1 — reviewer terminé (18297ms)
+- 2026-11-05 10:10:48 UTC — [ticket-761] validateur: APPROVED — Les trois critères d'acceptation ont été satisfaits : le code mort a été retiré, (103093ms)
+- 2026-11-05 10:10:48 UTC — [ticket-761] APPROVED après 1 tour(s)
+- 2026-11-05 10:14:02 UTC — [ticket-761] documentation: 0 fichier(s) (187030ms) — après tour de correction
+- 2026-11-05 10:18:26 UTC — [ide-core] ticket-761 PR #909 confiée au CIWatcher
+- 2026-11-05 10:18:33 UTC — [ticket-772] branche ticket-772-design-how-tessera-keeps-its-secrets-in-the-opera
+- 2026-11-05 10:18:35 UTC — [ticket-772] tour 1 — codeur démarré
+- 2026-11-05 10:24:21 UTC — [ticket-772] tour 1 — architect terminé (346093ms)
+- 2026-11-05 10:24:38 UTC — [ticket-772] testeur: OK (exit 0)
+- 2026-11-05 10:25:30 UTC — [ticket-761] livraison: arrêt — PR #909 non mergée : CI failing : la PR #909 reste ouverte.
+- 2026-11-05 10:26:01 UTC — [ticket-772] securite: PASS — Ce diff ajoute un document de conception et des règles pour un système de gestio (82750ms)
+- 2026-11-05 10:26:01 UTC — [ticket-772] tour 1 — reviewer démarré
+- 2026-11-05 10:26:23 UTC — [ticket-772] tour 1 — reviewer terminé (22750ms)
+- 2026-11-05 10:31:01 UTC — [ticket-772] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-05 10:31:47 UTC — [ticket-772] validateur: fichiers cités joints : projects/ide-core/memory/decisions.md (tronqué) ; non joints (budget épuisé) : contraintes.md, projects/ide-core/tickets/todo/
+- 2026-11-05 10:31:47 UTC — [ticket-772] validateur: APPROVED — Le ticket 772 satisfait intégralement son cahier des charges : une ADR-073 compl (346156ms)
+- 2026-11-05 10:31:47 UTC — [ticket-772] APPROVED après 1 tour(s)
+- 2026-11-05 10:31:55 UTC — [ticket-772] fichiers non suivis laissés par le run : tickets/todo/ticket-794-a-coffre-module-reads-and-writes-secrets-in-the-system-vault.md, tickets/todo/ticket-795-settings-reads-its-secrets-from-the-vault-and-refuses-to-start-without-it.md, tickets/todo/ticket-796-every-vault-secret-is-masked-in-logs-and-blanked-for-subprocesses.md, tickets/todo/ticket-797-a-command-moves-the-dotenv-secrets-into-the-vault-without-writing-them-in-clear.md, tickets/todo/ticket-798-the-pre-push-hook-and-the-history-scan-read-the-forbidden-terms-through-the-backend.md, tickets/todo/ticket-799-the-read-guard-refuses-bash-commands-that-run-the-vault.md, tickets/todo/ticket-800-doctor-health-env-example-and-docker-describe-where-the-secrets-live.md (à ignorer dans .gitignore ?)
+- 2026-11-05 10:36:51 UTC — [ticket-772] documentation: 1 fichier(s) (295844ms) — après tour de correction
+- 2026-11-05 10:53:23 UTC — [ticket-775] branche ticket-775-design-a-per-project-lessons-memory-fed-by-correc
+- 2026-11-05 10:53:24 UTC — [ticket-775] tour 1 — codeur démarré
+- 2026-11-05 10:56:28 UTC — [ticket-775] tour 1 — architect terminé (183563ms)
+- 2026-11-05 10:56:56 UTC — [ticket-775] testeur: OK (exit 0)
+- 2026-11-05 10:58:17 UTC — [ticket-775] securite: PASS — Le diff ajoute uniquement de la documentation (ADR-074 et contrainte proposée) s (80702ms)
+- 2026-11-05 10:58:17 UTC — [ticket-775] tour 1 — reviewer démarré
+- 2026-11-05 10:58:17 UTC — [ticket-775] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-11-05 10:58:43 UTC — [ticket-775] tour 1 — reviewer terminé (25891ms)
+- 2026-11-05 10:58:45 UTC — [ticket-775] validateur: fichiers cités joints : projects/ide-core/memory/decisions.md (tronqué) ; non joints (budget épuisé) : projects/ide-core/tickets/todo/
+- 2026-11-05 10:58:45 UTC — [ticket-775] validateur: APPROVED — Le design ADR-074 est complet et couvre rigoureusement l'architecture d'une mémo (27608ms)
+- 2026-11-05 10:58:45 UTC — [ticket-775] APPROVED après 1 tour(s)
+- 2026-11-05 10:58:53 UTC — [ticket-775] fichiers non suivis laissés par le run : tickets/todo/ticket-801-a-lessons-module-parses-and-checks-the-project-lessons-file.md, tickets/todo/ticket-802-the-in-force-lessons-reach-the-coder-and-the-reviewer-only.md, tickets/todo/ticket-803-an-approved-run-that-had-a-corrected-failure-proposes-one-lesson.md, tickets/todo/ticket-804-a-run-diff-that-touches-the-lessons-file-blocks-the-run.md (à ignorer dans .gitignore ?)
+- 2026-11-05 11:02:18 UTC — [ticket-775] documentation: 1 fichier(s) (204875ms)
+- 2026-11-05 11:02:42 UTC — [ide-core] ticket-775 PR #912 confiée au CIWatcher
+- 2026-11-05 11:02:49 UTC — [ticket-776] branche ticket-776-design-the-backend-services-folder-grouped-by-dom
+- 2026-11-05 11:02:50 UTC — [ticket-776] tour 1 — codeur démarré
+- 2026-11-05 11:09:33 UTC — [ide-core] ticket-775 PR #912 mergée (CI verte)
+- 2026-11-05 11:11:47 UTC — [ticket-776] tour 1 — architect terminé (536516ms)
+- 2026-11-05 11:11:58 UTC — [ticket-776] testeur: OK (exit 0)
+- 2026-11-05 11:12:27 UTC — [ticket-776] securite: PASS — Ce diff ajoute une documentation architecturale (ADR-074) et un plan de refactor (29250ms)
+- 2026-11-05 11:12:27 UTC — [ticket-776] tour 1 — reviewer démarré
+- 2026-11-05 11:12:55 UTC — [ticket-776] tour 1 — reviewer terminé (28061ms)
+- 2026-11-05 11:17:27 UTC — [ticket-776] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-05 11:17:55 UTC — [ticket-776] validateur: fichiers cités joints : projects/ide-core/memory/decisions.md (tronqué) ; non joints (budget épuisé) : projects/ide-core/tickets/todo/
+- 2026-11-05 11:17:55 UTC — [ticket-776] validateur: APPROVED — Le ticket a produit ADR-074 avec la liste complète des 207 modules organisés en  (327953ms)
+- 2026-11-05 11:17:55 UTC — [ticket-776] APPROVED après 1 tour(s)
+- 2026-11-05 11:18:03 UTC — [ticket-776] fichiers non suivis laissés par le run : tickets/todo/ticket-801-the-architecture-test-knows-the-services-domains.md, tickets/todo/ticket-802-a-script-moves-one-services-domain-and-rewrites-its-references.md, tickets/todo/ticket-803-the-supervision-modules-move-to-services-supervision.md, tickets/todo/ticket-804-the-documentation-modules-move-to-services-documentation.md, tickets/todo/ticket-805-the-queue-modules-move-to-services-file.md, tickets/todo/ticket-806-the-verdict-modules-move-to-services-verdicts.md, tickets/todo/ticket-807-the-agent-modules-move-to-services-agents.md, tickets/todo/ticket-808-the-project-creation-modules-move-to-services-creation-projet.md, tickets/todo/ticket-809-the-verification-modules-move-to-services-verification.md, tickets/todo/ticket-810-the-github-modules-move-to-services-github-and-agents-package-goes.md et 9 autres (à ignorer dans .gitignore ?)
+- 2026-11-05 11:18:49 UTC — [ticket-776] documentation: 0 fichier(s) (46297ms)
+- 2026-11-05 11:19:05 UTC — renumérotation : ticket-801 → ticket-820 (numéro déjà pris sur origin/develop)
+- 2026-11-05 11:19:05 UTC — renumérotation : ticket-802 → ticket-821 (numéro déjà pris sur origin/develop)
+- 2026-11-05 11:19:05 UTC — renumérotation : ticket-803 → ticket-822 (numéro déjà pris sur origin/develop)
+- 2026-11-05 11:19:05 UTC — renumérotation : ticket-804 → ticket-823 (numéro déjà pris sur origin/develop)
+- 2026-11-05 11:19:05 UTC — renumérotation : ADR-074 → ADR-075 (numéro déjà pris sur origin/develop)
+- 2026-11-05 11:20:19 UTC — [ide-core] ticket-776 PR #913 non surveillée (livraison arrêtée)
+- 2026-11-05 11:20:24 UTC — [ticket-780] branche ticket-780-design-global-settings-that-can-be-changed-from-t
+- 2026-11-05 11:20:25 UTC — [ticket-780] tour 1 — codeur démarré
+- 2026-11-05 11:25:31 UTC — [ticket-780] tour 1 — architect terminé (305421ms)
+- 2026-11-05 11:25:43 UTC — [ticket-780] testeur: OK (exit 0)
+- 2026-11-05 11:28:41 UTC — [ticket-780] securite: PASS — Ce diff ajoute une spécification et des contraintes proposées (non injectées aux (178327ms)
+- 2026-11-05 11:28:41 UTC — [ticket-780] tour 1 — reviewer démarré
+- 2026-11-05 11:29:03 UTC — [ticket-780] tour 1 — reviewer terminé (21592ms)
+- 2026-11-05 11:33:41 UTC — [ticket-780] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-05 11:34:10 UTC — [ticket-780] validateur: fichiers cités joints : projects/ide-core/memory/decisions.md (tronqué) ; non joints (budget épuisé) : contraintes.md, projects/ide-core/tickets/todo/
+- 2026-11-05 11:34:10 UTC — [ticket-780] validateur: APPROVED — Le design de ticket-780 est complet. ADR-075 créée avec ses deux règles en contr (328094ms)
+- 2026-11-05 11:34:10 UTC — [ticket-780] APPROVED après 1 tour(s)
+- 2026-11-05 11:34:17 UTC — [ticket-780] fichiers non suivis laissés par le run : tickets/todo/ticket-805-a-reglages-module-stores-five-overridable-settings.md, tickets/todo/ticket-806-a-run-keeps-the-budgets-and-the-dialogue-delay-it-opened-with.md, tickets/todo/ticket-807-the-test-limit-and-the-stay-awake-setting-are-read-when-used.md, tickets/todo/ticket-808-a-route-reads-and-writes-the-settings-from-a-declared-origin-only.md, tickets/todo/ticket-809-the-bash-guard-refuses-network-commands-that-name-the-settings-route.md, tickets/todo/ticket-810-a-gear-button-at-the-foot-of-the-rail-opens-the-settings.md (à ignorer dans .gitignore ?)
+- 2026-11-05 11:35:07 UTC — [ticket-780] documentation: 0 fichier(s) (49983ms)
+- 2026-11-05 11:44:34 UTC — [ticket-790] branche ticket-790-a-registry-records-which-external-tools-our-promp
+- 2026-11-05 11:44:35 UTC — [ticket-790] tour 1 — codeur démarré
+- 2026-11-05 11:46:33 UTC — [ticket-790] tour 1 — codeur terminé (117500ms)
+- 2026-11-05 11:47:01 UTC — [ticket-790] testeur: dur�es : pytest 15 s, mypy 16 s, mypy-linux 9 s
+- 2026-11-05 11:49:07 UTC — [ticket-790] securite: PASS — Audit du diff ticket-790 : enregistrement des inspirations externes. Aucune vuln (125890ms)
+- 2026-11-05 11:49:07 UTC — [ticket-790] tour 1 — reviewer démarré
+- 2026-11-05 11:49:44 UTC — [ticket-790] tour 1 — reviewer terminé (37016ms)
+- 2026-11-05 11:53:08 UTC — [ticket-790] validateur: fichiers cités joints : docs/inspirations.md, agents/plugin/skills/design-ui/SKILL.md, agents/prompts/doc-fonctionnelle.md, projects/ide-core/memory/decisions.md (tronqué) ; absents : blader/humanizer, pbakaus/impeccable
+- 2026-11-05 11:53:08 UTC — [ticket-790] validateur: APPROVED — Tous les critères d'acceptation ont été respectés. Le registre des inspirations  (240625ms)
+- 2026-11-05 11:53:08 UTC — [ticket-790] APPROVED après 1 tour(s)
+- 2026-11-05 11:57:07 UTC — [ticket-790] documentation: 0 fichier(s) (230969ms) — après tour de correction
+- 2026-11-05 13:59:05 UTC — [ticket-830] branche ticket-830-decisions-md-keeps-only-the-adrs-that-still-groun
+- 2026-11-05 13:59:06 UTC — [ticket-830] tour 1 — codeur démarré
+- 2026-11-05 14:12:43 UTC — [ticket-830] tour 1 — codeur terminé (816266ms)
+- 2026-11-05 14:14:10 UTC — [ticket-830] testeur: dur�es : pytest 32 s, mypy 44 s, mypy-linux 33 s
+- 2026-11-05 14:15:24 UTC — [ticket-830] securite: PASS — Ticket-830 archives uncited ADRs from decisions.md to decisions-archive.md and a (73655ms)
+- 2026-11-05 14:15:24 UTC — [ticket-830] tour 1 — reviewer démarré
+- 2026-11-05 14:16:10 UTC — [ticket-830] tour 1 — reviewer terminé (46187ms)
+- 2026-11-05 14:20:26 UTC — [ticket-830] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-05 14:22:06 UTC — [ticket-830] validateur: fichiers cités joints : backend/tests/test_consignes_coherentes.py (tronqué) ; non joints (budget épuisé) : projects/ide-core/memory/decisions.md, contraintes.md, CLAUDE.md, projects/ide-core/CLAUDE.md, projects/ide-core/memory/decisions-archive.md
+- 2026-11-05 14:22:06 UTC — [ticket-830] validateur: CHANGES_REQUESTED — Trois critères sur quatre sont satisfaits. Les ADR non-citées ont bien été archi (401217ms)
+- 2026-11-05 14:22:06 UTC — [ticket-830] CHANGES_REQUESTED tour 1: Validateur : Trois critères sur quatre sont satisfaits. Les ADR non-citées ont bien été archivées dans `decisions-archive.md`, les tests de vérification passent, et les nouveaux tests de cohérence ont
+- 2026-11-05 14:22:06 UTC — [ticket-830] tour 2 — codeur démarré
+- 2026-11-05 14:24:18 UTC — [ticket-830] tour 2 — codeur terminé (131811ms)
+- 2026-11-05 14:24:45 UTC — [ticket-830] testeur: dur�es : mypy 7 s, mypy-linux 8 s, pytest 23 s
+- 2026-11-05 14:25:30 UTC — [ticket-830] securite: PASS — Ticket-830 ajoute des tests de validation pour l'archivage des ADR et réorganise (45157ms)
+- 2026-11-05 14:25:30 UTC — [ticket-830] tour 2 — reviewer démarré
+- 2026-11-05 14:25:30 UTC — [ticket-830] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-11-05 14:25:56 UTC — [ticket-830] tour 2 — reviewer terminé (25563ms)
+- 2026-11-05 14:26:25 UTC — [ticket-830] validateur: fichiers cités joints : backend/tests/test_consignes_coherentes.py (tronqué) ; non joints (budget épuisé) : projects/ide-core/memory/decisions.md, contraintes.md, CLAUDE.md, projects/ide-core/CLAUDE.md, projects/ide-core/memory/decisions-archive.md
+- 2026-11-05 14:26:25 UTC — [ticket-830] validateur: APPROVED — Tous les critères sont satisfaits. Les 13 ADR non citées ont bien été archivées  (54827ms)
+- 2026-11-05 14:26:25 UTC — [ticket-830] APPROVED après 2 tour(s)
+- 2026-11-05 14:31:18 UTC — [ticket-830] documentation: 1 fichier(s) (285983ms) — après tour de correction
+- 2026-11-05 14:32:23 UTC — [ide-core] ticket-830 PR #923 confiée au CIWatcher
+- 2026-11-05 14:32:28 UTC — [ticket-805] branche ticket-805-a-reglages-module-stores-five-overridable-setting
+- 2026-11-05 14:32:30 UTC — [ticket-805] tour 1 — codeur démarré
+- 2026-11-05 14:36:50 UTC — [ticket-805] tour 1 — codeur terminé (259766ms)
+- 2026-11-05 14:40:30 UTC — [ticket-805] testeur: dur�es : mypy 11 s, mypy-linux 12 s, pytest 216 s
+- 2026-11-05 14:42:57 UTC — [ticket-805] securite: PASS — Ticket-805 introduces a secure settings registry for five configurable parameter (147233ms)
+- 2026-11-05 14:42:57 UTC — [ticket-805] tour 1 — reviewer démarré
+- 2026-11-05 14:43:16 UTC — [ticket-805] tour 1 — reviewer terminé (18577ms)
+- 2026-11-05 14:46:54 UTC — [ticket-805] validateur: fichiers cités joints : reglages.py ; absents : services/
+- 2026-11-05 14:46:54 UTC — [ticket-805] validateur: APPROVED — Tous les critères d'acceptation sont respectés : les tests passent, le fichier r (237156ms)
+- 2026-11-05 14:46:54 UTC — [ticket-805] APPROVED après 1 tour(s)
+- 2026-11-05 14:54:31 UTC — [ticket-805] documentation: 0 fichier(s) (445687ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « jeton vérifiable » — guillemets « quand ... , ... » n'est ni dans le texte remplacé, ni dans les tickets, le diff
+- 2026-11-05 15:06:54 UTC — [ide-core] ticket-805 : base réalignée sur develop
+- 2026-11-05 15:06:54 UTC — [ide-core] ticket-805 PR #924 confiée au CIWatcher
+- 2026-11-05 14:39:48 UTC — [ide-core] ticket-830 PR #923 mergée (CI verte)
+- 2026-11-05 15:06:48 UTC — [ide-core] ticket-805 PR #924 mergée (CI verte)
+- 2026-11-05 15:07:11 UTC — [ticket-806] branche ticket-806-a-run-keeps-the-budgets-and-the-dialogue-delay-it
+- 2026-11-05 15:07:14 UTC — [ticket-806] tour 1 — codeur démarré
+- 2026-11-05 15:11:01 UTC — [ticket-806] tour 1 — codeur terminé (226983ms)
+- 2026-11-05 15:13:02 UTC — [ticket-806] testeur: 1 failed, 395 passed in 115.60s (0:01:55)
+- 2026-11-05 15:13:02 UTC — [ticket-806] tests rouges au tour 1
+- 2026-11-05 15:13:02 UTC — [ticket-806] tour 2 — codeur démarré
+- 2026-11-05 15:14:23 UTC — [ticket-806] tour 2 — codeur terminé (81406ms)
+- 2026-11-05 15:15:54 UTC — [ide-core] ticket-807 retiré de la file
+- 2026-11-05 15:15:54 UTC — [ide-core] ticket-808 retiré de la file
+- 2026-11-05 15:15:54 UTC — [ide-core] ticket-809 retiré de la file
+- 2026-11-05 15:15:54 UTC — [ide-core] ticket-810 retiré de la file
+- 2026-11-05 15:17:28 UTC — [ticket-806] testeur: dur�es : mypy 6 s, mypy-linux 9 s, pytest 182 s
+- 2026-11-05 15:20:38 UTC — [ticket-806] securite: PASS — Ticket-806 (ADR-075) implémente correctement le figement des réglages d'un run : (189375ms)
+- 2026-11-05 15:20:38 UTC — [ticket-806] tour 2 — reviewer démarré
+- 2026-11-05 15:21:04 UTC — [ticket-806] tour 2 — reviewer terminé (26078ms)
+- 2026-11-05 15:24:15 UTC — [ticket-806] validateur: fichiers cités joints : reglages.py, config.py (tronqué)
+- 2026-11-05 15:24:15 UTC — [ticket-806] validateur: APPROVED — Les deux critères d'acceptation sont satisfaits. Les tests existants passent, y  (217436ms)
+- 2026-11-05 15:24:15 UTC — [ticket-806] APPROVED après 2 tour(s)
+- 2026-11-05 15:30:14 UTC — [ticket-806] documentation: 3 fichier(s) (348938ms) — après tour de correction
+- 2026-11-05 15:35:13 UTC — [ticket-806] livraison: rebase sur develop (1203ms)
+- 2026-11-05 15:35:13 UTC — [ticket-806] livraison: tests relancés après rebase : rouges (FAILED tests/test_longueur_des_fichiers.py::test_backend_files_respect_their_ceilings !!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!! !!!!!!!!!!!! xdist.dsession.Interrupted: stopping after 1 failures !!!!!!!!!!!! 1 failed, 752 passed in 140.09s (0:02:20) dur�es : myp) (282578ms)
+- 2026-11-05 15:35:13 UTC — [ticket-806] livraison: branche remise sur 5d0654f (0ms)
+- 2026-11-05 15:35:13 UTC — [ticket-806] livraison: arrêt — Tests rouges après rebase sur develop : rien n'est poussé. La base a avancé pendant le run et le tra
+- 2026-11-05 15:40:25 UTC — [ticket-806] livraison: rebase sur develop (1532ms)
+- 2026-11-05 15:40:25 UTC — [ticket-806] livraison: tests relancés après rebase : rouges (FAILED tests/test_longueur_des_fichiers.py::test_backend_files_respect_their_ceilings !!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!! !!!!!!!!!!!! xdist.dsession.Interrupted: stopping after 1 failures !!!!!!!!!!!! 1 failed, 753 passed in 142.49s (0:02:22) dur�es : myp) (301218ms)
+- 2026-11-05 15:40:25 UTC — [ticket-806] livraison: branche remise sur 1aa4376 (0ms)
+- 2026-11-05 15:40:25 UTC — [ticket-806] livraison: arrêt — Tests rouges après rebase sur develop : rien n'est poussé. La base a avancé pendant le run et le tra
+- 2026-11-05 16:18:11 UTC — [ide-core] file interrompue : Ticket introuvable : ticket-847
+- 2026-11-05 17:29:32 UTC — [ticket-847] branche ticket-847-design-tessera-supervising-itself-without-an-ide
+- 2026-11-05 17:29:33 UTC — [ticket-847] tour 1 — codeur démarré
+- 2026-11-05 17:36:47 UTC — [ticket-847] tour 1 — architect terminé (433891ms)
+- 2026-11-05 17:36:59 UTC — [ticket-847] testeur: OK (exit 0)
+- 2026-11-05 17:39:21 UTC — [ticket-847] securite: PASS — Ce diff est une spécification d'architecture (ADR-080, sans code exécutable) pou (142358ms)
+- 2026-11-05 17:39:21 UTC — [ticket-847] tour 1 — reviewer démarré
+- 2026-11-05 17:39:59 UTC — [ticket-847] tour 1 — reviewer terminé (37594ms)
+- 2026-11-05 17:44:21 UTC — [ticket-847] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-05 17:45:13 UTC — [ticket-847] validateur: fichiers cités joints : projects/ide-core/memory/decisions.md (tronqué) ; non joints (budget épuisé) : projects/ide-core/memory/contraintes.md, projects/ide-core/tickets/todo/
+- 2026-11-05 17:45:13 UTC — [ticket-847] validateur: APPROVED — Ticket de conception pure : une ADR-080 qui gouverne le superviseur interne, hui (351842ms)
+- 2026-11-05 17:45:13 UTC — [ticket-847] CHANGES_REQUESTED tour 1: Reviewer : 1. ticket-864 s'appuie sur l'outil `signaler` de ticket-863. Il borne cet outil à 5 signalements par revue, et son test `test_professional_project_review_emits_no_report` vérifie qu'une rev
+- 2026-11-05 17:45:13 UTC — [ticket-847] tour 2 — codeur démarré
+- 2026-11-05 17:45:26 UTC — [ticket-847] tour 2 — architect terminé (12484ms)
+- 2026-11-05 17:47:33 UTC — [ticket-847] testeur: OK (exit 0)
+- 2026-11-05 17:50:21 UTC — [ticket-847] securite: PASS — Ce diff ajoute une spécification de conception (ADR-080) pour un superviseur Tes (167375ms)
+- 2026-11-05 17:50:21 UTC — [ticket-847] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : serveur 'http://127.0.0.1:11434' en refroidissement
+- 2026-11-05 17:50:21 UTC — [ticket-847] tour 2 — reviewer démarré
+- 2026-11-05 17:50:31 UTC — [ticket-847] tour 2 — reviewer terminé (9295ms)
+- 2026-11-05 17:51:02 UTC — [ticket-847] validateur: fichiers cités joints : projects/ide-core/memory/decisions.md (tronqué) ; non joints (budget épuisé) : projects/ide-core/memory/contraintes.md, projects/ide-core/tickets/todo/
+- 2026-11-05 17:51:02 UTC — [ticket-847] validateur: APPROVED — Ticket de conception validé. ADR-080 fixe le superviseur sur quatre actions ferm (40813ms)
+- 2026-11-05 17:51:02 UTC — [ticket-847] APPROVED après 2 tour(s)
+- 2026-11-05 17:51:09 UTC — [ticket-847] fichiers non suivis laissés par le run : tickets/todo/ticket-848-prochain-numero-reserves-the-number-it-returns.md, tickets/todo/ticket-849-a-queue-refuses-tickets-absent-from-origin-base-before-it-opens.md, tickets/todo/ticket-850-the-registry-says-when-a-queue-holds-a-project-between-two-tickets.md, tickets/todo/ticket-851-a-module-holds-the-supervisor-closed-action-registry-and-its-guards.md, tickets/todo/ticket-852-the-supervisor-role-config-and-prompt-exist.md, tickets/todo/ticket-853-the-supervision-journal-is-written-by-the-service-only.md, tickets/todo/ticket-854-a-supervision-intervention-is-a-run-with-one-commit-per-action.md, tickets/todo/ticket-855-the-supervisor-turns-a-raw-report-into-a-ticket-in-place.md, tickets/todo/ticket-856-the-supervisor-decides-a-delegated-lesson-or-rule.md, tickets/todo/ticket-857-the-supervisor-hands-an-unwatched-green-pr-back-to-ciwatcher.md et 8 autres (à ignorer dans .gitignore ?)
+- 2026-11-05 17:55:25 UTC — [ticket-847] documentation: 2 fichier(s) (256358ms) — après tour de correction — refusé : doc-technique : description refusée — agents.json : règle « preuve » — l'extrait « def lire_lecons(memory_dir: Path) -> Lecons: » (backend/src/tessera/services/
+- 2026-11-05 17:56:35 UTC — [ide-core] ticket-847 PR #932 confiée au CIWatcher
+- 2026-11-05 18:03:58 UTC — [ide-core] ticket-847 PR #932 mergée (CI verte)
+- 2026-11-05 18:08:07 UTC — [ticket-848] branche ticket-848-prochain-numero-reserves-the-number-it-returns
+- 2026-11-05 18:08:10 UTC — [ticket-848] tour 1 — codeur démarré
+- 2026-11-05 18:12:25 UTC — [ticket-848] tour 1 — codeur terminé (255469ms)
+- 2026-11-05 18:21:17 UTC — [ticket-848] testeur: 1 failed, 1915 passed, 71 warnings in 527.13s (0:08:47)
+- 2026-11-05 18:21:17 UTC — [ticket-848] tests rouges au tour 1
+- 2026-11-05 18:21:17 UTC — [ticket-848] tour 2 — codeur démarré
+- 2026-11-05 18:22:40 UTC — [ticket-848] tour 2 — codeur terminé (82265ms)
+- 2026-11-05 18:31:19 UTC — [ticket-848] testeur: 1 failed, 1915 passed, 64 warnings in 514.74s (0:08:34)
+- 2026-11-05 18:31:19 UTC — [ticket-848] tests rouges au tour 2
+- 2026-11-05 18:31:19 UTC — [ticket-848] tour 3 — codeur démarré
+- 2026-11-05 18:33:18 UTC — [ticket-848] tour 3 — codeur terminé (119218ms)
+- 2026-11-05 18:46:35 UTC — [ticket-848] testeur: dur�es : mypy 2 s, mypy-linux 2 s, pytest 794 s
+- 2026-11-05 18:48:23 UTC — [ticket-848] securite: PASS — Ticket-848 introduit une réservation de numéros atomique et partagée entre workt (108077ms)
+- 2026-11-05 18:48:23 UTC — [ticket-848] tour 3 — reviewer démarré
+- 2026-11-05 18:48:47 UTC — [ticket-848] tour 3 — reviewer terminé (24250ms)
+- 2026-11-05 18:50:12 UTC — [ticket-848] validateur: APPROVED — Les quatre critères d'acceptation sont satisfaits. Le code implémente correcteme (109561ms)
+- 2026-11-05 18:50:12 UTC — [ticket-848] APPROVED après 3 tour(s)
+- 2026-11-05 18:51:26 UTC — [ticket-848] leçons: rien à retenir
+- 2026-11-05 18:57:10 UTC — [ticket-848] documentation: 3 fichier(s) (335906ms)
+- 2026-11-05 19:23:01 UTC — [ticket-848] livraison: rebase sur develop (17329ms)
+- 2026-11-05 19:23:01 UTC — [ticket-848] livraison: conflit résolu : backend/tests/test_prochain_numero.py (0ms)
+- 2026-11-05 19:23:01 UTC — [ticket-848] livraison: tests relancés après rebase : rouges (FAILED tests/test_ruff_propre.py::test_ruff_check_passes_on_src_and_tests - A... !!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!! !!!!!!!!!!!! xdist.dsession.Interrupted: stopping after 1 failures !!!!!!!!!!!! 1 failed, 4306 passed, 64 warnings in 776.66s (0:12:56) ruf) (1520703ms)
+- 2026-11-05 19:23:01 UTC — [ticket-848] livraison: branche remise sur 17dacf1 ; résolution de conflit abandonnée (0ms)
+- 2026-11-05 19:23:01 UTC — [ticket-848] livraison: arrêt — Tests rouges après rebase sur develop : rien n'est poussé. La base a avancé pendant le run et le tra
+- 2026-11-05 19:23:03 UTC — [ide-core] file interrompue : ticket-848 n'a pas été livré
+- 2026-11-05 19:27:02 UTC — [ticket-849] branche ticket-849-a-queue-refuses-tickets-absent-from-origin-base-b
+- 2026-11-05 19:27:03 UTC — [ticket-849] tour 1 — codeur démarré
+- 2026-11-05 19:33:23 UTC — [ticket-849] tour 1 — codeur terminé (380467ms)
+- 2026-11-05 19:33:48 UTC — [ticket-849] testeur: dur�es : ruff 0 s, pytest 21 s
+- 2026-11-05 19:33:48 UTC — [ticket-849] tests rouges au tour 1
+- 2026-11-05 19:33:48 UTC — [ticket-849] tour 2 — codeur démarré
+- 2026-11-05 19:34:31 UTC — [ticket-849] tour 2 — codeur terminé (42688ms)
+- 2026-11-05 19:35:19 UTC — [ticket-849] testeur: dur�es : ruff 0 s, pytest 20 s, mypy 23 s, mypy-linux 21 s
+- 2026-11-05 19:37:43 UTC — [ticket-849] securite: PASS — Audit ticket-849 : aucune vulnérabilité introduite. Le contrôle refus_avant_ouve (144547ms)
+- 2026-11-05 19:37:43 UTC — [ticket-849] tour 2 — reviewer démarré
+- 2026-11-05 19:38:09 UTC — [ticket-849] tour 2 — reviewer terminé (25452ms)
+- 2026-11-05 19:40:13 UTC — [ticket-849] validateur: APPROVED — Tous les critères d'acceptation ont été satisfaits. Le code implémente le contrô (149188ms)
+- 2026-11-05 19:40:13 UTC — [ticket-849] APPROVED après 2 tour(s)
+- 2026-11-05 19:40:41 UTC — [ticket-849] leçons: rien à retenir
+- 2026-11-05 19:48:15 UTC — [ticket-849] documentation: 2 fichier(s) (445813ms) — après tour de correction
+- 2026-11-05 19:49:02 UTC — [ide-core] ticket-849 PR #936 confiée au CIWatcher
+- 2026-11-05 19:49:10 UTC — [ticket-850] branche ticket-850-the-registry-says-when-a-queue-holds-a-project-be
+- 2026-11-05 19:49:11 UTC — [ticket-850] tour 1 — codeur démarré
+- 2026-11-05 19:50:47 UTC — [ticket-850] tour 1 — codeur terminé (95343ms)
+- 2026-11-05 19:53:36 UTC — [ticket-850] testeur: dur�es : ruff 0 s, mypy 6 s, mypy-linux 7 s, pytest 165 s
+- 2026-11-05 19:54:46 UTC — [ticket-850] securite: PASS — Le diff ajoute une méthode interne `projet_tenu_par_file()` au registry avec tes (70187ms)
+- 2026-11-05 19:54:46 UTC — [ticket-850] tour 1 — reviewer démarré
+- 2026-11-05 19:55:09 UTC — [ticket-850] tour 1 — reviewer terminé (23016ms)
+- 2026-11-05 19:56:36 UTC — [ticket-850] validateur: APPROVED — Tous les tests critiques sont passés et l'implémentation de `RunRegistry.projet_ (109907ms)
+- 2026-11-05 19:56:36 UTC — [ticket-850] APPROVED après 1 tour(s)
+- 2026-11-05 19:58:15 UTC — [ticket-850] documentation: 0 fichier(s) (91375ms)
+- 2026-11-05 20:20:49 UTC — [ide-core] ticket-850 : base réalignée sur develop
+- 2026-11-05 20:20:49 UTC — [ide-core] ticket-850 PR #937 confiée au CIWatcher
+- 2026-11-05 20:04:07 UTC — [ticket-849] livraison: arrêt — PR #936 non mergée : CI failing : la PR #936 reste ouverte.
+- 2026-11-05 20:20:44 UTC — [ide-core] ticket-850 PR #937 mergée (CI verte)
+- 2026-11-05 20:20:54 UTC — [ticket-851] branche ticket-851-a-module-holds-the-supervisor-closed-action-regis
+- 2026-11-05 20:20:56 UTC — [ticket-851] tour 1 — codeur démarré
+- 2026-11-05 20:24:03 UTC — [ticket-851] tour 1 — codeur terminé (187297ms)
+- 2026-11-05 20:24:15 UTC — [ticket-851] testeur: dur�es : ruff 0 s, mypy 3 s, mypy-linux 2 s, pytest 9 s
+- 2026-11-05 20:25:52 UTC — [ticket-851] securite: PASS — Le ticket-851 introduit un service pur de validation des actions du superviseur  (96218ms)
+- 2026-11-05 20:25:52 UTC — [ticket-851] tour 1 — reviewer démarré
+- 2026-11-05 20:26:37 UTC — [ticket-851] tour 1 — reviewer terminé (44983ms)
+- 2026-11-05 20:27:48 UTC — [ticket-851] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (116500ms)
+- 2026-11-05 20:27:48 UTC — [ticket-851] APPROVED après 1 tour(s)
+- 2026-11-05 20:28:41 UTC — [ticket-851] documentation: 0 fichier(s) (43875ms)
+- 2026-11-05 20:45:41 UTC — [ide-core] ticket-852 sauté : dépend de ticket-851, non mergé
+- 2026-11-05 20:45:41 UTC — [ide-core] ticket-853 sauté : dépend de ticket-851, non mergé
+- 2026-11-05 20:45:41 UTC — [ide-core] ticket-857 sauté : dépend de ticket-851, non mergé
+- 2026-11-05 20:45:41 UTC — [ide-core] ticket-854 sauté : dépend de ticket-853, sauté
+- 2026-11-05 20:45:41 UTC — [ide-core] ticket-858 sauté : dépend de ticket-851, non mergé
+- 2026-11-05 20:45:41 UTC — [ide-core] ticket-860 sauté : dépend de ticket-853, sauté
+- 2026-11-05 20:45:41 UTC — [ide-core] ticket-855 sauté : dépend de ticket-851, non mergé
+- 2026-11-05 20:45:41 UTC — [ide-core] ticket-856 sauté : dépend de ticket-851, non mergé
+- 2026-11-05 20:45:41 UTC — [ide-core] ticket-861 sauté : dépend de ticket-860, sauté
+- 2026-11-05 20:45:41 UTC — [ide-core] ticket-859 sauté : dépend de ticket-855, sauté
+- 2026-11-05 20:45:41 UTC — [ide-core] ticket-851 PR #939 confiée au CIWatcher
+- 2026-11-05 20:45:41 UTC — [ticket-851] livraison: arrêt — PR #939 non mergée : Fin de l'attente : la CI de la PR #939 n'a pas rendu de verdict. La PR reste ouverte.
+- 2026-11-05 20:45:50 UTC — [ticket-862] branche ticket-862-an-agent-report-is-checked-bounded-and-deduplicat
+- 2026-11-05 20:45:51 UTC — [ticket-862] tour 1 — codeur démarré
+- 2026-11-05 20:48:23 UTC — [ticket-862] tour 1 — codeur terminé (151766ms)
+- 2026-11-05 20:48:37 UTC — [ticket-862] testeur: dur�es : ruff 0 s, mypy 4 s, mypy-linux 4 s, pytest 9 s
+- 2026-11-05 20:52:14 UTC — [ticket-862] securite: PASS — Ticket-862 introduces secure validation and ledger management for agent signaler (216516ms)
+- 2026-11-05 20:52:14 UTC — [ticket-862] tour 1 — reviewer démarré
+- 2026-11-05 20:52:36 UTC — [ticket-862] tour 1 — reviewer terminé (22109ms)
+- 2026-11-05 20:54:20 UTC — [ticket-862] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (126141ms)
+- 2026-11-05 20:54:20 UTC — [ticket-862] CHANGES_REQUESTED tour 1: Reviewer : 1. Le contrôle de confidentialité peut être contourné. `_refus_de_confidentialite` passe `"+" + a_plat` à `TermesInterditsService.verifier`. Or `verifier` (termes_interdits.py:146-151) pren
+- 2026-11-05 20:54:20 UTC — [ticket-862] tour 2 — codeur démarré
+- 2026-11-05 20:55:10 UTC — [ticket-862] tour 2 — codeur terminé (49811ms)
+- 2026-11-05 20:55:30 UTC — [ticket-862] testeur: dur�es : ruff 0 s, mypy 8 s, mypy-linux 7 s, pytest 15 s
+- 2026-11-05 20:58:33 UTC — [ticket-862] securite: PASS — Pure validation logic for agent signal calls (ticket-862, ADR-080): correctly ha (183436ms)
+- 2026-11-05 20:58:33 UTC — [ticket-862] tour 2 — reviewer démarré
+- 2026-11-05 20:58:45 UTC — [ticket-862] tour 2 — reviewer terminé (11921ms)
+- 2026-11-05 21:02:12 UTC — [ticket-862] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (219141ms)
+- 2026-11-05 21:02:12 UTC — [ticket-862] APPROVED après 2 tour(s)
+- 2026-11-05 21:04:34 UTC — [ticket-862] leçons: une leçon proposée
+- 2026-11-05 21:06:53 UTC — [ticket-862] documentation: 0 fichier(s) (132563ms) — après tour de correction
+- 2026-11-05 21:15:02 UTC — [ide-core] ticket-862 : base réalignée sur develop
+- 2026-11-05 21:15:02 UTC — [ide-core] ticket-862 PR #941 confiée au CIWatcher
+- 2026-11-05 21:14:59 UTC — [ide-core] ticket-862 PR #941 mergée (CI verte)
+- 2026-11-05 21:15:09 UTC — [ticket-863] branche ticket-863-every-tooled-agent-gets-a-signaler-tool-served-by
+- 2026-11-05 21:15:11 UTC — [ticket-863] tour 1 — codeur démarré
+- 2026-11-05 21:23:24 UTC — [ticket-863] tour 1 — codeur terminé (493250ms)
+- 2026-11-05 21:30:47 UTC — [ticket-863] testeur: dur�es : ruff 0 s, mypy 7 s, mypy-linux 9 s, pytest 439 s
+- 2026-11-05 21:33:12 UTC — [ticket-863] securite: PASS — Le ticket-863 implémente l'outil `signaler` avec des protections robustes : vali (145282ms)
+- 2026-11-05 21:33:12 UTC — [ticket-863] tour 1 — reviewer démarré
+- 2026-11-05 21:33:46 UTC — [ticket-863] tour 1 — reviewer terminé (33468ms)
+- 2026-11-05 21:37:44 UTC — [ticket-863] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Les tests passent et le code imp (271843ms)
+- 2026-11-05 21:37:44 UTC — [ticket-863] APPROVED après 1 tour(s)
+- 2026-11-05 21:44:26 UTC — [ticket-863] documentation: 1 fichier(s) (393483ms) — après tour de correction — refusé : doc-technique : docs/configuration.md : règle « preuve » — l'extrait « # [OPTIONNEL] Détecteur d'anomalies des runs (ticket-834, AD » (.env.example) n'est ni da
+- 2026-11-05 21:59:32 UTC — [ide-core] ticket-863 : base réalignée sur develop
+- 2026-11-05 21:59:32 UTC — [ide-core] ticket-863 PR #942 confiée au CIWatcher
+- 2026-11-05 21:59:28 UTC — [ide-core] ticket-863 PR #942 mergée (CI verte)
+- 2026-11-05 21:59:40 UTC — [ticket-864] branche ticket-864-a-project-review-runs-as-a-design-run-that-writes
+- 2026-11-05 21:59:41 UTC — [ticket-864] tour 1 — codeur démarré
+- 2026-11-05 22:20:01 UTC — [ticket-864] tour 1 — codeur terminé (1219452ms)
+- 2026-11-05 22:25:38 UTC — [ticket-864] testeur: 1 failed, 848 passed, 24 warnings in 330.69s (0:05:30)
+- 2026-11-05 22:25:38 UTC — [ticket-864] tests rouges au tour 1
+- 2026-11-05 22:25:38 UTC — [ticket-864] tour 2 — codeur démarré
+- 2026-11-05 22:25:49 UTC — [ticket-864] codeur: outil Bash refusé par le CLI
+- 2026-11-05 22:25:49 UTC — [ticket-864] tour 2 — codeur terminé (10750ms)
+- 2026-11-05 22:31:12 UTC — [ticket-864] testeur: 1 failed, 848 passed, 24 warnings in 318.68s (0:05:18)
+- 2026-11-05 22:31:12 UTC — [ticket-864] tests rouges au tour 2
+- 2026-11-05 22:31:12 UTC — [ticket-864] tour 3 — codeur démarré
+- 2026-11-05 22:31:45 UTC — [ticket-864] tour 3 — codeur terminé (33532ms)
+- 2026-11-05 22:38:25 UTC — [ticket-864] testeur: dur�es : ruff 0 s, mypy 2 s, mypy-linux 2 s, pytest 394 s
+- 2026-11-05 22:40:20 UTC — [ticket-864] securite: PASS — Le diff implémente la revue de projet (ticket-864) avec des gardes de sécurité c (115061ms)
+- 2026-11-05 22:40:20 UTC — [ticket-864] tour 3 — reviewer démarré
+- 2026-11-05 22:40:57 UTC — [ticket-864] tour 3 — reviewer terminé (36781ms)
+- 2026-11-05 22:45:20 UTC — [ticket-864] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-05 22:45:53 UTC — [ticket-864] validateur: APPROVED — Tous les critères d'acceptation sont vérifiés par le code et les tests passent ( (332375ms)
+- 2026-11-05 22:45:53 UTC — [ticket-864] APPROVED après 3 tour(s)
+- 2026-11-05 22:46:15 UTC — [ticket-864] leçons: une leçon proposée
+- 2026-11-05 22:52:28 UTC — [ticket-864] documentation: 1 fichier(s) (363108ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « preuve » — l'extrait « anomalies: list[dict] » (backend/src/tessera/services/run_registry.py) n'est ni dans le di
+- 2026-11-05 22:59:48 UTC — [ide-core] ticket-864 : base réalignée sur develop
+- 2026-11-05 22:59:48 UTC — [ide-core] ticket-864 PR #943 confiée au CIWatcher
+- 2026-11-05 22:59:45 UTC — [ide-core] ticket-864 PR #943 mergée (CI verte)
+- 2026-11-05 22:59:54 UTC — [ticket-865] branche ticket-865-a-review-button-launches-a-project-review-and-sho
+- 2026-11-05 22:59:56 UTC — [ticket-865] tour 1 — codeur démarré
+- 2026-11-05 23:03:51 UTC — [ticket-865] tour 1 — codeur terminé (235125ms)
+- 2026-11-05 23:06:31 UTC — [ticket-865] testeur: dur�es : tsc 13 s, eslint 24 s, vitest 119 s
+- 2026-11-05 23:09:13 UTC — [ticket-865] securite: PASS — Le diff ajoute un bouton de revue de projet (ticket-865) avec composant React, u (162063ms)
+- 2026-11-05 23:09:13 UTC — [ticket-865] tour 1 — reviewer démarré
+- 2026-11-05 23:09:35 UTC — [ticket-865] tour 1 — reviewer terminé (22125ms)
+- 2026-11-05 23:11:33 UTC — [ticket-865] validateur: fichiers cités joints : RevueProjetBouton.test.tsx
+- 2026-11-05 23:11:33 UTC — [ticket-865] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le composant `RevueProjetBouto (139688ms)
+- 2026-11-05 23:11:33 UTC — [ticket-865] APPROVED après 1 tour(s)
+- 2026-11-05 23:21:04 UTC — [ticket-865] documentation: 0 fichier(s) (558750ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « jeton vérifiable » — ticket « ticket-833 » n'est ni dans le texte remplacé, ni dans les tickets, le diff ou les f — refusé : doc-fonctionnelle : docs/guide-utilisateur.md : règle « preuve » — l'extrait « RUN_ANOMALY = "run_anomaly"
+    #: Le détecteur d'anomalies  » (backend/src/tesse
+- 2026-11-05 23:21:30 UTC — [ticket-865] livraison: arrêt — Livraison interrompue : GitCommandError: git command failed (code 1): git -c core.hooksPath=C:\Users
+- 2026-11-05 23:21:44 UTC — [ticket-852] branche ticket-852-the-supervisor-role-config-and-prompt-exist
+- 2026-11-05 23:21:46 UTC — [ticket-852] tour 1 — codeur démarré
+- 2026-11-05 23:25:13 UTC — [ticket-852] tour 1 — codeur terminé (207000ms)
+- 2026-11-05 23:27:07 UTC — [ticket-852] testeur: 1 failed, 595 passed in 108.44s (0:01:48)
+- 2026-11-05 23:27:07 UTC — [ticket-852] tests rouges au tour 1
+- 2026-11-05 23:27:07 UTC — [ticket-852] tour 2 — codeur démarré
+- 2026-11-05 23:28:29 UTC — [ticket-852] tour 2 — codeur terminé (81657ms)
+- 2026-11-05 23:30:14 UTC — [ticket-852] testeur: dur�es : ruff 0 s, mypy 7 s, mypy-linux 11 s, pytest 102 s
+- 2026-11-05 23:32:50 UTC — [ticket-852] securite: PASS — Ticket-852 introduces secure supervisor agent infrastructure with proper configu (155531ms)
+- 2026-11-05 23:32:50 UTC — [ticket-852] tour 2 — reviewer démarré
+- 2026-11-05 23:33:16 UTC — [ticket-852] tour 2 — reviewer terminé (26375ms)
+- 2026-11-05 23:35:40 UTC — [ticket-852] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (170405ms)
+- 2026-11-05 23:35:40 UTC — [ticket-852] APPROVED après 2 tour(s)
+- 2026-11-05 23:36:55 UTC — [ticket-852] leçons: rien à retenir
+- 2026-11-05 23:44:27 UTC — [ticket-852] documentation: 0 fichier(s) (444358ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « jeton vérifiable » — nombre « 80 % » n'est ni dans le texte remplacé, ni dans les tickets, le diff ou les fichier — refusé : doc-fonctionnelle : docs/guide-utilisateur.md : règle « preuve » — l'extrait « # ANOMALIE_OUTIL_REPETE=4
+# ANOMALIE_SILENCE_S=900
+# ANOMALI » (.env.example) n'e
+- 2026-11-05 23:54:16 UTC — [ide-core] ticket-852 : base réalignée sur develop
+- 2026-11-05 23:54:16 UTC — [ide-core] ticket-852 PR #945 confiée au CIWatcher
+- 2026-11-05 23:54:12 UTC — [ide-core] ticket-852 PR #945 mergée (CI verte)
+- 2026-11-05 23:54:23 UTC — [ticket-853] branche ticket-853-the-supervision-journal-is-written-by-the-service
+- 2026-11-05 23:54:25 UTC — [ticket-853] tour 1 — codeur démarré
+- 2026-11-05 23:56:41 UTC — [ticket-853] tour 1 — codeur terminé (136030ms)
+- 2026-11-05 23:58:53 UTC — [ticket-853] testeur: dur�es : ruff 0 s, pytest 123 s
+- 2026-11-05 23:58:53 UTC — [ticket-853] tests rouges au tour 1
+- 2026-11-05 23:58:53 UTC — [ticket-853] tour 2 — codeur démarré
+- 2026-11-05 23:59:33 UTC — [ticket-853] tour 2 — codeur terminé (40375ms)
+- 2026-11-06 00:01:57 UTC — [ticket-853] testeur: dur�es : ruff 0 s, mypy 8 s, mypy-linux 9 s, pytest 140 s
+- 2026-11-06 00:05:25 UTC — [ticket-853] securite: PASS — Le ticket introduit l'infrastructure de lecture/écriture et de garde du journal  (207953ms)
+- 2026-11-06 00:05:25 UTC — [ticket-853] tour 2 — reviewer démarré
+- 2026-11-06 00:05:43 UTC — [ticket-853] tour 2 — reviewer terminé (18155ms)
+- 2026-11-06 00:09:00 UTC — [ticket-853] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (214890ms)
+- 2026-11-06 00:09:00 UTC — [ticket-853] APPROVED après 2 tour(s)
+- 2026-11-06 00:10:24 UTC — [ticket-853] leçons: une leçon proposée
+- 2026-11-06 00:19:51 UTC — [ticket-853] documentation: 0 fichier(s) (557735ms) — après tour de correction — refusé : doc-technique : docs/architecture.md : règle « jeton vérifiable » — nombre « 900 s » n'est ni dans le texte remplacé, ni dans les tickets, le diff ou les fichie — refusé : doc-fonctionnelle : docs/guide-utilisateur.md : règle « jeton vérifiable » — nombre « 5 min » n'est ni dans le texte remplacé, ni dans les tickets, le diff ou l
+- 2026-11-06 00:28:08 UTC — [ide-core] ticket-853 : base réalignée sur develop
+- 2026-11-06 00:28:08 UTC — [ide-core] ticket-853 PR #946 confiée au CIWatcher
+- 2026-11-06 00:28:04 UTC — [ide-core] ticket-853 PR #946 mergée (CI verte)
+- 2026-11-06 00:28:15 UTC — [ticket-857] branche ticket-857-the-supervisor-hands-an-unwatched-green-pr-back-t
+- 2026-11-06 00:28:17 UTC — [ticket-857] tour 1 — codeur démarré
+- 2026-11-06 00:30:43 UTC — [ticket-857] tour 1 — codeur terminé (145672ms)
+- 2026-11-06 00:31:05 UTC — [ticket-857] testeur: dur�es : ruff 0 s, mypy 7 s, pytest 15 s, mypy-linux 10 s
+- 2026-11-06 00:32:55 UTC — [ticket-857] securite: PASS — Le diff introduit `superviseur_pr.py` et son test, deux fichiers de supervision  (110264ms)
+- 2026-11-06 00:32:55 UTC — [ticket-857] tour 1 — reviewer démarré
+- 2026-11-06 00:33:24 UTC — [ticket-857] tour 1 — reviewer terminé (28453ms)
+- 2026-11-06 00:34:44 UTC — [ticket-857] validateur: APPROVED — Tous les critères d'acceptation sont respectés. Le code implémente correctement  (108875ms)
+- 2026-11-06 00:34:44 UTC — [ticket-857] APPROVED après 1 tour(s)
+- 2026-11-06 00:43:04 UTC — [ticket-857] documentation: 3 fichier(s) (491297ms) — après tour de correction
+- 2026-11-06 00:43:21 UTC — [ticket-857] livraison: arrêt — Rebase refusé : error: cannot rebase: You have unstaged changes.
+error: Please commit or stash them.
+- 2026-11-06 01:10:07 UTC — [ticket-866] branche ticket-866-the-agents-json-description-written-by-the-docume
+- 2026-11-06 01:10:08 UTC — [ticket-866] tour 1 — codeur démarré
+- 2026-11-06 01:17:11 UTC — [ticket-866] tour 1 — codeur terminé (422328ms)
+- 2026-11-06 01:32:11 UTC — [ticket-866] testeur: dur�es : ruff 0 s, mypy 7 s, mypy-linux 11 s, pytest 896 s
+- 2026-11-06 01:34:32 UTC — [ticket-866] securite: PASS — Le diff introduit deux méthodes git (`est_modifie`, `stager_chemins`) et une log (140686ms)
+- 2026-11-06 01:34:32 UTC — [ticket-866] tour 1 — reviewer démarré
+- 2026-11-06 01:35:04 UTC — [ticket-866] tour 1 — reviewer terminé (32297ms)
+- 2026-11-06 01:36:56 UTC — [ticket-866] validateur: fichiers cités joints : agents.json
+- 2026-11-06 01:36:56 UTC — [ticket-866] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits : un test vérifie qu'une descri (144187ms)
+- 2026-11-06 01:36:56 UTC — [ticket-866] APPROVED après 1 tour(s)
+- 2026-11-06 01:38:28 UTC — [ticket-866] documentation: 0 fichier(s) (84313ms)
+- 2026-11-06 01:38:28 UTC — [ticket-847] documentation: pas de diff retrouvable, non documenté
+- 2026-11-06 01:54:22 UTC — [ide-core] ticket-866 PR #950 confiée au CIWatcher
+- 2026-11-06 01:54:29 UTC — [ticket-858] branche ticket-858-the-supervisor-reopens-a-queue-cut-by-the-infrast
+- 2026-11-06 01:54:31 UTC — [ticket-858] tour 1 — codeur démarré
+- 2026-11-06 01:58:19 UTC — [ticket-858] tour 1 — codeur terminé (228062ms)
+- 2026-11-06 01:59:23 UTC — [ticket-858] testeur: dur�es : ruff 0 s, mypy 9 s, mypy-linux 9 s, pytest 60 s
+- 2026-11-06 02:02:36 UTC — [ticket-858] securite: PASS — No security vulnérabilities (injection, secrets, auth, XSS) detected. Two valida (192797ms)
+- 2026-11-06 02:02:36 UTC — [ticket-858] tour 1 — reviewer démarré
+- 2026-11-06 02:02:55 UTC — [ticket-858] tour 1 — reviewer terminé (19155ms)
+- 2026-11-06 02:05:34 UTC — [ticket-858] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (178625ms)
+- 2026-11-06 02:05:34 UTC — [ticket-858] APPROVED après 1 tour(s)
+- 2026-11-06 02:09:38 UTC — [ticket-858] documentation: 1 fichier(s) (233875ms) — après tour de correction
+- 2026-11-06 02:24:13 UTC — [ide-core] ticket-858 : base réalignée sur develop
+- 2026-11-06 02:24:13 UTC — [ide-core] ticket-858 PR #951 confiée au CIWatcher
+- 2026-11-06 02:07:53 UTC — [ide-core] ticket-866 PR #950 mergée (CI verte)
+- 2026-11-06 02:24:11 UTC — [ide-core] ticket-858 PR #951 mergée (CI verte)
+- 2026-11-06 02:24:24 UTC — [ticket-860] branche ticket-860-a-route-returns-the-supervision-recap-and-the-a-t
+- 2026-11-06 02:24:26 UTC — [ticket-860] tour 1 — codeur démarré
+- 2026-11-06 02:26:19 UTC — [ticket-860] tour 1 — codeur terminé (113000ms)
+- 2026-11-06 02:28:22 UTC — [ticket-860] testeur: 2 failed, 870 passed in 116.77s (0:01:56)
+- 2026-11-06 02:28:22 UTC — [ticket-860] tests rouges au tour 1
+- 2026-11-06 02:28:22 UTC — [ticket-860] tour 2 — codeur démarré
+- 2026-11-06 02:29:01 UTC — [ticket-860] tour 2 — codeur terminé (38827ms)
+- 2026-11-06 02:31:43 UTC — [ticket-860] testeur: dur�es : ruff 0 s, pytest 156 s
+- 2026-11-06 02:31:43 UTC — [ticket-860] tests rouges au tour 2
+- 2026-11-06 02:31:43 UTC — [ticket-860] tour 3 — codeur démarré
+- 2026-11-06 02:32:23 UTC — [ticket-860] tour 3 — codeur terminé (39280ms)
+- 2026-11-06 02:35:10 UTC — [ticket-860] testeur: dur�es : ruff 0 s, mypy 7 s, mypy-linux 9 s, pytest 163 s
+- 2026-11-06 02:36:46 UTC — [ticket-860] securite: PASS — Diff sûr : nouvelle route read-only sur le journal de supervision (ticket-860, A (95467ms)
+- 2026-11-06 02:36:46 UTC — [ticket-860] tour 3 — reviewer démarré
+- 2026-11-06 02:37:03 UTC — [ticket-860] tour 3 — reviewer terminé (16828ms)
+- 2026-11-06 02:41:18 UTC — [ticket-860] validateur: APPROVED — Tous les critères d'acceptation ont été satisfaits. Le code implémente correctem (272452ms)
+- 2026-11-06 02:41:18 UTC — [ticket-860] APPROVED après 3 tour(s)
+- 2026-11-06 02:42:02 UTC — [ticket-860] leçons: une leçon proposée
+- 2026-11-06 02:46:48 UTC — [ticket-860] documentation: 0 fichier(s) (277985ms) — après tour de correction
+- 2026-11-06 02:59:57 UTC — [ide-core] ticket-861 sauté : dépend de ticket-860, non mergé
+- 2026-11-06 02:59:57 UTC — [ide-core] ticket-860 PR #952 confiée au CIWatcher
+- 2026-11-06 02:59:57 UTC — [ticket-860] livraison: arrêt — PR #952 non mergée : la tête de la PR #952 n'est plus le commit poussé : 871e039 au lieu de e57a3d0. La PR reste ouverte.
+- 2026-11-06 03:00:07 UTC — [ticket-854] branche ticket-854-a-supervision-intervention-is-a-run-with-one-comm
+- 2026-11-06 03:00:08 UTC — [ticket-854] tour 1 — codeur démarré
+- 2026-11-06 03:12:44 UTC — [ticket-854] tour 1 — codeur terminé (756188ms)
+- 2026-11-06 03:23:10 UTC — [ticket-854] testeur: dur�es : ruff 0 s, mypy 10 s, mypy-linux 14 s, pytest 621 s
+- 2026-11-06 03:26:03 UTC — [ticket-854] securite: PASS — Ce diff implémente les interventions du superviseur (ticket-854) avec protection (173266ms)
+- 2026-11-06 03:26:03 UTC — [ticket-854] tour 1 — reviewer démarré
+- 2026-11-06 03:26:34 UTC — [ticket-854] tour 1 — reviewer terminé (31141ms)
+- 2026-11-06 03:31:03 UTC — [ticket-854] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-06 03:31:45 UTC — [ticket-854] validateur: fichiers cités joints : livraison.py (tronqué) ; absents : services/pipeline/
+- 2026-11-06 03:31:45 UTC — [ticket-854] validateur: APPROVED — Les 9 critères sont satisfaits. Tous les tests (critères 1-8) existent et ont pa (342141ms)
+- 2026-11-06 03:31:45 UTC — [ticket-854] APPROVED après 1 tour(s)
+- 2026-11-06 03:35:18 UTC — [ticket-854] documentation: 2 fichier(s) (203812ms)
+- 2026-11-06 03:53:25 UTC — [ide-core] ticket-854 : base réalignée sur develop
+- 2026-11-06 03:53:25 UTC — [ide-core] ticket-854 PR #954 confiée au CIWatcher
+- 2026-11-06 03:53:20 UTC — [ide-core] ticket-854 PR #954 mergée (CI verte)
+- 2026-11-06 03:53:31 UTC — [ticket-855] branche ticket-855-the-supervisor-turns-a-raw-report-into-a-ticket-i
+- 2026-11-06 03:53:32 UTC — [ticket-855] tour 1 — codeur démarré
+- 2026-11-06 04:00:44 UTC — [ticket-855] tour 1 — codeur terminé (431438ms)
+- 2026-11-06 04:01:23 UTC — [ticket-855] testeur: dur�es : ruff 1 s, pytest 36 s
+- 2026-11-06 04:01:23 UTC — [ticket-855] tests rouges au tour 1
+- 2026-11-06 04:01:24 UTC — [ticket-855] tour 2 — codeur démarré
+- 2026-11-06 04:02:09 UTC — [ticket-855] tour 2 — codeur terminé (45375ms)
+- 2026-11-06 04:02:27 UTC — [ticket-855] testeur: dur�es : ruff 1 s, mypy 7 s, pytest 13 s, mypy-linux 7 s
+- 2026-11-06 04:05:11 UTC — [ticket-855] securite: PASS — Supervisor triage implementation (ticket-855, ADR-080) is secure. Multiple defen (164718ms)
+- 2026-11-06 04:05:11 UTC — [ticket-855] tour 2 — reviewer démarré
+- 2026-11-06 04:05:50 UTC — [ticket-855] tour 2 — reviewer terminé (38592ms)
+- 2026-11-06 04:10:11 UTC — [ticket-855] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-06 04:10:45 UTC — [ticket-855] validateur: APPROVED — Les 6 critères d'acceptation, tous des tests pytest, sont présents dans le diff  (333500ms)
+- 2026-11-06 04:10:45 UTC — [ticket-855] APPROVED après 2 tour(s)
+- 2026-11-06 04:11:25 UTC — [ticket-855] leçons: rien à retenir
+- 2026-11-06 04:12:56 UTC — [ticket-855] documentation: 0 fichier(s) (81609ms)
+- 2026-11-06 04:21:04 UTC — [ide-core] ticket-855 : base réalignée sur develop
+- 2026-11-06 04:21:04 UTC — [ide-core] ticket-855 PR #955 confiée au CIWatcher
+- 2026-11-06 04:21:00 UTC — [ide-core] ticket-855 PR #955 mergée (CI verte)
+- 2026-11-06 04:21:16 UTC — [ticket-856] branche ticket-856-the-supervisor-decides-a-delegated-lesson-or-rule
+- 2026-11-06 04:21:18 UTC — [ticket-856] tour 1 — codeur démarré
+- 2026-11-06 04:28:11 UTC — [ticket-856] tour 1 — codeur terminé (412672ms)
+- 2026-11-06 04:28:28 UTC — [ticket-856] testeur: dur�es : ruff 0 s, pytest 10 s
+- 2026-11-06 04:28:28 UTC — [ticket-856] tests rouges au tour 1
+- 2026-11-06 04:28:28 UTC — [ticket-856] tour 2 — codeur démarré
+- 2026-11-06 04:29:17 UTC — [ticket-856] tour 2 — codeur terminé (49609ms)
+- 2026-11-06 04:29:37 UTC — [ticket-856] testeur: dur�es : ruff 0 s, mypy 6 s, pytest 15 s, mypy-linux 10 s
+- 2026-11-06 04:31:57 UTC — [ticket-856] securite: PASS — The supervisor decision system (ticket-856) implements robust security controls  (140281ms)
+- 2026-11-06 04:31:57 UTC — [ticket-856] tour 2 — reviewer démarré
+- 2026-11-06 04:32:23 UTC — [ticket-856] tour 2 — reviewer terminé (25717ms)
+- 2026-11-06 04:36:57 UTC — [ticket-856] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-06 04:37:37 UTC — [ticket-856] validateur: APPROVED — Tous les 6 tests d'acceptation du superviseur sont implémentés et passent (exit  (339766ms)
+- 2026-11-06 04:37:37 UTC — [ticket-856] APPROVED après 2 tour(s)
+- 2026-11-06 04:39:03 UTC — [ticket-856] leçons: rien à retenir
+- 2026-11-06 04:41:23 UTC — [ticket-856] documentation: 1 fichier(s) (132797ms)
+- 2026-11-06 04:49:12 UTC — [ide-core] ticket-856 : base réalignée sur develop
+- 2026-11-06 04:49:12 UTC — [ide-core] ticket-856 PR #956 confiée au CIWatcher
+- 2026-11-06 04:49:10 UTC — [ide-core] ticket-856 PR #956 mergée (CI verte)
+- 2026-11-06 04:49:20 UTC — [ticket-859] branche ticket-859-a-background-task-runs-the-supervisor-on-events-a
+- 2026-11-06 04:49:22 UTC — [ticket-859] tour 1 — codeur démarré
+- 2026-11-06 04:56:35 UTC — [ticket-859] tour 1 — codeur terminé (433265ms)
+- 2026-11-06 05:08:03 UTC — [ticket-859] testeur: dur�es : ruff 0 s, tsc 34 s, eslint 54 s, vitest 196 s, pytest 682 s
+- 2026-11-06 05:08:03 UTC — [ticket-859] tests rouges au tour 1
+- 2026-11-06 05:08:03 UTC — [ticket-859] tour 2 — codeur démarré
+- 2026-11-06 05:09:03 UTC — [ticket-859] tour 2 — codeur terminé (60218ms)
+- 2026-11-06 05:21:33 UTC — [ticket-859] testeur: dur�es : ruff 1 s, mypy 11 s, tsc 19 s, mypy-linux 16 s, eslint 33 s, vitest 174 s, pytest 746 s
+- 2026-11-06 05:24:15 UTC — [ticket-859] securite: PASS — The supervisor background task infrastructure (ticket-859, ADR-080) is securely  (161593ms)
+- 2026-11-06 05:24:15 UTC — [ticket-859] tour 2 — reviewer démarré
+- 2026-11-06 05:24:50 UTC — [ticket-859] tour 2 — reviewer terminé (35391ms)
+- 2026-11-06 05:29:15 UTC — [ticket-859] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-06 05:29:43 UTC — [ticket-859] validateur: APPROVED — The background supervisor loop is fully implemented with all 6 test criteria pas (327297ms)
+- 2026-11-06 05:29:43 UTC — [ticket-859] APPROVED après 2 tour(s)
+- 2026-11-06 05:31:08 UTC — [ticket-859] leçons: rien à retenir
+- 2026-11-06 05:31:17 UTC — [ticket-859] fichiers non suivis laissés par le run : tickets/todo/ticket-867-the-supervisor-loop-reads-the-inputs-of-pr-handback-and-queue-restart.md (à ignorer dans .gitignore ?)
+- 2026-11-06 05:32:37 UTC — [ticket-859] documentation: 0 fichier(s) (79297ms)
+- 2026-11-06 05:33:05 UTC — [ide-core] ticket-859 PR #957 confiée au CIWatcher
+- 2026-11-06 05:33:19 UTC — [ticket-861] branche ticket-861-the-a-toi-column-and-a-recap-panel-show-what-the
+- 2026-11-06 05:33:21 UTC — [ticket-861] tour 1 — codeur démarré
+- 2026-11-06 05:36:45 UTC — [ticket-861] tour 1 — codeur terminé (204109ms)
+- 2026-11-06 05:39:39 UTC — [ticket-861] testeur: dur�es : tsc 17 s, eslint 24 s, vitest 128 s
+- 2026-11-06 05:42:20 UTC — [ticket-861] securite: PASS — Frontend UI for supervisor recap is implemented securely with proper input valid (160561ms)
+- 2026-11-06 05:42:21 UTC — [ticket-861] tour 1 — reviewer démarré
+- 2026-11-06 05:42:40 UTC — [ticket-861] tour 1 — reviewer terminé (19061ms)
+- 2026-11-06 05:46:11 UTC — [ticket-861] validateur: fichiers cités joints : aToi.test.ts, ColonneAToi.test.tsx, RecapSuperviseur.test.tsx
+- 2026-11-06 05:46:11 UTC — [ticket-861] validateur: APPROVED — Tous les critères d'acceptation ont été satisfaits. Le code implémente correctem (231172ms)
+- 2026-11-06 05:46:11 UTC — [ticket-861] APPROVED après 1 tour(s)
+- 2026-11-06 05:50:03 UTC — [ticket-861] documentation: 0 fichier(s) (222969ms)
+- 2026-11-06 05:53:32 UTC — [ide-core] ticket-861 PR #958 confiée au CIWatcher
+- 2026-11-06 05:40:46 UTC — [ide-core] ticket-859 PR #957 mergée (CI verte)
+- 2026-11-06 05:53:44 UTC — [ticket-867] branche ticket-867-the-supervisor-loop-reads-the-inputs-of-the-pr-ha
+- 2026-11-06 05:53:46 UTC — [ticket-867] tour 1 — codeur démarré
+- 2026-11-06 06:01:34 UTC — [ticket-867] tour 1 — codeur terminé (467907ms)
+- 2026-11-06 06:04:03 UTC — [ticket-867] testeur: dur�es : ruff 1 s, mypy 10 s, mypy-linux 13 s, pytest 145 s
+- 2026-11-06 06:06:22 UTC — [ticket-867] securite: PASS — Audit of ticket-867 superviseur orchestration code shows no CRITICAL or HIGH sec (138375ms)
+- 2026-11-06 06:06:22 UTC — [ticket-867] tour 1 — reviewer démarré
+- 2026-11-06 06:06:58 UTC — [ticket-867] tour 1 — reviewer terminé (36561ms)
+- 2026-11-06 06:09:52 UTC — [ticket-867] validateur: APPROVED — Tous les critères d'acceptation ont été satisfaits. Les tests associés confirmen (209906ms)
+- 2026-11-06 06:09:52 UTC — [ticket-867] APPROVED après 1 tour(s)
+- 2026-11-06 06:10:01 UTC — [ticket-867] fichiers non suivis laissés par le run : tickets/todo/ticket-868-the-supervisor-writes-its-a-toi-cases-to-its-journal.md (à ignorer dans .gitignore ?)
+- 2026-11-06 06:14:01 UTC — [ticket-867] documentation: 0 fichier(s) (239625ms) — après tour de correction
+- 2026-11-06 06:09:38 UTC — [ticket-861] livraison: arrêt — PR #958 non mergée : Fin de l'attente : la CI de la PR #958 n'a pas rendu de verdict. La PR reste ouverte.
+- 2026-11-06 06:17:16 UTC — [ide-core] ticket-867 PR #959 confiée au CIWatcher
+- 2026-11-06 06:24:39 UTC — [ide-core] ticket-867 PR #959 mergée (CI verte)
+- 2026-11-06 08:57:45 UTC — [ticket-869] branche ticket-869-ticket-check-finds-the-project-in-the-repository
+- 2026-11-06 08:57:46 UTC — [ticket-869] tour 1 — codeur démarré
+- 2026-11-06 08:58:46 UTC — [ticket-869] tour 1 — codeur terminé (60422ms)
+- 2026-11-06 08:59:12 UTC — [ticket-869] testeur: dur�es : ruff 0 s, pytest 10 s, mypy 13 s, mypy-linux 10 s
+- 2026-11-06 09:00:57 UTC — [ticket-869] securite: PASS — Audit de sécurité du diff ticket-869 : ajout de localisation multi-emplacements  (104766ms)
+- 2026-11-06 09:00:57 UTC — [ticket-869] tour 1 — reviewer démarré
+- 2026-11-06 09:01:13 UTC — [ticket-869] tour 1 — reviewer terminé (16422ms)
+- 2026-11-06 09:04:02 UTC — [ticket-869] validateur: fichiers cités joints : ticket_check.py, backend/tests/test_ticket_check.py, backend/src/tessera/config.py (tronqué)
+- 2026-11-06 09:04:02 UTC — [ticket-869] validateur: APPROVED — Tous les critères d'acceptation ont été respectés. Le code a été mis à jour pour (184844ms)
+- 2026-11-06 09:04:02 UTC — [ticket-869] APPROVED après 1 tour(s)
+- 2026-11-06 09:05:09 UTC — [ticket-869] documentation: 0 fichier(s) (61922ms)
+- 2026-11-06 09:12:18 UTC — [ide-core] ticket-869 : base réalignée sur develop
+- 2026-11-06 09:12:18 UTC — [ide-core] ticket-869 PR #962 confiée au CIWatcher
+- 2026-11-06 09:12:17 UTC — [ide-core] ticket-869 PR #962 mergée (CI verte)
+- 2026-11-06 09:12:23 UTC — [ticket-870] branche ticket-870-prochain-numero-py-accepts-a-project-id-and-refus
+- 2026-11-06 09:12:24 UTC — [ticket-870] tour 1 — codeur démarré
+- 2026-11-06 09:14:01 UTC — [ticket-870] tour 1 — codeur terminé (96842ms)
+- 2026-11-06 09:23:34 UTC — [ticket-870] testeur: dur�es : ruff 0 s, mypy 2 s, mypy-linux 2 s, pytest 570 s
+- 2026-11-06 09:27:26 UTC — [ticket-870] securite: PASS — Diff ajoute une validation de projet pour `scripts/prochain_numero.py` : les nou (232375ms)
+- 2026-11-06 09:27:26 UTC — [ticket-870] tour 1 — reviewer démarré
+- 2026-11-06 09:27:42 UTC — [ticket-870] tour 1 — reviewer terminé (16047ms)
+- 2026-11-06 09:29:29 UTC — [ticket-870] validateur: fichiers cités joints : scripts/prochain_numero.py, backend/tests/test_prochain_numero.py
+- 2026-11-06 09:29:29 UTC — [ticket-870] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente la fonction  (122780ms)
+- 2026-11-06 09:29:29 UTC — [ticket-870] APPROVED après 1 tour(s)
+- 2026-11-06 09:31:24 UTC — [ticket-870] documentation: 0 fichier(s) (110422ms)
+- 2026-11-06 09:42:30 UTC — [ide-core] ticket-870 PR #964 confiée au CIWatcher
+- 2026-11-06 10:00:33 UTC — [ide-core] ticket-870 PR #964 mergée (CI verte)
+- 2026-11-06 10:49:15 UTC — [ticket-872] branche ticket-872-an-approved-run-whose-approved-sha-could-not-be-r
+- 2026-11-06 10:49:16 UTC — [ticket-872] tour 1 — codeur démarré
+- 2026-11-06 11:04:05 UTC — [ticket-872] tour 1 — codeur terminé (888327ms)
+- 2026-11-06 11:09:26 UTC — [ticket-872] testeur: dur�es : ruff 0 s, mypy 14 s, mypy-linux 13 s, pytest 317 s
+- 2026-11-06 11:09:38 UTC — [ticket-872] securite: PASS — Le diff renforce la porte de livraison : un run approuvé sans approved_sha lisib (12640ms)
+- 2026-11-06 11:09:38 UTC — [ticket-872] tour 1 — reviewer démarré
+- 2026-11-06 11:09:57 UTC — [ticket-872] tour 1 — reviewer terminé (18750ms)
+- 2026-11-06 11:14:21 UTC — [ticket-872] validateur: fichiers cités joints : backend/tests/test_livraison_sha_approuve.py, pipeline_approbation.py
+- 2026-11-06 11:14:21 UTC — [ticket-872] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente correctement (282968ms)
+- 2026-11-06 11:14:21 UTC — [ticket-872] APPROVED après 1 tour(s)
+- 2026-11-06 11:15:59 UTC — [ticket-872] documentation: 0 fichier(s) (92063ms)
+- 2026-11-06 11:21:20 UTC — [ide-core] ticket-872 PR #967 confiée au CIWatcher
+- 2026-11-06 11:21:24 UTC — [ticket-875] branche ticket-875-an-interrupted-run-is-marked-recovered-only-after
+- 2026-11-06 11:21:26 UTC — [ticket-875] tour 1 — codeur démarré
+- 2026-11-06 11:24:37 UTC — [ticket-875] tour 1 — codeur terminé (190484ms)
+- 2026-11-06 11:26:25 UTC — [ticket-875] testeur: 1 failed, 599 passed in 104.54s (0:01:44)
+- 2026-11-06 11:26:25 UTC — [ticket-875] tests rouges au tour 1
+- 2026-11-06 11:26:25 UTC — [ticket-875] tour 2 — codeur démarré
+- 2026-11-06 11:28:28 UTC — [ticket-875] tour 2 — codeur terminé (123765ms)
+- 2026-11-06 11:30:25 UTC — [ticket-875] testeur: dur�es : ruff 0 s, mypy 6 s, mypy-linux 9 s, pytest 114 s
+- 2026-11-06 11:30:35 UTC — [ticket-875] securite: PASS — Verdict PASS : le diff ne contient aucune vulnérabilité. Il déplace la fonction  (9984ms)
+- 2026-11-06 11:30:35 UTC — [ticket-875] tour 2 — reviewer démarré
+- 2026-11-06 11:30:54 UTC — [ticket-875] tour 2 — reviewer terminé (18375ms)
+- 2026-11-06 11:34:02 UTC — [ticket-875] validateur: fichiers cités joints : backend/tests/test_reprise_orphelin_echec.py
+- 2026-11-06 11:34:02 UTC — [ticket-875] validateur: APPROVED — Tous les critères d'acceptation ont été implémentés et vérifiés : un test valide (206452ms)
+- 2026-11-06 11:34:02 UTC — [ticket-875] APPROVED après 2 tour(s)
+- 2026-11-06 11:35:05 UTC — [ticket-875] leçons: une leçon proposée
+- 2026-11-06 11:37:17 UTC — [ticket-875] documentation: 0 fichier(s) (126952ms)
+- 2026-11-06 11:39:31 UTC — [ide-core] ticket-875 PR #968 confiée au CIWatcher
+- 2026-11-06 11:28:08 UTC — [ide-core] ticket-872 PR #967 mergée (CI verte)
+- 2026-11-06 11:39:35 UTC — [ticket-873] branche ticket-873-agent-subprocesses-receive-no-github-credentials
+- 2026-11-06 11:39:37 UTC — [ticket-873] tour 1 — codeur démarré
+- 2026-11-06 11:40:35 UTC — [ticket-873] tour 1 — codeur terminé (58375ms)
+- 2026-11-06 11:41:07 UTC — [ticket-873] testeur: dur�es : ruff 0 s, mypy 6 s, mypy-linux 9 s, pytest 28 s
+- 2026-11-06 11:41:20 UTC — [ticket-873] securite: PASS — Le diff durcit la sécurité : il retire les identifiants GitHub (jetons, session  (13093ms)
+- 2026-11-06 11:41:20 UTC — [ticket-873] tour 1 — reviewer démarré
+- 2026-11-06 11:41:40 UTC — [ticket-873] tour 1 — reviewer terminé (19952ms)
+- 2026-11-06 11:43:22 UTC — [ticket-873] validateur: fichiers cités joints : backend/tests/test_env_sdk.py, env_sdk.py
+- 2026-11-06 11:43:22 UTC — [ticket-873] validateur: APPROVED — Tous les critères d'acceptation ont été satisfaits. Les tests ont été ajoutés ou (122000ms)
+- 2026-11-06 11:43:22 UTC — [ticket-873] APPROVED après 1 tour(s)
+- 2026-11-06 11:47:52 UTC — [ticket-873] documentation: 0 fichier(s) (264468ms) — après tour de correction
+- 2026-11-06 11:48:41 UTC — [ide-core] ticket-873 PR #969 confiée au CIWatcher
+- 2026-11-06 11:47:57 UTC — [ide-core] ticket-875 PR #968 mergée (CI verte)
+- 2026-11-06 11:48:46 UTC — [ticket-874] branche ticket-874-ciwatcher-merge-results-are-bound-to-their-pull-r
+- 2026-11-06 11:49:14 UTC — [ticket-874] plan rendu (26703ms)
+- 2026-11-06 11:49:14 UTC — [ticket-874] tour 1 — codeur démarré
+- 2026-11-06 11:53:41 UTC — [ticket-874] tour 1 — codeur terminé (266953ms)
+- 2026-11-06 11:55:22 UTC — [ticket-874] testeur: dur�es : ruff 0 s, mypy 10 s, mypy-linux 10 s, pytest 98 s
+- 2026-11-06 11:55:35 UTC — [ticket-874] securite: PASS — Le diff réorganise la logique interne de CIWatcher : les résultats sont rangés p (13109ms)
+- 2026-11-06 11:55:35 UTC — [ticket-874] tour 1 — reviewer démarré
+- 2026-11-06 11:56:12 UTC — [ticket-874] tour 1 — reviewer terminé (36889ms)
+- 2026-11-06 12:00:35 UTC — [ticket-874] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-06 12:01:23 UTC — [ticket-874] validateur: fichiers cités joints : backend/tests/test_ci_watcher_relivraison.py
+- 2026-11-06 12:01:23 UTC — [ticket-874] validateur: APPROVED — Tous les critères sont satisfaits. Le ticket implémente complètement le suivi de (347922ms)
+- 2026-11-06 12:01:23 UTC — [ticket-874] APPROVED après 1 tour(s)
+- 2026-11-06 12:03:21 UTC — [ticket-874] documentation: 2 fichier(s) (112453ms)
+- 2026-11-06 12:05:08 UTC — [ide-core] ticket-874 PR #970 confiée au CIWatcher
+- 2026-11-06 11:57:06 UTC — [ide-core] ticket-873 PR #969 mergée (CI verte)
+- 2026-11-06 12:05:12 UTC — [ticket-876] branche ticket-876-the-agentrole-enum-only-names-roles-the-registry
+- 2026-11-06 12:05:13 UTC — [ticket-876] tour 1 — codeur démarré
+- 2026-11-06 12:06:29 UTC — [ticket-876] tour 1 — codeur terminé (75688ms)
+- 2026-11-06 12:11:51 UTC — [ticket-876] testeur: dur�es : ruff 0 s, mypy 12 s, mypy-linux 13 s, pytest 319 s
+- 2026-11-06 12:11:56 UTC — [ticket-876] securite: PASS — Le diff retire le rôle `orchestrateur`, qui n'a pas de prompt, de l'enum `AgentR (5219ms)
+- 2026-11-06 12:11:56 UTC — [ticket-876] tour 1 — reviewer démarré
+- 2026-11-06 12:12:21 UTC — [ticket-876] tour 1 — reviewer terminé (24250ms)
+- 2026-11-06 12:13:38 UTC — [ticket-876] validateur: fichiers cités joints : backend/src/tessera/models/agent.py, backend/src/tessera/services/agents/agent_runner.py, backend/tests/test_agent_role_registre.py
+- 2026-11-06 12:13:38 UTC — [ticket-876] validateur: APPROVED — Les trois critères d'acceptation ont été respectés. Le rôle 'orchestrateur' a ét (101218ms)
+- 2026-11-06 12:13:38 UTC — [ticket-876] APPROVED après 1 tour(s)
+- 2026-11-06 12:14:37 UTC — [ticket-876] documentation: 0 fichier(s) (54625ms)
+- 2026-11-06 12:20:00 UTC — [ide-core] ticket-876 PR #971 confiée au CIWatcher
+- 2026-11-06 12:12:44 UTC — [ide-core] ticket-874 PR #970 mergée (CI verte)
+- 2026-11-06 12:20:05 UTC — [ticket-880] branche ticket-880-a-pipeline-gate-cannot-be-lowered-while-any-run-i
+- 2026-11-06 12:20:06 UTC — [ticket-880] tour 1 — codeur démarré
+- 2026-11-06 12:22:31 UTC — [ticket-880] tour 1 — codeur terminé (144172ms)
+- 2026-11-06 12:23:07 UTC — [ticket-880] testeur: dur�es : ruff 0 s, pytest 33 s
+- 2026-11-06 12:23:07 UTC — [ticket-880] tests rouges au tour 1
+- 2026-11-06 12:23:07 UTC — [ticket-880] tour 2 — codeur démarré
+- 2026-11-06 12:23:28 UTC — [ticket-880] tour 2 — codeur terminé (21688ms)
+- 2026-11-06 12:23:56 UTC — [ticket-880] testeur: dur�es : ruff 0 s, mypy 13 s, pytest 15 s, mypy-linux 12 s
+- 2026-11-06 12:24:11 UTC — [ticket-880] securite: PASS — Le diff ne fait que durcir le pipeline. Pendant un run, il refuse 409 sur deux t (14718ms)
+- 2026-11-06 12:24:11 UTC — [ticket-880] tour 2 — reviewer démarré
+- 2026-11-06 12:24:37 UTC — [ticket-880] tour 2 — reviewer terminé (25686ms)
+- 2026-11-06 12:26:15 UTC — [ticket-880] validateur: fichiers cités joints : backend/tests/test_pipeline_portes.py, agent_admin.py
+- 2026-11-06 12:26:15 UTC — [ticket-880] validateur: APPROVED — Tous les critères d'acceptation ont été vérifiés : un test couvre `abaisse_une_p (124031ms)
+- 2026-11-06 12:26:15 UTC — [ticket-880] APPROVED après 2 tour(s)
+- 2026-11-06 12:27:41 UTC — [ticket-880] leçons: une leçon proposée
+- 2026-11-06 12:30:09 UTC — [ticket-880] documentation: 0 fichier(s) (143375ms)
+- 2026-11-06 12:36:04 UTC — [ide-core] ticket-880 PR #972 confiée au CIWatcher
+- 2026-11-06 12:35:26 UTC — [ide-core] ticket-876 PR #971 mergée (CI verte)
+- 2026-11-06 12:36:09 UTC — [ticket-877] branche ticket-877-the-frontend-and-the-tauri-app-get-the-api-sessio
+- 2026-11-06 12:36:58 UTC — [ticket-877] plan rendu (47327ms)
+- 2026-11-06 12:36:58 UTC — [ticket-877] tour 1 — codeur démarré
+- 2026-11-06 12:42:27 UTC — [ticket-877] tour 1 — codeur terminé (329360ms)
+- 2026-11-06 12:55:15 UTC — [ticket-877] testeur: dur�es : ruff 0 s, mypy 9 s, mypy-linux 13 s, tsc 28 s, eslint 55 s, vitest 231 s, pytest 764 s
+- 2026-11-06 12:55:42 UTC — [ticket-877] securite: PASS — Ce diff retire VITE_STATIC_TOKEN, qui était inscrit dans le bundle. Le jeton vie (26875ms)
+- 2026-11-06 12:55:42 UTC — [ticket-877] tour 1 — reviewer démarré
+- 2026-11-06 12:56:21 UTC — [ticket-877] tour 1 — reviewer terminé (39109ms)
+- 2026-11-06 13:00:30 UTC — [ticket-877] validateur: fichiers cités joints : frontend/src/lib/auth.test.ts, auth.test.ts, frontend/src/lib/http.test.ts, frontend/src/lib/ws.test.ts, frontend/src/ (dossier, 8 fichiers), frontend/src-tauri/src/lib.rs
+- 2026-11-06 13:00:30 UTC — [ticket-877] validateur: APPROVED — Tous les critères d'acceptation ont été satisfaits. Le code implémente correctem (288032ms)
+- 2026-11-06 13:00:30 UTC — [ticket-877] APPROVED après 1 tour(s)
+- 2026-11-06 13:03:25 UTC — [ticket-877] documentation: 0 fichier(s) (169764ms)
+- 2026-11-06 13:27:58 UTC — [ide-core] ticket-879 retiré de la file
+- 2026-11-06 13:27:58 UTC — [ide-core] ticket-881 retiré de la file
+- 2026-11-06 13:33:10 UTC — [ide-core] ticket-877 : base réalignée sur develop
+- 2026-11-06 13:33:10 UTC — [ide-core] ticket-877 PR #976 confiée au CIWatcher
+- 2026-11-06 12:43:58 UTC — [ide-core] ticket-880 PR #972 mergée (CI verte)
+- 2026-11-06 13:33:02 UTC — [ide-core] ticket-877 PR #976 mergée (CI verte)
+- 2026-11-06 13:33:35 UTC — [ticket-878] branche ticket-878-the-api-requires-a-per-boot-session-token-on-ever
+- 2026-11-06 13:35:15 UTC — [ticket-878] plan rendu (87030ms)
+- 2026-11-06 13:35:15 UTC — [ticket-878] tour 1 — codeur démarré
+- 2026-11-06 13:44:45 UTC — [ticket-878] tour 1 — codeur terminé (569719ms)
+- 2026-11-06 13:58:21 UTC — [ticket-878] testeur: 1 failed, 1979 passed, 64 warnings in 801.90s (0:13:21)
+- 2026-11-06 13:58:21 UTC — [ticket-878] tests rouges au tour 1
+- 2026-11-06 13:58:21 UTC — [ticket-878] tour 2 — codeur démarré
+- 2026-11-06 13:59:32 UTC — [ticket-878] tour 2 — codeur terminé (71438ms)
+- 2026-11-06 14:16:44 UTC — [ticket-878] testeur: dur�es : ruff 0 s, mypy 13 s, mypy-linux 8 s, pytest 1022 s
+- 2026-11-06 14:17:07 UTC — [ticket-878] securite: PASS — Le diff ferme le mode ouvert de l'API : sans STATIC_TOKEN, le backend tire un je (23250ms)
+- 2026-11-06 14:17:07 UTC — [ticket-878] configuration des tests modifiée : backend/tests/conftest.py
+- 2026-11-06 14:17:07 UTC — [ticket-878] tour 2 — reviewer démarré
+- 2026-11-06 14:17:43 UTC — [ticket-878] tour 2 — reviewer terminé (35625ms)
+- 2026-11-06 14:22:07 UTC — [ticket-878] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-06 14:23:06 UTC — [ticket-878] validateur: fichiers cités joints : backend/tests/test_jeton_de_session.py, backend/tests/test_invariant_routes_jeton.py, backend/tests/test_env_sdk.py, memory/decisions.md (tronqué) ; non joints (budget épuisé) : memory/contraintes.md
+- 2026-11-06 14:23:06 UTC — [ticket-878] validateur: APPROVED — All six acceptance criteria are met. The implementation creates a session token  (358264ms)
+- 2026-11-06 14:23:06 UTC — [ticket-878] APPROVED après 2 tour(s)
+- 2026-11-06 14:23:48 UTC — [ticket-878] leçons: refusée — preuve absente du retour du run
+- 2026-11-06 14:26:52 UTC — [ticket-878] documentation: 0 fichier(s) (179454ms)
+- 2026-11-06 14:35:25 UTC — [ide-core] ticket-878 : base réalignée sur develop
+- 2026-11-06 14:35:25 UTC — [ide-core] ticket-878 PR #978 confiée au CIWatcher
+- 2026-11-06 14:35:22 UTC — [ide-core] ticket-878 PR #978 mergée (CI verte)
+- 2026-11-06 14:35:30 UTC — [ticket-882] branche ticket-882-the-secrets-check-scans-added-lines-even-when-the
+- 2026-11-06 14:35:31 UTC — [ticket-882] tour 1 — codeur démarré
+- 2026-11-06 14:41:06 UTC — [ticket-882] tour 1 — codeur terminé (334500ms)
+- 2026-11-06 14:43:31 UTC — [ticket-882] testeur: dur�es : ruff 1 s, mypy 19 s, mypy-linux 24 s, pytest 141 s
+- 2026-11-06 14:43:49 UTC — [ticket-882] securite: PASS — Le diff renforce la porte des secrets. Un en-tête `+++` illisible ou sans préfix (17922ms)
+- 2026-11-06 14:43:49 UTC — [ticket-882] tour 1 — reviewer démarré
+- 2026-11-06 14:44:13 UTC — [ticket-882] tour 1 — reviewer terminé (24000ms)
+- 2026-11-06 14:47:51 UTC — [ticket-882] validateur: fichiers cités joints : backend/tests/test_secrets_diff.py ; absents : dossier/naïf.py
+- 2026-11-06 14:47:51 UTC — [ticket-882] validateur: APPROVED — Les trois critères d'acceptation ont été satisfaits. Le code implémente correcte (242389ms)
+- 2026-11-06 14:47:51 UTC — [ticket-882] APPROVED après 1 tour(s)
+- 2026-11-06 14:50:13 UTC — [ticket-882] documentation: 0 fichier(s) (135250ms)
+- 2026-11-06 14:50:32 UTC — [ide-core] ticket-882 PR #979 confiée au CIWatcher
+- 2026-11-06 14:50:38 UTC — [ticket-879] branche ticket-879-the-agent-hook-refuses-reading-the-session-token
+- 2026-11-06 14:50:39 UTC — [ticket-879] tour 1 — codeur démarré
+- 2026-11-06 14:53:25 UTC — [ticket-879] tour 1 — codeur terminé (165718ms)
+- 2026-11-06 14:54:20 UTC — [ticket-879] testeur: dur�es : ruff 0 s, pytest 52 s
+- 2026-11-06 14:54:20 UTC — [ticket-879] tests rouges au tour 1
+- 2026-11-06 14:54:20 UTC — [ticket-879] tour 2 — codeur démarré
+- 2026-11-06 14:55:06 UTC — [ticket-879] tour 2 — codeur terminé (45780ms)
+- 2026-11-06 14:55:47 UTC — [ticket-879] testeur: dur�es : ruff 0 s, mypy 22 s, pytest 36 s, mypy-linux 16 s
+- 2026-11-06 14:56:07 UTC — [ticket-879] securite: PASS — Le diff étend le hook PreToolUse pour qu'il refuse aussi la lecture du fichier d (19639ms)
+- 2026-11-06 14:56:07 UTC — [ticket-879] tour 2 — reviewer démarré
+- 2026-11-06 14:56:24 UTC — [ticket-879] tour 2 — reviewer terminé (17437ms)
+- 2026-11-06 14:59:44 UTC — [ticket-879] validateur: fichiers cités joints : backend/tests/test_garde_jetons.py
+- 2026-11-06 14:59:44 UTC — [ticket-879] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits : les tests couvrent les différe (216875ms)
+- 2026-11-06 14:59:44 UTC — [ticket-879] APPROVED après 2 tour(s)
+- 2026-11-06 15:01:20 UTC — [ticket-879] leçons: une leçon proposée
+- 2026-11-06 15:02:52 UTC — [ticket-879] documentation: 0 fichier(s) (86295ms)
+- 2026-11-06 15:08:00 UTC — [ide-core] ticket-879 PR #980 confiée au CIWatcher
+- 2026-11-06 15:07:02 UTC — [ide-core] ticket-882 PR #979 mergée (CI verte)
+- 2026-11-06 15:08:06 UTC — [ticket-881] branche ticket-881-a-role-s-model-cannot-be-changed-and-a-project-ca
+- 2026-11-06 15:08:08 UTC — [ticket-881] tour 1 — codeur démarré
+- 2026-11-06 15:09:33 UTC — [ticket-881] tour 1 — codeur terminé (85155ms)
+- 2026-11-06 15:09:55 UTC — [ticket-881] testeur: dur�es : ruff 0 s, pytest 19 s
+- 2026-11-06 15:09:55 UTC — [ticket-881] tests rouges au tour 1
+- 2026-11-06 15:09:55 UTC — [ticket-881] tour 2 — codeur démarré
+- 2026-11-06 15:10:17 UTC — [ticket-881] tour 2 — codeur terminé (22390ms)
+- 2026-11-06 15:10:47 UTC — [ticket-881] testeur: dur�es : ruff 0 s, mypy 13 s, pytest 23 s, mypy-linux 13 s
+- 2026-11-06 15:10:58 UTC — [ticket-881] securite: PASS — Le diff ne fait qu'ajouter des protections : un 409 pendant tout run vivant sur  (11280ms)
+- 2026-11-06 15:10:58 UTC — [ticket-881] tour 2 — reviewer démarré
+- 2026-11-06 15:11:15 UTC — [ticket-881] tour 2 — reviewer terminé (16827ms)
+- 2026-11-06 15:15:41 UTC — [ticket-881] validateur: fichiers cités joints : backend/tests/test_portes_voisines.py, backend/src/tessera/routers/projects/agents.py, backend/src/tessera/routers/projects/removal.py
+- 2026-11-06 15:15:41 UTC — [ticket-881] validateur: APPROVED — Les quatre critères d'acceptation sont satisfaits : les tests vérifient les comp (282828ms)
+- 2026-11-06 15:15:41 UTC — [ticket-881] APPROVED après 2 tour(s)
+- 2026-11-06 15:16:36 UTC — [ticket-881] leçons: rien à retenir
+- 2026-11-06 15:19:21 UTC — [ticket-881] documentation: 0 fichier(s) (159937ms)
+- 2026-11-06 15:20:20 UTC — [ide-core] ticket-881 PR #981 confiée au CIWatcher
+- 2026-11-06 15:15:14 UTC — [ide-core] ticket-879 PR #980 mergée (CI verte)
+- 2026-11-06 15:20:25 UTC — [ticket-883] branche ticket-883-a-capture-run-that-times-out-kills-its-node-proce
+- 2026-11-06 15:20:27 UTC — [ticket-883] tour 1 — codeur démarré
+- 2026-11-06 15:22:15 UTC — [ticket-883] tour 1 — codeur terminé (107655ms)
+- 2026-11-06 15:22:48 UTC — [ticket-883] testeur: dur�es : ruff 0 s, mypy 11 s, mypy-linux 16 s, pytest 29 s
+- 2026-11-06 15:22:57 UTC — [ticket-883] securite: PASS — Pas de faille de sécurité dans ce diff : verdict PASS. Il ajoute un try/except a (8875ms)
+- 2026-11-06 15:22:57 UTC — [ticket-883] tour 1 — reviewer démarré
+- 2026-11-06 15:23:16 UTC — [ticket-883] tour 1 — reviewer terminé (18610ms)
+- 2026-11-06 15:24:35 UTC — [ticket-883] validateur: fichiers cités joints : backend/tests/test_captures_delai.py
+- 2026-11-06 15:24:35 UTC — [ticket-883] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le code modifie `_lancer_le_sc (97500ms)
+- 2026-11-06 15:24:35 UTC — [ticket-883] APPROVED après 1 tour(s)
+- 2026-11-06 15:26:15 UTC — [ticket-883] documentation: 0 fichier(s) (94796ms)
+- 2026-11-06 15:29:34 UTC — [ide-core] ticket-883 PR #982 confiée au CIWatcher
+- 2026-11-06 15:28:31 UTC — [ide-core] ticket-881 PR #981 mergée (CI verte)
+- 2026-11-06 15:29:40 UTC — [ticket-884] branche ticket-884-text-published-before-a-subscription-is-replayed
+- 2026-11-06 15:29:42 UTC — [ticket-884] tour 1 — codeur démarré
+- 2026-11-06 15:31:02 UTC — [ticket-884] tour 1 — codeur terminé (80125ms)
+- 2026-11-06 15:31:23 UTC — [ticket-884] testeur: dur�es : ruff 0 s, mypy 8 s, mypy-linux 8 s, pytest 18 s
+- 2026-11-06 15:31:28 UTC — [ticket-884] securite: PASS — Le diff n'ajoute que deux tests. Le premier vérifie qu'un observateur qui s'abon (5296ms)
+- 2026-11-06 15:31:28 UTC — [ticket-884] tour 1 — reviewer démarré
+- 2026-11-06 15:31:45 UTC — [ticket-884] tour 1 — reviewer terminé (16782ms)
+- 2026-11-06 15:33:47 UTC — [ticket-884] validateur: fichiers cités joints : backend/tests/test_canal_d_observation.py
+- 2026-11-06 15:33:47 UTC — [ticket-884] validateur: APPROVED — Les deux critères d'acceptation ont été satisfaits. Un test a été ajouté dans `t (139125ms)
+- 2026-11-06 15:33:47 UTC — [ticket-884] APPROVED après 1 tour(s)
+- 2026-11-06 15:36:02 UTC — [ticket-884] documentation: 0 fichier(s) (129875ms)
+- 2026-11-06 15:38:02 UTC — [ide-core] ticket-884 PR #983 confiée au CIWatcher
+- 2026-11-06 15:37:27 UTC — [ide-core] ticket-883 PR #982 mergée (CI verte)
+- 2026-11-06 15:38:07 UTC — [ticket-885] branche ticket-885-the-phase-1-delivery-test-proves-the-steps-and-du
+- 2026-11-06 15:38:09 UTC — [ticket-885] tour 1 — codeur démarré
+- 2026-11-06 15:39:02 UTC — [ticket-885] tour 1 — codeur terminé (53454ms)
+- 2026-11-06 15:39:31 UTC — [ticket-885] testeur: dur�es : ruff 0 s, mypy 5 s, mypy-linux 11 s, pytest 25 s
+- 2026-11-06 15:39:37 UTC — [ticket-885] securite: PASS — Le diff ne modifie qu'un test (backend/tests/test_livraison.py). Il passe l'auto (5905ms)
+- 2026-11-06 15:39:37 UTC — [ticket-885] tour 1 — reviewer démarré
+- 2026-11-06 15:39:47 UTC — [ticket-885] tour 1 — reviewer terminé (10327ms)
+- 2026-11-06 15:42:19 UTC — [ticket-885] validateur: fichiers cités joints : backend/tests/test_livraison.py (tronqué)
+- 2026-11-06 15:42:19 UTC — [ticket-885] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le test a été mis à jour pour  (161594ms)
+- 2026-11-06 15:42:19 UTC — [ticket-885] APPROVED après 1 tour(s)
+- 2026-11-06 15:43:59 UTC — [ticket-885] documentation: 0 fichier(s) (92109ms) — après tour de correction
+- 2026-11-06 15:47:35 UTC — [ide-core] ticket-885 PR #984 confiée au CIWatcher
+- 2026-11-06 15:46:47 UTC — [ide-core] ticket-884 PR #983 mergée (CI verte)
+- 2026-11-06 15:47:40 UTC — [ticket-886] branche ticket-886-the-supervision-badge-test-renders-the-count-with
+- 2026-11-06 15:47:42 UTC — [ticket-886] tour 1 — codeur démarré
+- 2026-11-06 15:48:30 UTC — [ticket-886] tour 1 — codeur terminé (47561ms)
+- 2026-11-06 15:52:10 UTC — [ticket-886] testeur: dur�es : tsc 18 s, eslint 37 s, vitest 163 s
+- 2026-11-06 15:52:15 UTC — [ticket-886] securite: PASS — Le diff ne modifie qu'un test Vitest : il rend `ListeView` avec des fixtures inv (5359ms)
+- 2026-11-06 15:52:15 UTC — [ticket-886] tour 1 — reviewer démarré
+- 2026-11-06 15:52:28 UTC — [ticket-886] tour 1 — reviewer terminé (12483ms)
+- 2026-11-06 15:53:46 UTC — [ticket-886] validateur: APPROVED — Les deux critères d'acceptation sont respectés. Le test a été modifié pour rendr (90297ms)
+- 2026-11-06 15:53:46 UTC — [ticket-886] APPROVED après 1 tour(s)
+- 2026-11-06 15:55:10 UTC — [ticket-886] documentation: 0 fichier(s) (76795ms)
+- 2026-11-06 15:54:44 UTC — [ide-core] ticket-885 PR #984 mergée (CI verte)
+- 2026-11-06 15:59:43 UTC — [ide-core] ticket-886 PR #986 confiée au CIWatcher
+- 2026-11-06 16:08:45 UTC — [ide-core] ticket-886 PR #986 mergée (CI verte)
+- 2026-11-06 17:39:36 UTC — [ticket-888] branche ticket-888-every-process-that-runs-project-code-gets-an-envi
+- 2026-11-06 17:39:38 UTC — [ticket-888] tour 1 — codeur démarré
+- 2026-11-06 17:41:25 UTC — [ticket-888] tour 1 — codeur terminé (106563ms)
+- 2026-11-06 17:44:37 UTC — [ticket-888] testeur: 1 failed, 1009 passed, 72 warnings in 187.64s (0:03:07)
+- 2026-11-06 17:44:37 UTC — [ticket-888] tests rouges au tour 1
+- 2026-11-06 17:44:37 UTC — [ticket-888] tour 2 — codeur démarré
+- 2026-11-06 17:47:08 UTC — [ticket-888] tour 2 — codeur terminé (151000ms)
+- 2026-11-06 17:54:04 UTC — [ticket-888] testeur: dur�es : ruff 2 s, pytest 402 s
+- 2026-11-06 17:54:04 UTC — [ticket-888] tests rouges au tour 2
+- 2026-11-06 17:54:04 UTC — [ticket-888] tour 3 — codeur démarré
+- 2026-11-06 17:54:47 UTC — [ticket-888] tour 3 — codeur terminé (43030ms)
+- 2026-11-06 17:59:01 UTC — [ticket-888] testeur: dur�es : ruff 0 s, mypy 20 s, mypy-linux 16 s, pytest 244 s
+- 2026-11-06 17:59:15 UTC — [ticket-888] securite: PASS — Ce diff renforce la sécurité. Les tests, les services, l'app du contrôle visuel  (14016ms)
+- 2026-11-06 17:59:15 UTC — [ticket-888] tour 3 — reviewer démarré
+- 2026-11-06 17:59:33 UTC — [ticket-888] tour 3 — reviewer terminé (18171ms)
+- 2026-11-06 18:04:15 UTC — [ticket-888] validateur: repli vers agent_sdk/claude-haiku-4-5 — Ollama : délai dépassé (300 s)
+- 2026-11-06 18:05:13 UTC — [ticket-888] validateur: fichiers cités joints : backend/tests/test_env_du_code_de_projet.py, test_runner.py (tronqué) ; non joints (budget épuisé) : process_registry.py, app_du_run.py, captures.py, groupe_d_etape.py
+- 2026-11-06 18:05:13 UTC — [ticket-888] validateur: APPROVED — Tous les critères sont satisfaits. La fonction env_du_code_de_projet filtre corr (357672ms)
+- 2026-11-06 18:05:13 UTC — [ticket-888] APPROVED après 3 tour(s)
+- 2026-11-06 18:06:18 UTC — [ticket-888] leçons: une leçon proposée
+- 2026-11-06 18:09:14 UTC — [ticket-888] documentation: 0 fichier(s) (171671ms) — après tour de correction
+- 2026-11-06 18:13:14 UTC — [ide-core] ticket-888 PR #988 confiée au CIWatcher
+- 2026-11-06 18:20:36 UTC — [ide-core] ticket-888 PR #988 mergée (CI verte)
+- 2026-11-09 10:25:08 UTC — [ticket-889] branche ticket-889-a-fixed-token-leaves-no-stale-session-token-file
+- 2026-11-09 10:25:10 UTC — [ticket-889] tour 1 — codeur démarré
+- 2026-11-09 10:25:52 UTC — [ticket-889] tour 1 — codeur terminé (42015ms)
+- 2026-11-09 10:27:45 UTC — [ticket-889] testeur: dur�es : ruff 3 s, mypy 11 s, mypy-linux 9 s, pytest 110 s
+- 2026-11-09 10:27:52 UTC — [ticket-889] securite: PASS — Le diff ne fait qu'une chose : quand `STATIC_TOKEN` est défini, le démarrage sup (6360ms)
+- 2026-11-09 10:27:52 UTC — [ticket-889] tour 1 — reviewer démarré
+- 2026-11-09 10:28:05 UTC — [ticket-889] tour 1 — reviewer terminé (12985ms)
+- 2026-11-09 10:28:11 UTC — [ticket-889] validateur: APPROVED — Tous les critères sont satisfaits. La fonction `demarrer()` supprime le fichier  (19109ms)
+- 2026-11-09 10:28:11 UTC — [ticket-889] APPROVED après 1 tour(s)
+- 2026-11-09 10:30:35 UTC — [ticket-889] documentation: 0 fichier(s) (139811ms)
+- 2026-11-09 10:30:54 UTC — [ide-core] ticket-889 PR #991 confiée au CIWatcher
+- 2026-11-09 10:30:59 UTC — [ticket-891] branche ticket-891-the-editor-write-route-refuses-policy-files-witho
+- 2026-11-09 10:31:00 UTC — [ticket-891] tour 1 — codeur démarré
+- 2026-11-09 10:32:14 UTC — [ticket-891] tour 1 — codeur terminé (73719ms)
+- 2026-11-09 10:34:27 UTC — [ticket-891] testeur: dur�es : ruff 0 s, mypy 7 s, mypy-linux 10 s, pytest 130 s
+- 2026-11-09 10:34:44 UTC — [ticket-891] securite: PASS — PASS : le diff durcit la route : `PUT /fs/write` refuse désormais les fichiers d (16796ms)
+- 2026-11-09 10:34:46 UTC — [ticket-891] tour 1 — reviewer démarré
+- 2026-11-09 10:35:12 UTC — [ticket-891] tour 1 — reviewer terminé (25530ms)
+- 2026-11-09 10:35:16 UTC — [ticket-891] validateur: fichiers cités joints : agents.json, CLAUDE.md, .github/workflows/ (dossier, 2 fichiers), .claude/skills/ (dossier, 0 fichiers), .git/HEAD, .claude/settings.json, fs.py, chemins_proteges.py (tronqué) ; absents : src/x.py
+- 2026-11-09 10:35:16 UTC — [ticket-891] validateur: APPROVED — Tous les critères sont satisfaits. La route `PUT /api/v1/fs/write` refuse correc (31922ms)
+- 2026-11-09 10:35:16 UTC — [ticket-891] APPROVED après 1 tour(s)
+- 2026-11-09 10:38:45 UTC — [ticket-891] documentation: 0 fichier(s) (203625ms) — après tour de correction
+- 2026-11-09 10:59:41 UTC — [ide-core] ticket-891 PR #992 confiée au CIWatcher
+- 2026-11-09 10:53:53 UTC — [ide-core] ticket-889 PR #991 mergée (CI verte)
+- 2026-11-09 10:59:48 UTC — [ticket-868] branche ticket-868-the-supervisor-writes-its-a-toi-cases-to-its-jour
+- 2026-11-09 10:59:51 UTC — [ticket-868] tour 1 — codeur démarré
+- 2026-11-09 11:03:31 UTC — [ticket-868] tour 1 — codeur terminé (219452ms)
+- 2026-11-09 11:05:41 UTC — [ticket-868] testeur: dur�es : ruff 0 s, mypy 11 s, mypy-linux 11 s, pytest 127 s
+- 2026-11-09 11:05:57 UTC — [ticket-868] securite: PASS — PASS : rien de CRITICAL ni de HIGH dans ce diff. Le nouveau chemin « À toi » est (16016ms)
+- 2026-11-09 11:05:57 UTC — [ticket-868] tour 1 — reviewer démarré
+- 2026-11-09 11:06:18 UTC — [ticket-868] tour 1 — reviewer terminé (20938ms)
+- 2026-11-09 11:06:46 UTC — [ticket-868] validateur: fichiers cités joints : aucun ; absents : memory/supervision.md
+- 2026-11-09 11:06:46 UTC — [ticket-868] validateur: APPROVED — Toutes les fonctionnalités demandées sont implémentées et testées. Le code ajout (48172ms)
+- 2026-11-09 11:06:46 UTC — [ticket-868] APPROVED après 1 tour(s)
+- 2026-11-09 11:08:29 UTC — [ticket-868] documentation: 0 fichier(s) (81452ms)
+- 2026-11-09 11:10:47 UTC — [ide-core] ticket-868 PR #994 confiée au CIWatcher
+- 2026-11-09 11:06:32 UTC — [ide-core] ticket-891 PR #992 mergée (CI verte)
+- 2026-11-09 11:10:52 UTC — [ticket-893] branche ticket-893-the-agent-sdk-moves-to-0-2-179-which-ships-a-wind
+- 2026-11-09 11:10:53 UTC — [ticket-893] tour 1 — codeur démarré
+- 2026-11-09 11:11:33 UTC — [ticket-893] tour 1 — codeur terminé (39390ms)
+- 2026-11-09 11:23:56 UTC — [ticket-893] testeur: dur�es : ruff 1 s, mypy 17 s, mypy-linux 23 s, pytest 733 s
+- 2026-11-09 11:24:02 UTC — [ticket-893] securite: PASS — Le diff relève le plancher de claude-agent-sdk de 0.2.159 à 0.2.179 et met à jou (5609ms)
+- 2026-11-09 11:24:02 UTC — [ticket-893] tour 1 — reviewer démarré
+- 2026-11-09 11:24:18 UTC — [ticket-893] tour 1 — reviewer terminé (15781ms)
+- 2026-11-09 11:24:39 UTC — [ticket-893] validateur: fichiers cités joints : backend/pyproject.toml, backend/uv.lock (tronqué) ; non joints (budget épuisé) : test_agent_sdk_windows_wheel.py
+- 2026-11-09 11:24:39 UTC — [ticket-893] validateur: CHANGES_REQUESTED — Trois critères sur quatre sont satisfaits. Le pyproject.toml porte bien la versi (36780ms)
+- 2026-11-09 11:24:39 UTC — [ticket-893] CHANGES_REQUESTED tour 1: Validateur : Trois critères sur quatre sont satisfaits. Le pyproject.toml porte bien la version 0.2.179, le uv.lock a été mis à jour (confirmé par les tests passants qui incluent test_agent_sdk_window
+- 2026-11-09 11:24:39 UTC — [ticket-893] tour 2 — codeur démarré
+- 2026-11-09 11:25:00 UTC — [ticket-893] tour 2 — codeur terminé (20702ms)
+- 2026-11-09 11:36:22 UTC — [ticket-893] testeur: dur�es : ruff 0 s, mypy 2 s, mypy-linux 2 s, pytest 679 s
+- 2026-11-09 11:36:27 UTC — [ticket-893] securite: PASS — Le diff ne fait que relever la version minimale de claude-agent-sdk de 0.2.159 à (4984ms)
+- 2026-11-09 11:36:27 UTC — [ticket-893] tour 2 — reviewer démarré
+- 2026-11-09 11:36:41 UTC — [ticket-893] tour 2 — reviewer terminé (14625ms)
+- 2026-11-09 11:38:09 UTC — [ticket-893] validateur: fichiers cités joints : backend/pyproject.toml, backend/uv.lock (tronqué) ; non joints (budget épuisé) : test_agent_sdk_windows_wheel.py
+- 2026-11-09 11:38:09 UTC — [ticket-893] validateur: CHANGES_REQUESTED — Trois critères sur quatre sont satisfaits. Le pyproject.toml porte bien 0.2.179, (101875ms)
+- 2026-11-09 11:38:09 UTC — [ticket-893] CHANGES_REQUESTED tour 2: Validateur : Trois critères sur quatre sont satisfaits. Le pyproject.toml porte bien 0.2.179, les tests passent (incluant le test du wheel Windows), et le rapport du codeur est présent et complet. Seu
+- 2026-11-09 11:38:09 UTC — [ticket-893] tour 3 — codeur démarré
+- 2026-11-09 11:38:49 UTC — [ticket-893] tour 3 — codeur terminé (40702ms)
+- 2026-11-09 11:50:14 UTC — [ticket-893] testeur: dur�es : ruff 1 s, mypy 6 s, mypy-linux 3 s, pytest 672 s
+- 2026-11-09 11:50:20 UTC — [ticket-893] securite: PASS — Le diff relève seulement la version minimale de claude-agent-sdk, de 0.2.159 à 0 (6375ms)
+- 2026-11-09 11:50:20 UTC — [ticket-893] tour 3 — reviewer démarré
+- 2026-11-09 11:50:34 UTC — [ticket-893] tour 3 — reviewer terminé (13500ms)
+- 2026-11-09 11:51:18 UTC — [ticket-893] validateur: fichiers cités joints : backend/pyproject.toml, backend/uv.lock (tronqué) ; non joints (budget épuisé) : test_agent_sdk_windows_wheel.py
+- 2026-11-09 11:51:18 UTC — [ticket-893] validateur: APPROVED — Tous les critères sont satisfaits. Le pyproject.toml exige bien 0.2.179, le uv.l (57936ms)
+- 2026-11-09 11:51:18 UTC — [ticket-893] APPROVED après 3 tour(s)
+- 2026-11-09 11:51:50 UTC — [ticket-893] leçons: une leçon proposée
+- 2026-11-09 11:52:58 UTC — [ticket-893] documentation: 0 fichier(s) (62968ms)
+- 2026-11-09 12:12:19 UTC — [ide-core] ticket-893 : base réalignée sur develop
+- 2026-11-09 12:12:19 UTC — [ide-core] ticket-893 PR #995 confiée au CIWatcher
+- 2026-11-09 11:16:18 UTC — [ide-core] ticket-868 PR #994 mergée (CI verte)
+- 2026-11-09 12:12:17 UTC — [ide-core] ticket-893 PR #995 mergée (CI verte)
+- 2026-11-09 12:12:24 UTC — [ticket-890] branche ticket-890-project-services-come-back-after-a-backend-restar
+- 2026-11-09 12:13:04 UTC — [ticket-890] plan rendu (37561ms)
+- 2026-11-09 12:13:04 UTC — [ticket-890] tour 1 — codeur démarré
+- 2026-11-09 12:18:17 UTC — [ticket-890] tour 1 — codeur terminé (312906ms)
+- 2026-11-09 12:20:09 UTC — [ticket-890] testeur: 2 failed, 597 passed in 104.77s (0:01:44)
+- 2026-11-09 12:20:09 UTC — [ticket-890] tests rouges au tour 1
+- 2026-11-09 12:20:09 UTC — [ticket-890] tour 2 — codeur démarré
+- 2026-11-09 12:20:53 UTC — [ticket-890] tour 2 — codeur terminé (44000ms)
+- 2026-11-09 12:23:33 UTC — [ticket-890] testeur: dur�es : ruff 0 s, pytest 156 s
+- 2026-11-09 12:23:33 UTC — [ticket-890] tests rouges au tour 2
+- 2026-11-09 12:23:33 UTC — [ticket-890] tour 3 — codeur démarré
+- 2026-11-09 12:23:49 UTC — [ticket-890] tour 3 — codeur terminé (16735ms)
+- 2026-11-09 12:27:41 UTC — [ticket-890] testeur: dur�es : ruff 0 s, mypy 11 s, mypy-linux 10 s, pytest 228 s
+- 2026-11-09 12:28:02 UTC — [ticket-890] securite: PASS — PASS : aucune faille CRITICAL ou HIGH introduite. La route `start` reste authent (21686ms)
+- 2026-11-09 12:28:02 UTC — [ticket-890] tour 3 — reviewer démarré
+- 2026-11-09 12:28:28 UTC — [ticket-890] tour 3 — reviewer terminé (26030ms)
+- 2026-11-09 12:28:31 UTC — [ticket-890] validateur: fichiers cités joints : memory/decisions.md (tronqué)
+- 2026-11-09 12:28:31 UTC — [ticket-890] validateur: APPROVED — Tous les critères sont satisfaits. Le code implémente correctement la reprise de (28610ms)
+- 2026-11-09 12:28:31 UTC — [ticket-890] APPROVED après 3 tour(s)
+- 2026-11-09 12:29:40 UTC — [ticket-890] leçons: refusée — preuve absente du retour du run
+- 2026-11-09 12:33:11 UTC — [ticket-890] documentation: 0 fichier(s) (206985ms) — après tour de correction
+- 2026-11-09 12:33:30 UTC — [ide-core] ticket-890 PR #996 confiée au CIWatcher
+- 2026-11-09 12:33:35 UTC — [ticket-892] branche ticket-892-the-retest-after-a-rebase-only-runs-the-tests-the
+- 2026-11-09 12:34:28 UTC — [ticket-892] plan rendu (51078ms)
+- 2026-11-09 12:34:28 UTC — [ticket-892] tour 1 — codeur démarré
+- 2026-11-09 12:35:49 UTC — [ticket-892] tour 1 — codeur terminé (81531ms)
+- 2026-11-09 12:47:18 UTC — [ticket-892] testeur: dur�es : ruff 0 s, mypy 14 s, mypy-linux 17 s, pytest 685 s
+- 2026-11-09 12:47:34 UTC — [ticket-892] securite: PASS — Le diff ne fait qu'ajouter de la journalisation : le SHA du fork, tronqué, et le (16296ms)
+- 2026-11-09 12:47:38 UTC — [ticket-892] tour 1 — reviewer démarré
+- 2026-11-09 12:48:26 UTC — [ticket-892] tour 1 — reviewer terminé (47859ms)
+- 2026-11-09 12:49:03 UTC — [ticket-892] validateur: fichiers cités joints : verifier.py, frontend/ (dossier, 17 fichiers), retest_apres_rebase.py (tronqué) ; non joints (budget épuisé) : conftest.py, package.json
+- 2026-11-09 12:49:03 UTC — [ticket-892] validateur: APPROVED — Les quatre critères sont satisfaits. Le code ajoute une logique pour détecter le (88186ms)
+- 2026-11-09 12:49:03 UTC — [ticket-892] CHANGES_REQUESTED tour 1: Reviewer : 1. Le nouveau court-circuit de `_chemins_depuis` ne s'exécute jamais en production. Il ne joue que si `paths` ne contient ni `backend/` ni `scripts/`. Or `main()` n'appelle `_pytest_impacte
+- 2026-11-09 12:49:03 UTC — [ticket-892] tour 2 — codeur démarré
+- 2026-11-09 12:51:27 UTC — [ticket-892] tour 2 — codeur terminé (143719ms)
+- 2026-11-09 13:03:25 UTC — [ticket-892] testeur: 1 failed, 5885 passed, 72 warnings in 714.46s (0:11:54)
+- 2026-11-09 13:03:25 UTC — [ticket-892] tests rouges au tour 2
+- 2026-11-09 13:03:25 UTC — [ticket-892] tour 3 — codeur démarré
+- 2026-11-09 13:03:54 UTC — [ticket-892] tour 3 — codeur terminé (28750ms)
+- 2026-11-09 13:15:04 UTC — [ticket-892] testeur: dur�es : ruff 0 s, mypy 4 s, mypy-linux 3 s, pytest 666 s ; impact depuis base : suite compl�te
+- 2026-11-09 13:15:12 UTC — [ticket-892] securite: PASS — Le diff touche le journal et la sélection des tests. Dans `retest_apres_rebase.p (7936ms)
+- 2026-11-09 13:15:17 UTC — [ticket-892] tour 3 — reviewer démarré
+- 2026-11-09 13:16:08 UTC — [ticket-892] tour 3 — reviewer terminé (50515ms)
+- 2026-11-09 13:16:38 UTC — [ticket-892] validateur: fichiers cités joints : verifier.py, frontend/ (dossier, 17 fichiers), retest_apres_rebase.py (tronqué) ; non joints (budget épuisé) : conftest.py, package.json
+- 2026-11-09 13:16:38 UTC — [ticket-892] validateur: APPROVED — Les quatre critères d'acceptation sont satisfaits. Le code ajoute une journalisa (86578ms)
+- 2026-11-09 13:16:38 UTC — [ticket-892] APPROVED après 3 tour(s)
+- 2026-11-09 13:18:08 UTC — [ticket-892] leçons: une leçon proposée
+- 2026-11-09 13:19:12 UTC — [ticket-892] documentation: 0 fichier(s) (58905ms)
+- 2026-11-09 13:30:30 UTC — [ide-core] ticket-892 PR #997 confiée au CIWatcher
+- 2026-11-09 12:39:55 UTC — [ide-core] ticket-890 PR #996 mergée (CI verte)
+- 2026-11-09 13:30:37 UTC — [ticket-897] branche ticket-897-the-interface-remembers-the-session-token-across
+- 2026-11-09 13:30:39 UTC — [ticket-897] tour 1 — codeur démarré
+- 2026-11-09 13:31:21 UTC — [ticket-897] tour 1 — codeur terminé (41937ms)
+- 2026-11-09 13:34:43 UTC — [ticket-897] testeur: dur�es : tsc 16 s, eslint 38 s, vitest 144 s
+- 2026-11-09 13:34:43 UTC — [ticket-897] tests rouges au tour 1
+- 2026-11-09 13:34:43 UTC — [ticket-897] tour 2 — codeur démarré
+- 2026-11-09 13:37:09 UTC — [ticket-897] tour 2 — codeur terminé (145968ms)
+- 2026-11-09 13:40:44 UTC — [ticket-897] testeur: dur�es : tsc 15 s, eslint 43 s, vitest 154 s
+- 2026-11-09 13:41:01 UTC — [ticket-897] securite: PASS — Le diff persiste le jeton Bearer en localStorage au lieu de sessionStorage : c'e (17686ms)
+- 2026-11-09 13:41:03 UTC — [ticket-897] tour 2 — reviewer démarré
+- 2026-11-09 13:41:28 UTC — [ticket-897] tour 2 — reviewer terminé (25155ms)
+- 2026-11-09 13:41:40 UTC — [ticket-897] validateur: fichiers cités joints : auth.ts, auth.test.ts ; absents : import.meta.env
+- 2026-11-09 13:41:40 UTC — [ticket-897] validateur: APPROVED — Tous les critères sont satisfaits. Le jeton est maintenant stocké en `localStora (39016ms)
+- 2026-11-09 13:41:40 UTC — [ticket-897] APPROVED après 2 tour(s)
+- 2026-11-09 13:43:35 UTC — [ticket-897] leçons: une leçon proposée
+- 2026-11-09 13:47:20 UTC — [ticket-897] documentation: 0 fichier(s) (219780ms)
+- 2026-11-09 15:41:37 UTC — [ticket-899] branche ticket-899-agents-cannot-kill-processes-by-name-nor-by-a-pid
+- 2026-11-09 15:41:38 UTC — [ticket-899] tour 1 — codeur démarré
+- 2026-11-09 15:43:30 UTC — [ticket-899] tour 1 — codeur terminé (112062ms)
+- 2026-11-09 15:44:20 UTC — [ticket-899] testeur: 1 failed, 814 passed in 44.86s
+- 2026-11-09 15:44:20 UTC — [ticket-899] tests rouges au tour 1
+- 2026-11-09 15:44:20 UTC — [ticket-899] tour 2 — codeur démarré
+- 2026-11-09 15:45:28 UTC — [ticket-899] tour 2 — codeur terminé (67795ms)
+- 2026-11-09 15:46:31 UTC — [ticket-899] testeur: dur�es : ruff 0 s, mypy 11 s, mypy-linux 10 s, pytest 60 s ; impact depuis base : 69 fichier(s) de test
+- 2026-11-09 15:46:48 UTC — [ticket-899] securite: PASS — Le diff ajoute un hook PreToolUse qui interdit à un agent de tuer des processus  (16734ms)
+- 2026-11-09 15:46:48 UTC — [ticket-899] tour 2 — reviewer démarré
+- 2026-11-09 15:47:13 UTC — [ticket-899] tour 2 — reviewer terminé (24875ms)
+- 2026-11-09 15:47:31 UTC — [ticket-899] validateur: fichiers cités joints : kill_guard.py, backend/src/tessera/services/providers/ (dossier, 36 fichiers), agent_sdk.py (tronqué)
+- 2026-11-09 15:47:31 UTC — [ticket-899] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le fichier `kill_guard.py` exis (42375ms)
+- 2026-11-09 15:47:31 UTC — [ticket-899] APPROVED après 2 tour(s)
+- 2026-11-09 15:48:16 UTC — [ticket-899] leçons: une leçon proposée
+- 2026-11-09 15:50:18 UTC — [ticket-899] documentation: 0 fichier(s) (111780ms) — après tour de correction
+- 2026-11-09 15:50:18 UTC — [ticket-899] documentation: pas de diff retrouvable, non documenté
+- 2026-11-09 13:51:51 UTC — [ide-core] ticket-897 PR #998 non surveillée (livraison arrêtée)
+- 2026-11-09 13:37:39 UTC — [ide-core] ticket-892 PR #997 mergée (CI verte)
+- 2026-11-09 13:51:56 UTC — [ticket-894] branche ticket-894-the-agent-cli-runs-under-the-dedicated-agent-acco
+- 2026-11-09 13:52:52 UTC — [ticket-894] plan rendu (53719ms)
+- 2026-11-09 13:52:52 UTC — [ticket-894] tour 1 — codeur démarré
+- 2026-11-09 14:01:30 UTC — [ticket-894] tour 1 — codeur terminé (518813ms)
+- 2026-11-09 14:03:57 UTC — [ticket-894] testeur: 3 failed, 939 passed, 3 skipped, 8 warnings in 143.13s (0:02:23)
+- 2026-11-09 14:03:57 UTC — [ticket-894] tests rouges au tour 1
+- 2026-11-09 14:03:57 UTC — [ticket-894] tour 2 — codeur démarré
+- 2026-11-09 14:05:37 UTC — [ticket-894] tour 2 — codeur terminé (99030ms)
+- 2026-11-09 14:11:47 UTC — [ticket-894] testeur: 1 failed, 1937 passed, 3 skipped, 8 warnings in 365.77s (0:06:05)
+- 2026-11-09 14:11:47 UTC — [ticket-894] tests rouges au tour 2
+- 2026-11-09 14:11:47 UTC — [ticket-894] tour 3 — codeur démarré
+- 2026-11-09 14:13:12 UTC — [ticket-894] tour 3 — codeur terminé (85266ms)
+- 2026-11-09 14:16:05 UTC — [ticket-894] testeur: 1 error in 166.37s (0:02:46)
+- 2026-11-09 14:16:05 UTC — [ticket-894] tests rouges au tour 3
+- 2026-11-09 14:16:05 UTC — [ticket-894] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-09 14:16:10 UTC — [ide-core] file interrompue : ticket-894 non approuvé
+- 2026-11-09 15:50:37 UTC — [ide-core] ticket-899 PR #1000 confiée au CIWatcher
+- 2026-11-09 15:50:55 UTC — [ticket-894] branche ticket-894-the-agent-cli-runs-under-the-dedicated-agent-acco
+- 2026-11-09 15:52:19 UTC — [ticket-894] plan rendu (74670ms)
+- 2026-11-09 15:52:19 UTC — [ticket-894] branche reprise (3 commit(s)) — refus précédent : revue, codeur en premier
+- 2026-11-09 15:52:19 UTC — [ticket-894] tour 1 — codeur démarré
+- 2026-11-09 15:52:58 UTC — [ticket-894] tour 1 — codeur terminé (39655ms)
+- 2026-11-09 15:55:46 UTC — [ticket-894] testeur: 1 error in 152.85s (0:02:32)
+- 2026-11-09 15:55:46 UTC — [ticket-894] tests rouges au tour 1
+- 2026-11-09 15:55:46 UTC — [ticket-894] tour 2 — codeur démarré
+- 2026-11-09 15:56:57 UTC — [ticket-894] tour 2 — codeur terminé (70485ms)
+- 2026-11-09 16:07:14 UTC — [ticket-894] testeur: 1 failed, 3782 passed, 3 skipped, 8 warnings in 612.15s (0:10:12)
+- 2026-11-09 16:07:14 UTC — [ticket-894] tests rouges au tour 2
+- 2026-11-09 16:07:14 UTC — [ticket-894] tour 3 — codeur démarré
+- 2026-11-09 16:07:47 UTC — [ticket-894] tour 3 — codeur terminé (33860ms)
+- 2026-11-09 16:17:13 UTC — [ticket-894] testeur: dur�es : ruff 0 s, mypy 2 s, mypy-linux 20 s, pytest 563 s ; impact depuis base : 268 fichier(s) de test
+- 2026-11-09 16:17:13 UTC — [ticket-894] tests rouges au tour 3
+- 2026-11-09 16:17:13 UTC — [ticket-894] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-09 16:17:18 UTC — [ide-core] file interrompue : ticket-894 non approuvé
+- 2026-11-09 15:56:14 UTC — [ide-core] ticket-899 PR #1000 mergée (CI verte)
+- 2026-11-09 16:36:16 UTC — [ticket-894] branche ticket-894-the-agent-cli-runs-under-the-dedicated-agent-acco
+- 2026-11-09 16:36:57 UTC — [ticket-894] plan rendu (38516ms)
+- 2026-11-09 16:36:57 UTC — [ticket-894] branche reprise (7 commit(s)) — refus précédent : revue, codeur en premier
+- 2026-11-09 16:36:57 UTC — [ticket-894] tour 1 — codeur démarré
+- 2026-11-09 16:37:23 UTC — [ticket-894] tour 1 — codeur terminé (25938ms)
+- 2026-11-09 16:46:35 UTC — [ticket-894] testeur: dur�es : ruff 0 s, mypy 8 s, mypy-linux 23 s, pytest 549 s ; impact depuis base : 269 fichier(s) de test
+- 2026-11-09 16:47:09 UTC — [ticket-894] securite: PASS — Le diff ne contient aucune faille CRITICAL ou HIGH. L'environnement de l'agent p (34483ms)
+- 2026-11-09 16:47:09 UTC — [ticket-894] tour 1 — reviewer démarré
+- 2026-11-09 16:47:39 UTC — [ticket-894] tour 1 — reviewer terminé (30061ms)
+- 2026-11-09 16:47:44 UTC — [ticket-894] validateur: fichiers cités joints : .env, memory/decisions.md (tronqué)
+- 2026-11-09 16:47:44 UTC — [ticket-894] validateur: APPROVED — Les 7 critères d'acceptation sont satisfaits. La fondation technique est en plac (35187ms)
+- 2026-11-09 16:47:44 UTC — [ticket-894] CHANGES_REQUESTED tour 1: Reviewer : 1. Dans l'ADR-083, le chemin du CLI partagé contient un caractère de contrôle à la place de `\b`. `\bin` a été écrit comme un retour arrière (0x08), puis `in`. Une recherche `Tessera\x08in`
+- 2026-11-09 16:47:44 UTC — [ticket-894] tour 2 — codeur démarré
+- 2026-11-09 16:48:08 UTC — [ticket-894] tour 2 — codeur terminé (23671ms)
+- 2026-11-09 17:00:46 UTC — [ticket-894] testeur: dur�es : ruff 0 s, mypy 3 s, mypy-linux 4 s, pytest 754 s ; impact depuis base : 269 fichier(s) de test
+- 2026-11-09 17:01:12 UTC — [ticket-894] securite: PASS — PASS : aucune faille CRITICAL ou HIGH introduite par ce diff. Le compte dédié ne (25968ms)
+- 2026-11-09 17:01:12 UTC — [ticket-894] tour 2 — reviewer démarré
+- 2026-11-09 17:01:36 UTC — [ticket-894] tour 2 — reviewer terminé (23406ms)
+- 2026-11-09 17:02:21 UTC — [ticket-894] validateur: fichiers cités joints : .env, memory/decisions.md (tronqué)
+- 2026-11-09 17:02:21 UTC — [ticket-894] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le diff implémente le compte dé (68796ms)
+- 2026-11-09 17:02:21 UTC — [ticket-894] APPROVED après 2 tour(s)
+- 2026-11-09 17:02:45 UTC — [ticket-894] leçons: une leçon proposée
+- 2026-11-09 17:04:30 UTC — [ticket-894] documentation: 0 fichier(s) (99125ms)
+- 2026-11-09 17:12:24 UTC — [ide-core] ticket-894 : base réalignée sur develop
+- 2026-11-09 17:12:24 UTC — [ide-core] ticket-894 PR #1001 confiée au CIWatcher
+- 2026-11-09 17:12:22 UTC — [ide-core] ticket-894 PR #1001 mergée (CI verte)
+- 2026-11-09 17:12:30 UTC — [ticket-895] branche ticket-895-worktrees-grant-the-agent-account-exactly-what-a
+- 2026-11-09 17:12:31 UTC — [ticket-895] tour 1 — codeur démarré
+- 2026-11-09 17:15:21 UTC — [ticket-895] tour 1 — codeur terminé (170062ms)
+- 2026-11-09 17:20:25 UTC — [ticket-895] testeur: dur�es : ruff 0 s, mypy 12 s, mypy-linux 11 s, pytest 300 s ; impact depuis base : 66 fichier(s) de test
+- 2026-11-09 17:20:59 UTC — [ticket-895] securite: PASS — Le diff pose les ACL du compte agent avec `icacls`, appelé par `create_subproces (34484ms)
+- 2026-11-09 17:20:59 UTC — [ticket-895] tour 1 — reviewer démarré
+- 2026-11-09 17:21:32 UTC — [ticket-895] validateur: fichiers cités joints : agents.json, CLAUDE.md, chemins_proteges.py
+- 2026-11-09 17:21:32 UTC — [ticket-895] validateur: APPROVED — La solution implémente correctement les trois règles de droits Windows via `icac (32358ms)
+- 2026-11-09 17:21:47 UTC — [ticket-895] tour 1 — reviewer terminé (47500ms)
+- 2026-11-09 17:21:47 UTC — [ticket-895] CHANGES_REQUESTED tour 1: Reviewer : 1. Les droits sont posés avant `peupler`. `ouvrir_worktree` appelle `accorder_droits_agent` (ligne 64) puis `peupler` (ligne 67). Une entrée `copy` de `populate` ajoute des fichiers après l
+- 2026-11-09 17:21:47 UTC — [ticket-895] tour 2 — codeur démarré
+- 2026-11-09 17:24:18 UTC — [ticket-895] tour 2 — codeur terminé (151187ms)
+- 2026-11-09 17:28:03 UTC — [ticket-895] testeur: dur�es : ruff 0 s, mypy 10 s, mypy-linux 9 s, pytest 222 s ; impact depuis base : 66 fichier(s) de test
+- 2026-11-09 17:28:54 UTC — [ticket-895] securite: PASS — Le diff ajoute des restrictions d'ACL pour le compte agent et ne retire aucun co (50968ms)
+- 2026-11-09 17:28:55 UTC — [ticket-895] tour 2 — reviewer démarré
+- 2026-11-09 17:29:23 UTC — [ticket-895] tour 2 — reviewer terminé (28438ms)
+- 2026-11-09 17:29:49 UTC — [ticket-895] validateur: fichiers cités joints : agents.json, CLAUDE.md, chemins_proteges.py
+- 2026-11-09 17:29:49 UTC — [ticket-895] validateur: APPROVED — Les cinq critères sont satisfaits. La solution implémente correctement les trois (55014ms)
+- 2026-11-09 17:29:49 UTC — [ticket-895] APPROVED après 2 tour(s)
+- 2026-11-09 17:30:25 UTC — [ticket-895] leçons: une leçon proposée
+- 2026-11-09 17:31:51 UTC — [ticket-895] documentation: 0 fichier(s) (80546ms)
+- 2026-11-09 17:32:11 UTC — [ide-core] ticket-895 PR #1002 confiée au CIWatcher
+- 2026-11-09 17:32:16 UTC — [ticket-896] branche ticket-896-a-setup-script-recreates-the-agent-account-on-any
+- 2026-11-09 17:32:18 UTC — [ticket-896] tour 1 — codeur démarré
+- 2026-11-09 17:34:23 UTC — [ticket-896] tour 1 — codeur terminé (125139ms)
+- 2026-11-09 17:44:34 UTC — [ticket-896] testeur: dur�es : ruff 0 s, mypy 7 s, mypy-linux 13 s, pytest 608 s ; impact depuis base : suite compl�te
+- 2026-11-09 17:45:23 UTC — [ticket-896] securite: BLOCK — BLOCK : le dossier partagé C:\ProgramData\Tessera\bin hérite du droit de créatio (48937ms)
+- 2026-11-09 17:45:28 UTC — [ide-core] file interrompue : ticket-896 non approuvé
+- 2026-11-09 17:38:40 UTC — [ticket-895] livraison: arrêt — PR #1002 non mergée : CI failing : la PR #1002 reste ouverte.
+- 2026-11-10 08:18:51 UTC — [ticket-896] branche ticket-896-a-setup-script-recreates-the-agent-account-on-any
+- 2026-11-10 08:18:54 UTC — [ticket-896] branche reprise (4 commit(s)) — refus précédent : securite, codeur en premier
+- 2026-11-10 08:18:54 UTC — [ticket-896] tour 1 — codeur démarré
+- 2026-11-10 08:19:50 UTC — [ticket-896] tour 1 — codeur terminé (55516ms)
+- 2026-11-10 08:30:04 UTC — [ticket-896] testeur: dur�es : ruff 1 s, mypy 9 s, mypy-linux 15 s, pytest 612 s ; impact depuis base : suite compl�te
+- 2026-11-10 08:30:42 UTC — [ticket-896] securite: PASS — Le diff n'introduit aucune faille CRITICAL ou HIGH : mot de passe tiré d'un géné (37358ms)
+- 2026-11-10 08:30:42 UTC — [ticket-896] tour 1 — reviewer démarré
+- 2026-11-10 08:31:15 UTC — [ticket-896] tour 1 — reviewer terminé (33516ms)
+- 2026-11-10 08:31:20 UTC — [ticket-896] validateur: fichiers cités joints : scripts/agent-setup-admin.ps1, scripts/agent-setup.ps1, scripts/tessera.ps1 (tronqué) ; absents : scripts/agent-setup*.ps1 ; non joints (budget épuisé) : docs/
+- 2026-11-10 08:31:20 UTC — [ticket-896] validateur: APPROVED — Tous les critères sont satisfaits. Le diff introduit deux nouveaux scripts Power (38343ms)
+- 2026-11-10 08:31:20 UTC — [ticket-896] APPROVED après 1 tour(s)
+- 2026-11-10 08:32:14 UTC — [ticket-896] leçons: refusée — preuve absente du retour du run
+- 2026-11-10 08:39:22 UTC — [ticket-896] documentation: 0 fichier(s) (423157ms) — après tour de correction — refusé : doc-fonctionnelle : docs/agent-isolation.md : règle « preuve » — l'extrait « sur le PC de Benjamin, son compte n'est **pas** administrate » (projects/ide-core/t
+- 2026-11-10 08:49:22 UTC — [ide-core] ticket-896 PR #1004 confiée au CIWatcher
+- 2026-11-10 08:49:26 UTC — [ticket-900] branche ticket-900-a-stopped-agent-takes-its-whole-process-tree-with
+- 2026-11-10 08:50:13 UTC — [ticket-900] plan rendu (45218ms)
+- 2026-11-10 08:50:13 UTC — [ticket-900] tour 1 — codeur démarré
+- 2026-11-10 08:52:55 UTC — [ticket-900] tour 1 — codeur terminé (162093ms)
+- 2026-11-10 08:55:10 UTC — [ticket-900] testeur: 1 failed, 903 passed, 3 skipped, 8 warnings in 129.26s (0:02:09)
+- 2026-11-10 08:55:10 UTC — [ticket-900] tests rouges au tour 1
+- 2026-11-10 08:55:10 UTC — [ticket-900] tour 2 — codeur démarré
+- 2026-11-10 08:57:37 UTC — [ticket-900] tour 2 — codeur terminé (147421ms)
+- 2026-11-10 08:59:54 UTC — [ticket-900] testeur: dur�es : ruff 0 s, pytest 132 s ; impact depuis base : 74 fichier(s) de test
+- 2026-11-10 08:59:54 UTC — [ticket-900] tests rouges au tour 2
+- 2026-11-10 08:59:54 UTC — [ticket-900] tour 3 — codeur démarré
+- 2026-11-10 09:00:40 UTC — [ticket-900] tour 3 — codeur terminé (46250ms)
+- 2026-11-10 09:02:16 UTC — [ticket-900] testeur: dur�es : ruff 1 s, mypy 23 s, mypy-linux 16 s, pytest 90 s ; impact depuis base : 74 fichier(s) de test
+- 2026-11-10 09:02:57 UTC — [ticket-900] securite: PASS — Le diff met le CLI de l'agent dans un job Windows qui se ferme à la fin de l'app (41375ms)
+- 2026-11-10 09:02:57 UTC — [ticket-900] tour 3 — reviewer démarré
+- 2026-11-10 09:03:23 UTC — [ticket-900] tour 3 — reviewer terminé (25640ms)
+- 2026-11-10 09:03:33 UTC — [ticket-900] validateur: APPROVED — Les quatre critères d'acceptation sont pleinement satisfaits. Le code implémente (35733ms)
+- 2026-11-10 09:03:33 UTC — [ticket-900] APPROVED après 3 tour(s)
+- 2026-11-10 09:04:02 UTC — [ticket-900] leçons: une leçon proposée
+- 2026-11-10 09:08:35 UTC — [ticket-900] documentation: 1 fichier(s) (265906ms)
+- 2026-11-10 10:21:17 UTC — [ide-core] ticket-903 sauté : dépend de ticket-902, non mergé
+- 2026-11-10 10:21:17 UTC — [ide-core] ticket-904 sauté : dépend de ticket-903, sauté
+- 2026-11-10 10:21:17 UTC — [ide-core] ticket-905 sauté : dépend de ticket-902, non mergé
+- 2026-11-10 10:21:17 UTC — [ide-core] ticket-902 PR #1011 non surveillée (livraison arrêtée)
+- 2026-11-10 10:21:31 UTC — [ticket-906] branche ticket-906-the-worktree-setup-has-its-own-timeout-and-one-re
+- 2026-11-10 10:22:38 UTC — [ticket-906] plan rendu (61250ms)
+- 2026-11-10 10:22:38 UTC — [ticket-906] tour 1 — codeur démarré
+- 2026-11-10 10:23:54 UTC — [ticket-906] tour 1 — codeur terminé (75233ms)
+- 2026-11-10 10:26:33 UTC — [ticket-906] testeur: dur�es : ruff 0 s, pytest 156 s ; impact depuis base : 71 fichier(s) de test
+- 2026-11-10 10:26:33 UTC — [ticket-906] tests rouges au tour 1
+- 2026-11-10 10:26:33 UTC — [ticket-906] tour 2 — codeur démarré
+- 2026-11-10 10:27:23 UTC — [ticket-906] tour 2 — codeur terminé (49360ms)
+- 2026-11-10 10:30:05 UTC — [ticket-906] testeur: dur�es : ruff 0 s, mypy 15 s, mypy-linux 12 s, pytest 159 s ; impact depuis base : 71 fichier(s) de test
+- 2026-11-10 10:30:14 UTC — [ticket-906] securite: PASS — Verdict PASS : le diff ajoute un délai propre au setup, validé comme entier stri (9266ms)
+- 2026-11-10 10:30:15 UTC — [ticket-906] tour 2 — reviewer démarré
+- 2026-11-10 10:30:33 UTC — [ticket-906] tour 2 — reviewer terminé (18280ms)
+- 2026-11-10 10:30:56 UTC — [ticket-906] validateur: fichiers cités joints : worktree_politique.py
+- 2026-11-10 10:30:56 UTC — [ticket-906] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code lit et valide correctem (41781ms)
+- 2026-11-10 10:30:56 UTC — [ticket-906] APPROVED après 2 tour(s)
+- 2026-11-10 10:32:40 UTC — [ticket-906] leçons: une leçon proposée
+- 2026-11-10 10:37:03 UTC — [ticket-906] documentation: 0 fichier(s) (257500ms)
+- 2026-11-10 08:56:13 UTC — [ide-core] ticket-896 PR #1004 mergée (CI verte)
+- 2026-11-10 09:10:14 UTC — [ide-core] ticket-900 PR #1007 confiée au CIWatcher
+- 2026-11-10 09:14:12 UTC — [ticket-902] branche ticket-902-recurring-rituals-are-read-from-a-versioned-file
+- 2026-11-10 09:14:14 UTC — [ticket-902] tour 1 — codeur démarré
+- 2026-11-10 09:16:59 UTC — [ticket-902] tour 1 — codeur terminé (165234ms)
+- 2026-11-10 09:21:46 UTC — [ticket-902] testeur: 1 failed, 736 passed in 260.51s (0:04:20)
+- 2026-11-10 09:21:46 UTC — [ticket-902] tests rouges au tour 1
+- 2026-11-10 09:21:46 UTC — [ticket-902] tour 2 — codeur démarré
+- 2026-11-10 09:22:56 UTC — [ticket-902] tour 2 — codeur terminé (70125ms)
+- 2026-11-10 09:28:22 UTC — [ticket-902] testeur: dur�es : ruff 0 s, tsc 33 s, eslint 53 s, vitest 197 s, pytest 321 s ; impact depuis base : 126 fichier(s) de test
+- 2026-11-10 09:28:22 UTC — [ticket-902] tests rouges au tour 2
+- 2026-11-10 09:28:22 UTC — [ticket-902] tour 3 — codeur démarré
+- 2026-11-10 09:28:43 UTC — [ticket-902] tour 3 — codeur terminé (20235ms)
+- 2026-11-10 09:36:20 UTC — [ticket-902] testeur: dur�es : ruff 0 s, mypy 16 s, tsc 34 s, mypy-linux 18 s, eslint 70 s, vitest 299 s, pytest 451 s ; impact depuis base : 126 fichier(s) de test
+- 2026-11-10 09:36:20 UTC — [ticket-902] tests rouges au tour 3
+- 2026-11-10 09:36:20 UTC — [ticket-902] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-10 09:36:41 UTC — [ide-core] file interrompue : ticket-902 non approuvé
+- 2026-11-10 09:16:33 UTC — [ide-core] ticket-900 PR #1007 mergée (CI verte)
+- 2026-11-10 09:39:34 UTC — [ticket-902] branche ticket-902-recurring-rituals-are-read-from-a-versioned-file
+- 2026-11-10 09:39:36 UTC — [ticket-902] branche reprise (3 commit(s)) — refus précédent : revue, codeur en premier
+- 2026-11-10 09:39:36 UTC — [ticket-902] tour 1 — codeur démarré
+- 2026-11-10 09:53:13 UTC — [ticket-902] tour 1 — codeur terminé (816843ms)
+- 2026-11-10 09:59:51 UTC — [ticket-902] testeur: dur�es : ruff 0 s, mypy 16 s, mypy-linux 16 s, tsc 35 s, eslint 106 s, vitest 218 s, pytest 394 s ; impact depuis base : 126 fichier(s) de test
+- 2026-11-10 10:00:08 UTC — [ticket-902] securite: PASS — Le diff ajoute trois routes pour les rituels. Elles sont couvertes par le jeton  (16562ms)
+- 2026-11-10 10:00:08 UTC — [ticket-902] tour 1 — reviewer démarré
+- 2026-11-10 10:00:47 UTC — [ticket-902] tour 1 — reviewer terminé (39282ms)
+- 2026-11-10 10:00:56 UTC — [ticket-902] validateur: fichiers cités joints : backend/src/tessera/services/projets/rituels.py, rituels.md, backend/src/tessera/services/noyau/database.py
+- 2026-11-10 10:00:56 UTC — [ticket-902] validateur: APPROVED — Le code implémente complètement la lecture de `rituels.md` avec validation Pydan (48327ms)
+- 2026-11-10 10:00:56 UTC — [ticket-902] CHANGES_REQUESTED tour 1: Reviewer : 1. Le `except (ValidationError, ValueError, OSError)` de `lire_definitions` ne rattrape pas les erreurs de syntaxe YAML. `frontmatter.loads` lève alors `yaml.YAMLError` (ScannerError, Parse
+- 2026-11-10 10:00:56 UTC — [ticket-902] tour 2 — codeur démarré
+- 2026-11-10 10:01:59 UTC — [ticket-902] tour 2 — codeur terminé (62264ms)
+- 2026-11-10 10:10:04 UTC — [ticket-902] testeur: dur�es : ruff 0 s, mypy 12 s, mypy-linux 11 s, tsc 26 s, eslint 82 s, vitest 249 s, pytest 482 s ; impact depuis base : 126 fichier(s) de test
+- 2026-11-10 10:10:21 UTC — [ticket-902] securite: PASS — Le diff ajoute trois routes de rituels. Elles sont protégées par le StaticTokenM (16610ms)
+- 2026-11-10 10:10:21 UTC — [ticket-902] tour 2 — reviewer démarré
+- 2026-11-10 10:10:43 UTC — [ticket-902] tour 2 — reviewer terminé (22125ms)
+- 2026-11-10 10:11:08 UTC — [ticket-902] validateur: fichiers cités joints : backend/src/tessera/services/projets/rituels.py, rituels.md, backend/src/tessera/services/noyau/database.py
+- 2026-11-10 10:11:08 UTC — [ticket-902] validateur: APPROVED — Le code implémente complètement les rituels récurrents : lecture de `rituels.md` (47187ms)
+- 2026-11-10 10:11:08 UTC — [ticket-902] APPROVED après 2 tour(s)
+- 2026-11-10 10:12:05 UTC — [ticket-902] leçons: une leçon proposée
+- 2026-11-10 10:14:39 UTC — [ticket-902] documentation: 0 fichier(s) (148796ms)
+- 2026-11-10 10:37:30 UTC — [ide-core] ticket-906 PR #1012 confiée au CIWatcher
+- 2026-11-10 10:39:22 UTC — [ticket-906] livraison: arrêt — PR #1012 non mergée : mise à jour refusée : Conflit hors des journaux, qui ne se résout pas sans relecture : projects/ide-core/memory/lecons.md
+- 2026-11-10 10:39:42 UTC — [ticket-903] branche ticket-903-a-rituals-view-lists-what-is-late-with-a-rail-bad
+- 2026-11-10 10:39:46 UTC — [ticket-903] tour 1 — codeur démarré
+- 2026-11-10 10:42:59 UTC — [ticket-903] tour 1 — codeur terminé (192797ms)
+- 2026-11-10 10:46:34 UTC — [ticket-903] testeur: dur�es : tsc 16 s, eslint 26 s, vitest 170 s
+- 2026-11-10 10:46:51 UTC — [ticket-903] securite: PASS — Ce diff ne touche que le frontend : une vue Rituels, un hook qui interroge l'API (16750ms)
+- 2026-11-10 10:46:51 UTC — [ticket-903] tour 1 — reviewer démarré
+- 2026-11-10 10:47:15 UTC — [ticket-903] tour 1 — reviewer terminé (24780ms)
+- 2026-11-10 10:47:22 UTC — [ticket-903] validateur: fichiers cités joints : frontend/src/components/Sidebar/panels.ts, rituels.md, backend/ (dossier, 6 fichiers)
+- 2026-11-10 10:47:22 UTC — [ticket-903] validateur: APPROVED — Tous les critères sont satisfaits. Le diff ajoute la vue Rituels et le hook useR (31891ms)
+- 2026-11-10 10:47:22 UTC — [ticket-903] APPROVED après 1 tour(s)
+- 2026-11-10 10:52:56 UTC — [ticket-903] documentation: 4 fichier(s) (328141ms)
+- 2026-11-10 10:58:17 UTC — [ide-core] ticket-903 PR #1015 confiée au CIWatcher
+- 2026-11-10 10:58:25 UTC — [ticket-905] branche ticket-905-ritual-done-state-follows-the-user-from-pc-to-pc
+- 2026-11-10 10:58:28 UTC — [ticket-905] tour 1 — codeur démarré
+- 2026-11-10 11:01:41 UTC — [ticket-905] tour 1 — codeur terminé (192921ms)
+- 2026-11-10 11:06:20 UTC — [ticket-905] testeur: dur�es : ruff 0 s, tsc 22 s, eslint 43 s, pytest 266 s, vitest 209 s ; impact depuis base : 92 fichier(s) de test
+- 2026-11-10 11:06:20 UTC — [ticket-905] tests rouges au tour 1
+- 2026-11-10 11:06:20 UTC — [ticket-905] tour 2 — codeur démarré
+- 2026-11-10 11:07:02 UTC — [ticket-905] tour 2 — codeur terminé (42047ms)
+- 2026-11-10 11:13:03 UTC — [ticket-905] testeur: 1 failed, 1162 passed in 331.89s (0:05:31)
+- 2026-11-10 11:13:03 UTC — [ticket-905] tests rouges au tour 2
+- 2026-11-10 11:13:03 UTC — [ticket-905] tour 3 — codeur démarré
+- 2026-11-10 11:14:00 UTC — [ticket-905] tour 3 — codeur terminé (57312ms)
+- 2026-11-10 11:19:54 UTC — [ticket-905] testeur: dur�es : ruff 0 s, mypy 5 s, mypy-linux 5 s, tsc 32 s, eslint 56 s, vitest 251 s, pytest 350 s ; impact depuis base : 92 fichier(s) de test
+- 2026-11-10 11:20:17 UTC — [ticket-905] securite: PASS — Le chemin du fichier (`CHEMIN`), la branche (`BRANCHE`) et le dépôt sont constan (22656ms)
+- 2026-11-10 11:20:17 UTC — [ticket-905] tour 3 — reviewer démarré
+- 2026-11-10 11:20:53 UTC — [ticket-905] tour 3 — reviewer terminé (36139ms)
+- 2026-11-10 11:21:15 UTC — [ticket-905] validateur: fichiers cités joints : rituels.md ; absents : rituels-etat.json
+- 2026-11-10 11:21:15 UTC — [ticket-905] validateur: APPROVED — All six acceptance criteria are satisfied. The implementation correctly merges r (57764ms)
+- 2026-11-10 11:21:15 UTC — [ticket-905] APPROVED après 3 tour(s)
+- 2026-11-10 11:22:45 UTC — [ticket-905] leçons: refusée — preuve absente du retour du run
+- 2026-11-10 11:25:14 UTC — [ticket-905] documentation: 0 fichier(s) (141093ms)
+- 2026-11-10 11:37:09 UTC — [ide-core] ticket-905 PR #1016 confiée au CIWatcher
+- 2026-11-10 11:05:33 UTC — [ide-core] ticket-903 PR #1015 mergée (CI verte)
+- 2026-11-10 11:37:14 UTC — [ticket-907] branche ticket-907-a-lessons-conflict-keeps-the-base-plus-the-run-s
+- 2026-11-10 11:38:10 UTC — [ticket-907] plan rendu (54389ms)
+- 2026-11-10 11:38:10 UTC — [ticket-907] tour 1 — codeur démarré
+- 2026-11-10 11:48:54 UTC — [ticket-907] tour 1 — codeur terminé (643641ms)
+- 2026-11-10 11:57:55 UTC — [ticket-907] testeur: dur�es : ruff 0 s, pytest 538 s ; impact depuis base : 73 fichier(s) de test
+- 2026-11-10 11:57:55 UTC — [ticket-907] tests rouges au tour 1
+- 2026-11-10 11:57:55 UTC — [ticket-907] tour 2 — codeur démarré
+- 2026-11-10 12:00:11 UTC — [ticket-907] tour 2 — codeur terminé (135766ms)
+- 2026-11-10 12:10:05 UTC — [ticket-907] testeur: dur�es : ruff 0 s, mypy 18 s, mypy-linux 17 s, pytest 591 s ; impact depuis base : 73 fichier(s) de test
+- 2026-11-10 12:10:39 UTC — [ticket-907] securite: PASS — Je n'ai trouvé aucune faille CRITICAL ou HIGH. Le diff résout automatiquement un (34110ms)
+- 2026-11-10 12:10:39 UTC — [ticket-907] tour 2 — reviewer démarré
+- 2026-11-10 12:11:07 UTC — [ticket-907] tour 2 — reviewer terminé (27562ms)
+- 2026-11-10 12:11:17 UTC — [ticket-907] validateur: fichiers cités joints : textes.py, lecons.md, mise_a_jour_branche.py, memory/lecons.md
+- 2026-11-10 12:11:17 UTC — [ticket-907] validateur: APPROVED — Tous les critères sont satisfaits. La fonction `_resoudre_lecons` implémente cor (37921ms)
+- 2026-11-10 12:11:17 UTC — [ticket-907] APPROVED après 2 tour(s)
+- 2026-11-10 12:12:58 UTC — [ticket-907] leçons: une leçon proposée
+- 2026-11-10 12:14:53 UTC — [ticket-907] documentation: 0 fichier(s) (109547ms)
+- 2026-11-10 11:44:20 UTC — [ide-core] ticket-905 PR #1016 mergée (CI verte)
+- 2026-11-10 12:24:10 UTC — [ide-core] ticket-907 PR #1017 confiée au CIWatcher
+- 2026-11-10 12:25:41 UTC — [ticket-904] branche ticket-904-a-late-ritual-rings-the-bell-once-per-due-date
+- 2026-11-10 12:25:42 UTC — [ticket-904] tour 1 — codeur démarré
+- 2026-11-10 12:28:37 UTC — [ticket-904] tour 1 — codeur terminé (175250ms)
+- 2026-11-10 12:32:32 UTC — [ticket-904] testeur: dur�es : tsc 19 s, eslint 40 s, vitest 172 s
+- 2026-11-10 12:32:42 UTC — [ticket-904] securite: PASS — Je n'ai trouvé aucune vulnérabilité dans ce diff, d'où le PASS. Le diff ne touch (9764ms)
+- 2026-11-10 12:32:42 UTC — [ticket-904] tour 1 — reviewer démarré
+- 2026-11-10 12:33:03 UTC — [ticket-904] validateur: fichiers cités joints : frontend/src/lib/notifications.ts, frontend/src/lib/reglagesNotifications.ts
+- 2026-11-10 12:33:03 UTC — [ticket-904] validateur: APPROVED — Le ticket-904 est complètement satisfait. Un type `rituel` est ajouté à la cloch (21266ms)
+- 2026-11-10 12:33:08 UTC — [ticket-904] tour 1 — reviewer terminé (26764ms)
+- 2026-11-10 12:33:08 UTC — [ticket-904] APPROVED après 1 tour(s)
+- 2026-11-10 12:36:45 UTC — [ticket-904] documentation: 0 fichier(s) (211250ms) — après tour de correction
+- 2026-11-10 12:30:30 UTC — [ide-core] ticket-907 PR #1017 mergée (CI verte)
+- 2026-11-10 12:40:21 UTC — [ide-core] ticket-904 PR #1019 confiée au CIWatcher
+- 2026-11-10 12:49:55 UTC — [ide-core] ticket-904 PR #1019 mergée (CI verte)
+- 2026-11-10 13:19:39 UTC — [ticket-908] branche ticket-908-ritual-sync-finds-its-repository-without-a-settin
+- 2026-11-10 13:19:41 UTC — [ticket-908] tour 1 — codeur démarré
+- 2026-11-10 13:21:41 UTC — [ticket-908] tour 1 — codeur terminé (120125ms)
+- 2026-11-10 13:24:55 UTC — [ticket-908] testeur: dur�es : ruff 0 s, mypy 8 s, mypy-linux 10 s, tsc 20 s, eslint 32 s, pytest 63 s, vitest 139 s ; impact depuis base : 7 fichier(s) de test
+- 2026-11-10 13:25:05 UTC — [ticket-908] securite: PASS — Le diff lit l'origin avec `subprocess.run` : liste d'arguments fixe, sans shell, (9639ms)
+- 2026-11-10 13:25:09 UTC — [ticket-908] tour 1 — reviewer démarré
+- 2026-11-10 13:25:34 UTC — [ticket-908] validateur: fichiers cités joints : frontend/src/lib/apiRituels.ts, rituels.md, backend/src/tessera/config.py ; absents : BenjaminCharmes/Tessera, https://github.com/BenjaminCharmes/Tessera.git, git@github.com:BenjaminCharmes/Tessera.git, https://gitlab.com/o/r.git
+- 2026-11-10 13:25:34 UTC — [ticket-908] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le diff implémente correctement (28546ms)
+- 2026-11-10 13:25:34 UTC — [ticket-908] tour 1 — reviewer terminé (24328ms)
+- 2026-11-10 13:25:34 UTC — [ticket-908] APPROVED après 1 tour(s)
+- 2026-11-10 13:29:48 UTC — [ticket-908] documentation: 0 fichier(s) (249485ms) — après tour de correction
+- 2026-11-10 13:30:07 UTC — [ide-core] ticket-908 PR #1021 confiée au CIWatcher
+- 2026-11-10 13:30:11 UTC — [ticket-909] branche ticket-909-bureauview-tests-pay-the-cold-render-once-outside
+- 2026-11-10 13:30:13 UTC — [ticket-909] tour 1 — codeur démarré
+- 2026-11-10 13:30:30 UTC — [ticket-909] tour 1 — codeur terminé (17077ms)
+- 2026-11-10 13:33:47 UTC — [ticket-909] testeur: dur�es : tsc 17 s, eslint 32 s, vitest 144 s
+- 2026-11-10 13:33:52 UTC — [ticket-909] securite: PASS — Le diff ne touche qu'un fichier de test frontend. Il regroupe les doubles d'API  (5828ms)
+- 2026-11-10 13:33:53 UTC — [ticket-909] tour 1 — reviewer démarré
+- 2026-11-10 13:34:06 UTC — [ticket-909] tour 1 — reviewer terminé (13202ms)
+- 2026-11-10 13:34:11 UTC — [ticket-909] validateur: fichiers cités joints : frontend/src/components/BureauView/BureauView.test.tsx, BureauView.test.tsx, memory/pipeline-log.md (tronqué) ; non joints (budget épuisé) : vite.config.ts
+- 2026-11-10 13:34:11 UTC — [ticket-909] validateur: APPROVED — Le diff satisfait les 3 critères : un `beforeAll` paye le rendu à froid une seul (18937ms)
+- 2026-11-10 13:34:11 UTC — [ticket-909] APPROVED après 1 tour(s)
+- 2026-11-10 13:35:12 UTC — [ticket-909] documentation: 0 fichier(s) (55562ms)
+- 2026-11-10 13:37:18 UTC — [ide-core] ticket-908 PR #1021 mergée (CI verte)
+- 2026-11-10 13:40:39 UTC — [ide-core] ticket-909 PR #1022 confiée au CIWatcher
+- 2026-11-10 13:48:55 UTC — [ide-core] ticket-909 PR #1022 mergée (CI verte)
+- 2026-11-11 08:01:48 UTC — [ticket-910] branche ticket-910-a-weekly-report-lists-what-each-public-project-sh
+- 2026-11-11 08:01:52 UTC — [ticket-910] tour 1 — codeur démarré
+- 2026-11-11 08:05:32 UTC — [ticket-910] tour 1 — codeur terminé (219875ms)
+- 2026-11-11 08:17:28 UTC — [ticket-910] testeur: 1 failed, 4707 passed, 3 skipped, 72 warnings in 709.99s (0:11:49)
+- 2026-11-11 08:17:28 UTC — [ticket-910] tests rouges au tour 1
+- 2026-11-11 08:17:28 UTC — [ticket-910] tour 2 — codeur démarré
+- 2026-11-11 08:18:05 UTC — [ticket-910] tour 2 — codeur terminé (36953ms)
+- 2026-11-11 08:33:35 UTC — [ticket-910] testeur: dur�es : ruff 0 s, mypy 19 s, mypy-linux 18 s, pytest 923 s ; impact depuis base : suite compl�te
+- 2026-11-11 08:33:52 UTC — [ticket-910] securite: PASS — Local, read-only script with no endpoint or network access. The git call takes a (16342ms)
+- 2026-11-11 08:33:53 UTC — [ticket-910] tour 2 — reviewer démarré
+- 2026-11-11 08:34:18 UTC — [ticket-910] tour 2 — reviewer terminé (25467ms)
+- 2026-11-11 08:34:50 UTC — [ticket-910] validateur: fichiers cités joints : backend/src/tessera/services/projets/releve_semaine.py, scripts/releve_semaine.py ; absents : memory/faits-notables.md
+- 2026-11-11 08:34:50 UTC — [ticket-910] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le module `releve_semaine.py` e (58328ms)
+- 2026-11-11 08:34:50 UTC — [ticket-910] CHANGES_REQUESTED tour 2: Reviewer : 1. `LIGNE_PR_MERGEE` exige `[ticket-N] livraison: PR #N mergée`. Ce format n'apparaît plus dans le vrai journal depuis la mi-octobre. Depuis, CIWatcher écrit chaque merge sous la forme `- 2
+- 2026-11-11 08:34:50 UTC — [ticket-910] tour 3 — codeur démarré
+- 2026-11-11 08:36:36 UTC — [ticket-910] tour 3 — codeur terminé (106375ms)
+- 2026-11-11 08:40:42 UTC — [ide-core] ticket-912 retiré de la file
+- 2026-11-11 08:40:42 UTC — [ide-core] ticket-914 retiré de la file
+- 2026-11-11 08:40:42 UTC — [ide-core] ticket-915 retiré de la file
+- 2026-11-11 08:40:42 UTC — [ide-core] ticket-916 retiré de la file
+- 2026-11-11 08:40:42 UTC — [ide-core] ticket-917 retiré de la file
+- 2026-11-11 08:40:42 UTC — [ide-core] ticket-918 retiré de la file
+- 2026-11-11 08:40:42 UTC — [ide-core] ticket-919 retiré de la file
+- 2026-11-11 08:48:30 UTC — [ticket-910] testeur: dur�es : ruff 0 s, mypy 5 s, mypy-linux 6 s, pytest 710 s ; impact depuis base : suite compl�te
+- 2026-11-11 08:48:50 UTC — [ticket-910] securite: PASS — Le diff ajoute un script en lecture seule, sans route HTTP, sans LLM ni GitHub ; (19703ms)
+- 2026-11-11 08:48:50 UTC — [ticket-910] tour 3 — reviewer démarré
+- 2026-11-11 08:49:05 UTC — [ticket-910] tour 3 — reviewer terminé (15344ms)
+- 2026-11-11 08:49:47 UTC — [ticket-910] validateur: fichiers cités joints : backend/src/tessera/services/projets/releve_semaine.py, scripts/releve_semaine.py ; absents : memory/faits-notables.md
+- 2026-11-11 08:49:47 UTC — [ticket-910] validateur: APPROVED — Le module `releve_semaine.py` satisfait tous les critères d'acceptation. La fonc (57827ms)
+- 2026-11-11 08:49:47 UTC — [ticket-910] APPROVED après 3 tour(s)
+- 2026-11-11 08:50:48 UTC — [ticket-910] leçons: refusée — preuve absente du retour du run
+- 2026-11-11 08:54:02 UTC — [ticket-910] documentation: 0 fichier(s) (170967ms) — après tour de correction
+- 2026-11-11 09:05:35 UTC — [ide-core] ticket-910 PR #1027 confiée au CIWatcher
+- 2026-11-11 09:05:42 UTC — [ticket-913] branche ticket-913-a-monthly-housekeeping-report-points-at-what-grew
+- 2026-11-11 09:05:45 UTC — [ticket-913] tour 1 — codeur démarré
+- 2026-11-11 09:08:33 UTC — [ticket-913] tour 1 — codeur terminé (168797ms)
+- 2026-11-11 09:17:16 UTC — [ticket-913] testeur: 1 failed, 2058 passed, 3 skipped, 72 warnings in 516.54s (0:08:36)
+- 2026-11-11 09:17:16 UTC — [ticket-913] tests rouges au tour 1
+- 2026-11-11 09:17:16 UTC — [ticket-913] tour 2 — codeur démarré
+- 2026-11-11 09:17:46 UTC — [ticket-913] tour 2 — codeur terminé (30328ms)
+- 2026-11-11 09:29:03 UTC — [ticket-913] testeur: 1 failed, 4688 passed, 3 skipped, 72 warnings in 670.97s (0:11:10)
+- 2026-11-11 09:29:03 UTC — [ticket-913] tests rouges au tour 2
+- 2026-11-11 09:29:03 UTC — [ticket-913] tour 3 — codeur démarré
+- 2026-11-11 09:30:36 UTC — [ticket-913] tour 3 — codeur terminé (93139ms)
+- 2026-11-11 09:55:40 UTC — [ticket-913] testeur: délai dépassé, suite relancée
+- 2026-11-11 09:55:40 UTC — [ticket-913] testeur: délai dépassé (1500 s, durée réelle 1500 s) — base coupé après 1500 s
+- 2026-11-11 09:56:17 UTC — [ide-core] ticket-915 retiré de la file
+- 2026-11-11 09:56:17 UTC — [ide-core] ticket-914 retiré de la file
+- 2026-11-11 09:56:17 UTC — [ide-core] ticket-916 retiré de la file
+- 2026-11-11 09:56:17 UTC — [ide-core] ticket-917 retiré de la file
+- 2026-11-11 09:56:17 UTC — [ide-core] ticket-918 retiré de la file
+- 2026-11-11 09:56:17 UTC — [ide-core] ticket-919 retiré de la file
+- 2026-11-11 09:56:17 UTC — [ide-core] ticket-912 retiré de la file
+- 2026-11-11 10:09:04 UTC — [ticket-913] testeur: dur�es : ruff 1 s, mypy 13 s, mypy-linux 8 s, pytest 802 s ; impact depuis base : suite compl�te
+- 2026-11-11 10:09:23 UTC — [ticket-913] securite: PASS — Outil de relevé en lecture seule, lancé seulement en ligne de commande, sans poi (18921ms)
+- 2026-11-11 10:09:23 UTC — [ticket-913] tour 3 — reviewer démarré
+- 2026-11-11 10:09:46 UTC — [ticket-913] tour 3 — reviewer terminé (22703ms)
+- 2026-11-11 10:10:11 UTC — [ticket-913] validateur: fichiers cités joints : backend/src/tessera/services/projets/releve_menage.py, memory/ (dossier, 10 fichiers), scripts/releve_menage.py
+- 2026-11-11 10:10:11 UTC — [ticket-913] validateur: APPROVED — Les six critères d'acceptation sont satisfaits. Le module `releve_menage.py` exp (48000ms)
+- 2026-11-11 10:10:11 UTC — [ticket-913] APPROVED après 3 tour(s)
+- 2026-11-11 10:11:09 UTC — [ticket-913] leçons: refusée — preuve absente du retour du run
+- 2026-11-11 10:13:51 UTC — [ticket-913] documentation: 0 fichier(s) (139171ms)
+- 2026-11-11 10:29:18 UTC — [ide-core] ticket-913 PR #1030 confiée au CIWatcher
+- 2026-11-11 09:13:00 UTC — [ide-core] ticket-910 PR #1027 mergée (CI verte)
+- 2026-11-11 10:29:24 UTC — [ticket-922] branche ticket-922-agents-cannot-read-the-frontend-s-local-env-files
+- 2026-11-11 10:29:27 UTC — [ticket-922] tour 1 — codeur démarré
+- 2026-11-11 10:32:13 UTC — [ticket-922] tour 1 — codeur terminé (166764ms)
+- 2026-11-11 10:32:44 UTC — [ticket-922] testeur: dur�es : ruff 1 s, pytest 26 s ; impact depuis base : 32 fichier(s) de test
+- 2026-11-11 10:32:44 UTC — [ticket-922] tests rouges au tour 1
+- 2026-11-11 10:32:44 UTC — [ticket-922] tour 2 — codeur démarré
+- 2026-11-11 10:33:04 UTC — [ticket-922] tour 2 — codeur terminé (20546ms)
+- 2026-11-11 10:33:39 UTC — [ticket-922] testeur: dur�es : ruff 0 s, mypy 11 s, mypy-linux 13 s, pytest 31 s ; impact depuis base : 32 fichier(s) de test
+- 2026-11-11 10:33:55 UTC — [ticket-922] securite: PASS — PASS : le diff ne fait que durcir la protection. Le hook refuse désormais aux ag (15921ms)
+- 2026-11-11 10:33:56 UTC — [ticket-922] tour 2 — reviewer démarré
+- 2026-11-11 10:34:11 UTC — [ticket-922] tour 2 — reviewer terminé (14657ms)
+- 2026-11-11 10:34:36 UTC — [ticket-922] validateur: fichiers cités joints : backend/tests/test_garde_jetons.py, frontend/.env.local, projects/ (dossier, 0 fichiers), backend/src/tessera/services/providers/garde_jetons.py (tronqué) ; absents : frontend/.env.development.local
+- 2026-11-11 10:34:36 UTC — [ticket-922] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le diff ajoute une nouvelle con (40562ms)
+- 2026-11-11 10:34:36 UTC — [ticket-922] APPROVED après 2 tour(s)
+- 2026-11-11 10:36:31 UTC — [ticket-922] leçons: refusée — plus de 200 caractères
+- 2026-11-11 10:38:14 UTC — [ticket-922] documentation: 0 fichier(s) (97593ms)
+- 2026-11-11 10:39:49 UTC — [ide-core] ticket-922 PR #1031 confiée au CIWatcher
+- 2026-11-11 10:36:12 UTC — [ide-core] ticket-913 PR #1030 mergée (CI verte)
+- 2026-11-11 10:39:55 UTC — [ticket-923] branche ticket-923-a-run-finds-tickets-merged-on-the-remote-base-of
+- 2026-11-11 10:40:33 UTC — [ide-core] ticket-915 retiré de la file
+- 2026-11-11 10:40:33 UTC — [ide-core] ticket-914 retiré de la file
+- 2026-11-11 10:40:33 UTC — [ide-core] ticket-916 retiré de la file
+- 2026-11-11 10:40:33 UTC — [ide-core] ticket-917 retiré de la file
+- 2026-11-11 10:40:33 UTC — [ide-core] ticket-918 retiré de la file
+- 2026-11-11 10:40:33 UTC — [ide-core] ticket-919 retiré de la file
+- 2026-11-11 10:40:33 UTC — [ide-core] ticket-912 retiré de la file
+- 2026-11-11 10:40:33 UTC — [ticket-923] plan rendu (36125ms)
+- 2026-11-11 10:40:33 UTC — [ticket-923] tour 1 — codeur démarré
+- 2026-11-11 10:43:08 UTC — [ticket-923] tour 1 — codeur terminé (154891ms)
+- 2026-11-11 10:46:05 UTC — [ticket-923] testeur: 1 failed, 570 passed, 32 warnings in 172.09s (0:02:52)
+- 2026-11-11 10:46:05 UTC — [ticket-923] tests rouges au tour 1
+- 2026-11-11 10:46:05 UTC — [ticket-923] tour 2 — codeur démarré
+- 2026-11-11 10:48:12 UTC — [ticket-923] tour 2 — codeur terminé (126655ms)
+- 2026-11-11 10:51:51 UTC — [ticket-923] testeur: dur�es : ruff 0 s, pytest 216 s ; impact depuis base : 89 fichier(s) de test
+- 2026-11-11 10:51:51 UTC — [ticket-923] tests rouges au tour 2
+- 2026-11-11 10:51:51 UTC — [ticket-923] tour 3 — codeur démarré
+- 2026-11-11 10:53:07 UTC — [ticket-923] tour 3 — codeur terminé (76250ms)
+- 2026-11-11 10:57:37 UTC — [ticket-923] testeur: dur�es : ruff 0 s, mypy 13 s, mypy-linux 13 s, pytest 266 s ; impact depuis base : 89 fichier(s) de test
+- 2026-11-11 10:57:50 UTC — [ticket-923] securite: PASS — PASS : rien de dangereux dans ce diff. Les identifiants de ticket envoyés par l' (13655ms)
+- 2026-11-11 10:57:50 UTC — [ticket-923] tour 3 — reviewer démarré
+- 2026-11-11 10:58:25 UTC — [ticket-923] validateur: fichiers cités joints : backend/tests/test_file_preflight.py
+- 2026-11-11 10:58:25 UTC — [ticket-923] validateur: APPROVED — Les cinq critères d'acceptation sont couverts par des tests fonctionnels présent (34483ms)
+- 2026-11-11 10:58:26 UTC — [ticket-923] tour 3 — reviewer terminé (35858ms)
+- 2026-11-11 10:58:26 UTC — [ticket-923] APPROVED après 3 tour(s)
+- 2026-11-11 10:59:09 UTC — [ticket-923] leçons: refusée — preuve absente du retour du run
+- 2026-11-11 11:02:22 UTC — [ticket-923] documentation: 0 fichier(s) (187516ms) — après tour de correction
+- 2026-11-11 10:47:11 UTC — [ide-core] ticket-922 PR #1031 mergée (CI verte)
+- 2026-11-11 11:06:21 UTC — [ide-core] ticket-923 PR #1033 confiée au CIWatcher
+- 2026-11-11 11:12:02 UTC — [ticket-923] livraison: arrêt — PR #1033 non mergée : CI failing : la PR #1033 reste ouverte.
+- 2026-11-11 11:40:58 UTC — [ticket-925] branche ticket-925-the-bash-write-guard-skips-heredoc-bodies-and-res
+- 2026-11-11 11:41:00 UTC — [ticket-925] tour 1 — codeur démarré
+- 2026-11-11 11:46:00 UTC — [ticket-925] tour 1 — codeur terminé (299953ms)
+- 2026-11-11 11:46:02 UTC — [ticket-925] testeur: en attente d'un créneau de test
+- 2026-11-11 11:49:07 UTC — [ticket-925] testeur: dur�es : ruff 1 s, pytest 48 s, mypy 81 s, mypy-linux 55 s ; impact depuis base : 14 fichier(s) de test
+- 2026-11-11 11:49:42 UTC — [ticket-925] securite: PASS — Le diff ne contient ni injection ni secret. Le `cd` en tête rend en général la g (35233ms)
+- 2026-11-11 11:49:43 UTC — [ticket-925] tour 1 — reviewer démarré
+- 2026-11-11 11:50:35 UTC — [ticket-925] tour 1 — reviewer terminé (52358ms)
+- 2026-11-11 11:50:48 UTC — [ticket-925] validateur: fichiers cités joints : services/providers/perimetre.py, backend/ (dossier, 8 fichiers) ; absents : backend/app/y.py
+- 2026-11-11 11:50:48 UTC — [ticket-925] validateur: APPROVED — Les cinq critères d'acceptation sont satisfaits. Le nouveau fichier `test_redire (65592ms)
+- 2026-11-11 11:50:48 UTC — [ticket-925] CHANGES_REQUESTED tour 1: Reviewer : 1. `_dossier_de_tete` applique le dossier du premier `cd` à toutes les cibles qui suivent, même quand un autre `cd`, `pushd` ou `popd` change le dossier courant plus loin dans la chaîne. Le
+- 2026-11-11 11:50:48 UTC — [ticket-925] tour 2 — codeur démarré
+- 2026-11-11 11:51:18 UTC — [ticket-925] tour 2 — codeur terminé (30280ms)
+- 2026-11-11 11:51:51 UTC — [ticket-925] testeur: dur�es : ruff 0 s, mypy 18 s, pytest 29 s, mypy-linux 12 s ; impact depuis base : 14 fichier(s) de test
+- 2026-11-11 11:52:16 UTC — [ticket-925] securite: PASS — Le préfixe `cd` relativise correctement les cibles. La garde finale (perimetre.p (24719ms)
+- 2026-11-11 11:52:16 UTC — [ticket-925] tour 2 — reviewer démarré
+- 2026-11-11 11:52:45 UTC — [ticket-925] tour 2 — reviewer terminé (28735ms)
+- 2026-11-11 11:53:20 UTC — [ticket-925] validateur: fichiers cités joints : services/providers/perimetre.py, backend/ (dossier, 6 fichiers) ; absents : backend/app/y.py
+- 2026-11-11 11:53:20 UTC — [ticket-925] validateur: APPROVED — Les cinq critères d'acceptation sont tous satisfaits. Le code introduit trois no (63780ms)
+- 2026-11-11 11:53:20 UTC — [ticket-925] APPROVED après 2 tour(s)
+- 2026-11-11 11:54:44 UTC — [ticket-925] leçons: rien à retenir
+- 2026-11-11 11:56:24 UTC — [ticket-925] documentation: 0 fichier(s) (95812ms)
+- 2026-11-11 11:56:42 UTC — [ide-core] ticket-925 PR #1035 confiée au CIWatcher
+- 2026-11-11 11:56:46 UTC — [ticket-915] branche ticket-915-the-agent-account-is-switched-on-project-by-proje
+- 2026-11-11 11:57:35 UTC — [ticket-915] plan rendu (48094ms)
+- 2026-11-11 11:57:35 UTC — [ticket-915] tour 1 — codeur démarré
+- 2026-11-11 12:00:21 UTC — [ticket-915] tour 1 — codeur terminé (165905ms)
+- 2026-11-11 12:08:41 UTC — [ticket-915] testeur: 1 failed, 1678 passed, 3 skipped, 46 warnings in 494.28s (0:08:14)
+- 2026-11-11 12:08:41 UTC — [ticket-915] tests rouges au tour 1
+- 2026-11-11 12:08:41 UTC — [ticket-915] tour 2 — codeur démarré
+- 2026-11-11 12:10:19 UTC — [ticket-915] tour 2 — codeur terminé (98500ms)
+- 2026-11-11 12:19:04 UTC — [ticket-915] testeur: dur�es : ruff 0 s, mypy 11 s, mypy-linux 12 s, pytest 522 s ; impact depuis base : 210 fichier(s) de test
+- 2026-11-11 12:19:27 UTC — [ticket-915] securite: PASS — Le diff rend le compte agent dédié facultatif par projet. Le déclenchement est f (22687ms)
+- 2026-11-11 12:19:27 UTC — [ticket-915] tour 2 — reviewer démarré
+- 2026-11-11 12:19:57 UTC — [ticket-915] tour 2 — reviewer terminé (29750ms)
+- 2026-11-11 12:20:11 UTC — [ticket-915] validateur: fichiers cités joints : models/worktree_config.py
+- 2026-11-11 12:20:11 UTC — [ticket-915] validateur: APPROVED — Tous les critères sont satisfaits. Le diff ajoute le champ `compte_agent: bool = (44125ms)
+- 2026-11-11 12:20:11 UTC — [ticket-915] APPROVED après 2 tour(s)
+- 2026-11-11 12:21:12 UTC — [ticket-915] leçons: une leçon proposée
+- 2026-11-11 12:23:10 UTC — [ticket-915] documentation: 0 fichier(s) (113125ms)
+- 2026-11-11 12:33:31 UTC — [ide-core] ticket-915 PR #1036 confiée au CIWatcher
+- 2026-11-11 12:02:32 UTC — [ide-core] ticket-925 PR #1035 mergée (CI verte)
+- 2026-11-11 12:33:36 UTC — [ticket-914] branche ticket-914-the-supervisor-decides-each-proposed-block-once-n
+- 2026-11-11 12:34:17 UTC — [ticket-914] plan rendu (39391ms)
+- 2026-11-11 12:34:17 UTC — [ticket-914] tour 1 — codeur démarré
+- 2026-11-11 12:35:55 UTC — [ticket-914] tour 1 — codeur terminé (97280ms)
+- 2026-11-11 12:37:46 UTC — [ticket-914] testeur: dur�es : ruff 0 s, mypy 15 s, mypy-linux 16 s, pytest 109 s ; impact depuis base : 96 fichier(s) de test
+- 2026-11-11 12:37:59 UTC — [ticket-914] securite: PASS — Ce diff remplace la décision groupée par une décision bloc par bloc. `decider_bl (13719ms)
+- 2026-11-11 12:37:59 UTC — [ticket-914] tour 1 — reviewer démarré
+- 2026-11-11 12:38:29 UTC — [ticket-914] tour 1 — reviewer terminé (29796ms)
+- 2026-11-11 12:38:36 UTC — [ticket-914] validateur: fichiers cités joints : intervention.py, superviseur_actions.py
+- 2026-11-11 12:38:36 UTC — [ticket-914] validateur: APPROVED — Les quatre critères sont satisfaits. La refactorisation introduit une décision p (36625ms)
+- 2026-11-11 12:38:36 UTC — [ticket-914] CHANGES_REQUESTED tour 1: Reviewer : 1. Le plafond `PLAFOND_DECISIONS` (5 appels au modèle par passe) ne s'applique plus en production, et l'arrêt sur intervention `abandonne` a disparu avec lui. `_candidats_decision` émet un 
+- 2026-11-11 12:38:36 UTC — [ticket-914] tour 2 — codeur démarré
+- 2026-11-11 12:39:26 UTC — [ticket-914] tour 2 — codeur terminé (49687ms)
+- 2026-11-11 12:41:17 UTC — [ticket-914] testeur: dur�es : ruff 0 s, mypy 9 s, mypy-linux 10 s, pytest 108 s ; impact depuis base : 96 fichier(s) de test
+- 2026-11-11 12:41:32 UTC — [ticket-914] securite: PASS — PASS : ce diff ne retire aucune garde. `decider_bloc` (superviseur_decision.py:1 (14453ms)
+- 2026-11-11 12:41:32 UTC — [ticket-914] tour 2 — reviewer démarré
+- 2026-11-11 12:41:56 UTC — [ticket-914] tour 2 — reviewer terminé (24093ms)
+- 2026-11-11 12:44:06 UTC — [ticket-914] validateur: fichiers cités joints : intervention.py, superviseur_actions.py
+- 2026-11-11 12:44:06 UTC — [ticket-914] validateur: APPROVED — Les quatre critères sont satisfaits. La refactorisation remplace la décision gro (154483ms)
+- 2026-11-11 12:44:06 UTC — [ticket-914] APPROVED après 2 tour(s)
+- 2026-11-11 12:45:46 UTC — [ticket-914] leçons: rien à retenir
+- 2026-11-11 12:48:06 UTC — [ticket-914] documentation: 0 fichier(s) (134530ms)
+- 2026-11-11 12:50:20 UTC — [ide-core] ticket-914 PR #1037 confiée au CIWatcher
+- 2026-11-11 12:38:28 UTC — [ide-core] ticket-915 PR #1036 mergée (CI verte)
+- 2026-11-11 12:50:38 UTC — [ticket-916] branche ticket-916-hand-made-buttons-move-to-the-shared-button-compo
+- 2026-11-11 12:50:40 UTC — [ticket-916] tour 1 — codeur démarré
+- 2026-11-11 12:52:47 UTC — [ticket-916] tour 1 — codeur terminé (126766ms)
+- 2026-11-11 12:56:28 UTC — [ticket-916] testeur: dur�es : tsc 9 s, eslint 25 s, vitest 185 s
+- 2026-11-11 12:56:45 UTC — [ticket-916] securite: PASS — Ce diff remplace seulement des `<button>` stylés à la main par le composant part (17125ms)
+- 2026-11-11 12:56:46 UTC — [ticket-916] tour 1 — reviewer démarré
+- 2026-11-11 12:57:12 UTC — [ticket-916] tour 1 — reviewer terminé (26578ms)
+- 2026-11-11 12:58:06 UTC — [ticket-916] validateur: fichiers cités joints : CarteRituel.tsx ; absents : components/
+- 2026-11-11 12:58:06 UTC — [ticket-916] validateur: CHANGES_REQUESTED — Les 6 fichiers visibles du diff sont bien refactorisés : usage cohérent de `<But (80844ms)
+- 2026-11-11 12:58:06 UTC — [ticket-916] CHANGES_REQUESTED tour 1: Validateur : Les 6 fichiers visibles du diff sont bien refactorisés : usage cohérent de `<Button>` avec variantes et tailles, suppression de la constante `BOUTON`, pas d'ajout de classes couleur. Les 
+- 2026-11-11 12:58:06 UTC — [ticket-916] tour 2 — codeur démarré
+- 2026-11-11 12:58:32 UTC — [ticket-916] tour 2 — codeur terminé (25453ms)
+- 2026-11-11 13:04:08 UTC — [ticket-916] testeur: dur�es : tsc 23 s, eslint 45 s, vitest 264 s
+- 2026-11-11 13:04:26 UTC — [ticket-916] securite: PASS — J'ai lu le composant partagé : frontend/src/design/ui/Button.tsx:35 met `type="b (18750ms)
+- 2026-11-11 13:04:26 UTC — [ticket-916] tour 2 — reviewer démarré
+- 2026-11-11 13:05:09 UTC — [ticket-916] tour 2 — reviewer terminé (42125ms)
+- 2026-11-11 13:06:34 UTC — [ticket-916] validateur: fichiers cités joints : CarteRituel.tsx ; absents : components/
+- 2026-11-11 13:06:34 UTC — [ticket-916] validateur: CHANGES_REQUESTED — The refactoring successfully migrates 6 of 8 cited bordé files and all 3 pleins  (127657ms)
+- 2026-11-11 13:06:34 UTC — [ticket-916] CHANGES_REQUESTED tour 2: Validateur : The refactoring successfully migrates 6 of 8 cited bordé files and all 3 pleins to the shared `Button` component, with correct variantes and sizes. No violet color classes are added, the 
+- 2026-11-11 13:06:34 UTC — [ticket-916] tour 3 — codeur démarré
+- 2026-11-11 13:08:23 UTC — [ticket-916] tour 3 — codeur terminé (108468ms)
+- 2026-11-11 13:08:39 UTC — [ticket-916] testeur: src/components/SupervisionView/RunCard.tsx(240,25): error TS7006: Parameter 'e' implicitly has an 'any' type.
+- 2026-11-11 13:08:39 UTC — [ticket-916] tests rouges au tour 3
+- 2026-11-11 13:08:39 UTC — [ticket-916] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-11 13:08:45 UTC — [ide-core] file interrompue : ticket-916 non approuvé
+- 2026-11-11 12:55:19 UTC — [ide-core] ticket-914 PR #1037 mergée (CI verte)
+- 2026-11-11 13:20:37 UTC — [ticket-917] branche ticket-917-empty-loading-and-error-states-use-the-shared-vie
+- 2026-11-11 13:20:38 UTC — [ticket-917] tour 1 — codeur démarré
+- 2026-11-11 13:21:53 UTC — [ticket-917] tour 1 — codeur terminé (75202ms)
+- 2026-11-11 13:25:56 UTC — [ticket-917] testeur: dur�es : tsc 12 s, eslint 23 s, vitest 205 s
+- 2026-11-11 13:26:07 UTC — [ticket-917] securite: PASS — PASS : aucune faille de sécurité dans ce diff, qui ne touche que l'interface. Il (11282ms)
+- 2026-11-11 13:26:07 UTC — [ticket-917] tour 1 — reviewer démarré
+- 2026-11-11 13:26:36 UTC — [ticket-917] tour 1 — reviewer terminé (28921ms)
+- 2026-11-11 13:27:03 UTC — [ticket-917] validateur: fichiers cités joints : HistoriqueView/index.tsx, ProjetsView/index.tsx, FichiersView/Sections.tsx, FichiersView/index.tsx, StatsView/index.tsx, StatsView/RunHistorique.tsx ; absents : design/ui/ViewState
+- 2026-11-11 13:27:03 UTC — [ticket-917] validateur: APPROVED — Tous les fichiers visés importent maintenant un composant de `ViewState`. Les fo (55875ms)
+- 2026-11-11 13:27:03 UTC — [ticket-917] APPROVED après 1 tour(s)
+- 2026-11-11 13:31:22 UTC — [ticket-917] documentation: 1 fichier(s) (255172ms)
+- 2026-11-11 13:31:22 UTC — [ticket-926] documentation: pas de diff retrouvable, non documenté
+- 2026-11-11 13:47:34 UTC — [ide-core] ticket-918 PR #1044 confiée au CIWatcher
+- 2026-11-11 13:39:43 UTC — [ide-core] ticket-917 PR #1041 mergée (CI verte)
+- 2026-11-11 13:47:39 UTC — [ticket-919] branche ticket-919-filter-chips-counter-badges-and-the-focus-ring-ea
+- 2026-11-11 13:47:40 UTC — [ticket-919] tour 1 — codeur démarré
+- 2026-11-11 13:51:40 UTC — [ticket-919] tour 1 — codeur terminé (240250ms)
+- 2026-11-11 13:54:53 UTC — [ticket-919] testeur: dur�es : tsc 9 s, eslint 14 s, vitest 167 s
+- 2026-11-11 13:55:01 UTC — [ticket-919] securite: PASS — Le diff est un refactor de présentation : la nouvelle utilité CSS `focus-violet` (8328ms)
+- 2026-11-11 13:55:01 UTC — [ticket-919] tour 1 — reviewer démarré
+- 2026-11-11 13:55:20 UTC — [ticket-919] tour 1 — reviewer terminé (19218ms)
+- 2026-11-11 13:55:33 UTC — [ticket-919] validateur: fichiers cités joints : TousLesRuns.tsx, BarreProjets.tsx, Cloche.tsx, Pastille.tsx, Dossiers.tsx, index.css (tronqué)
+- 2026-11-11 13:55:33 UTC — [ticket-919] validateur: APPROVED — Ticket-919 livré complet. Les trois composants (`PuceFiltre` pour les filtres, ` (31405ms)
+- 2026-11-11 13:55:33 UTC — [ticket-919] APPROVED après 1 tour(s)
+- 2026-11-11 13:56:16 UTC — [ticket-919] documentation: 0 fichier(s) (38516ms)
+- 2026-11-11 13:35:14 UTC — [ide-core] ticket-917 PR #1041 confiée au CIWatcher
+- 2026-11-11 13:35:20 UTC — [ticket-918] branche ticket-918-view-titles-go-through-regiontitle-and-modal-titl
+- 2026-11-11 13:35:22 UTC — [ticket-918] tour 1 — codeur démarré
+- 2026-11-11 13:37:12 UTC — [ticket-918] tour 1 — codeur terminé (109891ms)
+- 2026-11-11 13:41:11 UTC — [ticket-918] testeur: dur�es : tsc 15 s, eslint 19 s, vitest 202 s
+- 2026-11-11 13:41:18 UTC — [ticket-918] securite: PASS — Le diff ne change que la présentation : un composant `TitreDeModale` (un `<h2>`  (7125ms)
+- 2026-11-11 13:41:18 UTC — [ticket-918] tour 1 — reviewer démarré
+- 2026-11-11 13:41:36 UTC — [ticket-918] tour 1 — reviewer terminé (17514ms)
+- 2026-11-11 13:41:55 UTC — [ticket-918] validateur: fichiers cités joints : components/RituelsView/index.tsx, components/HistoriqueView/DetailDuRun.tsx, design/ui/Modale.tsx, design/ui/Modale.test.tsx, components/StatsView/RecentRuns.tsx (tronqué) ; non joints (budget épuisé) : components/StatsView/index.tsx
+- 2026-11-11 13:41:55 UTC — [ticket-918] validateur: APPROVED — Tous les critères sont satisfaits. Le diff montre le refactoring complet : Regio (36375ms)
+- 2026-11-11 13:41:55 UTC — [ticket-918] APPROVED après 1 tour(s)
+- 2026-11-11 13:43:41 UTC — [ticket-918] documentation: 0 fichier(s) (101421ms)
+- 2026-11-11 13:47:08 UTC — [ide-core] ticket-912 retiré de la file
+- 2026-11-11 14:30:26 UTC — [ide-core] ticket-929 sauté : dépend de ticket-928, non mergé
+- 2026-11-11 14:30:26 UTC — [ide-core] ticket-928 PR #1046 confiée au CIWatcher
+- 2026-11-11 14:16:28 UTC — [ticket-919] livraison: arrêt — PR #1045 non mergée : CI failing : la PR #1045 reste ouverte.
+- 2026-11-11 14:30:26 UTC — [ticket-928] livraison: arrêt — PR #1046 non mergée : CI failing : la PR #1046 reste ouverte.
+- 2026-11-11 14:30:30 UTC — [ticket-930] branche ticket-930-the-project-mcp-config-cli-hook-scripts-and-the-c
+- 2026-11-11 14:30:31 UTC — [ticket-930] tour 1 — codeur démarré
+- 2026-11-11 14:31:22 UTC — [ticket-930] tour 1 — codeur terminé (50781ms)
+- 2026-11-11 14:31:42 UTC — [ticket-930] testeur: dur�es : ruff 0 s, mypy 8 s, pytest 16 s, mypy-linux 9 s ; impact depuis base : 18 fichier(s) de test
+- 2026-11-11 14:31:57 UTC — [ticket-930] securite: PASS — Ce diff ne fait qu'élargir les protections en écriture : `.mcp.json`, `.claude/h (15453ms)
+- 2026-11-11 14:31:57 UTC — [ticket-930] tour 1 — reviewer démarré
+- 2026-11-11 14:32:13 UTC — [ticket-930] tour 1 — reviewer terminé (15234ms)
+- 2026-11-11 14:32:24 UTC — [ticket-930] validateur: fichiers cités joints : backend/tests/test_chemins_proteges.py, scripts/termes_interdits_ci.py, backend/src/tessera/services/providers/redirections_bash.py (tronqué) ; absents : <projet>/.mcp.json, <projet>/.claude/hooks/x.py, <projet>/.claude/notes.md ; non joints (budget épuisé) : .mcp.json
+- 2026-11-11 14:32:24 UTC — [ticket-930] validateur: APPROVED — Tous les critères sont satisfaits. Le diff ajoute les trois protections manquant (26469ms)
+- 2026-11-11 14:32:24 UTC — [ticket-930] APPROVED après 1 tour(s)
+- 2026-11-11 14:38:25 UTC — [ticket-930] documentation: 0 fichier(s) (356625ms) — après tour de correction
+- 2026-11-11 14:02:07 UTC — [ide-core] ticket-919 PR #1045 confiée au CIWatcher
+- 2026-11-11 13:58:41 UTC — [ticket-918] livraison: arrêt — PR #1044 non mergée : CI failing : la PR #1044 reste ouverte.
+- 2026-11-11 14:02:11 UTC — [ticket-928] branche ticket-928-the-secret-read-guard-sees-through-device-and-unc
+- 2026-11-11 14:02:12 UTC — [ticket-928] tour 1 — codeur démarré
+- 2026-11-11 14:03:32 UTC — [ticket-928] tour 1 — codeur terminé (79983ms)
+- 2026-11-11 14:03:53 UTC — [ticket-928] testeur: dur�es : ruff 0 s, mypy 5 s, mypy-linux 11 s, pytest 19 s ; impact depuis base : 32 fichier(s) de test
+- 2026-11-11 14:04:07 UTC — [ticket-928] securite: PASS — Verdict PASS : le diff durcit la garde de lecture des secrets sans rien retirer. (14483ms)
+- 2026-11-11 14:04:07 UTC — [ticket-928] tour 1 — reviewer démarré
+- 2026-11-11 14:04:35 UTC — [ticket-928] validateur: fichiers cités joints : backend/tests/test_garde_jetons.py, .env, frontend/ (dossier, 17 fichiers), backend/src/tessera/services/providers/perimetre.py (tronqué) ; absents : *.py
+- 2026-11-11 14:04:35 UTC — [ticket-928] validateur: APPROVED — Les 6 critères sont satisfaits. Le codeur a extrait la normalisation des préfixe (27546ms)
+- 2026-11-11 14:04:36 UTC — [ticket-928] tour 1 — reviewer terminé (28953ms)
+- 2026-11-11 14:04:36 UTC — [ticket-928] APPROVED après 1 tour(s)
+- 2026-11-11 14:06:13 UTC — [ticket-928] documentation: 0 fichier(s) (92078ms)
+- 2026-11-11 15:04:51 UTC — [ide-core] ticket-931 PR #1048 confiée au CIWatcher
+- 2026-11-11 14:44:04 UTC — [ticket-930] PR #1047 mise à jour avec develop : 5f1fde8 → 4bf602e
+- 2026-11-11 15:03:54 UTC — [ticket-930] livraison: arrêt — PR #1047 non mergée : CI failing : la PR #1047 reste ouverte.
+- 2026-11-11 15:04:55 UTC — [ticket-933] branche ticket-933-a-run-is-blocked-when-an-agent-call-changes-a-pro
+- 2026-11-11 15:06:02 UTC — [ticket-933] plan rendu (65594ms)
+- 2026-11-11 15:06:02 UTC — [ticket-933] tour 1 — codeur démarré
+- 2026-11-11 15:13:29 UTC — [ticket-933] tour 1 — codeur terminé (447514ms)
+- 2026-11-11 15:16:18 UTC — [ticket-933] testeur: 2 failed, 534 passed, 40 warnings in 165.33s (0:02:45)
+- 2026-11-11 15:16:18 UTC — [ticket-933] tests rouges au tour 1
+- 2026-11-11 15:16:18 UTC — [ticket-933] tour 2 — codeur démarré
+- 2026-11-11 15:17:23 UTC — [ticket-933] tour 2 — codeur terminé (64250ms)
+- 2026-11-11 15:23:05 UTC — [ticket-933] testeur: 1 failed, 890 passed, 40 warnings in 338.69s (0:05:38)
+- 2026-11-11 15:23:05 UTC — [ticket-933] tests rouges au tour 2
+- 2026-11-11 15:23:05 UTC — [ticket-933] tour 3 — codeur démarré
+- 2026-11-11 15:28:39 UTC — [ticket-933] tour 3 — codeur terminé (334000ms)
+- 2026-11-11 15:35:58 UTC — [ticket-933] testeur: dur�es : ruff 0 s, mypy 8 s, mypy-linux 13 s, pytest 436 s ; impact depuis base : 147 fichier(s) de test
+- 2026-11-11 15:36:18 UTC — [ticket-933] securite: PASS — Le diff ajoute une protection de plus : une empreinte sha256 des fichiers protég (20531ms)
+- 2026-11-11 15:36:19 UTC — [ticket-933] tour 3 — reviewer démarré
+- 2026-11-11 15:36:56 UTC — [ticket-933] validateur: fichiers cités joints : .git/config, agents.json, memory/decisions.md (tronqué) ; absents : .git/hooks/pre-commit
+- 2026-11-11 15:36:56 UTC — [ticket-933] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le ticket implémente un contrôl (37766ms)
+- 2026-11-11 15:37:02 UTC — [ticket-933] tour 3 — reviewer terminé (43078ms)
+- 2026-11-11 15:37:02 UTC — [ticket-933] APPROVED après 3 tour(s)
+- 2026-11-11 15:38:55 UTC — [ticket-933] leçons: une leçon proposée
+- 2026-11-11 15:42:00 UTC — [ticket-933] documentation: 0 fichier(s) (180530ms) — après tour de correction
+- 2026-11-11 14:38:45 UTC — [ide-core] ticket-930 PR #1047 confiée au CIWatcher
+- 2026-11-11 14:38:50 UTC — [ticket-931] branche ticket-931-the-bash-write-guard-expands-and-variables-and-re
+- 2026-11-11 14:38:51 UTC — [ticket-931] tour 1 — codeur démarré
+- 2026-11-11 14:40:24 UTC — [ticket-931] tour 1 — codeur terminé (93531ms)
+- 2026-11-11 14:41:04 UTC — [ticket-931] testeur: dur�es : ruff 0 s, pytest 37 s ; impact depuis base : 64 fichier(s) de test
+- 2026-11-11 14:41:04 UTC — [ticket-931] tests rouges au tour 1
+- 2026-11-11 14:41:04 UTC — [ticket-931] tour 2 — codeur démarré
+- 2026-11-11 14:41:25 UTC — [ticket-931] tour 2 — codeur terminé (21546ms)
+- 2026-11-11 14:42:09 UTC — [ticket-931] testeur: dur�es : ruff 0 s, mypy 9 s, mypy-linux 12 s, pytest 41 s ; impact depuis base : 64 fichier(s) de test
+- 2026-11-11 14:42:41 UTC — [ticket-931] securite: PASS — Le diff renforce la garde d'écriture Bash sans retirer aucun contrôle : ~ et $VA (32640ms)
+- 2026-11-11 14:42:41 UTC — [ticket-931] tour 2 — reviewer démarré
+- 2026-11-11 14:43:17 UTC — [ticket-931] validateur: fichiers cités joints : backend/src/tessera/services/providers/perimetre.py, backend/tests/test_redirections_heredoc_cd.py
+- 2026-11-11 14:43:17 UTC — [ticket-931] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code introduit `developpemen (34842ms)
+- 2026-11-11 14:43:25 UTC — [ticket-931] tour 2 — reviewer terminé (44062ms)
+- 2026-11-11 14:43:25 UTC — [ticket-931] APPROVED après 2 tour(s)
+- 2026-11-11 14:45:37 UTC — [ticket-931] leçons: une leçon proposée
+- 2026-11-11 14:46:43 UTC — [ticket-931] documentation: 0 fichier(s) (61046ms)
+- 2026-11-11 15:49:33 UTC — [ide-core] ticket-933 PR #1050 confiée au CIWatcher
+- 2026-11-11 15:18:27 UTC — [ticket-931] livraison: arrêt — PR #1048 non mergée : CI failing : la PR #1048 reste ouverte.
+- 2026-11-11 15:49:37 UTC — [ticket-932] branche ticket-932-the-git-guard-reads-a-command-name-the-way-the-sh
+- 2026-11-11 15:49:38 UTC — [ticket-932] tour 1 — codeur démarré
+- 2026-11-11 15:51:53 UTC — [ticket-932] tour 1 — codeur terminé (134702ms)
+- 2026-11-11 15:52:11 UTC — [ticket-932] testeur: dur�es : ruff 0 s, mypy 9 s, pytest 12 s, mypy-linux 6 s ; impact depuis base : 9 fichier(s) de test
+- 2026-11-11 15:52:33 UTC — [ticket-932] securite: PASS — Le diff durcit la garde git/gh et ne crée aucun passage nouveau. `nom_de_command (22280ms)
+- 2026-11-11 15:52:34 UTC — [ticket-932] tour 1 — reviewer démarré
+- 2026-11-11 15:52:52 UTC — [ticket-932] validateur: fichiers cités joints : backend/tests/test_git_guard.py
+- 2026-11-11 15:52:52 UTC — [ticket-932] validateur: APPROVED — Tous les 5 critères sont satisfaits : les tests couvrent les variantes quotes/ba (18546ms)
+- 2026-11-11 15:53:12 UTC — [ticket-932] tour 1 — reviewer terminé (37453ms)
+- 2026-11-11 15:53:12 UTC — [ticket-932] APPROVED après 1 tour(s)
+- 2026-11-11 15:56:21 UTC — [ticket-932] documentation: 0 fichier(s) (184641ms) — après tour de correction
+- 2026-11-11 16:10:54 UTC — [ide-core] ticket-932 PR #1051 confiée au CIWatcher
+- 2026-11-11 15:56:44 UTC — [ticket-933] PR #1050 mise à jour avec develop : 61232b8 → 9e45d49
+- 2026-11-11 16:10:24 UTC — [ide-core] ticket-933 PR #1050 mergée (CI verte)
+- 2026-11-11 16:10:58 UTC — [ticket-934] branche ticket-934-under-the-dedicated-agent-account-the-test-comman
+- 2026-11-11 16:11:54 UTC — [ticket-934] plan rendu (54842ms)
+- 2026-11-11 16:11:54 UTC — [ticket-934] tour 1 — codeur démarré
+- 2026-11-11 16:14:56 UTC — [ticket-934] tour 1 — codeur terminé (181672ms)
+- 2026-11-11 16:21:19 UTC — [ticket-934] testeur: 1 failed, 2078 passed, 3 skipped, 88 warnings in 380.79s (0:06:20)
+- 2026-11-11 16:21:19 UTC — [ticket-934] tests rouges au tour 1
+- 2026-11-11 16:21:19 UTC — [ticket-934] tour 2 — codeur démarré
+- 2026-11-11 16:22:14 UTC — [ticket-934] tour 2 — codeur terminé (54327ms)
+- 2026-11-11 16:28:58 UTC — [ticket-934] testeur: 1 failed, 2827 passed, 3 skipped, 88 warnings in 401.53s (0:06:41)
+- 2026-11-11 16:28:58 UTC — [ticket-934] tests rouges au tour 2
+- 2026-11-11 16:28:58 UTC — [ticket-934] tour 3 — codeur démarré
+- 2026-11-11 16:31:02 UTC — [ticket-934] tour 3 — codeur terminé (123937ms)
+- 2026-11-11 16:34:47 UTC — [ide-core] ticket-912 retiré de la file
+- 2026-11-11 16:34:47 UTC — [ide-core] ticket-929 retiré de la file
+- 2026-11-11 16:40:12 UTC — [ticket-934] testeur: dur�es : ruff 0 s, mypy 9 s, mypy-linux 13 s, pytest 547 s ; impact depuis base : suite compl�te
+- 2026-11-11 16:40:32 UTC — [ticket-934] securite: PASS — PASS : aucune faille HIGH ou CRITICAL. Le diff fait partir la commande de test e (19796ms)
+- 2026-11-11 16:40:32 UTC — [ticket-934] tour 3 — reviewer démarré
+- 2026-11-11 16:41:06 UTC — [ticket-934] tour 3 — reviewer terminé (34092ms)
+- 2026-11-11 16:41:14 UTC — [ticket-934] validateur: fichiers cités joints : test_runner.py (tronqué) ; non joints (budget épuisé) : app_du_run.py, memory/decisions.md
+- 2026-11-11 16:41:14 UTC — [ticket-934] validateur: APPROVED — Le ticket met en place le lancement sous `AGENT_USER` pour `TestRunnerService` e (41797ms)
+- 2026-11-11 16:41:14 UTC — [ticket-934] APPROVED après 3 tour(s)
+- 2026-11-11 16:42:13 UTC — [ticket-934] leçons: une leçon proposée
+- 2026-11-11 16:43:57 UTC — [ticket-934] documentation: 0 fichier(s) (99078ms)
+- 2026-11-11 16:59:26 UTC — [ide-core] ticket-934 PR #1053 confiée au CIWatcher
+- 2026-11-11 16:27:02 UTC — [ide-core] ticket-932 PR #1051 mergée (CI verte)
+- 2026-11-11 16:59:33 UTC — [ticket-929] branche ticket-929-the-secret-read-guard-also-covers-the-claude-subs
+- 2026-11-11 16:59:36 UTC — [ticket-929] tour 1 — codeur démarré
+- 2026-11-11 17:01:37 UTC — [ticket-929] tour 1 — codeur terminé (121171ms)
+- 2026-11-11 17:02:10 UTC — [ticket-929] testeur: dur�es : ruff 0 s, pytest 29 s ; impact depuis base : 32 fichier(s) de test
+- 2026-11-11 17:02:10 UTC — [ticket-929] tests rouges au tour 1
+- 2026-11-11 17:02:10 UTC — [ticket-929] tour 2 — codeur démarré
+- 2026-11-11 17:02:27 UTC — [ticket-929] tour 2 — codeur terminé (16594ms)
+- 2026-11-11 17:03:24 UTC — [ticket-929] testeur: dur�es : ruff 0 s, mypy 32 s, pytest 52 s, mypy-linux 21 s ; impact depuis base : 32 fichier(s) de test
+- 2026-11-11 17:03:40 UTC — [ticket-929] securite: PASS — Le diff ajoute des refus de lecture pour trois fichiers d'identifiants du compte (15953ms)
+- 2026-11-11 17:03:40 UTC — [ticket-929] tour 2 — reviewer démarré
+- 2026-11-11 17:04:01 UTC — [ticket-929] tour 2 — reviewer terminé (21108ms)
+- 2026-11-11 17:04:15 UTC — [ticket-929] validateur: fichiers cités joints : backend/tests/test_garde_jetons.py, <home>/.claude/settings.json ; absents : <home>/.claude/.credentials.json, hosts.yml
+- 2026-11-11 17:04:15 UTC — [ticket-929] validateur: APPROVED — Les cinq critères sont satisfaits. Le diff ajoute un nouveau module `garde_compt (35094ms)
+- 2026-11-11 17:04:15 UTC — [ticket-929] APPROVED après 2 tour(s)
+- 2026-11-11 17:06:21 UTC — [ticket-929] leçons: refusée — preuve absente du retour du run
+- 2026-11-11 17:09:32 UTC — [ticket-929] documentation: 0 fichier(s) (185157ms) — après tour de correction
+- 2026-11-11 17:11:14 UTC — [ide-core] ticket-929 PR #1054 confiée au CIWatcher
+- 2026-11-11 17:05:18 UTC — [ide-core] ticket-934 PR #1053 mergée (CI verte)
+- 2026-11-11 17:11:29 UTC — [ticket-936] branche ticket-936-a-hosted-project-s-description-is-never-replaced
+- 2026-11-11 17:12:15 UTC — [ticket-936] plan rendu (43485ms)
+- 2026-11-11 17:12:15 UTC — [ticket-936] tour 1 — codeur démarré
+- 2026-11-11 17:14:43 UTC — [ticket-936] tour 1 — codeur terminé (148390ms)
+- 2026-11-11 17:15:26 UTC — [ticket-936] testeur: 1 failed, 302 passed, 8 warnings in 39.35s
+- 2026-11-11 17:15:26 UTC — [ticket-936] tests rouges au tour 1
+- 2026-11-11 17:15:26 UTC — [ticket-936] tour 2 — codeur démarré
+- 2026-11-11 17:17:59 UTC — [ticket-936] tour 2 — codeur terminé (152937ms)
+- 2026-11-11 17:19:13 UTC — [ticket-936] testeur: dur�es : ruff 0 s, pytest 70 s ; impact depuis base : 30 fichier(s) de test
+- 2026-11-11 17:19:13 UTC — [ticket-936] tests rouges au tour 2
+- 2026-11-11 17:19:13 UTC — [ticket-936] tour 3 — codeur démarré
+- 2026-11-11 17:19:41 UTC — [ticket-936] tour 3 — codeur terminé (28203ms)
+- 2026-11-11 17:20:55 UTC — [ticket-936] testeur: dur�es : ruff 0 s, mypy 8 s, mypy-linux 13 s, pytest 71 s ; impact depuis base : 30 fichier(s) de test
+- 2026-11-11 17:21:08 UTC — [ticket-936] securite: PASS — PASS : rien de CRITICAL ni de HIGH n'est introduit. Le diff ajoute un refus des  (13141ms)
+- 2026-11-11 17:21:08 UTC — [ticket-936] tour 3 — reviewer démarré
+- 2026-11-11 17:22:03 UTC — [ticket-936] tour 3 — reviewer terminé (54218ms)
+- 2026-11-11 17:22:33 UTC — [ticket-936] validateur: fichiers cités joints : backend/tests/ (dossier, 479 fichiers, tronqué), CLAUDE.md
+- 2026-11-11 17:22:33 UTC — [ticket-936] validateur: APPROVED — Les quatre critères d'acceptation sont satisfaits. Le codeur a implémenté un nou (84155ms)
+- 2026-11-11 17:22:33 UTC — [ticket-936] CHANGES_REQUESTED tour 3: Reviewer : 1. `phrases_interdites` ne retient la première phrase du CLAUDE.md de Tessera que si `racine not in projet.parents`. Or les projets hébergés vivent dans le dépôt Tessera : `tessera/projects
+- 2026-11-11 17:22:33 UTC — [ticket-936] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-11 17:22:38 UTC — [ide-core] file interrompue : ticket-936 non approuvé
+- 2026-11-11 17:16:30 UTC — [ide-core] ticket-929 PR #1054 mergée (CI verte)
+- 2026-11-11 17:23:54 UTC — [ticket-912] branche ticket-912-old-pipeline-log-months-move-to-a-monthly-archive
+- 2026-11-11 17:24:40 UTC — [ticket-912] plan rendu (44516ms)
+- 2026-11-11 17:24:41 UTC — [ticket-912] tour 1 — codeur démarré
+- 2026-11-11 17:26:34 UTC — [ticket-912] tour 1 — codeur terminé (111641ms)
+- 2026-11-11 17:37:03 UTC — [ticket-912] testeur: 1 failed, 4870 passed, 3 skipped, 88 warnings in 624.57s (0:10:24)
+- 2026-11-11 17:37:03 UTC — [ticket-912] BLOCKED — fichier protégé modifié pendant un appel d'agent : .git/config
+- 2026-11-11 17:46:45 UTC — [ticket-912] branche ticket-912-old-pipeline-log-months-move-to-a-monthly-archive
+- 2026-11-11 17:47:18 UTC — [ticket-912] plan rendu (31328ms)
+- 2026-11-11 17:56:39 UTC — [ticket-912] testeur: 1 failed, 4842 passed, 3 skipped, 88 warnings in 559.62s (0:09:19)
+- 2026-11-11 17:56:39 UTC — [ticket-912] branche reprise (2 commit(s)) — tests red, codeur en premier
+- 2026-11-11 17:56:39 UTC — [ticket-912] tour 1 — codeur démarré
+- 2026-11-11 17:57:06 UTC — [ticket-912] tour 1 — codeur terminé (27172ms)
+- 2026-11-11 18:08:01 UTC — [ticket-912] testeur: dur�es : ruff 0 s, mypy 20 s, mypy-linux 33 s, pytest 650 s ; impact depuis base : suite compl�te
+- 2026-11-11 18:08:25 UTC — [ticket-912] securite: PASS — Verdict PASS. Le diff ajoute un script local qui déplace les vieilles lignes du  (23312ms)
+- 2026-11-11 18:08:25 UTC — [ticket-912] tour 1 — reviewer démarré
+- 2026-11-11 18:08:44 UTC — [ticket-912] tour 1 — reviewer terminé (19421ms)
+- 2026-11-11 18:08:58 UTC — [ticket-912] validateur: fichiers cités joints : git_workspace/chemins.py, scripts/archiver_journal.py ; absents : memory/journal/
+- 2026-11-11 18:08:58 UTC — [ticket-912] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le module `archive_journal.py`  (33157ms)
+- 2026-11-11 18:08:58 UTC — [ticket-912] APPROVED après 1 tour(s)
+- 2026-11-11 18:09:50 UTC — [ticket-912] leçons: refusée — preuve absente du retour du run
+- 2026-11-11 18:13:41 UTC — [ticket-912] documentation: 0 fichier(s) (225062ms) — après tour de correction
+- 2026-11-11 18:19:03 UTC — [ide-core] ticket-912 PR #1062 mergée (CI verte)
+- 2026-11-12 09:00:45 UTC — [ticket-941] branche ticket-941-the-git-config-fingerprint-is-read-by-git-itself
+- 2026-11-12 09:00:47 UTC — [ticket-941] tour 1 — codeur démarré
+- 2026-11-12 09:11:13 UTC — [ticket-941] tour 1 — codeur terminé (625187ms)
+- 2026-11-12 09:20:23 UTC — [ticket-941] testeur: dur�es : ruff 0 s, mypy 81 s, mypy-linux 78 s, pytest 547 s ; impact depuis base : 214 fichier(s) de test
+- 2026-11-12 09:20:57 UTC — [ticket-941] securite: PASS — Ce diff durcit la sécurité : tous les appels git passent par `build_command`, qu (33968ms)
+- 2026-11-12 09:20:58 UTC — [ticket-941] tour 1 — reviewer démarré
+- 2026-11-12 09:21:37 UTC — [ticket-941] tour 1 — reviewer terminé (39030ms)
+- 2026-11-12 09:21:49 UTC — [ticket-941] validateur: fichiers cités joints : .git/config, backend/src/tessera (dossier, 11 fichiers)
+- 2026-11-12 09:21:49 UTC — [ticket-941] validateur: APPROVED — Tous les critères du ticket-941 sont satisfaits. Le codeur a créé un point uniqu (50922ms)
+- 2026-11-12 09:21:49 UTC — [ticket-941] APPROVED après 1 tour(s)
+- 2026-11-12 09:23:19 UTC — [ticket-941] documentation: 0 fichier(s) (72704ms)
+- 2026-11-12 09:23:19 UTC — [ticket-938] documentation: pas de diff retrouvable, non documenté
+- 2026-11-12 10:04:47 UTC — [ide-core] ticket-942 PR #1068 confiée au CIWatcher
+- 2026-11-12 09:33:27 UTC — [ticket-941] livraison: nouvelle tentative de la PR #1067 après une erreur réseau (ReadTimeout), PR non mergée
+- 2026-11-12 09:38:27 UTC — [ide-core] ticket-941 PR #1067 mergée (CI verte)
+- 2026-11-12 10:04:51 UTC — [ticket-946] branche ticket-946-the-agent-cli-starts-under-the-agent-account-desp
+- 2026-11-12 10:04:53 UTC — [ticket-946] tour 1 — codeur démarré
+- 2026-11-12 10:07:29 UTC — [ticket-946] tour 1 — codeur terminé (155485ms)
+- 2026-11-12 10:07:51 UTC — [ticket-946] testeur: 1 failed, 634 passed, 3 skipped, 8 warnings in 17.23s
+- 2026-11-12 10:07:51 UTC — [ticket-946] tests rouges au tour 1
+- 2026-11-12 10:07:51 UTC — [ticket-946] tour 2 — codeur démarré
+- 2026-11-12 10:09:58 UTC — [ticket-946] tour 2 — codeur terminé (126780ms)
+- 2026-11-12 10:10:22 UTC — [ticket-946] testeur: dur�es : ruff 0 s, pytest 20 s ; impact depuis base : 34 fichier(s) de test
+- 2026-11-12 10:10:22 UTC — [ticket-946] tests rouges au tour 2
+- 2026-11-12 10:10:22 UTC — [ticket-946] tour 3 — codeur démarré
+- 2026-11-12 10:10:38 UTC — [ticket-946] tour 3 — codeur terminé (15578ms)
+- 2026-11-12 10:11:04 UTC — [ticket-946] testeur: dur�es : ruff 0 s, mypy 7 s, mypy-linux 9 s, pytest 23 s ; impact depuis base : 34 fichier(s) de test
+- 2026-11-12 10:11:24 UTC — [ticket-946] securite: PASS — PASS : rien de critique ni de grave dans ce diff. Les valeurs longues (prompt sy (19311ms)
+- 2026-11-12 10:11:25 UTC — [ticket-946] tour 3 — reviewer démarré
+- 2026-11-12 10:11:55 UTC — [ticket-946] tour 3 — reviewer terminé (29657ms)
+- 2026-11-12 10:12:03 UTC — [ticket-946] validateur: CHANGES_REQUESTED — Les critères testables (1–4) sont tous satisfaits : les tests couvrent la limite (39360ms)
+- 2026-11-12 10:12:04 UTC — [ticket-946] CHANGES_REQUESTED tour 3: Reviewer : 1. Critère 4, première moitié (« les fichiers de l'appel sont supprimés après la fin du processus ») : aucun test ne la couvre. `test_call_files_are_removed_after_close` utilise `LanceurEsp
+- 2026-11-12 10:12:04 UTC — [ticket-946] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-12 10:12:08 UTC — [ide-core] file interrompue : ticket-946 non approuvé
+- 2026-11-12 09:32:22 UTC — [ide-core] ticket-941 PR #1067 confiée au CIWatcher
+- 2026-11-12 09:32:36 UTC — [ticket-942] branche ticket-942-an-app-squatting-port-5173-can-no-longer-pick-up
+- 2026-11-12 09:32:39 UTC — [ticket-942] tour 1 — codeur démarré
+- 2026-11-12 09:34:32 UTC — [ticket-942] tour 1 — codeur terminé (113360ms)
+- 2026-11-12 09:46:20 UTC — [ticket-942] testeur: dur�es : ruff 0 s, mypy 19 s, tsc 30 s, mypy-linux 29 s, eslint 67 s, vitest 207 s, pytest 705 s ; impact depuis base : suite compl�te
+- 2026-11-12 09:46:33 UTC — [ticket-942] securite: PASS — Le diff durcit la sécurité : le jeton passe en sessionStorage, l'héritage de loc (12641ms)
+- 2026-11-12 09:46:34 UTC — [ticket-942] configuration des tests modifiée : frontend/vite.config.ts
+- 2026-11-12 09:46:34 UTC — [ticket-942] tour 1 — reviewer démarré
+- 2026-11-12 09:46:56 UTC — [ticket-942] tour 1 — reviewer terminé (22671ms)
+- 2026-11-12 09:48:14 UTC — [ticket-942] validateur: fichiers cités joints : frontend/vite.config.ts, backend/tests/ (dossier, 485 fichiers, tronqué)
+- 2026-11-12 09:48:14 UTC — [ticket-942] validateur: APPROVED — All four functional objectives are met: `strictPort: true` binds port 5173 to pr (100030ms)
+- 2026-11-12 09:48:14 UTC — [ticket-942] APPROVED après 1 tour(s)
+- 2026-11-12 09:52:04 UTC — [ticket-942] documentation: 1 fichier(s) (224343ms) — après tour de correction
+- 2026-11-12 10:10:49 UTC — [ide-core] ticket-942 PR #1068 mergée (CI verte)
+- 2026-11-12 10:38:38 UTC — [ticket-940] branche ticket-940-a-documentation-batch-refused-twice-leaves-the-qu
+- 2026-11-12 10:38:42 UTC — [ticket-940] tour 1 — codeur démarré
+- 2026-11-12 10:42:29 UTC — [ticket-940] tour 1 — codeur terminé (226889ms)
+- 2026-11-12 10:43:31 UTC — [ticket-940] testeur: 1 failed, 307 passed, 8 warnings in 57.21s
+- 2026-11-12 10:43:31 UTC — [ticket-940] tests rouges au tour 1
+- 2026-11-12 10:43:31 UTC — [ticket-940] tour 2 — codeur démarré
+- 2026-11-12 10:44:09 UTC — [ticket-940] tour 2 — codeur terminé (37547ms)
+- 2026-11-12 10:44:51 UTC — [ticket-940] testeur: dur�es : ruff 0 s, pytest 39 s ; impact depuis base : 28 fichier(s) de test
+- 2026-11-12 10:44:51 UTC — [ticket-940] tests rouges au tour 2
+- 2026-11-12 10:44:51 UTC — [ticket-940] tour 3 — codeur démarré
+- 2026-11-12 10:45:13 UTC — [ticket-940] tour 3 — codeur terminé (20984ms)
+- 2026-11-12 10:45:48 UTC — [ticket-940] testeur: dur�es : ruff 0 s, mypy 9 s, mypy-linux 15 s, pytest 32 s ; impact depuis base : 28 fichier(s) de test
+- 2026-11-12 10:45:58 UTC — [ticket-940] securite: PASS — Je n'ai trouvé aucune faille de sécurité dans ce diff. Il ajoute un compteur de  (9765ms)
+- 2026-11-12 10:45:59 UTC — [ticket-940] tour 3 — reviewer démarré
+- 2026-11-12 10:46:23 UTC — [ticket-940] tour 3 — reviewer terminé (24030ms)
+- 2026-11-12 10:46:40 UTC — [ticket-940] validateur: fichiers cités joints : documentation.json, memory/pipeline-log.md (tronqué) ; non joints (budget épuisé) : documentation.py, documentation_selection.py
+- 2026-11-12 10:46:40 UTC — [ticket-940] validateur: APPROVED — Tous les critères d'acceptation du ticket 940 sont satisfaits. Les six tests cor (41750ms)
+- 2026-11-12 10:46:41 UTC — [ticket-940] APPROVED après 3 tour(s)
+- 2026-11-12 10:47:06 UTC — [ticket-940] leçons: une leçon proposée
+- 2026-11-12 10:48:14 UTC — [ticket-940] documentation: 0 fichier(s) (62500ms)
+- 2026-11-12 15:34:51 UTC — [ticket-950] branche ticket-950-documentation-refused-on-several-runs-in-a-row-ra
+- 2026-11-12 15:35:00 UTC — [ticket-950] tour 1 — codeur démarré
+- 2026-11-12 15:39:25 UTC — [ticket-950] tour 1 — codeur terminé (262484ms)
+- 2026-11-12 15:52:05 UTC — [ticket-950] testeur: 1 failed, 1245 passed, 8 warnings in 751.43s (0:12:31)
+- 2026-11-12 15:52:05 UTC — [ticket-950] tests rouges au tour 1
+- 2026-11-12 15:52:05 UTC — [ticket-950] tour 2 — codeur démarré
+- 2026-11-12 15:52:45 UTC — [ticket-950] tour 2 — codeur terminé (39437ms)
+- 2026-11-12 16:06:21 UTC — [ticket-950] testeur: dur�es : ruff 0 s, tsc 57 s, eslint 298 s, pytest 373 s, vitest 454 s ; impact depuis base : 100 fichier(s) de test
+- 2026-11-12 16:06:22 UTC — [ticket-950] tests rouges au tour 2
+- 2026-11-12 16:06:22 UTC — [ticket-950] tour 3 — codeur démarré
+- 2026-11-12 16:07:22 UTC — [ticket-950] tour 3 — codeur terminé (56578ms)
+- 2026-11-12 16:18:19 UTC — [ticket-950] testeur: 1 failed, 1245 passed, 8 warnings in 636.88s (0:10:36)
+- 2026-11-12 16:18:20 UTC — [ticket-950] tests rouges au tour 3
+- 2026-11-12 16:18:20 UTC — [ticket-950] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-12 16:18:31 UTC — [ide-core] file interrompue : ticket-950 non approuvé
+- 2026-11-12 16:39:08 UTC — [ticket-952] branche ticket-952-the-description-guard-covers-projects-hosted-insi
+- 2026-11-12 16:39:11 UTC — [ticket-952] tour 1 — codeur démarré
+- 2026-11-12 16:40:23 UTC — [ticket-952] tour 1 — codeur terminé (71453ms)
+- 2026-11-12 16:41:13 UTC — [ticket-952] testeur: 1 failed, 190 passed, 8 warnings in 42.81s
+- 2026-11-12 16:41:13 UTC — [ticket-952] tests rouges au tour 1
+- 2026-11-12 16:41:13 UTC — [ticket-952] tour 2 — codeur démarré
+- 2026-11-12 16:43:02 UTC — [ticket-952] tour 2 — codeur terminé (108453ms)
+- 2026-11-12 16:43:47 UTC — [ticket-952] testeur: dur�es : ruff 0 s, mypy 4 s, mypy-linux 6 s, pytest 41 s ; impact depuis base : 22 fichier(s) de test
+- 2026-11-12 16:44:03 UTC — [ticket-952] securite: PASS — Le diff rend plus stricte la règle qui refuse une description de projet reprenan (15500ms)
+- 2026-11-12 16:44:04 UTC — [ticket-952] tour 2 — reviewer démarré
+- 2026-11-12 16:44:34 UTC — [ticket-952] validateur: fichiers cités joints : projects/homelab-monitor (dossier, 7 fichiers), projects/ide-core (dossier, 2 fichiers), test_documentation_ailleurs.py
+- 2026-11-12 16:44:34 UTC — [ticket-952] validateur: APPROVED — Tous les critères sont satisfaits. Les quatre nouveaux tests (1 à 4) couvrent le (30625ms)
+- 2026-11-12 16:44:37 UTC — [ticket-952] tour 2 — reviewer terminé (33014ms)
+- 2026-11-12 16:44:37 UTC — [ticket-952] APPROVED après 2 tour(s)
+- 2026-11-12 16:45:41 UTC — [ticket-952] leçons: une leçon proposée
+- 2026-11-12 16:49:43 UTC — [ticket-952] documentation: 2 fichier(s) (236061ms)
+- 2026-11-12 16:50:45 UTC — [ide-core] ticket-952 PR #1080 confiée au CIWatcher
+- 2026-11-12 16:50:51 UTC — [ticket-953] branche ticket-953-a-documentation-proof-extract-is-checked-line-by
+- 2026-11-12 16:50:55 UTC — [ticket-953] tour 1 — codeur démarré
+- 2026-11-12 16:54:14 UTC — [ticket-953] tour 1 — codeur terminé (199046ms)
+- 2026-11-12 16:55:16 UTC — [ticket-953] testeur: dur�es : ruff 0 s, mypy 13 s, mypy-linux 23 s, pytest 57 s ; impact depuis base : 22 fichier(s) de test
+- 2026-11-12 16:55:31 UTC — [ticket-953] securite: PASS — Le diff porte uniquement sur la façon de comparer un extrait de preuve dans le s (14453ms)
+- 2026-11-12 16:55:32 UTC — [ticket-953] tour 1 — reviewer démarré
+- 2026-11-12 16:55:53 UTC — [ticket-953] tour 1 — reviewer terminé (21139ms)
+- 2026-11-12 16:56:05 UTC — [ticket-953] validateur: APPROVED — Les six critères d'acceptation sont tous satisfaits. Le ticket ajoute la fonctio (33406ms)
+- 2026-11-12 16:56:06 UTC — [ticket-953] APPROVED après 1 tour(s)
+- 2026-11-12 16:58:36 UTC — [ticket-953] documentation: 0 fichier(s) (146156ms)
+- 2026-11-12 17:11:05 UTC — [ide-core] ticket-954 PR #1083 confiée au CIWatcher
+- 2026-11-12 17:04:42 UTC — [ide-core] ticket-953 PR #1081 mergée (CI verte)
+- 2026-11-12 17:11:30 UTC — [ticket-949] branche ticket-949-a-ticket-that-needs-a-real-proof-stops-at-its-pr
+- 2026-11-12 17:11:40 UTC — [ticket-949] tour 1 — codeur démarré
+- 2026-11-12 17:14:04 UTC — [ticket-949] tour 1 — codeur terminé (142734ms)
+- 2026-11-12 17:24:14 UTC — [ticket-949] testeur: 2 failed, 1013 passed, 32 warnings in 602.98s (0:10:02)
+- 2026-11-12 17:24:14 UTC — [ticket-949] tests rouges au tour 1
+- 2026-11-12 17:24:14 UTC — [ticket-949] tour 2 — codeur démarré
+- 2026-11-12 17:26:49 UTC — [ticket-949] tour 2 — codeur terminé (154968ms)
+- 2026-11-12 17:39:42 UTC — [ticket-949] testeur: dur�es : ruff 0 s, tsc 26 s, eslint 38 s, vitest 203 s, pytest 768 s ; impact depuis base : 194 fichier(s) de test
+- 2026-11-12 17:39:43 UTC — [ticket-949] tests rouges au tour 2
+- 2026-11-12 17:39:43 UTC — [ticket-949] tour 3 — codeur démarré
+- 2026-11-12 17:40:52 UTC — [ticket-949] tour 3 — codeur terminé (68906ms)
+- 2026-11-12 17:53:35 UTC — [ticket-949] testeur: dur�es : ruff 1 s, mypy 61 s, tsc 68 s, mypy-linux 26 s, eslint 74 s, vitest 235 s, pytest 739 s ; impact depuis base : 194 fichier(s) de test
+- 2026-11-12 17:53:49 UTC — [ticket-949] securite: PASS — PASS : aucune faille CRITICAL ou HIGH. Le diff ajoute une garde qui empêche le m (13421ms)
+- 2026-11-12 17:53:50 UTC — [ticket-949] tour 3 — reviewer démarré
+- 2026-11-12 17:54:18 UTC — [ticket-949] validateur: APPROVED — Tous les critères sont satisfaits. Le champ `preuve_reelle: bool = False` est aj (28139ms)
+- 2026-11-12 17:54:29 UTC — [ticket-949] tour 3 — reviewer terminé (38625ms)
+- 2026-11-12 17:54:29 UTC — [ticket-949] CHANGES_REQUESTED tour 3: Reviewer : 1. La retenue ne survit pas à un redémarrage du backend. Au démarrage, en autonomie `merge`, `reprise_surveillance._reprendre_projet` reprend toutes les PR ouvertes. Elles viennent de deux 
+- 2026-11-12 17:54:29 UTC — [ticket-949] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-12 17:54:36 UTC — [ide-core] file interrompue : ticket-949 non approuvé
+- 2026-11-12 16:59:39 UTC — [ide-core] ticket-953 PR #1081 confiée au CIWatcher
+- 2026-11-12 16:57:11 UTC — [ide-core] ticket-952 PR #1080 mergée (CI verte)
+- 2026-11-12 16:59:45 UTC — [ticket-954] branche ticket-954-the-documentation-batch-sees-the-whole-documentat
+- 2026-11-12 16:59:48 UTC — [ticket-954] tour 1 — codeur démarré
+- 2026-11-12 17:01:15 UTC — [ticket-954] tour 1 — codeur terminé (87046ms)
+- 2026-11-12 17:02:23 UTC — [ticket-954] testeur: 1 failed, 307 passed, 8 warnings in 58.64s
+- 2026-11-12 17:02:23 UTC — [ticket-954] tests rouges au tour 1
+- 2026-11-12 17:02:23 UTC — [ticket-954] tour 2 — codeur démarré
+- 2026-11-12 17:03:58 UTC — [ticket-954] tour 2 — codeur terminé (94546ms)
+- 2026-11-12 17:04:51 UTC — [ticket-954] testeur: dur�es : ruff 0 s, mypy 14 s, mypy-linux 10 s, pytest 46 s ; impact depuis base : 28 fichier(s) de test
+- 2026-11-12 17:05:02 UTC — [ticket-954] securite: PASS — Verdict : PASS. Le diff déplace la lecture de la documentation dans un nouveau m (9577ms)
+- 2026-11-12 17:05:02 UTC — [ticket-954] tour 2 — reviewer démarré
+- 2026-11-12 17:05:19 UTC — [ticket-954] tour 2 — reviewer terminé (17063ms)
+- 2026-11-12 17:05:40 UTC — [ticket-954] validateur: APPROVED — Les quatre critères d'acceptation sont satisfaits. Les tests couvrent le passage (37250ms)
+- 2026-11-12 17:05:40 UTC — [ticket-954] APPROVED après 2 tour(s)
+- 2026-11-12 17:07:49 UTC — [ticket-954] leçons: une leçon proposée
+- 2026-11-12 17:09:52 UTC — [ticket-954] documentation: 0 fichier(s) (117891ms)
+- 2026-11-13 08:37:39 UTC — [ide-core] ticket-958 PR #1089 confiée au CIWatcher
+- 2026-11-13 08:37:45 UTC — [ticket-957] branche ticket-957-a-hung-bash-call-is-cut-soon-after-the-cli-s-own
+- 2026-11-13 08:37:48 UTC — [ticket-957] tour 1 — codeur démarré
+- 2026-11-13 08:39:05 UTC — [ticket-957] tour 1 — codeur terminé (76719ms)
+- 2026-11-13 08:45:25 UTC — [ticket-957] testeur: 1 failed, 1542 passed, 3 skipped, 24 warnings in 373.93s (0:06:13)
+- 2026-11-13 08:45:26 UTC — [ticket-957] tests rouges au tour 1
+- 2026-11-13 08:45:26 UTC — [ticket-957] tour 2 — codeur démarré
+- 2026-11-13 08:46:07 UTC — [ticket-957] tour 2 — codeur terminé (40609ms)
+- 2026-11-13 08:58:09 UTC — [ticket-957] testeur: 1 failed, 2137 passed, 3 skipped, 24 warnings in 716.53s (0:11:56)
+- 2026-11-13 08:58:09 UTC — [ticket-957] tests rouges au tour 2
+- 2026-11-13 08:58:09 UTC — [ticket-957] tour 3 — codeur démarré
+- 2026-11-13 08:59:48 UTC — [ticket-957] tour 3 — codeur terminé (98264ms)
+- 2026-11-13 09:09:09 UTC — [ticket-957] testeur: dur�es : ruff 0 s, pytest 556 s ; impact depuis base : 284 fichier(s) de test
+- 2026-11-13 09:09:10 UTC — [ticket-957] tests rouges au tour 3
+- 2026-11-13 09:09:10 UTC — [ticket-957] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-13 09:09:14 UTC — [ide-core] file interrompue : ticket-957 non approuvé
+- 2026-11-12 17:18:01 UTC — [ide-core] ticket-954 PR #1083 mergée (CI verte)
+- 2026-11-12 18:38:33 UTC — [ticket-958] branche ticket-958-a-single-run-is-refused-while-one-of-its-dependen
+- 2026-11-12 18:38:38 UTC — [ticket-958] tour 1 — codeur démarré
+- 2026-11-12 18:39:27 UTC — [ticket-958] tour 1 — codeur terminé (48139ms)
+- 2026-11-12 18:39:56 UTC — [ticket-958] testeur: OK (exit 0)
+- 2026-11-12 18:40:08 UTC — [ticket-958] securite: PASS — Il n'y a aucun diff à auditer. Ce qui m'a été transmis est le compte rendu du co (11235ms)
+- 2026-11-12 18:40:10 UTC — [ticket-958] tour 1 — reviewer démarré
+- 2026-11-12 18:40:39 UTC — [ticket-958] tour 1 — reviewer terminé (28578ms)
+- 2026-11-12 18:40:59 UTC — [ticket-958] validateur: APPROVED — All acceptance criteria target backend code (`backend/src/tessera/` and `backend (48485ms)
+- 2026-11-12 18:41:01 UTC — [ticket-958] CHANGES_REQUESTED tour 1: Reviewer : 1. Aucun des cinq critères d'acceptation n'est rempli : le diff ne contient ni le contrôle des dépendances en mode single dans routers/orchestrator.py, ni le module services/pipeline, ni au
+- 2026-11-12 18:41:01 UTC — [ticket-958] tour 2 — codeur démarré
+- 2026-11-12 18:41:36 UTC — [ticket-958] tour 2 — codeur terminé (32656ms)
+- 2026-11-12 18:41:44 UTC — [ticket-958] testeur: en attente d'un créneau de test
+- 2026-11-12 18:42:03 UTC — [ticket-958] testeur: OK (exit 0)
+- 2026-11-12 18:42:09 UTC — [ticket-958] securite: PASS — Je n'ai reçu aucun diff, seulement le rapport du codeur : il n'a modifié aucun f (5453ms)
+- 2026-11-12 18:42:10 UTC — [ticket-958] tour 2 — reviewer démarré
+- 2026-11-12 18:42:24 UTC — [ticket-958] tour 2 — reviewer terminé (13843ms)
+- 2026-11-12 18:42:30 UTC — [ticket-958] validateur: CHANGES_REQUESTED — Le run n'a produit aucun code : le garde-fou a rejeté l'écriture du module `serv (19514ms)
+- 2026-11-12 18:42:30 UTC — [ticket-958] CHANGES_REQUESTED tour 2: Reviewer : 1. Aucun des cinq critères d'acceptation n'est rempli. Le diff ne contient ni le contrôle des dépendances en mode single dans routers/orchestrator.py, ni le module de contrôle, ni aucun des
+- 2026-11-12 18:42:30 UTC — [ticket-958] tour 3 — codeur démarré
+- 2026-11-12 18:42:38 UTC — [ticket-958] tour 3 — codeur terminé (7265ms)
+- 2026-11-12 18:42:56 UTC — [ticket-958] testeur: OK (exit 0)
+- 2026-11-12 18:43:03 UTC — [ticket-958] securite: PASS — Le diff est vide : le codeur dit qu'il n'a modifié aucun fichier, parce que le h (6203ms)
+- 2026-11-12 18:43:04 UTC — [ticket-958] tour 3 — reviewer démarré
+- 2026-11-12 18:43:16 UTC — [ticket-958] tour 3 — reviewer terminé (12093ms)
+- 2026-11-12 18:43:23 UTC — [ticket-958] validateur: CHANGES_REQUESTED — Le run n'a produit aucun code : les trois tours ont échoué car le garde-fou a re (19203ms)
+- 2026-11-12 18:43:23 UTC — [ticket-958] CHANGES_REQUESTED tour 3: Reviewer : 1. Aucun des cinq critères d'acceptation n'est rempli. Le diff ne contient ni le contrôle des dépendances en mode single dans routers/orchestrator.py, ni le module de contrôle, ni aucun des
+- 2026-11-12 18:43:23 UTC — [ticket-958] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-12 18:43:28 UTC — [ide-core] file interrompue : ticket-958 non approuvé
+- 2026-11-13 08:25:19 UTC — [ticket-958] branche ticket-958-a-single-run-is-refused-while-one-of-its-dependen
+- 2026-11-13 08:25:22 UTC — [ticket-958] branche reprise (3 commit(s)) — refus précédent : revue, codeur en premier
+- 2026-11-13 08:25:22 UTC — [ticket-958] tour 1 — codeur démarré
+- 2026-11-13 08:29:23 UTC — [ticket-958] tour 1 — codeur terminé (240828ms)
+- 2026-11-13 08:30:07 UTC — [ticket-958] testeur: dur�es : ruff 1 s, mypy 21 s, pytest 32 s, mypy-linux 18 s ; impact depuis base : 19 fichier(s) de test
+- 2026-11-13 08:30:24 UTC — [ticket-958] securite: PASS — PASS : le diff ajoute un contrôle des dépendances au mode `single` (refus 409, c (17264ms)
+- 2026-11-13 08:30:25 UTC — [ticket-958] tour 1 — reviewer démarré
+- 2026-11-13 08:30:46 UTC — [ticket-958] tour 1 — reviewer terminé (20766ms)
+- 2026-11-13 08:30:52 UTC — [ticket-958] validateur: APPROVED — Le code implémente le contrôle des dépendances pour les runs single : une dépend (27141ms)
+- 2026-11-13 08:30:52 UTC — [ticket-958] APPROVED après 1 tour(s)
+- 2026-11-13 08:32:07 UTC — [ticket-958] leçons: refusée — preuve absente du retour du run
+- 2026-11-13 08:37:19 UTC — [ticket-958] documentation: 2 fichier(s) (304641ms) — après tour de correction
+- 2026-11-13 08:37:19 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-13 08:37:19 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-13 08:43:58 UTC — [ide-core] ticket-958 PR #1089 mergée (CI verte)
+- 2026-11-13 09:12:40 UTC — [ticket-960] branche ticket-960-a-round-whose-diff-is-empty-is-never-approved-wha
+- 2026-11-13 09:12:43 UTC — [ticket-960] tour 1 — codeur démarré
+- 2026-11-13 09:15:41 UTC — [ticket-960] tour 1 — codeur terminé (177516ms)
+- 2026-11-13 09:21:15 UTC — [ticket-960] testeur: 1 failed, 520 passed, 40 warnings in 329.52s (0:05:29)
+- 2026-11-13 09:21:16 UTC — [ticket-960] tests rouges au tour 1
+- 2026-11-13 09:21:16 UTC — [ticket-960] tour 2 — codeur démarré
+- 2026-11-13 09:23:05 UTC — [ticket-960] tour 2 — codeur terminé (109125ms)
+- 2026-11-13 09:28:05 UTC — [ticket-960] testeur: dur�es : ruff 0 s, pytest 296 s ; impact depuis base : 100 fichier(s) de test
+- 2026-11-13 09:28:06 UTC — [ticket-960] tests rouges au tour 2
+- 2026-11-13 09:28:06 UTC — [ticket-960] tour 3 — codeur démarré
+- 2026-11-13 09:28:37 UTC — [ticket-960] tour 3 — codeur terminé (30718ms)
+- 2026-11-13 09:34:44 UTC — [ticket-960] testeur: dur�es : ruff 0 s, mypy 21 s, mypy-linux 25 s, pytest 362 s ; impact depuis base : 100 fichier(s) de test
+- 2026-11-13 09:35:02 UTC — [ticket-960] securite: PASS — Le diff resserre la porte d'approbation : un diff vide, ou un diff en échec, met (17125ms)
+- 2026-11-13 09:35:03 UTC — [ticket-960] tour 3 — reviewer démarré
+- 2026-11-13 09:36:12 UTC — [ticket-960] tour 3 — reviewer terminé (68796ms)
+- 2026-11-13 09:36:21 UTC — [ticket-960] validateur: APPROVED — Tous les critères sont satisfaits. Le diff implémente correctement le drapeau `r (77781ms)
+- 2026-11-13 09:36:21 UTC — [ticket-960] CHANGES_REQUESTED tour 3: Reviewer : 1. Les tickets `design` (architecte, revues de projet) ne peuvent plus être approuvés. `diff_depuis_base` exclut toujours `tickets/` (`_ORCHESTRATOR_ARTIFACT_PATHS`, dans git_workspace/chem
+- 2026-11-13 09:36:21 UTC — [ticket-960] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-13 09:36:31 UTC — [ide-core] file interrompue : ticket-960 non approuvé
+- 2026-11-13 14:54:01 UTC — [ide-core] ticket-943 PR #1102 non reprise : merge après preuve réelle
+- 2026-11-13 14:54:01 UTC — [ide-core] ticket-947 PR #1095 non reprise : merge après preuve réelle
+- 2026-11-13 14:40:59 UTC — [ide-core] ticket-943 PR #1102 non surveillée (livraison arrêtée)
+- 2026-11-13 14:54:54 UTC — [ticket-948] branche ticket-948-a-project-venv-whose-launcher-smart-app-control-b
+- 2026-11-13 14:54:59 UTC — [ticket-948] tour 1 — codeur démarré
+- 2026-11-13 15:01:12 UTC — [ticket-948] tour 1 — codeur terminé (372500ms)
+- 2026-11-13 15:01:29 UTC — [ticket-948] testeur: en attente d'un créneau de test
+- 2026-11-13 15:11:40 UTC — [ticket-948] testeur: dur�es : ruff 1 s, pytest 556 s ; impact depuis base : 169 fichier(s) de test
+- 2026-11-13 15:11:40 UTC — [ticket-948] tests rouges au tour 1
+- 2026-11-13 15:11:40 UTC — [ticket-948] tour 2 — codeur démarré
+- 2026-11-13 15:14:37 UTC — [ticket-948] tour 2 — codeur terminé (175953ms)
+- 2026-11-13 15:14:51 UTC — [ticket-948] testeur: en attente d'un créneau de test
+- 2026-11-13 15:27:06 UTC — [ticket-948] testeur: dur�es : ruff 0 s, mypy 33 s, mypy-linux 22 s, pytest 502 s ; impact depuis base : 169 fichier(s) de test
+- 2026-11-13 15:27:32 UTC — [ticket-948] securite: PASS — Verdict PASS : je n'ai trouvé aucune faille CRITICAL ou HIGH dans ce diff. Aucun (24546ms)
+- 2026-11-13 15:27:33 UTC — [ticket-948] tour 2 — reviewer démarré
+- 2026-11-13 15:28:15 UTC — [ticket-948] tour 2 — reviewer terminé (42312ms)
+- 2026-11-13 15:28:57 UTC — [ticket-948] validateur: fichiers cités joints : backend/tests/test_longueur_des_fichiers.py ; absents : pyvenv.cfg, <tmp>/ailleurs/uv/python/cpython-3.11, .venv/Scripts
+- 2026-11-13 15:28:57 UTC — [ticket-948] validateur: APPROVED — Tous les critères sont satisfaits. Les deux nouveaux modules venv_sac.py et repr (84375ms)
+- 2026-11-13 15:28:57 UTC — [ticket-948] APPROVED après 2 tour(s)
+- 2026-11-13 15:30:10 UTC — [ticket-948] leçons: refusée — preuve absente du retour du run
+- 2026-11-13 15:32:48 UTC — [ticket-948] documentation: 0 fichier(s) (149047ms) — après tour de correction
+- 2026-11-13 15:32:48 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-13 15:32:48 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-13 13:48:36 UTC — [ide-core] ticket-947 PR #1095 non surveillée (livraison arrêtée)
+- 2026-11-13 13:48:52 UTC — [ticket-943] branche ticket-943-processes-of-the-agent-account-end-with-each-agen
+- 2026-11-13 13:49:22 UTC — [ticket-943] tour 1 — codeur démarré
+- 2026-11-13 13:55:55 UTC — [ticket-943] tour 1 — codeur terminé (388328ms)
+- 2026-11-13 13:56:00 UTC — [ticket-943] testeur: en attente d'un créneau de test
+- 2026-11-13 14:06:16 UTC — [ticket-943] testeur: 1 failed, 762 passed, 3 skipped, 88 warnings in 398.62s (0:06:38)
+- 2026-11-13 14:06:17 UTC — [ticket-943] tests rouges au tour 1
+- 2026-11-13 14:06:17 UTC — [ticket-943] tour 2 — codeur démarré
+- 2026-11-13 14:15:46 UTC — [ticket-943] tour 2 — codeur terminé (567937ms)
+- 2026-11-13 14:16:00 UTC — [ticket-943] testeur: en attente d'un créneau de test
+- 2026-11-13 14:27:55 UTC — [ticket-943] testeur: dur�es : ruff 1 s, mypy 56 s, mypy-linux 57 s, pytest 605 s ; impact depuis base : 116 fichier(s) de test
+- 2026-11-13 14:28:53 UTC — [ticket-943] securite: PASS — Verdict : PASS. Le diff réduit les droits du compte agent : l'écriture n'est acc (54390ms)
+- 2026-11-13 14:28:58 UTC — [ticket-943] tour 2 — reviewer démarré
+- 2026-11-13 14:30:10 UTC — [ticket-943] tour 2 — reviewer terminé (71905ms)
+- 2026-11-13 14:30:55 UTC — [ticket-943] validateur: APPROVED — Les quatre critères d'acceptation sont satisfaits. Les tests demandés sont prése (117156ms)
+- 2026-11-13 14:30:58 UTC — [ticket-943] APPROVED après 2 tour(s)
+- 2026-11-13 14:31:53 UTC — [ticket-943] leçons: refusée — plus de 200 caractères
+- 2026-11-13 14:33:21 UTC — [ticket-943] documentation: 0 fichier(s) (78375ms)
+- 2026-11-13 14:33:21 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-13 14:33:21 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-13 12:58:03 UTC — [ticket-947] branche ticket-947-worktrees-of-an-agent-account-project-live-outsid
+- 2026-11-13 12:58:09 UTC — [ticket-947] tour 1 — codeur démarré
+- 2026-11-13 13:05:34 UTC — [ticket-947] tour 1 — codeur terminé (443687ms)
+- 2026-11-13 13:05:38 UTC — [ticket-947] testeur: en attente d'un créneau de test
+- 2026-11-13 13:21:35 UTC — [ticket-947] testeur: dur�es : ruff 1 s, mypy 40 s, mypy-linux 49 s, pytest 911 s ; impact depuis base : suite compl�te
+- 2026-11-13 13:22:06 UTC — [ticket-947] securite: PASS — Aucune faille CRITICAL ni HIGH n'est introduite : `_sous_le_dossier` résout les  (30202ms)
+- 2026-11-13 13:22:09 UTC — [ticket-947] tour 1 — reviewer démarré
+- 2026-11-13 13:22:56 UTC — [ticket-947] validateur: fichiers cités joints : backend/tests/ (dossier, 494 fichiers, tronqué)
+- 2026-11-13 13:22:56 UTC — [ticket-947] validateur: APPROVED — Tous les critères sont satisfaits. Le code déploie une nouvelle variable `IDE_WO (46483ms)
+- 2026-11-13 13:23:08 UTC — [ticket-947] tour 1 — reviewer terminé (59358ms)
+- 2026-11-13 13:23:10 UTC — [ticket-947] APPROVED après 1 tour(s)
+- 2026-11-13 13:31:32 UTC — [ticket-947] documentation: 2 fichier(s) (473139ms) — après tour de correction — refusé : doc-fonctionnelle : docs/guide-utilisateur.md : règle « preuve » — l'édition ne cite aucun code livré. Ajoute `preuve: [{fichier, extrait}]`, extrait recopié du
+- 2026-11-13 13:31:32 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-13 13:31:32 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-13 16:54:13 UTC — [ide-core] ticket-962 PR #1106 confiée au CIWatcher
+- 2026-11-13 16:56:41 UTC — [ticket-962] livraison: nouvelle tentative de la PR #1106 après une erreur réseau (ConnectError: [Errno 11001] getaddrinfo failed), PR non mergée
+- 2026-11-13 16:56:44 UTC — [ticket-962] livraison: arrêt — PR #1106 non mergée : tête de la PR #1106 illisible (ConnectError: [Errno 11001] getaddrinfo failed) : elle reste ouverte
+- 2026-11-13 17:41:43 UTC — [ticket-964] branche ticket-964-the-real-proof-flag-of-a-ticket-is-read-before-an
+- 2026-11-13 17:41:47 UTC — [ticket-964] tour 1 — codeur démarré
+- 2026-11-13 17:44:15 UTC — [ticket-964] tour 1 — codeur terminé (148125ms)
+- 2026-11-13 17:44:21 UTC — [ticket-964] testeur: en attente d'un créneau de test
+- 2026-11-13 17:50:24 UTC — [ticket-964] testeur: 1 failed, 782 passed, 40 warnings in 230.38s (0:03:50)
+- 2026-11-13 17:50:25 UTC — [ticket-964] tests rouges au tour 1
+- 2026-11-13 17:50:25 UTC — [ticket-964] tour 2 — codeur démarré
+- 2026-11-13 17:50:49 UTC — [ticket-964] tour 2 — codeur terminé (24328ms)
+- 2026-11-13 17:55:38 UTC — [ticket-964] testeur: 1 failed, 1068 passed, 40 warnings in 283.02s (0:04:43)
+- 2026-11-13 17:55:38 UTC — [ticket-964] tests rouges au tour 2
+- 2026-11-13 17:55:38 UTC — [ticket-964] tour 3 — codeur démarré
+- 2026-11-13 18:01:22 UTC — [ticket-964] tour 3 — codeur terminé (343172ms)
+- 2026-11-13 18:06:55 UTC — [ticket-964] testeur: dur�es : ruff 0 s, pytest 328 s ; impact depuis base : 173 fichier(s) de test
+- 2026-11-13 18:06:55 UTC — [ticket-964] tests rouges au tour 3
+- 2026-11-13 18:06:55 UTC — [ticket-964] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-13 18:07:01 UTC — [ide-core] file interrompue : ticket-964 non approuvé
+- 2026-11-13 15:33:46 UTC — [ide-core] ticket-948 PR #1103 non surveillée (livraison arrêtée)
+- 2026-11-13 15:34:13 UTC — [ticket-962] branche ticket-962-each-documentation-role-reads-the-documentation-a
+- 2026-11-13 15:34:51 UTC — [ticket-962] tour 1 — codeur démarré
+- 2026-11-13 15:38:25 UTC — [ticket-962] tour 1 — codeur terminé (212156ms)
+- 2026-11-13 15:38:31 UTC — [ticket-962] testeur: en attente d'un créneau de test
+- 2026-11-13 15:40:21 UTC — [ticket-962] testeur: 1 failed, 345 passed, 8 warnings in 67.64s (0:01:07)
+- 2026-11-13 15:40:24 UTC — [ticket-962] tests rouges au tour 1
+- 2026-11-13 15:40:24 UTC — [ticket-962] tour 2 — codeur démarré
+- 2026-11-13 15:43:07 UTC — [ticket-962] tour 2 — codeur terminé (161327ms)
+- 2026-11-13 15:43:17 UTC — [ticket-962] testeur: en attente d'un créneau de test
+- 2026-11-13 15:52:54 UTC — [ticket-962] testeur: dur�es : ruff 2 s, pytest 333 s ; impact depuis base : 27 fichier(s) de test
+- 2026-11-13 15:52:55 UTC — [ticket-962] tests rouges au tour 2
+- 2026-11-13 15:52:55 UTC — [ticket-962] tour 3 — codeur démarré
+- 2026-11-13 15:57:33 UTC — [ticket-962] tour 3 — codeur terminé (273531ms)
+- 2026-11-13 15:57:43 UTC — [ticket-962] testeur: en attente d'un créneau de test
+- 2026-11-13 16:01:20 UTC — [ticket-962] testeur: dur�es : ruff 1 s, mypy 42 s, mypy-linux 35 s, pytest 114 s ; impact depuis base : 27 fichier(s) de test
+- 2026-11-13 16:01:34 UTC — [ticket-962] securite: PASS — Ce diff est surtout une refonte. Les fonctions `titres_fichiers_vises` et `brief (12655ms)
+- 2026-11-13 16:01:35 UTC — [ticket-962] tour 3 — reviewer démarré
+- 2026-11-13 16:02:01 UTC — [ticket-962] tour 3 — reviewer terminé (25500ms)
+- 2026-11-13 16:02:31 UTC — [ticket-962] validateur: fichiers cités joints : docs/guide-utilisateur.md (tronqué) ; non joints (budget épuisé) : services/documentation
+- 2026-11-13 16:02:31 UTC — [ticket-962] validateur: APPROVED — Le ticket implémente correctement la solution : à chaque appel de rôle, le brief (55843ms)
+- 2026-11-13 16:02:32 UTC — [ticket-962] APPROVED après 3 tour(s)
+- 2026-11-13 16:02:47 UTC — [ide-core] ticket-964 retiré de la file
+- 2026-11-13 16:02:47 UTC — [ide-core] ticket-965 retiré de la file
+- 2026-11-13 16:02:47 UTC — [ide-core] ticket-967 retiré de la file
+- 2026-11-13 16:02:47 UTC — [ide-core] ticket-968 retiré de la file
+- 2026-11-13 16:03:23 UTC — [ticket-962] leçons: une leçon proposée
+- 2026-11-13 16:05:27 UTC — [ticket-962] documentation: 0 fichier(s) (115594ms)
+- 2026-11-13 16:05:27 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-13 16:05:27 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-13 18:17:51 UTC — [ticket-965] branche ticket-965-no-program-named-in-a-project-s-git-config-runs-w
+- 2026-11-13 18:17:58 UTC — [ticket-965] tour 1 — codeur démarré
+- 2026-11-13 18:19:33 UTC — [ticket-965] tour 1 — codeur terminé (94280ms)
+- 2026-11-13 18:22:45 UTC — [ticket-965] testeur: 1 failed, 480 passed, 16 warnings in 186.79s (0:03:06)
+- 2026-11-13 18:22:45 UTC — [ticket-965] tests rouges au tour 1
+- 2026-11-13 18:22:45 UTC — [ticket-965] tour 2 — codeur démarré
+- 2026-11-13 18:23:13 UTC — [ticket-965] tour 2 — codeur terminé (27640ms)
+- 2026-11-13 18:31:58 UTC — [ticket-965] testeur: dur�es : ruff 0 s, mypy 2 s, mypy-linux 3 s, pytest 521 s ; impact depuis base : 135 fichier(s) de test
+- 2026-11-13 18:32:22 UTC — [ticket-965] securite: PASS — Le diff durcit les commandes git : il neutralise gpg, ssh, pager et diff externe (23562ms)
+- 2026-11-13 18:32:23 UTC — [ticket-965] tour 2 — reviewer démarré
+- 2026-11-13 18:32:55 UTC — [ticket-965] validateur: APPROVED — Les quatre critères d'acceptation sont satisfaits. `build_command` force mainten (32530ms)
+- 2026-11-13 18:33:07 UTC — [ticket-965] tour 2 — reviewer terminé (44172ms)
+- 2026-11-13 18:33:07 UTC — [ticket-965] APPROVED après 2 tour(s)
+- 2026-11-13 18:33:50 UTC — [ticket-965] leçons: refusée — preuve absente du retour du run
+- 2026-11-13 18:40:20 UTC — [ticket-965] documentation: 1 fichier(s) (368344ms) — après tour de correction
+- 2026-11-13 18:40:20 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-13 18:40:20 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-13 18:41:36 UTC — [ide-core] ticket-965 PR #1111 confiée au CIWatcher
+- 2026-11-13 18:41:43 UTC — [ticket-967] branche ticket-967-a-project-service-never-starts-on-a-port-tessera
+- 2026-11-13 18:41:46 UTC — [ticket-967] tour 1 — codeur démarré
+- 2026-11-13 18:44:18 UTC — [ticket-967] tour 1 — codeur terminé (151358ms)
+- 2026-11-13 18:46:24 UTC — [ticket-967] testeur: dur�es : ruff 0 s, mypy 20 s, mypy-linux 19 s, pytest 121 s ; impact depuis base : 93 fichier(s) de test
+- 2026-11-13 18:46:36 UTC — [ticket-967] securite: PASS — J'ai lu le diff, je n'ai rien lu hors du diff, et je n'y trouve aucune faille CR (10483ms)
+- 2026-11-13 18:46:36 UTC — [ticket-967] tour 1 — reviewer démarré
+- 2026-11-13 18:46:56 UTC — [ticket-967] validateur: APPROVED — All acceptance criteria are satisfied. The implementation correctly prevents pro (19359ms)
+- 2026-11-13 18:46:58 UTC — [ticket-967] tour 1 — reviewer terminé (21375ms)
+- 2026-11-13 18:46:58 UTC — [ticket-967] APPROVED après 1 tour(s)
+- 2026-11-13 18:51:20 UTC — [ticket-967] documentation: 0 fichier(s) (242703ms) — après tour de correction
+- 2026-11-13 18:51:20 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-13 18:51:20 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-13 18:53:31 UTC — [ide-core] ticket-967 PR #1112 confiée au CIWatcher
+- 2026-11-13 18:46:53 UTC — [ide-core] ticket-965 PR #1111 mergée (CI verte)
+- 2026-11-13 18:53:36 UTC — [ticket-968] branche ticket-968-every-project-repository-carries-the-forbidden-te
+- 2026-11-13 18:53:39 UTC — [ticket-968] tour 1 — codeur démarré
+- 2026-11-13 18:58:55 UTC — [ticket-968] tour 1 — codeur terminé (316421ms)
+- 2026-11-13 19:07:10 UTC — [ticket-968] testeur: dur�es : ruff 0 s, mypy 11 s, mypy-linux 12 s, pytest 490 s ; impact depuis base : suite compl�te
+- 2026-11-13 19:07:37 UTC — [ticket-968] securite: PASS — Le diff pose un hook pre-push de deux lignes qui appelle le script de Tessera pa (26907ms)
+- 2026-11-13 19:07:38 UTC — [ticket-968] tour 1 — reviewer démarré
+- 2026-11-13 19:07:58 UTC — [ticket-968] validateur: APPROVED — Les quatre critères d'acceptation sont satisfaits. Le code produit installe le h (20062ms)
+- 2026-11-13 19:08:09 UTC — [ticket-968] tour 1 — reviewer terminé (31437ms)
+- 2026-11-13 19:08:10 UTC — [ticket-968] APPROVED après 1 tour(s)
+- 2026-11-13 19:12:12 UTC — [ticket-968] documentation: 0 fichier(s) (236655ms) — après tour de correction
+- 2026-11-13 19:12:12 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-13 19:12:12 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-13 18:58:18 UTC — [ide-core] ticket-967 PR #1112 mergée (CI verte)
+- 2026-11-13 19:21:19 UTC — [ide-core] ticket-968 PR #1113 confiée au CIWatcher
+- 2026-11-13 19:27:42 UTC — [ticket-968] livraison: arrêt — PR #1113 non mergée : Le merge de la PR #1113 a échoué sur une erreur réseau (ReadTimeout, la PR est lue « open »). La PR reste ouverte.
+- 2026-11-16 09:18:28 UTC — [ticket-974] branche ticket-974-la-garde-de-port-du-ticket-967-lit-le-port-que-le
+- 2026-11-16 09:18:32 UTC — [ticket-974] tour 1 — codeur démarré
+- 2026-11-16 09:20:52 UTC — [ticket-974] tour 1 — codeur terminé (140000ms)
+- 2026-11-16 09:23:40 UTC — [ticket-974] testeur: dur�es : ruff 8 s, mypy 36 s, mypy-linux 51 s, pytest 162 s ; impact depuis base : 93 fichier(s) de test
+- 2026-11-16 09:24:11 UTC — [ticket-974] securite: PASS — Le diff lit `package.json` et `vite.config` du dossier du service pour en déduir (30016ms)
+- 2026-11-16 09:24:13 UTC — [ticket-974] tour 1 — reviewer démarré
+- 2026-11-16 09:24:58 UTC — [ticket-974] tour 1 — reviewer terminé (44750ms)
+- 2026-11-16 09:25:20 UTC — [ticket-974] validateur: fichiers cités joints : frontend/vite.config.ts, vite.config.ts, package.json
+- 2026-11-16 09:25:20 UTC — [ticket-974] validateur: CHANGES_REQUESTED — Le code implémente correctement la logique : lecture du `cwd`, extraction de `pa (67155ms)
+- 2026-11-16 09:25:21 UTC — [ticket-974] CHANGES_REQUESTED tour 1: Validateur : Le code implémente correctement la logique : lecture du `cwd`, extraction de `package.json` et `vite.config.ts`, détection du port cible sans exécution. Les 5 premiers critères (tests uni
+- 2026-11-16 09:25:21 UTC — [ticket-974] tour 2 — codeur démarré
+- 2026-11-16 09:25:35 UTC — [ticket-974] tour 2 — codeur terminé (12250ms)
+- 2026-11-16 09:25:49 UTC — [ticket-974] testeur: en attente d'un créneau de test
+- 2026-11-16 09:28:35 UTC — [ticket-974] testeur: dur�es : ruff 0 s, mypy 5 s, mypy-linux 5 s, pytest 159 s ; impact depuis base : 93 fichier(s) de test
+- 2026-11-16 09:29:03 UTC — [ticket-974] securite: PASS — Le diff lit package.json et la config Vite en texte, sans rien exécuter, pour tr (27827ms)
+- 2026-11-16 09:29:04 UTC — [ticket-974] tour 2 — reviewer démarré
+- 2026-11-16 09:29:27 UTC — [ticket-974] tour 2 — reviewer terminé (22782ms)
+- 2026-11-16 09:30:14 UTC — [ticket-974] validateur: fichiers cités joints : frontend/vite.config.ts, vite.config.ts, package.json
+- 2026-11-16 09:30:14 UTC — [ticket-974] validateur: CHANGES_REQUESTED — Les cinq premiers critères sont tous satisfaits par les tests unitaires (exit 0, (70750ms)
+- 2026-11-16 09:30:15 UTC — [ticket-974] CHANGES_REQUESTED tour 2: Validateur : Les cinq premiers critères sont tous satisfaits par les tests unitaires (exit 0, pytest 159 s) : lecture du `cwd`, extraction du script `dev` et du `vite.config.ts`, détection du port san
+- 2026-11-16 09:30:15 UTC — [ticket-974] tour 3 — codeur démarré
+- 2026-11-16 09:30:22 UTC — [ticket-974] tour 3 — codeur terminé (7047ms)
+- 2026-11-16 09:33:50 UTC — [ide-core] ticket-971 retiré de la file
+- 2026-11-16 09:33:50 UTC — [ide-core] ticket-970 retiré de la file
+- 2026-11-16 09:33:50 UTC — [ide-core] ticket-973 retiré de la file
+- 2026-11-16 09:34:05 UTC — [ticket-974] testeur: dur�es : ruff 0 s, mypy 4 s, mypy-linux 7 s, pytest 218 s ; impact depuis base : 93 fichier(s) de test
+- 2026-11-16 09:34:32 UTC — [ticket-974] securite: PASS — Le diff lit package.json et vite.config sans les exécuter (json.loads, regex) et (26625ms)
+- 2026-11-16 09:34:36 UTC — [ticket-974] tour 3 — reviewer démarré
+- 2026-11-16 09:35:06 UTC — [ticket-974] tour 3 — reviewer terminé (30420ms)
+- 2026-11-16 09:35:24 UTC — [ticket-974] validateur: fichiers cités joints : frontend/vite.config.ts, vite.config.ts, package.json
+- 2026-11-16 09:35:24 UTC — [ticket-974] validateur: CHANGES_REQUESTED — Les cinq premiers critères sont satisfaits : le diff implémente la lecture du `c (50436ms)
+- 2026-11-16 09:35:25 UTC — [ticket-974] CHANGES_REQUESTED tour 3: Validateur : Les cinq premiers critères sont satisfaits : le diff implémente la lecture du `cwd`, l'extraction du script `dev` et de la config Vite, la détection du port sans exécution, et la gestion 
+- 2026-11-16 09:35:25 UTC — [ticket-974] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-16 09:35:30 UTC — [ide-core] file interrompue : ticket-974 non approuvé
+- 2026-11-16 09:48:12 UTC — [ticket-974] branche ticket-974-la-garde-de-port-du-ticket-967-lit-le-port-que-le
+- 2026-11-16 09:48:16 UTC — [ticket-974] branche reprise (3 commit(s)) — refus précédent : revue, codeur en premier
+- 2026-11-16 09:48:16 UTC — [ticket-974] tour 1 — codeur démarré
+- 2026-11-16 09:49:04 UTC — [ticket-974] tour 1 — codeur terminé (47516ms)
+- 2026-11-16 09:52:44 UTC — [ticket-974] testeur: dur�es : ruff 0 s, mypy 5 s, mypy-linux 6 s, pytest 212 s ; impact depuis base : 93 fichier(s) de test
+- 2026-11-16 09:53:10 UTC — [ticket-974] securite: PASS — PASS : le diff ne lit que des fichiers du projet, avec read_text et json.loads,  (25484ms)
+- 2026-11-16 09:53:11 UTC — [ticket-974] tour 1 — reviewer démarré
+- 2026-11-16 09:53:38 UTC — [ticket-974] tour 1 — reviewer terminé (27484ms)
+- 2026-11-16 09:53:40 UTC — [ticket-974] validateur: fichiers cités joints : frontend/vite.config.ts, vite.config.ts, package.json
+- 2026-11-16 09:53:40 UTC — [ticket-974] validateur: APPROVED — La garde de port lit désormais le dossier du service pour extrait le port réel d (29813ms)
+- 2026-11-16 09:53:41 UTC — [ticket-974] APPROVED après 1 tour(s)
+- 2026-11-16 09:54:31 UTC — [ticket-974] leçons: refusée — preuve absente du retour du run
+- 2026-11-16 09:58:53 UTC — [ticket-974] documentation: 0 fichier(s) (253592ms) — après tour de correction
+- 2026-11-16 09:58:53 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-16 09:58:53 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-16 09:59:14 UTC — [ide-core] ticket-974 PR #1119 non surveillée (livraison arrêtée)
+- 2026-11-16 09:59:20 UTC — [ticket-977] branche ticket-977-un-run-relit-son-ticket-une-fois-la-base-avanc-e
+- 2026-11-16 09:59:23 UTC — [ticket-977] tour 1 — codeur démarré
+- 2026-11-16 10:01:54 UTC — [ticket-977] tour 1 — codeur terminé (150703ms)
+- 2026-11-16 10:09:41 UTC — [ticket-977] testeur: 2 failed, 838 passed, 40 warnings in 455.99s (0:07:35)
+- 2026-11-16 10:09:41 UTC — [ticket-977] tests rouges au tour 1
+- 2026-11-16 10:09:41 UTC — [ticket-977] tour 2 — codeur démarré
+- 2026-11-16 10:11:14 UTC — [ticket-977] tour 2 — codeur terminé (91875ms)
+- 2026-11-16 10:22:02 UTC — [ticket-977] testeur: dur�es : ruff 0 s, mypy 22 s, tsc 39 s, mypy-linux 25 s, eslint 54 s, vitest 339 s, pytest 642 s ; impact depuis base : 160 fichier(s) de test
+- 2026-11-16 10:22:11 UTC — [ticket-977] securite: PASS — Je n'ai trouvé aucune faille dans ce diff. Après la création de la branche, il r (8078ms)
+- 2026-11-16 10:22:11 UTC — [ticket-977] tour 2 — reviewer démarré
+- 2026-11-16 10:22:42 UTC — [ticket-977] tour 2 — reviewer terminé (31140ms)
+- 2026-11-16 10:23:18 UTC — [ticket-977] validateur: APPROVED — Tous les critères sont couverts par les tests. Le code implémente correctement l (66969ms)
+- 2026-11-16 10:23:18 UTC — [ticket-977] CHANGES_REQUESTED tour 2: Reviewer : 1. Le critère d'acceptation 1 n'est pas rempli. Le ticket exige un test sur un vrai dépôt de test : la base locale porte une version A de la fiche, `origin/<base>` porte une version B, et a
+- 2026-11-16 10:23:18 UTC — [ticket-977] tour 3 — codeur démarré
+- 2026-11-16 10:25:10 UTC — [ticket-977] tour 3 — codeur terminé (111202ms)
+- 2026-11-16 10:40:27 UTC — [ticket-977] testeur: dur�es : ruff 0 s, mypy 11 s, mypy-linux 10 s, tsc 55 s, eslint 69 s, vitest 350 s, pytest 908 s ; impact depuis base : 161 fichier(s) de test
+- 2026-11-16 10:40:27 UTC — [ticket-977] tests rouges au tour 3
+- 2026-11-16 10:40:27 UTC — [ticket-977] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-16 10:40:34 UTC — [ide-core] file interrompue : ticket-977 non approuvé
+- 2026-11-16 10:42:21 UTC — [ticket-977] branche ticket-977-un-run-relit-son-ticket-une-fois-la-base-avanc-e
+- 2026-11-16 10:42:24 UTC — [ticket-977] branche reprise (3 commit(s)) — refus précédent : revue, codeur en premier
+- 2026-11-16 10:42:24 UTC — [ticket-977] tour 1 — codeur démarré
+- 2026-11-16 10:42:48 UTC — [ide-core] ticket-970 retiré de la file
+- 2026-11-16 10:42:48 UTC — [ide-core] ticket-973 retiré de la file
+- 2026-11-16 10:42:48 UTC — [ide-core] ticket-971 retiré de la file
+- 2026-11-16 10:42:48 UTC — [ide-core] ticket-976 retiré de la file
+- 2026-11-16 10:46:30 UTC — [ticket-977] tour 1 — codeur terminé (246375ms)
+- 2026-11-16 10:46:31 UTC — [ticket-977] BLOCKED — fichier protégé modifié pendant un appel d'agent : scripts/hooks/__pycache__/pre-pushcpython-311.pyc
+- 2026-11-16 10:46:35 UTC — [ide-core] file interrompue : ticket-977 non approuvé
+- 2026-11-16 10:47:52 UTC — [ticket-977] branche ticket-977-un-run-relit-son-ticket-une-fois-la-base-avanc-e
+- 2026-11-16 10:57:52 UTC — [ticket-977] testeur: dur�es : ruff 0 s, mypy 4 s, mypy-linux 5 s, tsc 30 s, eslint 42 s, vitest 208 s, pytest 597 s ; impact depuis base : 161 fichier(s) de test
+- 2026-11-16 10:57:52 UTC — [ticket-977] branche reprise (5 commit(s)) — tests green, codeur sauté
+- 2026-11-16 10:58:04 UTC — [ticket-977] securite: PASS — Ce diff relit la fiche du ticket depuis le dépôt local après la création de la b (9046ms)
+- 2026-11-16 10:58:06 UTC — [ticket-977] tour 1 — reviewer démarré
+- 2026-11-16 10:58:38 UTC — [ticket-977] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code ajoute une relecture de (32297ms)
+- 2026-11-16 10:58:44 UTC — [ticket-977] tour 1 — reviewer terminé (38563ms)
+- 2026-11-16 10:58:45 UTC — [ticket-977] APPROVED après 1 tour(s)
+- 2026-11-16 11:00:25 UTC — [ticket-977] documentation: 0 fichier(s) (94546ms)
+- 2026-11-16 11:00:25 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-16 11:00:25 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-16 11:28:11 UTC — [ide-core] ticket-975 PR #1124 non surveillée (livraison arrêtée)
+- 2026-11-16 11:16:52 UTC — [ide-core] ticket-977 PR #1122 mergée (CI verte)
+- 2026-11-16 11:28:18 UTC — [ticket-979] branche ticket-979-les-processus-des-agents-n-crivent-pas-de-bytecod
+- 2026-11-16 11:28:23 UTC — [ticket-979] tour 1 — codeur démarré
+- 2026-11-16 11:30:35 UTC — [ticket-979] tour 1 — codeur terminé (131125ms)
+- 2026-11-16 11:35:08 UTC — [ticket-979] testeur: 1 failed, 723 passed, 3 skipped, 104 warnings in 267.50s (0:04:27)
+- 2026-11-16 11:35:09 UTC — [ticket-979] tests rouges au tour 1
+- 2026-11-16 11:35:09 UTC — [ticket-979] tour 2 — codeur démarré
+- 2026-11-16 11:36:19 UTC — [ticket-979] tour 2 — codeur terminé (69968ms)
+- 2026-11-16 11:40:38 UTC — [ticket-979] testeur: dur�es : ruff 0 s, mypy 9 s, mypy-linux 9 s, pytest 255 s ; impact depuis base : 111 fichier(s) de test
+- 2026-11-16 11:40:55 UTC — [ticket-979] securite: PASS — Je n'ai trouvé aucune vulnérabilité : le diff ajoute seulement `PYTHONDONTWRITEB (16469ms)
+- 2026-11-16 11:40:56 UTC — [ticket-979] tour 2 — reviewer démarré
+- 2026-11-16 11:41:14 UTC — [ticket-979] validateur: fichiers cités joints : scripts/hooks/__pycache__/ (dossier, 1 fichiers)
+- 2026-11-16 11:41:14 UTC — [ticket-979] validateur: APPROVED — Les quatre critères sont satisfaits par le code et les tests. La variable `PYTHO (17953ms)
+- 2026-11-16 11:41:16 UTC — [ticket-979] tour 2 — reviewer terminé (19797ms)
+- 2026-11-16 11:41:16 UTC — [ticket-979] APPROVED après 2 tour(s)
+- 2026-11-16 11:41:43 UTC — [ticket-979] leçons: refusée — plus de 200 caractères
+- 2026-11-16 11:42:25 UTC — [ticket-979] documentation: 0 fichier(s) (37265ms)
+- 2026-11-16 11:42:25 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-16 11:42:25 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-16 11:12:02 UTC — [ide-core] ticket-977 PR #1122 confiée au CIWatcher
+- 2026-11-16 11:12:16 UTC — [ticket-975] branche ticket-975-le-compte-agent-peut-examiner-les-dossiers-parent
+- 2026-11-16 11:12:19 UTC — [ticket-975] tour 1 — codeur démarré
+- 2026-11-16 11:15:14 UTC — [ticket-975] tour 1 — codeur terminé (174921ms)
+- 2026-11-16 11:15:18 UTC — [ticket-975] testeur: en attente d'un créneau de test
+- 2026-11-16 11:20:29 UTC — [ticket-975] testeur: dur�es : ruff 0 s, mypy 17 s, mypy-linux 18 s, pytest 259 s ; impact depuis base : 84 fichier(s) de test
+- 2026-11-16 11:20:48 UTC — [ticket-975] securite: PASS — PASS : le diff ajoute seulement un droit `(RX)` non héritable au compte agent, s (18484ms)
+- 2026-11-16 11:20:49 UTC — [ticket-975] tour 1 — reviewer démarré
+- 2026-11-16 11:21:08 UTC — [ticket-975] tour 1 — reviewer terminé (19343ms)
+- 2026-11-16 11:21:12 UTC — [ticket-975] validateur: APPROVED — Les trois critères sont satisfaits. Le code ajoute correctement `accorder_lectur (23500ms)
+- 2026-11-16 11:21:12 UTC — [ticket-975] APPROVED après 1 tour(s)
+- 2026-11-16 11:22:37 UTC — [ticket-975] documentation: 0 fichier(s) (79906ms)
+- 2026-11-16 11:22:37 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-16 11:22:37 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-16 11:42:42 UTC — [ide-core] ticket-979 PR #1125 confiée au CIWatcher
+- 2026-11-16 11:45:38 UTC — [ticket-979] PR #1125 mise à jour avec develop : 64f65c8 → 01e2dd6
+- 2026-11-16 11:51:40 UTC — [ide-core] ticket-979 PR #1125 mergée (CI verte)
+- 2026-11-16 12:04:46 UTC — [ticket-976] branche ticket-976-le-compte-agent-lance-des-outils-qu-il-peut-lire
+- 2026-11-16 12:04:51 UTC — [ticket-976] tour 1 — codeur démarré
+- 2026-11-16 12:06:41 UTC — [ticket-976] tour 1 — architect terminé (108750ms)
+- 2026-11-16 12:06:59 UTC — [ticket-976] testeur: OK (exit 0)
+- 2026-11-16 12:07:06 UTC — [ticket-976] securite: PASS — Le diff ne touche que de la documentation, sans code exécutable, secret ni confi (5640ms)
+- 2026-11-16 12:07:06 UTC — [ticket-976] tour 1 — reviewer démarré
+- 2026-11-16 12:07:26 UTC — [ticket-976] tour 1 — reviewer terminé (20250ms)
+- 2026-11-16 12:07:41 UTC — [ticket-976] validateur: fichiers cités joints : contraintes.md
+- 2026-11-16 12:07:41 UTC — [ticket-976] validateur: APPROVED — Le ticket de design a produit l'ADR-086 qui tranche entre les trois pistes (chaî (34641ms)
+- 2026-11-16 12:07:41 UTC — [ticket-976] APPROVED après 1 tour(s)
+- 2026-11-16 12:07:46 UTC — [ticket-976] fichiers non suivis laissés par le run : tickets/todo/ticket-981-agent-setup-installs-a-shared-toolchain.md, tickets/todo/ticket-982-the-agent-account-path-is-built-from-the-toolchain.md, tickets/todo/ticket-983-agent-doctor-launches-the-tools-as-the-agent-account.md, tickets/todo/ticket-984-a-project-venv-points-at-the-shared-python.md (à ignorer dans .gitignore ?)
+- 2026-11-16 12:09:31 UTC — [ticket-976] documentation: 1 fichier(s) (105327ms)
+- 2026-11-16 12:09:31 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-16 12:09:31 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-16 12:10:03 UTC — [ide-core] ticket-976 PR #1126 confiée au CIWatcher
+- 2026-11-16 12:10:17 UTC — [ticket-980] branche ticket-980-un-merge-douteux-se-relit-pendant-deux-minutes-av
+- 2026-11-16 12:10:20 UTC — [ticket-980] tour 1 — codeur démarré
+- 2026-11-16 12:11:54 UTC — [ticket-980] tour 1 — codeur terminé (94202ms)
+- 2026-11-16 12:14:11 UTC — [ticket-980] testeur: dur�es : ruff 0 s, mypy 18 s, mypy-linux 16 s, pytest 132 s ; impact depuis base : 55 fichier(s) de test
+- 2026-11-16 12:14:22 UTC — [ticket-980] securite: PASS — Le diff étend la relecture d'une PR, sur une fenêtre bornée, aux erreurs 5xx et  (10389ms)
+- 2026-11-16 12:14:23 UTC — [ticket-980] tour 1 — reviewer démarré
+- 2026-11-16 12:14:53 UTC — [ticket-980] tour 1 — reviewer terminé (29952ms)
+- 2026-11-16 12:14:54 UTC — [ticket-980] validateur: APPROVED — Les 7 critères d'acceptation sont satisfaits. Le diff ajoute une boucle de relec (30186ms)
+- 2026-11-16 12:14:54 UTC — [ticket-980] CHANGES_REQUESTED tour 1: Reviewer : 1. Le point 2 du ticket ne se produit pas en production. Dans `merge_si_la_ci_est_verte`, `except httpx.HTTPStatusError` (lignes 411-416) attrape toute erreur HTTP de `merge_quand_fusionnab
+- 2026-11-16 12:14:54 UTC — [ticket-980] tour 2 — codeur démarré
+- 2026-11-16 12:16:39 UTC — [ticket-980] tour 2 — codeur terminé (105186ms)
+- 2026-11-16 12:18:22 UTC — [ticket-980] testeur: 1 failed, 379 passed, 8 warnings in 96.62s (0:01:36)
+- 2026-11-16 12:18:22 UTC — [ticket-980] tests rouges au tour 2
+- 2026-11-16 12:18:22 UTC — [ticket-980] tour 3 — codeur démarré
+- 2026-11-16 12:21:49 UTC — [ticket-980] tour 3 — codeur terminé (206500ms)
+- 2026-11-16 12:24:00 UTC — [ticket-980] testeur: dur�es : ruff 0 s, mypy 12 s, mypy-linux 10 s, pytest 126 s ; impact depuis base : 62 fichier(s) de test
+- 2026-11-16 12:24:14 UTC — [ticket-980] securite: PASS — Le diff ne fait que reclasser des erreurs HTTP de GitHub et ajouter une relectur (13188ms)
+- 2026-11-16 12:24:14 UTC — [ticket-980] tour 3 — reviewer démarré
+- 2026-11-16 12:24:36 UTC — [ide-core] ticket-970 retiré de la file
+- 2026-11-16 12:24:36 UTC — [ide-core] ticket-973 retiré de la file
+- 2026-11-16 12:24:36 UTC — [ide-core] ticket-971 retiré de la file
+- 2026-11-16 12:24:42 UTC — [ticket-980] tour 3 — reviewer terminé (27156ms)
+- 2026-11-16 12:24:49 UTC — [ticket-980] validateur: APPROVED — Les 7 critères d'acceptation sont satisfaits. Le diff ajoute une boucle de relec (34515ms)
+- 2026-11-16 12:24:49 UTC — [ticket-980] APPROVED après 3 tour(s)
+- 2026-11-16 12:25:53 UTC — [ticket-980] leçons: refusée — vérification affaiblie : un contrôle retiré ou ignoré
+- 2026-11-16 12:29:25 UTC — [ticket-980] documentation: 0 fichier(s) (207625ms) — après tour de correction
+- 2026-11-16 12:29:25 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-16 12:29:25 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-16 12:32:32 UTC — [ide-core] ticket-980 PR #1128 confiée au CIWatcher
+- 2026-11-16 12:16:24 UTC — [ide-core] ticket-976 PR #1126 mergée (CI verte)
+- 2026-11-16 12:32:41 UTC — [ticket-981] branche ticket-981-agent-setup-installs-a-shared-toolchain-outside-e
+- 2026-11-16 12:32:48 UTC — [ticket-981] tour 1 — codeur démarré
+- 2026-11-16 12:33:18 UTC — [ticket-981] INTERROMPU au tour 1 — ResultError: Claude Code returned an error result: You've hit your 5-hour limit · resets 3pm (Europe/Paris) (exit code: 1)
+- 2026-11-16 12:33:23 UTC — [ide-core] file interrompue : ticket-981 non approuvé
+- 2026-11-16 12:38:20 UTC — [ide-core] ticket-980 PR #1128 mergée (CI verte)
+- 2026-11-16 14:13:23 UTC — [ticket-981] branche ticket-981-agent-setup-installs-a-shared-toolchain-outside-e
+- 2026-11-16 14:14:39 UTC — [ticket-981] testeur: OK (exit 0)
+- 2026-11-16 14:14:40 UTC — [ticket-981] branche reprise (2 commit(s)) — tests green, codeur sauté
+- 2026-11-16 14:15:21 UTC — [ticket-981] securite: PASS — Le diff transmis est vide : il n'y a aucune ligne ajoutée ou supprimée à juger,  (38858ms)
+- 2026-11-16 14:15:21 UTC — [ticket-981] tour 1 — reviewer démarré
+- 2026-11-16 14:15:50 UTC — [ticket-981] validateur: CHANGES_REQUESTED — Le diff ne contient que les métadonnées du ticket (passage blocked → in-progress (28921ms)
+- 2026-11-16 14:16:41 UTC — [ticket-981] tour 1 — reviewer terminé (79219ms)
+- 2026-11-16 14:16:41 UTC — [ticket-981] CHANGES_REQUESTED tour 1: Reviewer : 1. Le run n'implémente aucun critère d'acceptation. Le diff ne modifie ni scripts/agent-setup-admin.ps1 ni scripts/agent-setup.ps1. Il manque la création de C:\ProgramData\Tessera\toolchain
+- 2026-11-16 14:16:41 UTC — [ticket-981] tour 2 — codeur démarré
+- 2026-11-16 14:17:38 UTC — [ticket-981] tour 2 — codeur terminé (56421ms)
+- 2026-11-16 14:30:37 UTC — [ticket-981] testeur: dur�es : ruff 0 s, mypy 8 s, mypy-linux 6 s, pytest 775 s ; impact depuis base : suite compl�te
+- 2026-11-16 14:31:16 UTC — [ticket-981] securite: PASS — Le diff resserre les droits : l'agent n'a plus de RX sur le profil (`/remove /T` (35312ms)
+- 2026-11-16 14:31:16 UTC — [ticket-981] ARRÊTÉ par l'utilisateur au tour 2
+- 2026-11-16 14:31:22 UTC — [ide-core] file interrompue : ticket-981 non approuvé
+- 2026-11-16 14:31:42 UTC — [ticket-981] branche ticket-981-agent-setup-installs-a-shared-toolchain-outside-e
+- 2026-11-16 14:42:51 UTC — [ticket-981] testeur: dur�es : ruff 0 s, mypy 6 s, mypy-linux 5 s, pytest 664 s ; impact depuis base : suite compl�te
+- 2026-11-16 14:42:51 UTC — [ticket-981] branche reprise (5 commit(s)) — tests green, codeur sauté
+- 2026-11-16 14:43:20 UTC — [ticket-981] securite: PASS — Le diff réduit les droits de l'agent. Il retire les droits RX que l'agent avait  (26531ms)
+- 2026-11-16 14:43:21 UTC — [ticket-981] tour 1 — reviewer démarré
+- 2026-11-16 14:43:40 UTC — [ticket-981] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le code implémente la création (18920ms)
+- 2026-11-16 14:44:02 UTC — [ticket-981] tour 1 — reviewer terminé (40828ms)
+- 2026-11-16 14:44:03 UTC — [ticket-981] APPROVED après 1 tour(s)
+- 2026-11-16 14:46:17 UTC — [ticket-981] documentation: 0 fichier(s) (129156ms) — après tour de correction
+- 2026-11-16 14:46:17 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-16 14:46:17 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-16 15:13:41 UTC — [ticket-982] branche ticket-982-the-path-of-every-agent-account-process-is-built
+- 2026-11-16 15:13:44 UTC — [ticket-982] tour 1 — codeur démarré
+- 2026-11-16 15:16:48 UTC — [ticket-982] tour 1 — codeur terminé (183578ms)
+- 2026-11-16 15:23:47 UTC — [ide-core] ticket-985 retiré de la file
+- 2026-11-16 15:27:20 UTC — [ticket-982] testeur: dur�es : ruff 0 s, mypy 18 s, mypy-linux 25 s, pytest 627 s ; impact depuis base : suite compl�te
+- 2026-11-16 15:27:35 UTC — [ticket-982] securite: PASS — Le diff réduit le PATH du compte agent : la chaîne d'outils en tête, puis seulem (14375ms)
+- 2026-11-16 15:27:35 UTC — [ticket-982] tour 1 — reviewer démarré
+- 2026-11-16 15:28:17 UTC — [ticket-982] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits : filtrage des entrées C:\Users (41281ms)
+- 2026-11-16 15:28:30 UTC — [ticket-982] tour 1 — reviewer terminé (54297ms)
+- 2026-11-16 15:28:30 UTC — [ticket-982] CHANGES_REQUESTED tour 1: Reviewer : 1. Le test d'architecture `test_no_module_builds_an_account_path_elsewhere` ne peut pas détecter la régression qu'il doit empêcher. D'abord, il ne lit que les fichiers dont le nom contient 
+- 2026-11-16 15:28:30 UTC — [ticket-982] tour 2 — codeur démarré
+- 2026-11-16 15:29:02 UTC — [ticket-982] tour 2 — codeur terminé (32343ms)
+- 2026-11-16 15:40:16 UTC — [ticket-982] testeur: dur�es : ruff 0 s, mypy 3 s, mypy-linux 5 s, pytest 670 s ; impact depuis base : suite compl�te
+- 2026-11-16 15:40:36 UTC — [ticket-982] securite: PASS — Le diff réduit le PATH du compte agent à la chaîne d'outils partagée et aux doss (18890ms)
+- 2026-11-16 15:40:37 UTC — [ticket-982] tour 2 — reviewer démarré
+- 2026-11-16 15:40:57 UTC — [ticket-982] tour 2 — reviewer terminé (20780ms)
+- 2026-11-16 15:41:03 UTC — [ticket-982] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits : filtrage des entrées C:\Users (25890ms)
+- 2026-11-16 15:41:03 UTC — [ticket-982] APPROVED après 2 tour(s)
+- 2026-11-16 15:41:46 UTC — [ticket-982] leçons: une leçon proposée
+- 2026-11-16 15:44:43 UTC — [ticket-982] documentation: 0 fichier(s) (171922ms) — après tour de correction
+- 2026-11-16 15:44:43 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-16 15:44:43 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-16 15:56:22 UTC — [ide-core] ticket-983 sauté : dépend de ticket-982, non mergé
+- 2026-11-16 15:56:22 UTC — [ide-core] ticket-982 PR #1134 non surveillée (livraison arrêtée)
+- 2026-11-16 15:56:28 UTC — [ticket-984] branche ticket-984-a-project-venv-points-at-the-shared-python-not-at
+- 2026-11-16 15:56:31 UTC — [ticket-984] tour 1 — codeur démarré
+- 2026-11-16 15:59:10 UTC — [ticket-984] tour 1 — codeur terminé (158609ms)
+- 2026-11-16 16:01:25 UTC — [ticket-984] testeur: dur�es : ruff 0 s, mypy 26 s, mypy-linux 19 s, pytest 130 s ; impact depuis base : 50 fichier(s) de test
+- 2026-11-16 16:01:39 UTC — [ticket-984] securite: PASS — Le diff ajoute deux variables uv, sans secret, à l'environnement du setup. Il re (13547ms)
+- 2026-11-16 16:01:40 UTC — [ticket-984] tour 1 — reviewer démarré
+- 2026-11-16 16:02:05 UTC — [ticket-984] validateur: fichiers cités joints : aucun ; absents : pyvenv.cfg
+- 2026-11-16 16:02:05 UTC — [ticket-984] validateur: APPROVED — Les deux critères sont entièrement satisfaits par les tests écrits dans le diff  (24219ms)
+- 2026-11-16 16:02:08 UTC — [ticket-984] tour 1 — reviewer terminé (27828ms)
+- 2026-11-16 16:02:08 UTC — [ticket-984] APPROVED après 1 tour(s)
+- 2026-11-16 16:03:37 UTC — [ticket-984] documentation: 0 fichier(s) (83579ms)
+- 2026-11-16 16:03:37 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-16 16:03:37 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-17 09:15:34 UTC — [ticket-987] branche ticket-987-a-resumed-ticket-reads-the-file-of-its-base
+- 2026-11-17 09:15:37 UTC — [ticket-987] tour 1 — codeur démarré
+- 2026-11-17 09:25:49 UTC — [ticket-987] tour 1 — codeur terminé (610687ms)
+- 2026-11-17 09:36:17 UTC — [ticket-987] testeur: 3 failed, 468 passed, 16 warnings in 615.91s (0:10:15)
+- 2026-11-17 09:36:17 UTC — [ticket-987] tests rouges au tour 1
+- 2026-11-17 09:36:17 UTC — [ticket-987] tour 2 — codeur démarré
+- 2026-11-17 09:42:40 UTC — [ticket-987] tour 2 — codeur terminé (382343ms)
+- 2026-11-17 09:42:48 UTC — [ticket-987] testeur: en attente d'un créneau de test
+- 2026-11-17 09:49:51 UTC — [ticket-987] testeur: 1 failed, 904 passed, 16 warnings in 406.19s (0:06:46)
+- 2026-11-17 09:49:52 UTC — [ticket-987] tests rouges au tour 2
+- 2026-11-17 09:49:52 UTC — [ticket-987] tour 3 — codeur démarré
+- 2026-11-17 09:50:58 UTC — [ticket-987] tour 3 — codeur terminé (65858ms)
+- 2026-11-17 09:59:59 UTC — [ticket-987] testeur: dur�es : ruff 0 s, mypy 18 s, mypy-linux 17 s, pytest 536 s ; impact depuis base : 114 fichier(s) de test
+- 2026-11-17 10:00:18 UTC — [ticket-987] securite: PASS — Je n'ai trouvé aucune faille CRITICAL ou HIGH dans ce diff, donc le verdict est  (18358ms)
+- 2026-11-17 10:00:18 UTC — [ticket-987] tour 3 — reviewer démarré
+- 2026-11-17 10:00:47 UTC — [ticket-987] tour 3 — reviewer terminé (28889ms)
+- 2026-11-17 10:01:04 UTC — [ticket-987] validateur: fichiers cités joints : tickets/ (dossier, 0 fichiers) ; absents : stale/
+- 2026-11-17 10:01:04 UTC — [ticket-987] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code ajoute la lecture du ti (45312ms)
+- 2026-11-17 10:01:04 UTC — [ticket-987] APPROVED après 3 tour(s)
+- 2026-11-17 10:01:54 UTC — [ticket-987] leçons: une leçon proposée
+- 2026-11-17 10:05:17 UTC — [ticket-987] documentation: 0 fichier(s) (196891ms) — après tour de correction
+- 2026-11-17 10:05:17 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-17 10:05:17 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-16 14:46:39 UTC — [ide-core] ticket-982 sauté : dépend de ticket-981, non mergé
+- 2026-11-16 14:46:39 UTC — [ide-core] ticket-983 sauté : dépend de ticket-981, non mergé
+- 2026-11-16 14:46:39 UTC — [ide-core] ticket-984 sauté : dépend de ticket-981, non mergé
+- 2026-11-16 14:46:39 UTC — [ide-core] ticket-981 PR #1131 non surveillée (livraison arrêtée)
+- 2026-11-16 14:46:44 UTC — [ticket-971] branche ticket-971-a-test-that-times-out-in-files-the-diff-does-not
+- 2026-11-16 14:46:47 UTC — [ticket-971] tour 1 — codeur démarré
+- 2026-11-16 14:52:13 UTC — [ticket-971] tour 1 — codeur terminé (325139ms)
+- 2026-11-16 14:52:25 UTC — [ide-core] ticket-970 retiré de la file
+- 2026-11-16 14:52:25 UTC — [ide-core] ticket-973 retiré de la file
+- 2026-11-16 14:54:35 UTC — [ide-core] ticket-970 retiré de la file
+- 2026-11-16 14:54:35 UTC — [ide-core] ticket-973 retiré de la file
+- 2026-11-16 14:56:21 UTC — [ticket-971] testeur: 2 failed, 439 passed, 112 warnings in 241.82s (0:04:01)
+- 2026-11-16 14:56:21 UTC — [ticket-971] tests rouges au tour 1
+- 2026-11-16 14:56:21 UTC — [ticket-971] tour 2 — codeur démarré
+- 2026-11-16 15:00:34 UTC — [ticket-971] tour 2 — codeur terminé (252110ms)
+- 2026-11-16 15:05:06 UTC — [ticket-971] testeur: dur�es : ruff 0 s, mypy 15 s, mypy-linux 13 s, pytest 267 s ; impact depuis base : 83 fichier(s) de test
+- 2026-11-16 15:05:29 UTC — [ticket-971] securite: PASS — Verdict PASS : aucune faille CRITICAL ou HIGH dans ce diff. La relance passe par (22422ms)
+- 2026-11-16 15:05:29 UTC — [ticket-971] tour 2 — reviewer démarré
+- 2026-11-16 15:05:55 UTC — [ticket-971] validateur: APPROVED — Tous les critères d'acceptation du ticket-971 sont satisfaits. Le code implément (25922ms)
+- 2026-11-16 15:06:07 UTC — [ticket-971] tour 2 — reviewer terminé (37639ms)
+- 2026-11-16 15:06:07 UTC — [ticket-971] CHANGES_REQUESTED tour 2: Reviewer : 1. Quand le diff ne peut pas être lu, la relance s'ouvre au lieu de se fermer. La docstring de `_diff_du_run` promet `None when unknown, so no test is run again`, mais `fichiers_du_diff` (p
+- 2026-11-16 15:06:07 UTC — [ticket-971] tour 3 — codeur démarré
+- 2026-11-16 15:07:38 UTC — [ticket-971] tour 3 — codeur terminé (90046ms)
+- 2026-11-16 15:11:17 UTC — [ticket-971] testeur: dur�es : ruff 0 s, mypy 10 s, mypy-linux 13 s, pytest 215 s ; impact depuis base : 83 fichier(s) de test
+- 2026-11-16 15:11:46 UTC — [ticket-971] securite: PASS — Le diff ne crée aucune faille CRITICAL ou HIGH : pas de shell, pas de secret, et (29046ms)
+- 2026-11-16 15:11:47 UTC — [ticket-971] tour 3 — reviewer démarré
+- 2026-11-16 15:12:15 UTC — [ticket-971] tour 3 — reviewer terminé (28125ms)
+- 2026-11-16 15:12:34 UTC — [ticket-971] validateur: APPROVED — Les six critères d'acceptation sont satisfaits par le code et les tests. La rela (47077ms)
+- 2026-11-16 15:12:34 UTC — [ticket-971] CHANGES_REQUESTED tour 3: Reviewer : 1. Une étape rouge qui contient des échecs non reconnus par le parseur peut redevenir verte. Avec `scripts/verifier.py` (lignes 183-185 et 207-213), une erreur ruff, mypy, mypy-linux, tsc o
+- 2026-11-16 15:12:34 UTC — [ticket-971] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-16 15:12:50 UTC — [ide-core] file interrompue : ticket-971 non approuvé
+- 2026-11-17 10:15:32 UTC — [ide-core] ticket-987 PR #1140 confiée au CIWatcher
+- 2026-11-17 10:15:42 UTC — [ticket-971] branche ticket-971-a-test-that-times-out-in-files-the-diff-does-not
+- 2026-11-17 10:15:42 UTC — [ticket-971] fiche relue après l'avance de la base (691f92b5e0e2b43e0e9bc88fa54cd54bc55d09a8 → f6d7053e1927304e1d1e7b2bbeccab64600e6484)
+- 2026-11-17 10:15:46 UTC — [ticket-971] branche reprise (3 commit(s)) — refus précédent : revue, codeur en premier
+- 2026-11-17 10:15:46 UTC — [ticket-971] tour 1 — codeur démarré
+- 2026-11-17 10:19:50 UTC — [ticket-971] tour 1 — codeur terminé (242842ms)
+- 2026-11-17 10:24:52 UTC — [ticket-971] testeur: dur�es : ruff 0 s, mypy 44 s, mypy-linux 60 s, pytest 292 s ; impact depuis base : 84 fichier(s) de test
+- 2026-11-17 10:25:18 UTC — [ticket-971] securite: PASS — Je laisse passer (PASS) : aucune faille CRITICAL ou HIGH n'est introduite. La re (25358ms)
+- 2026-11-17 10:25:18 UTC — [ticket-971] tour 1 — reviewer démarré
+- 2026-11-17 10:25:50 UTC — [ticket-971] validateur: APPROVED — Les 6 critères sont tous couverts par des tests unitaires dans `test_relance_ins (31422ms)
+- 2026-11-17 10:25:52 UTC — [ticket-971] tour 1 — reviewer terminé (33421ms)
+- 2026-11-17 10:25:52 UTC — [ticket-971] APPROVED après 1 tour(s)
+- 2026-11-17 10:26:37 UTC — [ticket-971] leçons: une leçon proposée
+- 2026-11-17 10:30:05 UTC — [ticket-971] documentation: 1 fichier(s) (202983ms) — après tour de correction
+- 2026-11-17 10:30:05 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-17 10:30:05 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-17 10:33:37 UTC — [ide-core] ticket-971 PR #1142 confiée au CIWatcher
+- 2026-11-17 10:21:35 UTC — [ide-core] ticket-987 PR #1140 mergée (CI verte)
+- 2026-11-17 10:33:43 UTC — [ticket-970] branche ticket-970-a-local-base-that-only-diverges-in-history-after
+- 2026-11-17 10:33:45 UTC — [ticket-970] tour 1 — codeur démarré
+- 2026-11-17 10:44:25 UTC — [ticket-970] tour 1 — codeur terminé (639733ms)
+- 2026-11-17 10:55:37 UTC — [ticket-970] testeur: dur�es : ruff 0 s, mypy 47 s, mypy-linux 31 s, pytest 666 s ; impact depuis base : 115 fichier(s) de test
+- 2026-11-17 10:56:05 UTC — [ticket-970] securite: PASS — PASS : ce diff ne crée aucune faille d'injection, de path traversal ni de contou (25952ms)
+- 2026-11-17 10:56:05 UTC — [ticket-970] tour 1 — reviewer démarré
+- 2026-11-17 10:57:02 UTC — [ticket-970] validateur: APPROVED — Le code implémente le realignment de base après squash via la classe `GitRealign (56358ms)
+- 2026-11-17 10:57:05 UTC — [ticket-970] tour 1 — reviewer terminé (59687ms)
+- 2026-11-17 10:57:06 UTC — [ticket-970] CHANGES_REQUESTED tour 1: Reviewer : 1. Le point 3 du ticket n'est corrigé que pour la divergence de base. Dans la même fonction, la branche `except GitWorkspaceError` (échec de `create_branch`, donc avant le premier agent et 
+- 2026-11-17 10:57:06 UTC — [ticket-970] tour 2 — codeur démarré
+- 2026-11-17 11:00:50 UTC — [ticket-970] tour 2 — codeur terminé (223702ms)
+- 2026-11-17 11:10:31 UTC — [ticket-970] testeur: dur�es : ruff 0 s, mypy 17 s, mypy-linux 20 s, pytest 576 s ; impact depuis base : 115 fichier(s) de test
+- 2026-11-17 11:10:54 UTC — [ticket-970] securite: PASS — Aucune faille relevée, verdict PASS. Les commandes git passent des listes d'argu (20937ms)
+- 2026-11-17 11:10:54 UTC — [ticket-970] tour 2 — reviewer démarré
+- 2026-11-17 11:11:20 UTC — [ticket-970] tour 2 — reviewer terminé (25094ms)
+- 2026-11-17 11:11:41 UTC — [ticket-970] validateur: APPROVED — Le ticket-970 implémente correctement le réalignement de base après squash et le (46891ms)
+- 2026-11-17 11:11:42 UTC — [ticket-970] APPROVED après 2 tour(s)
+- 2026-11-17 11:12:52 UTC — [ticket-970] leçons: refusée — preuve absente du retour du run
+- 2026-11-17 11:16:29 UTC — [ticket-970] documentation: 0 fichier(s) (211139ms) — après tour de correction
+- 2026-11-17 11:16:29 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-17 11:16:29 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-17 11:26:32 UTC — [ide-core] ticket-970 PR #1143 confiée au CIWatcher
+- 2026-11-17 10:39:24 UTC — [ide-core] ticket-971 PR #1142 mergée (CI verte)
+- 2026-11-17 11:26:39 UTC — [ticket-973] branche ticket-973-the-hooks-command-skips-a-project-that-has-an-ope
+- 2026-11-17 11:26:49 UTC — [ticket-973] tour 1 — codeur démarré
+- 2026-11-17 11:29:11 UTC — [ticket-973] tour 1 — codeur terminé (140921ms)
+- 2026-11-17 11:31:17 UTC — [ticket-973] testeur: dur�es : ruff 1 s, mypy 58 s, mypy-linux 53 s, pytest 113 s ; impact depuis base : 15 fichier(s) de test
+- 2026-11-17 11:31:26 UTC — [ticket-973] securite: PASS — Rien à signaler dans ce diff. La base SQLite s'ouvre en lecture seule (`mode=ro` (8514ms)
+- 2026-11-17 11:31:26 UTC — [ticket-973] tour 1 — reviewer démarré
+- 2026-11-17 11:31:48 UTC — [ticket-973] validateur: APPROVED — Les trois critères sont satisfaits par le code et les tests. La commande `hooks` (21687ms)
+- 2026-11-17 11:31:50 UTC — [ticket-973] tour 1 — reviewer terminé (23328ms)
+- 2026-11-17 11:31:50 UTC — [ticket-973] APPROVED après 1 tour(s)
+- 2026-11-17 11:33:16 UTC — [ticket-973] documentation: 0 fichier(s) (81609ms)
+- 2026-11-17 11:33:16 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-17 11:33:16 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-17 11:33:16 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-17 11:34:17 UTC — [ide-core] ticket-973 PR #1144 confiée au CIWatcher
+- 2026-11-17 11:32:06 UTC — [ide-core] ticket-970 PR #1143 mergée (CI verte)
+- 2026-11-17 11:34:21 UTC — [ticket-985] branche ticket-985-un-ticket-arr-t-porte-toujours-son-motif
+- 2026-11-17 11:34:24 UTC — [ticket-985] tour 1 — codeur démarré
+- 2026-11-17 11:35:51 UTC — [ticket-985] tour 1 — codeur terminé (86703ms)
+- 2026-11-17 11:37:27 UTC — [ticket-985] testeur: 1 failed, 372 passed, 48 warnings in 90.89s (0:01:30)
+- 2026-11-17 11:37:28 UTC — [ticket-985] tests rouges au tour 1
+- 2026-11-17 11:37:28 UTC — [ticket-985] tour 2 — codeur démarré
+- 2026-11-17 11:38:20 UTC — [ticket-985] tour 2 — codeur terminé (51938ms)
+- 2026-11-17 11:40:43 UTC — [ticket-985] testeur: dur�es : ruff 0 s, mypy 10 s, mypy-linux 11 s, pytest 139 s ; impact depuis base : 75 fichier(s) de test
+- 2026-11-17 11:40:53 UTC — [ticket-985] securite: PASS — PASS : aucune faille bloquante. Le diff remplit seulement un `arret` vide, sur t (8842ms)
+- 2026-11-17 11:40:53 UTC — [ticket-985] tour 2 — reviewer démarré
+- 2026-11-17 11:41:08 UTC — [ticket-985] tour 2 — reviewer terminé (14515ms)
+- 2026-11-17 11:41:31 UTC — [ticket-985] validateur: fichiers cités joints : pipeline_outcomes.py
+- 2026-11-17 11:41:31 UTC — [ticket-985] validateur: APPROVED — Tous les critères sont satisfaits. Le code ajoute les raisons manquantes aux tro (37328ms)
+- 2026-11-17 11:41:31 UTC — [ticket-985] APPROVED après 2 tour(s)
+- 2026-11-17 11:43:06 UTC — [ticket-985] leçons: fichier plein, à compacter à la main
+- 2026-11-17 11:47:49 UTC — [ticket-985] documentation: 0 fichier(s) (277562ms) — après tour de correction
+- 2026-11-17 11:47:49 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-17 11:47:49 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-17 11:47:49 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-17 16:06:11 UTC — [ticket-996] branche ticket-996-a-reparse-point-in-the-run-tree-blocks-the-run-be
+- 2026-11-17 16:06:14 UTC — [ticket-996] tour 1 — codeur démarré
+- 2026-11-17 16:09:30 UTC — [ticket-996] tour 1 — codeur terminé (195187ms)
+- 2026-11-17 16:13:40 UTC — [ticket-996] testeur: dur�es : ruff 0 s, mypy 12 s, mypy-linux 13 s, pytest 244 s ; impact depuis base : 109 fichier(s) de test
+- 2026-11-17 16:14:11 UTC — [ticket-996] securite: PASS — Le diff ajoute un refus des jonctions et liens non déclarés avant `add` et `diff (31235ms)
+- 2026-11-17 16:14:12 UTC — [ticket-996] tour 1 — reviewer démarré
+- 2026-11-17 16:14:46 UTC — [ticket-996] tour 1 — reviewer terminé (33750ms)
+- 2026-11-17 16:15:11 UTC — [ticket-996] validateur: APPROVED — All three acceptance criteria are satisfied. The implementation detects and refu (58500ms)
+- 2026-11-17 16:15:11 UTC — [ticket-996] CHANGES_REQUESTED tour 1: Reviewer : 1. La fonction `admis` laisse passer tout lien pour lequel `git ls-files --error-unmatch -- <chemin>` réussit. Or cette commande réussit aussi quand le chemin est un dossier qui contient de
+- 2026-11-17 16:15:11 UTC — [ticket-996] tour 2 — codeur démarré
+- 2026-11-17 16:17:30 UTC — [ticket-996] tour 2 — codeur terminé (138608ms)
+- 2026-11-17 16:22:00 UTC — [ticket-996] testeur: dur�es : ruff 0 s, mypy 13 s, mypy-linux 16 s, pytest 265 s ; impact depuis base : 109 fichier(s) de test
+- 2026-11-17 16:22:19 UTC — [ticket-996] securite: PASS — Le diff ajoute une protection : les jonctions et liens symboliques non déclarés  (19016ms)
+- 2026-11-17 16:22:20 UTC — [ticket-996] tour 2 — reviewer démarré
+- 2026-11-17 16:22:57 UTC — [ticket-996] tour 2 — reviewer terminé (37187ms)
+- 2026-11-17 16:23:21 UTC — [ticket-996] validateur: APPROVED — Tous les critères sont satisfaits. Le code refuse les points de reparse (jonctio (60702ms)
+- 2026-11-17 16:23:21 UTC — [ticket-996] APPROVED après 2 tour(s)
+- 2026-11-17 16:24:26 UTC — [ticket-996] leçons: fichier plein, à compacter à la main
+- 2026-11-17 16:26:24 UTC — [ticket-996] documentation: 0 fichier(s) (113781ms) — après tour de correction
+- 2026-11-17 16:26:24 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-17 16:26:24 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-17 16:26:24 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-17 11:52:34 UTC — [ide-core] ticket-985 PR #1146 reprise par le CIWatcher après redémarrage
+- 2026-11-17 11:40:02 UTC — [ide-core] ticket-973 PR #1144 mergée (CI verte)
+- 2026-11-17 11:51:15 UTC — [ide-core] ticket-985 PR #1146 confiée au CIWatcher
+- 2026-11-17 11:55:54 UTC — [ide-core] ticket-985 PR #1146 mergée (CI verte)
+- 2026-11-17 15:55:46 UTC — [ticket-995] branche ticket-995-the-worktree-setup-runs-under-the-agent-account
+- 2026-11-17 15:55:50 UTC — [ticket-995] tour 1 — codeur démarré
+- 2026-11-17 15:57:47 UTC — [ticket-995] tour 1 — codeur terminé (117235ms)
+- 2026-11-17 15:59:35 UTC — [ticket-995] testeur: dur�es : ruff 0 s, mypy 24 s, mypy-linux 25 s, pytest 102 s ; impact depuis base : 51 fichier(s) de test
+- 2026-11-17 15:59:48 UTC — [ticket-995] securite: PASS — Le diff fait tourner la commande `setup` du worktree sous le compte agent quand  (12593ms)
+- 2026-11-17 15:59:49 UTC — [ticket-995] tour 1 — reviewer démarré
+- 2026-11-17 16:00:16 UTC — [ticket-995] tour 1 — reviewer terminé (27014ms)
+- 2026-11-17 16:00:17 UTC — [ticket-995] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits par les tests ajoutés. Le code m (28203ms)
+- 2026-11-17 16:00:17 UTC — [ticket-995] APPROVED après 1 tour(s)
+- 2026-11-17 16:03:15 UTC — [ticket-995] documentation: 1 fichier(s) (172766ms) — après tour de correction
+- 2026-11-17 16:03:15 UTC — documentation trop longue, titres seuls : docs/architecture.md (180045 caractères)
+- 2026-11-17 16:03:15 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-17 16:03:15 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-18 10:52:58 UTC — [ide-core] ticket-997 PR #1157 non surveillée (livraison arrêtée)
+- 2026-11-18 10:53:03 UTC — [ticket-1000] branche ticket-1000-a-resumed-branch-in-a-worktree-reads-the-ticket
+- 2026-11-18 10:53:06 UTC — [ticket-1000] tour 1 — codeur démarré
+- 2026-11-18 10:54:46 UTC — [ticket-1000] tour 1 — codeur terminé (99093ms)
+- 2026-11-18 10:58:30 UTC — [ticket-1000] testeur: dur�es : ruff 1 s, mypy 30 s, mypy-linux 14 s, pytest 151 s ; impact depuis base : 50 fichier(s) de test
+- 2026-11-18 10:58:42 UTC — [ticket-1000] securite: PASS — Le diff retire l'exemption du worktree dans `relire_apres_branche` (ticket_apres (11344ms)
+- 2026-11-18 10:58:42 UTC — [ticket-1000] tour 1 — reviewer démarré
+- 2026-11-18 10:59:02 UTC — [ticket-1000] validateur: APPROVED — Les deux critères sont satisfaits. Le code change le comportement de `relire_apr (19343ms)
+- 2026-11-18 10:59:17 UTC — [ticket-1000] tour 1 — reviewer terminé (34484ms)
+- 2026-11-18 10:59:17 UTC — [ticket-1000] APPROVED après 1 tour(s)
+- 2026-11-18 11:00:49 UTC — [ticket-1000] documentation: 0 fichier(s) (69562ms)
+- 2026-11-18 11:00:49 UTC — documentation trop longue, titres seuls : docs/architecture.md (181178 caractères)
+- 2026-11-18 11:00:49 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-18 11:00:49 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-18 11:03:11 UTC — [ide-core] ticket-1000 PR #1159 non surveillée (livraison arrêtée)
+- 2026-11-18 11:03:22 UTC — [ticket-999] branche ticket-999-the-chat-refuses-to-run-a-project-that-declares-a
+- 2026-11-18 11:03:27 UTC — [ticket-999] tour 1 — codeur démarré
+- 2026-11-18 11:04:54 UTC — [ticket-999] tour 1 — codeur terminé (87030ms)
+- 2026-11-18 11:06:10 UTC — [ticket-999] testeur: 1 failed, 159 passed, 3 skipped, 8 warnings in 32.57s
+- 2026-11-18 11:06:10 UTC — [ticket-999] tests rouges au tour 1
+- 2026-11-18 11:06:10 UTC — [ticket-999] tour 2 — codeur démarré
+- 2026-11-18 11:08:34 UTC — [ticket-999] tour 2 — codeur terminé (143921ms)
+- 2026-11-18 11:09:52 UTC — [ticket-999] testeur: dur�es : ruff 0 s, mypy 10 s, mypy-linux 10 s, pytest 34 s ; impact depuis base : 27 fichier(s) de test
+- 2026-11-18 11:10:07 UTC — [ticket-999] securite: PASS — Le diff ajoute deux contrôles qui échouent fermés. Le chat refuse avec un 409 le (14875ms)
+- 2026-11-18 11:10:08 UTC — [ticket-999] tour 2 — reviewer démarré
+- 2026-11-18 11:10:28 UTC — [ticket-999] validateur: APPROVED — Les deux critères sont satisfaits. Le `/chat/run` refuse désormais les projets a (19890ms)
+- 2026-11-18 11:10:32 UTC — [ticket-999] tour 2 — reviewer terminé (24250ms)
+- 2026-11-18 11:10:32 UTC — [ticket-999] APPROVED après 2 tour(s)
+- 2026-11-18 11:11:49 UTC — [ticket-999] leçons: fichier plein, à compacter à la main
+- 2026-11-18 11:14:26 UTC — [ticket-999] documentation: 1 fichier(s) (135032ms)
+- 2026-11-18 11:14:26 UTC — documentation trop longue, titres seuls : docs/architecture.md (181178 caractères)
+- 2026-11-18 11:14:26 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-18 11:14:26 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-18 11:16:53 UTC — [ide-core] ticket-999 PR #1160 non surveillée (livraison arrêtée)
+- 2026-11-18 11:17:00 UTC — [ticket-993] branche ticket-993-an-empty-leftover-worktree-folder-does-not-block
+- 2026-11-18 11:17:05 UTC — [ticket-993] tour 1 — codeur démarré
+- 2026-11-18 11:18:58 UTC — [ticket-993] tour 1 — codeur terminé (111532ms)
+- 2026-11-18 11:19:17 UTC — [ticket-993] ARRÊTÉ par l'utilisateur au tour 1
+- 2026-11-18 11:19:38 UTC — [ide-core] file interrompue : ticket-993 non approuvé
+- 2026-11-18 11:20:33 UTC — [ide-core] ticket-999 PR #1160 non reprise : merge après preuve réelle
+- 2026-11-18 11:41:56 UTC — [ticket-993] branche ticket-993-an-empty-leftover-worktree-folder-does-not-block
+- 2026-11-18 11:46:18 UTC — [ticket-993] testeur: dur�es : ruff 0 s, mypy 13 s, mypy-linux 13 s, pytest 236 s ; impact depuis base : 88 fichier(s) de test
+- 2026-11-18 11:46:18 UTC — [ticket-993] branche reprise (3 commit(s)) — tests green, codeur sauté
+- 2026-11-18 11:47:02 UTC — [ticket-993] securite: PASS — PASS : rien de bloquant. Le diff ajoute seulement des `rmdir` non récursifs, et  (12078ms)
+- 2026-11-18 11:47:02 UTC — [ticket-993] tour 1 — reviewer démarré
+- 2026-11-18 11:47:23 UTC — [ticket-993] validateur: APPROVED — All three acceptance criteria are satisfied. The implementation correctly handle (20391ms)
+- 2026-11-18 11:47:25 UTC — [ticket-993] tour 1 — reviewer terminé (22608ms)
+- 2026-11-18 11:47:25 UTC — [ticket-993] APPROVED après 1 tour(s)
+- 2026-11-18 11:48:38 UTC — [ticket-993] documentation: 0 fichier(s) (50765ms)
+- 2026-11-18 11:48:38 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-18 11:48:38 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-18 11:48:38 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-18 11:49:15 UTC — [ide-core] ticket-993 PR #1163 confiée au CIWatcher
+- 2026-11-18 11:49:20 UTC — [ticket-990] branche ticket-990-the-tester-log-names-the-failing-test-files
+- 2026-11-18 11:49:23 UTC — [ticket-990] tour 1 — codeur démarré
+- 2026-11-18 11:50:45 UTC — [ticket-990] tour 1 — codeur terminé (81858ms)
+- 2026-11-18 11:53:18 UTC — [ticket-990] testeur: dur�es : ruff 0 s, mypy 14 s, mypy-linux 17 s, pytest 112 s ; impact depuis base : 53 fichier(s) de test
+- 2026-11-18 11:53:26 UTC — [ticket-990] securite: PASS — Le diff ne touche qu'une ligne de journal, enrichie des noms de fichiers en éche (7218ms)
+- 2026-11-18 11:53:27 UTC — [ticket-990] tour 1 — reviewer démarré
+- 2026-11-18 11:53:42 UTC — [ticket-990] tour 1 — reviewer terminé (15625ms)
+- 2026-11-18 11:53:50 UTC — [ticket-990] validateur: APPROVED — Les trois critères sont couverts par les tests du fichier test_ligne_des_echecs. (23092ms)
+- 2026-11-18 11:53:50 UTC — [ticket-990] APPROVED après 1 tour(s)
+- 2026-11-18 11:56:43 UTC — [ticket-990] documentation: 0 fichier(s) (152062ms)
+- 2026-11-18 11:56:43 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-18 11:56:43 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-18 11:56:43 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-18 12:00:40 UTC — [ide-core] ticket-990 PR #1164 confiée au CIWatcher
+- 2026-11-18 11:55:01 UTC — [ide-core] ticket-993 PR #1163 mergée (CI verte)
+- 2026-11-18 12:00:45 UTC — [ticket-989] branche ticket-989-a-refused-doc-edit-shows-the-agent-where-its-anch
+- 2026-11-18 12:00:49 UTC — [ticket-989] tour 1 — codeur démarré
+- 2026-11-18 12:02:28 UTC — [ticket-989] tour 1 — codeur terminé (99265ms)
+- 2026-11-18 12:04:38 UTC — [ticket-989] testeur: dur�es : ruff 0 s, mypy 16 s, mypy-linux 22 s, pytest 62 s ; impact depuis base : 28 fichier(s) de test
+- 2026-11-18 12:04:52 UTC — [ticket-989] securite: PASS — Aucune faille bloquante : l'extrait joint au refus vient d'un fichier dont le ch (13828ms)
+- 2026-11-18 12:04:54 UTC — [ticket-989] tour 1 — reviewer démarré
+- 2026-11-18 12:05:16 UTC — [ticket-989] tour 1 — reviewer terminé (21671ms)
+- 2026-11-18 12:05:19 UTC — [ticket-989] validateur: APPROVED — Le diff implémente complètement le ticket : nouvelle classe `EditionRefusee` por (22765ms)
+- 2026-11-18 12:05:19 UTC — [ticket-989] APPROVED après 1 tour(s)
+- 2026-11-18 12:07:16 UTC — [ticket-989] documentation: 0 fichier(s) (93812ms)
+- 2026-11-18 12:07:16 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-18 12:07:16 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-18 12:07:16 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-18 12:15:02 UTC — [ticket-1005] branche ticket-1005-a-refused-link-ends-the-run-at-once-named-instea
+- 2026-11-18 12:15:05 UTC — [ticket-1005] tour 1 — codeur démarré
+- 2026-11-18 12:17:44 UTC — [ticket-1005] tour 1 — codeur terminé (158452ms)
+- 2026-11-18 12:23:35 UTC — [ticket-1005] testeur: 1 failed, 630 passed, 48 warnings in 311.26s (0:05:11)
+- 2026-11-18 12:23:36 UTC — [ticket-1005] tests rouges au tour 1
+- 2026-11-18 12:23:36 UTC — [ticket-1005] tour 2 — codeur démarré
+- 2026-11-18 12:27:14 UTC — [ticket-1005] tour 2 — codeur terminé (218358ms)
+- 2026-11-18 12:32:48 UTC — [ticket-1005] testeur: 1 failed, 1127 passed, 48 warnings in 291.29s (0:04:51)
+- 2026-11-18 12:32:48 UTC — [ticket-1005] tests rouges au tour 2
+- 2026-11-18 12:32:48 UTC — [ticket-1005] tour 3 — codeur démarré
+- 2026-11-18 12:34:20 UTC — [ticket-1005] tour 3 — codeur terminé (91655ms)
+- 2026-11-18 12:39:36 UTC — [ticket-1005] testeur: dur�es : ruff 0 s, mypy 17 s, mypy-linux 16 s, pytest 277 s ; impact depuis base : 108 fichier(s) de test
+- 2026-11-18 12:39:56 UTC — [ticket-1005] securite: PASS — PASS. Le diff fait remonter `LienNonDeclare` au lieu de retomber sur la prose du (19359ms)
+- 2026-11-18 12:39:56 UTC — [ticket-1005] tour 3 — reviewer démarré
+- 2026-11-18 12:40:32 UTC — [ticket-1005] tour 3 — reviewer terminé (35578ms)
+- 2026-11-18 12:40:32 UTC — [ticket-1005] validateur: APPROVED — Tous les critères sont satisfaits par le code et validés par les tests. Le pipel (35641ms)
+- 2026-11-18 12:40:32 UTC — [ticket-1005] CHANGES_REQUESTED tour 3: Reviewer : 1. Critère 1 non couvert. Il demande un run `blocked` au tour 1, sans aucun appel d'audit, de reviewer ni de validateur. `test_a_refused_link_blocks_the_run_and_names_the_link` appelle seul
+- 2026-11-18 12:40:32 UTC — [ticket-1005] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-18 12:40:54 UTC — [ide-core] file interrompue : ticket-1005 non approuvé
+- 2026-11-18 12:14:59 UTC — [ide-core] ticket-989 PR #1165 mergée (CI verte)
+- 2026-11-18 12:41:32 UTC — [ticket-1005] branche ticket-1005-a-refused-link-ends-the-run-at-once-named-instea
+- 2026-11-18 12:41:36 UTC — [ticket-1005] branche reprise (3 commit(s)) — refus précédent : revue, codeur en premier
+- 2026-11-18 12:41:36 UTC — [ticket-1005] tour 1 — codeur démarré
+- 2026-11-18 12:44:24 UTC — [ticket-1005] tour 1 — codeur terminé (168250ms)
+- 2026-11-18 12:51:43 UTC — [ticket-1005] testeur: dur�es : ruff 0 s, mypy 2 s, mypy-linux 4 s, pytest 397 s ; impact depuis base : 108 fichier(s) de test
+- 2026-11-18 12:52:02 UTC — [ticket-1005] securite: PASS — Verdict PASS. Le diff fait échouer le run fermé : un lien non déclaré met le run (18234ms)
+- 2026-11-18 12:52:02 UTC — [ticket-1005] tour 1 — reviewer démarré
+- 2026-11-18 12:52:34 UTC — [ticket-1005] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le code implémente correctemen (31640ms)
+- 2026-11-18 12:52:43 UTC — [ticket-1005] tour 1 — reviewer terminé (40812ms)
+- 2026-11-18 12:52:43 UTC — [ticket-1005] CHANGES_REQUESTED tour 1: Reviewer : 1. Critère 1 : « l'arrêt contient le chemin du lien » n'est pas vraiment testé. Les deux tests vérifient `"lien" in resultat.arret`, mais `arret` commence toujours par « lien non déclaré da
+- 2026-11-18 12:52:43 UTC — [ticket-1005] tour 2 — codeur démarré
+- 2026-11-18 12:53:16 UTC — [ticket-1005] tour 2 — codeur terminé (32407ms)
+- 2026-11-18 12:58:57 UTC — [ticket-1005] testeur: dur�es : ruff 0 s, mypy 3 s, mypy-linux 4 s, pytest 282 s ; impact depuis base : 108 fichier(s) de test
+- 2026-11-18 12:59:15 UTC — [ticket-1005] securite: PASS — PASS : aucune faille CRITICAL ni HIGH introduite, seulement un risque LOW de cou (16922ms)
+- 2026-11-18 12:59:15 UTC — [ticket-1005] tour 2 — reviewer démarré
+- 2026-11-18 12:59:30 UTC — [ticket-1005] tour 2 — reviewer terminé (14296ms)
+- 2026-11-18 12:59:55 UTC — [ticket-1005] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le code implémente bien le flu (40047ms)
+- 2026-11-18 12:59:56 UTC — [ticket-1005] APPROVED après 2 tour(s)
+- 2026-11-18 13:00:34 UTC — [ticket-1005] leçons: refusée — preuve absente du retour du run
+- 2026-11-18 13:00:57 UTC — [ticket-1005] documentation: 0 fichier(s) (437ms)
+- 2026-11-18 13:00:57 UTC — [ticket-1005] documentation: pas de diff retrouvable, non documenté
+- 2026-11-18 13:01:34 UTC — [ide-core] ticket-1005 PR #1167 non surveillée (livraison arrêtée)
+- 2026-11-18 13:01:39 UTC — [ticket-1004] branche ticket-1004-a-project-that-merges-without-ci-still-waits-for
+- 2026-11-18 13:01:43 UTC — [ticket-1004] tour 1 — codeur démarré
+- 2026-11-18 13:03:11 UTC — [ticket-1004] tour 1 — codeur terminé (87546ms)
+- 2026-11-18 13:10:01 UTC — [ticket-1004] testeur: 1 failed, 1026 passed, 16 warnings in 369.81s (0:06:09)
+- 2026-11-18 13:10:01 UTC — [ticket-1004] tests rouges au tour 1
+- 2026-11-18 13:10:01 UTC — [ticket-1004] tour 2 — codeur démarré
+- 2026-11-18 13:12:26 UTC — [ticket-1004] tour 2 — codeur terminé (144765ms)
+- 2026-11-18 13:25:13 UTC — [ticket-1004] testeur: dur�es : ruff 0 s, mypy 13 s, mypy-linux 36 s, pytest 726 s ; impact depuis base : 155 fichier(s) de test
+- 2026-11-18 13:25:26 UTC — [ticket-1004] securite: PASS — Le diff rend la livraison plus stricte : avec `merge_without_ci`, une CI `pendin (12797ms)
+- 2026-11-18 13:25:28 UTC — [ticket-1004] tour 2 — reviewer démarré
+- 2026-11-18 13:25:58 UTC — [ticket-1004] tour 2 — reviewer terminé (30109ms)
+- 2026-11-18 13:26:44 UTC — [ticket-1004] validateur: APPROVED — Tous les critères sont satisfaits. Les quatre tests couvrent exactement les cas  (76171ms)
+- 2026-11-18 13:26:44 UTC — [ticket-1004] APPROVED après 2 tour(s)
+- 2026-11-18 13:27:17 UTC — [ticket-1004] leçons: refusée — plus de 200 caractères
+- 2026-11-18 13:30:28 UTC — [ticket-1004] documentation: 0 fichier(s) (156140ms) — après tour de correction
+- 2026-11-18 13:30:28 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-18 13:30:28 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-18 13:30:28 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-18 08:14:55 UTC — [ide-core] ticket-996 PR #1155 non reprise : merge après preuve réelle
+- 2026-11-18 08:14:55 UTC — [ide-core] ticket-995 PR #1153 non reprise : merge après preuve réelle
+- 2026-11-18 10:40:31 UTC — [ticket-997] branche ticket-997-an-agent-process-the-backend-cannot-inspect-block
+- 2026-11-18 10:40:35 UTC — [ticket-997] tour 1 — codeur démarré
+- 2026-11-18 10:42:39 UTC — [ticket-997] tour 1 — codeur terminé (123969ms)
+- 2026-11-18 10:43:58 UTC — [ticket-997] testeur: dur�es : ruff 0 s, mypy 19 s, pytest 28 s, mypy-linux 16 s ; impact depuis base : 13 fichier(s) de test
+- 2026-11-18 10:44:20 UTC — [ticket-997] securite: PASS — Le diff durcit le ménage des processus du compte agent. Un processus apparu pend (22125ms)
+- 2026-11-18 10:44:21 UTC — [ticket-997] tour 1 — reviewer démarré
+- 2026-11-18 10:44:54 UTC — [ticket-997] validateur: APPROVED — Les trois critères sont validés par des tests qui passent. Le code distingue les (33577ms)
+- 2026-11-18 10:45:13 UTC — [ticket-997] tour 1 — reviewer terminé (51766ms)
+- 2026-11-18 10:45:13 UTC — [ticket-997] CHANGES_REQUESTED tour 1: Reviewer : 1. Faux positif quasi certain. `processus_par_sid` lève `ProcessusIllisibles` pour tout PID apparu depuis l'ouverture de l'appel dont le jeton est illisible, quel que soit son propriétaire.
+- 2026-11-18 10:45:13 UTC — [ticket-997] tour 2 — codeur démarré
+- 2026-11-18 10:46:32 UTC — [ticket-997] tour 2 — codeur terminé (78937ms)
+- 2026-11-18 10:48:13 UTC — [ticket-997] testeur: dur�es : ruff 0 s, mypy 22 s, pytest 31 s, mypy-linux 15 s ; impact depuis base : 13 fichier(s) de test
+- 2026-11-18 10:48:37 UTC — [ticket-997] securite: PASS — Le diff renforce l'isolation : il détecte les processus récents dont le jeton es (24093ms)
+- 2026-11-18 10:48:38 UTC — [ticket-997] tour 2 — reviewer démarré
+- 2026-11-18 10:49:12 UTC — [ticket-997] validateur: APPROVED — Les trois critères sont validés par des tests unitaires dédiés qui passent (exit (32953ms)
+- 2026-11-18 10:49:29 UTC — [ticket-997] tour 2 — reviewer terminé (50781ms)
+- 2026-11-18 10:49:29 UTC — [ticket-997] APPROVED après 2 tour(s)
+- 2026-11-18 10:50:02 UTC — [ticket-997] leçons: fichier plein, à compacter à la main
+- 2026-11-18 10:52:07 UTC — [ticket-997] documentation: 0 fichier(s) (102875ms)
+- 2026-11-18 10:52:07 UTC — documentation trop longue, titres seuls : docs/architecture.md (181178 caractères)
+- 2026-11-18 10:52:07 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-18 10:52:07 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-18 10:52:57 UTC — [ticket-997] livraison: rebase sur develop (563ms)
+- 2026-11-18 10:52:57 UTC — [ticket-997] livraison: PR #1157 ouverte (4984ms)
+- 2026-11-18 10:52:57 UTC — [ticket-997] livraison: arrêt — PR ouverte, merge après preuve réelle
+- 2026-11-18 13:47:59 UTC — [ide-core] ticket-1004 PR #1169 confiée au CIWatcher
+- 2026-11-18 13:48:18 UTC — [ticket-997] branche ticket-997-an-agent-process-the-backend-cannot-inspect-block
+- 2026-11-18 13:48:19 UTC — [ticket-997] fiche relue après l'avance de la base (afbfdead6ec9ee0758ec82db535f57c1b6b8b213 → 82b86ee6311f0deabff612965eae9d120a8d145e)
+- 2026-11-18 13:49:48 UTC — [ticket-997] testeur: dur�es : ruff 0 s, mypy 33 s, pytest 39 s, mypy-linux 24 s ; impact depuis base : 13 fichier(s) de test
+- 2026-11-18 13:49:48 UTC — [ticket-997] branche reprise (5 commit(s)) — tests green, codeur sauté
+- 2026-11-18 13:50:33 UTC — [ticket-997] securite: PASS — PASS : le diff durcit le contrôle. Un processus récent dont le jeton est illisib (25671ms)
+- 2026-11-18 13:50:34 UTC — [ticket-997] tour 1 — reviewer démarré
+- 2026-11-18 13:50:54 UTC — [ticket-997] tour 1 — reviewer terminé (19469ms)
+- 2026-11-18 13:51:21 UTC — [ticket-997] validateur: CHANGES_REQUESTED — Critères 3 et 4 validés : le buffer plein déclenche une énumération plus grande  (47296ms)
+- 2026-11-18 13:51:22 UTC — [ticket-997] CHANGES_REQUESTED tour 1: Reviewer : 1. La règle du suspect est exactement celle que la fiche a refusée. Tout processus absent de l'instantané `_AVANT` dont l'ouverture est refusée (ERROR_ACCESS_DENIED) devient suspect. Or, me
+- 2026-11-18 13:51:22 UTC — [ticket-997] tour 2 — codeur démarré
+- 2026-11-18 13:54:50 UTC — [ticket-997] tour 2 — codeur terminé (207781ms)
+- 2026-11-18 13:56:39 UTC — [ticket-997] testeur: dur�es : ruff 0 s, mypy 15 s, mypy-linux 15 s, pytest 52 s ; impact depuis base : 13 fichier(s) de test
+- 2026-11-18 13:57:03 UTC — [ticket-997] securite: PASS — Le diff renforce le ménage des processus du compte agent sans affaiblir aucune g (23578ms)
+- 2026-11-18 13:57:04 UTC — [ticket-997] tour 2 — reviewer démarré
+- 2026-11-18 13:57:29 UTC — [ticket-997] validateur: APPROVED — Les quatre critères d'acceptation sont tous couverts par des tests explicites qu (25593ms)
+- 2026-11-18 13:57:38 UTC — [ticket-997] tour 2 — reviewer terminé (33969ms)
+- 2026-11-18 13:57:38 UTC — [ticket-997] APPROVED après 2 tour(s)
+- 2026-11-18 13:58:59 UTC — [ticket-997] leçons: refusée — preuve absente du retour du run
+- 2026-11-18 13:59:37 UTC — [ticket-997] documentation: 0 fichier(s) (94ms)
+- 2026-11-18 14:00:30 UTC — [ticket-997] livraison: arrêt — Livraison interrompue : GitCommandError: git command failed (code 1): git -c core.hooksPath=C:\Users
+- 2026-11-18 13:53:32 UTC — [ide-core] ticket-1004 PR #1169 mergée (CI verte)
+- 2026-11-18 14:00:36 UTC — [ticket-998] branche ticket-998-design-the-agent-account-loses-its-rights-on-the
+- 2026-11-18 14:00:39 UTC — [ticket-998] tour 1 — codeur démarré
+- 2026-11-18 14:03:08 UTC — [ticket-998] tour 1 — architect terminé (149125ms)
+- 2026-11-18 14:04:12 UTC — [ticket-998] testeur: OK (exit 0)
+- 2026-11-18 14:04:29 UTC — [ticket-998] securite: PASS — PASS : le diff ne change que deux fichiers de documentation. Il ajoute une règle (16250ms)
+- 2026-11-18 14:04:31 UTC — [ticket-998] validateur: APPROVED — Aucun critère d'acceptation — approbation automatique. (0ms)
+- 2026-11-18 14:04:31 UTC — [ticket-998] tour 1 — reviewer démarré
+- 2026-11-18 14:05:07 UTC — [ticket-998] tour 1 — reviewer terminé (35171ms)
+- 2026-11-18 14:05:08 UTC — [ticket-998] APPROVED après 1 tour(s)
+- 2026-11-18 14:06:03 UTC — [ticket-998] fichiers non suivis laissés par le run : tickets/todo/ticket-1006-the-agent-account-gives-back-the-files-it-created.md, tickets/todo/ticket-1007-one-worktree-at-a-time-under-the-agent-account.md, tickets/todo/ticket-1008-the-agent-profile-is-wiped-when-the-account-is-idle.md, tickets/todo/ticket-1009-the-agent-process-loads-no-registry-profile.md (à ignorer dans .gitignore ?)
+- 2026-11-18 14:08:10 UTC — [ticket-998] documentation: 0 fichier(s) (126014ms)
+- 2026-11-18 14:08:10 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-18 14:08:10 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-18 14:08:10 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-18 12:08:57 UTC — [ide-core] ticket-989 PR #1165 confiée au CIWatcher
+- 2026-11-18 12:06:41 UTC — [ide-core] ticket-990 PR #1164 mergée (CI verte)
+- 2026-11-18 12:09:02 UTC — [ticket-1001] branche ticket-1001-low-findings-of-the-17-11-audit-declared-env-rel
+- 2026-11-18 12:09:05 UTC — [ticket-1001] tour 1 — codeur démarré
+- 2026-11-18 12:12:36 UTC — [ticket-1001] tour 1 — codeur terminé (210468ms)
+- 2026-11-18 12:12:36 UTC — [ticket-1001] BLOCKED — fichier protégé modifié pendant un appel d'agent : scripts/hooks/pre-push
+- 2026-11-18 12:12:56 UTC — [ide-core] file interrompue : ticket-1001 non approuvé
+- 2026-11-18 14:59:38 UTC — [ide-core] ticket-983 PR #1172 non surveillée (livraison arrêtée)
+- 2026-11-18 14:13:59 UTC — [ticket-998] livraison: nouvelle tentative de la PR #1171 après une erreur réseau (ConnectTimeout), PR non mergée
+- 2026-11-18 14:14:23 UTC — [ide-core] ticket-998 PR #1171 mergée (CI verte)
+- 2026-11-18 14:59:45 UTC — [ticket-1001] branche ticket-1001-low-findings-of-the-17-11-audit-declared-env-rel
+- 2026-11-18 15:11:31 UTC — [ticket-1001] testeur: dur�es : ruff 0 s, mypy 17 s, mypy-linux 27 s, pytest 683 s ; impact depuis base : suite compl�te
+- 2026-11-18 15:11:31 UTC — [ticket-1001] branche reprise (3 commit(s)) — tests green, codeur sauté
+- 2026-11-18 15:12:14 UTC — [ticket-1001] securite: PASS — Le diff durcit le code : les secrets d'`extra` et `PATH` sont filtrés, les noms  (25203ms)
+- 2026-11-18 15:12:14 UTC — [ticket-1001] tour 1 — reviewer démarré
+- 2026-11-18 15:12:45 UTC — [ticket-1001] validateur: APPROVED — Le critère unique demandant un test par point (L1, L4, L6, L9, L10, réserve 973) (30922ms)
+- 2026-11-18 15:12:57 UTC — [ticket-1001] tour 1 — reviewer terminé (42702ms)
+- 2026-11-18 15:12:57 UTC — [ticket-1001] CHANGES_REQUESTED tour 1: Reviewer : 1. Dans `Test-DossierWorktreesAgent`, `($_.IdentityReference.Value -split '\')` utilise le motif regex `'\'` seul (une barre oblique inverse), qui est invalide : PowerShell lève « Illegal \
+- 2026-11-18 15:12:57 UTC — [ticket-1001] tour 2 — codeur démarré
+- 2026-11-18 15:15:08 UTC — [ticket-1001] tour 2 — codeur terminé (130203ms)
+- 2026-11-18 15:29:45 UTC — [ticket-1001] testeur: dur�es : ruff 1 s, mypy 10 s, mypy-linux 9 s, pytest 814 s ; impact depuis base : suite compl�te
+- 2026-11-18 15:30:05 UTC — [ticket-1001] securite: PASS — Le diff ne fait que durcir le code. Une base des runs illisible fait refuser la  (19421ms)
+- 2026-11-18 15:30:06 UTC — [ticket-1001] tour 2 — reviewer démarré
+- 2026-11-18 15:30:23 UTC — [ticket-1001] tour 2 — reviewer terminé (17343ms)
+- 2026-11-18 15:30:37 UTC — [ticket-1001] validateur: APPROVED — Le critère unique demandant un test par point de l'audit (L1, L4, L6, L9, L10, r (30782ms)
+- 2026-11-18 15:30:37 UTC — [ticket-1001] APPROVED après 2 tour(s)
+- 2026-11-18 15:31:31 UTC — [ticket-1001] leçons: fichier plein, à compacter à la main
+- 2026-11-18 15:34:15 UTC — [ticket-1001] documentation: 0 fichier(s) (139312ms) — après tour de correction
+- 2026-11-18 15:34:15 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-18 15:34:15 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-18 15:34:15 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-16 16:03:58 UTC — [ide-core] ticket-984 PR #1135 non surveillée (livraison arrêtée)
+- 2026-11-16 16:27:10 UTC — [ticket-983] branche ticket-983-agent-doctor-launches-node-uv-and-python-as-the-a
+- 2026-11-16 16:27:12 UTC — [ticket-983] tour 1 — codeur démarré
+- 2026-11-16 16:29:18 UTC — [ticket-983] tour 1 — codeur terminé (126125ms)
+- 2026-11-16 16:29:20 UTC — [ticket-983] ARRÊTÉ par l'utilisateur au tour 1
+- 2026-11-16 16:29:25 UTC — [ide-core] file interrompue : ticket-983 non approuvé
+- 2026-11-18 14:08:46 UTC — [ide-core] ticket-998 PR #1171 confiée au CIWatcher
+- 2026-11-18 14:09:01 UTC — [ticket-983] branche ticket-983-agent-doctor-launches-node-uv-and-python-as-the-a
+- 2026-11-18 14:09:01 UTC — [ticket-983] fiche relue après l'avance de la base (4bc65e2e6a3efa9deaa3c0d31cc4d11da0549e41 → b75b919f8f36a5d2486d1cb809c83c0a6dcd0800)
+- 2026-11-18 14:12:23 UTC — [ticket-983] testeur: 1 failed, 1963 passed, 3 skipped, 112 warnings in 178.60s (0:02:58)
+- 2026-11-18 14:12:23 UTC — [ticket-983] branche reprise (3 commit(s)) — tests red, codeur en premier
+- 2026-11-18 14:12:23 UTC — [ticket-983] tour 1 — codeur démarré
+- 2026-11-18 14:16:35 UTC — [ticket-983] tour 1 — codeur terminé (251280ms)
+- 2026-11-18 14:27:18 UTC — [ticket-983] testeur: 1 failed, 5106 passed, 3 skipped, 112 warnings in 610.02s (0:10:10)
+- 2026-11-18 14:27:18 UTC — [ticket-983] tests rouges au tour 1
+- 2026-11-18 14:27:18 UTC — [ticket-983] tour 2 — codeur démarré
+- 2026-11-18 14:27:41 UTC — [ticket-983] tour 2 — codeur terminé (22671ms)
+- 2026-11-18 14:41:15 UTC — [ticket-983] testeur: dur�es : ruff 0 s, mypy 19 s, mypy-linux 24 s, pytest 767 s ; impact depuis base : suite compl�te
+- 2026-11-18 14:41:34 UTC — [ticket-983] securite: PASS — PASS : le diff n'ajoute aucune injection, aucun secret dans le code ni aucun acc (18905ms)
+- 2026-11-18 14:41:35 UTC — [ticket-983] tour 2 — reviewer démarré
+- 2026-11-18 14:41:58 UTC — [ticket-983] tour 2 — reviewer terminé (23157ms)
+- 2026-11-18 14:42:08 UTC — [ticket-983] validateur: fichiers cités joints : agent-setup.ps1
+- 2026-11-18 14:42:08 UTC — [ticket-983] validateur: APPROVED — Le module `agent_doctor_cli` lance correctement les outils sous le compte agent  (33280ms)
+- 2026-11-18 14:42:09 UTC — [ticket-983] APPROVED après 2 tour(s)
+- 2026-11-18 14:43:24 UTC — [ticket-983] leçons: refusée — preuve absente du retour du run
+- 2026-11-18 14:46:05 UTC — [ticket-983] documentation: 0 fichier(s) (135578ms)
+- 2026-11-18 14:46:05 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-18 14:46:05 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-18 14:46:05 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-18 14:59:37 UTC — [ticket-983] livraison: rebase sur develop (1094ms)
+- 2026-11-18 14:59:37 UTC — [ticket-983] livraison: tests relancés après rebase : verts (dur�es : ruff 0 s, mypy 2 s, mypy-linux 4 s, pytest 774 s ; impact depuis base : suite compl�te) (774609ms)
+- 2026-11-18 14:59:37 UTC — [ticket-983] livraison: PR #1172 ouverte (6437ms)
+- 2026-11-18 14:59:37 UTC — [ticket-983] livraison: arrêt — PR ouverte, merge après preuve réelle
+- 2026-11-18 15:47:51 UTC — [ide-core] ticket-1001 PR #1174 non surveillée (livraison arrêtée)
+- 2026-11-18 15:47:51 UTC — [ticket-997] relivraison: échec — git command failed (code 1): git -c core.hooksPath=C:\Users\BENJAM~1.CHA\AppData\Local\Temp\tessera-
+- 2026-11-18 16:06:26 UTC — [ticket-983] branche ticket-983-agent-doctor-launches-node-uv-and-python-as-the-a
+- 2026-11-18 16:06:26 UTC — [ticket-983] fiche relue après l'avance de la base (fb12fbbef19676f667d5c4076e80acd613923c82 → 560ef279a3257da2173ed42fdfc66f8d0c0080dc)
+- 2026-11-18 16:16:57 UTC — [ticket-983] testeur: dur�es : ruff 0 s, mypy 7 s, mypy-linux 6 s, pytest 607 s ; impact depuis base : suite compl�te
+- 2026-11-18 16:16:57 UTC — [ticket-983] branche reprise (8 commit(s)) — tests green, codeur sauté
+- 2026-11-18 16:17:31 UTC — [ticket-983] securite: PASS — Aucune faille introduite par ce diff, d'où le PASS. Le nouveau CLI lance des com (14953ms)
+- 2026-11-18 16:17:33 UTC — [ticket-983] tour 1 — reviewer démarré
+- 2026-11-18 16:17:51 UTC — [ticket-983] tour 1 — reviewer terminé (18092ms)
+- 2026-11-18 16:19:09 UTC — [ticket-983] validateur: fichiers cités joints : agent-setup.ps1
+- 2026-11-18 16:19:09 UTC — [ticket-983] validateur: CHANGES_REQUESTED — Le diff laisse en place les trois défauts signalés par la PR précédente (refus d (96719ms)
+- 2026-11-18 16:19:09 UTC — [ticket-983] CHANGES_REQUESTED tour 1: Reviewer : 1. Défaut 1 du refus non corrigé : les outils se lancent toujours depuis le dossier courant. `main()` appelle `verifier_outils(Path.cwd())`, et `tessera.ps1` fait `Push-Location backend` ju
+- 2026-11-18 16:19:09 UTC — [ticket-983] tour 2 — codeur démarré
+- 2026-11-18 16:21:48 UTC — [ticket-983] tour 2 — codeur terminé (158687ms)
+- 2026-11-18 16:33:43 UTC — [ticket-983] testeur: dur�es : ruff 0 s, mypy 11 s, mypy-linux 13 s, pytest 675 s ; impact depuis base : suite compl�te
+- 2026-11-18 16:34:01 UTC — [ticket-983] securite: PASS — Verdict PASS : aucune faille CRITICAL ni HIGH introduite par ce diff. Le nouveau (17812ms)
+- 2026-11-18 16:34:02 UTC — [ticket-983] tour 2 — reviewer démarré
+- 2026-11-18 16:34:25 UTC — [ticket-983] validateur: fichiers cités joints : agent-setup.ps1
+- 2026-11-18 16:34:25 UTC — [ticket-983] validateur: APPROVED — Le diff adresse tous les défauts du refus précédent. Les outils se lancent désor (22969ms)
+- 2026-11-18 16:34:30 UTC — [ticket-983] tour 2 — reviewer terminé (28375ms)
+- 2026-11-18 16:34:30 UTC — [ticket-983] APPROVED après 2 tour(s)
+- 2026-11-18 16:35:48 UTC — [ticket-983] leçons: fichier plein, à compacter à la main
+- 2026-11-18 16:36:07 UTC — [ticket-983] documentation: 0 fichier(s) (125ms)
+- 2026-11-18 16:36:16 UTC — [ticket-983] livraison: arrêt — Livraison interrompue : GitCommandError: git command failed (code 1): git -c core.hooksPath=C:\Users
+- 2026-11-18 16:36:25 UTC — [ticket-1010] branche ticket-1010-a-resumed-branch-already-on-the-remote-is-delive
+- 2026-11-18 16:36:30 UTC — [ticket-1010] tour 1 — codeur démarré
+- 2026-11-18 16:43:30 UTC — [ticket-1010] tour 1 — codeur terminé (420296ms)
+- 2026-11-18 16:46:06 UTC — [ticket-1010] testeur: 1 failed, 194 passed, 8 warnings in 98.87s (0:01:38) — fichiers en échec : tests/test_longueur_des_fichiers.py
+- 2026-11-18 16:46:06 UTC — [ticket-1010] tests rouges au tour 1
+- 2026-11-18 16:46:06 UTC — [ticket-1010] tour 2 — codeur démarré
+- 2026-11-18 16:47:38 UTC — [ticket-1010] tour 2 — codeur terminé (91030ms)
+- 2026-11-18 16:50:40 UTC — [ticket-1010] testeur: dur�es : ruff 0 s, mypy 18 s, mypy-linux 17 s, pytest 126 s ; impact depuis base : 23 fichier(s) de test
+- 2026-11-18 16:51:11 UTC — [ticket-1010] securite: PASS — Le diff pousse sous un nom dérivé au lieu de forcer, sans `--force` et sans rien (29640ms)
+- 2026-11-18 16:51:12 UTC — [ticket-1010] tour 2 — reviewer démarré
+- 2026-11-18 16:51:50 UTC — [ticket-1010] validateur: APPROVED — Les trois critères sont couverts par des tests fonctionnels explicites dans le f (38516ms)
+- 2026-11-18 16:51:59 UTC — [ticket-1010] tour 2 — reviewer terminé (47015ms)
+- 2026-11-18 16:51:59 UTC — [ticket-1010] CHANGES_REQUESTED tour 2: Reviewer : 1. Le nom dérivé s'arrête à `open_pull_request`. Après l'ouverture, `LivraisonService._apres_ouverture` calcule `pushed_sha=await sha_pousse(self._git, branch)` avec le nom d'origine. Dans 
+- 2026-11-18 16:51:59 UTC — [ticket-1010] tour 3 — codeur démarré
+- 2026-11-18 16:58:47 UTC — [ticket-1010] tour 3 — codeur terminé (407250ms)
+- 2026-11-18 17:10:03 UTC — [ticket-1010] testeur: dur�es : ruff 1 s, mypy 35 s, mypy-linux 30 s, pytest 611 s ; impact depuis base : 158 fichier(s) de test
+- 2026-11-18 17:10:28 UTC — [ticket-1010] securite: PASS — Le diff ne force jamais un push. Il ne supprime rien sur le distant : un nom dér (23687ms)
+- 2026-11-18 17:10:29 UTC — [ticket-1010] tour 3 — reviewer démarré
+- 2026-11-18 17:10:56 UTC — [ticket-1010] tour 3 — reviewer terminé (26907ms)
+- 2026-11-18 17:10:56 UTC — [ticket-1010] validateur: APPROVED — Les trois critères sont couverts par des tests fonctionnels explicites et détail (27015ms)
+- 2026-11-18 17:10:56 UTC — [ticket-1010] APPROVED après 3 tour(s)
+- 2026-11-18 17:12:21 UTC — [ticket-1010] leçons: fichier plein, à compacter à la main
+- 2026-11-18 17:16:10 UTC — [ticket-1010] documentation: 0 fichier(s) (189657ms) — après tour de correction
+- 2026-11-18 17:16:10 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-18 17:16:10 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-18 17:16:10 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-18 17:26:23 UTC — [ide-core] ticket-1010 PR #1177 confiée au CIWatcher
+- 2026-11-18 17:26:32 UTC — [ticket-1011] branche ticket-1011-a-link-found-at-the-final-commit-is-named-remove
+- 2026-11-18 17:26:37 UTC — [ticket-1011] tour 1 — codeur démarré
+- 2026-11-18 17:31:29 UTC — [ticket-1011] tour 1 — codeur terminé (291812ms)
+- 2026-11-18 17:39:25 UTC — [ticket-1011] testeur: 1 failed, 686 passed, 48 warnings in 417.43s (0:06:57) — fichiers en échec : tests/test_longueur_des_fichiers.py
+- 2026-11-18 17:39:25 UTC — [ticket-1011] tests rouges au tour 1
+- 2026-11-18 17:39:25 UTC — [ticket-1011] tour 2 — codeur démarré
+- 2026-11-18 17:41:20 UTC — [ticket-1011] tour 2 — codeur terminé (114453ms)
+- 2026-11-18 17:49:35 UTC — [ticket-1011] testeur: dur�es : ruff 0 s, mypy 22 s, mypy-linux 22 s, pytest 438 s ; impact depuis base : 110 fichier(s) de test
+- 2026-11-18 17:49:58 UTC — [ticket-1011] securite: PASS — Pas de faille bloquante. Si un lien apparaît dans le chemin approuvé après la le (21530ms)
+- 2026-11-18 17:49:59 UTC — [ticket-1011] tour 2 — reviewer démarré
+- 2026-11-18 17:50:28 UTC — [ticket-1011] validateur: APPROVED — Les deux critères sont satisfaits par le diff et les tests. Le code capture `Lie (28641ms)
+- 2026-11-18 17:50:35 UTC — [ticket-1011] tour 2 — reviewer terminé (35562ms)
+- 2026-11-18 17:50:35 UTC — [ticket-1011] CHANGES_REQUESTED tour 2: Reviewer : 1. Sur les sorties non approuvées, `commit_apres_lien` renvoie un sha et un arrêt non nul (« lien non déclaré retiré avant le commit : … ») même quand le commit réussit. Or la plupart des a
+- 2026-11-18 17:50:35 UTC — [ticket-1011] tour 3 — codeur démarré
+- 2026-11-18 17:52:07 UTC — [ticket-1011] tour 3 — codeur terminé (91233ms)
+- 2026-11-18 17:59:53 UTC — [ticket-1011] testeur: dur�es : ruff 0 s, mypy 26 s, mypy-linux 23 s, pytest 410 s ; impact depuis base : 110 fichier(s) de test
+- 2026-11-18 18:00:12 UTC — [ticket-1011] securite: PASS — Verdict PASS : aucune faille CRITICAL ou HIGH introduite. Sur une sortie non app (17405ms)
+- 2026-11-18 18:00:13 UTC — [ticket-1011] tour 3 — reviewer démarré
+- 2026-11-18 18:00:40 UTC — [ticket-1011] tour 3 — reviewer terminé (26390ms)
+- 2026-11-18 18:00:46 UTC — [ticket-1011] validateur: APPROVED — Les deux critères sont satisfaits. Le diff ajoute le chemin manquant pour les li (32500ms)
+- 2026-11-18 18:00:46 UTC — [ticket-1011] APPROVED après 3 tour(s)
+- 2026-11-18 18:01:47 UTC — [ticket-1011] leçons: fichier plein, à compacter à la main
+- 2026-11-18 18:02:21 UTC — [ticket-1011] documentation: 0 fichier(s) (905ms)
+- 2026-11-18 18:02:21 UTC — [ticket-1011] documentation: pas de diff retrouvable, non documenté
+- 2026-11-18 18:11:09 UTC — [ide-core] ticket-1011 PR #1178 confiée au CIWatcher
+- 2026-11-18 17:31:25 UTC — [ide-core] ticket-1010 PR #1177 mergée (CI verte)
+- 2026-11-18 18:11:17 UTC — [ticket-1006] branche ticket-1006-the-agent-account-gives-back-the-files-it-create
+- 2026-11-18 18:11:22 UTC — [ticket-1006] tour 1 — codeur démarré
+- 2026-11-18 18:13:29 UTC — [ticket-1006] tour 1 — codeur terminé (126672ms)
+- 2026-11-18 18:16:10 UTC — [ticket-1006] testeur: dur�es : ruff 0 s, mypy 24 s, mypy-linux 30 s, pytest 108 s ; impact depuis base : 17 fichier(s) de test
+- 2026-11-18 18:16:47 UTC — [ticket-1006] securite: BLOCK — BLOCK : le `/reset /T` ajouté dans `retirer_ecriture` efface, dès la fin du prem (36109ms)
+- 2026-11-18 18:17:19 UTC — [ide-core] file interrompue : ticket-1006 non approuvé
+- 2026-11-18 19:01:49 UTC — [ticket-1011] livraison: arrêt — PR #1178 non mergée : délai dépassé (2400s)
+- 2026-11-19 08:35:51 UTC — [ticket-1006] branche ticket-1006-the-agent-account-gives-back-the-files-it-create
+- 2026-11-19 08:35:52 UTC — [ticket-1006] fiche relue après l'avance de la base (46c2683040d50f03260d9ff84f6954bbce2f45a1 → a5c2d3ed2fe9ee327eaab6ffdc9fd673b3fa7694)
+- 2026-11-19 08:35:55 UTC — [ticket-1006] branche reprise (3 commit(s)) — refus précédent : securite, codeur en premier
+- 2026-11-19 08:35:55 UTC — [ticket-1006] tour 1 — codeur démarré
+- 2026-11-19 08:37:25 UTC — [ticket-1006] tour 1 — codeur terminé (89297ms)
+- 2026-11-19 08:38:59 UTC — [ticket-1006] testeur: 2 failed, 155 passed, 8 warnings in 43.50s — fichiers en échec : tests/test_processus_compte.py
+- 2026-11-19 08:38:59 UTC — [ticket-1006] tests rouges au tour 1
+- 2026-11-19 08:38:59 UTC — [ticket-1006] tour 2 — codeur démarré
+- 2026-11-19 08:39:26 UTC — [ticket-1006] tour 2 — codeur terminé (26405ms)
+- 2026-11-19 08:40:41 UTC — [ticket-1006] testeur: 2 failed, 156 passed, 8 warnings in 33.60s — fichiers en échec : tests/test_processus_compte.py
+- 2026-11-19 08:40:41 UTC — [ticket-1006] tests rouges au tour 2
+- 2026-11-19 08:40:41 UTC — [ticket-1006] tour 3 — codeur démarré
+- 2026-11-19 08:41:09 UTC — [ticket-1006] tour 3 — codeur terminé (28094ms)
+- 2026-11-19 08:42:48 UTC — [ticket-1006] testeur: 2 failed, 155 passed, 8 warnings in 61.15s (0:01:01) — fichiers en échec : tests/test_processus_compte.py
+- 2026-11-19 08:42:48 UTC — [ticket-1006] tests rouges au tour 3
+- 2026-11-19 08:42:48 UTC — [ticket-1006] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-19 08:53:12 UTC — [ticket-1006] branche ticket-1006-the-agent-account-gives-back-the-files-it-create
+- 2026-11-19 08:53:14 UTC — [ticket-1006] branche reprise (5 commit(s)) — refus précédent : revue, codeur en premier
+- 2026-11-19 08:53:14 UTC — [ticket-1006] tour 1 — codeur démarré
+- 2026-11-19 08:54:14 UTC — [ticket-1006] tour 1 — codeur terminé (60077ms)
+- 2026-11-19 08:55:41 UTC — [ticket-1006] testeur: dur�es : ruff 0 s, mypy 8 s, mypy-linux 9 s, pytest 51 s ; impact depuis base : 18 fichier(s) de test
+- 2026-11-19 08:56:55 UTC — [ticket-1006] securite: PASS — PASS : le diff durcit les droits (ACE OWNER RIGHTS limité à RC, propriété repris (74077ms)
+- 2026-11-19 08:56:56 UTC — [ticket-1006] tour 1 — reviewer démarré
+- 2026-11-19 08:57:31 UTC — [ticket-1006] tour 1 — reviewer terminé (35375ms)
+- 2026-11-19 08:57:56 UTC — [ticket-1006] validateur: APPROVED — Le diff implémente correctement le refus itéré des fichiers protégés après la re (59452ms)
+- 2026-11-19 08:57:56 UTC — [ticket-1006] APPROVED après 1 tour(s)
+- 2026-11-19 08:58:40 UTC — [ticket-1006] leçons: rien à retenir
+- 2026-11-19 09:00:13 UTC — [ticket-1006] documentation: 0 fichier(s) (71219ms)
+- 2026-11-19 09:00:13 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-19 09:00:13 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-19 09:00:13 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-19 09:00:47 UTC — [ticket-1006] livraison: rebase sur develop (563ms)
+- 2026-11-19 09:00:47 UTC — [ticket-1006] livraison: PR #1182 ouverte (5265ms)
+- 2026-11-19 09:00:47 UTC — [ticket-1006] livraison: arrêt — PR ouverte, merge après preuve réelle
+- 2026-11-19 09:17:02 UTC — [ticket-1007] branche ticket-1007-two-worktrees-never-carry-a-call-under-the-agent
+- 2026-11-19 09:17:05 UTC — [ticket-1007] tour 1 — codeur démarré
+- 2026-11-19 09:18:33 UTC — [ticket-1007] tour 1 — codeur terminé (87530ms)
+- 2026-11-19 09:26:44 UTC — [ticket-1007] testeur: dur�es : ruff 0 s, mypy 15 s, mypy-linux 15 s, pytest 447 s ; impact depuis base : 307 fichier(s) de test
+- 2026-11-19 09:27:04 UTC — [ticket-1007] securite: PASS — Le diff ne fait que sérialiser par défaut les appels du compte agent par worktre (19422ms)
+- 2026-11-19 09:27:04 UTC — [ticket-1007] tour 1 — reviewer démarré
+- 2026-11-19 09:27:47 UTC — [ticket-1007] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le code implémente une file d'a (42453ms)
+- 2026-11-19 09:28:04 UTC — [ticket-1007] tour 1 — reviewer terminé (59702ms)
+- 2026-11-19 09:28:04 UTC — [ticket-1007] APPROVED après 1 tour(s)
+- 2026-11-19 09:31:05 UTC — [ticket-1007] documentation: 0 fichier(s) (161594ms) — après tour de correction
+- 2026-11-19 09:31:05 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-19 09:31:05 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-19 09:31:05 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-19 09:31:40 UTC — [ticket-1007] livraison: rebase sur develop (563ms)
+- 2026-11-19 09:31:40 UTC — [ticket-1007] livraison: PR #1183 ouverte (5672ms)
+- 2026-11-19 09:31:40 UTC — [ticket-1007] livraison: arrêt — PR ouverte, merge après preuve réelle
+- 2026-11-19 09:44:22 UTC — [ticket-1008] branche ticket-1008-the-agent-profile-folder-is-wiped-when-the-accou
+- 2026-11-19 09:44:25 UTC — [ticket-1008] tour 1 — codeur démarré
+- 2026-11-19 09:49:20 UTC — [ticket-1008] tour 1 — codeur terminé (294280ms)
+- 2026-11-19 09:52:10 UTC — [ticket-1008] testeur: 1 failed, 1905 passed, 3 skipped, 113 warnings in 129.40s (0:02:09) — fichiers en échec : tests/test_agent_sdk_compte_dedie.py
+- 2026-11-19 09:52:11 UTC — [ticket-1008] tests rouges au tour 1
+- 2026-11-19 09:52:11 UTC — [ticket-1008] tour 2 — codeur démarré
+- 2026-11-19 09:53:40 UTC — [ticket-1008] tour 2 — codeur terminé (88594ms)
+- 2026-11-19 10:03:01 UTC — [ticket-1008] testeur: dur�es : ruff 0 s, mypy 9 s, mypy-linux 27 s, pytest 522 s ; impact depuis base : suite compl�te
+- 2026-11-19 10:03:44 UTC — [ticket-1008] securite: PASS — PASS : le diff ne contient aucune faille CRITICAL ou HIGH. J'ai relevé deux MEDI (42202ms)
+- 2026-11-19 10:03:46 UTC — [ticket-1008] tour 2 — reviewer démarré
+- 2026-11-19 10:04:26 UTC — [ticket-1008] tour 2 — reviewer terminé (39250ms)
+- 2026-11-19 10:04:33 UTC — [ticket-1008] validateur: fichiers cités joints : aucun ; absents : uv.toml
+- 2026-11-19 10:04:33 UTC — [ticket-1008] validateur: APPROVED — Toutes les exigences du ticket sont implémentées et testées. Le profil agent a q (48078ms)
+- 2026-11-19 10:04:33 UTC — [ticket-1008] CHANGES_REQUESTED tour 2: Reviewer : 1. Après `reinitialiser_profil`, le dossier vers lequel pointent `TEMP` et `TMP` (`PROFIL_AGENT\AppData\Local\Temp`, défini dans `env_du_profil`) n'existe plus. `APPDATA` et `LOCALAPPDATA` 
+- 2026-11-19 10:04:33 UTC — [ticket-1008] tour 3 — codeur démarré
+- 2026-11-19 10:07:00 UTC — [ticket-1008] tour 3 — codeur terminé (146936ms)
+- 2026-11-19 10:16:49 UTC — [ticket-1008] testeur: dur�es : ruff 0 s, mypy 12 s, mypy-linux 21 s, pytest 551 s ; impact depuis base : suite compl�te
+- 2026-11-19 10:17:26 UTC — [ticket-1008] securite: PASS — PASS : aucune faille CRITICAL ou HIGH introduite. Le vidage du profil ne suit ni (35764ms)
+- 2026-11-19 10:17:26 UTC — [ticket-1008] tour 3 — reviewer démarré
+- 2026-11-19 10:17:56 UTC — [ticket-1008] tour 3 — reviewer terminé (29765ms)
+- 2026-11-19 10:18:10 UTC — [ticket-1008] validateur: fichiers cités joints : aucun ; absents : uv.toml
+- 2026-11-19 10:18:10 UTC — [ticket-1008] validateur: APPROVED — Le ticket ticket-1008 est entièrement satisfait. Le profil agent a été migré de  (43813ms)
+- 2026-11-19 10:18:11 UTC — [ticket-1008] CHANGES_REQUESTED tour 3: Reviewer : 1. `_recreer` construit `Path(env[cle]).relative_to(PROFIL_AGENT)` sur des chaînes séparées par des backslashs. Sous Linux, `Path` est un `PosixPath` : `C:\ProgramData\...\AppData\Local\Tem
+- 2026-11-19 10:18:11 UTC — [ticket-1008] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-19 11:08:59 UTC — [ide-core] ticket-1013 PR #1188 confiée au CIWatcher
+- 2026-11-19 11:09:03 UTC — [ticket-1015] branche ticket-1015-the-rights-of-a-call-are-set-on-the-run-worktree
+- 2026-11-19 11:09:06 UTC — [ticket-1015] tour 1 — codeur démarré
+- 2026-11-19 11:11:14 UTC — [ticket-1015] tour 1 — codeur terminé (127563ms)
+- 2026-11-19 11:13:29 UTC — [ticket-1015] testeur: 1 failed, 463 passed, 3 skipped, 9 warnings in 100.21s (0:01:40) — fichiers en échec : tests/test_agent_doctor_cli.py
+- 2026-11-19 11:13:29 UTC — [ticket-1015] tests rouges au tour 1
+- 2026-11-19 11:13:29 UTC — [ticket-1015] tour 2 — codeur démarré
+- 2026-11-19 11:24:52 UTC — [ticket-1015] codeur: outil Read refusé par le CLI
+- 2026-11-19 11:24:52 UTC — [ticket-1015] tour 2 — codeur terminé (682625ms)
+- 2026-11-19 11:27:49 UTC — [ticket-1015] testeur: 1 failed, 551 passed, 3 skipped, 104 warnings in 136.37s (0:02:16) — fichiers en échec : tests/test_app_du_run_compte.py
+- 2026-11-19 11:27:49 UTC — [ticket-1015] tests rouges au tour 2
+- 2026-11-19 11:27:49 UTC — [ticket-1015] tour 3 — codeur démarré
+- 2026-11-19 11:31:11 UTC — [ticket-1015] tour 3 — codeur terminé (201827ms)
+- 2026-11-19 11:35:53 UTC — [ticket-1015] testeur: dur�es : ruff 0 s, pytest 240 s ; impact depuis base : 140 fichier(s) de test
+- 2026-11-19 11:35:54 UTC — [ticket-1015] tests rouges au tour 3
+- 2026-11-19 11:35:54 UTC — [ticket-1015] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-19 11:36:15 UTC — [ide-core] file interrompue : ticket-1015 non approuvé
+- 2026-11-19 10:58:07 UTC — [ticket-1013] branche ticket-1013-a-refused-closure-of-an-agent-call-is-never-swal
+- 2026-11-19 10:58:10 UTC — [ticket-1013] tour 1 — codeur démarré
+- 2026-11-19 10:59:28 UTC — [ticket-1013] tour 1 — codeur terminé (78125ms)
+- 2026-11-19 11:01:13 UTC — [ticket-1013] testeur: 1 failed, 1464 passed, 3 skipped, 8 warnings in 66.24s (0:01:06) — fichiers en échec : tests/test_longueur_des_fichiers.py
+- 2026-11-19 11:01:14 UTC — [ticket-1013] tests rouges au tour 1
+- 2026-11-19 11:01:14 UTC — [ticket-1013] tour 2 — codeur démarré
+- 2026-11-19 11:02:15 UTC — [ticket-1013] tour 2 — codeur terminé (61250ms)
+- 2026-11-19 11:03:56 UTC — [ticket-1013] testeur: dur�es : ruff 0 s, mypy 9 s, mypy-linux 10 s, pytest 66 s ; impact depuis base : 90 fichier(s) de test
+- 2026-11-19 11:04:04 UTC — [ticket-1013] securite: PASS — Ce diff durcit la gestion d'erreur. `DroitsAgentRefuses` remonte désormais de `_ (7156ms)
+- 2026-11-19 11:04:05 UTC — [ticket-1013] tour 2 — reviewer démarré
+- 2026-11-19 11:04:22 UTC — [ticket-1013] tour 2 — reviewer terminé (17780ms)
+- 2026-11-19 11:04:51 UTC — [ticket-1013] validateur: fichiers cités joints : etape_de_capture.py, agent_sdk.py (tronqué)
+- 2026-11-19 11:04:51 UTC — [ticket-1013] validateur: APPROVED — Le codeur a implémenté les deux changements requis : `_arreter` et `_run_ou_repr (46313ms)
+- 2026-11-19 11:04:51 UTC — [ticket-1013] APPROVED après 2 tour(s)
+- 2026-11-19 11:06:36 UTC — [ticket-1013] leçons: refusée — preuve absente du retour du run
+- 2026-11-19 11:08:23 UTC — [ticket-1013] documentation: 1 fichier(s) (87046ms)
+- 2026-11-19 11:08:23 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-19 11:08:23 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-19 11:08:23 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-19 11:14:29 UTC — [ide-core] ticket-1013 PR #1188 mergée (CI verte)
+- 2026-11-19 12:01:05 UTC — [ticket-1014] branche ticket-1014-the-agent-profile-wipe-cannot-be-bypassed-and-fa
+- 2026-11-19 12:01:08 UTC — [ticket-1014] tour 1 — codeur démarré
+- 2026-11-19 12:05:36 UTC — [ticket-1014] tour 1 — codeur terminé (267640ms)
+- 2026-11-19 12:08:22 UTC — [ticket-1014] testeur: 1 failed, 1767 passed, 3 skipped, 113 warnings in 123.81s (0:02:03) — fichiers en échec : tests/test_agent_setup_scripts.py
+- 2026-11-19 12:08:22 UTC — [ticket-1014] tests rouges au tour 1
+- 2026-11-19 12:08:22 UTC — [ticket-1014] tour 2 — codeur démarré
+- 2026-11-19 12:08:46 UTC — [ticket-1014] tour 2 — codeur terminé (23890ms)
+- 2026-11-19 12:17:12 UTC — [ticket-1014] testeur: 1 failed, 5087 passed, 3 skipped, 113 warnings in 462.42s (0:07:42) — fichiers en échec : tests/test_ruff_propre.py
+- 2026-11-19 12:17:12 UTC — [ticket-1014] tests rouges au tour 2
+- 2026-11-19 12:17:13 UTC — [ticket-1014] tour 3 — codeur démarré
+- 2026-11-19 12:17:53 UTC — [ticket-1014] tour 3 — codeur terminé (39811ms)
+- 2026-11-19 12:27:35 UTC — [ticket-1014] testeur: dur�es : ruff 0 s, mypy 13 s, mypy-linux 18 s, pytest 543 s ; impact depuis base : suite compl�te
+- 2026-11-19 12:28:08 UTC — [ticket-1014] securite: PASS — PASS : rien de CRITICAL ni de HIGH introduit. Le diff durcit le nettoyage du pro (32140ms)
+- 2026-11-19 12:28:08 UTC — [ticket-1014] tour 3 — reviewer démarré
+- 2026-11-19 12:28:44 UTC — [ticket-1014] tour 3 — reviewer terminé (35859ms)
+- 2026-11-19 12:29:00 UTC — [ticket-1014] validateur: APPROVED — All five acceptance criteria are satisfied. The implementation properly hardens  (51218ms)
+- 2026-11-19 12:29:00 UTC — [ticket-1014] APPROVED après 3 tour(s)
+- 2026-11-19 12:31:06 UTC — [ticket-1014] leçons: une leçon proposée
+- 2026-11-19 12:33:11 UTC — [ticket-1014] documentation: 1 fichier(s) (101625ms)
+- 2026-11-19 12:33:11 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-19 12:33:11 UTC — documentation trop longue, titres seuls : docs/inspirations.md (2532 caractères)
+- 2026-11-19 12:33:11 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-19 12:33:49 UTC — [ticket-1014] livraison: rebase sur develop (609ms)
+- 2026-11-19 12:33:49 UTC — [ticket-1014] livraison: PR #1190 ouverte (5563ms)
+- 2026-11-19 12:33:49 UTC — [ticket-1014] livraison: arrêt — PR ouverte, merge après preuve réelle
+- 2026-11-19 12:45:13 UTC — [ticket-1017] branche ticket-1017-a-cancelled-closure-still-withdraws-the-right-an
+- 2026-11-19 12:45:16 UTC — [ticket-1017] tour 1 — codeur démarré
+- 2026-11-19 12:47:34 UTC — [ticket-1017] tour 1 — codeur terminé (137656ms)
+- 2026-11-19 12:48:47 UTC — [ticket-1017] testeur: dur�es : ruff 0 s, mypy 8 s, mypy-linux 8 s, pytest 30 s ; impact depuis base : 45 fichier(s) de test
+- 2026-11-19 12:49:05 UTC — [ticket-1017] securite: PASS — Le diff ferme une fuite de droit d'écriture : un appel annulé pendant la pose du (17250ms)
+- 2026-11-19 12:49:05 UTC — [ticket-1017] tour 1 — reviewer démarré
+- 2026-11-19 12:49:36 UTC — [ticket-1017] tour 1 — reviewer terminé (30936ms)
+- 2026-11-19 12:49:40 UTC — [ticket-1017] validateur: APPROVED — Les trois critères sont satisfaits. Le code ajoute la protection par `asyncio.sh (35219ms)
+- 2026-11-19 12:49:41 UTC — [ticket-1017] APPROVED après 1 tour(s)
+- 2026-11-19 12:52:10 UTC — [ticket-1017] documentation: 0 fichier(s) (126296ms) — après tour de correction — refusé : doc-technique : README.md : règle « preuve » — la ligne « Le backend Tessera écoute sur le port **8100**, jamais sur 8000 : ce dernier est le port par défaut d'
+- 2026-11-19 12:52:10 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-19 12:52:10 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-19 12:52:10 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-19 12:58:17 UTC — [ide-core] ticket-1017 PR #1191 mergée (CI verte)
+- 2026-11-19 12:59:59 UTC — [ticket-1016] branche ticket-1016-decide-how-to-close-what-the-agent-account-can-s
+- 2026-11-19 13:00:02 UTC — [ticket-1016] tour 1 — codeur démarré
+- 2026-11-19 13:01:38 UTC — [ticket-1016] tour 1 — architect terminé (95437ms)
+- 2026-11-19 13:02:31 UTC — [ticket-1016] testeur: 2 failed, 26 passed, 1 warning in 12.80s — fichiers en échec : tests/test_consignes_coherentes.py
+- 2026-11-19 13:02:31 UTC — [ticket-1016] tests rouges au tour 1
+- 2026-11-19 13:02:31 UTC — [ticket-1016] tour 2 — codeur démarré
+- 2026-11-19 13:03:05 UTC — [ticket-1016] tour 2 — architect terminé (33766ms)
+- 2026-11-19 13:03:58 UTC — [ticket-1016] testeur: OK (exit 0)
+- 2026-11-19 13:04:04 UTC — [ticket-1016] securite: PASS — Ce diff ne touche que de la documentation. Il ajoute l'ADR-088 dans `decisions.m (5844ms)
+- 2026-11-19 13:04:05 UTC — [ticket-1016] tour 2 — reviewer démarré
+- 2026-11-19 13:04:28 UTC — [ticket-1016] tour 2 — reviewer terminé (22530ms)
+- 2026-11-19 13:05:44 UTC — [ticket-1016] validateur: fichiers cités joints : memory/decisions.md (tronqué) ; non joints (budget épuisé) : tickets/todo/
+- 2026-11-19 13:05:44 UTC — [ticket-1016] validateur: APPROVED — ADR-088 successfully addresses all three architectural decision points (processe (99280ms)
+- 2026-11-19 13:05:46 UTC — [ticket-1016] APPROVED après 2 tour(s)
+- 2026-11-19 13:07:32 UTC — [ticket-1016] leçons: une leçon proposée
+- 2026-11-19 13:07:58 UTC — [ticket-1016] fichiers non suivis laissés par le run : tickets/todo/ticket-1018-a-new-unreadable-process-during-a-call-blocks-the-run.md, tickets/todo/ticket-1019-the-uv-cache-is-copied-and-read-only-for-the-agent-account.md, tickets/todo/ticket-1020-files-of-the-agent-account-in-shared-folders-are-purged.md, tickets/todo/ticket-1021-a-protected-file-created-in-a-subfolder-refuses-the-run.md (à ignorer dans .gitignore ?)
+- 2026-11-19 13:09:30 UTC — [ticket-1016] documentation: 0 fichier(s) (91750ms)
+- 2026-11-19 13:09:30 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-19 13:09:30 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-19 13:09:30 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-19 13:15:48 UTC — [ide-core] ticket-1016 PR #1192 reprise par le CIWatcher après redémarrage
+- 2026-11-19 13:15:56 UTC — [ide-core] ticket-1016 PR #1192 mergée (CI verte)
+- 2026-11-19 13:26:10 UTC — [ticket-1021] branche ticket-1021-a-protected-file-created-in-a-subfolder-refuses
+- 2026-11-19 13:26:14 UTC — [ticket-1021] tour 1 — codeur démarré
+- 2026-11-19 13:27:49 UTC — [ticket-1021] tour 1 — codeur terminé (95000ms)
+- 2026-11-19 13:31:03 UTC — [ticket-1021] testeur: dur�es : ruff 0 s, mypy 12 s, mypy-linux 12 s, pytest 153 s ; impact depuis base : 53 fichier(s) de test
+- 2026-11-19 13:31:22 UTC — [ticket-1021] securite: PASS — PASS : le diff renforce une porte existante. Les fichiers protégés créés dans un (18093ms)
+- 2026-11-19 13:31:23 UTC — [ticket-1021] tour 1 — reviewer démarré
+- 2026-11-19 13:31:54 UTC — [ticket-1021] validateur: fichiers cités joints : CLAUDE.md ; absents : sous/dossier/, .mcp.json
+- 2026-11-19 13:31:54 UTC — [ticket-1021] validateur: APPROVED — La mise en œuvre ajoute la détection des fichiers protégés créés en sous-dossier (31514ms)
+- 2026-11-19 13:31:56 UTC — [ticket-1021] tour 1 — reviewer terminé (32764ms)
+- 2026-11-19 13:31:56 UTC — [ticket-1021] APPROVED après 1 tour(s)
+- 2026-11-19 13:35:30 UTC — [ticket-1021] documentation: 0 fichier(s) (189733ms) — après tour de correction
+- 2026-11-19 13:35:30 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-19 13:35:30 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-19 13:35:30 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-19 13:41:22 UTC — [ticket-1019] branche ticket-1019-the-uv-cache-is-copied-and-read-only-for-the-age
+- 2026-11-19 13:41:23 UTC — [ticket-1019] fiche relue après l'avance de la base (290e7573c54a04859f721d5157e2d65d1f44b5c5 → 9506f3c7aad61b50c7c35f1465baa7da29ee81ba)
+- 2026-11-19 13:41:26 UTC — [ticket-1019] tour 1 — codeur démarré
+- 2026-11-19 13:42:34 UTC — [ticket-1019] tour 1 — codeur terminé (68219ms)
+- 2026-11-19 13:45:29 UTC — [ticket-1019] testeur: dur�es : ruff 0 s, mypy 15 s, mypy-linux 15 s, pytest 137 s ; impact depuis base : 136 fichier(s) de test
+- 2026-11-19 13:45:41 UTC — [ticket-1019] securite: PASS — Le diff durcit l'isolation du compte agent. Le cache uv n'est plus gardé : il pa (11670ms)
+- 2026-11-19 13:45:42 UTC — [ticket-1019] tour 1 — reviewer démarré
+- 2026-11-19 13:45:58 UTC — [ticket-1019] tour 1 — reviewer terminé (16640ms)
+- 2026-11-19 13:46:13 UTC — [ticket-1019] validateur: fichiers cités joints : profil_agent.py ; absents : uv/cache/, npm-cache/
+- 2026-11-19 13:46:13 UTC — [ticket-1019] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Les trois tests attendus ont ét (31250ms)
+- 2026-11-19 13:46:13 UTC — [ticket-1019] APPROVED après 1 tour(s)
+- 2026-11-19 13:48:23 UTC — [ticket-1019] documentation: 0 fichier(s) (108327ms) — après tour de correction
+- 2026-11-19 13:48:23 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-19 13:48:23 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-19 13:48:23 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-19 13:50:58 UTC — [ticket-1019] livraison: rebase sur develop (860ms)
+- 2026-11-19 13:50:58 UTC — [ticket-1019] livraison: tests relancés après rebase : verts (dur�es : ruff 0 s, mypy 11 s, mypy-linux 11 s, pytest 120 s ; impact depuis base : 136 fichier(s) de test) (120937ms)
+- 2026-11-19 13:50:58 UTC — [ticket-1019] livraison: PR #1197 ouverte (5297ms)
+- 2026-11-19 13:50:58 UTC — [ticket-1019] livraison: arrêt — PR ouverte, merge après preuve réelle
+- 2026-11-19 14:13:29 UTC — [ide-core] ticket-1022 PR #1199 non surveillée (livraison arrêtée)
+- 2026-11-19 14:13:39 UTC — [ticket-1018] branche ticket-1018-scheduled-tasks-of-the-agent-account-are-removed
+- 2026-11-19 14:13:43 UTC — [ticket-1018] tour 1 — codeur démarré
+- 2026-11-19 14:15:50 UTC — [ticket-1018] tour 1 — codeur terminé (126359ms)
+- 2026-11-19 14:20:11 UTC — [ticket-1018] testeur: dur�es : ruff 0 s, mypy 22 s, mypy-linux 23 s, pytest 210 s ; impact depuis base : 109 fichier(s) de test
+- 2026-11-19 14:20:44 UTC — [ticket-1018] securite: PASS — PASS : rien de CRITICAL ni de HIGH n'est introduit. Les noms de tâches viennent  (32342ms)
+- 2026-11-19 14:20:45 UTC — [ticket-1018] tour 1 — reviewer démarré
+- 2026-11-19 14:21:12 UTC — [ticket-1018] validateur: APPROVED — Le diff implémente complètement le module `taches_compte.py` avec `retirer_les_t (26563ms)
+- 2026-11-19 14:21:26 UTC — [ticket-1018] tour 1 — reviewer terminé (40546ms)
+- 2026-11-19 14:21:26 UTC — [ticket-1018] CHANGES_REQUESTED tour 1: Reviewer : 1. `retirer_les_taches` passe par `lancer_sous_compte`, qui lève `EchecLancementCompte` quand le mot de passe manque ou que le lanceur est indisponible (`ProviderIndisponible` emballé). Or 
+- 2026-11-19 14:21:26 UTC — [ticket-1018] tour 2 — codeur démarré
+- 2026-11-19 14:22:54 UTC — [ticket-1018] tour 2 — codeur terminé (86969ms)
+- 2026-11-19 14:27:14 UTC — [ticket-1018] testeur: dur�es : ruff 0 s, mypy 21 s, mypy-linux 21 s, pytest 207 s ; impact depuis base : 109 fichier(s) de test
+- 2026-11-19 14:27:40 UTC — [ticket-1018] securite: PASS — Le diff ajoute la suppression des tâches planifiées du compte agent. Les command (25594ms)
+- 2026-11-19 14:27:41 UTC — [ticket-1018] tour 2 — reviewer démarré
+- 2026-11-19 14:28:12 UTC — [ticket-1018] tour 2 — reviewer terminé (30922ms)
+- 2026-11-19 14:28:13 UTC — [ticket-1018] validateur: APPROVED — Les quatre critères d'acceptation sont satisfaits. L'implémentation de `taches_c (31359ms)
+- 2026-11-19 14:28:13 UTC — [ticket-1018] CHANGES_REQUESTED tour 2: Reviewer : 1. Dans `_clore_sous_verrou`, `retirer_les_taches()` est appelé en tête du même bloc `try` que `arreter_les_restants` et `reinitialiser_profil`. Si la liste ou une suppression de tâche lève
+- 2026-11-19 14:28:13 UTC — [ticket-1018] tour 3 — codeur démarré
+- 2026-11-19 14:30:16 UTC — [ticket-1018] tour 3 — codeur terminé (122578ms)
+- 2026-11-19 14:34:40 UTC — [ticket-1018] testeur: dur�es : ruff 0 s, mypy 22 s, mypy-linux 22 s, pytest 209 s ; impact depuis base : 109 fichier(s) de test
+- 2026-11-19 14:35:22 UTC — [ticket-1018] securite: PASS — Aucune faille CRITICAL ou HIGH introduite, donc PASS. Les commandes schtasks par (40829ms)
+- 2026-11-19 14:35:23 UTC — [ticket-1018] tour 3 — reviewer démarré
+- 2026-11-19 14:35:49 UTC — [ticket-1018] tour 3 — reviewer terminé (25969ms)
+- 2026-11-19 14:36:12 UTC — [ticket-1018] validateur: APPROVED — Les quatre critères sont satisfaits. Le nouveau module `taches_compte.py` implém (49469ms)
+- 2026-11-19 14:36:13 UTC — [ticket-1018] APPROVED après 3 tour(s)
+- 2026-11-19 14:37:34 UTC — [ticket-1018] leçons: refusée — preuve absente du retour du run
+- 2026-11-19 14:39:56 UTC — [ticket-1018] documentation: 0 fichier(s) (113889ms)
+- 2026-11-19 14:39:56 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-19 14:39:56 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-19 14:39:56 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-19 14:40:45 UTC — [ticket-1018] livraison: rebase sur develop (1016ms)
+- 2026-11-19 14:40:45 UTC — [ticket-1018] livraison: PR #1200 ouverte (7328ms)
+- 2026-11-19 14:40:45 UTC — [ticket-1018] livraison: arrêt — PR ouverte, merge après preuve réelle
+- 2026-11-19 13:41:27 UTC — [ide-core] ticket-1021 PR #1195 mergée (CI verte)
+- 2026-11-19 13:52:41 UTC — [ticket-1022] branche ticket-1022-a-test-command-opens-one-call-for-all-its-steps
+- 2026-11-19 13:52:45 UTC — [ticket-1022] tour 1 — codeur démarré
+- 2026-11-19 13:54:58 UTC — [ticket-1022] tour 1 — codeur terminé (133046ms)
+- 2026-11-19 13:57:46 UTC — [ticket-1022] testeur: 2 failed, 496 passed, 120 warnings in 125.98s (0:02:05) — fichiers en échec : tests/test_preparation_compte.py, tests/test_longueur_des_fichiers.py
+- 2026-11-19 13:57:47 UTC — [ticket-1022] tests rouges au tour 1
+- 2026-11-19 13:57:47 UTC — [ticket-1022] tour 2 — codeur démarré
+- 2026-11-19 13:59:18 UTC — [ticket-1022] tour 2 — codeur terminé (90562ms)
+- 2026-11-19 14:03:11 UTC — [ticket-1022] testeur: dur�es : ruff 0 s, mypy 9 s, mypy-linux 9 s, pytest 194 s ; impact depuis base : 87 fichier(s) de test
+- 2026-11-19 14:03:25 UTC — [ticket-1022] securite: PASS — Le diff regroupe les étapes d'une commande de test dans un seul appel englobant  (14264ms)
+- 2026-11-19 14:03:26 UTC — [ticket-1022] tour 2 — reviewer démarré
+- 2026-11-19 14:03:45 UTC — [ticket-1022] tour 2 — reviewer terminé (19327ms)
+- 2026-11-19 14:04:00 UTC — [ticket-1022] validateur: APPROVED — Les trois critères sont satisfaits. Le code refactorise `run_tests` pour ouvrir  (34030ms)
+- 2026-11-19 14:04:00 UTC — [ticket-1022] APPROVED après 2 tour(s)
+- 2026-11-19 14:06:27 UTC — [ticket-1022] leçons: une leçon proposée
+- 2026-11-19 14:07:51 UTC — [ticket-1022] documentation: 0 fichier(s) (60265ms)
+- 2026-11-19 14:07:51 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-19 14:07:51 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-19 14:07:51 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-19 14:13:27 UTC — [ticket-1022] livraison: rebase sur develop (1828ms)
+- 2026-11-19 14:13:27 UTC — [ticket-1022] livraison: tests relancés après rebase : verts (dur�es : ruff 0 s, mypy 17 s, mypy-linux 21 s, pytest 294 s ; impact depuis base : 87 fichier(s) de test) (295375ms)
+- 2026-11-19 14:13:27 UTC — [ticket-1022] livraison: PR #1199 ouverte (6109ms)
+- 2026-11-19 14:13:27 UTC — [ticket-1022] livraison: arrêt — PR ouverte, merge après preuve réelle
+- 2026-11-19 14:40:48 UTC — [ide-core] ticket-1018 PR #1200 non surveillée (livraison arrêtée)
+- 2026-11-19 15:08:08 UTC — [ticket-944] branche ticket-944-design-the-agent-account-runs-on-its-own-window-s
+- 2026-11-19 15:08:13 UTC — [ticket-944] tour 1 — codeur démarré
+- 2026-11-19 15:10:36 UTC — [ticket-944] tour 1 — architect terminé (143077ms)
+- 2026-11-19 15:11:51 UTC — [ticket-944] testeur: OK (exit 0)
+- 2026-11-19 15:12:00 UTC — [ticket-944] securite: PASS — Le diff ne touche que de la documentation : il ajoute une règle sous `## Proposé (7905ms)
+- 2026-11-19 15:12:01 UTC — [ticket-944] tour 1 — reviewer démarré
+- 2026-11-19 15:12:42 UTC — [ticket-944] tour 1 — reviewer terminé (41000ms)
+- 2026-11-19 15:13:03 UTC — [ticket-944] validateur: fichiers cités joints : memory/decisions.md (tronqué) ; non joints (budget épuisé) : tickets/todo/
+- 2026-11-19 15:13:03 UTC — [ticket-944] validateur: CHANGES_REQUESTED — Le ticket de conception a rempli son rôle : il a choisi la piste (window station (62203ms)
+- 2026-11-19 15:13:04 UTC — [ticket-944] CHANGES_REQUESTED tour 1: Validateur : Le ticket de conception a rempli son rôle : il a choisi la piste (window station + bureau dédiés en défense en profondeur), écrit l'ADR-089 correspondante avec ses limites bien énoncées, 
+- 2026-11-19 15:13:04 UTC — [ticket-944] tour 2 — codeur démarré
+- 2026-11-19 15:13:14 UTC — [ticket-944] tour 2 — architect terminé (10015ms)
+- 2026-11-19 15:14:32 UTC — [ticket-944] testeur: OK (exit 0)
+- 2026-11-19 15:14:41 UTC — [ticket-944] securite: PASS — Le diff ne touche que de la documentation : une ADR-089 ajoutée à decisions.md e (8015ms)
+- 2026-11-19 15:14:42 UTC — [ticket-944] tour 2 — reviewer démarré
+- 2026-11-19 15:15:07 UTC — [ticket-944] tour 2 — reviewer terminé (24952ms)
+- 2026-11-19 15:15:17 UTC — [ticket-944] validateur: fichiers cités joints : memory/decisions.md (tronqué) ; non joints (budget épuisé) : tickets/todo/
+- 2026-11-19 15:15:17 UTC — [ticket-944] validateur: CHANGES_REQUESTED — Le ticket de conception a rempli son rôle : il a tranché entre les trois pistes  (35295ms)
+- 2026-11-19 15:15:17 UTC — [ticket-944] CHANGES_REQUESTED tour 2: Validateur : Le ticket de conception a rempli son rôle : il a tranché entre les trois pistes (window station + bureau dédiés), écrit l'ADR-089 correspondante avec ses limites explicitées, et créé deux
+- 2026-11-19 15:15:17 UTC — [ticket-944] tour 3 — codeur démarré
+- 2026-11-19 15:15:26 UTC — [ticket-944] tour 3 — architect terminé (7547ms)
+- 2026-11-19 15:16:41 UTC — [ticket-944] testeur: OK (exit 0)
+- 2026-11-19 15:16:51 UTC — [ticket-944] securite: PASS — PASS : le diff ne change que de la documentation. Il ajoute une règle sous « Pro (9094ms)
+- 2026-11-19 15:16:52 UTC — [ticket-944] tour 3 — reviewer démarré
+- 2026-11-19 15:17:14 UTC — [ticket-944] tour 3 — reviewer terminé (22015ms)
+- 2026-11-19 15:17:25 UTC — [ticket-944] validateur: fichiers cités joints : memory/decisions.md (tronqué) ; non joints (budget épuisé) : tickets/todo/
+- 2026-11-19 15:17:25 UTC — [ticket-944] validateur: CHANGES_REQUESTED — Le ticket de conception a rempli son rôle : ADR-089 choisit la piste (station +  (32860ms)
+- 2026-11-19 15:17:25 UTC — [ticket-944] CHANGES_REQUESTED tour 3: Validateur : Le ticket de conception a rempli son rôle : ADR-089 choisit la piste (station + bureau dédiés en défense en profondeur) et énonce ses limites. Les deux tickets d'implémentation qui en déc
+- 2026-11-19 15:17:26 UTC — [ticket-944] BLOCKED après 3 tour(s) sans approbation
+- 2026-11-19 15:17:58 UTC — [ticket-944] fichiers non suivis laissés par le run : tickets/todo/ticket-1023-the-agent-account-launches-on-a-dedicated-window-station.md, tickets/todo/ticket-1024-the-agent-call-job-limits-the-user-interface.md (à ignorer dans .gitignore ?)
+- 2026-11-19 15:46:00 UTC — [ticket-1026] branche ticket-1026-the-tickets-a-design-run-writes-are-committed-wi
+- 2026-11-19 15:46:05 UTC — [ticket-1026] tour 1 — codeur démarré
+- 2026-11-19 15:48:39 UTC — [ticket-1026] tour 1 — codeur terminé (153905ms)
+- 2026-11-19 15:51:04 UTC — [ticket-1026] testeur: dur�es : ruff 0 s, mypy 34 s, mypy-linux 42 s, pytest 85 s ; impact depuis base : 9 fichier(s) de test
+- 2026-11-19 15:51:28 UTC — [ticket-1026] securite: PASS — Verdict PASS : le diff fait commiter et afficher dans le diff de revue les fiche (22750ms)
+- 2026-11-19 15:51:31 UTC — [ticket-1026] tour 1 — reviewer démarré
+- 2026-11-19 15:51:58 UTC — [ticket-1026] validateur: fichiers cités joints : tickets/todo/ (dossier, 5 fichiers) ; absents : tickets/todo/ticket-900-x.md
+- 2026-11-19 15:51:58 UTC — [ticket-1026] validateur: APPROVED — Les trois critères testent l'intégration de fiches créées sous `tickets/todo/` d (28062ms)
+- 2026-11-19 15:52:11 UTC — [ticket-1026] tour 1 — reviewer terminé (39859ms)
+- 2026-11-19 15:52:12 UTC — [ticket-1026] APPROVED après 1 tour(s)
+- 2026-11-19 15:54:41 UTC — [ticket-1026] documentation: 0 fichier(s) (113670ms)
+- 2026-11-19 15:54:41 UTC — [ticket-944] documentation: pas de diff retrouvable, non documenté
+- 2026-11-19 15:54:41 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-19 15:54:41 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-19 15:54:41 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)

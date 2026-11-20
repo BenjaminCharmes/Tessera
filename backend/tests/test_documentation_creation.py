@@ -9,8 +9,8 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services.documentation import EditionRefusee, ResultatDocumentation
-from tessera.services.documentation_editions import appliquer_editions
+from tessera.services.documentation.documentation import EditionRefusee, ResultatDocumentation
+from tessera.services.documentation.documentation_editions import appliquer_editions
 from tests.test_documentation_apres_run import _runner
 from tests.test_orchestrator import _FakeGit, _make_orchestrator, _noop
 

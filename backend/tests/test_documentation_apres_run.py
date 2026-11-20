@@ -11,17 +11,10 @@ from unittest.mock import AsyncMock, MagicMock
 
 from tessera.models.agent import AgentResult, AgentRole
 from tessera.models.ticket import TicketStatus
-from tessera.services.documentation import DocumentationService, ResultatDocumentation
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.documentation.documentation import DocumentationService, ResultatDocumentation
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 from tests.matiere_factice import matiere_factice
-from tests.test_orchestrator import (
-    _FakeGit,
-    _make_agent_result,
-    _make_orchestrator,
-    _make_ticket,
-    _make_ticket_service_for,
-    _noop,
-)
+from tests.test_orchestrator import _FakeGit, _make_agent_result, _make_orchestrator, _make_ticket, _make_ticket_service_for, _noop
 from tests.test_providers_base import FakeProvider
 
 
@@ -174,7 +167,7 @@ async def test_integration_quinze_tickets_tronque_event(tmp_path: Path) -> None:
     Vérifie le chemin complet : DocumentationService tronque à _PLAFOND,
     et l'orchestrateur émet l'événement même sans fichier doc modifié.
     """
-    from tessera.services.documentation import DocumentationService, _PLAFOND
+    from tessera.services.documentation.documentation import _PLAFOND, DocumentationService
 
     project_path, prompts = _init_projet(tmp_path, _PLAFOND + 5)  # 15 tickets
     _avec_marqueur_vide(project_path)
@@ -224,9 +217,25 @@ async def test_integration_tickets_sans_diff_listes_dans_l_evenement_et_le_journ
     assert len(doc_events) == 1
     assert doc_events[0].data["ecartes"] == ["ticket-002"]
     assert doc_events[0].data["tickets"] == ["ticket-001", "ticket-003"]
-    journal = [l for l in lignes if "pas de diff retrouvable, non documenté" in l]
+    journal = [ln for ln in lignes if "pas de diff retrouvable, non documenté" in ln]
     assert len(journal) == 1
     assert "ticket-002" in journal[0]
+
+
+async def test_un_fichier_reduit_a_ses_titres_est_ecrit_dans_le_journal(tmp_path: Path) -> None:
+    orc = _make_orchestrator(tmp_path, runner=_runner(), git_workspace=_FakeGit())
+    orc._documenter = AsyncMock(
+        return_value=ResultatDocumentation(
+            [], [], ["ticket-001"], reduits=["docs/x.md (250000 caractères)"]
+        )
+    )
+    lignes: list[str] = []
+    orc._log = lignes.append  # type: ignore[method-assign]
+
+    await orc.run_pipeline("proj", "ticket-001", _noop)
+
+    journal = [ln for ln in lignes if "documentation trop longue, titres seuls" in ln]
+    assert journal == ["documentation trop longue, titres seuls : docs/x.md (250000 caractères)"]
 
 
 async def test_integration_provider_qui_leve_emet_documentation_failed(tmp_path: Path) -> None:
@@ -235,7 +244,7 @@ async def test_integration_provider_qui_leve_emet_documentation_failed(tmp_path:
     Vérifie que l'exception levée par provider.complete() remonte hors du
     service, est attrapée par documenter_le_run, et produit l'événement attendu.
     """
-    from tessera.services.documentation import DocumentationService
+    from tessera.services.documentation.documentation import DocumentationService
     from tessera.services.providers.base import ProviderResult
 
     class _RaisingProvider:

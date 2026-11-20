@@ -7,26 +7,26 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from tessera.config import settings
-from tessera.services.ticket_diff import TicketDiff, diff_du_ticket
 from tessera.models.ticket import Ticket, TicketBatchCreate, TicketBatchResponse, TicketCreate, TicketListResponse, TicketStatus, TicketStatusUpdate
-from tessera.services.github_service import CiStatus, GitHubService, PRStatus
-from tessera.services.autonomie import lire_niveau
-from tessera.services.database_runs import list_runs, list_runs_for_ticket
-from tessera.services.pr_status_cache import get_cached_status
-from tessera.services.event_hub import EVENT_HUB
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
+from tessera.routers.dependencies import require_github_service, require_valid_project_id
+from tessera.routers.merge_http import merge_ou_502
+from tessera.services.gardes.politique_run import PolitiqueRun
+from tessera.services.git_workspace import GitWorkspaceError, GitWorkspaceService
+from tessera.services.git_workspace.ticket_diff import TicketDiff, diff_du_ticket
+from tessera.services.github.github_service import CiStatus, GitHubService, PRStatus
+from tessera.services.github.github_workflow import GitHubWorkflowService, WorkflowError
+from tessera.services.github.sync_map import SyncMapService
+from tessera.services.livraison.pr_status_cache import get_cached_status
+from tessera.services.noyau.database_runs import list_runs, list_runs_for_ticket
+from tessera.services.noyau.event_hub import EVENT_HUB
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.projets.autonomie import lire_niveau
+from tessera.services.projets.project_loader import ProjectLoader, load_project
+from tessera.services.projets.ticket_check import Probleme, verifier_tickets
+from tessera.services.projets.ticket_service import TicketService
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
-from tessera.services.git_workspace import GitWorkspaceError, GitWorkspaceService
-from tessera.services.github_workflow import GitHubWorkflowService, WorkflowError
-from tessera.services.politique_run import PolitiqueRun
-from tessera.routers.dependencies import require_github_service, require_valid_project_id
-from tessera.services.project_loader import load_project
-from tessera.services.project_loader import ProjectLoader
-from tessera.services.sync_map import SyncMapService
-from tessera.services.ticket_check import Probleme, verifier_tickets
-from tessera.services.ticket_service import TicketService
 
 router = APIRouter(
     tags=["tickets"],
@@ -284,7 +284,7 @@ async def get_all_pr_statuses_endpoint(project_id: str) -> AllPrStatusesResponse
     Tickets without a pr_number and PR numbers absent from the repository are
     both silently omitted (status 200 with a shorter list).
     """
-    from tessera.services.pr_statuses import get_all_pr_statuses
+    from tessera.services.livraison.pr_statuses import get_all_pr_statuses
 
     loader = ProjectLoader(settings.ide_workspace_dir)
     try:
@@ -521,8 +521,7 @@ async def merge_pull_request_for_ticket(
         raise HTTPException(status_code=404, detail=f"Ticket {ticket_id} introuvable")
     if ticket.pr_number is None:
         raise HTTPException(
-            status_code=422, detail="Ce ticket n'a pas de pull request ouverte."
-        )
+            422, "Ce ticket n'a pas de pull request ouverte.")
 
     project_path = settings.ide_workspace_dir / project_id
     project = load_project(project_path)
@@ -537,7 +536,7 @@ async def merge_pull_request_for_ticket(
         project_path=project_path,
     )
 
-    merge = await service.merge_si_la_ci_est_verte(ticket.pr_number)
+    merge = await merge_ou_502(service, ticket.pr_number)
     if not merge:
         raise HTTPException(
             status_code=422,

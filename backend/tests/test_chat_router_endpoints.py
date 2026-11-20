@@ -12,9 +12,9 @@ from fastapi.testclient import TestClient
 
 from tessera.config import settings
 from tessera.main import app
-from tessera.services.chat_service import ChatBudgetExceeded, ChatReply
-from tessera.services.database import init_db
-from tessera.services.database_chat import list_chat_messages
+from tessera.services.agents.chat_service import ChatBudgetExceeded, ChatReply
+from tessera.services.noyau.database import init_db
+from tessera.services.noyau.database_chat import list_chat_messages
 
 
 @pytest.fixture(autouse=True)
@@ -219,7 +219,7 @@ async def test_le_contexte_du_chat_ne_garde_que_les_adr_qui_le_concernent(
     workspace: Path,
 ) -> None:
     # Le chat titrait sa section « Décisions d'architecture », que
-    # `services/adr.py` ne reconnaît pas : il recevait le fichier entier,
+    # `services/projets/adr.py` ne reconnaît pas : il recevait le fichier entier,
     # choix de stack compris, quand chaque agent du pipeline est filtré.
     from tessera.routers.chat import _build_context
 
@@ -292,7 +292,7 @@ def test_le_lancement_transmet_la_discussion_au_codeur(
     # de la conversation est perdu.
     import asyncio
 
-    from tessera.services.database_chat import save_chat_message
+    from tessera.services.noyau.database_chat import save_chat_message
 
     asyncio.run(
         save_chat_message(
@@ -310,7 +310,7 @@ def test_le_lancement_transmet_la_discussion_au_codeur(
             captured["context"] = self._project_context
             captured["ticket_id"] = ticket_id
             from tessera.models.ticket import TicketStatus
-            from tessera.services.pipeline_events import PipelineResult
+            from tessera.services.noyau.pipeline_events import PipelineResult
 
             return PipelineResult(
                 ticket_id=ticket_id,
@@ -339,7 +339,7 @@ def test_un_lancement_concurrent_est_refuse_avec_409(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     # Deux pipelines sur le même dépôt violeraient l'isolation par branche.
-    from tessera.services.run_registry import RUN_REGISTRY, RunActif
+    from tessera.services.pipeline.run_registry import RUN_REGISTRY, RunActif
 
     async def _build(project_id: str) -> object:
         raise AssertionError("ne doit pas être atteint")

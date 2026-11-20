@@ -1,50 +1,71 @@
-from pathlib import Path
+import asyncio
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette.requests import Request
 
+from tessera import reglages
 from tessera.auth import HostOriginMiddleware, StaticTokenMiddleware
 from tessera.config import settings
-from tessera.services.process_registry import PROCESS_REGISTRY
-from tessera.services.shell_detection import agent_shell_ok, resolve_git_bash, warn_if_shell_missing
+from tessera.config_coffre import source_effective
+from tessera.models.run_request import RunRequest
 from tessera.routers import (
     agent_admin,
     agents,
-    captures as captures_router,
     chat,
     fs,
     observation,
     orchestrator,
     projects,
-    provisioning as provisioning_router,
     runs,
-    services as services_router,
+    salle_tessera,
     services_activite,
     services_running,
     signalements,
+    supervision_recap,
     ticket_proposals,
     tickets,
     tickets_archive,
     usage,
-    salle_tessera,
 )
-from tessera.services.database import init_db
-from tessera.services.database_runs import solder_les_runs_orphelins
-from tessera.services.eveil import relacher as eveil_relacher
-from tessera.services.event_hub import EVENT_HUB
-from tessera.services.reprise_orphelin import reprendre_depots_orphelins
-from tessera.services.reprise_worktrees import reprendre_worktrees_orphelins
-from tessera.services.reprise_surveillance import reprendre_surveillances
-from tessera.services.surveillance_run import surveillance_de_reprise
-from tessera.services.signalements_en_attente import migrer_ancien_fichier
-from tessera.services.prompt_loader import MissingPromptError
+from tessera.routers import captures as captures_router
+from tessera.routers import provisioning as provisioning_router
+from tessera.routers import reglages as reglages_router
+from tessera.routers import rituels as rituels_router
+from tessera.routers import services as services_router
+from tessera.routers.services_reprise import reprendre_les_services
+from tessera.routers.services_running import get_sonde
+from tessera.services.livraison.reprise_surveillance import reprendre_surveillances
+from tessera.services.livraison.surveillance_run import surveillance_de_reprise
+from tessera.services.noyau import jeton_de_session
+from tessera.services.noyau.database import init_db
+from tessera.services.noyau.database_runs import solder_les_runs_orphelins
+from tessera.services.noyau.eveil import relacher as eveil_relacher
+from tessera.services.noyau.event_hub import EVENT_HUB
+from tessera.services.noyau.prompt_loader import MissingPromptError
+from tessera.services.noyau.shell_detection import agent_shell_ok, resolve_git_bash, warn_if_shell_missing
+from tessera.services.pipeline.reprise_orphelin import reprendre_depots_orphelins
+from tessera.services.pipeline.reprise_worktrees import reprendre_worktrees_orphelins
+from tessera.services.pipeline.run_registry import RUN_REGISTRY
+from tessera.services.pipeline.signalements_en_attente import migrer_ancien_fichier
+from tessera.services.providers.droits_worktree import DroitsAgentRefuses
+from tessera.services.providers.profil_agent import reinitialiser_profil
+from tessera.services.providers.taches_compte import retirer_les_taches
+from tessera.services.supervision.anomalies.detecteur import DetecteurDAnomalies, arreter_le_detecteur
+from tessera.services.supervision.superviseur_collecte_livraison import boucle_du_superviseur
+from tessera.services.verification.process_registry import PROCESS_REGISTRY
+from tessera.utils.access_log_redaction import install_token_redaction
 from tessera.utils.logger import configure_file_logging, get_logger, install_asyncio_exception_handler
 
 _logger = get_logger(__name__)
+
+# Le jeton d'une WebSocket voyage en query string : il ne doit pas finir dans
+# le journal d'accès d'uvicorn (ticket-758).
+install_token_redaction()
 
 # Résolution unique au démarrage : la variable d'environnement ne change pas
 # en cours d'exécution. Sous Windows, un bash.exe introuvable loge un
@@ -69,8 +90,31 @@ async def _reprendre_les_surveillances() -> None:
         _logger.exception("reprise_surveillances_echec")
 
 
+async def _rouvrir_une_file(project_id: str, ticket_ids: list[str]) -> str:
+    """Open a queue on the remaining tickets by the entry that starts one (ADR-041, ticket-867)."""
+    demarre = await orchestrator.run_pipeline(RunRequest(project_id=project_id, mode="queue", ticket_ids=ticket_ids))
+    return demarre.run_id
+
+
+async def _reinitialiser_le_profil_agent() -> None:
+    """Wipe the agent profile left by a stop (ticket-1008); a refusal is logged, the next call retries."""
+    if not settings.agent_user:
+        return
+    # Chaque étape tourne même si l'autre échoue ; les deux marquent leur échec.
+    try:
+        await retirer_les_taches()
+    except DroitsAgentRefuses:
+        _logger.exception("taches_agent_non_retirees")
+    try:
+        await reinitialiser_profil(settings.agent_user)
+    except DroitsAgentRefuses:
+        _logger.exception("profil_agent_non_nettoye")
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    # Avant toute requête : sans jeton, l'API refuse tout (ticket-878).
+    jeton_de_session.demarrer()
     # Le chemin peut venir de l'environnement : il reste sous backend/logs.
     configure_file_logging(
         settings.ide_log_file, racine=Path(__file__).resolve().parents[2] / "logs"
@@ -78,6 +122,8 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     install_asyncio_exception_handler()
     warn_if_shell_missing(_GIT_BASH_PATH)
     await init_db(settings.ide_db_path)
+    # Les surcharges de réglages passent en cache : la base est prête (ADR-075).
+    await reglages.charger(settings.ide_db_path)
     # La file des signalements a quitté le dépôt (ticket-430).
     migrer_ancien_fichier()
     # Les runs qu'un processus tué a laissés « en cours » (ticket-177).
@@ -92,10 +138,26 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     )
     # Les worktrees de run qu'un arrêt a laissés : commit, puis suppression (ticket-520).
     await reprendre_worktrees_orphelins(
-        settings.ide_workspace_dir, settings.ide_worktrees_dir
+        settings.ide_workspace_dir, settings.ide_worktrees_dir,
+        settings.ide_worktrees_dir_agent,
     )
+    await _reinitialiser_le_profil_agent()
     await _reprendre_les_surveillances()
+    # Les services que l'utilisateur avait lancés (ticket-890, ADR-082).
+    await reprendre_les_services(settings.ide_db_path, get_sonde(), PROCESS_REGISTRY)
+    # Le témoin des runs (ADR-078) : une tâche de fond, qui n'agit sur rien.
+    detecteur = (
+        asyncio.create_task(
+            DetecteurDAnomalies(RUN_REGISTRY, EVENT_HUB, settings.ide_db_path, settings).boucle()
+        )
+        if settings.anomalies_actives
+        else None
+    )
+    # Le superviseur (ADR-080) : ne démarre que si un projet déclare le rôle actif.
+    superviseur = asyncio.create_task(boucle_du_superviseur(rouvrir=_rouvrir_une_file).boucle())
     yield
+    await arreter_le_detecteur(superviseur)
+    await arreter_le_detecteur(detecteur)
     # Les services lancés pour un projet sont des enfants de ce process et
     # s'arrêtent avec lui (ADR-042). Les terminer explicitement rend l'arrêt
     # propre plutôt que brutal : l'alternative — les détacher — laisserait un
@@ -106,6 +168,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     # Filet de sécurité : relâche la demande de veille au cas où un run
     # n'aurait pas été fermé proprement avant l'arrêt (ticket-394).
     eveil_relacher()
+    jeton_de_session.arreter()
 
 
 app = FastAPI(title="Tessera", version="0.1.0", lifespan=lifespan)
@@ -133,9 +196,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Toujours installé : il lit `settings.static_token` à chaque requête et laisse
-# tout passer quand elle est vide. L'installer sous condition figeait le choix
-# au démarrage et rendait le comportement intestable (ticket-120).
+# Toujours installé : il lit le jeton de session à chaque requête, et refuse
+# tout sans lui, `STATIC_TOKEN` vide compris (ticket-878). L'installer sous
+# condition figeait le choix au démarrage (ticket-120).
 app.add_middleware(StaticTokenMiddleware)
 # Ajouté en dernier donc le plus externe : un `Host` ou un `Origin` étranger est
 # refusé avant tout le reste, token compris (ticket-704).
@@ -158,10 +221,19 @@ app.include_router(agent_admin.router, prefix="/api/v1")
 app.include_router(fs.router, prefix="/api/v1")
 app.include_router(usage.router, prefix="/api/v1")
 app.include_router(runs.router, prefix="/api/v1")
+app.include_router(reglages_router.router, prefix="/api/v1")
+app.include_router(rituels_router.router, prefix="/api/v1")
 app.include_router(signalements.router, prefix="/api/v1")
 app.include_router(salle_tessera.router, prefix="/api/v1")
+app.include_router(supervision_recap.router, prefix="/api/v1")
 
 
 @app.get("/health")
 async def health() -> dict[str, str | bool]:
-    return {"status": "ok", "version": "0.1.0", "agent_shell": _AGENT_SHELL_OK}
+    # `secrets` : d'où viennent les secrets (ADR-073), jamais un nom ni une valeur.
+    return {
+        "status": "ok",
+        "version": "0.1.0",
+        "agent_shell": _AGENT_SHELL_OK,
+        "secrets": source_effective(),
+    }

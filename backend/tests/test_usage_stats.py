@@ -8,8 +8,8 @@ from fastapi.testclient import TestClient
 
 from tessera.config import settings
 from tessera.main import app
-from tessera.services.database import init_db
-from tessera.services.usage_stats import usage_stats
+from tessera.services.noyau.database import init_db
+from tessera.services.usage.usage_stats import usage_stats
 
 TODAY = date(2026, 9, 28)
 
@@ -287,6 +287,7 @@ async def test_totals_run_count_excludes_queue_and_autonomous_rows(
     assert "s1" in ids
 
 
+@pytest.mark.perf
 async def test_usage_stats_responds_in_under_two_seconds_on_fifty_thousand_rows(
     tmp_path: Path,
 ) -> None:

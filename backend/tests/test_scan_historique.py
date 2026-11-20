@@ -38,3 +38,26 @@ def test_findings_name_locations_never_terms() -> None:
     SCAN.MOTIFS.append(SCAN.motif("zorglub"))  # type: ignore[attr-defined]
     SCAN.examiner("PR #1 corps", "built for Zorglub")  # type: ignore[attr-defined]
     assert list(SCAN.TROUVES) == ["PR #1 corps"]  # type: ignore[attr-defined]
+
+
+def test_scan_historique_reads_terms_through_the_resolver() -> None:
+    # ticket-798 : plus aucune lecture de `.env`, le backend résout la liste.
+    import subprocess
+
+    import pytest
+
+    appels: list[list[str]] = []
+
+    def lancer(cmd: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
+        appels.append(cmd)
+        return subprocess.CompletedProcess(cmd, 0, stdout="zorglub, bidule", stderr="")
+
+    assert SCAN.termes(lancer=lancer) == ["zorglub", "bidule"]  # type: ignore[attr-defined]
+    assert appels[0][-3:] == ["-m", "tessera.coffre_cli", "termes"]
+    assert "--project" in appels[0]
+
+    def en_echec(cmd: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
+        return subprocess.CompletedProcess(cmd, 2, stdout="", stderr="")
+
+    with pytest.raises(SystemExit):
+        SCAN.termes(lancer=en_echec)  # type: ignore[attr-defined]

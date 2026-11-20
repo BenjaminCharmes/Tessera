@@ -4,75 +4,8 @@ Ce fichier trace les décisions importantes et leur justification, dans
 l'ordre où elles ont été prises — pas par sujet. Un ADR **sans `Portée`** est
 une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 
----
-
-## ADR-001 — Self-hosting comme premier projet
-
-**Date** : 2025-06  
-**Portée** : architect  
-**Décision** : L'IDE se construit lui-même via le projet `ide-core`  
-**Raison** : Évite de maintenir deux systèmes séparés. L'IDE mange sa propre cuisine dès le départ, ce qui force à le rendre utilisable rapidement.  
-**Alternative rejetée** : Écrire l'IDE "à la main" puis le brancher après.
-
----
-
-## ADR-002 — Pas de framework agent externe
-
-**Date** : 2025-06  
-**Portée** : architect  
-**Décision** : On implémente notre propre agent loop (pas LangChain, CrewAI, etc.)  
-**Raison** : Ces frameworks changent d'API tous les 6 mois. On veut contrôler le protocole de communication entre agents (JSON-RPC), la gestion des tickets, et la mémoire.  
-**Alternative rejetée** : LangGraph (trop couplé à l'écosystème LangChain).
-
----
-
-## ADR-003 — Tickets comme fichiers Markdown
-
-**Date** : 2025-06  
-**Portée** : architect  
-**Décision** : Les tickets sont des fichiers `.md` avec frontmatter YAML, pas une DB  
-**Raison** : Lisibles sans l'IDE, versionnables avec git, diffables. La DB vient en couche de cache au-dessus, pas comme source de vérité.  
-**Alternative rejetée** : SQLite comme source de vérité pour les tickets.
-
----
-
-## ADR-004 — Tauri plutôt qu'Electron
-
-**Date** : 2025-06  
-**Portée** : architect  
-**Décision** : Shell desktop en Tauri v2  
-**Raison** : Bundle 10x plus léger, accès filesystem natif sécurisé, Rust pour les parties critiques. Microsoft lui-même cherche à sortir d'Electron sur VS Code.  
-**Alternative rejetée** : Electron (trop lourd), app web pure (pas d'accès filesystem).
-
----
-
-## ADR-005 — uv comme gestionnaire Python
-
-**Date** : 2025-06  
-**Portée** : architect  
-**Décision** : `uv` pour toute la gestion des dépendances Python  
-**Raison** : 10-100x plus rapide que pip, résolution de dépendances déterministe, remplace pip + venv + poetry en un seul outil.  
-**Alternative rejetée** : Poetry (lent), pip (pas de lock file natif).
-
----
-
-## ADR-006 — ProjectLoader filtre sur CLAUDE.md
-
-**Date** : 2026-06  
-**Portée** : architect, codeur, reviewer  
-**Décision** : `ProjectLoader.list_projects()` ne liste que les dossiers contenant un `CLAUDE.md`, tandis que `list_projects()` (module-level) liste tous les dossiers.  
-**Raison** : L'orchestrateur ne doit travailler que sur des projets structurés. La fonction module-level reste disponible comme utilitaire bas niveau pour les tests et scripts.  
-**Alternative rejetée** : Filtrer aussi dans la fonction module-level (casserait les tests existants sans apport réel).
-
----
-
-## ADR-007 — Modèle de projet : `name` parsé depuis le H1 du CLAUDE.md
-
-**Date** : 2026-06  
-**Portée** : architect, codeur, reviewer  
-**Décision** : Le champ `name` d'un `Project` est extrait de la première ligne `# Titre` du CLAUDE.md, avec fallback sur le nom du dossier.  
-**Raison** : Le nom du dossier est un identifiant technique (`ide-core`) ; le titre H1 est le nom lisible (`CLAUDE.md — projet ide-core`). Les deux coexistent.  
-**Alternative rejetée** : Utiliser uniquement le nom du dossier comme `name` (perd l'intention du CLAUDE.md).
+Une ADR qu'aucune règle de `contraintes.md` ni aucun `CLAUDE.md` ne cite part dans
+`decisions-archive.md`, son numéro inchangé (ticket-830).
 
 ---
 
@@ -133,26 +66,6 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 **Décision** : Vitest pour l'exécution + RTL pour les assertions composants.
 **Raison** : Vitest partage la config Vite (transforms, aliases, ESM) sans configuration séparée. RTL encourage les tests par comportement utilisateur, pas par implémentation.
 **Alternative rejetée** : Jest (configuration babel séparée, pas d'ESM natif, overhead de setup).
-
----
-
-## ADR-015 — CI : des jobs parallèles, et macOS seulement si Tauri change
-
-**Date** : 2026-06-20
-**Portée** : architect  
-**Décision** : cinq jobs — `detecter`, `backend` (ubuntu, pytest), `frontend` (ubuntu, tsc+vitest), `e2e` (Playwright) après `frontend`, et `tauri` (macos, `cargo check`) qui ne tourne que si `detecter` voit `frontend/src-tauri/` changer.
-**Raison** : responsabilités séparées et exécution parallèle donnent un retour rapide. `macos-latest` est requis par Tauri (headers WKWebView) mais une minute y vaut dix minutes d'ubuntu — pour dix-huit secondes de `cargo check`, le conditionner paie. `cargo check` et non `cargo build` : dix minutes de compilation évitées.
-**Alternative rejetée** : job unique séquentiel (lent) ; `cargo build` complet (coûteux) ; `tauri` inconditionnel — facturé à chaque PR sans rien apprendre.
-
----
-
-## ADR-011 — httpx natif plutôt que PyGitHub pour l'API GitHub
-
-**Date** : 2026-06  
-**Portée** : architect  
-**Décision** : `GitHubService` utilise `httpx` async directement (déjà dépendance du projet).  
-**Raison** : PyGitHub est synchrone et ajoute une abstraction lourde. On n'utilise que 3 endpoints (list issues, add label, remove label). httpx + respx donne des mocks propres en tests.  
-**Alternative rejetée** : PyGitHub (blocking I/O), gidgethub (trop orienté webhooks).
 
 ---
 
@@ -271,30 +184,12 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 **Raison** : `cwd` place l'agent dans le projet, il ne l'y enferme pas. Plusieurs dépôts tiers voisins dans `projects/`, et un agent qui se trompe de dossier écrit dans le mauvais — la fuite qu'ADR-021 et ADR-023 empêchent, prise par l'autre bout.
 **Ce que ça ne garantit pas** : le contrôle sur `Bash` attrape une erreur, pas une évasion — `python -c "open('../x','w')"` passe. Ce qui ne se lit pas avec certitude passe aussi : un faux refus priverait l'agent de son moyen de vérifier son travail.
 
-## ADR-032 — Un ADR déclare qui il contraint
-
-**Date** : 2026-09-18
-**Portée** : architect
-**Décision** : un ADR peut porter `**Portée** : rôle, rôle` ; `services/adr.py` réduit alors la section « Décisions récentes » du prompt aux ADR qui concernent le rôle appelé. **Sans portée, l'ADR part à tous.** Elle ne s'écrit que sur un ADR qui enregistre un choix passé, jamais sur une contrainte de comportement — un test le verrouille.
-**Raison** : le fichier part dans chaque appel d'agent, jusqu'à dix-huit par ticket. Le coût compte, la dilution davantage : un codeur recevait la palette de couleurs et le choix du gestionnaire de paquets Python au milieu des règles qu'il doit tenir.
-**Ce qui rend la règle sûre** : un agent que l'utilisateur vient de créer n'est nommé nulle part, et reçoit malgré tout tout le tronc commun — donc toutes les contraintes.
-
 ## ADR-033 — Un conflit se tente, et se relit toujours
 
 **Date** : 2026-09-18
 **Décision** : sur un conflit de rebase, un agent `resolveur-conflit` réécrit les fichiers. `GitWorkspaceService` vérifie ensuite l'arbre et **annule tout** au moindre doute : résolveur qui lève, marqueur restant, fichier manquant. Une résolution qui aboutit ouvre sa PR et **ne se merge jamais seule**, même sur un projet en `merge`.
 **Raison** : détecter et rendre la main était honnête, mais s'arrêtait sur un travail de cinq minutes. Le tenter vaut la peine ; le merger, non. Un conflit est par définition l'endroit où deux intentions divergent : le pire endroit pour deviner, et celui où une erreur ne se voit pas dans un diff vert.
 **Invariants** : l'arbre ne reste jamais à mi-rebase ; l'agent ne touche à aucune commande git, le rebase est en cours et il n'en voit qu'une partie.
-
----
-
-## ADR-034 — Une règle n'est décrite qu'à un endroit, et ce qui compte est mesuré
-
-**Date** : 2026-09-18
-**Portée** : architect
-**Décision** : une règle a **une** description ; les fichiers de consigne renvoient à elle au lieu de la reformuler. `test_consignes_coherentes.py` vérifie qu'ils ne se contredisent pas sur git, ne codent en dur aucun chemin de machine, ne décrivent rien d'absent, et qu'aucun ADR ne dépasse son budget.
-**Raison** : `projects/ide-core/CLAUDE.md` portait sa propre version du flux git — PR de ticket sur `main`, merge en `--squash` — l'exact inverse de la règle. Il est `@`-importé dans chaque session quand le skill juste se charge à la demande : la consigne fausse était toujours en contexte, la bonne seulement parfois.
-**Corollaire** : un budget que rien ne mesure est un souhait. Douze ADR sur trente et un dépassaient le leur, dont trois écrits le jour où ce budget était rappelé.
 
 ---
 
@@ -305,17 +200,6 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 **Décision** : après chaque run **approuvé**, sur sa branche et avant sa livraison, `doc-technique` et `doc-fonctionnelle` reçoivent les tickets livrés depuis le dernier marqueur (amendé 2026-09-26 : en fin de file, elle restait sur le disque sans commit). Ils rendent des **modifications** : un ancien texte exact, un nouveau. Un ancien absent, ambigu, ou qui amputerait le fichier de moitié rejette tout le lot sans rien écrire.
 **Raison** : `doc-updater` réécrivait le fichier **entier** depuis une vue tronquée à 8 000 caractères. Sur un `README.md` de 24 000 caractères, il en aurait effacé les deux tiers sans erreur — le contrat ne lui laissait pas le choix.
 **Pourquoi deux agents** : un seul écrit un guide utilisateur plein de noms de classes — c'est ce qu'il vient de lire.
-
----
-
-## ADR-036 — Une clef de manifeste se renomme en gardant la lecture de l'ancienne
-
-**Date** : 2026-09-21
-**Portée** : architect
-**Décision** : le produit s'appelle Tessera. Les identifiants portant l'ancien nom sont réécrits, **sauf** `vibe_artifacts` dans `agents.json` : la clef devient `artifacts`, l'ancienne reste lue, jamais réécrite.
-**Raison** : des manifestes la déclaraient déjà sur disque, dont des dépôts que ce dépôt ne versionne pas. Une clef inconnue tombe sur le défaut fermé d'ADR-023 : un projet en `tracked` serait repassé en `local` sans demande et sans message. Le renommage aurait donc changé un comportement qu'il prétendait préserver.
-**Alternative rejetée** : migrer les manifestes d'office — écrire dans un dépôt tiers pour une question cosmétique ; garder les deux clefs en écriture — elles divergeraient.
-**Conséquence assumée** : le nom d'origine survit dans une constante et ses tests. C'est le prix d'une donnée déjà écrite ailleurs.
 
 ---
 
@@ -468,31 +352,12 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 
 ---
 
-## ADR-052 — Séparer le journal des contraintes en vigueur
-
-**Date** : 2026-10-02
-**Portée** : architect
-**Décision** : `memory/decisions.md` reste le journal complet. `memory/contraintes.md` en extrait les règles actives, regroupées par thème, une ou deux phrases à l'impératif. `memory/adr-audit.md` classe chaque ADR (règle, histoire, obsolète, fusion). Les agents liront `contraintes.md` à la place du journal une fois ticket-311 livré.
-**Raison** : le journal fait 43 Ko et 51 ADR ; un codeur en reçoit 39 après filtrage par portée. La moitié raconte *pourquoi* un choix a été fait, pas ce qu'un agent doit faire. Les règles de design (ADR-026, ADR-047) ont été régulièrement ignorées — une règle noyée dans un journal se lit mal.
-**Alternative rejetée** : raccourcir `decisions.md` — on perd l'histoire et la justification ; n'archiver que les ADR obsolètes — la dilution reste, la taille change peu.
-
----
-
 ## ADR-053 — Les jetons de mise en ligne ne quittent pas le backend
 
 **Date** : 2026-10-16
 **Décision** : seule une action de l'utilisateur crée les ressources en ligne d'un projet (Vercel, base, Resend, Stripe, Cloudflare), jamais un agent. Les jetons ne vivent que dans le `.env` de Tessera : aucun agent ne les reçoit ni ne lit ce fichier (amende ADR-031), aucun dépôt, ticket, journal ou réponse d'API ne les porte, les logs les masquent. Portée minimale : Stripe restreinte et en test, Vercel expirant, Cloudflare limité à la zone DNS. Relancer complète l'existant, sans doublon. Restent humains : comptes, achat du domaine, mode réel Stripe.
 **Raison** : un jeton Vercel ouvre tout le compte, et ADR-031 laisse lire hors du projet : un agent lirait le `.env`.
 **Alternative rejetée** : un agent qui déploie avec le jeton — le contrôle de `Bash` attrape une erreur, pas une évasion (ADR-031).
-
----
-
-## ADR-054 — Proposer des tickets passe par un worktree temporaire, et le CIWatcher merge
-
-**Date** : 2026-10-18
-**Décision** : `POST /api/v1/projects/{id}/tickets/propose` valide le lot avant la configuration GitHub, puis écrit dans un worktree temporaire créé depuis `origin/<base>` : commit, push, PR vers la base, worktree supprimé même si le push échoue. L'arbre principal n'est jamais touché ; le `fetch` ne met à jour que `refs/remotes/origin/<base>`. Le merge n'a pas lieu dans la requête : en `autonomy: merge`, la PR est remise au `CIWatcher`, sinon elle reste ouverte.
-**Raison** : la route sert quand un run tient l'arbre. Une requête HTTP n'attend pas une CI (ADR-051).
-**Alternative rejetée** : merge synchrone dans la requête — bloque sur la CI (ADR-029).
 
 ---
 
@@ -543,15 +408,6 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 
 ---
 
-## ADR-060 — Un ticket non mergé n'arrête que ceux qui en dépendent
-
-**Date** : 2026-10-27
-**Décision** : complète ADR-051. Quand un ticket de la file n'est pas mergé, les tickets restants qui en dépendent par `depends_on`, directement ou par transitivité, sont retirés de la file ; chacun s'écrit dans `memory/pipeline-log.md` avec sa dépendance (« ticket-546 sauté : dépend de ticket-544, non mergé »). La file continue avec les autres et ne s'arrête que s'il ne reste plus rien. Le ticket non mergé reste `blocked`, PR ouverte, comme dans ADR-051.
-**Raison** : le 23/10, la CI rouge du ticket-544 a arrêté onze tickets alors qu'un seul en dépendait.
-**Alternative rejetée** : arrêter toute la file par prudence — un ticket indépendant n'a pas besoin du code manquant.
-
----
-
 ## ADR-061 — Un verdict de rôle se rend en JSON validé par un schéma
 
 **Date** : 2026-10-27
@@ -568,17 +424,6 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 **Raison** : le 23/10 un chevauchement entre 1024 et 1150 px a passé reviewer et validateur, qui lisent un diff.
 **Mesure** : non faite ; borne haute 7 min par run, durée réelle journalisée (ticket-618).
 **Alternative rejetée** : un validateur à vision — le contrat de chaque provider à étendre.
-
----
-
-## ADR-063 — Reporter la compression du contexte des agents
-
-**Date** : 2026-10-28
-**Portée** : architect
-**Décision** : headroom n'entre pas dans le pipeline. Si le sujet rouvre, le point d'entrée est la compression du texte du prompt, pour reviewer et sécurité seulement, avec un garde qui renvoie l'original quand une ligne `FAILED` ou un nom de test disparaît. Le proxy ne s'envisage qu'après un spike sur l'abonnement et le cache. Seuils chiffrés : spec `2026-10-27-compression-contexte-design`, section 4.
-**Raison** : le codeur pèse 66 % du coût et n'est atteignable que par le proxy, dont on ignore l'effet sur le cache de prompt et sur le jeton d'abonnement.
-**Mesure** : non faite ; estimation 5-10 % du coût, à confirmer (tickets 604, 605).
-**Alternative rejetée** : adopter le proxy d'emblée — un gain annoncé par le projet, sans mesure ici, ne justifie pas un composant sur le chemin du jeton.
 
 ---
 
@@ -601,18 +446,6 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 **Mesure** : non faite ; coût : un ticket prêt attend la CI du précédent.
 **Alternative rejetée** : push forcé depuis le watcher (`pushed_sha` périmé) ; `merge=union` côté dépôt (GitHub l'ignore) ; partir de la branche du précédent (défait ADR-056).
 **Limite** : une PR rendue conflictuelle hors file reste arrêtée sur « à rebaser » (ticket-674).
-
----
-
-## ADR-066 — Écarter les sous-tâches d'un run
-
-**Date** : 2026-10-30
-**Portée** : architect
-**Décision** : un run garde un diff, un commit et une revue par tour (ADR-018) : ni sous-tâches tirées du plan, ni écrites dans le ticket. Un ticket trop gros se découpe en tickets. Le ticket-702 journalise l'épuisement des actions. Rouvrir si, sur 30 runs, 10 % des appels du codeur l'épuisent, ou si son tour 1 dépasse 12 min au p90 (8 min aujourd'hui).
-**Raison** : le codeur pèse 19 % de la durée d'un ticket ; tests et audit se paient par diff. Des sous-tâches relues ajoutent 3 à 4 min et 47 à 66 % de coût.
-**Mesure** : 358 approbations ; 118 tours à tests rouges, 105 refus dont 46 du validateur, qu'une sous-tâche ne voit pas.
-**Alternative rejetée** : sous-tâches tirées du plan — son échec est toléré, le run changerait de forme sans le dire.
-**Détail** : `docs/superpowers/specs/2026-10-30-sous-taches-dans-un-run-design.md`
 
 ---
 
@@ -652,3 +485,169 @@ une contrainte pour tous les agents ; une portée ne marque qu'un choix passé.
 **Raison** : un `<path>` par jeton portait dix pièces à 3 974 nœuds SVG pour un plafond de 2 250 ; partagées, elles en font 1 815.
 **Alternative rejetée** : relever le plafond — la vue se relit toutes les 10 s ; un canvas — ADR-058.
 **Détail** : ticket-727.
+
+---
+
+## ADR-071 — Un prompt trop gros pour un provider local part directement sur son repli
+
+**Date** : 2026-11-03
+**Décision** : amende ADR-046. Un rôle dont le principal est `ollama` et qui déclare un `fallback` peut déclarer `fallback_above_chars` : au-delà de cette taille de prompt, l'appel part sur le repli sans tenter le principal. C'est un troisième déclencheur, à côté de l'indisponibilité et du run `rapide` ; une réponse illisible n'en déclenche toujours aucun.
+**Raison** : un modèle local tronque ou refuse un prompt plus long que sa fenêtre, et le constat n'arrive qu'après un appel long et inutile ; la taille se connaît avant l'appel.
+**Alternative rejetée** : tronquer le prompt — le validateur jugerait des critères qu'il n'a pas lus ; router selon la taille du ticket (écarté par ADR-046) — la taille du prompt est le vrai critère, et seulement pour un local.
+**Détail** : ticket-714 ; relevé par l'audit du 30/10.
+
+---
+
+## ADR-072 — La porte de configuration des tests connaît tous les fichiers et veut un chemin complet
+
+**Date** : 2026-11-03
+**Décision** : complète ADR-027. La liste des fichiers de configuration des tests s'étend à `pytest.ini`, `tox.ini`, `setup.cfg`, `mypy.ini`, `.mypy.ini`, `.coveragerc`, `vite.config.*` et `vitest.workspace.*`. Un fichier touché n'est couvert par le ticket que si son chemin complet depuis la racine du dépôt y figure ; le nom de base ne suffit plus.
+**Raison** : `pytest.ini` et `mypy.ini` priment sur `pyproject.toml`, et la configuration vitest de ce dépôt vit dans le bloc `test:` de `vite.config.ts` : la porte était inerte sur eux. Un ticket qui citait `frontend/src/x/vitest.config.ts` couvrait aussi `frontend/vitest.config.ts`.
+**Alternative rejetée** : lire le bloc `test:` de `vite.config.ts` seul — plus fin, mais un changement ailleurs dans ce fichier (alias, plugins) peut aussi désarmer les tests ; le ticket n'a qu'à le nommer.
+**Détail** : ticket-748 ; relevé par l'audit du 30/10.
+
+---
+
+## ADR-073 — Les secrets de Tessera vivent dans le coffre du système
+
+**Date** : 2026-11-05
+**Décision** : complète ADR-053. Neuf secrets (`ANTHROPIC_API_KEY`, `GITHUB_TOKEN`, les cinq jetons de mise en ligne, `STATIC_TOKEN`, `FORBIDDEN_TERMS`) vont dans le coffre du système, via `keyring`. Lecture : variable d'environnement, coffre, puis `.env`. `SECRETS_SOURCE=auto` par défaut (05/11, multi-PC) : sans coffre, `.env` et avertissement, refus si un secret migré manque ; un PC migré passe en `coffre` ; `env` pour CI et Docker. Un secret ne s'exporte jamais dans un sous-processus. Le hook `pre-push` lit par le backend et refuse s'il ne peut pas lire. Le garde d'ADR-053 refuse aussi les commandes qui exécutent le coffre.
+**Raison** : `.env` se lit, se copie et se synchronise ; le coffre chiffre au repos. Tout processus de l'utilisateur le lit pourtant : le plafond d'un jeton reste sa portée.
+**Alternative rejetée** : chiffrer `.env` — la clé de déchiffrement reste à côté.
+**Détail** : `docs/superpowers/specs/2026-11-05-secrets-dans-le-coffre-design.md`.
+
+---
+
+## ADR-074 — Les leçons d'un projet vivent dans `memory/lecons.md`
+
+**Date** : 2026-11-05
+**Décision** : après un run approuvé dont `review_feedback` n'est pas vide, le service, sans outils, écrit au plus une leçon « Quand <situation>, <action>. » sous `## Proposées` de `memory/lecons.md`, artefact d'ADR-021 et ADR-023. Un humain la déplace sous `## En vigueur`, seule section injectée, au codeur et au reviewer, sous les contraintes : 25 leçons, 4 Ko. Refus : hors forme, 200 caractères, preuve absente du retour, doublon, vérification affaiblie. Un diff de run qui touche ce fichier met le run en `blocked` (ADR-055). Une leçon dit un piège observé ; `decisions.md` dit un choix.
+**Raison** : ticket-736 a perdu trois tours sur des doubles de test ; un texte de modèle injecté sans relecture change la consigne de tous (ADR-055).
+**Alternative rejetée** : écriture directe par l'agent, ou activation automatique — la confiance accordée à un texte non relu est une décision humaine.
+
+---
+
+## ADR-075 — Cinq réglages modifiables depuis l'interface, figés par run
+
+**Date** : 2026-11-05
+**Décision** : `run_max_budget_usd`, `llm_max_budget_usd`, `dialogue_timeout_s`, `max_parallel_test_runs` et `keep_awake_during_runs` se modifient depuis l'interface, dans un registre fermé et borné ; « sans plafond » ne se pose que dans `.env`. Secrets (ADR-073), chemins, hôtes et réglages par projet n'y entrent jamais. La valeur vit en SQLite au-dessus du défaut de `.env`, que rien ne réécrit ; `reglages.courants()` est l'unique lecture. Un run fige plafonds et délai à l'ouverture ; les deux réglages de machine valent à leur prochaine lecture. Une écriture exige un `Origin` déclaré (ticket-754), sinon 403.
+**Raison** : l'API est ouverte quand `STATIC_TOKEN` est vide et un agent a `Bash` : ni lui ni une page locale ne doivent relever un plafond.
+**Alternative rejetée** : réécrire `.env` — le redémarrage coupe les runs ; appliquer à chaud — un plafond bougerait sous un run.
+**Détail** : `docs/superpowers/specs/2026-11-05-reglages-globaux-design.md`.
+
+---
+
+## ADR-076 — Ranger `services/` par domaine, sans import vers un rang plus haut
+
+**Date** : 2026-11-05
+**Décision** : `services/` se range en dix-huit domaines, du plus bas au plus haut : noyau, projets, usage, provisioning, gardes, git_workspace, worktrees, github, providers, verification, verdicts, agents, documentation, creation_projet, livraison, pipeline, file, supervision. Un module n'importe que son domaine ou un plus bas ; `test_sens_des_imports.py` le mesure, avec cliquet. `tessera/agents/` disparaît : `github_sync` rejoint `github`. Ordre : `ORDRE` de `test_domaines_services.py`. Les déplacements gardent le comportement, un domaine par ticket, chacun attendant le merge du précédent.
+**Raison** : deux cents modules à plat ne disent ni où chercher ni qui importe qui ; `agents/` échappait au contrôle.
+**Alternative rejetée** : tout déplacer d'un coup — conflit avec chaque PR ouverte ; une façade à l'ancien chemin — les `monkeypatch` par chaîne cessent de s'appliquer, sans erreur.
+
+---
+
+## ADR-078 — Un détecteur d'anomalies observe les runs sans les arrêter
+
+**Date** : 2026-11-05
+**Décision** : une tâche de fond du backend relit toutes les 5 min, en lecture seule, chaque run vivant. Six règles : outil répété 4 fois, étape ou coût au-delà de 3 × la médiane du projet, 15 min sans événement, dernier tour de revue, deux blocages de même cause. Chaque anomalie se signale une fois, en `run_anomaly` : cloche, Bureau, salle Tessera, historique, log. Elle n'arrête, ne relance ni ne modifie aucun run.
+**Raison** : le 03/11, testeur figé de 19 h à 7 h 48, trois tours perdus sur des doubles de test, deux livraisons coupées par le réseau : seul un humain l'a vu ; « figé ? » ignore les étapes silencieuses.
+**Alternative rejetée** : couper au seuil — un faux positif perd un travail payé (ADR-037).
+**Détail** : spec 2026-11-05-detecteur-d-anomalies-design.md, tickets 794 à 833.
+
+---
+
+## ADR-080 — Un superviseur agit par actions fermées, dans des bornes déclarées
+
+**Date** : 2026-11-05
+**Décision** : `superviseur`, sans outil, choisit parmi quatre actions : trier un signalement, décider une leçon ou règle déléguée, reconfier une PR verte à `CIWatcher`, relancer une file coupée par l'infrastructure. Le code les exécute, une par commit, sous `RunLock`, jamais pendant une file, livrées en PR et jamais mergées par lui. Jamais : argent, suppression, secrets, projet `professional`, `agents.json`, `.github/`, `CLAUDE.md`, règle qui le borne. Délégation déclarée dans `agents.json`, sinon rien (amende ADR-055, ADR-074). Tout agent outillé a `signaler`, borné ; la revue de projet est un run `design` sans code. Un numéro rendu est pris.
+**Raison** : le 05/11, ADR-074 et tickets 801-804 renumérotés après coup, file coupée sur « ticket-847 introuvable », PR #913 sans surveillance.
+**Alternative rejetée** : un agent avec `Bash` — rien ne borne ses effets.
+**Détail** : spec 2026-11-05-superviseur-design.md.
+
+---
+
+## ADR-081 — L'API exige un jeton de session sur toute route
+
+**Date** : 2026-11-06
+**Décision** : `STATIC_TOKEN`, sinon un jeton tiré à chaque démarrage (`noyau/jeton_de_session.py`), gardé en mémoire et écrit dans `ide_state_dir/jeton-de-session`, supprimé à l'arrêt. `StaticTokenMiddleware` l'exige sur toute requête HTTP et WebSocket sauf `/health` et `OPTIONS` ; sans jeton, il refuse. Jamais dans l'environnement d'un agent. Un test parcourt `app.routes`.
+**Raison** : audit du 06/11 — `STATIC_TOKEN` vide, tout passait : depuis `Bash`, `curl -X PATCH …/pipeline` baissait les portes d'un projet.
+**Alternatives rejetées** : injection par le proxy Vite (Tauri n'en a pas) ; vérifier le processus pair (un agent est un enfant du backend) ; `Origin` (se forge).
+**Limite** : le fichier du jeton reste lisible par un agent (ticket-879).
+
+---
+
+## ADR-082 — L'intention de lancer les services d'un projet survit au backend
+
+**Date** : 2026-11-09
+**Décision** : amende ADR-042. `services/start` inscrit le projet dans `services_demandes`, `stop` l'en retire. Au démarrage, `reprendre_les_services` relance chaque projet inscrit par le chemin de `start`, un `try` par projet. Un échec, dont le 409 « déjà lancé hors de Tessera », est journalisé (`services_non_repris`) et retire le projet : pas de boucle de plantage. L'arrêt du backend ne retire rien.
+**Persisté** : l'intention. **Non persisté** : les processus, enfants du backend, sans reprise d'orphelin.
+**Raison** : le 09/11, un redémarrage a tué les services d'Affût et de Kadoomi.
+**Placement** : table dans `noyau`, reprise dans `routers/` (ADR-076).
+
+---
+
+## ADR-083 — Le CLI d'un agent tourne sous un compte Windows dédié
+
+**Date** : 2026-11-09
+**Décision** : `AGENT_USER` (vide : rien ne change). Renseigné, le CLI part sous ce compte par `TransportCompteAgent`, sous-classe de `SubprocessCLITransport` passée à `query(transport=…)` : hooks, MCP et `resume` restent au protocole du SDK. Lanceur derrière un `Protocol`, en `ctypes` sur `CreateProcessWithLogonW` (pas de pywin32 : une DLL de plus pour WDAC). `cli_path` : copie partagée `C:\ProgramData\Tessera\bin\claude.exe`.
+**Environnement** : bâti de zéro, liste blanche, profil du compte, `CLAUDE_CODE_OAUTH_TOKEN` ; jamais le mot de passe. Les deux secrets rejoignent `NOMS_SECRETS`. Échec fermé : `ProviderIndisponible`, jamais de repli (ADR-037).
+**Ferme** : lecture des secrets, du `.env`, de la session Claude ; écriture des fichiers de politique.
+**Ne ferme pas** : le réseau ; le jeton OAuth, lisible par l'agent, voulu ; les droits des worktrees ; l'authentification, qui dépend du jeton longue durée tiré par `claude setup-token`.
+
+---
+
+## ADR-084 — Un appel d'agent qui change un fichier protégé arrête le run
+
+**Date** : 2026-11-11
+**Décision** : `pipeline_empreinte.py` hache les fichiers que `motif_de_protection` désigne, plus `config` et `hooks/` du dépôt commun et du worktree, juste avant et après chaque appel (plan, codeur, tests, audit, revue + validateur). Une différence termine le run `blocked` avec commit (ADR-037), motif nommant les fichiers sans contenu ; au tour du codeur, avant la lecture du diff. Les lectures git passent `core.fsmonitor=false`.
+**Raison** : `sed -i`, `dd of=` ou un heredoc passent les gardes lexicales (ADR-031).
+**Ne voit pas** : l'écriture est constatée, pas empêchée ; le code exécuté pendant l'appel ; `filter.*` et `diff.external` ; les fichiers hors dépôt (ticket-931).
+**Faux positif** : un autre run ou `CIWatcher` qui écrit `.git/config` pendant l'appel ; revue et validateur partagent un garde.
+
+---
+
+## ADR-085 — La commande de test et l'app du contrôle visuel tournent aussi sous `AGENT_USER`
+
+**Date** : 2026-11-11
+**Décision** : amende ADR-083. Avec `worktree.compte_agent` et `AGENT_USER`, `TestRunnerService` et `demarreur_du_run` (app du contrôle visuel) passent par le `LanceurAgent`, via `lancement_compte.py`. Environnement bâti de zéro (`PATH`, `SystemRoot`, `TEMP`…), sans secret. Sinon, rien ne change.
+**Échec fermé** : compte, mot de passe ou lanceur manquant, logon refusé → `EchecLancementCompte` : test `demarree=False`, capture en échec, jamais de repli (ADR-037).
+**Sous `AGENT_USER`** : CLI, commande de test (aussi au retest après rebase), app visuelle. **Sous le backend** : setup du worktree (ticket à ouvrir), services (ADR-042), CI.
+**Limites** : pas de job Windows, `kill()` ne coupe que le processus direct ; le compte veut lecture sur `.venv`, `node_modules`, cache `uv`, écriture sur le worktree et `TEMP`.
+
+---
+
+## ADR-086 — Le compte agent n'a pour outils qu'une chaîne partagée hors de tout profil
+
+**Date** : 2026-11-16
+**Décision** : amende ADR-083 et ADR-085. node, npm, uv et Python lancés sous `AGENT_USER` viennent de `C:\ProgramData\Tessera\toolchain\`, copie posée par `agent setup` : écriture à l'utilisateur et aux administrateurs, lecture-exécution au compte. Le `PATH` de tout processus du compte (CLI, tests, app visuelle) est bâti de zéro : cette chaîne, puis les entrées système hors `C:\Users`. Les droits `RX` donnés sur le profil se retirent. `agent doctor` lance `node`, `uv` et `python --version` sous le compte.
+**Raison** : node ne résout pas son chemin sous un profil fermé (EPERM sur `scoop`) ; lire le profil rouvre ce que l'isolation ferme.
+**Alternative rejetée** : `Program Files` (installeur administrateur, versions du poste imposées) ; lecture d'un dossier du profil (ancêtres à traverser, droits orphelins).
+
+---
+
+## ADR-087 — Un appel sous le compte agent ne laisse ni droit ni profil derrière lui
+
+**Date** : 2026-11-18
+**Décision** : amende ADR-083. Le worktree porte une ACE héritable `OWNER RIGHTS` réduite à `RC` et une ACE `F` du backend ; à la fin du dernier appel, `/setowner` puis `/reset` sur l'arbre, échec fermé (ADR-037). Deux worktrees ne portent pas d'appel en même temps sous le compte, sauf `AGENT_CALLS_PARALLEL=true`. `HOME`, `APPDATA`, `LOCALAPPDATA` et `TEMP` visent `C:\ProgramData\Tessera\profil-agent\`, vidé hors caches `npm` et `uv` quand le compte est au repos ; plus de profil chargé (pas de ruche `HKCU`).
+**Raison** : le propriétaire réécrit la DACL de ce qu'il crée ; le profil persiste d'un projet à l'autre.
+**Alternative rejetée** : un compte par projet — mots de passe, droits sur la chaîne d'outils et setup multipliés.
+**Ne ferme pas** : une DACL posée à la création du fichier ; deux appels simultanés avec l'opt-out.
+
+---
+
+## ADR-088 — Ce que le compte agent garde encore : retiré, fermé ou à trancher
+
+**Date** : 2026-11-19
+**Décision** : amende ADR-087, après essais sous le compte. (1) Sortie du job : aucune voie trouvée (WMI refusé ; une tâche planifiée se crée sans s'exécuter). Ses tâches planifiées se **retirent** au dernier appel ; pas d'inventaire des processus illisibles (faux positifs du ticket-997). (2) Cache uv : le compte l'écrit dès `uv run`, donc `UV_LINK_MODE=copy` et le cache **part** avec le profil ; cache npm **accepté** (intégrité vérifiée). (3) Dossiers ouverts à tous : le backend ne purge que le dossier public ; **à trancher** par l'utilisateur, refus à l'installation ou acceptation (ticket-1020). (4) Fichier protégé ajouté pendant un appel : il entre dans l'empreinte, run `blocked`.
+**Raison** : uv ne revérifie pas son cache ; le backend, non administrateur, ne lit pas tous les dossiers partagés.
+**Alternative écartée sans essai** : intégrité basse ou jeton restreint.
+
+---
+
+## ADR-089 — Le compte agent tourne sur une window station et un bureau dédiés
+
+**Date** : 2026-11-19
+**Décision** : amende ADR-083. Le backend crée, par appel, une window station et un bureau nommés, dont la DACL ne vise que le compte agent et lui-même ; `lpDesktop` les nomme. Le job d'appel y ajoute `JOB_OBJECT_UILIMIT_*` en défense en profondeur. Station impossible à créer ou lancement refusé : `EchecLancementCompte`, jamais de repli sur `WinSta0\Default` (ADR-037).
+**Raison** : presse-papiers, atomes et hooks sont propres à la station ; `SendInput` et la capture dépendent du bureau, hors de portée d'un job.
+**Alternative rejetée** : `UILIMIT` seul (ni frappes simulées ni capture) ; session 0 par tâche ou service (administrateur, tuyaux stdio perdus, sortie du job d'ADR-088).
+**Ne ferme pas** : Node, Playwright ou le CLI peuvent refuser une station non interactive ; preuve avant câblage (ticket-1023).

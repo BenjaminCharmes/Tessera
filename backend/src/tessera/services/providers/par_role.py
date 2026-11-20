@@ -8,17 +8,14 @@ que rien ne le dise. Un test le vérifie.
 from collections.abc import Callable
 from pathlib import Path
 
+from tessera import reglages
 from tessera.config import settings
 from tessera.models.agent import AgentConfig
-from tessera.services.project_loader import load_agents_config
+from tessera.services.projets.project_loader import load_agents_config
 from tessera.services.providers import get_provider
 from tessera.services.providers.agent_sdk import ClaudeAgentSDKProvider
 from tessera.services.providers.base import LLMProvider
-from tessera.services.providers.declaration import (
-    PROVIDER_OLLAMA,
-    PROVIDER_OPENAI,
-    resoudre_cle,
-)
+from tessera.services.providers.declaration import PROVIDER_OLLAMA, PROVIDER_OPENAI, resoudre_cle
 from tessera.services.providers.refus_garde import JournalDesRefus
 from tessera.services.providers.repli import ProviderAvecRepli
 from tessera.services.providers.repli_direct import ProviderRepliDirect
@@ -29,7 +26,12 @@ OUTILS_WEB = ["WebFetch", "WebSearch"]
 #: Les rôles qui rendent du texte ou du JSON, et dont un appel a une durée
 #: totale maximale (ticket-518). Le codeur et le reviewer en sont exclus : un
 #: tour légitime de codeur dure longtemps, et c'est le silence qui le borne.
-ROLES_TEXTE = frozenset({"validateur", "securite", "doc-technique", "doc-fonctionnelle"})
+ROLES_TEXTE = frozenset(
+    {
+        "validateur", "securite", "doc-technique", "doc-fonctionnelle", "lecons",
+        "superviseur",
+    }
+)
 
 
 def outils_du_role(
@@ -95,6 +97,7 @@ def provider_pour_role(
     journal_refus: JournalDesRefus | None = None,
     journal_repli: Callable[[str], None] | None = None,
     rapide: bool = False,
+    compte_agent: bool = False,
 ) -> LLMProvider:
     """Builds the provider `role` declares, wrapped in its fallback if any.
 
@@ -109,6 +112,8 @@ def provider_pour_role(
     Un rôle texte (`ROLES_TEXTE`) reçoit, pour le principal comme pour le
     repli, une durée totale maximale par appel (ticket-518). `journal_repli`
     reçoit la ligne que `ProviderAvecRepli` écrit quand le repli joue.
+
+    `compte_agent` : le projet du run a déclaré le compte dédié (ticket-915).
     """
     config = config_du_role(project_path, role)
     tools = outils_du_role(config, allow_tools, tools)
@@ -127,15 +132,20 @@ def provider_pour_role(
     # (`agents.json` refuse `openai_compatible` comme repli).
     url, cle = connexion_du_role(config, nom)
 
+    # Le plafond d'un appel : celui figé à l'ouverture dans un run, le courant
+    # hors run (ADR-075).
+    plafond_appel = reglages.courants().llm_max_budget_usd
+
     def _construire(fournisseur: str) -> LLMProvider:
         principal = fournisseur == nom
         return get_provider(
             fournisseur, settings.anthropic_api_key,
-            max_turns=tours, max_budget_usd=settings.llm_max_budget_usd,
+            max_turns=tours, max_budget_usd=plafond_appel,
             allow_tools=allow_tools, tools=tools, racine_ecriture=racine_ecriture,
             skills=skills, duree_max_s=duree, effort=effort,
             base_url=url if principal else None,
-            endpoint_key=cle if principal else "", **journal,
+            endpoint_key=cle if principal else "",
+            compte_agent=compte_agent, **journal,
         )
 
     if rapide and config is not None and config.fallback is not None:

@@ -4,14 +4,9 @@ from typing import Any
 from unittest.mock import AsyncMock, MagicMock
 
 from tessera.models.agent import AgentRole
-from tessera.models.ticket import (
-    Ticket,
-    TicketPriority,
-    TicketStatus,
-    TicketType,
-)
-from tessera.services.orchestrator import Orchestrator
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
+from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.pipeline.orchestrator import Orchestrator
 
 
 def _ticket(type_: TicketType) -> Ticket:
@@ -84,7 +79,7 @@ async def _lance(
     git.current_diff.return_value = "diff --git a/x b/x\n+x\n"
     git.commit_all.return_value = "abc"
 
-    from tessera.services import pipeline_controles
+    from tessera.services.pipeline import pipeline_controles
 
     async def _revue(orch: Any, run: Any, contexte: Any) -> tuple[bool, str, str]:
         return True, "", "APPROVED"

@@ -16,11 +16,11 @@ from pathlib import Path
 
 import pytest
 
-from tests.depot_numerotation import creer_depot, ecrire, fiche, git
 from tessera.services.git_workspace import GitWorkspaceService
-from tessera.services.livraison import Livraison, LivraisonService
-from tessera.services.numerotation import GitIllisible
-from tessera.services.renumeroter import Renumeroteur, renumeroter
+from tessera.services.livraison.livraison import Livraison, LivraisonService
+from tessera.services.livraison.renumeroter import Renumeroteur, renumeroter
+from tessera.services.noyau.numerotation import GitIllisible
+from tests.depot_numerotation import creer_depot, ecrire, fiche, git
 
 _JOURNAL = "memory/pipeline-log.md"
 
@@ -251,7 +251,7 @@ async def _livrer(clone: Path, git_faux: _FauxGit, wf: _FauxWorkflow) -> Livrais
     )
     return await service.livrer_phase_1(
         ticket_id="ticket-570", ticket_title="Conception", ticket_body="",
-        branch="ticket-570-conception", approuve=True,
+        branch="ticket-570-conception", approuve=True, approved_sha="a1" * 20,
     )
 
 

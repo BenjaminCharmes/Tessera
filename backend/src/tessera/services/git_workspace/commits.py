@@ -2,14 +2,10 @@
 
 from pathlib import Path
 
-from tessera.services.git_workspace.chemins import (
-    _BOOKKEEPING_COMMIT_MESSAGE,
-    _ORCHESTRATOR_ARTIFACT_PATHS,
-)
+from tessera.services.git_workspace.chemins import _BOOKKEEPING_COMMIT_MESSAGE, _ORCHESTRATOR_ARTIFACT_PATHS
 from tessera.services.git_workspace.erreurs import GitCommandError
 from tessera.services.git_workspace.etat import GitState
 from tessera.utils.logger import get_logger
-
 
 _logger = get_logger("tessera.services.git_workspace")
 
@@ -44,6 +40,8 @@ class GitCommits(GitState):
         removed them with ``rm`` so they disappear from the repository rather
         than staying as empty files. The commit is not blocked.
         """
+        # Avant tout `add` : un lien non déclaré fait indexer sa cible (audit C2).
+        await self._refuser_les_liens()
         policy_modifiees = await self._detect_modified_policy_files()
         if policy_modifiees:
             _logger.warning(
@@ -73,6 +71,11 @@ class GitCommits(GitState):
             *await self._exclude_pathspecs(),
             *(f":(exclude){path}" for path in self._preexisting_untracked),
         )
+        # Les fiches qu'un run de conception crée sous `tickets/todo/` sont son
+        # livrable : le pathspec ci-dessus exclut `tickets/`, on les nomme (ticket-1026).
+        fiches = await self.fiches_creees_par_le_run()
+        if fiches:
+            await self._run("add", "--", *fiches)
         # Retire de l'index les fichiers devenus ignorés après le `git add -A`.
         # `git add -A` ne dé-stage pas automatiquement des fichiers déjà dans
         # l'index dont le chemin est maintenant couvert par `.gitignore` — par
@@ -100,11 +103,35 @@ class GitCommits(GitState):
         retenus = [c for c in chemins if not await self._is_ignored(c)]
         if not retenus:
             return False
+        await self._refuser_les_liens()
         await self._run("add", "-A", "--", *retenus)
         if not (await self._run("diff", "--cached", "--name-only")).strip():
             return False
         await self._run("commit", "-m", message)
         return True
+
+    async def est_modifie(self, chemin: str) -> bool:
+        """True when the tracked file `chemin` (project-relative) differs from HEAD.
+
+        Untracked files are not reported: a file git does not know yet has no
+        earlier state to protect (ticket-866).
+        """
+        statut = await self._run(
+            "status", "--porcelain", "--untracked-files=no", "--", chemin
+        )
+        return bool(statut.strip())
+
+    async def stager_chemins(self, chemins: list[str]) -> None:
+        """Stage exactly `chemins` (project-relative), without committing.
+
+        The next `commit_all` commits what is staged, run-policy files included:
+        naming a file here is the explicit decision that `commit_all` refuses to
+        take on its own. An ignored path is skipped, as in `commit_chemins`.
+        """
+        retenus = [c for c in chemins if not await self._is_ignored(c)]
+        if retenus:
+            await self._refuser_les_liens()
+            await self._run("add", "-A", "--", *retenus)
 
     async def _list_tracked_ticket_basenames(self) -> frozenset[str]:
         """Return the basenames of tracked files under ``tickets/`` at call time.

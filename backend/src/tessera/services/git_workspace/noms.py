@@ -4,7 +4,6 @@ import re
 
 from tessera.services.git_workspace.erreurs import InvalidSlugError
 
-
 _MAX_BRANCH_LENGTH = 60
 
 

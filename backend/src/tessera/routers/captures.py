@@ -6,9 +6,9 @@ from fastapi.responses import FileResponse
 
 from tessera.config import settings
 from tessera.routers.dependencies import require_valid_project_id
-from tessera.services import captures
-from tessera.services.captures_config import ConfigCaptures, load_captures_config
-from tessera.services.captures_session import lire_le_jeton
+from tessera.services.verification import captures
+from tessera.services.verification.captures_config import ConfigCaptures, load_captures_config
+from tessera.services.verification.captures_session import lire_le_jeton
 
 router = APIRouter(
     prefix="/projects",

@@ -7,7 +7,7 @@ traitement possible, et rien ne le signalait. Ce test est le garde-fou.
 import re
 from pathlib import Path
 
-from tessera.services.pipeline_events import EventType
+from tessera.services.noyau.pipeline_events import EventType
 
 _TS_TYPES = Path(__file__).resolve().parents[2] / "frontend" / "src" / "types" / "runs.ts"
 

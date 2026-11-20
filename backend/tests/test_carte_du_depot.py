@@ -11,13 +11,9 @@ from typing import Any
 from unittest.mock import MagicMock
 
 from tessera.models.agent import AgentResult, AgentRole
-from tessera.services.carte_du_depot import CarteDuDepot, replier
-from tessera.services.politique_run import PolitiqueRun
-from tests.test_orchestrator import (
-    _make_agent_result,
-    _make_orchestrator,
-    _noop,
-)
+from tessera.services.agents.carte_du_depot import CarteDuDepot, replier
+from tessera.services.gardes.politique_run import PolitiqueRun
+from tests.test_orchestrator import _make_agent_result, _make_orchestrator, _noop
 
 
 async def _git(cwd: Path, *args: str) -> None:

@@ -6,7 +6,9 @@ import httpx
 import pytest
 
 from tessera.config import settings
-from tessera.services.livraison import LivraisonService, Livraison
+from tessera.services.livraison.livraison import Livraison, LivraisonService
+
+_APPROUVE = "a1" * 20
 
 
 class _FauxGit:
@@ -31,6 +33,9 @@ class _FauxGit:
 
     async def commit_bookkeeping(self) -> None:
         pass
+
+    async def commits_hors_rangement(self, depuis: str) -> list[str]:
+        return []
 
 
 class _FauxWorkflow:
@@ -114,6 +119,7 @@ async def _livrer(svc: LivraisonService, approuve: bool = True) -> Livraison:
         ticket_body="",
         branch="ticket-001-x",
         approuve=approuve,
+        approved_sha=_APPROUVE,
     )
 
 
@@ -181,6 +187,7 @@ async def test_livraison_transmet_le_type_du_ticket(tmp_path: Path) -> None:
         ticket_type="feat",
         branch="ticket-001-x",
         approuve=True,
+        approved_sha=_APPROUVE,
     )
 
     assert len(workflow.ouvertures) == 1
@@ -528,21 +535,26 @@ async def _phase_1(svc: LivraisonService, approuve: bool = True) -> Livraison:
         ticket_body="",
         branch="ticket-001-x",
         approuve=approuve,
+        approved_sha=_APPROUVE,
     )
 
 
 async def test_phase_1_produit_memes_etapes_et_durees_que_livrer_jusqu_a_la_pr(
     tmp_path: Path,
 ) -> None:
-    """livrer_phase_1 rend les mêmes étapes que livrer() jusqu'à l'ouverture de la PR."""
-    svc_phase, _g1, _w1 = _service(tmp_path / "phase", "pr")
-    svc_livrer, _g2, _w2 = _service(tmp_path / "livrer", "pr")
+    """livrer_phase_1 rend le début des étapes de livrer(), en autonomie merge."""
+    svc_phase, _g1, _w1 = _service(tmp_path / "phase", "merge")
+    svc_livrer, _g2, _w2 = _service(tmp_path / "livrer", "merge")
 
     phase1 = await _phase_1(svc_phase)
     livraison = await _livrer(svc_livrer)
 
-    # Les étapes jusqu'à la PR sont identiques.
-    assert phase1.etapes == livraison.etapes
+    # En merge, livrer() ajoute la CI et le merge : la phase 1 n'en est que le début.
+    assert phase1.etapes == livraison.etapes[: len(phase1.etapes)]
+    assert len(phase1.etapes) < len(livraison.etapes)
+    # Chaque étape porte sa durée, et la phase 1 en compte moins que livrer().
+    assert len(phase1.durees_ms) == len(phase1.etapes)
+    assert len(phase1.durees_ms) < len(livraison.durees_ms)
     assert phase1.pr_number == livraison.pr_number
     assert phase1.arret is None
 
@@ -599,7 +611,7 @@ async def test_phase_1_exception_apres_la_pr_porte_son_numero(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Une exception levée une fois la PR ouverte garde son numéro (ticket-415)."""
-    from tessera.services.livraison import LivraisonInterrompue
+    from tessera.services.livraison.livraison import LivraisonInterrompue
 
     svc, _git, _workflow = _service(tmp_path, "pr")
 
@@ -611,7 +623,7 @@ async def test_phase_1_exception_apres_la_pr_porte_son_numero(
             raise OSError("journal indisponible")
 
     svc._post_pr_callback = _callback_en_echec  # type: ignore[assignment]
-    monkeypatch.setattr("tessera.services.livraison._logger", _JournalCasse())
+    monkeypatch.setattr("tessera.services.livraison.livraison._logger", _JournalCasse())
 
     with pytest.raises(LivraisonInterrompue) as info:
         await _phase_1(svc)
@@ -684,7 +696,10 @@ async def test_merge_timeout_on_a_merged_pr_ends_merged(tmp_path: Path) -> None:
     assert any("confirmée après une erreur réseau" in e for e in livraison.etapes)
 
 
-async def test_merge_timeout_on_an_open_pr_stops(tmp_path: Path) -> None:
+async def test_merge_timeout_on_an_open_pr_stops(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr("tessera.services.livraison.livraison_merge.FENETRE_RELECTURE_S", 0.0)
     workflow = _MergeQuiLache(httpx.ReadTimeout("lent"), etat="open")
     svc, _git, _w = _service(tmp_path, "merge", workflow=workflow)
 

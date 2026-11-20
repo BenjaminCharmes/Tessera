@@ -11,9 +11,9 @@ Couverture :
 import asyncio
 
 from tessera.models.ticket import TicketStatus
-from tessera.services.ci_watcher import CIWatcher, ControleTete
-from tessera.services.livraison import Livraison
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.livraison.ci_watcher import CIWatcher, ControleTete
+from tessera.services.livraison.livraison import Livraison
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 
 _SHA_POUSSE = "a" * 40
 _SHA_REBASE = "b" * 40

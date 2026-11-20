@@ -3,7 +3,8 @@
 À lancer avant de rendre un dépôt public, ou après un incident :
 `python scripts/scan_historique.py` depuis la racine du dépôt.
 
-Lit FORBIDDEN_TERMS dans le .env du dépôt. N'affiche que des emplacements
+Lit FORBIDDEN_TERMS par le backend (`coffre_cli termes`, ADR-073) : environnement,
+coffre du système, puis .env, comme le hook pre-push. N'affiche que des emplacements
 (blob et chemins, commit, ref, PR/issue et champ) et un nombre de termes.
 
 Couvre :
@@ -18,6 +19,7 @@ import subprocess
 import sys
 import unicodedata
 from collections import defaultdict
+from collections.abc import Callable
 from pathlib import Path
 
 REPO = Path(subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True,
@@ -30,15 +32,22 @@ def git(*args: str) -> bytes:
     return subprocess.run(["git", "-C", str(REPO), *args], capture_output=True, check=True).stdout
 
 
-def termes() -> list[str]:
-    import os
-    if os.environ.get("FORBIDDEN_TERMS"):
-        return [t.strip() for t in os.environ["FORBIDDEN_TERMS"].split(",") if t.strip()]
-    txt = (REPO / ".env").read_text(encoding="utf-8")
-    m = re.search(r"^FORBIDDEN_TERMS=(.*)$", txt, re.M)
-    if not m:
-        sys.exit("FORBIDDEN_TERMS absent de .env : rien à scanner.")
-    return [t.strip() for t in m.group(1).strip().strip("'\"").split(",") if t.strip()]
+def termes(lancer: Callable[..., "subprocess.CompletedProcess[str]"] = subprocess.run) -> list[str]:
+    """Ask the backend for the list, as the pre-push hook does (ticket-798)."""
+    commande = ["uv", "run", "--project", str(REPO / "backend"),
+                "python", "-m", "tessera.coffre_cli", "termes"]
+    try:
+        r = lancer(commande, capture_output=True, text=True, encoding="utf-8",
+                   errors="replace", timeout=120, check=False)
+    except (OSError, subprocess.SubprocessError):
+        r = None
+    if r is None or r.returncode != 0:
+        sys.exit("Lecture des termes interdits impossible : lance `uv sync` dans backend/, "
+                 "ou déclare SECRETS_SOURCE=env.")
+    liste = [t.strip() for t in r.stdout.split(",") if t.strip()]
+    if not liste:
+        sys.exit("FORBIDDEN_TERMS non déclaré : rien à scanner.")
+    return liste
 
 
 def normaliser(texte: str) -> str:

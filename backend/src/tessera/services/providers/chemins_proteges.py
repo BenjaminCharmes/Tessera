@@ -17,11 +17,14 @@ endroit où écrire la même chose. Le message dit ce qui est protégé, et
 pourquoi — un projet dont un dossier s'appelle `.github/workflows` par usage
 réel doit comprendre le refus, pas le contourner.
 """
+import os
 from fnmatch import fnmatch
 from pathlib import Path
 
 from tessera.config import Settings
+from tessera.services.providers.developpement_chemin import developper
 from tessera.services.providers.script_verification import motif_du_script
+from tessera.utils.noms_windows import normaliser_segment, normaliser_segments
 
 #: Ce que l'agent lit quand on lui refuse un chemin protégé.
 PROTECTION_REFUS = (
@@ -35,12 +38,42 @@ PROTECTION_REFUS = (
 _MANIFESTE = "agents.json"
 #: Les hooks git versionnés du dépôt, sous sa racine (ADR-050).
 _HOOKS_DU_DEPOT = Path("scripts") / "hooks"
+#: Le script de la CI qui applique les termes interdits (ADR-050).
+_SCRIPT_TERMES_CI = Path("scripts") / "termes_interdits_ci.py"
+#: Les serveurs MCP du projet, lus par le CLI, en forme normalisée.
+_FICHIER_MCP = ".mcp.json"
 #: Le motif de fichier de réglages du CLI, sous `.claude/`.
 _REGLAGES_CLI = "settings*.json"
-#: Les consignes que le CLI charge dans chaque session (ticket-240).
-_CONSIGNES = {"CLAUDE.md", "CLAUDE.local.md"}
+#: Les consignes que le CLI charge dans chaque session (ticket-240), en forme
+#: normalisée : minuscules, comme `normaliser_segments` les rend.
+_CONSIGNES = {"claude.md", "claude.local.md"}
 #: Les dossiers de `.claude/` dont le CLI charge le contenu à la demande.
 _DOSSIERS_CLI = {"skills", "commands", "agents"}
+
+
+def _cible_resolue(chemin: str, racine: Path) -> Path | None:
+    """Le chemin absolu et résolu ; sans résolution possible, sa forme absolue.
+
+    Un nom que `resolve()` ne sait pas lire (flux NTFS, par exemple) ne doit pas
+    échapper au garde : on le juge tel quel plutôt que de le laisser passer.
+    """
+    try:
+        cible = Path(developper(chemin))
+        if not cible.is_absolute():
+            cible = racine / cible
+    except ValueError:
+        return None
+    try:
+        return cible.resolve()
+    except (OSError, ValueError):
+        return Path(os.path.abspath(cible))
+
+
+def _est_le_manifeste(cible: Path, project_path: Path) -> bool:
+    """Say whether `cible` is the project's `agents.json`, under any Win32 spelling."""
+    if normaliser_segment(cible.name) != _MANIFESTE:
+        return False
+    return cible.parent == project_path.resolve()
 
 
 def _motif_du_depot(cible: Path, racine: Path) -> str | None:
@@ -55,7 +88,7 @@ def _motif_du_depot(cible: Path, racine: Path) -> str | None:
             "le `.env` de Tessera porte les jetons de mise en ligne et la liste "
             "des termes interdits (ADR-050, ADR-053)"
         )
-    if cible.name == _MANIFESTE and (cible.parent / "CLAUDE.md").is_file():
+    if normaliser_segment(cible.name) == _MANIFESTE and (cible.parent / "CLAUDE.md").is_file():
         return (
             "`agents.json` d'un projet déclare son autonomie, sa racine git et sa "
             "confidentialité : un run ne change pas la politique d'un projet"
@@ -64,6 +97,11 @@ def _motif_du_depot(cible: Path, racine: Path) -> str | None:
         return (
             "`scripts/hooks/` porte le hook `pre-push`, l'une des portes des "
             "termes interdits (ADR-050)"
+        )
+    if cible == (racine / _SCRIPT_TERMES_CI).resolve():
+        return (
+            "`scripts/termes_interdits_ci.py` est exécuté par la CI : c'est l'une "
+            "des portes des termes interdits (ADR-050)"
         )
     return None
 
@@ -85,15 +123,11 @@ def motif_de_protection(
     `script` est le fichier que `test_command` exécute, déjà résolu (ticket-490) :
     le run ne réécrit pas la vérification qui le juge.
     """
-    try:
-        cible = Path(chemin)
-        if not cible.is_absolute():
-            cible = racine / cible
-        cible = cible.resolve()
-    except (OSError, ValueError):
+    cible = _cible_resolue(chemin, racine)
+    if cible is None:
         return None
 
-    if cible == (project_path / _MANIFESTE).resolve():
+    if _est_le_manifeste(cible, project_path):
         return "`agents.json` déclare l'autonomie, la racine git et les artefacts du projet"
 
     motif_depot = _motif_du_depot(cible, racine)
@@ -106,19 +140,24 @@ def motif_de_protection(
 
     # Un `CLAUDE.md` réécrit pendant un run devient la consigne de tous les
     # agents suivants, sans ticket pour l'autoriser (règle 5 de CLAUDE.md).
-    if cible.name in _CONSIGNES:
+    # Les segments se comparent normalisés : Windows ouvre le même fichier sous
+    # `settings.json.`, `Settings.JSON` ou `settings.json::$DATA` (ticket-747).
+    segments = normaliser_segments(cible)
+    if segments[-1] in _CONSIGNES:
         return (
             f"`{cible.name}` est chargé dans chaque session du CLI : le réécrire "
             "change la consigne de tous les agents suivants"
         )
 
-    segments = cible.parts
+    if segments[-1] == _FICHIER_MCP:
+        return "`.mcp.json` déclare des serveurs MCP que le CLI lance dans les sessions suivantes"
+
     if ".git" in segments:
         return (
             "`.git/` est le dépôt lui-même : un hook ou une configuration "
             "déposés là s'exécuteraient au commit, sous l'identité de l'utilisateur"
         )
-    for precedent, suivant in zip(segments, segments[1:]):
+    for precedent, suivant in zip(segments, segments[1:], strict=False):
         if precedent == ".claude" and fnmatch(suivant, _REGLAGES_CLI):
             return (
                 "`.claude/settings*.json` déclare des hooks que le CLI exécuterait "
@@ -128,6 +167,11 @@ def motif_de_protection(
             return (
                 f"`.claude/{suivant}/` porte des consignes que le CLI charge à la "
                 "demande dans les sessions suivantes"
+            )
+        if precedent == ".claude" and suivant == "hooks":
+            return (
+                "`.claude/hooks/` porte les scripts que les hooks du CLI exécutent "
+                "au run suivant"
             )
         if precedent == ".github" and suivant == "workflows":
             return (
@@ -145,7 +189,7 @@ def refus_de_protection(motif: str) -> str:
 #: Ce que l'agent lit quand il tente de passer par un interpréteur pour écrire
 #: dans un fichier protégé (ticket-326).
 INTERPRETE_PROTEGE_REFUS = (
-    "Écriture refusée : passer par `python -c` ou `node -c` ne contourne pas "
+    "Écriture refusée : passer par `python -c` ou `node -e` ne contourne pas "
     "ce refus. Un refus de hook est définitif — aucune autre voie n'est permise "
     "pour obtenir le même effet. Décris dans ton rapport ce qui a été refusé et "
     "pourquoi le ticket le demandait."

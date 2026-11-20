@@ -1,11 +1,13 @@
 import os
 import sys
 from pathlib import Path
-from typing import ClassVar
+from typing import ClassVar, Literal
 
 from pydantic import SecretStr, ValidationError
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, PydanticBaseSettingsSource, SettingsConfigDict
 
+from tessera.coffre import NOMS_SECRETS
+from tessera.config_coffre import sources_des_secrets
 from tessera.config_errors import ConfigurationError, describe_validation_error
 
 # Racine du dépôt : backend/src/tessera/config.py -> remonter de 4 niveaux.
@@ -54,6 +56,25 @@ class Settings(BaseSettings):
     # Le `.env` de Tessera, que le hook de lecture refuse aux agents (ADR-053).
     env_file: ClassVar[Path] = Path(_ENV_FILE)
 
+    # Où lire les onze secrets (ADR-073) : `auto` (coffre s'il répond, sinon
+    # `.env` avec un avertissement), `coffre` (refus sans lui), `env` (CI,
+    # Docker, tests). Lu avant le reste par `config_coffre`.
+    secrets_source: Literal["auto", "coffre", "env"] = "auto"
+
+    @classmethod
+    def settings_customise_sources(
+        cls,
+        settings_cls: type[BaseSettings],
+        init_settings: PydanticBaseSettingsSource,
+        env_settings: PydanticBaseSettingsSource,
+        dotenv_settings: PydanticBaseSettingsSource,
+        file_secret_settings: PydanticBaseSettingsSource,
+    ) -> tuple[PydanticBaseSettingsSource, ...]:
+        """Put the system vault between the environment and .env (ADR-073)."""
+        return sources_des_secrets(
+            settings_cls, init_settings, env_settings, dotenv_settings, file_secret_settings
+        )
+
     # Jetons de mise en ligne (ADR-053). `SecretStr` : ni `repr` ni `model_dump`
     # ne montrent la valeur. Vides : la mise en ligne reste inactive. Portée
     # minimale et expiration : voir `.env.example`.
@@ -62,6 +83,14 @@ class Settings(BaseSettings):
     resend_api_key: SecretStr = SecretStr("")
     stripe_api_key: SecretStr = SecretStr("")
     cloudflare_api_token: SecretStr = SecretStr("")
+    # Compte dédié des agents (ADR-083) : vide, le CLI part sous le compte du
+    # backend, comme avant. Mot de passe et jeton OAuth vivent au coffre.
+    agent_user: str = ""
+    agent_logon_password: SecretStr = SecretStr("")
+    # Vrai : les appels de worktrees différents se recouvrent sous le compte ;
+    # faux (défaut), un seul worktree à la fois (ADR-087).
+    agent_calls_parallel: bool = False
+    agent_oauth_token: SecretStr = SecretStr("")
     # Identifiant d'équipe Vercel : pas un secret.
     vercel_team_id: str = ""
     # Identifiant d'organisation Neon : pas un secret. Vide, le client le lit
@@ -158,13 +187,19 @@ class Settings(BaseSettings):
     # et par ticket. Hors de tout dépôt — rien à exclure, rien qu'un `git add`
     # balaie — et court, à cause des chemins longs de Windows.
     ide_worktrees_dir: Path = Path.home() / ".tessera" / "worktrees"
+    # Worktrees des projets au compte agent dédié (ticket-947) : hors du profil,
+    # où le CLI du compte ne résout pas les chemins.
+    ide_worktrees_dir_agent: Path = Path(r"C:\ProgramData\Tessera\worktrees")
     # Fichier de log tournant (5 × 10 Mo). Ancré sur la racine du dépôt pour
     # ne pas dépendre du répertoire de lancement (ticket-330).
     ide_log_file: Path = _REPO_ROOT / "backend" / "logs" / "tessera.log"
-    static_token: str = ""  # if set, all API requests require Authorization: Bearer <token>
+    static_token: str = ""  # the session token; empty, the backend draws one per boot (ticket-878)
     # Noms de `Host` admis en plus du loopback, séparés par des virgules
     # (ticket-704). Vide : 127.0.0.1, localhost et [::1] seuls.
     allowed_hosts: str = ""
+    # Origines admises en plus des défauts pour une WebSocket, séparées par des
+    # virgules (ticket-754). Vide : Vite 5173-5176 et l'app Tauri seuls.
+    allowed_origins: str = ""
     # Borne le nombre de suites de tests lancées simultanément sur la machine.
     # 0 ou moins : pas de borne. Voir ticket-348.
     max_parallel_test_runs: int = 2
@@ -191,6 +226,9 @@ class Settings(BaseSettings):
     # la suite de tests (≈ 6 min) peut rester muette sans être figée.
     # 0 désactive la borne.
     agent_silence_max_s: float = 1200.0
+    # Pendant qu'un appel `Bash` attend son résultat : la limite du CLI (10 min)
+    # plus une minute (ticket-957). 0 désactive cette borne.
+    bash_silence_max_s: float = 660.0
     # Délai maximum d'attente du calcul « fusionnable » d'une PR par GitHub
     # avant d'abandonner le merge (ticket-384).
     attente_fusionnabilite_max_s: float = 300.0
@@ -206,11 +244,35 @@ class Settings(BaseSettings):
     # Utilise SetThreadExecutionState sous Windows ; no-op ailleurs.
     # Désactivable si un outil externe gère déjà la veille.
     keep_awake_during_runs: bool = True
+    # Détecteur d'anomalies des runs (ticket-834, ADR-078) : un témoin, qui
+    # dit et n'agit pas. Seuils de la spec 2026-11-05-detecteur-d-anomalies.
+    anomalies_actives: bool = True
+    anomalie_intervalle_s: float = 300.0
+    anomalie_outil_repete: int = 4
+    anomalie_silence_s: float = 900.0
+    anomalie_tours: int = 3
+    anomalie_facteur_median: float = 3.0
+    anomalie_echantillon_min: int = 10
+    anomalie_fenetre: int = 20
+    anomalie_plancher_etape_s: float = 300.0
+    anomalie_plancher_cout_usd: float = 0.5
+    anomalie_part_budget: float = 0.8
 
-    def valeurs_des_jetons(self) -> list[str]:
-        """Return the non-empty values of the online-service tokens (ADR-053)."""
-        valeurs = (getattr(self, champ).get_secret_value() for champ in CHAMPS_JETONS)
-        return [valeur for valeur in valeurs if valeur]
+    def valeurs_des_secrets(self) -> list[str]:
+        """Return the non-empty values of the secrets (ADR-073).
+
+        Every name of ``NOMS_SECRETS`` but ``FORBIDDEN_TERMS``: that one is the
+        list the push gate already applies, not a value to mask.
+        """
+        valeurs: list[str] = []
+        for nom in NOMS_SECRETS:
+            if nom == "FORBIDDEN_TERMS":
+                continue
+            valeur = getattr(self, nom.lower())
+            texte = valeur.get_secret_value() if isinstance(valeur, SecretStr) else valeur
+            if texte:
+                valeurs.append(texte)
+        return valeurs
 
 
 def load_settings(env_file: Path | None = None) -> Settings:

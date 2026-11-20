@@ -1,0 +1,167 @@
+"""Read a ticket that only exists on the remote base — ticket-923.
+
+Un projet sans worktree travaille dans son checkout : un ticket mergé sur
+`origin/<base>` n'y est qu'après l'avance rapide que `create_branch` fait,
+mais celle-ci vient après la lecture du ticket. Ce module la fait plus tôt,
+une seule fois, quand le ticket manque à l'arbre.
+"""
+from typing import TYPE_CHECKING
+
+from tessera.models.ticket import Ticket, TicketStatus
+from tessera.services.git_workspace import journal_attente, journal_en_attente
+from tessera.services.noyau.pipeline_events import EventType, PipelineResult
+from tessera.services.pipeline import pipeline_branche
+from tessera.services.pipeline.pipeline_run import PipelineRun, emit
+from tessera.services.projets.ticket_alignement import aligner_sur_contenu
+from tessera.services.projets.ticket_service import ticket_depuis_contenu
+from tessera.utils.logger import get_logger
+
+if TYPE_CHECKING:
+    from tessera.services.pipeline.orchestrator import Orchestrator
+
+_logger = get_logger(__name__)
+
+
+async def _avancer(orch: "Orchestrator") -> str | None:
+    """Fast-forward the base with the pending log lines set aside, then put them back."""
+    racine = orch._project_path
+    lignes = await journal_en_attente.mettre_de_cote(racine) if racine else []
+    if racine:
+        lignes += await journal_attente.reprendre(racine)
+    try:
+        return await pipeline_branche._realigner_base_au_depart(orch)
+    finally:
+        pipeline_branche._reecrire_journal(racine, lignes)
+
+
+async def lire_apres_avance(
+    orch: "Orchestrator", ticket_id: str
+) -> tuple[Ticket | None, str | None] | None:
+    """The ticket read after realigning the base, and the refusal reason if any.
+
+    Sans workspace git, ou dans un worktree de run (qui part déjà de
+    `origin/<base>`), rien n'est tenté : `None`.
+    """
+    if orch._git_workspace is None or getattr(orch, "_worktree", None) is not None:
+        return None
+    raison = await _avancer(orch)
+    ticket = await orch._ticket_svc.get_ticket(ticket_id)
+    if ticket is None:
+        _logger.info("ticket_absent_apres_avance", extra={"ticket_id": ticket_id, "raison": raison})
+    return ticket, raison
+
+
+def arret_ticket_absent(ticket_id: str, raison: str | None) -> PipelineResult:
+    """A blocked result, with nothing created, saying why the ticket is still missing."""
+    cause = f" (avance de la base refusée : {raison})" if raison else ""
+    return PipelineResult(
+        ticket_id=ticket_id,
+        final_status=TicketStatus.blocked,
+        rounds=0,
+        approved=False,
+        arret=f"Ticket introuvable : {ticket_id}{cause}",
+    )
+
+
+async def trouver_ticket(orch: "Orchestrator", ticket_id: str) -> Ticket | PipelineResult:
+    """The ticket of a run: tree, then restored from the base, then after the fast-forward.
+
+    Absent partout : `ValueError` hors avance tentée, sinon un résultat bloqué.
+    Le fichier ticket a pu être déplacé sans commit lors d'un run précédent coupé
+    net (ex : blocked/ sans commit) : on le retrouve sur la base distante.
+    """
+    ticket = await orch._ticket_svc.get_ticket(ticket_id)
+    if ticket is None and orch._git_workspace is not None:
+        if await orch._git_workspace.restaurer_ticket_depuis_base(ticket_id):
+            ticket = await orch._ticket_svc.get_ticket(ticket_id)
+    if ticket is not None:
+        # Figé ici, avant le premier agent : la livraison ne relit pas la fiche,
+        # que le codeur a pu réécrire pendant le run (ticket-964).
+        orch._preuves_reelles[ticket_id] = ticket.preuve_reelle is True
+        return ticket
+    avance = await lire_apres_avance(orch, ticket_id)
+    if avance is None:
+        raise ValueError(f"Ticket introuvable : {ticket_id}")
+    if avance[0] is None:
+        return arret_ticket_absent(ticket_id, avance[1])
+    # Retrouvé après l'avance : figé de même (ticket-964).
+    orch._preuves_reelles[ticket_id] = avance[0].preuve_reelle is True
+    return avance[0]
+
+
+async def sha_de_base(orch: "Orchestrator") -> str | None:
+    """The head SHA, or None when it cannot be read (no repo, test double)."""
+    if orch._git_workspace is None:
+        return None
+    try:
+        return str(await orch._git_workspace.head_sha())
+    except Exception:  # noqa: BLE001 — un SHA manquant ne doit pas coûter le run
+        return None
+
+
+def _texte_change(avant: Ticket, apres: Ticket) -> bool:
+    exclus = {"file_path", "status"}
+    return avant.model_dump(exclude=exclus) != apres.model_dump(exclude=exclus)
+
+
+async def _aligner_sur_la_base(orch: "Orchestrator", relu: Ticket) -> tuple[Ticket, bool]:
+    """The ticket as ``_base_ref`` writes it, and whether the tree's copy lagged it.
+
+    Une branche reprise porte sa propre fiche, déplacée et au texte périmé
+    (ticket-987) : la base gagne, le statut reste celui du pipeline, et il ne
+    reste qu'un fichier. Rien n'est écrit quand la fiche est déjà celle de la base.
+    """
+    # getattr : les doubles de workspace des tests d'étape n'ont pas cette lecture.
+    lire = getattr(orch._git_workspace, "lire_ticket_sur_base_ref", None)
+    contenu = await lire(relu.id) if lire is not None else None
+    if contenu is None:
+        return relu, False
+    try:
+        base = ticket_depuis_contenu("tickets/todo/base.md", contenu, relu.project_id)
+    except ValueError:
+        return relu, False
+    copies = orch._ticket_svc._find_all_files(relu.id)
+    if len(copies) <= 1 and not _texte_change(relu, base):
+        return relu, False
+    aligne = aligner_sur_contenu(orch._ticket_svc, relu.id, contenu)
+    return (aligne or relu), True
+
+
+async def relire_apres_branche(
+    orch: "Orchestrator", run: PipelineRun, sha_avant: str | None
+) -> PipelineResult | None:
+    """Re-read the ticket once the base is advanced and the branch created (ticket-977).
+
+    Remplace `run.ticket` par la fiche relue et refait le gel de `preuve_reelle`.
+    Fiche introuvable : un résultat bloqué, sans agent. Vaut aussi dans un worktree
+    de run : une branche reprise y est extraite telle quelle, avec la fiche que le
+    codeur a pu réécrire ; `preuve_reelle`, critères et type se lisent sur la base.
+    """
+    if orch._git_workspace is None:
+        return None
+    relu = await orch._ticket_svc.get_ticket(run.ticket_id)
+    if relu is None:
+        return arret_ticket_absent(run.ticket_id, "fiche introuvable après l'avance de la base")
+    relu, periodee = await _aligner_sur_la_base(orch, relu)
+    if not periodee and not _texte_change(run.ticket, relu):
+        return None
+    run.ticket = relu
+    orch._preuves_reelles[run.ticket_id] = relu.preuve_reelle is True
+    sha_apres = await sha_de_base(orch)
+    await emit(
+        run, EventType.TICKET_RELU_APRES_AVANCE, ancien_sha=sha_avant, nouveau_sha=sha_apres
+    )
+    orch._log(
+        f"[{run.ticket_id}] fiche relue après l'avance de la base "
+        f"({sha_avant or '?'} → {sha_apres or '?'})"
+    )
+    return None
+
+
+async def creer_branche_et_relire(orch: "Orchestrator", run: PipelineRun) -> PipelineResult | None:
+    """Create the run's branch, then re-read the ticket the advanced base may have changed."""
+    sha_avant = await sha_de_base(orch)
+    refus = await pipeline_branche.create_branch(orch, run)
+    if refus is not None:
+        return refus
+    return await relire_apres_branche(orch, run, sha_avant)

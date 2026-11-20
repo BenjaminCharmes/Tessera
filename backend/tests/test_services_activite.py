@@ -7,7 +7,7 @@ import asyncio
 import json
 from collections.abc import Iterator
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
@@ -16,8 +16,8 @@ from fastapi.testclient import TestClient
 from tessera.config import settings
 from tessera.main import app
 from tessera.routers.services_running import get_sonde
-from tessera.services.database import init_db
-from tessera.services.sonde_systeme import InfoProcessus
+from tessera.services.noyau.database import init_db
+from tessera.services.supervision.sonde_systeme import InfoProcessus
 
 
 @dataclass
@@ -74,7 +74,7 @@ def _declarer(projet: Path) -> None:
 
 
 def _ecrire_activite(projet: Path) -> None:
-    maintenant = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    maintenant = datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
     contenu = {
         "version": 1,
         "maj": maintenant,

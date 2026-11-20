@@ -9,7 +9,7 @@ from fastapi.testclient import TestClient
 
 from tessera.config import settings
 from tessera.main import app
-from tessera.services.run_registry import RUN_REGISTRY, RunActif
+from tessera.services.pipeline.run_registry import RUN_REGISTRY, RunActif
 
 
 @pytest.fixture(autouse=True)
@@ -116,6 +116,21 @@ def test_blank_description_is_422() -> None:
 
 def test_unknown_nature_is_422() -> None:
     assert _envoyer(nature="question").status_code == 422
+
+
+@pytest.mark.parametrize(
+    "champ, limite",
+    [("titre", 200), ("description", 20_000), ("contexte", 20_000), ("projet", 100)],
+)
+def test_signalement_over_the_size_limit_is_refused(
+    workspace: Path, champ: str, limite: int
+) -> None:
+    assert _envoyer(**{champ: "x" * (limite + 1)}).status_code == 422
+    assert _tickets(workspace, "ide-core") == []
+
+
+def test_signalement_at_the_size_limit_is_accepted(workspace: Path) -> None:
+    assert _envoyer(description="x" * 20_000).status_code == 201
 
 
 def test_router_is_mounted_under_api_v1() -> None:

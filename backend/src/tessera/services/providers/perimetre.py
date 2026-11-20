@@ -21,23 +21,19 @@ ce que ce module garantit. Ce qui ne se lit pas avec certitude passe, plutôt
 que de refuser une commande légitime : un faux refus coûte à l'agent son moyen
 de vérifier son travail.
 """
+from collections.abc import Awaitable, Callable
 from pathlib import Path
-from typing import Any, Awaitable, Callable
+from typing import Any
 
 from claude_agent_sdk import HookContext, HookInput, HookJSONOutput
 
-from tessera.services.racine_depot import declare_ancestor, racine_ecriture_projet
-from tessera.services.providers.chemins_proteges import (
-    INTERPRETE_PROTEGE_REFUS,
-    motif_de_protection,
-    refus_de_protection,
-)
+from tessera.services.projets.racine_depot import declare_ancestor, racine_ecriture_projet
+from tessera.services.providers.chemins_proteges import INTERPRETE_PROTEGE_REFUS, motif_de_protection, refus_de_protection
+from tessera.services.providers.developpement_chemin import developper, est_indetermine
+from tessera.services.providers.redirections_bash import cibles_ecrites, cibles_interpreteur_ecriture
 from tessera.services.providers.refus_garde import JournalDesRefus
-from tessera.services.providers.redirections_bash import (
-    cibles_ecrites,
-    cibles_interpreteur_ecriture,
-)
 from tessera.services.providers.script_verification import script_de_verification
+from tessera.services.providers.suivi_cd import CD_INCERTAIN_REFUS, DOSSIER_INCERTAIN
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -88,14 +84,29 @@ def hors_perimetre(
     if racine is None:
         racine = racine_autorisee(project_path)
     try:
-        cible = Path(chemin)
+        texte = developper(chemin)
+        if est_indetermine(texte):
+            return True
+        cible = Path(texte)
         if not cible.is_absolute():
-            cible = racine / cible
+            # Relatif au dossier de l'agent (son `cwd`), pas à la racine : sous
+            # `git_root: ancestor` les deux diffèrent (ticket-959).
+            cible = project_path / cible
         return not cible.resolve().is_relative_to(racine)
     except (OSError, ValueError):
         # Un chemin que le système refuse de résoudre n'est pas un chemin
         # qu'on laisse écrire.
         return True
+
+
+def _absolue(chemin: str, project_path: Path) -> str:
+    """`chemin` made absolute from the agent's folder, as `hors_perimetre` reads it."""
+    try:
+        texte = developper(chemin)
+    except ValueError:
+        return chemin
+    cible = Path(texte)
+    return str(cible if cible.is_absolute() else project_path / cible)
 
 
 def hook_refus_hors_perimetre(
@@ -167,13 +178,15 @@ def hook_refus_hors_perimetre(
         racine = racine_figee if racine_figee is not None else project_path.resolve()
         for cible in cibles:
             if hors_perimetre(cible, project_path, racine):
+                raison = CD_INCERTAIN_REFUS if cible.startswith(DOSSIER_INCERTAIN) else ECRITURE_REFUS
                 return _refus(
                     "ecriture_hors_perimetre_refusee", cible, project_path,
-                    ECRITURE_REFUS, journal,
+                    raison, journal,
                 )
             # Dans le projet, mais porteur de ses règles : `agents.json`, `.git/`,
-            # `.claude/settings*.json`, `.github/workflows/` (ticket-119).
-            motif = motif_de_protection(cible, project_path, racine, script)
+            # `.claude/settings*.json`, `.github/workflows/` (ticket-119). Jugé
+            # sur le même chemin absolu que le périmètre (ticket-963).
+            motif = motif_de_protection(_absolue(cible, project_path), project_path, racine, script)
             if motif is not None:
                 return _refus(
                     "ecriture_protegee_refusee",

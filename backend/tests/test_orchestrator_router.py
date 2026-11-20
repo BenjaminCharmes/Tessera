@@ -12,8 +12,8 @@ from pathlib import Path
 import pytest
 
 from tessera.config import settings
-from tessera.services.assemblage_run import build_orchestrator, build_project_context, tours_du_role
-from tessera.services.pipeline_plan import ROLE_PLAN
+from tessera.services.pipeline.assemblage_run import build_orchestrator, build_project_context, tours_du_role
+from tessera.services.pipeline.pipeline_plan import ROLE_PLAN
 from tessera.services.providers.repli import ProviderAvecRepli
 
 

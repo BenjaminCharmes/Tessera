@@ -4,16 +4,10 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services.documentation import DocumentationService, EditionRefusee
-from tessera.services.documentation_editions import appliquer_editions
-from tessera.services.documentation_code import DiffDeTicket, FichierLivre, MatiereCode
-from tessera.services.documentation_preuve import (
-    VOLUME_MAX_EDITION,
-    VOLUME_MAX_ROLE,
-    ControleDePreuve,
-    fichiers_de_la_matiere,
-    jetons_de,
-)
+from tessera.services.documentation.documentation import DocumentationService, EditionRefusee
+from tessera.services.documentation.documentation_code import DiffDeTicket, FichierLivre, MatiereCode
+from tessera.services.documentation.documentation_editions import appliquer_editions
+from tessera.services.documentation.documentation_preuve import VOLUME_MAX_EDITION, VOLUME_MAX_ROLE, ControleDePreuve, fichiers_de_la_matiere, jetons_de
 from tests.matiere_factice import matiere_factice
 
 
@@ -138,7 +132,62 @@ def test_excerpt_from_removed_lines_is_refused() -> None:
 
 def test_single_line_excerpt_still_passes() -> None:
     _verifier(_controle_du_diff(), 'export type QuizMode =')
-    _verifier(_controle_du_diff(), "const ancien = 1")
+    _verifier(_controle_du_diff(), "+export type QuizMode =")
+
+
+def test_single_line_excerpt_found_only_on_a_removed_line_is_refused() -> None:
+    with pytest.raises(EditionRefusee, match=r"(?s)preuve.*n'est ni dans"):
+        _verifier(_controle_du_diff(), "const ancien = 1")
+    with pytest.raises(EditionRefusee, match=r"(?s)preuve.*n'est ni dans"):
+        _verifier(_controle_du_diff(), "-const ancien = 1")
+
+
+_DIFF_DEUX_SECTIONS = (
+    "diff --git a/src/a.py b/src/a.py\n"
+    "--- a/src/a.py\n"
+    "+++ b/src/a.py\n"
+    "@@ -1,2 +1,3 @@\n"
+    "+SEUIL = 3\n"
+    "+DELAI = 5\n"
+    " pass\n"
+    "@@ -90,2 +91,3 @@\n"
+    " def fin():\n"
+    "+    return SEUIL\n"
+    "+    # fin\n"
+)
+
+
+def _controle_de_deux_sections() -> ControleDePreuve:
+    diff = DiffDeTicket("ticket-9", _DIFF_DEUX_SECTIONS, ["src/a.py"])
+    return ControleDePreuve(MatiereCode(diffs=[diff]))
+
+
+def test_excerpt_of_two_lines_from_two_sections_is_refused() -> None:
+    # La dernière ligne de la section 1 et la première de la section 2 se touchent
+    # une fois les lignes recollées, mais ne se suivent pas dans le code livré.
+    with pytest.raises(EditionRefusee, match=r"(?s)preuve.*n'est ni dans"):
+        _verifier(_controle_de_deux_sections(), "pass\ndef fin():")
+
+
+def test_excerpt_of_two_consecutive_lines_of_one_section_is_accepted() -> None:
+    _verifier(_controle_de_deux_sections(), "SEUIL = 3\nDELAI = 5")
+    _verifier(_controle_de_deux_sections(), "def fin():\n    return SEUIL")
+
+
+def test_excerpt_cannot_straddle_two_files_of_the_material() -> None:
+    matiere = MatiereCode(
+        diffs=[DiffDeTicket("t", "diff --git a/a b/a\n+premier\n", ["a"])],
+        fichiers=[FichierLivre("b", "second\n")],
+    )
+    with pytest.raises(EditionRefusee, match=r"(?s)preuve.*n'est ni dans"):
+        _verifier(ControleDePreuve(matiere), "premier\nsecond")
+
+
+def test_an_added_line_starting_with_two_plus_signs_is_proof() -> None:
+    diff = "diff --git a/src/a.c b/src/a.c\n--- a/src/a.c\n+++ b/src/a.c\n@@ -1 +1,2 @@\n+++i\n x\n"
+    controle = ControleDePreuve(MatiereCode(diffs=[DiffDeTicket("t", diff, ["src/a.c"])]))
+
+    _verifier(controle, "++i")
 
 
 @pytest.mark.parametrize("entete", ["+++ b/src/types.ts", "@@ -1,3 +1,5 @@", "--- a/src/types.ts"])
@@ -423,3 +472,40 @@ async def test_the_service_refuses_an_invented_token_twice(tmp_path: Path) -> No
 
     assert any("jeton vérifiable" in r for r in resultat.refus)
     assert (tmp_path / "docs" / "guide.md").read_text(encoding="utf-8") == "Avant.\n"
+
+
+_NL = chr(10)
+_FICHIER_PREUVE = "alpha = 1" + chr(10) + "non citee = 0" + chr(10) + "beta = 2" + chr(10) * 2 + "gamma = 3"
+
+
+def _controle_fichier() -> ControleDePreuve:
+    return ControleDePreuve(_matiere("x = 0", _FICHIER_PREUVE))
+
+
+def test_lines_of_one_block_separated_by_an_uncited_line_are_accepted() -> None:
+    _verifier(_controle_fichier(), _NL.join(["alpha = 1", "beta = 2", "gamma = 3"]))
+
+
+def test_the_refusal_names_the_missing_line() -> None:
+    with pytest.raises(EditionRefusee, match="delta = 4"):
+        _verifier(_controle_fichier(), _NL.join(["alpha = 1", "delta = 4"]))
+
+
+def test_lines_present_in_different_blocks_are_refused() -> None:
+    controle = ControleDePreuve(
+        MatiereCode(fichiers=[FichierLivre("a.py", "un = 1"), FichierLivre("b.py", "deux = 2")])
+    )
+    with pytest.raises(EditionRefusee, match="deux = 2"):
+        _verifier(controle, _NL.join(["un = 1", "deux = 2"]))
+
+
+def test_an_absent_single_line_extract_is_still_refused() -> None:
+    with pytest.raises(EditionRefusee, match="absente = 1"):
+        _verifier(_controle_fichier(), "absente = 1")
+
+
+@pytest.mark.parametrize("prompt", ["doc-technique.md", "doc-fonctionnelle.md"])
+def test_the_prompts_ask_for_a_single_line_extract(prompt: str) -> None:
+    racine = Path(__file__).resolve().parents[2]
+    texte = (racine / "agents" / "prompts" / prompt).read_text(encoding="utf-8")
+    assert "L'extrait tient sur une seule ligne" in texte

@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services.sync_map import SyncEntry, SyncMapService
+from tessera.services.github.sync_map import SyncEntry, SyncMapService
 
 
 @pytest.fixture

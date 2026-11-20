@@ -1,0 +1,104 @@
+[
+  {
+    "id": "d01",
+    "bras": "B",
+    "rang": 1,
+    "jugement": "confirme"
+  },
+  {
+    "id": "d01",
+    "bras": "B",
+    "rang": 2,
+    "jugement": "confirme"
+  },
+  {
+    "id": "d04",
+    "bras": "B",
+    "rang": 1,
+    "jugement": "confirme"
+  },
+  {
+    "id": "d04",
+    "bras": "B",
+    "rang": 2,
+    "jugement": "confirme"
+  },
+  {
+    "id": "d11",
+    "bras": "B",
+    "rang": 1,
+    "jugement": "confirme"
+  },
+  {
+    "id": "d11",
+    "bras": "B",
+    "rang": 2,
+    "jugement": "confirme"
+  },
+  {
+    "id": "s02",
+    "bras": "B",
+    "rang": 1,
+    "jugement": "confirme"
+  },
+  {
+    "id": "s09",
+    "bras": "B",
+    "rang": 1,
+    "jugement": "confirme"
+  },
+  {
+    "id": "s09",
+    "bras": "B",
+    "rang": 2,
+    "jugement": "confirme"
+  },
+  {
+    "id": "s10",
+    "bras": "B",
+    "rang": 1,
+    "jugement": "confirme"
+  },
+  {
+    "id": "s11",
+    "bras": "B",
+    "rang": 1,
+    "jugement": "confirme"
+  },
+  {
+    "id": "s12",
+    "bras": "B",
+    "rang": 1,
+    "jugement": "confirme"
+  },
+  {
+    "id": "d03",
+    "bras": "C",
+    "rang": 1,
+    "jugement": "infonde"
+  },
+  {
+    "id": "d07",
+    "bras": "C",
+    "rang": 1,
+    "jugement": "infonde"
+  },
+  {
+    "id": "d07",
+    "bras": "C",
+    "rang": 2,
+    "jugement": "infonde"
+  },
+  {
+    "id": "d08",
+    "bras": "C",
+    "rang": 1,
+    "jugement": "infonde"
+  },
+  {
+    "id": "s11",
+    "bras": "C",
+    "rang": 1,
+    "jugement": "infonde"
+  }
+]

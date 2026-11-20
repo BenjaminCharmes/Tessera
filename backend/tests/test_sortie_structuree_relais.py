@@ -2,7 +2,7 @@
 from pathlib import Path
 from typing import Any
 
-from tessera.services.agent_runner import AgentRunner
+from tessera.services.agents.agent_runner import AgentRunner
 from tessera.services.providers.base import LLMProvider, ProviderResult
 from tessera.services.providers.enregistrant import ProviderEnregistrant
 from tessera.services.providers.noms import ProviderIndisponible

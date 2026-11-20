@@ -5,6 +5,7 @@ import type {
   ProjectUsage,
   RecentRun,
   RunEvent,
+  RunDemarre,
   RunRequest,
   StatsPeriod,
   UsageStats,
@@ -18,7 +19,7 @@ export const orchestrator = {
    * (ticket-128). Le deroule s'observe sur `/orchestrator/observe`, ou
    * tous les runs de la machine passent.
    */
-  run: (body: RunRequest): Promise<{ run_id: string }> =>
+  run: (body: RunRequest): Promise<RunDemarre> =>
     request("/orchestrator/run", {
       method: "POST",
       headers: { "Content-Type": "application/json" },

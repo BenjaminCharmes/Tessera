@@ -14,19 +14,13 @@ import pytest
 from claude_agent_sdk import AssistantMessage, ResultMessage, TextBlock
 
 import tessera.services.providers.agent_sdk as agent_sdk_module
-from tessera.models.agent import AgentConfig, AgentResult, AgentRole
-from tessera.models.ticket import Ticket, TicketStatus
+from tessera.models.agent import AgentResult, AgentRole
 from tessera.services.providers.agent_sdk import ClaudeAgentSDKProvider
 from tessera.services.providers.anthropic_api import AnthropicApiProvider
 from tessera.services.providers.base import ProviderResult
 from tests.test_agent_runner import _make_ticket as _ticket_runner
 from tests.test_agent_runner import _runner
-from tests.test_orchestrator import (
-    _make_agent_result,
-    _make_orchestrator,
-    _make_ticket,
-    _noop,
-)
+from tests.test_orchestrator import _make_agent_result, _make_orchestrator, _make_ticket, _noop
 from tests.test_providers_base import FakeProvider
 
 
@@ -51,7 +45,7 @@ async def test_le_provider_sdk_rend_l_identifiant_de_session(
 ) -> None:
     # Sans cet identifiant, rien ne peut être repris : c'est le maillon que
     # tout le ticket suspend.
-    async def fake_query(*, prompt: str, options: Any) -> AsyncIterator[Any]:
+    async def fake_query(*, prompt: str, options: Any, **_: Any) -> AsyncIterator[Any]:
         yield AssistantMessage(content=[TextBlock(text="ok")], model="m")
         yield _result_message("sess-42")
 
@@ -67,7 +61,7 @@ async def test_le_provider_sdk_passe_la_session_dans_resume(
 ) -> None:
     captured: dict[str, Any] = {}
 
-    async def fake_query(*, prompt: str, options: Any) -> AsyncIterator[Any]:
+    async def fake_query(*, prompt: str, options: Any, **_: Any) -> AsyncIterator[Any]:
         captured["resume"] = options.resume
         yield _result_message("sess-43")
 
@@ -84,7 +78,7 @@ async def test_le_provider_sdk_sans_session_ne_reprend_rien(
 ) -> None:
     captured: dict[str, Any] = {}
 
-    async def fake_query(*, prompt: str, options: Any) -> AsyncIterator[Any]:
+    async def fake_query(*, prompt: str, options: Any, **_: Any) -> AsyncIterator[Any]:
         captured["resume"] = options.resume
         yield _result_message("sess-1")
 
@@ -102,7 +96,7 @@ async def test_une_reprise_qui_echoue_retombe_sur_un_appel_complet(
     # introuvable ne doit pas coûter le run, seulement l'économie espérée.
     tentatives: list[str | None] = []
 
-    async def fake_query(*, prompt: str, options: Any) -> AsyncIterator[Any]:
+    async def fake_query(*, prompt: str, options: Any, **_: Any) -> AsyncIterator[Any]:
         tentatives.append(options.resume)
         if options.resume is not None:
             raise RuntimeError("No conversation found with session ID")
@@ -124,7 +118,7 @@ async def test_un_echec_sans_session_remonte_tel_quel(
 ) -> None:
     # Le repli ne concerne que la reprise : un appel neuf qui échoue ne se
     # rejoue pas, il aurait le même résultat et coûterait deux fois.
-    async def fake_query(*, prompt: str, options: Any) -> AsyncIterator[Any]:
+    async def fake_query(*, prompt: str, options: Any, **_: Any) -> AsyncIterator[Any]:
         raise RuntimeError("panne")
         yield  # pragma: no cover
 

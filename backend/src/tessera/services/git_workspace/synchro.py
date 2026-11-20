@@ -4,8 +4,8 @@ import asyncio
 
 from tessera.services.git_workspace.base import GitBase
 from tessera.services.git_workspace.erreurs import GitCommandError
+from tessera.services.noyau.git_commande import build_command
 from tessera.utils.logger import get_logger
-
 
 _logger = get_logger("tessera.services.git_workspace")
 
@@ -54,9 +54,9 @@ class GitSync(GitBase):
         # concurrent git process overwriting the file (FETCH_HEAD is not a
         # named ref, but a plain file that any fetch overwrites).
         try:
-            fetch_sha = (await self._run("rev-parse", "FETCH_HEAD")).strip()
+            fetch_sha = await self._sha_base_distante(base_branch)
         except GitCommandError as exc:
-            raison = f"rev-parse FETCH_HEAD échoué : {exc.stderr.strip()}"
+            raison = f"lecture de la base distante échouée : {exc.stderr.strip()}"
             _logger.warning("sync_base_rev_parse_echoue", extra={"erreur": raison})
             return raison
 
@@ -76,7 +76,7 @@ class GitSync(GitBase):
 
         if local_sha is not None and local_sha != fetch_sha:
             proc = await asyncio.create_subprocess_exec(
-                "git", "merge-base", "--is-ancestor", local_sha, fetch_sha,
+                *build_command(("merge-base", "--is-ancestor", local_sha, fetch_sha)),
                 cwd=str(self._project_path),
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,

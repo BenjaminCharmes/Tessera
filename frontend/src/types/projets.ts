@@ -15,6 +15,10 @@ export interface Project {
    * « Lancer » demarrerait un second backend sur un port deja pris.
    */
   fait_tourner_l_ide?: boolean;
+  /** Les leçons proposées qui attendent d'être déplacées sous « En vigueur » (ticket-831). */
+  lecons_proposees?: number;
+  /** Les cas que le superviseur a laissés à relire dans `memory/supervision.md` (ticket-861). */
+  superviseur_a_toi?: number;
 }
 
 export interface ProjectCreationResult {
@@ -92,13 +96,15 @@ export interface ServiceActif {
    * (ticket-148). Le canal ne rejoue pas l'historique : sans elles, qui ouvre
    * l'IDE apres le demarrage ne verrait jamais l'adresse annoncee.
    */
-  sortie?: string[];
+  sortie: string[];
+  /** Lignes ecartees par le tampon avant la premiere de `sortie` (ticket-769). */
+  lignes_ecartees?: number;
   /**
    * Vrai quand c'est l'utilisateur qui a demande l'arret (ticket-151).
    * `terminate()` laisse un code non nul sur certaines plateformes : sans ce
    * drapeau, un service qu'on vient d'arreter s'afficherait en echec.
    */
-  arrete_a_la_main?: boolean;
+  arrete_a_la_main: boolean;
 }
 
 // ---------------------------------------------------------- liaison git ----

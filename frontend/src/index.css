@@ -219,3 +219,14 @@
 @media (prefers-reduced-motion: reduce) {
   .anim-pousse, .anim-devoile, .anim-ouvre { animation: none; }
 }
+
+/* Anneau de focus violet des éléments interactifs sans bordure propre
+   (ticket-919). Le violet reste en contour, jamais en couleur de texte. */
+@utility focus-violet {
+  &:focus-visible {
+    outline-style: solid;
+    outline-width: 2px;
+    outline-offset: 2px;
+    outline-color: var(--color-violet-500);
+  }
+}

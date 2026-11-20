@@ -13,12 +13,16 @@ dropped inside the workspace from pointing out of it.
 """
 from pathlib import Path
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Request
 from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel
 
+from tessera.auth import is_declared_origin
 from tessera.config import settings
+from tessera.services.creation_projet.project_importer import is_too_broad
+from tessera.services.providers.chemins_proteges import motif_de_protection
 from tessera.utils.logger import get_logger
+from tessera.utils.noms_windows import normaliser_segments
 
 _logger = get_logger(__name__)
 
@@ -54,9 +58,15 @@ def _workspace_roots() -> list[Path]:
         for child in workspace.iterdir():
             if child.is_symlink() and child.is_dir():
                 try:
-                    roots.append(child.resolve(strict=True))
+                    target = child.resolve(strict=True)
                 except OSError:
                     continue
+                # Même borne qu'à l'import : un lien créé avant elle, ou
+                # autrement, ne doit pas ouvrir le home ou un disque entier.
+                if is_too_broad(target):
+                    _logger.warning("fs_link_root_too_broad", extra={"path": str(target)})
+                    continue
+                roots.append(target)
     return roots
 
 
@@ -95,12 +105,15 @@ def _is_self_executing(resolved: Path) -> bool:
     carries hooks and commands run by the CLI. Other config files stay
     editable: the editor is the user's own tool.
     """
-    parts = [part.lower() for part in resolved.parts]
+    # Comparaison sur les noms normalisés : Windows ouvre le même fichier sous
+    # `settings.json.` ou `settings.json::$DATA` (ticket-747).
+    parts = normaliser_segments(resolved)
     if ".git" in parts:
         return True
-    name = resolved.name.lower()
+    name = parts[-1]
     return (
-        resolved.parent.name.lower() == ".claude"
+        len(parts) > 1
+        and parts[-2] == ".claude"
         and name.startswith("settings")
         and name.endswith(".json")
     )
@@ -136,8 +149,33 @@ async def read_file(path: str = Query(...)) -> str:
         ) from exc
 
 
+def _project_root_of(resolved: Path) -> Path:
+    """Le dossier du projet qui contient `resolved`, pour juger ses fichiers de politique.
+
+    Un projet lié en symlink est sa propre racine ; sinon c'est le premier
+    dossier sous le workspace.
+    """
+    roots = _workspace_roots()
+    for root in roots[1:]:
+        if resolved == root or root in resolved.parents:
+            return root
+    workspace = roots[0]
+    relative = resolved.relative_to(workspace)
+    return workspace / relative.parts[0] if relative.parts else workspace
+
+
+def _est_un_fichier_de_politique(resolved: Path) -> bool:
+    """Say whether a file governs the agents of its project.
+
+    Délègue à `motif_de_protection` : une seule liste de ce que protège le garde
+    de périmètre des runs (ADR-027), pas une seconde ici.
+    """
+    project = _project_root_of(resolved)
+    return motif_de_protection(str(resolved), project, project) is not None
+
+
 @router.put("/write", status_code=204)
-async def write_file(body: WriteRequest) -> None:
+async def write_file(body: WriteRequest, request: Request) -> None:
     resolved = _resolve_inside_workspace(body.path)
 
     if _is_self_executing(resolved):
@@ -147,6 +185,20 @@ async def write_file(body: WriteRequest) -> None:
             detail=(
                 "Ce fichier s'exécute sans action de ta part (hook git, réglage du CLI) : "
                 "l'éditeur refuse de l'écrire."
+            ),
+        )
+
+    # Un agent qui détient le jeton ne doit pas réécrire sa propre politique par
+    # cette route : seule l'interface, qui déclare son `Origin`, le peut (ADR-075).
+    if not is_declared_origin(request.headers.get("origin", "")) and _est_un_fichier_de_politique(
+        resolved
+    ):
+        _logger.warning("fs_write_policy_refused", extra={"path": str(resolved)})
+        raise HTTPException(
+            status_code=403,
+            detail=(
+                "Ce fichier porte les règles des agents du projet : seule l'interface "
+                "de Tessera, qui déclare son origine, peut l'écrire."
             ),
         )
 

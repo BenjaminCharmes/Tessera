@@ -4,6 +4,7 @@ import type { Physique, Tenue } from "./physique";
 import { POSTES, postesDuRun } from "./postesDuRun";
 import type { PosteId } from "./postesDuRun";
 import type { ProjetPourLaColonne } from "./aToi";
+import { laPause, laReunion, postesEnPause, postesEnReunion } from "./salles";
 
 /** Combien de temps un agent reste aux RH après un repli de provider. */
 export const DELAI_RH_MS = 20_000;
@@ -71,10 +72,20 @@ export function lieuxDuRun(etat: StreamState, maintenant: number): LieuxDuRun {
   return { directeur, rh: rh !== null && rh.poste === directeur ? null : rh };
 }
 
-/** Les postes dont l'agent n'est pas à sa place : la pièce ne les dessine pas deux fois. */
+/**
+ * Les postes dont l'agent n'est pas à sa place — chez le directeur, aux RH, en salle de
+ * pause ou de réunion : la pièce ne les dessine pas deux fois (ticket-791).
+ */
 export function postesAbsents(etat: StreamState, maintenant: number): PosteId[] {
   const { directeur, rh } = lieuxDuRun(etat, maintenant);
-  return [directeur, rh?.poste ?? null].filter((p): p is PosteId => p !== null);
+  const pause = laPause(etat);
+  const reunion = laReunion(etat);
+  const salles = [
+    ...(pause === null ? [] : postesEnPause(etat, pause).map((p) => p.poste)),
+    ...(reunion === null ? [] : postesEnReunion(etat, reunion)),
+  ];
+  const tous = [directeur, rh?.poste ?? null, ...salles].filter((p): p is PosteId => p !== null);
+  return [...new Set(tous)];
 }
 
 /** Les agents devant le directeur, tous projets confondus. */

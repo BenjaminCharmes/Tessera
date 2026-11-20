@@ -1,7 +1,7 @@
 """The contract of a provisioning step — ticket-465."""
 from dataclasses import dataclass, field
 from enum import StrEnum
-from typing import Optional, Protocol
+from typing import Protocol
 
 from tessera.services.provisioning.online_config import OnlineConfig
 
@@ -47,7 +47,7 @@ class DnsRecord:
     name: str
     content: str
     #: Only meaningful for MX records.
-    priority: Optional[int] = None
+    priority: int | None = None
 
 
 class EnvWriter(Protocol):
@@ -70,7 +70,7 @@ class ProvisioningContext:
     online: OnlineConfig
     env_writer: EnvWriter
     #: 'owner/repo' of the project, ``None`` when it has no remote.
-    github_remote: Optional[str] = None
+    github_remote: str | None = None
     #: Branche que Vercel déploie en production ; vide : celle des réglages.
     base_branch: str = ""
     #: Nom affiché du projet (``Project.name``) ; vide : l'identifiant du projet.

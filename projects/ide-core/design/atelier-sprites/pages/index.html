@@ -1,0 +1,27 @@
+<title>Atelier des sprites</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>/* COMMUN_CSS */</style>
+
+<div class="wrap">
+  <header style="display:flex;flex-direction:column;gap:12px">
+    <nav class="pages" aria-label="Pages de l'atelier">
+      <a href="index.html" aria-current="page">Catalogue</a>
+      <a href="piece.html">Pièce témoin</a>
+      <a href="techniques.html">Techniques de rendu</a>
+    </nav>
+    <span class="eyebrow">Tessera · Bureau · exploration, rien n'est appliqué</span>
+    <h1>Atelier des sprites</h1>
+    <p class="lead">Chaque sprite du Bureau, tel qu'il est aujourd'hui, puis redessiné en grille ×2 de <b>jour</b> et de <b>nuit</b>. La nuit prend la palette Néon. Le jour se choisit matière par matière, entre Tessera et Chaud : tes choix s'appliquent à tous les sprites qui partagent la matière.</p>
+  </header>
+
+  <div class="controls" role="toolbar" aria-label="Réglages d'affichage">
+    <div class="ctl"><span>Zoom</span><div class="seg" id="zoomSeg"></div></div>
+    <label class="chk"><input type="checkbox" id="outlineChk" checked> Contour sélectif</label>
+    <div class="ctl"><button class="btn ghost" id="copyBtn" type="button">Copier mes choix de jour</button><span id="copyOut" class="mono muted" aria-live="polite"></span></div>
+  </div>
+
+  <div id="sections" class="wrap" style="gap:36px"></div>
+</div>
+
+<!-- SOURCES -->

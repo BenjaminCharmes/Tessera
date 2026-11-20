@@ -13,7 +13,7 @@ import httpx
 import pytest
 import respx
 
-from tessera.services.project_loader import load_agents_config, set_agent_provider
+from tessera.services.projets.project_loader import load_agents_config, set_agent_provider
 from tessera.services.providers import par_role
 from tessera.services.providers.declaration import resoudre_cle
 from tessera.services.providers.noms import DeclarationRefusee, ProviderInconnu

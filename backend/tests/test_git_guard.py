@@ -1,10 +1,7 @@
 """Interdiction du git qui modifie l'historique, cote agent — ticket-068."""
 import pytest
 
-from tessera.services.providers.git_guard import (
-    GIT_REFUS,
-    commande_git_interdite,
-)
+from tessera.services.providers.git_guard import GIT_REFUS, commande_git_interdite
 
 
 @pytest.mark.parametrize(
@@ -298,6 +295,52 @@ def test_git_grep_pager_option_is_refused() -> None:
 
 @pytest.mark.parametrize(
     "commande",
+    [
+        "git grep --open=x foo",
+        "git grep --open-f=x foo",
+        "git grep --open-files-in-pager=x foo",
+        "git grep -iOx foo",
+    ],
+)
+def test_git_grep_pager_abbreviations_and_grouped_flags_are_refused(commande: str) -> None:
+    assert commande_git_interdite(commande) is True
+
+
+def test_git_grep_plain_flags_still_pass() -> None:
+    assert commande_git_interdite("git grep -i foo") is False
+    assert commande_git_interdite("git grep -n --or -e a -e b") is False
+
+
+@pytest.mark.parametrize(
+    "commande",
+    [
+        "git --namespace status push",
+        "git --attr-source x push",
+        "git --frobnicate status",
+        "git --exec-path=/x status",
+    ],
+)
+def test_git_unknown_global_option_is_refused(commande: str) -> None:
+    assert commande_git_interdite(commande) is True
+
+
+@pytest.mark.parametrize(
+    "commande",
+    [
+        "git --no-pager log",
+        "git -C sub status",
+        "git -P diff",
+        "git --literal-pathspecs status",
+        "git --git-dir=.git status",
+        "git --work-tree sub status",
+    ],
+)
+def test_git_listed_global_option_passes(commande: str) -> None:
+    assert commande_git_interdite(commande) is False
+
+
+@pytest.mark.parametrize(
+    "commande",
     ["gh --repo o/r pr merge 1", "gh -R o/r pr merge 1", "gh --hostname h pr merge 1"],
 )
 def test_gh_global_option_does_not_hide_the_subcommand(commande: str) -> None:
@@ -326,3 +369,16 @@ def test_gh_unlisted_subcommand_is_refused(commande: str) -> None:
 )
 def test_allowlist_keeps_status_diff_log_show(commande: str) -> None:
     assert commande_git_interdite(commande) is False
+
+
+@pytest.mark.parametrize(
+    "commande",
+    ["g''it push", "g\\it push", "g''h pr merge 1", "e''nv git push", "'g'it push", 'g"i"t push'],
+)
+def test_quoted_or_escaped_command_name_is_read_like_the_shell(commande: str) -> None:
+    assert commande_git_interdite(commande) is True
+
+
+def test_windows_path_to_git_is_still_a_read() -> None:
+    assert commande_git_interdite("C:\\Git\\bin\\git.exe status") is False
+    assert commande_git_interdite("C:\\Git\\bin\\git.exe push") is True

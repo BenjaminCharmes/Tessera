@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useReducer, useState } from "react";
 
 export interface UseResourceResult<T> {
   data: T;
@@ -53,6 +53,24 @@ function cleInterne(cle: CleRessource): string {
 /** Vide le cache — pour les tests uniquement. */
 export function _viderCacheResource(): void {
   _cache.clear();
+  _enVol.clear();
+}
+
+// Requêtes en vol par clé (ticket-767) : des instances montées ensemble avec la
+// même clé partagent une seule promesse, au lieu d'une requête chacune.
+const _enVol = new Map<string, Promise<unknown>>();
+
+function lireUneFois<T>(cle: string | undefined, fetcher: () => Promise<T>): Promise<T> {
+  if (cle === undefined) return fetcher();
+  const enVol = _enVol.get(cle);
+  if (enVol) return enVol as Promise<T>;
+  const promesse = fetcher();
+  _enVol.set(cle, promesse);
+  const liberer = () => {
+    if (_enVol.get(cle) === promesse) _enVol.delete(cle);
+  };
+  promesse.then(liberer, liberer);
+  return promesse;
 }
 
 /**
@@ -67,6 +85,11 @@ export function _viderCacheResource(): void {
  * « rien à charger ». `loading` et `error` se déduisent en comparant la
  * dernière réponse à la requête courante — aucun `setState` synchrone dans
  * l'effet, donc aucun rendu en cascade.
+ *
+ * Une lecture en échec garde la dernière donnée obtenue (celle du cache pour la
+ * clé, si le `fetcher` a changé) et expose l'erreur à part : une salle ne
+ * disparaît pas parce qu'un tick a échoué. Plusieurs instances montées avec la
+ * même `cle` partagent la requête en vol (ticket-767).
  *
  * Pendant un `refresh()`, la donnée précédente reste affichée ; au changement
  * de `fetcher`, elle repasse à `initial` — ce qui vient d'un autre projet ne
@@ -91,26 +114,41 @@ export function useResource<T>(
   const cleCache = cle !== undefined ? cleInterne(cle) : undefined;
   const [tick, setTick] = useState(0);
   const [reponse, setReponse] = useState<Reponse<T> | null>(null);
+  // Rendu forcé : une réponse annulée remplit le cache sans toucher à `reponse`.
+  const [, relire] = useReducer((n: number) => n + 1, 0);
 
   useEffect(() => {
     if (!fetcher) return;
     let cancelled = false;
-    fetcher()
+    lireUneFois(cleCache, fetcher)
       .then((data) => {
-        if (cancelled) return;
         // `cle` est capturée depuis la closure au moment où l'effet se lance :
-        // elle correspond toujours au fetcher qui vient de répondre.
+        // elle correspond toujours au fetcher qui vient de répondre. Une réponse
+        // réussie remplit le cache même si son effet a été annulé (ticket-771) :
+        // sous charge, la relance suivante arrive avant elle, et la donnée ne
+        // s'afficherait qu'après une réponse passée entre deux relances.
         if (cleCache !== undefined) setCached(cleCache, data);
+        if (cancelled) {
+          // Seul l'état de la requête courante l'ignore ; le rendu relit le cache.
+          if (cleCache !== undefined) relire();
+          return;
+        }
         setReponse({ fetcher, tick, data, error: null });
       })
       .catch((err: unknown) => {
         if (cancelled) return;
-        setReponse({
+        const message = err instanceof Error ? err.message : "Unknown error";
+        // Une lecture en échec garde la dernière donnée connue de cette
+        // requête, ou à défaut celle du cache pour la clé (ticket-767).
+        setReponse((avant) => ({
           fetcher,
           tick,
-          data: initial,
-          error: err instanceof Error ? err.message : "Unknown error",
-        });
+          data:
+            avant !== null && avant.fetcher === fetcher
+              ? avant.data
+              : ((cleCache !== undefined ? getCached<T>(cleCache) : undefined) ?? initial),
+          error: message,
+        }));
       });
     return () => {
       cancelled = true;

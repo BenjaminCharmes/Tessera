@@ -14,7 +14,7 @@ _AUTORISES = {"routers/provisioning.py"}
 
 #: Ce que la mise en ligne ne doit jamais atteindre, au-delà de la liste blanche.
 _INTERDITS = (
-    "services/orchestrator.py",
+    "services/pipeline/orchestrator.py",
     "services/pipeline_*.py",
     "services/run_*.py",
     "services/chat*.py",

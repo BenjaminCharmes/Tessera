@@ -1,15 +1,12 @@
 """Branch position, push and commit history reads."""
 
-from tessera.services.git_workspace.chemins import (
-    _JOURNAL_PIPELINE,
-    _is_orchestrator_artifact_path,
-    _relatif_au_projet,
-)
+import posixpath
+
+from tessera.services.gardes.termes_interdits import CommitInfo
+from tessera.services.git_workspace.chemins import _FICHES_NOUVELLES, _JOURNAL_PIPELINE, _is_orchestrator_artifact_path, _relatif_au_projet
 from tessera.services.git_workspace.erreurs import GitCommandError
 from tessera.services.git_workspace.poussee import GitPoussee
-from tessera.services.termes_interdits import CommitInfo
 from tessera.utils.logger import get_logger
-
 
 _logger = get_logger("tessera.services.git_workspace")
 
@@ -29,6 +26,16 @@ class GitHistory(GitPoussee):
         if self._worktree is not None:
             return
         await self._run("checkout", base_branch)
+
+    async def se_placer_sur(self, branch: str) -> None:
+        """Check out an existing branch, to deliver it again (ticket-792).
+
+        In a run worktree (ADR-056) it does nothing: the branch is the one the
+        worktree was created on.
+        """
+        if self._worktree is not None:
+            return
+        await self._run("checkout", branch)
 
     async def branche_courante(self) -> str:
         """Name of the checked-out branch (``HEAD`` when detached)."""
@@ -51,7 +58,21 @@ class GitHistory(GitPoussee):
             for chemin in presents
             if chemin not in self._preexisting_untracked
             and chemin != _JOURNAL_PIPELINE
+            and not chemin.startswith(_FICHES_NOUVELLES)
         )
+
+    def _fiches_parmi(self, non_suivis: tuple[str, ...]) -> tuple[str, ...]:
+        """Tickets the run created under ``tickets/todo/``, among `non_suivis` (ticket-1026)."""
+        return tuple(
+            chemin
+            for chemin in non_suivis
+            if chemin.startswith(_FICHES_NOUVELLES)
+            and chemin not in self._preexisting_untracked
+        )
+
+    async def fiches_creees_par_le_run(self) -> tuple[str, ...]:
+        """New ticket files under ``tickets/todo/``: the deliverable of a design run."""
+        return self._fiches_parmi(await self._untracked_files())
 
     async def head_sha(self) -> str:
         """Full SHA of the branch head (ticket-492). A failure raises."""
@@ -138,6 +159,18 @@ class GitHistory(GitPoussee):
             return False if exc.returncode == 1 else None
         return True
 
+    async def merge_base(self, gauche: str, droite: str) -> str | None:
+        """The full SHA of the merge base of two refs (ticket-793).
+
+        `None` when git cannot say — unknown ref, unrelated histories — so the
+        caller falls back on the whole suite instead of a guess.
+        """
+        try:
+            sortie = await self._run("merge-base", gauche, droite)
+        except GitCommandError:
+            return None
+        return sortie.strip() or None
+
     async def chemins_modifies(self, gauche: str, droite: str) -> list[str] | None:
         """Paths changed on `droite` since its merge base with `gauche` (ticket-584).
 
@@ -195,6 +228,46 @@ class GitHistory(GitPoussee):
 
         ``base...branch`` diffs from their merge-base, so work already on the
         base is not counted twice. A failure raises: the push check must not
-        pass on a diff it could not read.
+        pass on a diff it could not read. The prefixes are forced: a global
+        ``diff.noprefix`` would otherwise change the shape of every header the
+        secrets check reads.
         """
-        return await self._run("diff", f"{base}...{branch}")
+        return await self._run(
+            "diff", "--src-prefix=a/", "--dst-prefix=b/", f"{base}...{branch}"
+        )
+
+    async def fichiers_de_branche(self, base: str, branch: str) -> list[str]:
+        """Paths `branch` changes on top of `base`, relative to the project folder.
+
+        A path outside the project folder comes back as `../…`, so a caller that
+        only admits paths inside it refuses it. Renames count as a deletion and
+        an addition. A failure raises: a delivery gate must not pass on a diff it
+        could not read (ticket-854).
+        """
+        sortie = await self._run("diff", "--name-only", "--no-renames", "-z", f"{base}...{branch}")
+        return await self._relatifs_au_projet([nom for nom in sortie.split("\0") if nom])
+
+    async def fichiers_modifies(self) -> list[str]:
+        """Paths the working tree changes against HEAD, untracked ones included (ticket-854).
+
+        Relative to the project folder, `../…` outside it; both ends of a rename.
+        """
+        sortie = await self._run("status", "--porcelain", "-z", "--untracked-files=all")
+        entrees = sortie.split("\0")
+        noms: list[str] = []
+        i = 0
+        while i < len(entrees):
+            entree = entrees[i]
+            i += 1
+            if len(entree) < 4:
+                continue
+            noms.append(entree[3:])
+            if entree[0] in "RC" or entree[1] in "RC":
+                noms.extend(n for n in entrees[i:i + 1] if n)
+                i += 1
+        return await self._relatifs_au_projet(noms)
+
+    async def _relatifs_au_projet(self, noms: list[str]) -> list[str]:
+        """`noms` (relative to the repository root) re-expressed from the project folder."""
+        prefixe = (await self._run("rev-parse", "--show-prefix")).strip().rstrip("/")
+        return [posixpath.relpath(nom, prefixe or ".") for nom in noms]

@@ -15,7 +15,6 @@ Every call goes through `httpx`. The ``Authorization`` header is built per
 request and appears in no log and no error: a failure only carries the HTTP
 status and the API's error code (`ServiceError`). Nothing deletes.
 """
-from typing import Optional
 from urllib.parse import quote
 
 import httpx
@@ -37,14 +36,14 @@ class ResendClient:
     """The few Resend calls the provisioning steps need."""
 
     def __init__(
-        self, token: str, transport: Optional[httpx.AsyncBaseTransport] = None
+        self, token: str, transport: httpx.AsyncBaseTransport | None = None
     ) -> None:
         self._token = token
         self._transport = transport
 
     @classmethod
     def from_settings(
-        cls, settings: Settings, transport: Optional[httpx.AsyncBaseTransport] = None
+        cls, settings: Settings, transport: httpx.AsyncBaseTransport | None = None
     ) -> "ResendClient":
         """Build the client from the Resend key of ``Settings``."""
         return cls(settings.resend_api_key.get_secret_value(), transport)
@@ -55,7 +54,7 @@ class ResendClient:
         return bool(self._token.strip())
 
     async def _send(
-        self, method: str, path: str, body: Optional[dict[str, object]] = None
+        self, method: str, path: str, body: dict[str, object] | None = None
     ) -> httpx.Response:
         headers = {"Authorization": f"Bearer {self._token}"}
         try:
@@ -74,7 +73,7 @@ class ResendClient:
             raise ServiceError.from_response(SERVICE, reponse.status_code, reponse.content)
         return reponse
 
-    async def find_domain(self, name: str) -> Optional[ResendDomain]:
+    async def find_domain(self, name: str) -> ResendDomain | None:
         """Return the domain called ``name`` (without its records), if any."""
         reponse = await self._send("GET", "/domains")
         for brut in as_list(as_dict(reponse.json()).get("data")):

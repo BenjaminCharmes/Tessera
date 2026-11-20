@@ -1,4 +1,5 @@
 import { useState } from "react";
+import PuceFiltre from "../../design/ui/PuceFiltre";
 import StatusPill from "../../design/ui/StatusPill";
 import LienTicket from "../../design/ui/LienTicket";
 import { formatCout, formatDate } from "../../lib/format";
@@ -42,19 +43,9 @@ export default function TousLesRuns({
     <div className="min-h-0 flex-1 overflow-y-auto p-4">
       <div role="group" aria-label="Filtre des runs" className="mb-3 flex gap-2">
         {FILTRES.map(({ cle, libelle }) => (
-          <button
-            key={cle}
-            type="button"
-            aria-pressed={filtre === cle}
-            onClick={() => setFiltre(cle)}
-            className={`rounded-full px-2.5 py-1 text-xs transition-colors ${
-              filtre === cle
-                ? "bg-zinc-700 text-zinc-100"
-                : "border border-zinc-800 text-zinc-400 hover:text-zinc-200"
-            }`}
-          >
+          <PuceFiltre key={cle} active={filtre === cle} onClick={() => setFiltre(cle)}>
             {libelle}
-          </button>
+          </PuceFiltre>
         ))}
       </div>
 

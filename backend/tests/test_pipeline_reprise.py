@@ -2,8 +2,8 @@
 from pathlib import Path
 
 from tessera.models.agent import AgentRole
-from tessera.services.orchestrator import EventType, Orchestrator, OrchestratorEvent
-from tessera.services.test_runner import TestResult
+from tessera.services.pipeline.orchestrator import EventType, Orchestrator, OrchestratorEvent
+from tessera.services.verification.test_runner import TestResult
 from tests.test_orchestrator import _FakeGit, _make_orchestrator, _RecordingRunner
 
 _VERT = TestResult(passed=True, total=5, failed=0, output_summary="5 passed in 0.5s")
@@ -39,6 +39,7 @@ class _FakeTestRunner:
         project_path: Path,
         test_command: str | None = None,
         en_attente: object = None,
+        fichiers_du_diff: object = None,
     ) -> TestResult:
         self.calls += 1
         if len(self._results) > 1:

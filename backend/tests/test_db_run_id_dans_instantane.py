@@ -4,7 +4,7 @@ Un rechargement de page ne reçoit que l'instantané du run en cours. Sans
 l'identifiant en base, le frontend ne peut pas appeler GET /runs/{id}/events
 pour reconstruire les cartes passées (codeur tour 1, reviewer, sécurité…).
 """
-from tessera.services.run_registry import RunRegistry
+from tessera.services.pipeline.run_registry import RunRegistry
 
 
 async def test_l_instantane_porte_db_run_id() -> None:

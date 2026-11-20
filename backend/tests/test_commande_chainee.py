@@ -1,7 +1,7 @@
 """A test command chained with `&&`, split into steps — ticket-337."""
 import pytest
 
-from tessera.services.commande_chainee import CommandeNonGeree, decouper
+from tessera.services.verification.commande_chainee import CommandeNonGeree, decouper
 
 
 def test_a_single_command_is_one_step() -> None:

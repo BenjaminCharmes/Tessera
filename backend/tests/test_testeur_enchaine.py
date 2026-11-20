@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock
 
-from tessera.services.test_runner import TestResult, TestRunnerService
+from tessera.services.verification.test_runner import TestResult, TestRunnerService
 
 PY = f'"{sys.executable}" -c'
 
@@ -66,8 +66,8 @@ async def test_failure_details_in_coder_context(tmp_path: Path) -> None:
     the next turn.
     """
     from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-    from tessera.services import pipeline_testeur
-    from tessera.services.pipeline_run import PipelineRun
+    from tessera.services.pipeline import pipeline_testeur
+    from tessera.services.pipeline.pipeline_run import PipelineRun
 
     failure_detail = "FAILED tests/test_foo.py::test_bar - assert [5, 6] == [5]\n\nE   AssertionError: assert [5, 6] == [5]"
     mock_test_result = TestResult(

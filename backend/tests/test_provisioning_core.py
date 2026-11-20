@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 from tessera.services.provisioning import (
     OnlineConfig,
     OnlineConfigError,

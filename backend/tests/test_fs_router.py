@@ -11,7 +11,7 @@ from fastapi.testclient import TestClient
 
 from tessera.config import settings
 from tessera.main import app
-from tessera.services.database import init_db
+from tessera.services.noyau.database import init_db
 
 
 @pytest.fixture(autouse=True)
@@ -188,6 +188,46 @@ def test_un_lien_pose_dans_le_workspace_ne_donne_pas_acces_a_l_exterieur(
     assert "clef-privee" not in resp.text
 
 
+def test_a_link_to_the_home_folder_does_not_make_it_writable(
+    workspace: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Home factice : le test ne doit jamais toucher au vrai dossier personnel.
+    home = tmp_path / "home"
+    home.mkdir()
+    monkeypatch.setattr(Path, "home", classmethod(lambda cls: home))
+    try:
+        (workspace / "x").symlink_to(home, target_is_directory=True)
+    except (OSError, NotImplementedError):
+        pytest.skip("symlinks indisponibles sur cette machine")
+
+    resp = _client().put(
+        "/api/v1/fs/write", json={"path": str(home / "f.txt"), "content": "pwn"}
+    )
+
+    assert resp.status_code == 403
+    assert not (home / "f.txt").exists()
+
+
+def test_a_link_to_an_ordinary_project_folder_stays_writable(
+    workspace: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    home = tmp_path / "home"
+    project = home / "projets" / "ordinaire"
+    project.mkdir(parents=True)
+    monkeypatch.setattr(Path, "home", classmethod(lambda cls: home))
+    try:
+        (workspace / "lie").symlink_to(project, target_is_directory=True)
+    except (OSError, NotImplementedError):
+        pytest.skip("symlinks indisponibles sur cette machine")
+
+    resp = _client().put(
+        "/api/v1/fs/write", json={"path": str(project / "f.txt"), "content": "ok"}
+    )
+
+    assert resp.status_code == 204
+    assert (project / "f.txt").read_text(encoding="utf-8") == "ok"
+
+
 # ------------------------------------------------------------------
 # Fichiers qui s'exécutent seuls — ticket-707
 # ------------------------------------------------------------------
@@ -211,21 +251,90 @@ def test_fs_write_to_claude_settings_is_refused(workspace: Path) -> None:
     assert not settings_file.exists()
 
 
-def test_fs_write_to_other_claude_files_still_passes(workspace: Path) -> None:
-    skill = workspace / "mon-projet" / ".claude" / "skills" / "x" / "SKILL.md"
+UI_ORIGIN = {"Origin": "http://localhost:5173"}
 
-    resp = _client().put("/api/v1/fs/write", json={"path": str(skill), "content": "# x\n"})
+POLICY_FILES = [
+    "agents.json",
+    "CLAUDE.md",
+    ".github/workflows/ci.yml",
+    ".claude/skills/x/SKILL.md",
+]
+
+
+@pytest.mark.parametrize("relative", POLICY_FILES)
+def test_fs_write_to_a_policy_file_without_origin_is_refused(
+    workspace: Path, relative: str
+) -> None:
+    target = workspace / "mon-projet" / relative
+    before = target.read_text(encoding="utf-8") if target.exists() else None
+
+    resp = _client().put("/api/v1/fs/write", json={"path": str(target), "content": "pwn"})
+
+    assert resp.status_code == 403
+    assert (target.read_text(encoding="utf-8") if target.exists() else None) == before
+
+
+@pytest.mark.parametrize("relative", POLICY_FILES)
+def test_fs_write_to_a_policy_file_with_a_foreign_origin_is_refused(
+    workspace: Path, relative: str
+) -> None:
+    target = workspace / "mon-projet" / relative
+
+    resp = _client().put(
+        "/api/v1/fs/write",
+        json={"path": str(target), "content": "pwn"},
+        headers={"Origin": "http://localhost:9999"},
+    )
+
+    assert resp.status_code == 403
+    assert not target.exists() or target.read_text(encoding="utf-8") != "pwn"
+
+
+def test_fs_write_to_claude_md_with_the_ui_origin_passes(workspace: Path) -> None:
+    target = workspace / "mon-projet" / "CLAUDE.md"
+
+    resp = _client().put(
+        "/api/v1/fs/write",
+        json={"path": str(target), "content": "# édité\n"},
+        headers=UI_ORIGIN,
+    )
 
     assert resp.status_code == 204
+    assert target.read_text(encoding="utf-8") == "# édité\n"
 
 
-def test_fs_write_to_agents_json_still_passes(workspace: Path) -> None:
+def test_fs_write_to_agents_json_with_the_ui_origin_passes(workspace: Path) -> None:
     agents = workspace / "mon-projet" / "agents.json"
 
-    resp = _client().put("/api/v1/fs/write", json={"path": str(agents), "content": "{}"})
+    resp = _client().put(
+        "/api/v1/fs/write", json={"path": str(agents), "content": "{}"}, headers=UI_ORIGIN
+    )
 
     assert resp.status_code == 204
     assert agents.read_text(encoding="utf-8") == "{}"
+
+
+def test_fs_write_to_an_ordinary_file_without_origin_passes(workspace: Path) -> None:
+    target = workspace / "mon-projet" / "src" / "x.py"
+
+    resp = _client().put("/api/v1/fs/write", json={"path": str(target), "content": "x = 1\n"})
+
+    assert resp.status_code == 204
+    assert target.read_text(encoding="utf-8") == "x = 1\n"
+
+
+@pytest.mark.parametrize("relative", [".git/HEAD", ".claude/settings.json"])
+def test_fs_write_to_self_executing_files_is_refused_even_with_the_ui_origin(
+    workspace: Path, relative: str
+) -> None:
+    target = workspace / "mon-projet" / relative
+
+    resp = _client().put(
+        "/api/v1/fs/write", json={"path": str(target), "content": "x"}, headers=UI_ORIGIN
+    )
+
+    assert resp.status_code == 403
+    assert not target.exists()
 
 
 def test_read_of_a_protected_file_is_still_allowed(workspace: Path) -> None:

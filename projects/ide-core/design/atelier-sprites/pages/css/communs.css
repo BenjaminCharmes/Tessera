@@ -1,0 +1,7 @@
+/* Console allumée : quatre images du texte, chacune visible un quart du cycle (comme steps(4) dans Tessera). */
+.com-ecran { animation: com-defile 1.2s steps(1) infinite; opacity: 0; }
+@keyframes com-defile { 0% { opacity: 1; } 25% { opacity: 0; } 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .com-ecran { animation: none; opacity: 0; }
+  .com-ecran.com-f0 { opacity: 1; }
+}

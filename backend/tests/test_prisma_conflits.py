@@ -1,7 +1,7 @@
 """Pure merges for Prisma schemas and migration folders — ticket-484."""
 import pytest
 
-from tessera.services.prisma_conflits import fusionner_ajouts, planifier_renumerotation
+from tessera.services.git_workspace.prisma_conflits import fusionner_ajouts, planifier_renumerotation
 
 _ANCETRE = """generator client {
   provider = "prisma-client-js"

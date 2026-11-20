@@ -94,3 +94,26 @@ describe("agentsAuDirecteur and agentsAuxRh", () => {
     ]);
   });
 });
+
+describe("postesAbsents in the common rooms (ticket-791)", () => {
+  it("lists the validator during the CI of a pull request", () => {
+    const etat = applyEvent(INITIAL, ev("livraison_done", { pr_number: 4, arret: null }));
+
+    expect(postesAbsents(etat, T0)).toEqual(["validateur"]);
+  });
+
+  it("keeps the validator out of the list when the current run occupies it", () => {
+    const etat = [
+      ev("livraison_done", { pr_number: 4, arret: null }),
+      ev("validation_started"),
+    ].reduce(applyEvent, INITIAL);
+
+    expect(postesAbsents(etat, T0)).toEqual([]);
+  });
+
+  it("lists the reviewer during a conflict in the meeting room", () => {
+    const etat = applyEvent(INITIAL, ev("conflict_resolution", { phase: "started", files: ["a.py"], outcome: null }));
+
+    expect(postesAbsents(etat, T0)).toEqual(["reviewer"]);
+  });
+});

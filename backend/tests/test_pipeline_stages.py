@@ -7,13 +7,12 @@ et ce qui permet de couvrir un cas limite sans monter tout un pipeline.
 import asyncio
 from pathlib import Path
 
-import pytest
-
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services import pipeline_branche, pipeline_controles, pipeline_production, pipeline_testeur
 from tessera.services.git_workspace import GitCommandError, GitWorkspaceService, NotAGitRepository
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
-from tessera.services.pipeline_run import PipelineRun
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.pipeline import pipeline_branche, pipeline_controles, pipeline_production, pipeline_testeur
+from tessera.services.pipeline.pipeline_run import PipelineRun
+from tests.doubles_git import GitWorkspaceDouble
 
 
 async def _git(cwd: Path, *args: str) -> None:
@@ -115,12 +114,9 @@ async def test_ensure_clean_tree_laisse_passer_sans_git() -> None:
 async def test_ensure_clean_tree_bloque_le_ticket_sur_un_arbre_sale() -> None:
     # Le ticket ne doit surtout pas rester en `todo` : `pick_next_ticket` le
     # resservirait à chaque slot restant d'un run autonome.
-    class _DirtyGit:
+    class _DirtyGit(GitWorkspaceDouble):
         async def is_clean(self) -> bool:
             return False
-
-        async def dirty_files(self) -> list[str]:
-            return []
 
     class _TicketSvc:
         def __init__(self) -> None:
@@ -144,7 +140,7 @@ async def test_ensure_clean_tree_bloque_le_ticket_sur_un_arbre_sale() -> None:
 
 async def test_ensure_clean_tree_porte_la_liste_des_fichiers_dans_l_evenement_error() -> None:
     """The error event carries the list of blocking files (ticket-323)."""
-    class _DirtyGit:
+    class _DirtyGit(GitWorkspaceDouble):
         async def is_clean(self) -> bool:
             return False
 
@@ -172,7 +168,7 @@ async def test_ensure_clean_tree_porte_la_liste_des_fichiers_dans_l_evenement_er
 async def test_ensure_clean_tree_laisse_passer_si_le_controle_git_echoue() -> None:
     # Un dépôt cassé ne doit pas empêcher de travailler : le garde-fou est un
     # filet de sécurité, pas une condition de démarrage.
-    class _BrokenGit:
+    class _BrokenGit(GitWorkspaceDouble):
         async def is_clean(self) -> bool:
             raise GitCommandError(command=["git", "status"], returncode=128, stderr="boom")
 
@@ -221,15 +217,7 @@ async def test_ensure_clean_tree_laisse_passer_quand_seul_le_journal_est_modifie
 async def test_create_branch_degrade_sans_depot_git() -> None:
     # Un projet sans dépôt git reste utilisable : on continue sans branche.
     # NotAGitRepository est la seule erreur qui autorise ce repli (ticket-314).
-    class _NoRepoGit:
-        async def commit_bookkeeping(self) -> None:
-            pass
-
-        async def initialiser_base_ref(
-            self, base_branch: str | None = None, *, exiger_distant: bool = False
-        ) -> str | None:
-            return None
-
+    class _NoRepoGit(GitWorkspaceDouble):
         async def create_branch(self, ticket_id: str, slug: str) -> str:
             raise NotAGitRepository(
                 command=["git", "checkout"], returncode=128, stderr="not a git repository"
@@ -243,15 +231,7 @@ async def test_create_branch_degrade_sans_depot_git() -> None:
 
 
 async def test_create_branch_renseigne_la_branche_et_emet_l_evenement() -> None:
-    class _Git:
-        async def commit_bookkeeping(self) -> None:
-            pass
-
-        async def initialiser_base_ref(
-            self, base_branch: str | None = None, *, exiger_distant: bool = False
-        ) -> str | None:
-            return None
-
+    class _Git(GitWorkspaceDouble):
         async def create_branch(self, ticket_id: str, slug: str) -> str:
             return f"{ticket_id}-slug"
 
@@ -270,15 +250,7 @@ async def test_create_branch_git_command_error_bloque_le_run() -> None:
     git failure on a real repository must stop the pipeline so that the coder
     agent never runs on the wrong branch.
     """
-    class _GitAvecErreur:
-        async def commit_bookkeeping(self) -> None:
-            pass
-
-        async def initialiser_base_ref(
-            self, base_branch: str | None = None, *, exiger_distant: bool = False
-        ) -> str | None:
-            return None
-
+    class _GitAvecErreur(GitWorkspaceDouble):
         async def create_branch(self, ticket_id: str, slug: str) -> str:
             raise GitCommandError(
                 command=["git", "checkout", "-b"],
@@ -302,7 +274,8 @@ async def test_create_branch_git_command_error_bloque_le_run() -> None:
     assert result.arret is not None
     assert "overwritten" in result.arret
     assert run.branch is None
-    assert TicketStatus.blocked in svc.statuts
+    # La fiche reste en place : un déplacement non commité salirait l'arbre (ticket-970).
+    assert svc.statuts == []
     assert any(e.type == EventType.ERROR for e in events)
 
 
@@ -418,7 +391,8 @@ async def test_create_branch_fichier_code_modifie_bloque(tmp_path: Path) -> None
     assert result.final_status is TicketStatus.blocked
     assert result.arret is not None
     assert run.branch is None
-    assert TicketStatus.blocked in svc.statuts
+    # La fiche reste en place : un déplacement non commité salirait l'arbre (ticket-970).
+    assert svc.statuts == []
 
     # code.py was NOT committed by commit_bookkeeping: it is still dirty
     status_out = await _git_out(root, "status", "--porcelain", "--untracked-files=no")
@@ -487,7 +461,7 @@ def test_l_outil_ask_user_n_est_offert_qu_en_mode_interactif() -> None:
     # Offrir `ask_user` a un run non interactif promettrait a l'agent une
     # réponse que personne ne peut donner : il attendrait le delai complet a
     # chaque question, pour rien (ADR-025).
-    from tessera.services.dialogue import DialogueChannel
+    from tessera.services.noyau.dialogue import DialogueChannel
 
     run = _run()
     assert pipeline_production.asker_for(run) is None
@@ -547,7 +521,7 @@ class _AuditeurEnRepli:
     async def audit(
         self, code_diff: str, project_path: Path, contexte: object = None
     ) -> object:
-        from tessera.services.security_auditor import SecurityAuditResult
+        from tessera.services.verdicts.security_auditor import SecurityAuditResult
 
         return SecurityAuditResult(
             issues=[], verdict="PASS", summary="ok", fallback_reason="tours épuisés"
@@ -579,7 +553,7 @@ class _AuditeurEspion:
     async def audit(
         self, code_diff: str, project_path: Path, contexte: object = None
     ) -> object:
-        from tessera.services.security_auditor import SecurityAuditResult
+        from tessera.services.verdicts.security_auditor import SecurityAuditResult
 
         self.contexte = contexte
         return SecurityAuditResult(issues=[], verdict="PASS", summary="ok")
@@ -638,7 +612,7 @@ async def test_run_validation_sans_validateur_approuve_avec_raison_vide() -> Non
 
 
 def test_en_dict_contient_etapes_en_cours_vide_par_defaut() -> None:
-    from tessera.services.run_registry import RunActif
+    from tessera.services.pipeline.run_registry import RunActif
 
     run = RunActif(run_id="r1", project_id="p1")
     d = run.en_dict()
@@ -648,7 +622,7 @@ def test_en_dict_contient_etapes_en_cours_vide_par_defaut() -> None:
 
 
 def test_en_dict_expose_les_etapes_en_cours() -> None:
-    from tessera.services.run_registry import RunActif
+    from tessera.services.pipeline.run_registry import RunActif
 
     run = RunActif(run_id="r1", project_id="p1")
     run.etapes_en_cours = ["revue", "validation"]
@@ -660,9 +634,9 @@ def test_en_dict_expose_les_etapes_en_cours() -> None:
 def test_suivre_ajoute_revue_et_validation_dans_etapes_en_cours() -> None:
     """_suivre tracks both stages when reviewer and validator run concurrently."""
     from tessera.models.agent import AgentRole
-    from tessera.services.pipeline_events import EventType, OrchestratorEvent
-    from tessera.services.run_executor import _suivre
-    from tessera.services.run_registry import RunActif
+    from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
+    from tessera.services.pipeline.run_executor import _suivre
+    from tessera.services.pipeline.run_registry import RunActif
 
     run_actif = RunActif(run_id="r1", project_id="p1")
 
@@ -728,17 +702,17 @@ class _TestRunnerResult:
 
 
 def _expired_result() -> object:
-    from tessera.services.test_runner import TestResult
+    from tessera.services.verification.test_runner import TestResult
     return TestResult(passed=False, expiree=True, total=0, failed=0, output_summary="Timeout après 60s — cmd")
 
 
 def _green_result() -> object:
-    from tessera.services.test_runner import TestResult
+    from tessera.services.verification.test_runner import TestResult
     return TestResult(passed=True, expiree=False, total=5, failed=0, output_summary="5 passed in 0.5s")
 
 
 def _red_result() -> object:
-    from tessera.services.test_runner import TestResult
+    from tessera.services.verification.test_runner import TestResult
     return TestResult(passed=False, expiree=False, total=5, failed=1, output_summary="1 failed, 4 passed in 0.5s")
 
 
@@ -750,7 +724,6 @@ async def test_run_tests_sans_runner_rend_true() -> None:
 
 async def test_run_tests_premier_expire_second_vert_passe_a_la_securite() -> None:
     """First timeout + second green: continues without invoking the coder again (ticket-349)."""
-    from tessera.services.pipeline_events import PipelineResult
 
     runner = _TestRunnerResult([_expired_result(), _green_result()])
     orch = _Orch(
@@ -766,8 +739,8 @@ async def test_run_tests_premier_expire_second_vert_passe_a_la_securite() -> Non
 
 async def test_run_tests_deux_expirements_bloquent_le_run() -> None:
     """Two consecutive timeouts terminate the run as blocked (ticket-349)."""
-    from tessera.services.pipeline_events import PipelineResult
     from tessera.models.ticket import TicketStatus
+    from tessera.services.noyau.pipeline_events import PipelineResult
 
     class _TicketSvcMock:
         def __init__(self) -> None:
@@ -817,5 +790,5 @@ async def test_run_tests_log_mentionne_relance_sur_timeout() -> None:
     )
     await pipeline_testeur.run_tests(orch, _run())
 
-    relance_logs = [l for l in orch.logs if "délai dépassé, suite relancée" in l]
+    relance_logs = [ln for ln in orch.logs if "délai dépassé, suite relancée" in ln]
     assert relance_logs, "Expected a log line mentioning 'délai dépassé, suite relancée'"

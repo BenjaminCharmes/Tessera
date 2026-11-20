@@ -1,3 +1,4 @@
+import { useRituels } from "../useRituels";
 import { useNotificationsSysteme } from "../useNotificationsSysteme";
 import type { CockpitActions } from "./useCockpitActions";
 import type { CockpitNoyau } from "./useCockpitNoyau";
@@ -8,10 +9,13 @@ import type { CockpitNoyau } from "./useCockpitNoyau";
  */
 export function useCockpitNotifications(n: CockpitNoyau, a: CockpitActions) {
   const { supervision, runsStatus, appsEnCours, project } = n;
+  const rituels = useRituels();
   const notifications = useNotificationsSysteme(
     supervision,
     project?.id ?? null,
     a.ouvrirProjet,
+    rituels.rituels,
+    n.setPanel,
   );
 
   // Ce que la pastille doit dire avant tout le reste : un agent qui attend
@@ -25,9 +29,11 @@ export function useCockpitNotifications(n: CockpitNoyau, a: CockpitActions) {
       : null;
 
   return {
+    rituels,
     navRail: {
       runsActifs: supervision.runs.length,
       appsEnCours: appsEnCours.apps?.length ?? 0,
+      rituelsEnRetard: rituels.enRetard,
       alerte: alerteDeSupervision,
       notifications: { active: notifications.active, etat: notifications.etat, onChange: notifications.setActive },
       cloche: notifications.cloche,

@@ -20,7 +20,7 @@ export default function BaieAvecFiche({ baie, app }: BaieAvecFicheProps) {
   return (
     <AvecInfobulle
       label={`${baie.nom} : ${baie.libelle}`}
-      className="rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-500 hover:outline-2 hover:outline-offset-2 hover:outline-violet-500"
+      className="rounded-sm focus-violet hover:outline-2 hover:outline-offset-2 hover:outline-(--color-violet-500)"
       infobulle={
         <>
           <p className="mb-1 font-semibold text-zinc-100">

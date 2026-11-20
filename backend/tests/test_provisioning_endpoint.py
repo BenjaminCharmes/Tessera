@@ -9,22 +9,10 @@ from pydantic import SecretStr
 
 from tessera.config import settings
 from tessera.main import app
-from tessera.services.event_hub import EVENT_HUB, Abonnement
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
-from tessera.services.provisioning import (
-    OnlineConfig,
-    ProvisioningContext,
-    ProvisioningStep,
-    ServiceError,
-    StepResult,
-    StepState,
-)
-from tessera.services.provisioning.launcher import (
-    PROVISIONING_LOCK,
-    ProvisioningSetup,
-    build_setup,
-    get_setup_factory,
-)
+from tessera.services.noyau.event_hub import EVENT_HUB, Abonnement
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.provisioning import OnlineConfig, ProvisioningContext, ProvisioningStep, ServiceError, StepResult, StepState
+from tessera.services.provisioning.launcher import PROVISIONING_LOCK, ProvisioningSetup, build_setup, get_setup_factory
 from tessera.utils.secrets import SECRETS
 
 _URL = "/api/v1/projects/mon-projet/provision"
@@ -316,6 +304,7 @@ def test_get_reports_a_crashing_step_as_failed_without_leaking() -> None:
 # ------------------------------------------------------------------
 
 
+@pytest.mark.sans_jeton_par_defaut
 def test_both_routes_require_the_bearer_token_when_static_token_is_set(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

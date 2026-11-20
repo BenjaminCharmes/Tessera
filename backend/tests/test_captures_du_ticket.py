@@ -7,7 +7,7 @@ from fastapi.testclient import TestClient
 
 from tessera.config import settings
 from tessera.main import app
-from tessera.services import captures
+from tessera.services.verification import captures
 
 
 @pytest.fixture

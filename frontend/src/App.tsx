@@ -2,6 +2,7 @@ import Sidebar from "./components/Sidebar";
 import NavRail from "./components/Sidebar/NavRail";
 import CenterView from "./components/CenterView";
 import BottomPanel from "./components/BottomPanel";
+import BandeauJeton from "./components/BandeauJeton";
 import ErrorBoundary from "./components/ErrorBoundary";
 import ToastContainer from "./components/Toast";
 import DefsDuBureau from "./design/bureau/DefsDuBureau";
@@ -42,6 +43,7 @@ export default function App() {
           onChangePanel={cockpit.setPanel}
           runsActifs={cockpit.navRail.runsActifs}
           appsEnCours={cockpit.navRail.appsEnCours}
+          rituelsEnRetard={cockpit.navRail.rituelsEnRetard}
           alerte={cockpit.navRail.alerte}
           notifications={cockpit.navRail.notifications}
           cloche={cockpit.navRail.cloche}
@@ -83,6 +85,7 @@ export default function App() {
         <BottomPanel {...cockpit.bottomPanel} />
       </div>
 
+      <BandeauJeton />
       <ToastContainer toasts={cockpit.toasts} onDismiss={cockpit.fermerToast} />
       {/* Les symboles partagés des sprites du Bureau : vide hors du Bureau (ticket-727). */}
       <DefsDuBureau />

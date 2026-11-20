@@ -14,13 +14,7 @@ _SCRIPTS_DIR = Path(__file__).resolve().parent.parent.parent / "scripts"
 if str(_SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(_SCRIPTS_DIR))
 
-from arreter_tessera import (  # noqa: E402
-    Processus,
-    formater_sortie,
-    lire_entree,
-    main,
-    select_processus_tessera,
-)
+from arreter_tessera import Processus, formater_sortie, lire_entree, main, select_processus_tessera  # noqa: E402
 
 RACINE = r"C:\Users\Dev\tessera"
 AUCUN_PORT: dict[int, list[int]] = {}

@@ -17,37 +17,11 @@ if str(_SCRIPTS_DIR) not in sys.path:
 
 import argparse  # noqa: E402
 
-from mesure_calculs import (  # noqa: E402
-    ReleveRole,
-    cellule,
-    estimer_tokens,
-    lignes_perdues,
-    raison_non_mesurable,
-    releve_par_role,
-    run_mesurable,
-)
-from mesure_headroom import (  # noqa: E402
-    CompresseurIndisponible,
-    compresser,
-    diff_du_run,
-    taux_retire,
-)
-from mesure_rendu import (  # noqa: E402
-    LigneDiff,
-    LigneTableau,
-    ecrire_blocs,
-    remplacer_bloc,
-    rendre_conclusion,
-    rendre_diffs,
-    rendre_tableau,
-)
+from mesure_calculs import ReleveRole, cellule, estimer_tokens, lignes_perdues, raison_non_mesurable, releve_par_role, run_mesurable  # noqa: E402
+from mesure_headroom import CompresseurIndisponible, compresser, diff_du_run, taux_retire  # noqa: E402
+from mesure_rendu import LigneDiff, LigneTableau, ecrire_blocs, remplacer_bloc, rendre_conclusion, rendre_diffs, rendre_tableau  # noqa: E402
 from mesure_verdict import Mesures, verdict  # noqa: E402
-from mesurer_compression import (  # noqa: E402
-    agreger,
-    ligne_du_diff,
-    ligne_du_role,
-    mesurer,
-)
+from mesurer_compression import agreger, ligne_du_diff, ligne_du_role, mesurer  # noqa: E402
 from sonde_usage import cumule_les_tours, entree_totale, ligne_de_sortie  # noqa: E402
 
 _SORTIE_ROUGE = """\

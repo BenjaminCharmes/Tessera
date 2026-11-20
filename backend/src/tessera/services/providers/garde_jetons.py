@@ -8,23 +8,36 @@ Same shape as ``perimetre.py``: a ``PreToolUse`` hook, because an
 ``allowed_tools`` entry auto-approves a tool *before* any permission callback.
 
 **Ceiling.** ``Bash`` is covered by a lexical scan of the paths written in the
-command: ``cat ../../.env``, ``type``, ``Get-Content``. It catches a mistake,
+command: ``cat ../../.env``, ``type``, ``Get-Content``, a glob that can name the
+file (``.e*``) and a recursive search given a folder that holds it
+(``grep -r x ../..``). It catches a mistake,
 not an evasion — ``python -c "open('../../' + '.env')"`` goes through. A token's
 real ceiling is its scope and its expiry, not this hook. The refusal message
 says so.
 
 Only the ``.env`` of Tessera is refused: a project's own ``.env`` and
 ``.env.example`` are different files and pass.
+
+The same hook refuses a ``Bash`` command that runs the system vault
+(``garde_coffre.py``, ADR-073): the vault holds the same secrets. It also
+refuses a network command that names the settings route (``garde_reglages.py``,
+ADR-075).
 """
 import fnmatch
 import os
 import re
+from collections.abc import Awaitable, Callable
 from pathlib import Path
-from typing import Any, Awaitable, Callable
+from typing import Any
 
 from claude_agent_sdk import HookContext, HookInput, HookJSONOutput
 
 from tessera.config import Settings
+from tessera.services.noyau import jeton_de_session
+from tessera.services.providers.garde_chemins import glob_peut_designer, ramener_prefixe_windows
+from tessera.services.providers.garde_coffre import COFFRE_REFUS, commande_execute_le_coffre
+from tessera.services.providers.garde_comptes import COMPTE_REFUS, fichiers_de_compte
+from tessera.services.providers.garde_reglages import REGLAGES_REFUS, commande_vise_les_reglages
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -39,16 +52,45 @@ ENV_REFUS = (
     "fichier, dis-le dans ton rapport, c'est une action de l'utilisateur."
 )
 
+#: What the agent reads when the path is the session-token file.
+JETON_REFUS = (
+    "Lecture refusée : ce fichier porte le jeton de session de l'API Tessera "
+    "(ADR-081). Aucun agent ne le lit. Ce refus repère les chemins nommés, "
+    "variables et `~` développés, rien de plus : un chemin construit en deux "
+    "étapes passe (ADR-031). Un refus de hook est définitif ; si le ticket "
+    "demande ce jeton, dis-le dans ton rapport."
+)
+
+#: What the agent reads when the path is a local env file of the frontend.
+ENV_LOCAL_REFUS = (
+    "Lecture refusée : ce fichier d'environnement local du frontend de Tessera "
+    "peut porter le jeton de l'API. Aucun agent ne le lit (ADR-081). Ce refus "
+    "repère les chemins nommés, rien de plus : il attrape une erreur, pas une "
+    "évasion (ADR-031). Un refus de hook est définitif ; si le ticket demande "
+    "ce jeton, dis-le dans ton rapport."
+)
+
+# Les fichiers que Vite charge en local, à la racine du frontend de Tessera.
+_ENV_LOCAUX = (".env.local", ".env.development.local", ".env.production.local")
+
 _GIT_BASH = re.compile(r"^/([a-zA-Z])/(.*)$")
 _SEPARATEURS = re.compile(r"[\s;|&<>()=,`]+")
 _JOKERS = "*?[{"
+_COMMANDES = re.compile(r"[;|&\n]+")
+_FAMILLE_GREP = frozenset({"grep", "egrep", "fgrep"})
+# rg, ag et ack descendent dans les sous-dossiers sans option.
+_TOUJOURS_RECURSIFS = frozenset({"rg", "ag", "ack"})
 
 
 def _resoudre(brut: str, base: Path) -> Path | None:
     """Resolve a raw path against ``base``; ``None`` when it cannot be read."""
-    texte = brut.strip().strip("'\"").replace("\\", "/")
+    # Variables (`$X`, `%X%`) et `~` se développent avant `resolve()` : sinon
+    # `$LOCALAPPDATA/…` serait lu comme un chemin relatif sans rapport.
+    texte = os.path.expanduser(os.path.expandvars(brut.strip().strip("'\"")))
+    texte = texte.replace("\\", "/")
     if os.name == "nt":
         # Git Bash écrit `/c/Users/...` : le même fichier que `C:/Users/...`.
+        texte = ramener_prefixe_windows(texte)
         correspondance = _GIT_BASH.match(texte)
         if correspondance:
             texte = f"{correspondance[1].upper()}:/{correspondance[2]}"
@@ -89,14 +131,57 @@ def motif_vise_le_env(motif: str, base: Path, env_file: Path) -> bool:
     return racine is not None and env_file.is_relative_to(racine)
 
 
+def dossier_contient_le_env(brut: str, base: Path, env_file: Path) -> bool:
+    """True if ``brut`` resolves to a folder (or the file itself) holding the file."""
+    chemin = _resoudre(brut, base)
+    return chemin is not None and env_file.is_relative_to(chemin)
+
+
+def _recherche_recursive(segment: list[str]) -> bool:
+    """True if a command segment is a search that walks into sub-folders."""
+    if not segment:
+        return False
+    nom = segment[0].replace("\\", "/").rsplit("/", 1)[-1].lower().removesuffix(".exe")
+    options = segment[1:]
+    if nom in _TOUJOURS_RECURSIFS:
+        return True
+    if nom in _FAMILLE_GREP:
+        return any(
+            o == "--recursive" or o == "--dereference-recursive"
+            or (re.fullmatch(r"-[A-Za-z0-9]*[rR][A-Za-z0-9]*", o) is not None)
+            for o in options
+        )
+    return nom == "findstr" and any(o.lower() == "/s" for o in options)
+
+
+def _recherche_vise_le_dossier_du_env(commande: str, base: Path, env_file: Path) -> bool:
+    """A recursive search given a folder that holds the file reads it too.
+
+    Without a path argument the search starts from the working folder, which is
+    not scanned here: it only covers a folder the command names.
+    """
+    for brut in _COMMANDES.split(commande):
+        segment = [t for t in re.split(r"\s+", brut.strip()) if t]
+        if not _recherche_recursive(segment):
+            continue
+        for jeton in segment[1:]:
+            nu = jeton.strip("'\"")
+            if not nu.startswith("-") and dossier_contient_le_env(nu, base, env_file):
+                return True
+    return False
+
+
 def _commande_vise_le_env(commande: str, base: Path, env_file: Path) -> bool:
     """Lexical scan of a ``Bash`` command for a path to the file."""
     for jeton in _SEPARATEURS.split(commande):
         nu = jeton.strip("'\"").replace("\\", "/")
-        if nu.rsplit("/", 1)[-1].lower() == env_file.name.lower():
-            if vise_le_env(nu, base, env_file):
+        dernier = nu.rsplit("/", 1)[-1].lower()
+        if any(joker in dernier for joker in _JOKERS):
+            if motif_vise_le_env(nu, base, env_file):
                 return True
-    return False
+        elif dernier == env_file.name.lower() and vise_le_env(nu, base, env_file):
+            return True
+    return _recherche_vise_le_dossier_du_env(commande, base, env_file)
 
 
 def _outil_vise_le_env(
@@ -109,25 +194,43 @@ def _outil_vise_le_env(
     if outil not in ("Glob", "Grep"):
         return False
     dossier = _resoudre(str(entrees.get("path") or "."), base) or base
-    if outil == "Grep" and entrees.get("path") and vise_le_env(
-        str(entrees["path"]), base, env_file
-    ):
-        return True
+    chemin = str(entrees.get("path") or "")
+    glob = entrees.get("glob")
+    if outil == "Grep":
+        if chemin and vise_le_env(chemin, base, env_file):
+            return True
+        # Un dossier qui porte le fichier le livre avec le reste, sauf glob qui l'exclut.
+        if not glob and chemin and dossier_contient_le_env(chemin, base, env_file):
+            return True
+        if glob and glob_peut_designer(str(glob), dossier, env_file):
+            return True
     motif = entrees.get("pattern" if outil == "Glob" else "glob")
     return bool(motif) and motif_vise_le_env(str(motif), dossier, env_file)
 
 
 def hook_refus_env_tessera(
-    cwd: Path | None, env_file: Path | None = None
+    cwd: Path | None, env_file: Path | None = None, fichier_jeton: Path | None = None
 ) -> Callable[[HookInput, str | None, HookContext], Awaitable[HookJSONOutput]]:
-    """Build the ``PreToolUse`` hook refusing reads of Tessera's ``.env``.
+    """Build the ``PreToolUse`` hook refusing reads of Tessera's secret files.
 
-    Relative paths resolve against ``cwd``, the run's working folder; without
-    one, against the process's. ``env_file`` defaults to ``Settings.env_file``
-    and is resolved once, here.
+    Protected: the ``.env``, the session-token file (ticket-879) and the
+    frontend's ``.env*.local`` files (ticket-922) and the backend account's
+    credential files (ticket-929). Relative paths resolve against ``cwd``, the run's working
+    folder; without one, against the process's. ``env_file`` defaults to
+    ``Settings.env_file`` and ``fichier_jeton`` to
+    ``jeton_de_session.chemin_du_fichier()``; both are resolved once, here.
     """
     base = (cwd if cwd is not None else Path.cwd()).resolve()
-    cible = (env_file if env_file is not None else Settings.env_file).resolve()
+    env_tessera = (env_file if env_file is not None else Settings.env_file).resolve()
+    cibles = (
+        (env_tessera, ENV_REFUS),
+        ((fichier_jeton or jeton_de_session.chemin_du_fichier()).resolve(), JETON_REFUS),
+        *(
+            ((env_tessera.parent / "frontend" / nom).resolve(), ENV_LOCAL_REFUS)
+            for nom in _ENV_LOCAUX
+        ),
+        *((fichier, COMPTE_REFUS) for fichier in fichiers_de_compte()),
+    )
 
     async def hook(
         entree: HookInput, tool_use_id: str | None, contexte: HookContext
@@ -135,16 +238,28 @@ def hook_refus_env_tessera(
         donnees: dict[str, Any] = dict(entree)
         entrees: dict[str, Any] = donnees.get("tool_input", {})
         outil = donnees.get("tool_name")
-        if not _outil_vise_le_env(outil, entrees, base, cible):
-            return {}
         # Ni la valeur ni le contenu de la commande : le nom de l'outil suffit.
-        _logger.warning("lecture_env_tessera_refusee", extra={"outil": str(outil)})
-        return {
-            "hookSpecificOutput": {
-                "hookEventName": "PreToolUse",
-                "permissionDecision": "deny",
-                "permissionDecisionReason": ENV_REFUS,
-            }
-        }
+        if outil == "Bash" and commande_execute_le_coffre(str(entrees.get("command", ""))):
+            _logger.warning("execution_coffre_refusee", extra={"outil": str(outil)})
+            return _refus(COFFRE_REFUS)
+        if outil == "Bash" and commande_vise_les_reglages(str(entrees.get("command", ""))):
+            _logger.warning("route_reglages_refusee", extra={"outil": str(outil)})
+            return _refus(REGLAGES_REFUS)
+        for cible, message in cibles:
+            if _outil_vise_le_env(outil, entrees, base, cible):
+                _logger.warning("lecture_env_tessera_refusee", extra={"outil": str(outil)})
+                return _refus(message)
+        return {}
 
     return hook
+
+
+def _refus(raison: str) -> HookJSONOutput:
+    """Build the ``deny`` answer of a ``PreToolUse`` hook."""
+    return {
+        "hookSpecificOutput": {
+            "hookEventName": "PreToolUse",
+            "permissionDecision": "deny",
+            "permissionDecisionReason": raison,
+        }
+    }

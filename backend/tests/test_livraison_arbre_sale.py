@@ -11,10 +11,11 @@ from pathlib import Path
 import pytest
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services import pipeline_outcomes as outcomes
 from tessera.services.git_workspace import GitCommandError, GitWorkspaceService
-from tessera.services.pipeline_events import OrchestratorEvent
-from tessera.services.pipeline_run import PipelineRun
+from tessera.services.noyau.pipeline_events import OrchestratorEvent
+from tessera.services.pipeline import pipeline_outcomes as outcomes
+from tessera.services.pipeline.pipeline_run import PipelineRun
+from tests.doubles_git import GitWorkspaceDouble
 
 
 async def _git(cwd: Path, *args: str) -> None:
@@ -62,7 +63,7 @@ class _Tickets:
         self._journal.append(f"statut:{status.value}")
 
 
-class _Git:
+class _Git(GitWorkspaceDouble):
     def __init__(self, journal: list[str]) -> None:
         self._journal = journal
 
@@ -164,7 +165,7 @@ async def test_un_run_approuve_laisse_l_arbre_propre(repo: Path) -> None:
     du projet demineur, ou l'arbre portait `D tickets/in-review/...` et un
     `tickets/done/` non suivi au moment ou la livraison demarrait.
     """
-    from tessera.services.ticket_service import TicketService
+    from tessera.services.projets.ticket_service import TicketService
 
     tickets = repo / "tickets" / "in-review"
     tickets.mkdir(parents=True)

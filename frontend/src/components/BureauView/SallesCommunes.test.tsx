@@ -231,3 +231,65 @@ describe("Piece with an agent away", () => {
     expect(personnagesAssis()).toBe(pendantLeRepli + 1);
   });
 });
+
+describe("SallesCommunes — des occupants dans la salle de pause et la salle de réunion (ticket-784)", () => {
+  function pause(): HTMLElement {
+    return salle("Salle de pause");
+  }
+
+  it("seats the validator with the PR while its CI runs, even once the queue has moved on", () => {
+    const enCi = [
+      ev("livraison_done", { pr_number: 853, arret: null, conflits: [] }),
+      // La file passe au ticket suivant pendant la CI : seule `events` garde la livraison.
+      ev("queue_progress", { index: 2, total: 3, restants: [], faits: ["ticket-001"] }),
+      ev("agent_started", {}, "codeur"),
+    ].reduce(applyEvent, INITIAL);
+    const { rerender } = render(<SallesCommunes projets={[{ nom: "alpha", etat: enCi }]} maintenant={T0} />);
+
+    expect(within(pause()).getByText(/CI en cours de la PR #853/)).toBeInTheDocument();
+    const validateur = pause().querySelector('[data-agent="validateur"]');
+    expect(validateur).not.toBeNull();
+    expect(validateur?.getAttribute("data-objet")).toBe("pr");
+
+    const merge = applyEvent(enCi, ev("ci_merge_done", { pr_number: 853, merged: true }));
+    rerender(<SallesCommunes projets={[{ nom: "alpha", etat: merge }]} maintenant={T0} />);
+    expect(pause().querySelector("[data-agent]")).toBeNull();
+  });
+
+  it("gives the coder and the reviewer a coffee break while the quota is exhausted", () => {
+    const etat = applyEvent(INITIAL, ev("error", { reason: "quota_exhausted", resume: "14:00" }));
+    render(<SallesCommunes projets={[{ nom: "alpha", etat }]} maintenant={T0} />);
+
+    expect(pause().querySelector('[data-agent="codeur"]')).not.toBeNull();
+    expect(pause().querySelector('[data-agent="reviewer"]')).not.toBeNull();
+  });
+
+  it("has the coder wait by the coffee machine for a dependency to merge", () => {
+    const etat = applyEvent(INITIAL, ev("external_wait", { waiting: true, reason: "dependency", pr_number: 900 }));
+    render(<SallesCommunes projets={[{ nom: "alpha", etat }]} maintenant={T0} />);
+
+    expect(within(pause()).getByText(/Attend le merge de la PR #900/)).toBeInTheDocument();
+    expect(pause().querySelector('[data-agent="codeur"]')).not.toBeNull();
+  });
+
+  it("brings the reviewer to the table with the resolver during a conflict", () => {
+    const etat = applyEvent(INITIAL, ev("conflict_resolution", { phase: "started", files: ["a.py"], outcome: null }));
+    render(<SallesCommunes projets={[{ nom: "alpha", etat }]} maintenant={T0} />);
+
+    const reunion = salle("Salle de réunion");
+    expect(reunion.querySelector('[data-agent="resolveur"]')).not.toBeNull();
+    expect(reunion.querySelector('[data-agent="reviewer"]')).not.toBeNull();
+  });
+
+  it("keeps the resolver, PR in hand, while its resolved conflict waits for a human review", () => {
+    const etat = applyEvent(
+      INITIAL,
+      ev("livraison_done", { pr_number: 77, arret: "conflit résolu par l'agent : relecture humaine", conflits: ["a.py"] }),
+    );
+    render(<SallesCommunes projets={[{ nom: "alpha", etat }]} maintenant={T0} />);
+
+    const resolveur = salle("Salle de réunion").querySelector('[data-agent="resolveur"]');
+    expect(resolveur).not.toBeNull();
+    expect(resolveur?.getAttribute("data-objet")).toBe("pr");
+  });
+});

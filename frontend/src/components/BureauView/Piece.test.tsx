@@ -4,6 +4,7 @@ import { INITIAL } from "../../hooks/streamState";
 import { api } from "../../lib/api";
 import { serviceActif } from "../../test/contrat/exemples";
 import Piece from "./Piece";
+import type { PosteId } from "../../lib/bureau/postesDuRun";
 import { DERNIER, T0, etatApresPipeline, etatEnCodage, etatEnSecurite, nomme } from "./etatsDeTest";
 
 function bulle(): string | null {
@@ -66,21 +67,21 @@ describe("Piece", () => {
     }
   });
 
-  it("makes only the busy post clickable when a choice is listened to", () => {
+  it("makes every post clickable when a choice is listened to, done and waiting ones too (ticket-778)", () => {
     const onChoisir = vi.fn();
     render(<Piece projet="ide-core" etat={etatEnSecurite()} maintenant={T0 + 5_000} onChoisir={onChoisir} />);
 
-    for (const nom of [nomme("Codeur, a fini", "codeur"), nomme("Testeur, a fini", "testeur"), nomme("Reviewer, attend son tour", "reviewer"), nomme("Validateur, attend son tour", "validateur")]) {
-      const bouton = screen.getByRole("button", { name: nom });
+    const postes: [string, PosteId][] = [
+      ["Codeur, a fini", "codeur"],
+      ["Reviewer, attend son tour", "reviewer"],
+      ["Sécurité, travaille", "securite"],
+    ];
+    for (const [libelle, poste] of postes) {
+      const bouton = screen.getByRole("button", { name: nomme(libelle, poste) });
       fireEvent.click(bouton);
-      expect(bouton.className).not.toContain("cursor-pointer");
+      expect(bouton.className).toContain("cursor-pointer");
+      expect(onChoisir).toHaveBeenLastCalledWith("ide-core", poste);
     }
-    expect(onChoisir).not.toHaveBeenCalled();
-
-    const occupe = screen.getByRole("button", { name: nomme("Sécurité, travaille", "securite") });
-    fireEvent.click(occupe);
-    expect(occupe.className).toContain("cursor-pointer");
-    expect(onChoisir).toHaveBeenCalledWith("ide-core", "securite");
   });
 
   it("draws neither bubble nor pill when no post is busy", () => {

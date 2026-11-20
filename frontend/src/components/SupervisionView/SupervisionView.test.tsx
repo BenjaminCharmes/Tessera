@@ -224,10 +224,17 @@ describe("SupervisionView", () => {
 
   it("compte le chat parmi ce qui tourne", () => {
     // Le badge doit dire ce que l'IDE fait, pas seulement ses pipelines.
-    const sup = supervision({
-      runs: [run(), run({ run_id: "run-chat", mode: "chat" })],
-    });
-    expect(sup.runs).toHaveLength(2);
+    // On lit le nombre que l'en-tête affiche, pas la fixture : un chat exclu
+    // de l'affichage ferait lire « 1 run ».
+    render(
+      <ListeView
+        supervision={supervision({
+          runs: [run(), run({ run_id: "run-chat", mode: "chat", ticket_id: "chat" })],
+        })}
+        projects={PROJETS}
+      />,
+    );
+    expect(screen.getByText("2 runs")).toBeInTheDocument();
   });
 
   it("liste les services separement des runs", () => {
@@ -246,6 +253,8 @@ describe("SupervisionView", () => {
             demarre_a: new Date().toISOString(),
             en_cours: true,
             code_de_sortie: null,
+            sortie: [],
+            arrete_a_la_main: false,
           },
         ]}
       />,
@@ -269,6 +278,8 @@ describe("SupervisionView", () => {
             demarre_a: new Date().toISOString(),
             en_cours: false,
             code_de_sortie: 1,
+            sortie: [],
+            arrete_a_la_main: false,
           },
         ]}
       />,
@@ -294,6 +305,8 @@ describe("SupervisionView", () => {
             demarre_a: new Date().toISOString(),
             en_cours: true,
             code_de_sortie: null,
+            sortie: [],
+            arrete_a_la_main: false,
           },
         ]}
       />,

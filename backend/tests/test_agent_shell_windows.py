@@ -10,17 +10,15 @@ Quatre critères d'acceptation :
 4. Hors Windows, rien de tout cela ne s'applique et ``agent_shell`` vaut
    ``true``.
 """
-import platform
 from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
 
 import tessera.main
-import tessera.services.shell_detection as shell_mod
+import tessera.services.noyau.shell_detection as shell_mod
+from tessera.services.noyau.shell_detection import agent_shell_ok, resolve_git_bash
 from tessera.services.providers.agent_sdk import _build_options
-from tessera.services.shell_detection import agent_shell_ok, resolve_git_bash
-
 
 # ── critère 1 : _build_options et CLAUDE_CODE_GIT_BASH_PATH ─────────────────
 

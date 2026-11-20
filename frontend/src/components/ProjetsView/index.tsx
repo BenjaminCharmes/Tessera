@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { Chargement, Erreur, Vide } from "../../design/ui/ViewState";
+import Button from "../../design/ui/Button";
 import { api } from "../../lib/api";
 import { notifierProjetsModifies } from "../../hooks/useProjects";
 import { useEtatPersistant } from "../../hooks/useEtatPersistant";
@@ -38,41 +40,6 @@ const AUCUN: ProjectOverview[] = [];
 const lireVueDEnsemble = () => api.projects.overview();
 
 const GRILLE = "grid gap-3 grid-cols-[repeat(auto-fill,minmax(18rem,1fr))]";
-
-function Squelette() {
-  return (
-    <div className={`${GRILLE} p-4`} aria-label="Chargement des projets">
-      {[0, 1, 2].map((i) => (
-        <div key={i} className="h-40 animate-pulse rounded-sm bg-zinc-800" />
-      ))}
-    </div>
-  );
-}
-
-function Message({
-  texte,
-  action,
-  onAction,
-}: {
-  texte: string;
-  action?: string;
-  onAction?: () => void;
-}) {
-  return (
-    <div className="flex flex-col items-center gap-2 p-8 text-center text-sm text-zinc-500">
-      <p>{texte}</p>
-      {action && (
-        <button
-          type="button"
-          onClick={onAction}
-          className="rounded-sm bg-zinc-700 px-3 py-1.5 text-xs text-zinc-200 hover:bg-zinc-600"
-        >
-          {action}
-        </button>
-      )}
-    </div>
-  );
-}
 
 /**
  * La vue Projets du centre : une carte par projet — ticket-399.
@@ -162,20 +129,27 @@ export default function ProjetsView({
 
   let corps: React.ReactNode;
   if (error) {
-    corps = <Message texte={error} action="Réessayer" onAction={refresh} />;
+    corps = <Erreur message={error} onRetry={refresh} />;
   } else if (loading && data.length === 0) {
-    corps = <Squelette />;
+    corps = <Chargement />;
   } else if (visibles.length === 0) {
     corps = filtresActifs(filtres) ? (
-      <Message
-        texte="Aucun projet ne correspond."
-        action="Effacer la recherche"
-        onAction={() =>
-          setFiltres({ ...filtres, recherche: "", categorie: null })
+      <Vide
+        titre="Aucun projet ne correspond."
+        phrase="Change la recherche ou le filtre."
+        action={
+          <Button
+            variante="borde"
+            onClick={() =>
+              setFiltres({ ...filtres, recherche: "", categorie: null })
+            }
+          >
+            Effacer la recherche
+          </Button>
         }
       />
     ) : (
-      <Message texte="Aucun projet pour l'instant." />
+      <Vide titre="Aucun projet pour l'instant." phrase="Crée ou importe un projet pour commencer." />
     );
   } else if (filtres.categorie !== null) {
     corps = <div className={`${GRILLE} p-4`}>{visibles.map(carte)}</div>;

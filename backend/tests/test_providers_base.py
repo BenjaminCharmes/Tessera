@@ -4,12 +4,7 @@ from typing import Any
 
 import pytest
 
-from tessera.services.providers.base import (
-    LLMProvider,
-    ProviderResult,
-    StreamCallback,
-    ToolEventCallback,
-)
+from tessera.services.providers.base import LLMProvider, ProviderResult, StreamCallback, ToolEventCallback
 
 
 class FakeProvider:

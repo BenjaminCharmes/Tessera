@@ -2,10 +2,10 @@
 from types import SimpleNamespace
 from typing import cast
 
-from tessera.services.orchestrator import Orchestrator
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
-from tessera.services.pipeline_file import plafond_effectif
-from tessera.services.pipeline_file_tour import Tour, progres
+from tessera.services.file.pipeline_file import plafond_effectif
+from tessera.services.file.pipeline_file_tour import Tour, progres
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.pipeline.orchestrator import Orchestrator
 
 
 def _orch(plafond_par_ticket: float) -> Orchestrator:
@@ -29,7 +29,7 @@ def test_tour_payload_names_the_done_and_remaining_tickets() -> None:
 
     assert tour.restants == ["c"]
     assert tour.donnees() == {
-        "index": 2, "total": 3, "restants": ["c"], "faits": ["a"],
+        "index": 2, "total": 3, "restants": ["c"], "faits": ["a"], "non_livres": [],
     }
 
 

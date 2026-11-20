@@ -65,7 +65,7 @@ export default function RecentRuns({
             <th className={`${th} text-right`}>Tokens entrants / sortants</th>
             <th className={`${th} text-right`}>Coût</th>
             <th className={`${th} text-right`}>Durée</th>
-            <th className={th}>Issue</th>
+            <th className={th}>Résultat</th>
           </tr>
         </thead>
         <tbody>

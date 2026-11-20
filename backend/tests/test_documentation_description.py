@@ -8,15 +8,11 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services.documentation import DocumentationService
-from tessera.services.documentation_base import EditionRefusee
-from tessera.services.documentation_code import DiffDeTicket, MatiereCode
-from tessera.services.documentation_description import (
-    LONGUEUR_MAX,
-    ecrire_description,
-    remplacer_description,
-)
-from tessera.services.documentation_preuve import ControleDePreuve
+from tessera.services.documentation.documentation import DocumentationService
+from tessera.services.documentation.documentation_base import EditionRefusee
+from tessera.services.documentation.documentation_code import DiffDeTicket, MatiereCode
+from tessera.services.documentation.documentation_description import LONGUEUR_MAX, appliquer_description, ecrire_description, remplacer_description
+from tessera.services.documentation.documentation_preuve import ControleDePreuve
 from tessera.services.providers.base import ProviderResult
 from tests.matiere_factice import matiere_factice
 
@@ -135,6 +131,27 @@ def test_description_in_an_unreadable_manifest_is_refused(tmp_path: Path, conten
     assert manifeste.read_text(encoding="utf-8") == contenu
 
 
+def test_applying_a_description_to_a_latin_1_manifest_refuses_without_raising(
+    tmp_path: Path,
+) -> None:
+    manifeste = tmp_path / "agents.json"
+    avant = '{"description": "café"}'.encode("latin-1")
+    manifeste.write_bytes(avant)
+    matiere = MatiereCode(
+        diffs=[DiffDeTicket("ticket-001", "diff --git a/src/m.py b/src/m.py\n+def decrire(x):\n", ["src/m.py"])],
+        fichiers=[],
+        sans_diff=[],
+    )
+
+    ecrits, refus = appliquer_description(
+        manifeste, {"description": _proposition()}, matiere, "", "doc-technique"
+    )
+
+    assert ecrits == []
+    assert len(refus) == 1 and "description refusée" in refus[0]
+    assert manifeste.read_bytes() == avant
+
+
 def test_description_of_a_missing_manifest_is_refused(tmp_path: Path) -> None:
     with pytest.raises(EditionRefusee):
         ecrire_description(tmp_path / "agents.json", _proposition(), _controle())
@@ -145,7 +162,7 @@ class _Provider:
         self._reponses = reponses
         self._role = role
 
-    async def complete(self, *, system: str, user: str, model: str, max_tokens: int) -> ProviderResult:
+    async def complete(self, *, system: str, user: str, model: str, max_tokens: int, **_: object) -> ProviderResult:
         return ProviderResult(content=self._reponses[self._role], input_tokens=0, output_tokens=0)
 
 

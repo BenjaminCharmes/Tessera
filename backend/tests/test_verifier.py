@@ -20,7 +20,9 @@ if str(_SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(_SCRIPTS_DIR))
 
 from verifier import (  # noqa: E402
+    BACKEND_DIR,
     BACKEND_STEPS,
+    CONSIGNES_STEPS,
     FRONTEND_STEPS,
     STEPS,
     TYPE_STEPS,
@@ -28,7 +30,6 @@ from verifier import (  # noqa: E402
     _run_chain,
     chains_for,
     consignes_touchees,
-    CONSIGNES_STEPS,
     main,
     run_parallel,
     run_steps,
@@ -198,6 +199,16 @@ def test_pytest_runs_on_several_workers_when_xdist_is_installed() -> None:
     assert cmd[cmd.index("-n") + 1] == "8"
 
 
+def test_pytest_skips_integration_and_timing_tests() -> None:
+    """The pipeline tester runs beside other queues: timing tests stay in CI."""
+    from verifier import pytest_command
+
+    cmd = pytest_command()
+
+    marqueurs = cmd[cmd.index("-m", cmd.index("pytest")) + 1]
+    assert marqueurs == "not integration and not perf"
+
+
 def test_pytest_runs_serially_when_xdist_is_missing() -> None:
     from verifier import pytest_command
 
@@ -221,9 +232,9 @@ def test_xdist_is_a_dev_dependency() -> None:
 
 
 def test_backend_type_and_frontend_steps_are_defined() -> None:
-    """pytest, the two mypy runs and the frontend steps each sit in their own chain."""
+    """pytest, ruff with the two mypy runs, and the frontend steps each sit in their own chain."""
     assert [s.name for s in BACKEND_STEPS] == ["pytest"]
-    assert [s.name for s in TYPE_STEPS] == ["mypy", "mypy-linux"]
+    assert [s.name for s in TYPE_STEPS] == ["ruff", "mypy", "mypy-linux"]
     assert {s.name for s in FRONTEND_STEPS} == {"tsc", "eslint", "vitest"}
 
 
@@ -232,9 +243,16 @@ def test_steps_equals_backend_plus_types_plus_frontend() -> None:
     assert STEPS == BACKEND_STEPS + TYPE_STEPS + FRONTEND_STEPS
 
 
+def test_ruff_step_lints_src_and_tests_through_the_interpreter() -> None:
+    """Ruff runs as `<python> -m ruff`, never through a launcher (ticket-773)."""
+    ruff = TYPE_STEPS[0]
+    assert ruff.cmd[1:] == ["-m", "ruff", "check", "src", "tests"]
+    assert ruff.cwd == BACKEND_DIR
+
+
 def test_each_mypy_platform_has_its_own_cache() -> None:
     """A shared cache was invalidated by every run of the other platform."""
-    caches = [s.cmd[s.cmd.index("--cache-dir") + 1] for s in TYPE_STEPS]
+    caches = [s.cmd[s.cmd.index("--cache-dir") + 1] for s in TYPE_STEPS if s.name.startswith("mypy")]
     assert len(caches) == 2
     assert caches[0] != caches[1]
 
@@ -377,6 +395,11 @@ def test_a_change_to_the_test_script_runs_the_backend_chains() -> None:
 
 def test_a_diff_touching_neither_side_runs_nothing() -> None:
     assert chains_for(["projects/ide-core/tickets/todo/ticket-1.md", "docs/a.md"]) == (False, False)
+
+
+def test_an_openapi_change_runs_the_frontend_chain_too() -> None:
+    """The frontend contract test reads docs/openapi.json: ticket-860 added a route and failed it in CI."""
+    assert chains_for(["backend/src/tessera/routers/a.py", "docs/openapi.json"]) == (True, True)
 
 
 def test_an_instruction_change_is_detected() -> None:

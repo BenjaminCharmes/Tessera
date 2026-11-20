@@ -139,14 +139,19 @@ describe("ProjetCarte footer", () => {
     expect(pied).toHaveTextContent(/À faire/);
   });
 
-  it("puts the actions on the counters' row, which keeps its height without buttons", () => {
-    // Le 23/10, « File » vivait sur sa propre rangée (ticket-557) ; le 28/10, une
-    // carte sans bouton avait ses compteurs plus bas que sa voisine (ticket-633).
+  it("keeps the counters on the dates' line, unbroken, and the actions on a fixed-height row", () => {
+    // Le 28/10, une carte sans bouton avait ses compteurs plus bas que sa voisine
+    // (ticket-633) ; le 12/11, à côté de trois boutons, « À faire 13 Faits 27 » se
+    // cassait mot à mot et sortait de la carte (ticket-955).
     afficher(projet({ services_declares: true, tickets: { todo: 2, in_progress: 0, in_review: 0, blocked: 0, done: 1 } }));
 
+    const compteurs = screen.getByTestId("compteurs");
+    expect(compteurs).toHaveClass("whitespace-nowrap", "shrink-0");
+    expect(compteurs.parentElement).toHaveTextContent(/Créé/);
     const actions = screen.getByTestId("actions-de-carte");
-    expect(actions.parentElement).toHaveClass("h-7", "justify-between");
-    expect(actions.parentElement).toHaveTextContent(/À faire/);
+    expect(actions.parentElement).toHaveClass("min-h-7", "justify-end");
+    expect(actions).toHaveClass("flex-wrap", "min-w-0");
+    expect(actions.parentElement).not.toHaveTextContent(/À faire/);
     expect(within(actions).getByRole("button", { name: "File (2)" })).toBeInTheDocument();
     expect(within(actions).getByRole("button", { name: "Lancer l'app" })).toBeInTheDocument();
     expect(actions).not.toHaveTextContent(/À faire/);

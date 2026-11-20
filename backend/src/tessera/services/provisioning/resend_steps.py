@@ -7,16 +7,8 @@ the step names it and waits for a human instead of creating a second one.
 from typing import Literal
 
 from tessera.services.provisioning.resend import ResendClient
-from tessera.services.provisioning.resend_records import (
-    STATUS_FAILED,
-    STATUS_VERIFIED,
-    ResendDomain,
-)
-from tessera.services.provisioning.steps import (
-    ProvisioningContext,
-    StepResult,
-    StepState,
-)
+from tessera.services.provisioning.resend_records import STATUS_FAILED, STATUS_VERIFIED, ResendDomain
+from tessera.services.provisioning.steps import ProvisioningContext, StepResult, StepState
 from tessera.utils.logger import get_logger
 from tessera.utils.secrets import SECRETS, SecretRegistry
 

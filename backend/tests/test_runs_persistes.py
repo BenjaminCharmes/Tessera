@@ -12,16 +12,17 @@ import aiosqlite
 import pytest
 from fastapi.testclient import TestClient
 
-from tests.revue_structuree import revue
-from tests.test_providers_base import FakeProvider
 from tessera.config import settings
 from tessera.main import app
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services.agent_registry import AgentRegistryService
-from tessera.services.agent_runner import AgentRunner
-from tessera.services.database import init_db
-from tessera.services.orchestrator import Orchestrator
-from tessera.services.run_recorder import RunRecorder
+from tessera.services.agents.agent_registry import AgentRegistryService
+from tessera.services.agents.agent_runner import AgentRunner
+from tessera.services.noyau.database import init_db
+from tessera.services.pipeline.orchestrator import Orchestrator
+from tessera.services.pipeline.run_recorder import RunRecorder
+from tests.doubles_git import GitWorkspaceDouble
+from tests.revue_structuree import revue
+from tests.test_providers_base import FakeProvider
 
 
 def _ticket(tid: str) -> Ticket:
@@ -48,18 +49,7 @@ class _Tickets:
         return [t for t in self._tickets.values() if status is None or t.status is status]
 
 
-class _Git:
-    async def commit_bookkeeping(self) -> None:
-        pass
-
-    async def is_clean(self) -> bool:
-        return True
-
-    async def initialiser_base_ref(
-        self, base_branch: str | None = None, *, exiger_distant: bool = False
-    ) -> str | None:
-        return None
-
+class _Git(GitWorkspaceDouble):
     async def create_branch(self, ticket_id: str, slug: str) -> str:
         return f"{ticket_id}-slug"
 
@@ -71,9 +61,6 @@ class _Git:
 
     async def commit_all(self, message: str) -> str | None:
         return "abc1234"
-
-    async def advance_base_ref(self) -> None:
-        return None
 
 
 def _orchestrateur(tmp_path: Path, db_path: Path, tickets: _Tickets) -> Orchestrator:
@@ -242,7 +229,7 @@ async def test_l_orchestrateur_construit_par_le_routeur_enregistre_ses_runs(
     workspace: Path,
 ) -> None:
     # C'est par la que passent `/chat/run`, la file et le run autonome.
-    from tessera.services.assemblage_run import build_orchestrator
+    from tessera.services.pipeline.assemblage_run import build_orchestrator
 
     orchestrator = await build_orchestrator("mon-projet")
 

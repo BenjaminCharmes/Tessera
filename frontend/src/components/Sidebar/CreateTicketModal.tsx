@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { Ticket, TicketPriority, TicketType } from "../../types/api";
 import { api } from "../../lib/api";
-import Modale from "../../design/ui/Modale";
+import Modale, { TitreDeModale } from "../../design/ui/Modale";
 import { PRIORITE } from "../../lib/libelles";
 
 interface CreateTicketModalProps {
@@ -68,9 +68,9 @@ export default function CreateTicketModal({
   return (
     <Modale onFermer={onClose} aria-label="Créer un ticket">
       <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-6 w-full max-w-md shadow-xl">
-        <h2 className="text-zinc-100 text-base font-semibold mb-4">
+        <TitreDeModale className="mb-4">
           Nouveau ticket
-        </h2>
+        </TitreDeModale>
         <form onSubmit={handleSubmit} noValidate>
           <div className="mb-4">
             <label

@@ -4,6 +4,7 @@ import TokenStream from "../AgentPanel/TokenStream";
 import VerdictBanner from "../AgentPanel/VerdictBanner";
 import { verdictDuReviewer } from "./verdict";
 import EnteteVerdict from "./EnteteVerdict";
+import EntreeAnomalieView from "./EntreeAnomalieView";
 import EntreeSecuriteView from "./EntreeSecuriteView";
 import EntreeTesteurView from "./EntreeTesteurView";
 import EntreeValidateurView from "./EntreeValidateurView";
@@ -99,6 +100,9 @@ export default function FilDuRun({ entries }: FilDuRunProps) {
     <>
       {entries.map((entry, idx) => {
         const isLast = idx === entries.length - 1;
+        if (entry.genre === "anomalie") {
+          return <EntreeAnomalieView key={entry.id} entry={entry} />;
+        }
         if (entry.genre === "securite") {
           return (
             <EntreeSecuriteView key={entry.id} entry={entry} isLast={isLast} />

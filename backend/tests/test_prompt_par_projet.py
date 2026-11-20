@@ -3,8 +3,8 @@ from pathlib import Path
 from unittest.mock import MagicMock
 
 from tessera.models.agent import AgentConfig
-from tessera.services.agent_registry import AgentRegistryService
-from tessera.services.agent_runner import AgentRunner
+from tessera.services.agents.agent_registry import AgentRegistryService
+from tessera.services.agents.agent_runner import AgentRunner
 
 
 def _runner(tmp_path: Path) -> AgentRunner:
@@ -43,7 +43,7 @@ def test_un_prompt_declare_mais_absent_echoue_bruyamment(tmp_path: Path) -> None
     # Un projet qui pointe vers un prompt inexistant tournerait sinon avec le
     # prompt générique, en silence — et produirait du code là où on attendait
     # une analyse.
-    from tessera.services.agent_registry import AgentNotFoundError
+    from tessera.services.agents.agent_registry import AgentNotFoundError
 
     runner = _runner(tmp_path)
     config = AgentConfig(

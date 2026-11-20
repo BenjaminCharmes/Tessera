@@ -17,12 +17,16 @@
 [CmdletBinding()]
 param(
     [Parameter(Position = 0)]
-    [ValidateSet('help', 'setup', 'doctor', 'run', 'dev', 'dev-frontend', 'stop', 'test', 'lint', 'verify', 'check-tickets')]
+    [ValidateSet('help', 'setup', 'doctor', 'run', 'dev', 'dev-frontend', 'stop', 'test', 'lint', 'verify', 'check-tickets', 'secrets', 'agent', 'hooks')]
     [string]$Task = 'help',
 
-    # Identifiant du projet, pour `check-tickets`.
+    # Identifiant du projet, pour `check-tickets` ; sous-verbe, pour `secrets`.
     [Parameter(Position = 1)]
-    [string]$Projet = ''
+    [string]$Projet = '',
+
+    # Nom du secret, pour `secrets set` et `secrets supprimer`.
+    [Parameter(Position = 2)]
+    [string]$Nom = ''
 )
 
 $ErrorActionPreference = 'Stop'
@@ -39,10 +43,30 @@ function Show-Help {
     Write-Host '  .\scripts\tessera.ps1 test         Suite de tests backend'
     Write-Host '  .\scripts\tessera.ps1 lint         Type-check mypy'
     Write-Host '  .\scripts\tessera.ps1 check-tickets <id>  Verifie les tickets d un projet avant de les committer'
+    Write-Host '  .\scripts\tessera.ps1 secrets migrer      Range les secrets de .env dans le coffre du systeme'
+    Write-Host '  .\scripts\tessera.ps1 secrets lister      Dit ou vit chaque secret (coffre, .env, absent)'
+    Write-Host '  .\scripts\tessera.ps1 secrets set <NOM>   Range un secret, saisi masque'
+    Write-Host '  .\scripts\tessera.ps1 secrets supprimer <NOM>  Retire un secret du coffre'
+    Write-Host '  .\scripts\tessera.ps1 hooks            Pose le hook pre-push des termes interdits dans chaque projet'
+    Write-Host '  .\scripts\tessera.ps1 agent setup         Installe le compte agent (voir docs/agent-isolation.md)'
+    Write-Host '  .\scripts\tessera.ps1 agent jeton         Change le jeton d abonnement de l agent'
+    Write-Host '  .\scripts\tessera.ps1 agent doctor        Verifie le compte agent, son coffre et son CLI'
     Write-Host ''
 }
 
+function Test-Port5173Libre {
+    # Un intrus sur 5173 aurait l'origine de l'interface (ticket-942).
+    $tenu = @(Get-NetTCPConnection -LocalPort 5173 -State Listen -ErrorAction SilentlyContinue)
+    if ($tenu.Count -gt 0) {
+        Write-Host "[KO] Le port 5173 est deja pris (PID $($tenu[0].OwningProcess)) : le liberer avant de lancer Vite." -ForegroundColor Red
+        return $false
+    }
+    Write-Host '[OK] Le port 5173 est libre.' -ForegroundColor Green
+    return $true
+}
+
 function Invoke-Doctor {
+    $null = Test-Port5173Libre
     Push-Location (Join-Path $Root 'backend')
     try { & uv run python -m tessera.doctor }
     finally { Pop-Location }
@@ -53,11 +77,135 @@ function Invoke-Setup {
     if (-not (Test-Path $envFile)) {
         Copy-Item (Join-Path $Root '.env.example') $envFile
         Write-Host "-> .env cree depuis .env.example"
+        Write-Host "-> Secrets : range-les dans le coffre du systeme, pas dans .env :"
+        Write-Host "   .\scripts\tessera.ps1 secrets set <NOM>, ou secrets migrer apres les avoir mis dans .env"
     }
     Push-Location (Join-Path $Root 'backend')
     try { & uv sync --extra dev } finally { Pop-Location }
     Push-Location (Join-Path $Root 'frontend')
     try { & npm install } finally { Pop-Location }
+}
+
+function Invoke-Secrets([string]$SousVerbe, [string]$NomSecret) {
+    # ADR-073 : aucune valeur en argument ni a l'ecran. `set` la saisit
+    # masquee et la passe par l'entree standard.
+    $permis = @('migrer', 'set', 'supprimer', 'lister')
+    $avecNom = @('set', 'supprimer')
+    if (($permis -notcontains $SousVerbe) -or (($avecNom -contains $SousVerbe) -and -not $NomSecret)) {
+        Write-Host 'usage : .\scripts\tessera.ps1 secrets migrer|lister|set <NOM>|supprimer <NOM>' -ForegroundColor Red
+        exit 2
+    }
+    Push-Location (Join-Path $Root 'backend')
+    try {
+        if ($SousVerbe -eq 'set') {
+            $saisie = Read-Host -AsSecureString "Valeur de $NomSecret"
+            $clair = [System.Net.NetworkCredential]::new('', $saisie).Password
+            $clair | & uv run python -m tessera.coffre_cli set $NomSecret
+            $clair = $null
+        } elseif ($SousVerbe -eq 'supprimer') {
+            & uv run python -m tessera.coffre_cli supprimer $NomSecret
+        } else {
+            & uv run python -m tessera.coffre_cli $SousVerbe
+        }
+    } finally { Pop-Location }
+    exit $LASTEXITCODE
+}
+
+function Invoke-Hooks {
+    # ticket-968 : le hook pre-push de Tessera dans le depot de chaque projet.
+    Push-Location (Join-Path $Root 'backend')
+    try { & uv run python -m tessera.services.creation_projet.hook_pre_push }
+    finally { Pop-Location }
+    exit $LASTEXITCODE
+}
+
+function Invoke-Agent([string]$SousVerbe) {
+    # ticket-896 : installation et controle du compte agent (AGENT_USER).
+    switch ($SousVerbe) {
+        'setup' { & (Join-Path $PSScriptRoot 'agent-setup.ps1') }
+        'jeton' { & (Join-Path $PSScriptRoot 'agent-setup.ps1') -Jeton }
+        'doctor' { Invoke-AgentDoctor }
+        default {
+            Write-Host 'usage : .\scripts\tessera.ps1 agent setup|jeton|doctor' -ForegroundColor Red
+            exit 2
+        }
+    }
+    exit $LASTEXITCODE
+}
+
+function Test-Etape([string]$Libelle, [bool]$Ok, [string]$Remede) {
+    if ($Ok) { Write-Host "[ok]    $Libelle" }
+    else { Write-Host "[echec] $Libelle -> $Remede" -ForegroundColor Red; $script:AgentEchecs++ }
+}
+
+function Get-SecretsAgent([string]$PyVenv) {
+    # `coffre_cli lister` ne montre aucune valeur : seulement coffre, .env ou absent.
+    if (-not (Test-Path $PyVenv)) { return @() }
+    Push-Location (Join-Path $Root 'backend')
+    try { return @(& $PyVenv -m tessera.coffre_cli lister 2>$null) } finally { Pop-Location }
+}
+
+function Get-VersionCli([string]$Chemin) {
+    if (-not (Test-Path -LiteralPath $Chemin)) { return '' }
+    return ([string](& $Chemin --version 2>$null)).Trim()
+}
+
+function Test-DossierWorktreesAgent {
+    # IDE_WORKTREES_DIR_AGENT : absent, c'est normal avant le 1er run ; present, son ACL est sans heritage.
+    $dossier = if ($env:IDE_WORKTREES_DIR_AGENT) { $env:IDE_WORKTREES_DIR_AGENT } else { 'C:\ProgramData\Tessera\worktrees' }
+    if (-not (Test-Path -LiteralPath $dossier)) {
+        Write-Host "[info]  dossier des worktrees agent absent ($dossier) : cree au premier run"
+        return
+    }
+    # Par SID, pas par nom : sur un Windows en francais, icacls ecrit
+    # « AUTORITE NT\Systeme » et « BUILTIN\Administrateurs ».
+    $acl = Get-Acl -LiteralPath $dossier
+    $heritage = -not $acl.AreAccessRulesProtected
+    $complets = @($acl.Access | Where-Object { $_.AccessControlType -eq 'Allow' -and ($_.FileSystemRights -band [System.Security.AccessControl.FileSystemRights]::FullControl) -eq [System.Security.AccessControl.FileSystemRights]::FullControl } | ForEach-Object {
+        try { $_.IdentityReference.Translate([System.Security.Principal.SecurityIdentifier]).Value } catch { $null }
+    })
+    $droits = ($complets -contains 'S-1-5-18') -and ($complets -contains 'S-1-5-32-544')
+    # Un droit herite pour l'agent ou pour Users ouvre le dossier a plus que prevu.
+    $agent = if ($env:AGENT_USER) { $env:AGENT_USER } else { 'tessera-agent' }
+    $herites = @($acl.Access | Where-Object { $_.IsInherited -and $_.AccessControlType -eq 'Allow' } | Where-Object {
+        $nom = ($_.IdentityReference.Value.Split('\'))[-1]
+        $sid = try { $_.IdentityReference.Translate([System.Security.Principal.SecurityIdentifier]).Value } catch { '' }
+        ($nom -eq $agent) -or ($sid -eq 'S-1-5-32-545')
+    })
+    Test-Etape "dossier des worktrees agent ($dossier) sans droit herite pour $agent ou Users" ($herites.Count -eq 0) "icacls '$dossier' /inheritance:r"
+    Test-Etape "dossier des worktrees agent ($dossier) sans heritage" (-not $heritage) "icacls '$dossier' /inheritance:r"
+    Test-Etape 'dossier des worktrees agent : SYSTEM et Administrateurs (F)' $droits "icacls '$dossier' /grant:r *S-1-5-18:(OI)(CI)F *S-1-5-32-544:(OI)(CI)F"
+}
+
+function Invoke-AgentDoctor {
+    $script:AgentEchecs = 0
+    $compte = 'tessera-agent'
+    $partage = 'C:\ProgramData\Tessera\bin\claude.exe'
+    $pyVenv = Join-Path $Root 'backend\.venv\Scripts\python.exe'
+    $embarque = Join-Path $Root 'backend\.venv\Lib\site-packages\claude_agent_sdk\_bundled\claude.exe'
+    $admin = 'fenetre administrateur : .\scripts\agent-setup-admin.ps1 -Proprietaire <ton compte>'
+    $secrets = Get-SecretsAgent $pyVenv
+    Test-Etape "compte $compte present" ([bool](Get-LocalUser -Name $compte -ErrorAction SilentlyContinue)) $admin
+    Test-Etape 'mot de passe dans le coffre (AGENT_LOGON_PASSWORD)' ($secrets -contains 'AGENT_LOGON_PASSWORD : coffre') '.\scripts\tessera.ps1 agent setup'
+    Test-Etape 'jeton dans le coffre (AGENT_OAUTH_TOKEN)' ($secrets -contains 'AGENT_OAUTH_TOKEN : coffre') '.\scripts\tessera.ps1 agent jeton'
+    $partagee = Get-VersionCli $partage
+    $sdk = Get-VersionCli $embarque
+    Test-Etape "CLI partage present ($partage)" ($partagee -ne '') '.\scripts\tessera.ps1 agent setup'
+    $recopie = "Copy-Item '$embarque' '$partage' -Force (ou agent setup)"
+    Test-Etape "CLI partage de la version du SDK (partage '$partagee', SDK '$sdk')" (($partagee -ne '') -and ($partagee -eq $sdk)) $recopie
+    # Les outils se lancent SOUS le compte agent (ticket-983) : une recherche sur le PATH
+    # tourne sous le compte de l'utilisateur et laissait passer un EPERM.
+    Push-Location (Join-Path $Root 'backend')
+    try { $sortieOutils = & $pyVenv -m tessera.agent_doctor_cli 2>&1; $codeOutils = $LASTEXITCODE } finally { Pop-Location }
+    $sortieOutils | ForEach-Object { Write-Host "  $_" }
+    Test-Etape 'node, uv, python et le cache npm sous le compte agent' ($codeOutils -eq 0) '.\scripts\tessera.ps1 agent setup'
+    $profil = $env:USERPROFILE
+    $droitsProfil = @(Get-Acl -LiteralPath $profil -ErrorAction SilentlyContinue | ForEach-Object { $_.Access } | Where-Object { "$($_.IdentityReference)" -like "*\$compte" })
+    Test-Etape "aucun droit de $compte sur le profil de l'utilisateur" ($droitsProfil.Count -eq 0) "icacls '$profil' /remove $compte"
+    Test-DossierWorktreesAgent
+    if ($script:AgentEchecs -gt 0) { exit 1 }
+    Write-Host 'Compte agent pret.' -ForegroundColor Green
+    exit 0
 }
 
 function Get-ProcessusTessera {
@@ -122,14 +270,34 @@ function Start-Backend {
     #  3. `Start-Process` rattache le backend a la console qui le lance : il
     #     meurt avec elle (ticket-667). `Win32_Process.Create` (WMI) le demarre
     #     hors de cette console, puis on attend /health avant de rendre la main.
+    #  4. Sans fenetre (ticket-901) : la sortie va dans un journal.
     $uv = (Get-Command uv -ErrorAction Stop).Source
     $commande = "`"$uv`" run python -m uvicorn tessera.main:app --host 127.0.0.1 --port 8100"
+    $backendPid = Start-Cache -Commande $commande -Dossier (Join-Path $Root 'backend') -Journal 'backend-console.log'
+    Wait-Health -Url 'http://127.0.0.1:8100/health' -BackendPid $backendPid
+}
+
+function Get-DossierJournaux {
+    # Hors du depot : le dossier d'etat de Tessera, comme le jeton de session.
+    $dossier = Join-Path $env:LOCALAPPDATA 'Tessera\logs'
+    New-Item -ItemType Directory -Force -Path $dossier | Out-Null
+    return $dossier
+}
+
+function Start-Cache([string]$Commande, [string]$Dossier, [string]$Journal) {
+    # `Win32_Process.Create` detache le processus de la console qui le lance
+    # (ticket-667) ; `ShowWindow = 0` lui retire sa fenetre (ticket-901). La
+    # sortie, qu'aucune fenetre ne montre plus, est ecrite dans le journal,
+    # ecrase a chaque lancement.
+    $chemin = Join-Path (Get-DossierJournaux) $Journal
+    $demarrage = New-CimInstance -ClassName Win32_ProcessStartup -ClientOnly -Property @{ ShowWindow = [uint16]0 }
     $resultat = Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{
-        CommandLine      = $commande
-        CurrentDirectory = (Join-Path $Root 'backend')
+        CommandLine               = "cmd.exe /d /c `"$Commande > `"$chemin`" 2>&1`""
+        CurrentDirectory          = $Dossier
+        ProcessStartupInformation = $demarrage
     }
     if ($resultat.ReturnValue -ne 0) { throw "Win32_Process.Create a echoue (code $($resultat.ReturnValue))" }
-    Wait-Health -Url 'http://127.0.0.1:8100/health' -BackendPid $resultat.ProcessId
+    return [int]$resultat.ProcessId
 }
 
 function Wait-Health([string]$Url, [int]$BackendPid, [int]$TimeoutSec = 90) {
@@ -141,18 +309,21 @@ function Wait-Health([string]$Url, [int]$BackendPid, [int]$TimeoutSec = 90) {
             if ($reponse.StatusCode -eq 200) { Write-Host "-> backend pret (PID $BackendPid)"; return }
         } catch { Start-Sleep -Milliseconds 500 }
     }
-    throw "Le backend ne repond pas sur $Url apres $TimeoutSec s (PID $BackendPid)."
+    $journal = Join-Path (Get-DossierJournaux) 'backend-console.log'
+    throw "Le backend ne repond pas sur $Url apres $TimeoutSec s (PID $BackendPid). Journal : $journal"
 }
 
 function Start-Frontend {
-    Start-Process -FilePath 'npm.cmd' -ArgumentList 'run', 'dev' `
-        -WorkingDirectory (Join-Path $Root 'frontend')
+    Start-Cache -Commande 'npm.cmd run dev' -Dossier (Join-Path $Root 'frontend') -Journal 'vite.log' | Out-Null
 }
 
 switch ($Task) {
     'help' { Show-Help }
     'setup' { Invoke-Setup }
     'doctor' { Invoke-Doctor }
+    'secrets' { Invoke-Secrets $Projet $Nom }
+    'agent' { Invoke-Agent $Projet }
+    'hooks' { Invoke-Hooks }
     'stop' { Stop-Tessera }
     'dev' { Start-Backend; Write-Host '-> http://localhost:8100/docs' }
     'dev-frontend' { Start-Frontend; Write-Host '-> http://localhost:5173' }
@@ -166,6 +337,14 @@ switch ($Task) {
         Write-Host ''
         Write-Host '-> Backend  : http://localhost:8100/docs'
         Write-Host '-> Frontend : http://localhost:5173'
+        # Le jeton de session est ecrit par le backend dans le dossier d'etat, jamais
+        # dans le code servi par Vite : il voyage dans le fragment de l'URL.
+        $FichierJeton = Join-Path $env:LOCALAPPDATA 'Tessera\jeton-de-session'
+        if (Test-Path -LiteralPath $FichierJeton) {
+            $Jeton = (Get-Content -LiteralPath $FichierJeton -Raw).Trim()
+            Write-Host "-> Avec jeton : http://localhost:5173/#jeton=$Jeton"
+        }
+        Write-Host "-> Journaux : $(Get-DossierJournaux) (sans fenetre de console)"
         Write-Host '-> Arreter  : .\scripts\tessera.ps1 stop'
     }
     'test' {
@@ -210,7 +389,7 @@ switch ($Task) {
             exit 2
         }
         Push-Location (Join-Path $Root 'backend')
-        try { & uv run python -m tessera.services.ticket_check $Projet }
+        try { & uv run python -m tessera.services.projets.ticket_check $Projet }
         finally { Pop-Location }
         exit $LASTEXITCODE
     }

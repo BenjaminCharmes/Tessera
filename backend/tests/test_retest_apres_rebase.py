@@ -15,16 +15,11 @@ from typing import Any
 from unittest.mock import AsyncMock, MagicMock
 
 from tessera.models.ticket import TicketStatus
-from tessera.services.livraison import Livraison, LivraisonService
-from tessera.services.orchestrator import Orchestrator
-from tessera.services.pipeline_events import OrchestratorEvent, PipelineResult
-from tessera.services.retest_apres_rebase import (
-    RetestApresRebase,
-    ResultatRetest,
-    etape_de,
-    retest_du_run,
-)
-from tessera.services.test_runner import TestCommandNotFound, TestResult
+from tessera.services.livraison.livraison import Livraison, LivraisonService
+from tessera.services.livraison.retest_apres_rebase import ResultatRetest, RetestApresRebase, etape_de, retest_du_run
+from tessera.services.noyau.pipeline_events import OrchestratorEvent, PipelineResult
+from tessera.services.pipeline.orchestrator import Orchestrator
+from tessera.services.verification.test_runner import TestCommandNotFound, TestResult
 
 
 def _verts() -> TestResult:
@@ -47,6 +42,18 @@ class _FauxGit:
         self.ancetre = ancetre
         self.comparaisons: list[tuple[str, str]] = []
         self.conflits: tuple[str, ...] = ()
+        self.tete = "b2" * 20
+        self.remises: list[str] = []
+        self.remise_echoue: Exception | None = None
+
+    async def head_sha(self) -> str:
+        return self.tete
+
+    async def remettre_sur(self, sha: str) -> None:
+        self.appels.append("remise")
+        if self.remise_echoue is not None:
+            raise self.remise_echoue
+        self.remises.append(sha)
 
     async def est_ancetre(self, ancetre: str, descendant: str) -> bool | None:
         self.comparaisons.append((ancetre, descendant))
@@ -142,6 +149,7 @@ class _Banc:
             ticket_body="",
             branch="ticket-001-slug",
             approuve=True,
+            approved_sha="a1" * 20,
         )
 
 
@@ -317,6 +325,20 @@ async def test_no_test_command_still_records_nothing() -> None:
     assert lanceur.lancements == 1
 
 
+async def test_red_then_no_command_still_stops() -> None:
+    lanceur = _LanceurEnSerie(_rouges(), TestCommandNotFound("pyproject.toml supprimé"))
+    retest = RetestApresRebase(_FauxGit([]), lanceur, worktree=False)
+
+    jugement = await retest.juger("main")
+
+    assert jugement is not None
+    assert jugement.arret is not None
+    assert jugement.arret.startswith("Tests rouges après rebase sur main")
+    assert "FAILED test_longueur_des_fichiers.py" in jugement.arret
+    assert "rouges" in jugement.etape
+    assert lanceur.lancements == 2
+
+
 async def test_base_a_avance_reads_the_ancestry() -> None:
     git = _FauxGit([], ancetre=True)
     retest = RetestApresRebase(git, _Lanceur([], _verts()), worktree=False)
@@ -354,6 +376,62 @@ async def test_retest_du_run_uses_the_run_test_runner_and_command(tmp_path: Path
 
     runner.run_tests.assert_awaited_once_with(tmp_path, test_command="python scripts/verifier.py")
     assert resultat is not None and resultat.vert is True
+
+
+class _GitAvecFork(_FauxGit):
+    """A git double that knows the merge base of the branch, or fails to read it."""
+
+    def __init__(self, fork: str | None | Exception) -> None:
+        super().__init__([], ancetre=False)
+        self.fork = fork
+
+    async def merge_base(self, gauche: str, droite: str) -> str | None:
+        if isinstance(self.fork, Exception):
+            raise self.fork
+        return self.fork
+
+    async def chemins_modifies(self, gauche: str, droite: str) -> list[str] | None:
+        return ["backend/src/a.py"]
+
+
+def _projet_avec_verifier(racine: Path) -> Path:
+    (racine / "scripts").mkdir()
+    (racine / "scripts" / "verifier.py").write_text("", encoding="utf-8")
+    return racine
+
+
+async def _commande_du_retest(racine: Path, git: _FauxGit) -> str | None:
+    runner = MagicMock()
+    runner.run_tests = AsyncMock(return_value=_verts())
+    retest = retest_du_run(git, False, runner, racine, "python scripts/verifier.py")
+    assert retest is not None
+    assert await retest.base_a_avance("main") is True
+
+    await retest.relancer()
+
+    return runner.run_tests.await_args.kwargs["test_command"]  # type: ignore[no-any-return]
+
+
+async def test_retest_with_a_verifier_adds_the_pre_rebase_fork_as_impact(tmp_path: Path) -> None:
+    fork = "c3" * 20
+
+    commande = await _commande_du_retest(_projet_avec_verifier(tmp_path), _GitAvecFork(fork))
+
+    assert commande == f"python scripts/verifier.py --impact {fork}"
+
+
+async def test_retest_without_a_verifier_keeps_the_command_unchanged(tmp_path: Path) -> None:
+    commande = await _commande_du_retest(tmp_path, _GitAvecFork("c3" * 20))
+
+    assert commande == "python scripts/verifier.py"
+
+
+async def test_retest_runs_the_whole_suite_when_the_fork_is_unreadable(tmp_path: Path) -> None:
+    racine = _projet_avec_verifier(tmp_path)
+    for fork in (None, OSError("git absent"), "pas un sha; rm -rf"):
+        commande = await _commande_du_retest(racine, _GitAvecFork(fork))
+
+        assert commande == "python scripts/verifier.py"
 
 
 def test_retest_du_run_is_absent_without_tester_or_git(tmp_path: Path) -> None:
@@ -416,3 +494,22 @@ class _OrchestrateurDouble(Orchestrator):
 
     async def _run_pipeline(self, *args: Any, **kwargs: Any) -> PipelineResult:
         return self._resultat
+
+
+async def test_retest_journals_the_impact_ref_and_the_number_of_test_files(tmp_path: Path) -> None:
+    fork = "c3" * 20
+    runner = MagicMock()
+    runner.run_tests = AsyncMock(return_value=TestResult(
+        passed=True, total=5, failed=0, output_summary="durées : pytest 4 s, vitest 9 s ; impact depuis abc : 5 fichier(s) de test",
+    ))
+    retest = retest_du_run(
+        _GitAvecFork(fork), False, runner, _projet_avec_verifier(tmp_path), "python scripts/verifier.py"
+    )
+    assert retest is not None
+    await retest.base_a_avance("main")
+
+    jugement = await retest.juger("main")
+
+    assert jugement is not None
+    assert runner.run_tests.await_args.kwargs["test_command"].endswith(f"--impact {fork}")
+    assert f"--impact {fork[:12]} : 5 fichier(s) de test" in jugement.etape

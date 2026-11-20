@@ -1,5 +1,5 @@
 """A service runs apart from the backend's console — ticket-664."""
-from tessera.services.lancement import options_de_lancement
+from tessera.services.noyau.lancement import options_de_lancement
 
 
 def test_on_windows_a_service_gets_its_own_hidden_console_and_process_group() -> None:

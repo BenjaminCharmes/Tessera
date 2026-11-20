@@ -3,8 +3,8 @@
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from tessera.services.outil_introuvable import outil_introuvable
-from tessera.services.test_runner import TestRunnerService
+from tessera.services.verification.outil_introuvable import outil_introuvable
+from tessera.services.verification.test_runner import TestRunnerService
 
 _PNPM_TSC = (
     "undefined\n"

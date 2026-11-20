@@ -1,30 +1,19 @@
 import { useCallback, useState } from "react";
-import { IconSettings } from "../../design/icons";
+import { IconEngrenage } from "../../design/icons";
+import PanneauReglages from "./PanneauReglages";
 import { useFermetureAuDehors } from "./useFermetureAuDehors";
-import PlafondsDeDepense from "./PlafondsDeDepense";
-import ReglageNotifications, {
-  type ReglageDesNotifications,
-} from "./ReglageNotifications";
 
 /**
- * Les réglages globaux, derrière un bouton au pied du rail — ticket-441.
- *
- * Notifications et plafonds de dépense valent pour tous les projets : les
- * répéter sous le nom de chaque projet laissait croire le contraire. Le panneau
- * s'ouvre à droite du rail, par-dessus la colonne, et se referme sur Échap ou
- * sur un clic en dehors.
+ * Le bouton « Réglages » au pied du rail, sous la cloche (ADR-075, ticket-810) :
+ * le même ressort que `Cloche`, un popover et non une destination.
  */
-interface BoutonReglagesProps {
-  notifications?: ReglageDesNotifications;
-}
-
-export default function BoutonReglages({ notifications }: BoutonReglagesProps) {
+export default function BoutonReglages() {
   const [ouvert, setOuvert] = useState(false);
   const fermer = useCallback(() => setOuvert(false), []);
   const conteneur = useFermetureAuDehors(ouvert, fermer);
 
   return (
-    <div ref={conteneur} className="relative px-1.5 pb-3">
+    <div ref={conteneur} className="relative px-1.5 pb-1.5">
       <button
         type="button"
         aria-label="Réglages"
@@ -37,25 +26,15 @@ export default function BoutonReglages({ notifications }: BoutonReglagesProps) {
             : "text-zinc-500 hover:bg-zinc-800/60 hover:text-zinc-200"
         }`}
       >
-        <IconSettings size={20} />
+        <IconEngrenage size={20} />
       </button>
-
       {ouvert ? (
         <div
           role="dialog"
-          aria-label="Réglages"
-          className="absolute bottom-2 left-full z-30 ml-1 w-72 rounded-md border border-zinc-700 bg-zinc-900 shadow-lg"
+          aria-label="Réglages globaux"
+          className="absolute bottom-0 left-full z-30 ml-1 max-h-[80vh] w-96 overflow-y-auto rounded-md border border-zinc-700 bg-zinc-900 shadow-lg"
         >
-          {notifications ? (
-            <ReglageNotifications
-              active={notifications.active}
-              etat={notifications.etat}
-              onChange={notifications.onChange}
-            />
-          ) : null}
-          <div className="px-3 py-3">
-            <PlafondsDeDepense />
-          </div>
+          <PanneauReglages />
         </div>
       ) : null}
     </div>

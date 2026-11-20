@@ -1,12 +1,14 @@
 """Pathspecs of Tessera's own artifacts and ignored-file purging."""
 
 import asyncio
+from pathlib import Path
 
 from tessera.services.git_workspace.chemins import _ORCHESTRATOR_ARTIFACT_PATHS, _RUN_POLICY_PATHS
 from tessera.services.git_workspace.erreurs import GitCommandError
+from tessera.services.git_workspace.liens import refuser_les_liens
 from tessera.services.git_workspace.socle import GitCore
+from tessera.services.noyau.git_commande import build_command
 from tessera.utils.logger import get_logger
-
 
 _logger = get_logger("tessera.services.git_workspace")
 
@@ -40,13 +42,24 @@ class GitIgnores(GitCore):
     async def _is_ignored(self, path: str) -> bool:
         """True si le dépôt ignore ce chemin (`.gitignore` ou `.git/info/exclude`)."""
         proc = await asyncio.create_subprocess_exec(
-            "git", "check-ignore", "-q", "--", path,
+            *build_command(("check-ignore", "-q", "--", path)),
             cwd=str(self._project_path),
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
         )
         await proc.communicate()
         return proc.returncode == 0
+
+    async def racine_de_l_arbre(self) -> Path:
+        """Root the link walk starts from: the repo top level when the project lives in its parent (ADR-024)."""
+        racine = self._project_path
+        if self._travaille_dans_le_parent():
+            racine = await self._toplevel() or racine
+        return racine
+
+    async def _refuser_les_liens(self) -> None:
+        """Bloque avant tout `add` ou `diff` si l'arbre porte un lien que git suivrait."""
+        await refuser_les_liens(await self.racine_de_l_arbre())
 
     async def _purger_stage_ignoré(self) -> None:
         """Retire de l'index les fichiers désormais couverts par `.gitignore`.

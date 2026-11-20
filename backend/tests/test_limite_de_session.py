@@ -6,17 +6,13 @@ le ticket suivant. Les autres exceptions gardent le comportement actuel.
 """
 from pathlib import Path
 
-import pytest
-
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services import pipeline_outcomes as outcomes
-from tessera.services.orchestrator import Orchestrator
-from tessera.services.pipeline_events import EventType, OrchestratorEvent, PipelineResult
-from tessera.services.pipeline_run import PipelineRun
-from tessera.services.session_limit import (
-    extract_reset_time,
-    is_session_limit,
-)
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent, PipelineResult
+from tessera.services.pipeline import pipeline_outcomes as outcomes
+from tessera.services.pipeline.orchestrator import Orchestrator
+from tessera.services.pipeline.pipeline_run import PipelineRun
+from tessera.services.usage.session_limit import extract_reset_time, is_session_limit
+from tests.doubles_git import GitWorkspaceDouble
 
 # ---------------------------------------------------------------------------
 # Helpers partagés
@@ -39,7 +35,7 @@ def _ticket(tid: str = "ticket-001") -> Ticket:
     )
 
 
-class _Git:
+class _Git(GitWorkspaceDouble):
     """Git minimal : commit réussit, pas d'avancement de ref de base."""
 
     def __init__(self) -> None:

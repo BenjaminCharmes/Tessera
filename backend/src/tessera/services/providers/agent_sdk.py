@@ -1,5 +1,4 @@
 import asyncio
-import json
 from collections.abc import AsyncGenerator, Awaitable, Callable
 from contextlib import aclosing
 from pathlib import Path
@@ -15,12 +14,36 @@ from claude_agent_sdk import (
     SdkPluginConfig,
     StreamEvent,
     SystemMessage,
-    TextBlock,
-    ToolUseBlock,
     UserMessage,
     query,
 )
+from claude_agent_sdk._internal.transport import Transport
 from claude_agent_sdk.types import SystemPromptFile
+
+from tessera.config import settings
+from tessera.models.agent import EffortLevel
+from tessera.services.noyau.groupe_de_processus import creer_groupe, fermer_le_groupe, rattacher_au_groupe
+from tessera.services.providers.base import ProviderResult, StreamCallback, ToolEventCallback
+from tessera.services.providers.droits_worktree import DroitsAgentRefuses
+from tessera.services.providers.duree_max import borner
+from tessera.services.providers.env_agent import CLI_PARTAGE, env_de_l_agent
+from tessera.services.providers.env_sdk import env_du_sous_processus
+from tessera.services.providers.garde_jetons import hook_refus_env_tessera
+from tessera.services.providers.git_guard import hook_refus_git
+from tessera.services.providers.kill_guard import hook_refus_kill
+from tessera.services.providers.messages_sdk import _format_de_sortie, provider_result_du_sdk
+from tessera.services.providers.noms import ProviderIndisponible
+from tessera.services.providers.perimetre import hook_refus_hors_perimetre
+from tessera.services.providers.prompt_fichier import prompt_systeme_pour_sdk
+from tessera.services.providers.refus_cli import ReleveDesRefusCli
+from tessera.services.providers.refus_garde import JournalDesRefus
+from tessera.services.providers.reglages_ancetres import reglages_sans_consignes_ancetres
+from tessera.services.providers.signaler import ContexteSignal, serveur_tessera
+from tessera.services.providers.silence_bash import SuiviAppelsBash
+from tessera.services.providers.traitement_messages import traiter_message
+from tessera.services.providers.transport_agent import TransportSuivi, transport_du_compte
+from tessera.services.usage.quota_tracker import QuotaTracker
+from tessera.utils.logger import get_logger
 
 # Union de tous les types émis par query() — utilisé pour typer le générateur.
 _SdkMessage = (
@@ -35,47 +58,28 @@ _SdkMessage = (
 
 
 async def _sdk_gen(
-    prompt: str, options: ClaudeAgentOptions
+    prompt: str, options: ClaudeAgentOptions, transport: Transport | None = None
 ) -> AsyncGenerator[_SdkMessage, None]:
     """Wraps query() as a typed AsyncGenerator so it exposes aclose()."""
-    async for msg in query(prompt=prompt, options=options):
+    # Sans transport maison, l'appel reste celui d'avant (ADR-083).
+    flux = (query(prompt=prompt, options=options) if transport is None
+            else query(prompt=prompt, options=options, transport=transport))
+    async for msg in flux:
         yield msg
 
-from tessera.models.agent import EffortLevel
-from tessera.services.providers.consignes_ancetres import claude_md_ancetres_a_exclure
-from tessera.services.providers.env_sdk import env_du_sous_processus
-from tessera.services.providers.garde_jetons import hook_refus_env_tessera
-from tessera.services.providers.git_guard import hook_refus_git
-from tessera.services.providers.perimetre import (
-    hook_refus_hors_perimetre,
-    racine_autorisee,
-)
-from tessera.services.racine_depot import depot_au_dessus
-from tessera.services.providers.refus_cli import ReleveDesRefusCli
-from tessera.services.providers.refus_garde import JournalDesRefus
-from tessera.services.providers.ask_user import (
-    ASK_USER_SERVER_NAME,
-    ASK_USER_TOOL_NAME,
-    build_ask_user_server,
-)
-from tessera.services.providers.base import (
-    ProviderResult,
-    StreamCallback,
-    ToolEventCallback,
-)
-from tessera.services.providers.duree_max import borner
-from tessera.services.providers.messages_sdk import (
-    OUTIL_SORTIE_STRUCTUREE,
-    _extract_stream_delta,
-    _format_de_sortie,
-    provider_result_du_sdk,
-)
-from tessera.services.providers.noms import ProviderIndisponible
-from tessera.services.providers.prompt_fichier import prompt_systeme_pour_sdk
-from tessera.services.quota_tracker import QuotaTracker
-from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
+
+
+def _rappel_de_rattachement(groupe: Any | None) -> Callable[[int], None]:
+    """Returns the callback that puts the CLI's pid in ``groupe`` (ticket-900)."""
+
+    def rattacher(pid: int) -> None:
+        if groupe is not None and not rattacher_au_groupe(groupe, pid):
+            _logger.warning("agent_non_rattache", extra={"pid": pid})
+
+    return rattacher
+
 
 _ALLOWED_TOOLS = ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
 
@@ -91,41 +95,6 @@ _TESSERA_PLUGIN_PATH: Path = _REPO_ROOT / "agents" / "plugin"
 SYSTEM_PROMPT_FILE_THRESHOLD_BYTES = 24_000
 
 
-def _depart_des_consignes(cwd: Path, racine_ecriture: Path) -> Path:
-    """The folder from which ancestor CLAUDE files are excluded.
-
-    Le dépôt de l'IDE pour un projet qui y vit. Un worktree de run est hors de
-    ce dépôt (ADR-056) : le départ est alors la racine de son propre checkout,
-    le premier ancêtre qui porte un ``.git`` (un fichier, pour un worktree lié),
-    et à défaut la racine d'écriture reçue, qui n'exclut rien.
-    """
-    projet = cwd.resolve()
-    if projet.is_relative_to(_REPO_ROOT.resolve()):
-        return _REPO_ROOT
-    depot = depot_au_dessus(projet)
-    return depot if depot is not None else racine_ecriture
-
-
-def _reglages_sans_consignes_ancetres(
-    cwd: Path | None, racine_ecriture: Path | None
-) -> str | None:
-    """The ``settings`` JSON excluding Tessera's CLAUDE files, or ``None``.
-
-    Un projet est « ancestor » quand sa racine d'écriture n'est pas son propre
-    dossier : on réutilise donc celle que le run a figée (ticket-119).
-    """
-    if cwd is None:
-        return None
-    racine = racine_ecriture if racine_ecriture is not None else racine_autorisee(cwd)
-    ancestor = racine.resolve() != cwd.resolve()
-    exclus = claude_md_ancetres_a_exclure(
-        cwd, _depart_des_consignes(cwd, racine), ancestor
-    )
-    if not exclus:
-        return None
-    return json.dumps({"claudeMdExcludes": exclus})
-
-
 def _build_options(
     *,
     system: str | SystemPromptFile,
@@ -135,6 +104,7 @@ def _build_options(
     cwd: Path | None,
     allowed_tools: list[str] | None = None,
     ask_user: Callable[[str], Awaitable[str]] | None = None,
+    signaler: ContexteSignal | None = None,
     racine_ecriture: Path | None = None,
     resume: str | None = None,
     skills: list[str] | None = None,
@@ -142,6 +112,7 @@ def _build_options(
     journal_refus: JournalDesRefus | None = None,
     effort: EffortLevel | None = None,
     schema: dict[str, Any] | None = None,
+    compte_agent: bool = False,
 ) -> ClaudeAgentOptions:
     """Builds SDK options with the guardrails established by the ticket-044 spike.
 
@@ -157,15 +128,15 @@ def _build_options(
     ``resume`` names a session of a previous call to pick up from (ticket-187).
     The CLI finds it on disk by ``cwd``, so both must match between the calls.
     """
-    # ``allowed_tools`` only controls auto-approval — the SDK CLI's
-    # subprocess transport reads ``if effective_allowed_tools:`` and omits
-    # ``--allowedTools`` entirely when the list is empty, leaving the CLI's
-    # full default toolset available. Only ``tools`` controls which built-in
-    # tools exist at all (``[]`` disables all of them). Both fields are
-    # always set to the same resolved list here, so a "no tools" request
-    # (`allowed_tools=[]`) actually disables tool availability instead of
-    # merely withholding auto-approval, and no configuration path can end up
-    # with an implicit toolset (ticket-044 merge-gate review, finding 1).
+    # ``allowed_tools`` only controls auto-approval — the SDK CLI's subprocess
+    # transport reads ``if effective_allowed_tools:`` and omits ``--allowedTools``
+    # entirely when the list is empty, leaving the CLI's full default toolset
+    # available. Only ``tools`` controls which built-in tools exist at all
+    # (``[]`` disables all of them). Both fields are always set to the same
+    # resolved list here, so a "no tools" request (`allowed_tools=[]`) really
+    # disables tool availability instead of merely withholding auto-approval,
+    # and no configuration path can end up with an implicit toolset
+    # (ticket-044 merge-gate review, finding 1).
     effective_tools = allowed_tools if allowed_tools is not None else _ALLOWED_TOOLS
 
     # `tools` étant explicite, l'option `skills` du SDK ne suffit pas à rendre
@@ -182,18 +153,18 @@ def _build_options(
     if skills and any(s.startswith("tessera:") for s in skills):
         plugins = [{"type": "local", "path": str(_TESSERA_PLUGIN_PATH)}]
 
-    # L'outil `ask_user` n'existe que si un canal de dialogue est branché sur
-    # ce run (ticket-066). Le donner sans canal reviendrait à promettre à
-    # l'agent une réponse que personne ne pourrait lui apporter.
-    mcp_servers: dict[str, Any] = {}
-    if ask_user is not None:
-        mcp_servers[ASK_USER_SERVER_NAME] = build_ask_user_server(ask_user)
-        effective_tools = [*effective_tools, ASK_USER_TOOL_NAME]
+    # `ask_user` : canal de dialogue branché (066) ; `signaler` : rôle outillé, `[]` non (863).
+    mcp_servers, noms_mcp = serveur_tessera(ask_user, signaler, outille=allowed_tools != [])
+    effective_tools = [*effective_tools, *noms_mcp]
 
-    env = env_du_sous_processus(git_bash_path)
+    # Compte dédié (ADR-083), si le projet du run le déclare (ticket-915) : env bâti
+    # de zéro et CLI partagé ; sinon rien ne change. Jeton absent : `ProviderIndisponible`.
+    compte = settings.agent_user if compte_agent else ""
+    env = env_de_l_agent(compte, git_bash_path) if compte else env_du_sous_processus(git_bash_path)
 
     return ClaudeAgentOptions(
         env=env,
+        cli_path=CLI_PARTAGE if compte else None,
         # Chemin long obligatoire : un chemin court Windows 8.3 fait refuser
         # les écritures.
         cwd=str(cwd.resolve()) if cwd is not None else None,
@@ -205,7 +176,7 @@ def _build_options(
         allowed_tools=effective_tools,
         setting_sources=["project"],
         # Un projet hébergé ne lit pas les CLAUDE.md de Tessera (ticket-414).
-        settings=_reglages_sans_consignes_ancetres(cwd, racine_ecriture),
+        settings=reglages_sans_consignes_ancetres(cwd, racine_ecriture),
         include_partial_messages=True,
         max_turns=max_turns,
         max_budget_usd=max_budget_usd,
@@ -217,12 +188,11 @@ def _build_options(
         plugins=plugins,
         # Les agents n'écrivent pas dans l'historique git : le pipeline crée la
         # branche et commite lui-même (ADR-018), et ne merge jamais (ADR-022).
-        # Le refus est posé ici, en `PreToolUse`, parce qu'une entrée de
-        # `allowed_tools` couvrant `Bash` l'auto-approuverait avant tout
-        # callback de permission — le garde serait inerte (ticket-068).
+        # Posé en `PreToolUse` : `allowed_tools` auto-approuverait `Bash` avant
+        # tout callback de permission (ticket-068). Même hook : pas de kill (899).
         hooks={
             "PreToolUse": [
-                HookMatcher(matcher="Bash", hooks=[hook_refus_git]),
+                HookMatcher(matcher="Bash", hooks=[hook_refus_git, hook_refus_kill]),
                 # Le `.env` de Tessera porte les jetons de mise en ligne, et
                 # ADR-031 laisse lire hors du projet (ADR-053, ticket-464).
                 HookMatcher(
@@ -258,17 +228,19 @@ class ClaudeAgentSDKProvider:
         skills: list[str] | None = None,
         git_bash_path: str | None = None,
         silence_max_s: float | None = None,
+        bash_silence_max_s: float | None = None,
         journal_refus: JournalDesRefus | None = None,
         duree_max_s: float | None = None,
         effort: EffortLevel | None = None,
+        compte_agent: bool = False,
     ) -> None:
+        self._compte_agent = compte_agent  # ticket-915 : faux, compte du backend
         # L'effort de raisonnement du rôle (ticket-573) ; None : défaut du SDK.
         self._effort = effort
         # Durée totale d'un appel (ticket-518) ; None : pas de borne, comme
         # pour le codeur, dont un tour légitime dure longtemps.
         self._duree_max_s = duree_max_s
-        # Là où les refus du garde-fou s'accumulent pour le reviewer et le
-        # validateur (ticket-476). None : personne ne les lira.
+        # Refus du garde-fou, pour le reviewer et le validateur (ticket-476) ; None : aucun.
         self._journal_refus = journal_refus
         self._max_turns = max_turns
         self._skills = list(skills) if skills else []
@@ -281,16 +253,14 @@ class ClaudeAgentSDKProvider:
         # donc ici que le quota se capte, et sa forme s'arrête ici (ticket-054).
         self.quota = QuotaTracker()
         self._allowed_tools = list(allowed_tools) if allowed_tools is not None else list(_ALLOWED_TOOLS)
-        # Chemin vers bash.exe sous Windows, transmis au sous-processus du SDK
-        # pour activer l'outil `Bash` (ticket-319).
+        # bash.exe sous Windows, transmis au sous-processus du SDK (`Bash`, ticket-319).
         self._git_bash_path = git_bash_path
-        # Délai maximum entre deux messages consécutifs (ticket-381).
-        # None à la construction → lu depuis les réglages.
+        # Délai maximum entre deux messages (ticket-381) ; None : lu des réglages.
         if silence_max_s is not None:
             self._silence_max_s = silence_max_s
         else:
-            from tessera.config import settings
             self._silence_max_s = settings.agent_silence_max_s
+        self._bash_silence_max_s = bash_silence_max_s  # ticket-957 ; None : réglages
 
     async def complete(
         self,
@@ -301,6 +271,7 @@ class ClaudeAgentSDKProvider:
         max_tokens: int,
         cwd: Path | None = None,
         ask_user: Callable[[str], Awaitable[str]] | None = None,
+        signaler: ContexteSignal | None = None,
         session: str | None = None,
         schema: dict[str, Any] | None = None,
     ) -> ProviderResult:
@@ -309,7 +280,7 @@ class ClaudeAgentSDKProvider:
         # Voir LLMProvider.complete pour la portée exacte de cette limitation.
         return await self._run_ou_reprendre(
             system=system, user=user, model=model, cwd=cwd, ask_user=ask_user,
-            session=session, schema=schema,
+            signaler=signaler, session=session, schema=schema,
         )
 
     async def stream(
@@ -323,6 +294,7 @@ class ClaudeAgentSDKProvider:
         on_token: StreamCallback | None = None,
         on_tool_use: ToolEventCallback | None = None,
         ask_user: Callable[[str], Awaitable[str]] | None = None,
+        signaler: ContexteSignal | None = None,
         session: str | None = None,
         schema: dict[str, Any] | None = None,
     ) -> ProviderResult:
@@ -330,12 +302,10 @@ class ClaudeAgentSDKProvider:
         return await self._run_ou_reprendre(
             system=system, user=user, model=model, cwd=cwd,
             on_token=on_token, on_tool_use=on_tool_use, ask_user=ask_user,
-            session=session, schema=schema,
+            signaler=signaler, session=session, schema=schema,
         )
 
-    async def _run_ou_reprendre(
-        self, *, session: str | None, **kwargs: Any
-    ) -> ProviderResult:
+    async def _run_ou_reprendre(self, *, session: str | None, **kwargs: Any) -> ProviderResult:
         """Resumes ``session`` when given, and falls back to a fresh call if
         that resume fails (ticket-187).
 
@@ -348,10 +318,10 @@ class ClaudeAgentSDKProvider:
             return await self._run(**kwargs)
         try:
             return await self._run(resume=session, **kwargs)
+        except DroitsAgentRefuses:
+            raise  # une clôture refusée n'est pas une session perdue : le run s'arrête
         except Exception as exc:  # noqa: BLE001 — le repli est le comportement d'avant
-            _logger.warning(
-                "session_resume_failed", extra={"session": session, "error": str(exc)}
-            )
+            _logger.warning("session_resume_failed", extra={"session": session, "error": str(exc)})
             return await self._run(**kwargs)
 
     async def _run(self, **kwargs: Any) -> ProviderResult:
@@ -378,71 +348,61 @@ class ClaudeAgentSDKProvider:
         on_token: StreamCallback | None = None,
         on_tool_use: ToolEventCallback | None = None,
         ask_user: Callable[[str], Awaitable[str]] | None = None,
+        signaler: ContexteSignal | None = None,
         resume: str | None = None,
         schema: dict[str, Any] | None = None,
     ) -> ProviderResult:
         options = _build_options(
             system=system, model=model, max_turns=self._max_turns,
             max_budget_usd=self._max_budget_usd, cwd=cwd,
-            allowed_tools=self._allowed_tools, ask_user=ask_user,
+            allowed_tools=self._allowed_tools, ask_user=ask_user, signaler=signaler,
             racine_ecriture=self.racine_ecriture, resume=resume,
             skills=self._skills, git_bash_path=self._git_bash_path,
             journal_refus=self._journal_refus, effort=self._effort,
-            schema=schema,
+            schema=schema, compte_agent=self._compte_agent,
         )
+        # Sous le compte dédié, le CLI part par le transport maison (ADR-083).
+        groupe = creer_groupe()
+        if groupe is None:
+            _logger.warning("agent_sans_groupe", extra={"model": model})
+        rappel = _rappel_de_rattachement(groupe)
+        # Le PID du CLI ne se voit que dans le transport : toujours un transport maison.
+        transport = (transport_du_compte(user, options, au_demarrage=rappel, compte_agent=self._compte_agent)
+                     or TransportSuivi(prompt=user, options=options, au_demarrage=rappel))
         chunks: list[str] = []
         result: ResultMessage | None = None
         refus_cli = ReleveDesRefusCli()
-        # None → pas de borne (0 ou négatif désactive également).
-        silence_timeout: float | None = self._silence_max_s if self._silence_max_s > 0 else None
+        suivi_bash = SuiviAppelsBash(self._silence_max_s, self._bash_silence_max_s)
+        flux = _sdk_gen(prompt=user, options=options, transport=transport)
+        try:
+            async with aclosing(flux) as gen:
+                while True:
+                    try:
+                        # `asyncio.timeout` plutôt que `wait_for` : sous Python 3.11,
+                        # `wait_for` rend le résultat et avale l'annulation quand
+                        # son tâche interne vient de finir. Avec un flux qui émet
+                        # sans cesse, la durée maximale était alors perdue et
+                        # l'appel ne finissait jamais (ticket-518).
+                        async with asyncio.timeout(suivi_bash.borne()):
+                            message = await gen.__anext__()
+                    except TimeoutError:
+                        _logger.warning(
+                            "agent_silencieux_arrete",
+                            extra={"model": model, "silence_s": suivi_bash.borne()},
+                        )
+                        raise ProviderIndisponible(suivi_bash.message_d_arret()) from None
+                    except StopAsyncIteration:
+                        break
 
-        async with aclosing(_sdk_gen(prompt=user, options=options)) as gen:
-            while True:
-                try:
-                    # `asyncio.timeout` plutôt que `wait_for` : sous Python 3.11,
-                    # `wait_for` rend le résultat et avale l'annulation quand
-                    # son tâche interne vient de finir. Avec un flux qui émet
-                    # sans cesse, la durée maximale était alors perdue et
-                    # l'appel ne finissait jamais (ticket-518).
-                    async with asyncio.timeout(silence_timeout):
-                        message = await gen.__anext__()
-                except TimeoutError:
-                    _logger.warning(
-                        "agent_silencieux_arrete",
-                        extra={"model": model, "silence_s": self._silence_max_s},
+                    refus_cli.observer(message)
+                    suivi_bash.observer(message)
+                    final = await traiter_message(
+                        message, chunks=chunks, quota=self.quota,
+                        on_token=on_token, on_tool_use=on_tool_use,
                     )
-                    raise ProviderIndisponible(
-                        f"agent silencieux depuis {self._silence_max_s:.0f} s"
-                    )
-                except StopAsyncIteration:
-                    break
-
-                refus_cli.observer(message)
-                if isinstance(message, RateLimitEvent):
-                    # L'état du quota d'abonnement : la seule mesure de la
-                    # ressource réellement finie en mode abonnement. Un provider
-                    # qui n'en émet pas laisse le tracker vide, et rien ne casse.
-                    self.quota.observe(getattr(message, "rate_limit_info", None))
-                elif isinstance(message, ResultMessage):
-                    result = message
-                elif isinstance(message, StreamEvent):
-                    # Forwarded live for display only — the authoritative record
-                    # of content is the buffered TextBlock below, so this must
-                    # never also be appended to `chunks` (would double the text).
-                    if on_token is not None:
-                        delta = _extract_stream_delta(message.event)
-                        if delta:
-                            await on_token(delta)
-                elif isinstance(message, AssistantMessage):
-                    for block in message.content:
-                        # isinstance plutôt que comparaison de type().__name__ :
-                        # robuste et vérifiable statiquement (finding 2, revue ticket-044).
-                        if isinstance(block, TextBlock):
-                            chunks.append(block.text)
-                        # La sortie structurée n'est pas une action de l'agent.
-                        elif (isinstance(block, ToolUseBlock) and on_tool_use is not None
-                              and block.name != OUTIL_SORTIE_STRUCTUREE):
-                            await on_tool_use(block.name, dict(block.input))
+                    result = final or result
+        finally:
+            fermer_le_groupe(groupe)
 
         if result is None:
             raise RuntimeError("Agent SDK: aucun ResultMessage reçu")

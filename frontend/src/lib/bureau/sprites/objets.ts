@@ -232,3 +232,26 @@ export function confetti(i: number): Sprite {
   g.stamp(0, 0, FORMES_CONFETTI[i % 5] ?? [], { h: `confetti${n}.hi`, b: `confetti${n}.b`, s: `confetti${n}.s` });
   return cuire(s);
 }
+
+/**
+ * Le marqueur d'anomalie, 9 × 8 (ADR-078, ticket-832) : un triangle d'avertissement en ton
+ * `etat-anomalie` (ambre), son point d'exclamation dans le creux. Posé au-dessus du poste
+ * de l'agent dont le run porte une anomalie : un seul par run, jamais par anomalie. Un
+ * voyant garde sa teinte (ADR-026), donc ni contour ni liseré de nuit.
+ */
+export function marqueurAnomalie(): Sprite {
+  const s = sprite(9, 8);
+  const g = s.calque();
+  const A = E("anomalie");
+  // Le triangle, du sommet à la base : 1, 3, 3, 5, 5, 7, 7, 9 pixels de large.
+  const demi = [0, 1, 1, 2, 2, 3, 3, 4];
+  demi.forEach((d, y) => {
+    g.rect(4 - d, y, 2 * d + 1, 1, A.b);
+    g.px(4 - d, y, A.hi);
+    g.px(4 + d, y, A.s);
+  });
+  g.rect(0, 7, 9, 1, A.s);
+  g.rect(4, 2, 1, 3, A.d);
+  g.px(4, 6, A.d);
+  return s;
+}

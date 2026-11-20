@@ -12,7 +12,8 @@ dependencies = [
     "python-frontmatter>=1.1.0",
     "websockets>=12.0",
     "httpx>=0.27.0",
-    "claude-agent-sdk>=0.2.159",
+    "claude-agent-sdk>=0.2.179",
+    "keyring>=25.0",
 ]
 
 [project.optional-dependencies]
@@ -26,6 +27,7 @@ dev = [
     # compilées sont bloquées par Smart App Control (ticket-385).
     "mypy>=1.10.0,<1.19",
     "respx>=0.23.1",
+    "ruff==0.14.3",
 ]
 
 [tool.uv]
@@ -36,7 +38,9 @@ no-binary-package = ["mypy"]
 # Même blocage pour la DLL de rpds-py 2026.9.1 (2026-10-12) : la chaîne
 # claude_agent_sdk → mcp → jsonschema → referencing → rpds ne s'importe plus.
 # 2026.6.3 passe ; un `uv lock --upgrade` ne doit pas la remplacer.
-constraint-dependencies = ["rpds-py==2026.6.3"]
+# Le 12/11, la DLL de pydantic-core 2.50.4 (pydantic 2.14.3) est refusée à son
+# tour ; 2.50.2 passe (ticket-939).
+constraint-dependencies = ["rpds-py==2026.6.3", "pydantic-core==2.50.2"]
 
 [build-system]
 requires = ["hatchling"]
@@ -60,6 +64,7 @@ filterwarnings = [
     "ignore::pytest.PytestUnhandledThreadExceptionWarning",
 ]
 markers = [
+    "perf: tests chronométrés, sensibles à la charge de la machine — sautés par scripts/verifier.py (testeur du pipeline), gardés par la CI GitHub",
     "integration: tests nécessitant une session Claude Code authentifiée et qui facturent l'abonnement Claude (dés-activés en CI) — pas une ANTHROPIC_API_KEY",
 ]
 
@@ -77,3 +82,36 @@ strict = true
 python_version = "3.11"
 
 
+
+[tool.ruff]
+target-version = "py311"
+line-length = 160
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+# E501 : le code dépasse largement 88 colonnes ; le formateur fera l'objet
+# d'un ticket séparé, ce ticket ne réécrit pas le backend.
+ignore = ["E501"]
+
+[tool.ruff.lint.flake8-bugbear]
+# B008 : les valeurs par défaut FastAPI sont des appels, par conception.
+extend-immutable-calls = [
+    "fastapi.Depends",
+    "fastapi.Query",
+    "fastapi.Body",
+    "fastapi.Header",
+    "fastapi.Path",
+    "fastapi.File",
+    "fastapi.Form",
+    "fastapi.Cookie",
+    "fastapi.Security",
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Fixture pytest importée d'un autre module : le paramètre la « redéfinit »,
+# c'est le mécanisme même des fixtures.
+"tests/test_commits_repris.py" = ["F811"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["tessera"]
+split-on-trailing-comma = false

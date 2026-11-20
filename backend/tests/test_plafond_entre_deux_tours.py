@@ -10,12 +10,7 @@ from unittest.mock import MagicMock
 
 from tessera.models.agent import AgentResult, AgentRole
 from tessera.models.ticket import TicketStatus
-from tests.test_orchestrator import (
-    _FakeGit,
-    _make_agent_result,
-    _make_orchestrator,
-    _noop,
-)
+from tests.test_orchestrator import _FakeGit, _make_agent_result, _make_orchestrator, _noop
 
 
 def _runner_qui_coute(cout_par_appel: float, calls: list[dict[str, Any]]) -> Any:

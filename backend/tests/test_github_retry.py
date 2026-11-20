@@ -3,8 +3,8 @@ import httpx
 import pytest
 import respx
 
-from tessera.services.github_retry import reessayer_5xx
-from tessera.services.github_service import GitHubService
+from tessera.services.github.github_retry import reessayer_5xx
+from tessera.services.github.github_service import GitHubService
 
 _REPO = "owner/my-repo"
 _BASE = "https://api.github.com"

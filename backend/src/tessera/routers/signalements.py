@@ -1,16 +1,16 @@
 """Signalements : un défaut ou une idée repérés ailleurs deviennent un ticket ide-core — ticket-407."""
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Literal
 
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, Field, field_validator
 
 from tessera.config import settings
 from tessera.models.ticket import Ticket, TicketType
-from tessera.services import signalements_en_attente as attente
-from tessera.services.run_registry import RUN_REGISTRY
-from tessera.services.ticket_service import TicketService
+from tessera.services.pipeline import signalements_en_attente as attente
+from tessera.services.pipeline.run_registry import RUN_REGISTRY
+from tessera.services.projets.ticket_service import TicketService
 from tessera.utils.project_id import validate_project_id
 
 #: Le projet qui reçoit tous les signalements : le backlog de Tessera lui-même.
@@ -23,17 +23,21 @@ attente.installer_vidage(PROJET_CIBLE)
 #: le triage reste une étape humaine.
 LIGNE_CRITERES = "- [ ] À écrire au triage"
 
+#: Bornes en caractères : un signalement est un résumé, pas un journal collé.
+MAX_DESCRIPTION = 20_000
+MAX_CONTEXTE = 20_000
+
 router = APIRouter(tags=["signalements"])
 
 
 class SignalementCreate(BaseModel):
     """Body of ``POST /signalements``."""
 
-    projet: str
+    projet: str = Field(max_length=100)
     nature: Literal["bug", "idee"]
-    titre: str
-    description: str
-    contexte: str = ""
+    titre: str = Field(max_length=200)
+    description: str = Field(max_length=MAX_DESCRIPTION)
+    contexte: str = Field(default="", max_length=MAX_CONTEXTE)
 
     @field_validator("titre", "description")
     @classmethod
@@ -76,7 +80,7 @@ def _exiger_projet(project_id: str) -> None:
 async def create_signalement(body: SignalementCreate) -> Ticket | JSONResponse:
     _exiger_projet(body.projet)
     _exiger_projet(PROJET_CIBLE)
-    recu_le = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    recu_le = datetime.now(UTC).strftime("%Y-%m-%d")
     type_ticket = TicketType.fix if body.nature == "bug" else TicketType.feat
     corps = _corps_du_ticket(body, recu_le)
     if RUN_REGISTRY.projet_occupe(PROJET_CIBLE):

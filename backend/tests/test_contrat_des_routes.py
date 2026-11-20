@@ -10,6 +10,7 @@ from tessera.main import app
 COUPLES: list[tuple[str, str]] = [
     ("DELETE", "/api/v1/agents/registry/{role}"),
     ("DELETE", "/api/v1/projects/{project_id}"),
+    ("DELETE", "/api/v1/reglages/{nom}"),
     ("GET", "/api/v1/agents/registry"),
     ("GET", "/api/v1/agents/registry/{role}"),
     ("GET", "/api/v1/fs/list"),
@@ -45,11 +46,14 @@ COUPLES: list[tuple[str, str]] = [
     ("GET", "/api/v1/projects/{project_id}/tickets/{ticket_id}/runs"),
     ("GET", "/api/v1/projects/{project_id}/usage"),
     ("GET", "/api/v1/projects/{project_id}/usage/breakdown"),
+    ("GET", "/api/v1/reglages"),
+    ("GET", "/api/v1/rituels"),
     ("GET", "/api/v1/runs/{run_id}"),
     ("GET", "/api/v1/runs/{run_id}/events"),
     ("GET", "/api/v1/services/running"),
     ("GET", "/api/v1/services/running/activite"),
     ("GET", "/api/v1/services/running/avertissements"),
+    ("GET", "/api/v1/supervision/recap"),
     ("GET", "/api/v1/tessera/salle"),
     ("GET", "/api/v1/usage/quota"),
     ("GET", "/api/v1/usage/recent-runs"),
@@ -87,12 +91,15 @@ COUPLES: list[tuple[str, str]] = [
     ("POST", "/api/v1/projects/{project_id}/tickets/{ticket_id}/create-pr"),
     ("POST", "/api/v1/projects/{project_id}/tickets/{ticket_id}/merge-pr"),
     ("POST", "/api/v1/projects/{project_id}/tickets/{ticket_id}/open-pr"),
+    ("POST", "/api/v1/rituels/{identifiant}/fait"),
+    ("POST", "/api/v1/rituels/{identifiant}/reporter"),
     ("POST", "/api/v1/services/running/{pid}/stop"),
     ("POST", "/api/v1/signalements"),
     ("PUT", "/api/v1/agents/registry/{role}"),
     ("PUT", "/api/v1/fs/write"),
     ("PUT", "/api/v1/projects/{project_id}/agents/{role}"),
     ("PUT", "/api/v1/projects/{project_id}/artifacts"),
+    ("PUT", "/api/v1/reglages/{nom}"),
 ]
 
 

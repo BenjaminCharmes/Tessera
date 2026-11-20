@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { grouperParEcran, listerLesCaptures, lireUneCapture, urlDeCapture } from "./capturesDuRun";
+import { cheminDeCapture, grouperParEcran, listerLesCaptures, lireUneCapture } from "./capturesDuRun";
 
 describe("capturesDuRun", () => {
   afterEach(() => vi.unstubAllGlobals());
@@ -31,9 +31,9 @@ describe("capturesDuRun", () => {
     expect(groupes[0].captures.map((c) => c.largeur)).toEqual([390, 1280]);
   });
 
-  it("builds the image address with the ticket as a query", () => {
-    expect(urlDeCapture("p 1", "ticket-620", "a-390-clair.png")).toBe(
-      "/api/v1/projects/p%201/captures/a-390-clair.png?ticket=ticket-620",
+  it("builds the image path with the ticket as a query", () => {
+    expect(cheminDeCapture("p 1", "ticket-620", "a-390-clair.png")).toBe(
+      "/projects/p%201/captures/a-390-clair.png?ticket=ticket-620",
     );
   });
 

@@ -13,26 +13,21 @@ from typing import Any
 
 import httpx
 import pytest
+from claude_agent_sdk import AssistantMessage, TextBlock
 
 import tessera.services.providers.agent_sdk as agent_sdk_module
 from tessera.config import settings
-from tessera.services.journal_pipeline import journal_vers
+from tessera.services.noyau.journal_pipeline import journal_vers
 from tessera.services.providers import par_role
 from tessera.services.providers.agent_sdk import ClaudeAgentSDKProvider
 from tessera.services.providers.base import ProviderResult
 from tessera.services.providers.duree_max import borner
 from tessera.services.providers.enregistrant import activer_enregistrement
 from tessera.services.providers.noms import ProviderIndisponible
-from tessera.services.providers.ollama import (
-    OllamaProvider,
-    _get_slot,
-    _reset_cooldowns,
-    _reset_slots,
-)
+from tessera.services.providers.ollama import OllamaProvider, _get_slot, _reset_cooldowns, _reset_slots
 from tessera.services.providers.par_role import ROLES_TEXTE, provider_pour_role
 from tessera.services.providers.repli import ProviderAvecRepli
 from tests.test_providers_base import FakeProvider
-from claude_agent_sdk import AssistantMessage, TextBlock
 
 _BASE = "http://duree-max.test:11434"
 
@@ -138,7 +133,7 @@ async def test_un_appel_agent_sdk_qui_emet_sans_fin_leve_provider_indisponible(
 ) -> None:
     # Un message toutes les 10 ms : le silence maximal (1 s) ne se déclenche
     # jamais, seule la durée totale peut couper.
-    async def fake_query(*, prompt: str, options: Any) -> AsyncIterator[Any]:
+    async def fake_query(*, prompt: str, options: Any, **_: Any) -> AsyncIterator[Any]:
         while True:
             yield AssistantMessage(content=[TextBlock(text="x")], model="m")
             await asyncio.sleep(0.01)

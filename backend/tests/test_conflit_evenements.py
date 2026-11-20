@@ -10,10 +10,10 @@ from pathlib import Path
 import pytest
 
 from tessera.services.git_workspace import GitWorkspaceService
-from tessera.services.livraison import LivraisonService
-from tessera.services.livraison_conflit import signal_courant
-from tessera.services.livraison_evenements import evenements_de_livraison
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.livraison.livraison import LivraisonService
+from tessera.services.livraison.livraison_conflit import signal_courant
+from tessera.services.livraison.livraison_evenements import evenements_de_livraison
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
 
 _SCHEMA = Path("prisma") / "schema.prisma"
 
@@ -77,6 +77,7 @@ async def _livrer_avec_resolveur(root: Path, ecrit: str) -> list[OrchestratorEve
             await service.livrer_phase_1(
                 ticket_id="ticket-005", ticket_title="T", ticket_body="",
                 branch="ticket-005-x", approuve=True,
+                approved_sha=await GitWorkspaceService(root).head_sha(),
             )
         except AssertionError:
             pass  # le rebase a abouti : seule l'ouverture de la PR n'est pas simulée

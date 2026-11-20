@@ -1,5 +1,5 @@
-import { describe, expect, it, vi } from "vitest";
-import { render, screen, within } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { act, render, screen, within } from "@testing-library/react";
 import StatsView from "./index";
 import type { UsageStats } from "../../types/api";
 
@@ -71,7 +71,7 @@ describe("StatsView", () => {
 
     expect(document.querySelector("[data-squelette='kpi']")).not.toBeNull();
     expect(document.querySelector("[data-squelette='cartes']")).not.toBeNull();
-    expect(screen.getByRole("status")).toHaveTextContent("Chargement…");
+    expect(screen.getByRole("status")).toHaveAccessibleName("Chargement");
   });
 
   it("calls the api with the days prop it receives", async () => {
@@ -151,5 +151,20 @@ describe("StatsView", () => {
     expect(await within(carte).findByText("40 %")).toBeInTheDocument();
     expect(within(carte).getByText("pas de relevé")).toBeInTheDocument();
   });
+
+  it("rereads the quota after one minute, on a simulated clock", async () => {
+    vi.useFakeTimers({ toFake: ["setInterval", "clearInterval", "Date"] });
+    vi.setSystemTime(new Date("2026-10-30T14:00:00Z"));
+    stats.mockResolvedValue(payload());
+    const lecture = vi.spyOn(apiQuota, "fenetres").mockResolvedValue({ windows: {} });
+    render(<StatsView projectId="quota-clock" days={7} />);
+    await act(async () => { await Promise.resolve(); });
+    const avant = lecture.mock.calls.length;
+
+    await act(async () => { await vi.advanceTimersByTimeAsync(61_000); });
+
+    expect(lecture.mock.calls.length).toBeGreaterThan(avant);
+  });
 });
 
+afterEach(() => { vi.useRealTimers(); });

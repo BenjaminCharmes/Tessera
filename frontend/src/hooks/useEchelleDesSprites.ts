@@ -1,4 +1,4 @@
-import { useSyncExternalStore } from "react";
+import { createContext, useContext, useSyncExternalStore } from "react";
 import { echellePourLargeur } from "../lib/bureau/echelleDesSprites";
 
 function abonner(rappel: () => void): () => void {
@@ -17,5 +17,13 @@ function lire(): number {
  * de front sans que leur mobilier se chevauche.
  */
 export function useEchelleDesSprites(): number {
-  return useSyncExternalStore(abonner, lire, () => echellePourLargeur(Infinity));
+  const commune = useSyncExternalStore(abonner, lire, () => echellePourLargeur(Infinity));
+  const imposee = useContext(EchelleImposee);
+  return imposee ?? commune;
 }
+
+/** L'échelle qu'une pièce impose à ses sprites, à la place de l'échelle commune (ticket-898). */
+const EchelleImposee = createContext<number | null>(null);
+
+/** Impose une échelle à tous les sprites qu'il contient : la pièce d'un run a la sienne. */
+export const FournisseurDEchelle = EchelleImposee.Provider;

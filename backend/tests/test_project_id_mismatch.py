@@ -2,8 +2,8 @@
 import json
 from pathlib import Path
 
-from tessera.services.project_loader import load_project
-from tessera.services.project_overview import build_overview, clear_overview_cache
+from tessera.services.projets.project_loader import load_project
+from tessera.services.supervision.project_overview import build_overview, clear_overview_cache
 
 
 def _project_dir(tmp_path: Path, manifest: dict[str, object] | None) -> Path:

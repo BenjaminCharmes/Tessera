@@ -12,7 +12,7 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services.project_loader import fait_tourner_l_ide
+from tessera.services.projets.project_loader import fait_tourner_l_ide
 
 
 def _projet(racine: Path, git_root: str | None = None) -> Path:

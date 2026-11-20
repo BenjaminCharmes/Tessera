@@ -11,11 +11,12 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services import manifeste
-from tessera.services.artifacts import read_artifact_mode
-from tessera.services.autonomie import NiveauAutonomie, lire_niveau
-from tessera.services.captures_config import load_captures_config
-from tessera.services.manifeste import (
+from tessera.services.gardes.politique_run import PolitiqueRun
+from tessera.services.gardes.worktree_politique import lire_worktree
+from tessera.services.projets import manifeste
+from tessera.services.projets.artifacts import read_artifact_mode
+from tessera.services.projets.autonomie import NiveauAutonomie, lire_niveau
+from tessera.services.projets.manifeste import (
     ecrire_clef,
     ecrire_manifeste,
     lire_booleen,
@@ -28,14 +29,9 @@ from tessera.services.manifeste import (
     lire_pour_modifier,
     lire_valeur,
 )
-from tessera.services.online_declaration import read_online_declaration
-from tessera.services.politique_run import PolitiqueRun
-from tessera.services.project_loader import (
-    _load_github_remote,
-    load_pipeline_config,
-    load_services_config,
-)
-from tessera.services.worktree_politique import lire_worktree
+from tessera.services.projets.online_declaration import read_online_declaration
+from tessera.services.projets.project_loader import _load_github_remote, load_pipeline_config, load_services_config
+from tessera.services.verification.captures_config import load_captures_config
 
 
 @dataclass(frozen=True)
@@ -206,6 +202,35 @@ def test_ecrire_clef_creates_a_missing_manifest(tmp_path: Path) -> None:
     projet = _projet(tmp_path, None)
     ecrire_clef(projet, "artifacts", "local")
     assert lire_chaine(projet, "artifacts") == "local"
+
+
+@pytest.mark.parametrize(
+    "octets",
+    [b"{ cass\xc3\xa9", "{\"agents\": \"café\"}".encode("latin-1"), b"[1, 2]"],
+    ids=["invalid_json", "latin_1", "not_an_object"],
+)
+def test_ecrire_clef_refuses_an_unreadable_manifest_and_leaves_it_untouched(
+    tmp_path: Path, octets: bytes
+) -> None:
+    projet = _projet(tmp_path, None)
+    (projet / "agents.json").write_bytes(octets)
+    with pytest.raises(ValueError):
+        ecrire_clef(projet, "github_remote", "acme/app")
+    assert (projet / "agents.json").read_bytes() == octets
+    assert sorted(p.name for p in projet.iterdir()) == ["agents.json"]
+
+
+def test_ecrire_clef_keeps_a_manifest_that_starts_with_a_bom(tmp_path: Path) -> None:
+    projet = _projet(tmp_path, None)
+    (projet / "agents.json").write_bytes(b"\xef\xbb\xbf" + b'{"autonomy": "pr"}')
+    ecrire_clef(projet, "github_remote", "acme/app")
+    assert lire_manifeste(projet) == {"autonomy": "pr", "github_remote": "acme/app"}
+
+
+def test_lire_fichier_reads_a_manifest_preceded_by_a_utf8_bom(tmp_path: Path) -> None:
+    projet = _projet(tmp_path, None)
+    (projet / "agents.json").write_bytes(b"\xef\xbb\xbf" + b'{"autonomy": "pr"}')
+    assert lire_fichier(projet / "agents.json") == {"autonomy": "pr"}
 
 
 def test_ecrire_clef_can_drop_an_obsolete_key(tmp_path: Path) -> None:

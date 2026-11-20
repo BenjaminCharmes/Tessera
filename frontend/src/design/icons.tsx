@@ -185,6 +185,14 @@ export const IconSettings = (p: IconProps) => (
   </Icon>
 );
 
+/** Une vraie roue dentée, huit dents et un moyeu percé ; `IconSettings` se lit comme un soleil. */
+export const IconEngrenage = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M10.5 3h3l.5 2.4 1.7.7 2.1-1.3 2.1 2.1-1.3 2.1.7 1.7L21 11v3l-2.4.5-.7 1.7 1.3 2.1-2.1 2.1-2.1-1.3-1.7.7L13.5 21h-3l-.5-2.4-1.7-.7-2.1 1.3-2.1-2.1 1.3-2.1-.7-1.7L3 14v-3l2.4-.5.7-1.7-1.3-2.1 2.1-2.1 2.1 1.3 1.7-.7z" />
+    <circle cx="12" cy="12.5" r="2.5" />
+  </Icon>
+);
+
 export const IconBell = (p: IconProps) => (
   <Icon {...p}>
     <path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15L6 16Z" />

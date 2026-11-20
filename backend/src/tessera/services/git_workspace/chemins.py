@@ -15,11 +15,19 @@ _EMPTY_TREE_SHA = "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
 # approved run would commit it under the ticket's message. Excluded from
 # both the reviewed diff and the ticket's own commit via git's magic
 # pathspec `:(exclude)`.
-_ORCHESTRATOR_ARTIFACT_PATHS: tuple[str, ...] = ("tickets/", "memory/pipeline-log.md")
+_ORCHESTRATOR_ARTIFACT_PATHS: tuple[str, ...] = (
+    "tickets/", "memory/pipeline-log.md", "memory/journal/",
+)
 
+
+#: Dossier où un run de conception écrit ses fiches : c'est son livrable (ticket-1026).
+_FICHES_NOUVELLES = "tickets/todo/"
 
 #: Journal du pipeline, relatif au dossier du projet.
 _JOURNAL_PIPELINE = "memory/pipeline-log.md"
+
+#: Leçons du projet : un humain les trie, une union y est fausse (ticket-907).
+_LECONS = "memory/lecons.md"
 
 
 # The same paths, without the `:(exclude)` magic, used to stage and commit

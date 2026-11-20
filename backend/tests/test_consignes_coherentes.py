@@ -75,9 +75,9 @@ def test_aucun_bloc_ne_squashe_develop_dans_main() -> None:
     fautifs = []
     for consigne in _CONSIGNES:
         for bloc in _blocs_de_code(_lire(consigne)):
-            vers_main = any("--base main" in l for l in bloc)
+            vers_main = any("--base main" in ln for ln in bloc)
             squash = [
-                l for l in bloc if "pr merge" in l and "--squash" in l and "PAS" not in l
+                ln for ln in bloc if "pr merge" in ln and "--squash" in ln and "PAS" not in ln
             ]
             if vers_main and squash:
                 fautifs.append(f"{consigne}: {squash[0].strip()[:60]}")
@@ -115,7 +115,7 @@ def test_claude_md_states_the_enforced_length() -> None:
     """
     from tests.test_longueur_des_fichiers import PLAFOND_GENERAL
 
-    ligne = next(l for l in _lire("CLAUDE.md").splitlines() if "petits fichiers" in l)
+    ligne = next(ln for ln in _lire("CLAUDE.md").splitlines() if "petits fichiers" in ln)
     nombres = [int(n) for n in re.findall(r"\d+", ligne.split("**")[-1])]
 
     assert nombres and nombres[0] == PLAFOND_GENERAL, ligne
@@ -210,9 +210,10 @@ def test_aucun_reglage_de_pipeline_n_est_mort() -> None:
     import inspect
 
     from tessera.models.agent import AgentPipelineConfig
-    from tessera.services import orchestrator as orch_service
     from tessera.routers import orchestrator as orch_router
-    from tessera.services import assemblage_run, documenteur_run
+    from tessera.services.documentation import documenteur_run
+    from tessera.services.pipeline import assemblage_run
+    from tessera.services.pipeline import orchestrator as orch_service
 
     sources = (
         inspect.getsource(orch_service)
@@ -364,7 +365,7 @@ def test_aucune_clef_du_manifeste_genere_n_est_morte() -> None:
     """
     import json
 
-    from tessera.services.project_loader import _default_agents_json
+    from tessera.services.projets.project_loader import _default_agents_json
 
     manifeste = json.loads(_default_agents_json("p", [], "tracked"))
 
@@ -393,7 +394,7 @@ def _clefs_mortes(manifeste: dict[str, object]) -> list[str]:
     # ne s'en servait. Le générateur et les déclarations de modèles sont donc
     # retirés des sources avant la recherche.
     exclus = [
-        _RACINE / "backend" / "src" / "tessera" / "services" / "gabarits_projet.py",
+        _RACINE / "backend" / "src" / "tessera" / "services" / "projets" / "gabarits_projet.py",
         _RACINE / "backend" / "src" / "tessera" / "models" / "agent.py",
     ]
     ailleurs = sources
@@ -478,9 +479,9 @@ def test_le_dossier_d_un_ticket_correspond_a_son_champ_status() -> None:
             entete = fichier.read_text(encoding="utf-8").split("---")[1]
             declare = next(
                 (
-                    l.split(":", 1)[1].strip()
-                    for l in entete.splitlines()
-                    if l.startswith("status:")
+                    ln.split(":", 1)[1].strip()
+                    for ln in entete.splitlines()
+                    if ln.startswith("status:")
                 ),
                 None,
             )
@@ -540,6 +541,57 @@ def test_tout_adr_cite_existe_encore() -> None:
     assert inconnus == {}, f"ADR cités mais introuvables : {inconnus}"
 
 
+#: Les trois fichiers dont une citation garde une ADR dans `decisions.md`.
+_CITANTS_D_ADR = (
+    "projects/ide-core/memory/contraintes.md",
+    "CLAUDE.md",
+    "projects/ide-core/CLAUDE.md",
+)
+
+
+def _adr_de(nom: str) -> list[str]:
+    texte = _lire(f"projects/ide-core/memory/{nom}")
+    return re.findall(r"^## (ADR-\d{3})", texte, re.M)
+
+
+def test_chaque_adr_de_decisions_est_citee_par_une_consigne() -> None:
+    # Une ADR que plus aucune règle ne cite n'apprend rien à un agent et pèse
+    # dans chaque appel : elle part dans l'archive, son numéro inchangé
+    # (ticket-830).
+    citees: set[str] = set()
+    for chemin in _CITANTS_D_ADR:
+        citees |= set(re.findall(r"ADR-\d{3}", _lire(chemin)))
+    assert citees, "aucune ADR citée — les chemins ont bougé"
+
+    a_archiver = [n for n in _adr_de("decisions.md") if n not in citees]
+
+    assert a_archiver == [], (
+        f"ADR citées ni par contraintes.md ni par un CLAUDE.md, "
+        f"à déplacer dans decisions-archive.md : {a_archiver}"
+    )
+
+
+def test_une_adr_n_est_pas_a_la_fois_en_vigueur_et_archivee() -> None:
+    doubles = set(_adr_de("decisions.md")) & set(_adr_de("decisions-archive.md"))
+
+    assert doubles == set(), f"présentes dans les deux fichiers : {sorted(doubles)}"
+
+
+def test_une_adr_archivee_remplacee_porte_sa_ligne_remplacee_par() -> None:
+    # « Remplacé par » dit en prose ne se retrouve pas à la lecture : la ligne
+    # `**Remplacée par**` est ce qui marque une ADR comme dépassée.
+    texte = _lire("projects/ide-core/memory/decisions-archive.md")
+    sans_ligne = [
+        bloc.splitlines()[0]
+        for bloc in re.split(r"\n(?=## ADR-)", texte)
+        if bloc.startswith("## ADR-")
+        and re.search(r"remplacé par \*\*ADR-\d{3}", bloc)
+        and not re.search(r"\*\*Remplacée par\*\* : ADR-\d{3}", bloc)
+    ]
+
+    assert sans_ligne == [], f"sans ligne **Remplacée par** : {sans_ligne}"
+
+
 def test_l_archive_n_est_importee_nulle_part() -> None:
     # Elle existe pour *sortir* du prompt : l'importer annulerait le ticket.
     # `rglob` descend dans `.venv` avant de filtrer et échoue sur des entrées
@@ -589,7 +641,7 @@ def test_tracabilite_chaque_regle_sans_portee_est_citee_dans_contraintes() -> No
     fichier qui remplace decisions.md dans le prompt des agents.
     Une règle absente de contraintes.md serait silencieusement ignorée.
     """
-    from tessera.services.adr import decouper, portee_de
+    from tessera.services.projets.adr import decouper, portee_de
 
     decisions = _lire("projects/ide-core/memory/decisions.md")
     audit = _audit_classement()
@@ -614,8 +666,15 @@ def test_tracabilite_chaque_regle_sans_portee_est_citee_dans_contraintes() -> No
     )
 
 
+def _sans_proposees(texte: str) -> str:
+    """The rules agents receive: `## Proposées` is never injected (ADR-055)."""
+    return re.sub(r"## Proposées\n.*?(?=\n## )", "", texte, flags=re.DOTALL)
+
+
 def test_contraintes_md_tient_sous_12000_caracteres() -> None:
-    taille = len(_lire("projects/ide-core/memory/contraintes.md"))
+    # Le plafond borne ce que chaque appel d'agent reçoit : une règle proposée
+    # ne compte qu'une fois acceptée, quand un humain la déplace et la resserre.
+    taille = len(_sans_proposees(_lire("projects/ide-core/memory/contraintes.md")))
 
     assert taille <= 12_000, (
         f"contraintes.md : {taille} caractères pour 12 000 permis"

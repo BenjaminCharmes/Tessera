@@ -1,7 +1,7 @@
 """L'ouverture de PR n'est proposee que la ou elle marche — ticket-081."""
 import pytest
 
-from tessera.services.forge import forge_supportee, nom_de_la_forge
+from tessera.services.projets.forge import forge_supportee, nom_de_la_forge
 
 
 @pytest.mark.parametrize(

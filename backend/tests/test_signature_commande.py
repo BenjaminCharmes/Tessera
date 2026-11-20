@@ -1,8 +1,8 @@
 """Reconnaître un service déclaré à sa ligne de commande — ticket-438."""
 import pytest
 
-from tessera.services.signature_commande import commande_porte, signature
-from tessera.services.sonde_systeme import InfoProcessus
+from tessera.services.supervision.signature_commande import commande_porte, signature
+from tessera.services.supervision.sonde_systeme import InfoProcessus
 
 
 def _proc(commande: str) -> InfoProcessus:

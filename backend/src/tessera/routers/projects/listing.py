@@ -5,19 +5,17 @@ import asyncio
 from fastapi import HTTPException
 from fastapi.responses import FileResponse
 
+from tessera.config import settings
 from tessera.models.project import Project, ProjectContext
 from tessera.models.ticket import TicketStatus
 from tessera.routers.projects.shared import loader, new_router, require_project_path, ticket_svc
-from tessera.config import settings
-from tessera.services.adr import lire_contraintes
-from tessera.services.process_registry import PROCESS_REGISTRY
-from tessera.services.project_loader import (
-    fait_tourner_l_ide,
-    load_agents_config,
-    load_services_config,
-)
-from tessera.services.project_overview import ProjectOverview, build_overview, find_icon
-from tessera.services.run_registry import RUN_REGISTRY
+from tessera.services.gardes.lecons import nombre_proposees
+from tessera.services.pipeline.run_registry import RUN_REGISTRY
+from tessera.services.projets.adr import lire_contraintes
+from tessera.services.projets.project_loader import fait_tourner_l_ide, load_agents_config, load_services_config
+from tessera.services.supervision.project_overview import ProjectOverview, build_overview, find_icon
+from tessera.services.supervision.superviseur_journal import cas_a_toi_ouverts, lire_journal
+from tessera.services.verification.process_registry import PROCESS_REGISTRY
 
 router = new_router()
 
@@ -26,7 +24,17 @@ _OPEN_STATUSES = {TicketStatus.todo, TicketStatus.in_progress, TicketStatus.in_r
 
 @router.get("", response_model=list[Project])
 async def list_projects() -> list[Project]:
-    return await loader().list_projects()
+    projets = await loader().list_projects()
+    # Une copie par projet : l'objet du cache du chargeur ne porte pas ce compte.
+    return [
+        p.model_copy(
+            update={
+                "lecons_proposees": nombre_proposees(p.path / "memory"),
+                "superviseur_a_toi": len(cas_a_toi_ouverts(lire_journal(p.path / "memory"))),
+            }
+        )
+        for p in projets
+    ]
 
 
 # `/overview` doit rester avant toute route `/{project_id}` : sinon « overview »

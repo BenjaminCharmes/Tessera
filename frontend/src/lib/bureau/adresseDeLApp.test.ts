@@ -10,6 +10,8 @@ function service(over: Partial<ServiceActif> = {}): ServiceActif {
     demarre_a: "2026-10-28T09:00:00Z",
     en_cours: true,
     code_de_sortie: null,
+    sortie: [],
+    arrete_a_la_main: false,
     ...over,
   };
 }

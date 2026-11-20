@@ -574,6 +574,12 @@
   --sprite-etat-fait-d: #16a34a;
   --sprite-etat-fait-bl: #4ade80;
   --sprite-etat-fait-ol: #15803d;
+  --sprite-etat-anomalie-hi: #fcd34d;
+  --sprite-etat-anomalie-b: #fbbf24;
+  --sprite-etat-anomalie-s: #f59e0b;
+  --sprite-etat-anomalie-d: #d97706;
+  --sprite-etat-anomalie-bl: #fbbf24;
+  --sprite-etat-anomalie-ol: #b45309;
   --sprite-lisere: #5ef2ff;
   --sprite-lisere-force: 0;
   --sprite-lueur-force: 0;
@@ -1150,6 +1156,12 @@
   --sprite-etat-fait-d: #16a34a;
   --sprite-etat-fait-bl: #4ade80;
   --sprite-etat-fait-ol: #15803d;
+  --sprite-etat-anomalie-hi: #fcd34d;
+  --sprite-etat-anomalie-b: #fbbf24;
+  --sprite-etat-anomalie-s: #f59e0b;
+  --sprite-etat-anomalie-d: #d97706;
+  --sprite-etat-anomalie-bl: #fbbf24;
+  --sprite-etat-anomalie-ol: #b45309;
   --sprite-lisere-force: 0.38;
   --sprite-lueur-force: 1;
 }

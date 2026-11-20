@@ -1,0 +1,128 @@
+"""Static checks on the agent account setup scripts (ticket-896).
+
+The scripts create an account and cannot run in CI: only what can be checked
+without elevation is checked here.
+"""
+
+from pathlib import Path
+
+import pytest
+
+_RACINE = Path(__file__).resolve().parents[2]
+_SCRIPTS = _RACINE / "scripts"
+_ADMIN = _SCRIPTS / "agent-setup-admin.ps1"
+_UTILISATEUR = _SCRIPTS / "agent-setup.ps1"
+
+
+def _scripts_agent() -> list[Path]:
+    return sorted(_SCRIPTS.glob("agent-setup*.ps1"))
+
+
+def test_both_setup_scripts_exist() -> None:
+    assert set(_scripts_agent()) == {_ADMIN, _UTILISATEUR}
+
+
+@pytest.mark.parametrize("script", _scripts_agent(), ids=lambda p: p.name)
+def test_setup_scripts_are_pure_ascii(script: Path) -> None:
+    script.read_bytes().decode("ascii")
+
+
+def test_admin_script_never_touches_the_user_profile() -> None:
+    texte = _ADMIN.read_text(encoding="ascii")
+    assert "USERPROFILE" not in texte.upper()
+    assert "APPDATA" not in texte.upper()
+    assert "[string]$Proprietaire" in texte
+
+
+def test_user_script_refuses_to_run_as_administrator() -> None:
+    texte = _UTILISATEUR.read_text(encoding="ascii")
+    assert "WindowsBuiltInRole]::Administrator" in texte
+    assert "throw" in texte.split("IsInRole", 1)[1].split("}", 1)[0]
+
+
+def test_tessera_ps1_lists_the_agent_verbs() -> None:
+    texte = (_SCRIPTS / "tessera.ps1").read_text(encoding="utf-8-sig")
+    assert "'agent'" in texte
+    for verbe in ("setup", "jeton", "doctor"):
+        assert f"tessera.ps1 agent {verbe}" in texte
+        assert f"'{verbe}' {{" in texte
+
+
+def test_agent_doctor_compares_shared_and_sdk_cli_versions() -> None:
+    texte = (_SCRIPTS / "tessera.ps1").read_text(encoding="utf-8-sig")
+    assert r"C:\ProgramData\Tessera\bin\claude.exe" in texte
+    assert "claude_agent_sdk" in texte
+    assert "Copy-Item" in texte
+
+
+def test_install_page_covers_the_non_administrator_case() -> None:
+    page = (_RACINE / "docs" / "agent-isolation.md").read_text(encoding="utf-8")
+    assert "pas** administrateur" in page
+    assert "agent-setup-admin.ps1" in page
+
+
+def test_admin_script_cuts_programdata_inheritance_on_the_shared_folder() -> None:
+    # Hérité de C:\ProgramData, BUILTIN\Users peut créer des fichiers : l'agent
+    # déposerait une DLL à côté de claude.exe.
+    texte = _ADMIN.read_text(encoding="ascii")
+    assert "Invoke-Icacls $Partage /inheritance:r" in texte
+    assert r'"$Partage\bin" /reset /T' in texte
+
+
+def test_admin_script_locks_the_password_file_before_writing_it() -> None:
+    texte = _ADMIN.read_text(encoding="ascii")
+    verrou = texte.index("SetAccessRuleProtection($true, $false)")
+    assert verrou < texte.index("$Flux.Write")
+
+
+def test_admin_script_creates_the_toolchain_with_inheritance_cut() -> None:
+    texte = _ADMIN.read_text(encoding="ascii")
+    assert "toolchain" in texte
+    assert "Invoke-Icacls $Outils /inheritance:r" in texte
+    assert '"*S-1-5-18:(OI)(CI)F"' in texte
+    assert '"${Compte}:(OI)(CI)RX"' in texte.split("$Outils /grant:r", 1)[1]
+
+
+def test_user_script_copies_the_toolchain_idempotently() -> None:
+    texte = _UTILISATEUR.read_text(encoding="ascii")
+    for nom in ("node", "uv", "UV_PYTHON_INSTALL_DIR", "uv python install", ".version"):
+        assert nom in texte
+    assert "LinkType" in texte  # the real folder, not scoop's `current` junction
+    assert "deja a jour" in texte
+
+
+def test_user_script_removes_profile_rights_and_never_grants_them() -> None:
+    texte = _UTILISATEUR.read_text(encoding="ascii")
+    assert "/remove $Compte /T" in texte
+    assert "/grant" not in texte
+
+
+def test_admin_script_stops_on_a_failed_icacls() -> None:
+    texte = _ADMIN.read_text(encoding="ascii")
+    assert "$LASTEXITCODE -ne 0" in texte
+    assert "icacls $" not in texte  # tout passe par Invoke-Icacls
+
+
+def test_agent_setup_empties_the_npmrc_of_the_node_copy() -> None:
+    texte = _UTILISATEUR.read_text(encoding="utf-8-sig")
+    assert "node_modules" in texte and "npm" in texte and "npmrc" in texte
+    apres_node = texte.split("Sync-Tool $nodeDir", 1)[1]
+    assert apres_node.index("npmrc") < apres_node.index("$uvDir")
+    assert "-Value ''" in apres_node.split("$uvDir", 1)[0]
+
+
+def test_agent_doctor_runs_the_python_module_and_no_get_command() -> None:
+    texte = (_SCRIPTS / "tessera.ps1").read_text(encoding="utf-8-sig")
+    doctor = texte.split("function Invoke-AgentDoctor", 1)[1].split("function Get-ProcessusTessera", 1)[0]
+    assert "tessera.agent_doctor_cli" in doctor
+    assert "Get-Command" not in doctor
+    assert chr(9) not in texte
+
+
+def test_admin_setup_creates_the_agent_profile_folder() -> None:
+    texte = (_SCRIPTS / "agent-setup-admin.ps1").read_text(encoding="utf-8-sig")
+    assert "profil-agent" in texte
+    suite = texte.split("profil-agent", 1)[1]
+    # Le compte ne modifie que le contenu ; sur le dossier, jamais DELETE (ticket-1014).
+    assert "(OI)(CI)(IO)M" in suite
+    assert "(RX,WD,AD)" in suite

@@ -4,21 +4,17 @@ import shutil
 from collections.abc import Awaitable, Callable
 from pathlib import Path
 
-from tessera.services.git_workspace.chemins import (
-    _JOURNAL_UNION_SUFFIXES,
-    _is_orchestrator_artifact_path,
-    _relatif_au_projet,
-)
+from tessera.services.git_workspace.chemins import _JOURNAL_UNION_SUFFIXES, _is_orchestrator_artifact_path, _relatif_au_projet
+from tessera.services.git_workspace.conflits_lecons import GitConflictsLecons
 from tessera.services.git_workspace.conflits_regles import GitConflictsRegles
 from tessera.services.git_workspace.erreurs import BaseIntrouvable, GitCommandError
 from tessera.services.git_workspace.textes import _extraire_fichiers_bloques
 from tessera.utils.logger import get_logger
 
-
 _logger = get_logger("tessera.services.git_workspace")
 
 
-class GitRebase(GitConflictsRegles):
+class GitRebase(GitConflictsRegles, GitConflictsLecons):
     """Replaying a branch on its base, with abort and recovery."""
 
     async def rejouer_sur(
@@ -96,6 +92,10 @@ class GitRebase(GitConflictsRegles):
             if await self._resoudre_conflits_journal_en_union(conflits):
                 return ()
 
+        # Leçons triées par un humain : la base, plus les seuls ajouts du run (ticket-907).
+        if await self._resoudre_lecons_au_rebase(conflits, prefixe):
+            return ()
+
         # Si tous les conflits sont des artefacts Tessera, les résoudre
         # automatiquement en faveur de la branche (ticket-300, ADR-033).
         if all(r is not None and _is_orchestrator_artifact_path(r) for r in relatifs):
@@ -137,6 +137,20 @@ class GitRebase(GitConflictsRegles):
                 return conflits
         self.regles_appliquees = appliquees
         return ()
+
+    async def remettre_sur(self, sha: str) -> None:
+        """Put the branch back on *sha*, the head it had before a rebase (ticket-740).
+
+        Built on the recovery used for an aborted rebase, which only logs a
+        failed reset: the head is read back, and a branch that did not move
+        raises, so the caller can say so instead of claiming a restoration.
+        """
+        await self._restaurer_depuis_sha(sha)
+        courant = (await self._run("rev-parse", "HEAD")).strip()
+        if courant != sha:
+            raise GitCommandError(
+                ["reset", "--hard", sha], 1, f"la tête est restée sur {courant[:7]}"
+            )
 
     async def _ref_existe(self, ref: str) -> bool:
         """La ref est-elle résolvable ici ?

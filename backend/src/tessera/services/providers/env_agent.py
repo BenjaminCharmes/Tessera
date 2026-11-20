@@ -1,0 +1,84 @@
+"""The environment of a CLI that runs under the dedicated agent account (ADR-083)."""
+import os
+
+from tessera.config import settings
+from tessera.services.providers.env_sdk import env_du_sous_processus
+from tessera.services.providers.noms import ProviderIndisponible
+from tessera.services.providers.path_compte import path_du_compte
+
+#: Où le CLI partagé est copié, hors du profil de l'utilisateur (ticket-894).
+CLI_PARTAGE = r"C:\ProgramData\Tessera\bin\claude.exe"
+
+#: Le profil unique du compte agent, hors de `C:\Users` (ticket-1008).
+PROFIL_AGENT = r"C:\ProgramData\Tessera\profil-agent"
+#: Le cache npm survit au nettoyage du profil ; celui de uv vit le temps d'un appel.
+#: Chemins relatifs à `PROFIL_AGENT`.
+CACHE_NPM = "npm-cache"
+CACHE_UV = r"uv\cache"
+
+#: Les seules clés que l'environnement de l'agent peut porter. Rien ne se copie
+#: de celui du backend : Windows transmet sinon `USERPROFILE` de l'appelant.
+CLES_AUTORISEES: frozenset[str] = frozenset({
+    "SystemRoot", "PATH", "TEMP", "TMP", "USERPROFILE", "HOME", "APPDATA",
+    "LOCALAPPDATA", "CLAUDE_CODE_OAUTH_TOKEN", "GH_CONFIG_DIR",
+    "GIT_CONFIG_COUNT", "GIT_CONFIG_KEY_0", "GIT_CONFIG_VALUE_0",
+    "GIT_TERMINAL_PROMPT", "CLAUDE_CODE_GIT_BASH_PATH", "PYTHONDONTWRITEBYTECODE",
+    "npm_config_cache", "UV_CACHE_DIR", "UV_LINK_MODE",
+})
+
+
+def profil_de(compte: str) -> str:
+    """Returns the profile folder of ``compte``: one shared folder, wiped between calls (ticket-1008).
+
+    Le compte n'a plus de profil sous le dossier des utilisateurs : `HOME`, `APPDATA`,
+    `TEMP`... en dérivent. Seul `npm-cache` survit au nettoyage
+    (`profil_agent.reinitialiser_profil`) : npm vérifie l'intégrité de ce qu'il
+    sort de son cache, uv ne revérifie pas un paquet déjà décompressé, donc son
+    cache part avec le reste du profil (ADR-088).
+    """
+    return PROFIL_AGENT
+
+
+def env_du_profil(compte: str) -> dict[str, str]:
+    """The variables that send temporary files and caches to the agent's shared profile.
+
+    Partagées par le CLI et les commandes du run (ticket-988) : celles du
+    backend visent le profil de l'utilisateur, où le compte ne crée rien.
+    `npm_config_cache` passe devant le `npmrc` copié de scoop avec la chaîne
+    d'outils, qui vise lui aussi un profil ; `UV_CACHE_DIR` fixe le cache de uv ;
+    `UV_LINK_MODE=copy` interdit tout lien physique entre un `.venv` et ce cache.
+    """
+    profil = profil_de(compte)
+    local = rf"{profil}\AppData\Local"
+    return {
+        "TEMP": rf"{local}\Temp",
+        "TMP": rf"{local}\Temp",
+        "USERPROFILE": profil,
+        "HOME": profil,
+        "APPDATA": rf"{profil}\AppData\Roaming",
+        "LOCALAPPDATA": local,
+        "npm_config_cache": rf"{profil}\{CACHE_NPM}",
+        "UV_CACHE_DIR": rf"{profil}\{CACHE_UV}",
+        "UV_LINK_MODE": "copy",
+    }
+
+
+def _de_base(compte: str) -> dict[str, str]:
+    """System variables and the agent's own profile, built from nothing."""
+    return {"SystemRoot": os.environ.get("SystemRoot", r"C:\Windows"), **env_du_profil(compte)}
+
+
+def env_de_l_agent(compte: str, git_bash_path: str | None) -> dict[str, str]:
+    """Builds the agent's ``env``; raises ``ProviderIndisponible`` without OAuth token.
+
+    Le mot de passe du compte n'y entre jamais : il ne sert qu'au logon.
+    """
+    jeton = settings.agent_oauth_token.get_secret_value()
+    if not jeton:
+        raise ProviderIndisponible("AGENT_OAUTH_TOKEN absent : l'agent ne peut pas s'authentifier")
+    env = _de_base(compte)
+    env.update(env_du_sous_processus(git_bash_path))
+    env["PATH"] = path_du_compte()
+    env["CLAUDE_CODE_OAUTH_TOKEN"] = jeton
+    # Le filtre retire les noms de secrets vidés par `env_sdk` : ils n'ont rien à y faire.
+    return {k: v for k, v in env.items() if k in CLES_AUTORISEES}

@@ -1,8 +1,9 @@
 """Arreter un run en cours — ticket-069."""
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services.dialogue import DialogueChannel
-from tessera.services.pipeline_events import EventType, OrchestratorEvent
-from tessera.services.pipeline_run import PipelineRun
+from tessera.services.noyau.dialogue import DialogueChannel
+from tessera.services.noyau.pipeline_events import EventType, OrchestratorEvent
+from tessera.services.pipeline.pipeline_run import PipelineRun
+from tests.doubles_git import GitWorkspaceDouble
 
 
 def _run() -> PipelineRun:
@@ -61,7 +62,7 @@ async def test_une_question_posee_apres_un_arret_ne_bloque_pas() -> None:
 # ------------------------------------------------------------------
 
 
-class _Git:
+class _Git(GitWorkspaceDouble):
     def __init__(self) -> None:
         self.messages: list[str] = []
 
@@ -96,7 +97,7 @@ async def test_un_run_arrete_commite_son_travail() -> None:
     # ADR-018 : chaque run laisse l'arbre propre pour le suivant. Un arret qui
     # abandonnerait le travail dans l'arbre bloquerait le ticket suivant, ce
     # qu'on vient justement de corriger ailleurs.
-    from tessera.services import pipeline_outcomes as outcomes
+    from tessera.services.pipeline import pipeline_outcomes as outcomes
 
     git = _Git()
     orch = _Orch(git)
@@ -113,7 +114,7 @@ async def test_un_run_arrete_commite_son_travail() -> None:
 
 
 async def test_un_run_arrete_annonce_la_raison() -> None:
-    from tessera.services import pipeline_outcomes as outcomes
+    from tessera.services.pipeline import pipeline_outcomes as outcomes
 
     events: list[OrchestratorEvent] = []
 

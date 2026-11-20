@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pièce témoin</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>/* COMMUN_CSS */
+:root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; }
+.salle { border: 1px solid var(--line); overflow: hidden; background: var(--panel); }
+.salle > header { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; padding: 6px 12px; border-bottom: 1px solid var(--line); font-size: 13px; }
+.salle > header b { font-weight: 600; }
+.salle > header .pastille { width: 10px; height: 10px; border-radius: 2px; }
+.scene { position: relative; overflow-x: auto; }
+.scene-inner { position: relative; min-width: 760px; }
+.mur { position: relative; }
+.pose { position: absolute; line-height: 0; }
+.ombre { position: absolute; border-radius: 50%; background: radial-gradient(closest-side, rgb(0 0 0 / .38), transparent); pointer-events: none; }
+.cone { position: absolute; pointer-events: none; mix-blend-mode: screen; background: radial-gradient(ellipse 50% 100% at 50% 0%, rgb(253 224 140 / .22), transparent 75%); }
+.voile { position: absolute; inset: 0; pointer-events: none; background: rgb(4 5 18 / .5); transition: opacity .6s; }
+.postes { display: grid; grid-template-columns: repeat(5, 1fr); align-items: end; justify-items: center; padding: 0 10px 10px; }
+.poste-cell { position: relative; line-height: 0; }
+.horloge-txt { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 20px; min-width: 6ch; }
+input[type="range"] { width: min(420px, 60vw); accent-color: var(--accent); }
+.legende { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header style="display:flex;flex-direction:column;gap:12px">
+    <nav class="pages" aria-label="Pages de l'atelier">
+      <a href="index.html">Catalogue</a>
+      <a href="piece.html" aria-current="page">Pièce témoin</a>
+      <a href="techniques.html">Techniques de rendu</a>
+    </nav>
+    <span class="eyebrow">Tessera · Bureau · exploration</span>
+    <h1>Pièce témoin</h1>
+    <p class="lead">Les sprites redessinés, posés aux mêmes abscisses que dans le Bureau, à taille réelle. Fais glisser l'heure : à 7 h la pièce passe en jour, à 19 h en Néon. Les choix de matières faits dans le catalogue s'appliquent ici.</p>
+  </header>
+
+  <div class="controls" role="toolbar" aria-label="Heure et éclairage">
+    <div class="ctl"><span>Heure</span><input type="range" id="heure" min="0" max="23.75" step="0.25" aria-label="Heure de la journée"><span class="horloge-txt" id="heureTxt"></span></div>
+    <button class="btn ghost" id="cycle" type="button">Faire défiler la journée</button>
+    <label class="chk"><input type="checkbox" id="lumiere" checked> Plafonniers allumés</label>
+    <div class="ctl"><span>Échelle</span><div class="seg" id="echelleSeg"></div></div>
+  </div>
+
+  <div id="salles" style="display:flex;flex-direction:column;gap:24px"></div>
+  <p class="note">Les états des postes sont mélangés pour la démonstration : un vrai run n'a qu'un agent actif à la fois. Les ombres au sol et les cônes de lumière sont des dégradés CSS, un nœud par objet ; tout le reste est en pixels.</p>
+</div>
+
+<!-- SOURCES -->
+</body>
+</html>

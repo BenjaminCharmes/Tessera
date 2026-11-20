@@ -62,12 +62,13 @@ async def test_get_provider_allow_tools_false_desactive_reellement_les_outils(
     from collections.abc import AsyncIterator
     from typing import Any
 
-    import tessera.services.providers.agent_sdk as agent_sdk_module
     from claude_agent_sdk import ResultMessage
+
+    import tessera.services.providers.agent_sdk as agent_sdk_module
 
     captured: dict[str, object] = {}
 
-    async def fake_query(*, prompt: str, options: Any) -> AsyncIterator[Any]:
+    async def fake_query(*, prompt: str, options: Any, **_: Any) -> AsyncIterator[Any]:
         captured["tools"] = options.tools
         captured["allowed_tools"] = options.allowed_tools
         yield ResultMessage(

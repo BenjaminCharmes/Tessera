@@ -75,7 +75,7 @@ function verdictLine(line: string): VerdictReviewer | null {
  * Extracts the reviewer verdict from the text of its response, for events that
  * carry no `verdict` field.
  *
- * Mirrors `services/pipeline_text._parse_reviewer_verdict` (ADR-009, ticket-298):
+ * Mirrors `services/pipeline/pipeline_text._parse_reviewer_verdict` (ADR-009, ticket-298):
  * the first line that *starts with* a verdict keyword wins; the fallback
  * (CHANGES_REQUESTED anywhere, then APPROVED as a whole word) is used when no
  * such line exists. A response with no recognisable verdict is refused.

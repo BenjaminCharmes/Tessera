@@ -12,7 +12,7 @@ import pytest
 from pydantic import ValidationError
 
 from tessera.models.agent import AgentConfig
-from tessera.services.project_loader import load_agents_config
+from tessera.services.projets.project_loader import load_agents_config
 from tessera.services.providers import par_role
 from tessera.services.providers.agent_sdk import ClaudeAgentSDKProvider, _build_options
 from tessera.services.providers.par_role import provider_pour_role
@@ -82,7 +82,7 @@ def test_provider_hands_its_effort_to_the_sdk_options(
         vus.append(options)
         return options
 
-    async def vide(prompt: str, options: Any) -> Any:
+    async def vide(prompt: str, options: Any, **_: Any) -> Any:
         return
         yield  # pragma: no cover — fait de la fonction un générateur
 

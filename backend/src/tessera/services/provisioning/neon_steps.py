@@ -4,15 +4,10 @@ The connection URI (password included) goes from the Neon API to the Vercel
 API and nowhere else: it is registered as a secret before it is sent, it is not
 in a result detail, a log or an event, and it is never returned to the caller.
 """
-from typing import Optional
 from urllib.parse import unquote, urlsplit
 
 from tessera.services.provisioning.neon import AmbiguousOrganization, NeonClient
-from tessera.services.provisioning.steps import (
-    ProvisioningContext,
-    StepResult,
-    StepState,
-)
+from tessera.services.provisioning.steps import ProvisioningContext, StepResult, StepState
 from tessera.utils.logger import get_logger
 from tessera.utils.secrets import SECRETS, SecretRegistry
 
@@ -70,7 +65,7 @@ class DatabaseStep:
         await self._hand_over(ctx, uri)
         return StepResult(StepState.DONE, f"{fait}; {URL_VARIABLE} written to Vercel")
 
-    async def _shortcut(self, ctx: ProvisioningContext) -> Optional[StepResult]:
+    async def _shortcut(self, ctx: ProvisioningContext) -> StepResult | None:
         """Answer without asking Neon when the variable decides, or no key is set."""
         presente = await ctx.env_writer.has_env(URL_VARIABLE)
         if not self._client.configured:

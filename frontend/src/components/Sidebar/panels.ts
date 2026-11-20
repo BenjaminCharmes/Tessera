@@ -14,6 +14,7 @@ export const PANNEAUX = [
   "agents",
   "usage",
   "supervision",
+  "rituels",
   "chat",
 ] as const;
 

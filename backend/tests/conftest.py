@@ -3,10 +3,12 @@ import asyncio
 import os
 import shutil
 import tempfile
-from pathlib import Path
-
-import pytest
 from collections.abc import Iterator
+from pathlib import Path
+from typing import Any
+
+import httpx
+import pytest
 
 # Avant tout import de `tessera` : `settings` se construit à l'import et lirait
 # sinon le vrai `.env`. Une variable inconnue qui y traîne (cas du ticket-487)
@@ -14,6 +16,10 @@ from collections.abc import Iterator
 os.environ.setdefault(
     "IDE_ENV_FILE", str(Path(tempfile.gettempdir()) / "tessera-tests-absent.env")
 )
+# Même raison pour le coffre du système (ADR-073) : la suite ne doit jamais lire
+# celui de la machine, ni dépendre d'un coffre absent en CI. Imposé, pas
+# `setdefault` : un `SECRETS_SOURCE` du shell ne doit pas l'emporter.
+os.environ["SECRETS_SOURCE"] = "env"
 
 
 def _symlinks_available() -> bool:
@@ -93,11 +99,11 @@ def _singletons_propres() -> Iterator[None]:
     Les caches de parsing de ticket et de projet sont également vidés pour
     que les tests restent indépendants (ticket-352).
     """
-    from tessera.services.event_hub import EVENT_HUB
-    from tessera.services.run_registry import RUN_REGISTRY
-    from tessera.services import ticket_service as _ts_module
-    from tessera.services import project_loader as _pl_module
-    from tessera.services import pr_status_cache as _prc_module
+    from tessera.services.livraison import pr_status_cache as _prc_module
+    from tessera.services.noyau.event_hub import EVENT_HUB
+    from tessera.services.pipeline.run_registry import RUN_REGISTRY
+    from tessera.services.projets import project_loader as _pl_module
+    from tessera.services.projets import ticket_service as _ts_module
 
     yield
     RUN_REGISTRY._runs.clear()
@@ -118,6 +124,49 @@ def _hote_du_client_de_test(monkeypatch: pytest.MonkeyPatch) -> None:
     from tessera.config import settings
 
     monkeypatch.setattr(settings, "allowed_hosts", "testserver")
+
+
+def pytest_configure(config: pytest.Config) -> None:
+    config.addinivalue_line(
+        "markers",
+        "sans_jeton_par_defaut: le TestClient n'ajoute pas `Authorization` (tests du refus 401)",
+    )
+
+
+#: Le jeton de session des tests : `lifespan` ne tourne que dans un `with TestClient`.
+JETON_DE_TEST = "jeton-de-session-de-test"
+
+
+@pytest.fixture(autouse=True)
+def _jeton_de_session_de_test(
+    monkeypatch: pytest.MonkeyPatch, request: pytest.FixtureRequest
+) -> None:
+    """Give the suite a session token and let `TestClient` present it — ticket-878.
+
+    L'API n'a plus de mode ouvert : sans cette fixture, chacun des tests qui
+    construisent un `TestClient(app)` recevrait 401. Le jeton est posé à la main,
+    car `demarrer()` ne tourne que dans un `with TestClient`. Le client en joint
+    l'en-tête quand la requête n'en porte pas ; un en-tête explicite l'emporte,
+    et `@pytest.mark.sans_jeton_par_defaut` retire l'ajout pour tester le refus.
+    """
+    from starlette.testclient import TestClient
+
+    from tessera.services.noyau import jeton_de_session
+
+    monkeypatch.setattr(jeton_de_session._ETAT, "genere", JETON_DE_TEST)
+    if request.node.get_closest_marker("sans_jeton_par_defaut"):
+        return
+    envoyer = TestClient.send
+
+    def send_avec_jeton(self: TestClient, requete: httpx.Request, **options: Any) -> httpx.Response:
+        from tessera.main import app
+
+        jeton = jeton_de_session.courant()
+        if self.app is app and jeton and "authorization" not in requete.headers:
+            requete.headers["Authorization"] = f"Bearer {jeton}"
+        return envoyer(self, requete, **options)
+
+    monkeypatch.setattr(TestClient, "send", send_avec_jeton)
 
 
 @pytest.fixture(autouse=True)
@@ -145,13 +194,18 @@ def _aucun_jeton_de_mise_en_ligne_de_la_machine(
     """
     from pydantic import SecretStr
 
-    from tessera.config import CHAMPS_JETONS, VARIABLES_JETONS, settings
+    from tessera.coffre import NOMS_SECRETS
+    from tessera.config import CHAMPS_JETONS, settings
     from tessera.utils.secrets import SECRETS
 
     for champ in CHAMPS_JETONS:
         monkeypatch.setattr(settings, champ, SecretStr(""))
-    for variable in VARIABLES_JETONS:
-        monkeypatch.delenv(variable, raising=False)
+    # Les trois autres secrets masqués (ticket-796) : champs `str`.
+    for champ in ("github_token", "static_token", "anthropic_api_key"):
+        monkeypatch.setattr(settings, champ, "")
+    for variable in NOMS_SECRETS:
+        if variable != "FORBIDDEN_TERMS":
+            monkeypatch.delenv(variable, raising=False)
     avant = SECRETS.valeurs()
     SECRETS.clear()
     yield
@@ -162,7 +216,7 @@ def _aucun_jeton_de_mise_en_ligne_de_la_machine(
 @pytest.fixture(scope="session")
 def _modele_de_base(tmp_path_factory: pytest.TempPathFactory) -> Path:
     """Schéma de la base, créé une seule fois pour toute la suite."""
-    from tessera.services.database import init_db
+    from tessera.services.noyau.database import init_db
 
     modele = tmp_path_factory.mktemp("modele_base") / "tessera.db"
     asyncio.run(init_db(modele))
@@ -205,7 +259,7 @@ def _dossier_de_donnees_isole(
     supprimerait, un vrai `backend/signalements_en_attente.json`.
     """
     from tessera.config import settings
-    from tessera.services import signalements_en_attente
+    from tessera.services.pipeline import signalements_en_attente
 
     dossier = tmp_path_factory.mktemp("etat_test")
     monkeypatch.setattr(settings, "ide_state_dir", dossier / "etat")

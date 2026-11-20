@@ -72,8 +72,12 @@ Les deux SHA doivent coïncider.
 Il ne prouve pas que l'application sert. Toucher une route réelle :
 
 ```bash
-curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1:8100/api/v1/projects/ide-core/tickets
+curl -s -o /dev/null -w "%{http_code}\n" \
+  -H "Authorization: Bearer $(cat "$LOCALAPPDATA/Tessera/jeton-de-session")" \
+  http://127.0.0.1:8100/api/v1/projects/ide-core/tickets
 ```
+
+Sans le jeton de session, toute route sauf `/health` rend `401` (ticket-878).
 
 Et identifier le **processus** qui répond — un worker `--reload` orphelin
 répond parfaitement en servant du code obsolète (→ `run-tessera`).

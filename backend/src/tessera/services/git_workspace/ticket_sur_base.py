@@ -8,7 +8,6 @@ from tessera.services.git_workspace.erreurs import GitCommandError
 from tessera.services.git_workspace.textes import _chemin_du_ticket
 from tessera.utils.logger import get_logger
 
-
 _logger = get_logger("tessera.services.git_workspace")
 
 
@@ -116,4 +115,26 @@ class GitTicketOnBase(GitBase):
                 "ticket_sur_la_base_illisible",
                 extra={"ticket_id": ticket_id, "erreur": exc.stderr.strip()},
             )
+            return None
+
+    async def lire_ticket_sur_base_ref(self, ticket_id: str) -> str | None:
+        """Read a ticket file at ``_base_ref``, the commit the run forks from.
+
+        Returns the file content, or None when no base is known or it holds no
+        such ticket. Read-only: unlike ``lire_ticket_sur_la_base`` it never
+        fetches, so it reads the very base the branch was replayed on.
+        """
+        if self._base_ref is None:
+            return None
+        try:
+            prefix = (await self._run("rev-parse", "--show-prefix")).strip()
+            listing = await self._run(
+                "ls-tree", "--full-tree", "-r", "--name-only", self._base_ref, "--",
+                f"{prefix}tickets/",
+            )
+            chemin = _chemin_du_ticket(listing, ticket_id)
+            if chemin is None:
+                return None
+            return await self._run("show", f"{self._base_ref}:{chemin}")
+        except GitCommandError:
             return None

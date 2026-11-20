@@ -4,7 +4,6 @@ Creating a Vercel project through the API does not deploy it, so a project put
 online with no variable to write would stay without any production deployment.
 The step reads the newest production deployment first and decides from it.
 """
-from typing import Optional
 
 from tessera.config import settings
 from tessera.services.provisioning.errors import ServiceError
@@ -38,16 +37,16 @@ class VercelRedeployStep:
 
     name = "redeploy"
 
-    def __init__(self, client: VercelClient, repos: Optional[RepoIdSource] = None) -> None:
+    def __init__(self, client: VercelClient, repos: RepoIdSource | None = None) -> None:
         self._client = client
         self._repos = repos or GitHubRepoLookup.from_settings(settings)
 
-    async def _latest(self, project_id: str) -> Optional[VercelDeployment]:
+    async def _latest(self, project_id: str) -> VercelDeployment | None:
         """The newest production deployment that still counts (a canceled one does not)."""
         dernier = await self._client.latest_deployment(project_id)
         return None if dernier is None or dernier.canceled else dernier
 
-    async def _project_id(self, ctx: ProvisioningContext) -> Optional[str]:
+    async def _project_id(self, ctx: ProvisioningContext) -> str | None:
         projet = await self._client.get_project(vercel_name(ctx.project_id))
         identifiant = projet.get("id") if projet else None
         return identifiant if isinstance(identifiant, str) else None

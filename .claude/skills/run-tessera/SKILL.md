@@ -43,12 +43,20 @@ ce que `tessera.ps1 run` remplace. Ne pas relancer les deux serveurs à la main.
 ## Vérifier que ça sert vraiment
 
 `/health` ne suffit pas — il répond même si le chargement des projets est
-cassé. Vérifier au moins un projet réel :
+cassé. Vérifier au moins un projet réel. Toute route sauf `/health` exige le
+jeton de session (ticket-878) : `STATIC_TOKEN` s'il est renseigné, sinon celui
+que le backend écrit à chaque démarrage dans
+`%LOCALAPPDATA%\Tessera\jeton-de-session` :
 
 ```bash
-curl -s http://127.0.0.1:8100/api/v1/projects | head -c 200
-curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1:8100/api/v1/projects/ide-core/tickets
+J="Authorization: Bearer $(cat "$LOCALAPPDATA/Tessera/jeton-de-session")"
+curl -s -H "$J" http://127.0.0.1:8100/api/v1/projects | head -c 200
+curl -s -o /dev/null -w "%{http_code}\n" -H "$J" http://127.0.0.1:8100/api/v1/projects/ide-core/tickets
 ```
+
+Un `401` veut dire « pas de jeton » : fichier non lu, ou backend redémarré
+depuis. Dans le navigateur, ouvrir l'URL `#jeton=…` que `tessera.ps1 run`
+affiche, ou coller le jeton dans le bandeau.
 
 Un `500` ici avec un `/health` vert signale presque toujours un fichier de
 ticket que le parsing refuse (valeur hors enum dans le frontmatter), ou un

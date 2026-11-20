@@ -20,7 +20,7 @@ failure only carries the HTTP status and the API's error code. Nothing here
 updates or deletes.
 """
 from dataclasses import dataclass, field
-from typing import Literal, Optional
+from typing import Literal
 
 import httpx
 
@@ -65,14 +65,14 @@ class StripeClient:
     """The few Stripe calls the step needs; nothing updates, nothing deletes."""
 
     def __init__(
-        self, api_key: str, transport: Optional[httpx.AsyncBaseTransport] = None
+        self, api_key: str, transport: httpx.AsyncBaseTransport | None = None
     ) -> None:
         self._api_key = api_key
         self._transport = transport
 
     @classmethod
     def from_settings(
-        cls, settings: Settings, transport: Optional[httpx.AsyncBaseTransport] = None
+        cls, settings: Settings, transport: httpx.AsyncBaseTransport | None = None
     ) -> "StripeClient":
         """Build the client from the key of ``Settings``."""
         return cls(settings.stripe_api_key.get_secret_value(), transport)
@@ -93,7 +93,7 @@ class StripeClient:
         return "unknown"
 
     async def _send(
-        self, method: str, path: str, params: Optional[Query] = None, form: Optional[Form] = None
+        self, method: str, path: str, params: Query | None = None, form: Form | None = None
     ) -> object:
         headers = {"Authorization": f"Bearer {self._api_key}"}
         try:
@@ -132,7 +132,7 @@ class StripeClient:
                 break
         return elements
 
-    async def find_product(self, project_id: str) -> Optional[str]:
+    async def find_product(self, project_id: str) -> str | None:
         """Return the id of the active product tagged with the project, if any."""
         produits = await self._list_all("/v1/products", [("active", "true")])
         for produit in produits:
@@ -148,7 +148,7 @@ class StripeClient:
             raise ServiceError(SERVICE, 200, "unreadable")
         return identifiant
 
-    async def find_price(self, lookup_key: str) -> Optional[StripePrice]:
+    async def find_price(self, lookup_key: str) -> StripePrice | None:
         """Return the price carrying this ``lookup_key``, ``None`` when there is none."""
         params: Query = [("lookup_keys[]", lookup_key), ("limit", "1")]
         corps = as_dict(await self._send("GET", "/v1/prices", params=params))

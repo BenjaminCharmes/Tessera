@@ -6,20 +6,27 @@ Couverture :
 - le numéro d'une branche sans fiche (nom seul) compte aussi ;
 - l'arbre non commité et `origin/develop` comptent ;
 - un dépôt sans remote répond avec son seul arbre ;
-- la ligne de commande imprime le numéro.
+- la ligne de commande imprime le numéro ;
+- ticket-870 : `resoudre_projet` garde un dossier existant et résout un id par
+  `dossier_du_projet` ; un projet introuvable ou sans `tickets/` sort avec 2 ;
+- ticket-848 : `reserver` ne rend jamais deux fois un numéro, partage la réservation
+  entre worktrees d'un projet, sépare deux dépôts, ne crée rien avec `--sans-reserver`
+  et met de côté un fichier illisible.
 """
+import json
 import sys
 from pathlib import Path
 
 import pytest
 
+from tessera.services.noyau import reservation
+from tessera.services.noyau.numerotation import GitIllisible, numeros_pris, prochain_numero, reserver
 from tests.depot_numerotation import creer_depot, ecrire, fiche, git, pousser_une_branche
-from tessera.services.numerotation import GitIllisible, numeros_pris, prochain_numero
 
 _SCRIPTS = Path(__file__).resolve().parent.parent.parent / "scripts"
 sys.path.insert(0, str(_SCRIPTS))
 
-from prochain_numero import main  # noqa: E402
+from prochain_numero import main, resoudre_projet  # noqa: E402
 
 
 def test_ticket_number_only_on_a_ticket_branch_is_counted(tmp_path: Path) -> None:
@@ -82,9 +89,150 @@ def test_repository_without_remote_answers_from_its_tree(tmp_path: Path) -> None
 
 
 def test_command_line_prints_the_next_number(
-    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+    tmp_path: Path, capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
 ) -> None:
     clone = creer_depot(tmp_path)
+    monkeypatch.setenv("IDE_STATE_DIR", str(tmp_path / "etat"))
 
     assert main(["adr", "--projet", str(clone)]) == 0
     assert capsys.readouterr().out.strip() == "62"
+
+
+def test_two_calls_return_distinct_numbers(tmp_path: Path) -> None:
+    clone = creer_depot(tmp_path)
+    etat = tmp_path / "etat"
+
+    assert reserver(clone, "ticket", "develop", etat) == 612
+    assert reserver(clone, "ticket", "develop", etat) == 613
+    assert reserver(clone, "adr", "develop", etat) == 62
+    assert git(clone, "status", "--porcelain") == ""
+
+
+def test_reserved_number_is_never_reissued_after_tree_catches_up(tmp_path: Path) -> None:
+    clone = creer_depot(tmp_path)
+    etat = tmp_path / "etat"
+
+    numero = reserver(clone, "ticket", "develop", etat)
+    ecrire(clone, f"tickets/todo/ticket-{numero}-ecrit.md", fiche(numero, "ecrit"))
+
+    assert reserver(clone, "ticket", "develop", etat) == numero + 1
+
+
+def test_reservation_is_shared_by_the_worktrees_of_a_project(tmp_path: Path) -> None:
+    clone = creer_depot(tmp_path)
+    git(clone, "worktree", "add", "-q", "-b", "run", str(tmp_path / "wt"))
+    etat = tmp_path / "etat"
+
+    assert reserver(clone, "ticket", "develop", etat) == 612
+    assert reserver(tmp_path / "wt", "ticket", "develop", etat) == 613
+
+
+def test_two_repositories_do_not_share_their_numbers(tmp_path: Path) -> None:
+    (tmp_path / "a").mkdir()
+    (tmp_path / "b").mkdir()
+    premier = creer_depot(tmp_path / "a")
+    second = creer_depot(tmp_path / "b")
+    etat = tmp_path / "etat"
+
+    assert reserver(premier, "ticket", "develop", etat) == 612
+    assert reserver(second, "ticket", "develop", etat) == 612
+
+
+def test_without_reserve_reads_only(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    clone = creer_depot(tmp_path)
+    etat = tmp_path / "etat"
+    monkeypatch.setenv("IDE_STATE_DIR", str(etat))
+
+    assert main(["ticket", "--projet", str(clone), "--sans-reserver"]) == 0
+    assert main(["ticket", "--projet", str(clone), "--sans-reserver"]) == 0
+
+    assert capsys.readouterr().out.split() == ["612", "612"]
+    assert not etat.exists()
+
+
+def test_corrupt_reservation_file_is_set_aside(tmp_path: Path) -> None:
+    clone = creer_depot(tmp_path)
+    etat = tmp_path / "etat"
+    etat.mkdir()
+    (etat / "numeros_reserves.json").write_text("{pas du json", encoding="utf-8")
+
+    assert reserver(clone, "ticket", "develop", etat) == 612
+
+    assert (etat / "numeros_reserves.json.corrompu").read_text(encoding="utf-8") == "{pas du json"
+    assert json.loads((etat / "numeros_reserves.json").read_text(encoding="utf-8"))
+    assert reserver(clone, "ticket", "develop", etat) == 613
+
+
+def test_reservation_file_of_the_wrong_shape_is_set_aside(tmp_path: Path) -> None:
+    etat = tmp_path / "etat"
+    etat.mkdir()
+    fichier = etat / "numeros_reserves.json"
+    fichier.write_text('{"depot": {"ticket": "douze"}}', encoding="utf-8")
+
+    assert reservation.lire(fichier) == {}
+    assert not fichier.exists()
+    assert fichier.with_name(fichier.name + ".corrompu").exists()
+
+
+def test_reservation_round_trip_and_lock(tmp_path: Path) -> None:
+    fichier = tmp_path / "numeros_reserves.json"
+    assert reservation.lire(fichier) == {}
+
+    with reservation.verrou(tmp_path / "x.lock"):
+        reservation.ecrire(fichier, {"d": {"ticket": 5}})
+
+    assert reservation.lire(fichier) == {"d": {"ticket": 5}}
+    assert not fichier.with_name(fichier.name + ".tmp").exists()
+
+
+def test_existing_folder_is_kept_as_is(tmp_path: Path) -> None:
+    assert resoudre_projet(tmp_path) == tmp_path
+
+
+def test_project_id_is_resolved_by_dossier_du_projet(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    demandes: list[str] = []
+
+    def faux(project_id: str) -> Path | None:
+        demandes.append(project_id)
+        return tmp_path
+
+    monkeypatch.setattr("tessera.services.projets.ticket_check.dossier_du_projet", faux)
+    monkeypatch.chdir(tmp_path)
+
+    assert resoudre_projet(Path("ide-core")) == tmp_path
+    assert demandes == ["ide-core"]
+
+
+def test_path_with_a_separator_is_never_taken_for_an_id(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(
+        "tessera.services.projets.ticket_check.dossier_du_projet",
+        lambda project_id: tmp_path,
+    )
+
+    assert resoudre_projet(tmp_path / "absent" / "x") is None
+
+
+def test_unknown_project_exits_2_and_names_the_value(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(
+        "tessera.services.projets.ticket_check.dossier_du_projet",
+        lambda project_id: None,
+    )
+    monkeypatch.chdir(tmp_path)
+
+    assert main(["ticket", "--projet", "absent", "--sans-reserver"]) == 2
+    assert "absent" in capsys.readouterr().err
+
+
+def test_folder_without_tickets_exits_2(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    assert main(["ticket", "--projet", str(tmp_path), "--sans-reserver"]) == 2
+    assert "tickets/" in capsys.readouterr().err

@@ -7,12 +7,12 @@ from typing import Literal
 import pytest
 
 from tessera.models.worktree_config import ConfigWorktree, EntreePopulate
-from tessera.services import run_worktree_populate
-from tessera.services.run_worktree import LienPersistant, RunWorktree, creer, supprimer
-from tessera.services.run_worktree_populate import chemin_etendu, peupler, retirer_les_liens
+from tessera.services.worktrees import run_worktree_populate
+from tessera.services.worktrees.run_worktree import LienPersistant, RunWorktree, creer, supprimer
+from tessera.services.worktrees.run_worktree_populate import chemin_etendu, peupler, retirer_les_liens
 from tests.depot_worktree import BRANCHE, construire, git, lier
 
-_LOGGER = "tessera.services.run_worktree_populate"
+_LOGGER = "tessera.services.worktrees.run_worktree_populate"
 
 
 @pytest.fixture

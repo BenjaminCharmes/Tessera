@@ -1,6 +1,7 @@
 import Agrandi from "../../design/bureau/Agrandi";
 import Bulle from "../../design/bureau/Bulle";
 import BulleDOutil from "../../design/bureau/BulleDOutil";
+import MarqueurAnomalie from "../../design/bureau/MarqueurAnomalie";
 import Poste from "../../design/bureau/Poste";
 import type { EcranId } from "../../lib/bureau/ecranDuPoste";
 import { libelleDuPoste, nomDuPoste } from "../../lib/bureau/libelleDuPoste";
@@ -27,6 +28,8 @@ interface PosteDeTravailProps {
   outil?: string | null;
   /** Ce que l'écran du poste montre : la scène de son étape ou son verdict (ticket-629). */
   ecran?: EcranId;
+  /** Les anomalies du run, si ce poste porte son marqueur : un seul poste par run (ADR-078). */
+  anomalies?: number;
 }
 
 /**
@@ -46,11 +49,13 @@ export default function PosteDeTravail({
   onChoisir,
   outil = null,
   ecran,
+  anomalies = 0,
 }: PosteDeTravailProps) {
   const occupe = poste.etat === "occupe";
   // Le prénom ouvre le nom accessible et l'infobulle native : c'est une identité, pas un état.
   const libelle = avecLeNom(projet, role, libelleDuPoste(role, poste.etat, sante, auRepos));
-  const choisir = occupe && onChoisir ? () => onChoisir(poste.poste) : undefined;
+  // Tout agent se choisit, qu'il travaille, ait fini ou attende son tour (ticket-778).
+  const choisir = onChoisir ? () => onChoisir(poste.poste) : undefined;
   // L'agent qui a fini se lève : la pièce le dessine hors du poste (AgentsDeLaPiece).
   return (
     <div
@@ -59,6 +64,7 @@ export default function PosteDeTravail({
     >
       {/* La bulle suit l'agent : absent, c'est la salle où il est qui la porte. */}
       <div className="flex h-5 max-w-full items-end">
+        {occupe && !absent && anomalies > 0 && <MarqueurAnomalie nombre={anomalies} />}
         {occupe && !absent && <Bulle sante={sante} />}
         {occupe && !absent && sante === "actif" && outil && <BulleDOutil phrase={outil} />}
       </div>
@@ -68,7 +74,7 @@ export default function PosteDeTravail({
         title={libelle}
         onClick={choisir}
         tabIndex={absent ? -1 : undefined}
-        className={`relative rounded-md p-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-500 ${choisir ? "cursor-pointer" : ""}`}
+        className={`relative rounded-md p-0.5 focus-violet ${choisir ? "cursor-pointer" : ""}`}
       >
         <Agrandi>
           <Poste

@@ -5,29 +5,29 @@ La sonde est un faux, le journal et le dossier des worktrees sont écrits dans
 """
 import json
 import os
-from datetime import datetime, timedelta, timezone
 from dataclasses import dataclass, field
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import aiosqlite
 from fastapi.testclient import TestClient
 
 from tessera.main import app
-from tessera.services.database import init_db
 from tessera.routers.services_running import get_sonde
+from tessera.services.noyau.database import init_db
 from tessera.services.providers import ollama
-from tessera.services.salle_tessera import (
+from tessera.services.supervision.salle_tessera import (
     PORT_DU_FRONTEND,
+    agents_en_cours,
     ci_en_attente,
     fin_du_journal,
-    agents_en_cours,
     processus_de_tessera,
-    runs_vivants,
     runs_du_jour,
+    runs_vivants,
     salle_tessera,
     taille_mo,
 )
-from tessera.services.sonde_systeme import InfoProcessus
+from tessera.services.supervision.sonde_systeme import InfoProcessus
 
 
 @dataclass
@@ -46,21 +46,19 @@ def _info(ppid: int, memoire_mo: float) -> InfoProcessus:
     return InfoProcessus(ppid=ppid, memoire_mo=memoire_mo, demarre_a=None)
 
 
-async def test_backend_counts_only_itself_and_frontend_counts_its_tree() -> None:
+def test_backend_counts_only_itself_and_frontend_counts_its_tree() -> None:
     moi = os.getpid()
-    sonde = FausseSonde(
-        ports={8100: moi, PORT_DU_FRONTEND: 50},
-        procs={moi: _info(1, 400.0), 900: _info(moi, 300.0), 50: _info(1, 100.0), 51: _info(50, 20.5)},
-    )
+    ports = {8100: moi, PORT_DU_FRONTEND: 50}
+    procs = {moi: _info(1, 400.0), 900: _info(moi, 300.0), 50: _info(1, 100.0), 51: _info(50, 20.5)}
 
-    backend, frontend = await processus_de_tessera(sonde)
+    backend, frontend = processus_de_tessera(ports, procs)
 
     assert (backend.nom, backend.port, backend.memoire_mo) == ("backend", 8100, 400.0)
     assert (frontend.nom, frontend.pid, frontend.memoire_mo) == ("frontend", 50, 120.5)
 
 
-async def test_a_frontend_nobody_serves_has_no_pid() -> None:
-    _, frontend = await processus_de_tessera(FausseSonde(procs={os.getpid(): _info(1, 1.0)}))
+def test_a_frontend_nobody_serves_has_no_pid() -> None:
+    _, frontend = processus_de_tessera({}, {os.getpid(): _info(1, 1.0)})
 
     assert frontend.pid is None
     assert frontend.memoire_mo == 0.0
@@ -86,8 +84,8 @@ def test_the_log_shows_only_the_event_never_the_payload(tmp_path: Path) -> None:
 
     fin = fin_du_journal(journal)
 
-    assert [l.evenement for l in fin] == [f"evt{i}" for i in range(4, 10)]
-    assert "secret" not in json.dumps([l.model_dump() for l in fin])
+    assert [ln.evenement for ln in fin] == [f"evt{i}" for i in range(4, 10)]
+    assert "secret" not in json.dumps([ln.model_dump() for ln in fin])
 
 
 def test_a_missing_log_gives_no_line(tmp_path: Path) -> None:
@@ -110,7 +108,7 @@ def test_running_agents_are_the_claude_processes_under_the_backend() -> None:
 async def test_runs_of_the_day_count_since_local_midnight(tmp_path: Path) -> None:
     base = tmp_path / "tessera.db"
     await init_db(base)
-    maintenant = datetime.now(timezone.utc)
+    maintenant = datetime.now(UTC)
     async with aiosqlite.connect(base) as db:
         for i, depuis in enumerate([maintenant, maintenant - timedelta(days=3)]):
             await db.execute(
@@ -121,6 +119,27 @@ async def test_runs_of_the_day_count_since_local_midnight(tmp_path: Path) -> Non
 
     assert await runs_du_jour(base) == 1
     assert await runs_du_jour(tmp_path / "absent" / "x.db") == 0
+
+
+async def test_runs_of_the_day_leave_out_queue_and_autonomous_envelopes(tmp_path: Path) -> None:
+    base = tmp_path / "tessera.db"
+    await init_db(base)
+    maintenant = datetime.now(UTC).isoformat()
+    lignes = [
+        ("envelope", "queue", "queue"),
+        ("auto", "autonomous", "autonomous"),
+        ("child1", "ticket-1", "single"),
+        ("child2", "ticket-2", None),
+    ]
+    async with aiosqlite.connect(base) as db:
+        for id_, ticket, mode in lignes:
+            await db.execute(
+                "INSERT INTO pipeline_runs (id, ticket_id, project_id, started_at, mode) VALUES (?, ?, ?, ?, ?)",
+                (id_, ticket, "p", maintenant, mode),
+            )
+        await db.commit()
+
+    assert await runs_du_jour(base) == 2
 
 
 def test_database_size_is_in_megabytes(tmp_path: Path) -> None:
@@ -186,3 +205,63 @@ def test_the_route_bounds_the_journal_length() -> None:
         assert client.get("/api/v1/tessera/salle?journal=500").status_code == 422
     finally:
         app.dependency_overrides.pop(get_sonde, None)
+
+
+@dataclass
+class SondeQuiCompte(FausseSonde):
+    appels_processus: int = 0
+    appels_ecouteurs: int = 0
+
+    async def ecouteurs(self) -> dict[int, int]:
+        self.appels_ecouteurs += 1
+        return self.ports
+
+    async def processus(self) -> dict[int, InfoProcessus]:
+        self.appels_processus += 1
+        return self.procs
+
+
+async def test_the_room_probes_processes_and_listeners_once(tmp_path: Path) -> None:
+    sonde = SondeQuiCompte(procs={os.getpid(): _info(1, 10.0)})
+
+    await salle_tessera(
+        sonde,
+        instantane=[],
+        ci_en_attente={},
+        ollama_url="http://127.0.0.1:11434",
+        refroidissement_s=None,
+        journal=tmp_path / "absent.log",
+        base=tmp_path / "absent.db",
+    )
+
+    assert (sonde.appels_processus, sonde.appels_ecouteurs) == (1, 1)
+
+
+def test_a_shell_whose_line_mentions_claude_is_not_an_agent() -> None:
+    moi = os.getpid()
+    snapshot = 'bash -c "source ~/.claude/shell-snapshots/snapshot-bash-1.sh && git status"'
+    procs = {
+        moi: _info(1, 1.0),
+        10: InfoProcessus(ppid=moi, memoire_mo=1.0, demarre_a=None, commande='"C:\outils\claude.exe" --print'),
+        11: InfoProcessus(ppid=10, memoire_mo=1.0, demarre_a=None, commande=snapshot),
+        12: InfoProcessus(ppid=10, memoire_mo=1.0, demarre_a=None, commande="node mcp-server.js --config ~/.claude/mcp.json"),
+        13: InfoProcessus(ppid=moi, memoire_mo=1.0, demarre_a=None, commande="/usr/bin/zsh -c 'claude-notes'"),
+    }
+
+    assert agents_en_cours(moi, procs) == 1
+
+
+def test_salle_tessera_counts_the_anomalies_of_a_live_run() -> None:
+    runs = runs_vivants(
+        [{"project_id": "p", "ticket_id": "ticket-001", "agent": "codeur", "etape": "codeur",
+          "anomalies": [{"regle": "silence"}, {"regle": "tours_de_revue"}]}]
+    )
+
+    assert runs[0].anomalies == 2
+
+
+def test_salle_tessera_run_without_anomaly_has_a_zero_count() -> None:
+    sans_champ = runs_vivants([{"project_id": "p", "ticket_id": "ticket-001"}])
+    liste_vide = runs_vivants([{"project_id": "p", "ticket_id": "ticket-001", "anomalies": []}])
+
+    assert sans_champ[0].anomalies == 0 and liste_vide[0].anomalies == 0

@@ -5,14 +5,9 @@ from pathlib import Path
 
 import pytest
 
+from tessera.services.verdicts.security_auditor import _SEVERITIES, SecurityAuditorService, SecurityAuditResult, SecurityIssue
+from tessera.services.verdicts.security_schema import SECURITY_SCHEMA
 from tests.test_providers_base import FakeProvider
-from tessera.services.security_auditor import (
-    _SEVERITIES,
-    SecurityAuditResult,
-    SecurityAuditorService,
-    SecurityIssue,
-)
-from tessera.services.security_schema import SECURITY_SCHEMA
 
 
 @pytest.fixture

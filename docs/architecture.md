@@ -78,6 +78,30 @@ Chaque appel d'agent SDK reçoit `CLAUDE_CODE_GIT_BASH_PATH` dans son environnem
 au Code Engine local de lancer Bash. Hors Windows, ce mécanisme ne s'applique pas (bash est
 toujours disponible) et `agent_shell` vaut `true`.
 
+#### Déport de valeurs longues sous compte agent (ticket-946)
+
+`CreateProcessWithLogonW` refuse une ligne de commande (`lpCommandLine`) de plus de 1 024 caractères. Le prompt système, la config MCP et les réglages du CLI Claude dépassent cette limite.
+
+La solution déporte les valeurs longues (prompt, config MCP, réglages) vers des fichiers temporaires. Chaque appel reçoit un dossier `tessera-appel-*` lisible par le compte agent en lecture seule (droits via icacls `/grant <compte>:(OI)(CI)R`), où vivent les fichiers. Le CLI utilise alors `--system-prompt-file`, `--append-system-prompt-file` et autres options fichier. Le dossier est nettoyé après la fermeture du processus, même en erreur.
+
+#### Listing des processus par SID sans tasklist (ticket-991)
+
+Au lieu d'énumérer les processus par la commande `tasklist`, qui résout les noms de compte, les processus du compte agent sont énumérés en comparant le SID du jeton de chaque processus au SID du compte, sans appel système de résolution. L'implémentation utilise les APIs Windows natives (`EnumProcesses`, `OpenProcessToken`, `GetTokenInformation`).
+
+#### Relais CLI pour les commandes trop longues (ticket-992)
+
+Une commande CLI qui dépasse la limite pour `CreateProcessWithLogonW` passe par un relais Node : un script `relais.js` relit la commande depuis un fichier JSON et la lance sans shell. Cette approche permet aux outils qui ne supportent que des paramètres en ligne (comme `--json-schema`) de rester complets.
+
+##### Résolution du chemin du script sous le compte agent (ticket-1003)
+
+Sans le flag `--preserve-symlinks-main`, Node.js résout le chemin réel de son script en examinant (`lstat`) chaque dossier parent. Le dossier d'appel vit dans `TEMP` utilisateur, sous un profil inaccessible au compte agent : cette résolution échoue avec `EPERM` sur `AppData` et code de sortie 1, rendant l'audit sécurité indisponible.
+
+Le flag `--preserve-symlinks-main` (ticket-1003) demande à Node d'ouvrir le chemin fourni directement, sans résoudre les parents — une opération permise car les fichiers du relais (`relais.js`, `relais.json`) résident dans le dossier d'appel, accessible au compte agent. Le relais garde sa fonctionnalité intacte : le CLI exécute normalement, et les stages suivants du pipeline démarrent.
+
+#### Lecture des fichiers protégés sous le compte agent (ticket-994)
+
+Les fichiers protégés (agents.json, CLAUDE.md, etc.) refusent au compte agent les droits précis sans interdire la lecture. Les droits simples d'icacls portent aussi `SYNCHRONIZE`, qui interdit toute ouverture ; les droits précis (`WD`, `AD`, `WEA`, `WA`, `DE`) évitent ce piège.
+
 ### Enregistrement automatique des appels
 
 Chaque appel LLM d'un run est enregistré dans `agent_calls` avec `run_id`,
@@ -325,7 +349,7 @@ Un worktree neuf est peuplé avant tout lancement : ses entrées déclarées (fi
 
 **Protection contre la suppression de liens traversés** : avant tout `worktree remove` ou `rmtree`, une étape retire chaque jonction et lien sans jamais en traverser l'intérieur — cela évite le bug du 14/10 où une jonction vidait le `node_modules` du dépôt principal. Sous Windows, la détection s'appuie sur l'attribut de point d'analyse (`st_file_attributes`). Si un lien subsiste après, la suppression du worktree s'arrête sans effacer le reste.
 
-Implémentation : `services/run_worktree_populate.py` (ticket-523, ADR-056).
+Implémentation : `services/worktrees/run_worktree_populate.py` (ticket-523, ADR-056).
 
 Sous Windows, les chemins de plus de 260 caractères (courant avec pnpm et les arbres imbriqués de `node_modules`) levaient `WinError 3` lors de la suppression du worktree, interrompant le run même après la livraison de la PR (ticket-531). La correction applique le préfixe étendu `\?\` pour les appels système du nettoyage et rattrape les erreurs `OSError` et `GitWorkspaceError` : le résultat du run reste inchangé (livré reste livré), un avertissement `run_worktree_non_supprime` est journalisé, et le dossier peut être nettoyé au prochain démarrage (ticket-520).
 
@@ -408,7 +432,7 @@ sans attendre que le testeur les installe.
 En cas d'échec ou dépassement, le run passe en `blocked` avec la sortie de la commande
 — le codeur n'est pas appelé (ADR-037).
 
-**Validation** : validée à la lecture du projet par `services/worktree_politique.py`
+**Validation** : validée à la lecture du projet par `services/gardes/worktree_politique.py`
 (ticket-521). Absente, aucune commande ne s'exécute avant le codeur.
 
 ### Reprise de runs orphelins (ticket-369)
@@ -554,7 +578,16 @@ Chaque agent reçoit un contexte filtré selon sa portée définie dans les ADR 
 
 **Invariant** : le contexte d'un agent inclut toujours le diff git, les résultats des étapes précédentes et l'audit, indépendamment de la portée des ADR du projet. Seule la section des décisions elle-même est filtrée par rôle.
 
-`adr_pertinents` (`backend/src/tessera/services/adr.py`) découpe à cette limite. Les ADRs au format `contraintes.md` (`contraintes_pour`) n'en ont pas besoin : leurs blocs s'arrêtent déjà au titre de niveau 2 suivant.
+`adr_pertinents` (`backend/src/tessera/services/projets/adr.py`) découpe à cette limite. Les ADRs au format `contraintes.md` (`contraintes_pour`) n'en ont pas besoin : leurs blocs s'arrêtent déjà au titre de niveau 2 suivant.
+
+### Composition du contexte : priorité aux contraintes
+
+Chaque agent reçoit deux fichiers de mémoire du projet, dans l'ordre de priorité :
+
+1. `memory/contraintes.md` — Les règles en vigueur pour le projet, spécifiques au rôle de l'agent
+2. `memory/decisions.md` — ADRs et décisions architecturales, en repli si le premier n'existe pas
+
+Le filtrage par rôle est implémenté dans les routers (`orchestrator.py`, `agents.py`, `chat.py`), qui passent par `services/projets/adr.py`. Une contrainte est une ligne portant un label entre crochets — ex. `[codeur]` — indiquant son champ d'application. Les agents n'appliquent que les contraintes qui les concernent.
 
 ### Contraintes proposées (ticket-493)
 
@@ -638,7 +671,34 @@ limite de silence (ticket-381) qui coupe après 1200 s sans message.
 
 ### Lancement isolé des services (ticket-664)
 
-Les services lancés par Tessera (backends, workers déclarés par les projets) ne doivent pas arrêter le backend orchestrateur. Sous Windows, un processus enfant qui reçoit `CTRL_C_EVENT` (ex: `uvicorn --reload`) le propage à toute sa console ; partagée, elle arrête le backend et tous ses enfants. Tessera isole chaque service dans sa propre console, son groupe de processus (`CREATE_NO_WINDOW | CREATE_NEW_PROCESS_GROUP` sur Windows, `start_new_session` ailleurs). La fonction `options_de_lancement(systeme)` dans `services/lancement.py` est appelée par `ProcessRegistry._lancer()`.
+Les services lancés par Tessera (backends, workers déclarés par les projets) ne doivent pas arrêter le backend orchestrateur. Sous Windows, un processus enfant qui reçoit `CTRL_C_EVENT` (ex: `uvicorn --reload`) le propage à toute sa console ; partagée, elle arrête le backend et tous ses enfants. Tessera isole chaque service dans sa propre console, son groupe de processus (`CREATE_NO_WINDOW | CREATE_NEW_PROCESS_GROUP` sur Windows, `start_new_session` ailleurs). La fonction `options_de_lancement(systeme)` dans `services/noyau/lancement.py` est appelée par `ProcessRegistry._lancer()`.
+
+### Détecteur d'anomalies (ticket-839, ADR-078)
+
+Une tâche de fond `DetecteurDAnomalies` observe les runs vivants toutes les 300 secondes. Elle relit les événements depuis la base en lecture seule, applique six règles de détection, et émet une notification d'anomalie par clé — chaque clé n'est signalée qu'une seule fois. Si une série se rompt puis se reforme, c'est une nouvelle clé et une nouvelle anomalie.
+
+Le détecteur ne modifie que les champs `anomalies` du run, sans aucune action externe : c'est un témoin. Les anomalies s'affichent comme notifications dans la cloche (réglables par type, ticket-840), dans le fil du run, et marquées sur le Bureau.
+
+#### Refus de documentation en série (ticket-950)
+
+Une règle `documentation_refusee_en_serie` signale quand les trois derniers lots de documentation du projet ont tous au moins un refus sans aucun fichier modifié — une boucle où la doc est rejetée sans jamais avancer.
+
+La lecture `derniers_lots_de_documentation` ramène les N derniers événements `doc_updated` par `project_id` depuis la base SQLite, du plus récent au plus ancien, sans exposer le texte des refus (seuls les comptes sont conservés). La règle rend une `Anomalie` avec clé `documentation_refusee:<id_lot>` (un épisode) et mesure = seuil = 3.
+
+### Coffre du système et gestion des secrets (ADR-073, tickets 794-798)
+
+Neuf secrets (`ANTHROPIC_API_KEY`, `GITHUB_TOKEN`, `VERCEL_TOKEN`, `NEON_API_KEY`, `RESEND_API_KEY`, `STRIPE_API_KEY`, `CLOUDFLARE_API_TOKEN`, `STATIC_TOKEN`, `FORBIDDEN_TERMS`) sont lus depuis le coffre du système (Credential Manager Windows, Keychain macOS, Secret Service Linux) plutôt que du `.env`. `SECRETS_SOURCE` choisit le mode : `auto` (défaut, coffre puis `.env`), `coffre` (refus sans coffre), `env` (CI, Docker, tests).
+
+**Flux de lecture** : `config.py` ordonne les sources Pydantic — environnement, `SourceCoffre`, `.env` — ce qui place les secrets du coffre entre les variables d'environnement et le fichier. En mode `auto`, l'absence ou l'erreur du coffre bascule silencieusement sur `.env` avec un avertissement, sauf si `.env` marque un secret comme migré : il devient une erreur de configuration.
+
+**Migration** : `python -m tessera.coffre_cli migrer` transfère les secrets de `.env` au coffre, les y relit pour en garantir l'exactitude, puis remplace chaque ligne par un commentaire. Aucune valeur n'est écrite en fichier temporaire.
+
+**Masquage et sécurité** : les 8 secrets (tout sauf `FORBIDDEN_TERMS`, qui est une liste) sont masqués dans les logs via `logger.py` et vidés de l'environnement du CLI (`env_sdk.py`). Le hook `pre-push` lit `FORBIDDEN_TERMS` par `coffre_cli termes` au lieu de `.env`, ce qui fonctionne depuis tout worktree. Une garde lexicale (`garde_coffre.py`) refuse à tout agent les commandes qui accèdent au coffre (`keyring`, `cmdkey`, `vaultcmd`, `secret-tool`, imports Python de keyring, etc.) : les secrets sont lus au démarrage du backend, pas à la demande.
+
+
+### Réglages globaux dynamiques (ADR-075)
+
+Cinq réglages—`run_max_budget_usd`, `llm_max_budget_usd`, `dialogue_timeout_s`, `max_parallel_test_runs`, `keep_awake_during_runs`—se lisent et se changent depuis l'UI du rail sans redémarrer le backend. Les écritures exigent un `Origin` déclaré, refusant les tentatives par le CLI. Le limiteur de suites relit sa limite à chaque acquisition, appliquant dynamiquement les changements.
 
 ## Endpoints implémentés
 
@@ -1014,6 +1074,20 @@ vérification plus faible.
 **Ce qui n'est pas fait** : le commit n'est jamais refusé même si la
 vérification s'affaiblit — c'est le rôle du reviewer et du validateur.
 
+### Écriture refusée dans les chemins protégés
+
+Les agents ne peuvent pas modifier certains fichiers système de l'IDE :
+
+- Workflows GitHub : `.github/workflows/`
+- Configuration Claude Code : `.claude/` (`settings*.json`, `skills/`, `commands/`, `agents/`)
+- Historique git : `.git/`
+- Registre des agents : `agents.json` (ADR-027, ticket-240)
+- Règles du projet : `CLAUDE.md`, `CLAUDE.local.md`
+
+Cette protection est implémentée dans `chemins_proteges.py`. Un ticket dont le livrable vit dans ces chemins se fait **à la main** : lancé dans le pipeline, il tourne trois tours sur un diff vide et se bloque. Le ticket peut porter la partie autorisée (tests, code métier) et indiquer que le reste est manuel.
+
+Une phrase du type « Ce ticket autorise la modification de `CLAUDE.md` » n'ouvre pas le garde-fou. La règle d'autorisation des modifications reste : seul un ticket explicite et autorisé peut proposer un changement, pas une phrase dans l'objectif.
+
 ## Synchronisation de la base au démarrage
 
 Au début de chaque run, avant la création de la branche, si un espace git et une branche de base sont connus et que l'arbre se trouve sur la base, l'orchestrateur appelle `sync_base_depuis_distant(base_branch)` (ticket-406). Cette fonction met les lignes de journal non commitées de côté, avance la base par `merge --ff-only` depuis le distant, puis réécrit les lignes à la suite.
@@ -1138,13 +1212,17 @@ Exemples d'erreurs ainsi empêchées :
 
 Une ADR (ticket-535) formalise cette règle.
 
-Le module `services/documentation_code.py` (ticket-540) produit ce contenu. Pour chaque ticket d'une file, il extrait :
+Le module `services/documentation/documentation_code.py` (ticket-540) produit ce contenu. Pour chaque ticket d'une file, il extrait :
 
 - **Diff filtré** : les changements du ticket, en excluant `tickets/`, `memory/`, `agents.json`, `README.md`, `docs/` et en réduisant les lockfiles à une seule ligne. Le diff est prélevé depuis la racine du dépôt, même pour un projet situé sous `projects/` (les exclusions portent alors le chemin complet du projet). Un diff supérieur à 12 000 caractères par ticket est tronqué, avec un total de 60 000 caractères par lot ; la troncature nomme les fichiers non affichés.
 - **Fichiers modifiés ou ajoutés** : le contenu des fichiers du diff, jusqu'à 8 000 caractères par fichier et 40 000 au total, trié par nombre de lignes changées décroissant. Un fichier trop long reste représenté par ses hunks.
 - **Tickets sans diff** : ceux dont le diff filtré est vide ou introuvable figurent dans une liste séparée.
 
 La fonction accepte une base explicite (commit ou branche) pour le diff, ce qui permet au run d'extraire les changements depuis le commit de la branche de travail — utile si la branche n'a pas encore été rebasée sur `main`. Les appelants existants gardent leur comportement (diff contre `main` par défaut).
+
+### Protection de la configuration lors de la documentation (ticket-866)
+
+La documentation réécrit la clé `description` d'`agents.json` pour enregistrer la description du produit. Deux protections garantissent l'arbre propre (ADR-018) : (1) une modification préexistante de l'interface pendant le run ne doit pas partir avec le commit de doc ; (2) `commit_all()` exclut normalement ce fichier de politique du run (ticket-296), donc la description stagée nommément pour la reprendre. Le mécanisme lit l'état de `agents.json` avant le lot et décide après coup si la description s'ajoute au commit ou se refuse.
 
 ## Livraison (ADR-029, ADR-030, ADR-051)
 
@@ -1311,6 +1389,8 @@ Lors d'une file de tickets en parallèle, chaque run ajoute des lignes à `memor
 
 L'attribut `.gitattributes merge=union` sur ce fichier demande à Git de combiner automatiquement les deux ensembles de lignes — la bonne résolution pour un journal qui ne fait que croître. Aucune intervention manuelle n'est requise pour ce fichier.
 
+Le fichier `.gitattributes` du dépôt déclare cette stratégie pour `projects/ide-core/memory/pipeline-log.md`. Quand deux tickets livrés en parallèle (ADR-051) y ajoutent simultanément leurs lignes, git les fusionne en concaténant les deux versions — chaque contribution reste intacte. Les vrais conflits du journal (modifications discordantes du même bloc) demandent une résolution manuelle.
+
 ### Délai de grâce pour l'enregistrement des checks
 
 GitHub n'enregistre pas les checks de CI instantanément après l'ouverture 
@@ -1371,6 +1451,8 @@ Quand l'appel d'ouverture de la PR échoue avec une erreur de transport (`httpx.
 
 Pour récupérer cette PR orpheline, la phase 1 cherche une PR ouverte dont la branche de tête est celle du run courant (`GET /pulls?head=<owner>:<branche>&state=open`). Si elle existe, elle est traitée comme une `LivraisonInterrompue` avec `pr_orpheline=True` : elle passe au CIWatcher pour le suivi du statut CI. Si la recherche elle-même échoue ou qu'aucune PR n'est trouvée, l'arrêt d'origine est conservé sans nouvelle erreur.
 
+Le ticket-788 étend ce mécanisme aux erreurs serveur GitHub (réponses 5xx). Quand l'ouverture de PR échoue, le système cherche d'abord une PR déjà ouverte malgré l'erreur, avec des délais croissants de 2 et 5 secondes, avant de retenter l'ouverture une fois. Les délais sont définis dans `_DELAIS_RECHERCHE_S`.
+
 #### Retry automatique pour les indisponibilités GitHub
 
 Lors de la lecture du statut CI ou du merge d'une PR, une indisponibilité passagère de GitHub (502 Bad Gateway, 503 Service Unavailable, 504 Gateway Timeout) n'arrête plus le run. Le CIWatcher réessaye jusqu'à trois fois avec une attente croissante (1 s, 2 s, 4 s) avant abandon définitif. Les erreurs 4xx (403 Forbidden, 404 Not Found…) ne déclenchent pas de retry — elles reflètent une vraie permission manquante ou une ressource disparue (ticket-461).
@@ -1425,7 +1507,7 @@ rapide, la branche n'est pas réécrite ; la raison s'ajoute à `Livraison.arret
 
 ### Réalignement de la base locale après merge du CIWatcher (ticket-420)
 
-Après qu'un run autonome soit mergé par le `CIWatcher` (`services/ci_watcher.py`), la base locale doit être réalignée sur la base distante pour que les services du projet servent le code à jour.
+Après qu'un run autonome soit mergé par le `CIWatcher` (`services/livraison/ci_watcher.py`), la base locale doit être réalignée sur la base distante pour que les services du projet servent le code à jour.
 
 **Condition** : le réalignement ne s'effectue que si :
 - Aucun run n'occupe actuellement le projet (`RUN_REGISTRY.projet_occupe()` retourne faux)
@@ -1460,6 +1542,8 @@ Après le merge d'une PR, le workspace se réaligne sur la branche de base. Deux
 - **Fichiers non suivis et non ignorés laissés par le run** : listés au journal du pipeline, sans être supprimés.
 
 Résultat : `git pull` ne refuse jamais, et le workspace est propre pour le ticket suivant.
+
+Le ticket-789 améliore cet invariant en gérant les lignes écrites par le CIWatcher après le retour sur la base. Quand le journal du pipeline est suivi par git et que CIWatcher ajoute une ligne en arrière-plan, celle-ci est mise en attente dans un fichier hors du dépôt (nommé `tessera-pipeline-log-attente` dans le répertoire git commun) plutôt que d'être ajoutée directement au checkout. Le run suivant reprend ces lignes et les réécrit dans son journal avant de committer.
 
 ### Finalisation de tous les runs et journalisation des défaillances (tickets-377, 390)
 
@@ -1512,11 +1596,89 @@ sur `origin/<base>` et alloue les numéros libres suivants. Elle réécrit les f
 pour les agents qui créent des tickets — architecte et codeur l'utilisent avant d'écrire
 une fiche pour garantir que le numéro n'est pris ni sur l'arbre, ni sur `origin/<base>`, ni sur d'autres branches `origin/ticket-*` en cours.
 
+## Supervision des runs (ADR-080)
+
+Entre deux runs — quand un run approuvé s'achève ou qu'une coupure infrastructure
+laisse une PR sans surveillance — le superviseur veille sur le projet. Il n'a ni
+outils ni shell : il **choisit** une action parmi un registre fermé
+(`superviseur_actions.py`), et le code, après ses propres vérifications, l'exécute
+ou la refuse.
+
+### Registre du superviseur (superviseur_actions.py)
+
+Quatre actions fermées :
+- `trier` : catégoriser les signalements bruts (tickets attendant d'être écrits).
+- `decider` : accepter ou rejeter une règle ou leçon proposée.
+- `reconfier_pr` : rendre une PR à `CIWatcher` quand elle a été abandonnée.
+- `relancer_file` : relancer une file coupée par une interruption infrastructure.
+
+Chaque action a ses gardes :
+- **Gardes de chemin** : `trier` peut écrire dans `tickets/**` ; `decider` dans
+  `memory/lecons.md`, `memory/contraintes.md`, `memory/supervision.md`. Jamais
+  `agents.json`, `.github/`, `CLAUDE.md`, `.claude/settings*`, `.git/`,
+  `memory/decisions.md`.
+- **Gardes de sensibilité** : une règle ou leçon qui nomme une porte d'ADR-080
+  (ADR-027, 031, 037, 039, 053, 055, 067, 073, 080) ou un mot interdit (`secret`,
+  `jeton`, `budget`, `quota`, `suppress`, `professionnel`, `force`, `superviseur`)
+  ne peut être décidée par le superviseur : verdict `a_toi` (escalade à l'humain).
+- **Déplacement pur** : pour `decider` sur une règle, le bloc doit passer de
+  `## Proposées` à la cible sans aucune autre ligne changée.
+
+Le modèle reçoit **une** cible (un signalement, une règle, une PR, une file) et
+rend un `Decision` JSON : action, cible, verdict (`agir` / `a_toi` / `rien`),
+raison. Toute réponse hors schéma est refusée — le superviseur ne fait rien.
+
+### Journal du superviseur (superviseur_journal.py)
+
+Chaque action laisse une ligne dans `memory/supervision.md`, format
+`- AAAA-MM-JJ | action | cible | sha | résumé`. Le service en est seul écrivain :
+un diff de run qui touche ce fichier met le run en `blocked`, sauf s'il s'agit
+d'une intervention du superviseur elle-même (type de run `mode == "supervision"`).
+
+Semblable à `memory/lecons.md` (ADR-074) : lecture sans lever (absent = vide),
+une seule source d'écriture.
+
+### Registre des files (run_registry.py)
+
+`RunRegistry.projet_tenu_par_file(project_id)` dit si une file ou un run autonome
+tient le projet, y compris **pendant le court instant** entre la fin d'un ticket
+et le début du suivant. ADR-034 : s'appuyer sur ce que le registre sait déjà —
+pas de structure parallèle. Le verrou `RunLock` n'est pas modifié (ADR-038).
+
+### Reprise de PR après coupure (superviseur_pr.py)
+
+Quand une coupure infrastructure (réseau, git, veille du système) arrête la
+livraison, la PR reste ouverte et `CIWatcher` l'ignore. Le superviseur la
+repère — approuvée, infrastructure stop, pas CI rouge, pas conflit-resolver — et
+la redonne à `CIWatcher` pour suite normale (vérif CI, merge si vert).
+
+Garde : la tête de la PR doit être `pushed_sha` (le SHA approuvé) ; sinon
+escalade en `a_toi`. Une par `(PR, sha)` — idempotence sur retentative.
+
+### Rôle superviseur
+
+Sans outils ni shell. Son prompt le dit clairement : il ne fait que choisir. Les
+portes sensibles d'ADR-080 (argent, suppression, secrets, `agents.json`, `.github/`,
+`CLAUDE.md`, `.claude/settings*`, `.git/`) restent fermées — pas de modèle ne
+les ouvre, même si la consigne y invite.
+
+## Vue Rituels du Bureau
+
+Les rituels sont des tâches récurrentes affichées dans la rail de navigation et organisées par statut. Chaque rituel porte un titre, un rythme de répétition, et un statut (`en_retard`, `a_venir` ou récemment exécuté).
+
+### Intégration au cockpit
+
+Dans la rail de navigation (`NavRail`), le panneau **Rituels** rejoint le groupe Pilotage (après Supervision). Une pastille ambre portant le nombre de rituels `en_retard` s'affiche, absente si ce nombre est zéro (ADR-026 : l'ambre pour une attente).
+
+### Polling et actions
+
+Le hook `useRituels` lit `GET /api/v1/rituels` par `usePolling` (intervalle de 5 minutes et à l'ouverture du panneau). Il expose la liste des rituels et un compteur `enRetard`, plus deux actions : `fait(id)` et `reporter(id)`, qui appellent les routes correspondantes (`POST /api/v1/rituels/{id}/fait` et `POST /api/v1/rituels/{id}/reporter`) puis relisent la liste.
+
 ## Caching des statuts GitHub (ticket-364)
 
 L'endpoint `/projects/{id}/tickets/{id}/pr-status` affichait le statut de chaque PR en interrogeant GitHub, sans cache. Chaque appel lancait deux requêtes GitHub (la PR, puis ses check-runs). Avec 139 tickets portant un `pr_number` dans ide-core, ouvrir le projet provoquait 139 appels à l'endpoint, soit ~280 requêtes GitHub — consommant 5,6 % du quota horaire (5 000 requêtes).
 
-Le module `backend/src/tessera/services/pr_status_cache.py` implémente deux niveaux de cache :
+Le module `backend/src/tessera/services/livraison/pr_status_cache.py` implémente deux niveaux de cache :
 
 - **Statuts définitifs** (`merged`, `closed`) : persistés dans une table SQLite `pr_status_cache`, relus sans appel GitHub — y compris après redémarrage.
 - **Statuts ouverts** : gardés en mémoire 30 secondes, puis redemandés.
@@ -1669,6 +1831,10 @@ En local, une liste vide désactive le contrôle. En CI, son absence bloque le
 merge — c'est intentionnel.
 
 
+## Isolation du jeton GitHub en CI (ticket-945)
+
+Le code d'une PR exécuté par la CI (tests, E2E) ne peut pas accéder au `GITHUB_TOKEN` du runner : chaque étape `actions/checkout` de `.github/workflows/ci.yml` porte `persist-credentials: false`, ce qui empêche le jeton de rester dans le `.git/config` du checkout.
+
 ## Détection de secrets dans les diffs (ticket-547)
 
 Avant de pousser une branche, `GitHubWorkflowService.open_pull_request()` vérifie que les lignes ajoutées ne contiennent pas de secrets reconnaissables — jetons, clés, identifiants. La détection est **déterministe**, sans appel LLM.
@@ -1697,6 +1863,26 @@ Cette détection est la deuxième porte de l'ADR-050, après le hook `pre-push` 
 
 Lorsqu'un diff ne touche que des fichiers de consignes — dans `projects/*/memory/` (contraintes et décisions), `agents/prompts/` (system prompts), `.claude/skills/` (skills), ou tout `CLAUDE.md` — le script `verifier.py` lance automatiquement `test_consignes_coherentes.py` même sans modification de code (ticket-734). Cela empêche les changements de configuration ou de règles de dépasser sans vérification.
 
+## Gestion des leçons du projet (ADR-074, tickets 801–804)
+
+Les leçons capturent les pièges rencontrés lors d'un run approuvé qui a dû corriger un échec. Elles n'atteignent que le codeur et le reviewer pour guider les tours suivants.
+
+Un module `services/lecons.py` — prouvé à exister par l'import dans les tests — fournit l'interface `Lecons` (dataclass avec `en_vigueur` et `proposees`), et les fonctions `lire_lecons(memory_dir)`, `refus_de_lecon(texte, preuve, existantes, retour)` et `ajouter_proposee(memory_dir, texte, ticket_id, jour)`. Les leçons sous `## Proposées` du fichier `memory/lecons.md` attendent l'approbation humaine ; seules celles sous `## En vigueur` sont injectées.
+
+Injection : `build_project_context` (ticket-802) ajoute une section `## Leçons du projet` au contexte projet, lue par `section_lecons(project_path / "memory")`. La fonction `adr_pertinents` filtre cette section : seuls les rôles `codeur` et `reviewer` (constante `ROLES_AVEC_LECONS`) la reçoivent (ADR-074). Un rôle créé après coup n'en recevra pas : le défaut protège.
+
+Production (ticket-803) : après un run approuvé, le service sans outils appelle le rôle `lecons` si `pipeline.lecons` est activé dans `agents.json`. Il reçoit le retour du run (borné à 4 Ko) et propose au plus une leçon sous `## Proposées`, avec la source posée par le service. Tout refus ou défaillance (JSON invalide, refus du contrôle, fichier plein) est journalisé sans bloquer le run.
+
+Protection du fichier (ticket-804) : le diff d'un run ne peut pas toucher `memory/lecons.md`, sauf s'il a été écrit par le service après approbation. Une ligne ajoutée, retirée ou déplacée par le codeur bloque le run avant le premier tour, avec message d'erreur.
+
+Après un run approuvé qui a dû se corriger — codeur relancé par le reviewer ou le testeur —, l'agent `lecons` propose une règle observée : une situation, une action, 200 caractères max. La leçon est écrite sous `## Proposées` de `memory/lecons.md`.
+
+Flux : humain valide en déplaçant sous `## En vigueur` — aucune autre ligne n'est modifiée, le placement est le seul geste admis. Codeur et reviewer reçoivent alors la section entière dans `## Leçons du projet` de leur contexte projet, via `adr_pertinents()`. Les autres rôles ne la voient pas.
+
+Garde : un diff qui touche `lecons.md` au tour du codeur bloque le run (`blocked`, raison `lessons_file_modified`). Le service écrit après le codeur seul. Un humain qui déplace une leçon le fait à la main, hors run — aucun conflit.
+
+Suivi du projet : le décompte `lecons_proposees` s'affiche dans la liste des projets.
+
 ## Gestion des signalements en attente (ticket-421)
 
 Quand un signalement (`POST /api/v1/signalements`, ticket-407) arrive pendant qu'un run ide-core est actif, il n'est pas écrit immédiatement dans l'arbre. Cela évite qu'il soit emporté dans le commit du run en cours — ce qui poluerait le diff réel avec une métadonnée Tessera.
@@ -1712,11 +1898,24 @@ Quand un signalement (`POST /api/v1/signalements`, ticket-407) arrive pendant qu
 
 L'ordre est garanti : deux signalements reçoivent des `position` croissantes et sont écrits dans cet ordre.
 
+
+## Gestion des réglages globaux (ADR-075, tickets 805–808)
+
+Cinq réglages modifiables sans redémarrage — plafonds de dépense, délai de dialogue, limite de tests, veille machine — vivent dans un registre fermé et borné. Une porte unique : validation, stockage SQLite, cache en mémoire.
+
+Structure : `reglages.py` porte `REGISTRE` (cinq noms avec leurs bornes), `valider`, `du_moment` (lecture live), `figer` (épingle snapshot), `courants` (snapshot ou live selon contexte). Table `reglages` pour les surcharges ; `.env` inchangé. Absent, un réglage vaut son défaut de `.env`.
+
+Deux modes de lecture : **Hors run** — `du_moment()` lit `.env` + cache à chaque appel. **Pendant un run** — `figer()` épingle les valeurs à l'ouverture du run, la tâche en hérite via `courants()`. Modification pendant le run = inapplicable à ce run.
+
+Deux catégories d'effet : **« prochain_run »** (`run_max_budget_usd`, `llm_max_budget_usd`, `dialogue_timeout_s`) figées par run. **« machine »** (`max_parallel_test_runs`, `keep_awake_during_runs`) lues au moment où elles s'appliquent — limiteur relit la limite à chaque acquisition, `eveil.retenir()` la relit, `relacher()` non (tiré d'abord, no-op en dernier).
+
+Routes : `GET /api/v1/reglages` liste les cinq avec valeur courante, défaut, bornes, effet. `PUT /{nom}` pose surcharge (422 si hors bornes ou type faux, 404 si secret sans le nommer). `DELETE /{nom}` annule. Contrôle `Origin` strict pour PUT et DELETE : seules origines déclarées passent, pas tout port loopback.
+
 ## Validation des identifiants de projet (ticket-370)
 
 Toutes les routes contenant un paramètre `project_id` valident cet identifiant pour assurer que le chemin du projet reste conforme au dossier des projets configuré. Un `project_id` invalide — contenant `.`, `..`, `/`, `\` ou tout caractère ne correspondant pas au pattern `^[A-Za-z0-9][A-Za-z0-9._-]*$` — retourne une `404` sans jamais accéder au disque.
 
-La validation est centralisée dans `backend/src/tessera/services/project_loader.py` :
+La validation est centralisée dans `backend/src/tessera/services/projets/project_loader.py` :
 
 1. **Paramètres de chemin** — FastAPI refuse un identifiant invalide avant l'appel du routeur (→ `404`)
 2. **Corps de requête** — les objets `RunRequest` et `RunAutonomousRequest` rejettent un `project_id` invalide (→ `422`)
@@ -1757,7 +1956,7 @@ CREATE TABLE agent_events (
     ts        TEXT NOT NULL
 );
 
--- Un appel LLM d'un run — tous les rôles (backend/src/tessera/services/database.py)
+-- Un appel LLM d'un run — tous les rôles (backend/src/tessera/services/noyau/database.py)
 CREATE TABLE agent_calls (
     id                INTEGER PRIMARY KEY AUTOINCREMENT,
     run_id            TEXT NOT NULL REFERENCES pipeline_runs(id),

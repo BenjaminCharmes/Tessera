@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Button from "../../design/ui/Button";
 import InfoTip from "../../design/InfoTip";
 import { adressesDansLaSortie } from "../SupervisionView/adresse";
 import AdresseDuService from "../SupervisionView/AdresseDuService";
@@ -114,23 +115,18 @@ function LigneDeService({
     : [];
 
   return (
-    <div className="rounded-sm border border-zinc-800">
-      <button
-        type="button"
-        onClick={onBasculer}
-        aria-expanded={ouvert}
-        className="flex w-full items-center justify-between gap-2 px-2 py-1.5 text-left hover:bg-zinc-800/40"
-      >
+    <div className="space-y-1">
+      <Button taille="compact" onClick={onBasculer} aria-expanded={ouvert}>
         <span className="truncate text-xs text-zinc-200">{service.nom}</span>
         <span
           className={`shrink-0 rounded-sm px-1.5 py-0.5 text-micro ${classeDeLEtat(service)}`}
         >
           {libelleDeLEtat(service)}
         </span>
-      </button>
+      </Button>
 
       {adresses.length > 0 ? (
-        <span className="flex flex-wrap gap-1 px-2 pb-1.5">
+        <span className="flex flex-wrap gap-1">
           {adresses.map((adresse) => (
             <AdresseDuService key={adresse.url} {...adresse} />
           ))}

@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useMaintenant } from "../../hooks/useMaintenant";
 import { api } from "../../lib/api";
 import { useResource } from "../../hooks/useResource";
 import RegionTitle from "../../design/RegionTitle";
@@ -10,6 +11,7 @@ import ShareBars from "../../design/charts/ShareBars";
 import { formatCount } from "../../design/charts/palette";
 import { formatDay, formatDurationMs, formatUsd } from "../../lib/format";
 import type { RecentRun, StatsPeriod, UsageStats } from "../../types/api";
+import { Chargement, Erreur, Vide } from "../../design/ui/ViewState";
 import Card from "./Card";
 import JaugesDeQuota from "../../design/ui/JaugesDeQuota";
 import { useQuotaLu } from "../../hooks/useQuotaLu";
@@ -41,12 +43,12 @@ interface StatsViewProps {
 export default function StatsView({ projectId, days }: StatsViewProps) {
   const fetcher = useMemo(() => () => api.usage.stats(days, projectId), [days, projectId]);
   // Une lecture qui échoue vaut « pas de donnée » : la vue le dit.
-  const { data, loading } = useResource<UsageStats | null>(fetcher, null);
+  const { data, loading, refresh } = useResource<UsageStats | null>(fetcher, null);
   // Le run sélectionné dans l'historique — ouvre sa vue en lecture seule (ticket-281).
   const [selectedRun, setSelectedRun] = useState<RecentRun | null>(null);
   // Le quota réel, relu chaque minute, comme pour les notifications (ticket-726).
-  const [ouvertA] = useState(() => Date.now());
-  const quota = useQuotaLu(ouvertA);
+  const maintenant = useMaintenant(60_000);
+  const quota = useQuotaLu(maintenant);
 
   if (selectedRun) {
     return (
@@ -65,17 +67,15 @@ export default function StatsView({ projectId, days }: StatsViewProps) {
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto p-4">
-        {!data && loading && (
-          <p role="status" className="sr-only">
-            Chargement…
-          </p>
+        {!data && loading && <Chargement lignes={0} />}
+        {!data && !loading && (
+          <Erreur message="Statistiques indisponibles." onRetry={refresh} />
         )}
-        {!data && !loading && <p className="mb-4 text-xs text-zinc-500">Statistiques indisponibles.</p>}
         {data && data.totals.runs === 0 && data.totals.cost_usd === 0 && (
-          <p className="mb-4 rounded-lg border border-dashed border-zinc-800 px-4 py-3 text-xs text-zinc-500">
-            Aucun run sur les {data.days} derniers jours. Les graphiques se rempliront au premier
-            pipeline exécuté.
-          </p>
+          <Vide
+            titre={`Aucun run sur les ${data.days} derniers jours.`}
+            phrase="Les graphiques se rempliront au premier pipeline exécuté."
+          />
         )}
         {/* Seul sur sa ligne, le quota laissait deux tiers vides : il rejoint les KPI.
             La carte garde sa place dans l'arbre quand les données arrivent. */}
@@ -143,7 +143,7 @@ function Dashboard({ data, onSelectRun }: DashboardProps) {
             empty="Aucun token sur la période."
           />
         </Card>
-        <Card title="Issue des runs">
+        <Card title="Résultat des runs">
           <QualityCard quality={data.quality} />
         </Card>
       </div>

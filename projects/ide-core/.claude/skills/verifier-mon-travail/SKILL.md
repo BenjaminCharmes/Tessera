@@ -29,6 +29,14 @@ erreur d'import croisé ne se voit qu'ainsi, et la CI lance exactement ceci :
 cd ../../backend && uv run python -m mypy src/
 ```
 
+Et le lint, avec correction automatique, sur les fichiers Python que tu as
+touchés (code et tests) : le testeur lance `ruff`, et un import mal trié lui
+suffit pour te renvoyer un tour entier (957, 960 et 964 l'ont perdu ainsi).
+
+```bash
+cd ../../backend && uv run python -m ruff check --fix src/tessera/mon_module.py tests/test_mon_module.py
+```
+
 Frontend, et le typage si tu as touché du TypeScript :
 
 ```bash

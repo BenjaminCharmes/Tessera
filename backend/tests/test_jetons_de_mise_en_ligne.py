@@ -7,11 +7,11 @@ import pytest
 from pydantic import SecretStr
 
 from tessera.config import CHAMPS_JETONS, VARIABLES_JETONS, Settings, settings
-from tessera.services.livreur_run import livraison_interrompue
-from tessera.services.github_workflow import GitHubWorkflowService, WorkflowError
-from tessera.services.politique_run import PolitiqueRun
+from tessera.services.gardes.politique_run import PolitiqueRun
+from tessera.services.gardes.termes_interdits import CommitInfo, TermesInterditsService
+from tessera.services.github.github_workflow import GitHubWorkflowService, WorkflowError
+from tessera.services.pipeline.livreur_run import livraison_interrompue
 from tessera.services.providers.agent_sdk import _build_options
-from tessera.services.termes_interdits import CommitInfo, TermesInterditsService
 from tessera.utils.logger import _JsonFormatter, get_logger
 from tessera.utils.secrets import MASQUE, SECRETS, SecretRegistry
 
@@ -40,7 +40,7 @@ def test_the_five_tokens_are_empty_by_default(monkeypatch: pytest.MonkeyPatch) -
 
     vides = Settings(_env_file=None)
 
-    assert vides.valeurs_des_jetons() == []
+    assert vides.valeurs_des_secrets() == []
     assert vides.vercel_team_id == ""
 
 
@@ -61,7 +61,7 @@ def test_settings_hide_every_token_value() -> None:
 
 
 def test_settings_still_hand_the_values_to_the_backend() -> None:
-    assert set(_reglages().valeurs_des_jetons()) == set(_JETONS.values())
+    assert set(_reglages().valeurs_des_secrets()) == set(_JETONS.values())
 
 
 def test_the_environment_feeds_the_token_fields(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -118,7 +118,7 @@ def _enregistrement(message: str, **extra: Any) -> logging.LogRecord:
 
 
 def test_logger_masks_a_configured_token() -> None:
-    SECRETS.register_all(_reglages().valeurs_des_jetons())
+    SECRETS.register_all(_reglages().valeurs_des_secrets())
 
     ligne = _JsonFormatter().format(
         _enregistrement(

@@ -15,6 +15,8 @@ export interface RunVivant {
   file_index: number;
   file_total: number;
   suivants: string[];
+  /** Les anomalies que le détecteur a relevées sur ce run (ADR-078, ticket-833). */
+  anomalies: number;
 }
 
 export interface LigneDeJournal {

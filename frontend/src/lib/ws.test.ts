@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
+import { oublierJeton, saisirJeton } from "./auth";
 import { wsUrl, createWebSocket } from "./ws";
 
 // Minimal WebSocket mock
@@ -16,7 +17,7 @@ class MockWebSocket {
 vi.stubGlobal("WebSocket", MockWebSocket);
 
 afterEach(() => {
-  vi.unstubAllEnvs();
+  oublierJeton();
 });
 
 describe("wsUrl", () => {
@@ -93,23 +94,22 @@ describe("createWebSocket", () => {
 
 // ticket-120 : `new WebSocket(url)` n'accepte pas d'en-tête, le token ne peut
 // passer que dans l'URL. Le backend ferme en 4401 sinon.
-describe("wsUrl et STATIC_TOKEN", () => {
-  it("ajoute ?token= quand VITE_STATIC_TOKEN est défini", () => {
-    vi.stubEnv("VITE_STATIC_TOKEN", "s3cret");
+describe("wsUrl et jeton de session", () => {
+  it("ajoute ?token= lu depuis sessionStorage", () => {
+    window.sessionStorage.setItem("tessera.jeton", "s3cret");
     expect(wsUrl("/api/v1/agents/stream")).toBe(
       `ws://${location.host}/api/v1/agents/stream?token=s3cret`,
     );
   });
 
   it("encode le token et enchaîne avec & si la query existe déjà", () => {
-    vi.stubEnv("VITE_STATIC_TOKEN", "a b&c");
+    saisirJeton("a b&c");
     expect(wsUrl("/api/v1/x?y=1")).toBe(
       `ws://${location.host}/api/v1/x?y=1&token=a%20b%26c`,
     );
   });
 
   it("laisse l'URL intacte sans token", () => {
-    vi.stubEnv("VITE_STATIC_TOKEN", "");
     expect(wsUrl("/api/v1/agents/stream")).toBe(
       `ws://${location.host}/api/v1/agents/stream`,
     );

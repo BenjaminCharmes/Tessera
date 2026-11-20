@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CONFRONTATIONS, schemaVise } from "./champs";
+import { CONFRONTATIONS, facultatifsExiges, schemaVise } from "./champs";
 import { proprietes, reponseDecrite, routesDuSchema } from "./openapi";
 import { HORS_PERIMETRE, SANS_SCHEMA } from "./perimetre";
 import { APPELS, routesCouvertes } from "./registre";
@@ -15,6 +15,25 @@ describe("types declared by the frontend against the backend schema", () => {
       expect(c.declares).toEqual(duSchema);
     },
   );
+
+  it("declares no field optional that the schema requires", () => {
+    for (const c of CONFRONTATIONS) expect(facultatifsExiges(c), c.libelle).toEqual([]);
+  });
+
+  it("fails the comparison when a required field is optional in the type", () => {
+    const service = CONFRONTATIONS.find((c) => c.libelle === "ServiceActif (liste)");
+    if (service === undefined) throw new Error("confrontation « ServiceActif (liste) » absente");
+
+    const infidele = { ...service, facultatifs: ["sortie", "arrete_a_la_main"] };
+
+    expect(facultatifsExiges(infidele)).toEqual(["sortie", "arrete_a_la_main"]);
+  });
+
+  it("only lists as optional fields the schema knows", () => {
+    for (const c of CONFRONTATIONS) {
+      for (const nom of c.facultatifs) expect(c.declares, `${c.libelle}.${nom}`).toContain(nom);
+    }
+  });
 
   it("names every field it leaves out on purpose, and the schema still has it", () => {
     for (const c of CONFRONTATIONS) {

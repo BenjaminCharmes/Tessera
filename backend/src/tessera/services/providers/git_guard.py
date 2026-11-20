@@ -23,7 +23,7 @@ from typing import Any
 from claude_agent_sdk import HookContext, HookInput, HookJSONOutput
 
 from tessera.services.providers import git_guard_lexique as lexique
-from tessera.services.providers.git_guard_lectures import gh_interdit, git_interdit
+from tessera.services.providers.git_guard_lectures import gh_interdit, gh_sans_sous_commande, git_interdit, git_sans_sous_commande
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -37,30 +37,61 @@ GIT_REFUS = (
     "fichiers. Le git en lecture (status, diff, log, show) reste disponible."
 )
 
-def _segment_interdit(jetons_: list[str]) -> bool:
-    """True si ce segment, une fois déballé, est un git ou un gh qui écrit."""
+def _xargs_sans_sous_commande(nom: str, reste: list[str]) -> bool:
+    """`xargs git` : la sous-commande arrive sur l'entrée standard (ticket-749)."""
+    if nom != "xargs" or not reste:
+        return False
+    cible = lexique.nom_de_commande(reste[0])
+    if cible == "git":
+        return git_sans_sous_commande(reste[1:])
+    return cible == "gh" and gh_sans_sous_commande(reste[1:])
+
+
+def _ligne_interdite(nom: str, jetons_: list[str], env_suspect: bool) -> bool:
+    """Un shell (`sh -c`, `cmd //c`, `powershell`…) ou `eval` : lit sa ligne."""
+    if nom == "eval":
+        return commande_git_interdite(" ".join(jetons_[1:]), env_suspect)
+    if lexique.commande_opaque(jetons_):
+        return True
+    ligne = lexique.ligne_derriere_c(jetons_)
+    return ligne is not None and commande_git_interdite(ligne, env_suspect)
+
+
+def _segment_interdit(jetons_: list[str], env_suspect: bool = False) -> bool:
+    """True si ce segment, une fois déballé, est un git ou un gh qui écrit.
+
+    `env_suspect` : une affectation de `GIT_*`, `GH_*`, `PAGER`… a été vue
+    devant la commande (ticket-746). Devant un git ou un gh, elle refuse ;
+    devant autre chose, elle ne dit rien.
+    """
     while True:
+        avant = jetons_
         jetons_ = lexique.sans_prefixe(jetons_)
+        env_suspect = env_suspect or lexique.affecte_environnement(avant, jetons_)
         if not jetons_:
             return False
         nom = lexique.nom_de_commande(jetons_[0])
-        if nom in lexique.SHELLS:
-            ligne = lexique.ligne_derriere_c(jetons_)
-            return ligne is not None and commande_git_interdite(ligne)
-        if nom == "eval":
-            return commande_git_interdite(" ".join(jetons_[1:]))
+        if nom in lexique.SHELLS or nom == "eval":
+            return _ligne_interdite(nom, jetons_, env_suspect)
         if nom in lexique.ENVELOPPES:
+            avant = jetons_
             jetons_ = lexique.sans_enveloppe(jetons_)
+            if _xargs_sans_sous_commande(nom, jetons_):
+                return True
+            env_suspect = env_suspect or lexique.affecte_environnement(avant, jetons_)
             continue
         if nom == "git":
-            return git_interdit(jetons_[1:])
+            return env_suspect or git_interdit(jetons_[1:])
         if nom == "gh":
-            return gh_interdit(jetons_[1:])
+            return env_suspect or gh_interdit(jetons_[1:])
         return False
 
 
-def commande_git_interdite(commande: str) -> bool:
+def commande_git_interdite(commande: str, env_suspect: bool = False) -> bool:
     """True si `commande` contient un git — ou un gh — qui écrit.
+
+    `env_suspect` vaut quand la ligne est elle-même le corps d'un `sh -c` ou
+    d'un `eval` précédé d'une affectation d'environnement git.
 
     Tokenise plutôt que de chercher un motif : une expression régulière sur une
     ligne de shell rate toujours une forme, et ici rater une forme veut dire
@@ -68,7 +99,10 @@ def commande_git_interdite(commande: str) -> bool:
     déballé de ses enveloppes (`env`, `sudo`, `sh -c`…) avant d'être lu ; les
     formes qui passaient avant ticket-119 sont dans `test_git_guard.py`.
     """
-    return any(_segment_interdit(lexique.jetons(s)) for s in lexique.segments(commande))
+    return any(
+        _segment_interdit(lexique.jetons(s), env_suspect)
+        for s in lexique.segments(commande)
+    )
 
 
 async def hook_refus_git(

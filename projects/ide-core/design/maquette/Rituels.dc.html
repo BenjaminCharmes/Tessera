@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Tessera — Rituels</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:#c4b5fd}a:hover{color:#ddd6fe}
+.mono{font-family:ui-monospace,'Cascadia Code',Consolas,monospace}
+.btn{height:30px;padding:0 12px;border-radius:5px;border:1px solid #3f3f46;background:#18181b;color:#e4e4e7;font:inherit;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-decoration:none}
+.btn:hover{background:#1f1f23}
+.btn:focus-visible{outline:2px solid #8b5cf6;outline-offset:2px}
+.prim{background:#7c3aed;border-color:#7c3aed;color:#ffffff}
+.prim:hover{background:#6d28d9}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; display: flex; background: #0f0f11; color: #e4e4e7; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 13px; overflow: hidden">
+
+  <nav aria-label="Navigation principale" style="width: 96px; flex-shrink: 0; background: #121214; border-right: 1px solid #27272a; display: flex; flex-direction: column; padding: 10px 8px; gap: 2px">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 0 12px; color: #a1a1aa; font-size: 10px"><span style="width: 22px; height: 22px; border-radius: 5px; background: #8b5cf6"></span>Tessera</div>
+    <div style="font-size: 9px; letter-spacing: 0.8px; text-transform: uppercase; color: #71717a; padding: 6px 4px 2px">Pilotage</div>
+    <a href="#" style="text-decoration: none; color: #a1a1aa; font-size: 11px; text-align: center; padding: 9px 0; border-radius: 6px">Projets</a>
+    <a href="#" style="text-decoration: none; color: #a1a1aa; font-size: 11px; text-align: center; padding: 9px 0; border-radius: 6px">En cours</a>
+    <a href="#" style="text-decoration: none; color: #a1a1aa; font-size: 11px; text-align: center; padding: 9px 0; border-radius: 6px">Supervision</a>
+    <a href="#" aria-current="page" aria-label="Rituels, {{nbAFaire}} à faire" style="position: relative; text-decoration: none; color: #f4f4f5; background: rgba(139,92,246,0.18); box-shadow: inset 0 0 0 1px rgba(139,92,246,0.45); font-size: 11px; text-align: center; padding: 9px 0; border-radius: 6px">Rituels
+      <sc-if value="{{aDesAFaire}}" hint-placeholder-val="{{ true }}"><span style="position: absolute; top: -4px; right: 2px; min-width: 16px; height: 16px; padding: 0 4px; box-sizing: border-box; border-radius: 8px; background: #f59e0b; color: #18181b; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center">{{nbAFaire}}</span></sc-if>
+    </a>
+    <div style="height: 1px; background: #27272a; margin: 8px 6px"></div>
+    <div style="font-size: 9px; letter-spacing: 0.8px; text-transform: uppercase; color: #71717a; padding: 0 4px 2px">Projet</div>
+    <a href="#" style="text-decoration: none; color: #a1a1aa; font-size: 11px; text-align: center; padding: 9px 0; border-radius: 6px">Tickets</a>
+    <a href="#" style="text-decoration: none; color: #a1a1aa; font-size: 11px; text-align: center; padding: 9px 0; border-radius: 6px">Fichiers</a>
+    <a href="#" style="text-decoration: none; color: #a1a1aa; font-size: 11px; text-align: center; padding: 9px 0; border-radius: 6px">Historique</a>
+  </nav>
+
+  <main style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column">
+    <div style="height: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; border-bottom: 1px solid #27272a">
+      <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase"><span style="width: 3px; height: 14px; background: #8b5cf6; border-radius: 2px"></span>Rituels</div>
+      <span style="font-size: 11px; color: #a1a1aa">Mardi 10 novembre · <span class="mono">rituels.yaml</span>, versionné dans le dépôt</span>
+    </div>
+
+    <div style="flex-grow: 1; overflow: auto; padding: 20px 24px 24px; display: flex; flex-direction: column; gap: 24px">
+
+      <section aria-label="À faire" style="display: flex; flex-direction: column; gap: 10px">
+        <h2 style="margin: 0; font-size: 11px; font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase; color: #a1a1aa">À faire · {{nbAFaire}}</h2>
+        <sc-if value="{{rienAFaire}}" hint-placeholder-val="{{ false }}">
+          <div style="padding: 16px; border: 1px dashed #3f3f46; border-radius: 8px; color: #a1a1aa">Rien en retard. Le prochain rituel est {{prochain}}.</div>
+        </sc-if>
+        <sc-for list="{{aFaire}}" as="r" hint-placeholder-count="2">
+          <article style="background: #18181b; border: 1px solid #3f3f46; border-radius: 8px; padding: 14px 16px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px 24px; align-items: start">
+            <div style="display: flex; flex-direction: column; gap: 6px; min-width: 0">
+              <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
+                <h3 style="margin: 0; font-size: 15px; font-weight: 600">{{r.titre}}</h3>
+                <span style="padding: 2px 8px; border-radius: 4px; font-size: 11px; background: rgba(245,158,11,.14); color: #fcd34d">{{r.quand}}</span>
+              </div>
+              <span style="font-size: 12px; color: #a1a1aa">{{r.rythme}} · {{r.duree}}</span>
+              <span style="font-size: 13px; color: #d4d4d8; line-height: 1.45">{{r.detail}}</span>
+              <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px; flex-wrap: wrap">
+                <span style="font-size: 12px; color: #a1a1aa">Dire à Claude :</span>
+                <span class="mono" style="padding: 4px 8px; border-radius: 4px; background: #0b0b0d; border: 1px solid #27272a; font-size: 12px; color: #e4e4e7">{{r.phrase}}</span>
+                <button type="button" class="btn" onClick="{{r.copier}}" aria-label="Copier la phrase : {{r.phrase}}" style="height: 26px">{{r.libelleCopie}}</button>
+              </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 8px; align-items: stretch; min-width: 190px">
+              <sc-for list="{{r.apps}}" as="a" hint-placeholder-count="1">
+                <a href="#" class="btn" style="justify-content: center">Ouvrir {{a}} ↗</a>
+              </sc-for>
+              <button type="button" class="btn prim" onClick="{{r.faire}}" style="justify-content: center">Fait</button>
+              <button type="button" class="btn" onClick="{{r.reporter}}" style="justify-content: center">Reporter à demain</button>
+            </div>
+          </article>
+        </sc-for>
+      </section>
+
+      <section aria-label="À venir" style="display: flex; flex-direction: column; gap: 6px">
+        <h2 style="margin: 0 0 4px; font-size: 11px; font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase; color: #a1a1aa">À venir</h2>
+        <sc-for list="{{avenir}}" as="r" hint-placeholder-count="4">
+          <div style="display: grid; grid-template-columns: 220px minmax(0, 1fr) 220px 150px; gap: 16px; align-items: center; padding: 10px 14px; border: 1px solid #27272a; border-radius: 6px; background: #121214">
+            <span style="font-weight: 600">{{r.titre}}</span>
+            <span style="font-size: 12px; color: #a1a1aa">{{r.rythme}} · {{r.duree}} · {{r.appsTexte}}</span>
+            <span style="{{r.styleQuand}}">{{r.quand}}</span>
+            <span style="font-size: 11px; color: #a1a1aa; text-align: right">{{r.dernier}}</span>
+          </div>
+        </sc-for>
+      </section>
+
+      <section aria-label="Faits récemment" style="display: flex; flex-direction: column; gap: 6px">
+        <h2 style="margin: 0 0 4px; font-size: 11px; font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase; color: #a1a1aa">Faits récemment</h2>
+        <sc-for list="{{faits}}" as="r" hint-placeholder-count="1">
+          <div style="display: grid; grid-template-columns: 220px minmax(0, 1fr) 220px; gap: 16px; align-items: center; padding: 10px 14px; border: 1px solid #27272a; border-radius: 6px">
+            <span style="color: #a1a1aa">{{r.titre}}</span>
+            <span style="font-size: 12px; color: #71717a">{{r.rythme}}</span>
+            <span style="font-size: 12px; color: #86efac">{{r.faitQuand}}</span>
+          </div>
+        </sc-for>
+      </section>
+
+      <p style="margin: 0; font-size: 12px; color: #a1a1aa; line-height: 1.5">La liste vient de <span class="mono">rituels.yaml</span>, versionné dans le dépôt Tessera : la même sur chaque PC. Un rituel en retard garde la pastille de l'onglet tant qu'il n'est ni fait ni reporté.</p>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { etats: {}, copie: null };
+  }
+  renderVals() {
+    const R = [
+      { id: 'revenus', titre: 'Point revenus', rythme: 'Chaque lundi, 18 h 30', duree: '30 min', phrase: 'point revenus', apps: ['Kadoomi', 'Devinoo'], detail: 'Chiffres de la semaine (visiteurs, Search Console), page « À toi de jouer », une décision.', etat: 'retard', quand: 'en retard depuis hier, 18 h 30', dernier: 'fait lundi 2' },
+      { id: 'marche', titre: 'Relevé marché', rythme: 'Le 5 de chaque mois', duree: '20 min', phrase: 'relevé marché', apps: ['Carrière'], detail: 'Nouvelles offres reportées dans Carrière, offres disparues clôturées.', etat: 'retard', quand: 'en retard depuis jeudi 5', dernier: 'fait le 5 octobre' },
+      { id: 'hebdo', titre: 'Point hebdo travail', rythme: 'Chaque vendredi, 16 h', duree: '10 min', phrase: 'point hebdo', apps: ['Carrière'], detail: 'Noter la semaine.', etat: 'avenir', quand: 'vendredi 13, 16 h', dernier: 'fait vendredi 6' },
+      { id: 'mensuel', titre: 'Rapport mensuel', rythme: 'Le 18, à rendre avant le 22', duree: '20 min', phrase: 'point mensuel', apps: ['Carrière'], detail: 'Rédiger le rapport du mois.', etat: 'avenir', quand: 'mercredi 18 · avant dimanche 22', echeance: true, dernier: 'fait le 20 octobre' },
+      { id: 'bf', titre: 'Passe Black Friday', rythme: 'Une fois, du 23 au 27 novembre', duree: '45 min', phrase: 'passe Black Friday', apps: ['Affût'], detail: 'Revoir tous les achats suivis.', etat: 'avenir', quand: 'lundi 23', dernier: 'jamais fait' },
+      { id: 'vigie', titre: 'Lecture de la veille', rythme: 'Chaque lundi matin', duree: '15 min', phrase: 'ouvrir Vigie', apps: ['Vigie'], detail: 'Lire la semaine écoulée.', etat: 'fait', quand: 'lundi 16', faitQuand: 'fait hier, 9 h 12', dernier: 'fait hier' }
+    ];
+    const etats = this.state.etats;
+    const set = (id, e) => this.setState({ etats: Object.assign({}, etats, { [id]: e }) });
+    const liste = R.map((r) => {
+      const e = etats[r.id] || r.etat;
+      const reporte = e === 'reporte';
+      const quand = reporte ? 'reporté à demain' : (e === 'fait' && r.etat !== 'fait' ? r.quandSuivant || 'prochaine échéance' : r.quand);
+      return Object.assign({}, r, {
+        e: e,
+        quand: quand,
+        faitQuand: e === 'fait' && r.etat !== 'fait' ? 'fait à l’instant' : r.faitQuand,
+        appsTexte: r.apps.join(', '),
+        styleQuand: 'font-size: 12px; color: ' + (reporte ? '#fcd34d' : (r.echeance ? '#93c5fd' : '#d4d4d8')),
+        libelleCopie: this.state.copie === r.id ? 'Copié' : 'Copier',
+        copier: () => this.setState({ copie: r.id }),
+        faire: () => set(r.id, 'fait'),
+        reporter: () => set(r.id, 'reporte')
+      });
+    });
+    const aFaire = liste.filter((r) => r.e === 'retard');
+    const avenir = liste.filter((r) => r.e === 'avenir' || r.e === 'reporte');
+    const faits = liste.filter((r) => r.e === 'fait');
+    return {
+      aFaire: aFaire, avenir: avenir, faits: faits,
+      nbAFaire: aFaire.length, aDesAFaire: aFaire.length > 0, rienAFaire: aFaire.length === 0,
+      prochain: 'le point hebdo travail, vendredi 13 à 16 h'
+    };
+  }
+}
+</script>
+</body>
+</html>

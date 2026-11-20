@@ -3,13 +3,9 @@ from __future__ import annotations
 
 import pytest
 
-from tessera.services.github_workflow import GitHubWorkflowService, WorkflowError
-from tessera.services.politique_run import PolitiqueRun
-from tessera.services.secrets_diff import (
-    ViolationSecret,
-    chercher_secrets,
-    refus_secrets,
-)
+from tessera.services.gardes.politique_run import PolitiqueRun
+from tessera.services.gardes.secrets_diff import ViolationSecret, chercher_secrets, refus_secrets
+from tessera.services.github.github_workflow import GitHubWorkflowService, WorkflowError
 
 # Les valeurs se construisent à l'exécution : ce fichier traverse lui-même le
 # contrôle quand Tessera livre son propre dépôt, et ne doit pas s'y reconnaître.
@@ -113,6 +109,13 @@ def test_placeholder_and_short_key_are_not_detected() -> None:
         assert chercher_secrets(_diff(ligne)) == [], ligne
 
 
+def test_a_url_regex_is_not_a_credential() -> None:
+    # Ticket-969 : repo-health 064, une regex d'URL GitHub bloquait la livraison.
+    regex = r'r"^(?:https?://(?:[^@/]+@)?github\.com/|git@github\.com:)"'
+
+    assert chercher_secrets(_diff(regex)) == []
+
+
 def test_line_number_follows_the_new_file() -> None:
     diff = (
         "diff --git a/a.py b/a.py\n"
@@ -146,6 +149,61 @@ def test_violation_message_never_carries_the_secret() -> None:
             message = str(violation) + repr(violation)
             assert not any(valeur in message for valeur in valeurs)
             assert "src/app.py:2" in message
+
+
+def test_secret_under_a_quoted_octal_escaped_header_reports_the_decoded_path() -> None:
+    diff = (
+        'diff --git "a/dossier/na\\303\\257f.py" "b/dossier/na\\303\\257f.py"\n'
+        '--- "a/dossier/na\\303\\257f.py"\n'
+        '+++ "b/dossier/na\\303\\257f.py"\n'
+        "@@ -1 +1,2 @@\n"
+        " import os\n"
+        f"+k = {_AWS}\n"
+    )
+
+    assert chercher_secrets(diff) == [
+        ViolationSecret("dossier/naïf.py", 2, "aws-access-key")
+    ]
+
+
+def test_quoted_header_decodes_quote_and_backslash_escapes() -> None:
+    diff = (
+        'diff --git "a/x\\"y.py" "b/x\\"y.py"\n'
+        '+++ "b/x\\"y\\\\z.py"\n'
+        "@@ -0,0 +1 @@\n"
+        f"+k = {_AWS}\n"
+    )
+
+    assert [v.fichier for v in chercher_secrets(diff)] == ['x"y\\z.py']
+
+
+def test_unprefixed_header_is_refused_instead_of_skipped() -> None:
+    diff = (
+        "diff --git fichier.py fichier.py\n"
+        "--- fichier.py\n"
+        "+++ fichier.py\n"
+        "@@ -1 +1,2 @@\n"
+        " import os\n"
+        f"+k = {_AWS}\n"
+    )
+
+    refus = refus_secrets(diff)
+
+    assert refus
+    assert "unreadable-diff-header" in refus
+    assert _AWS not in refus
+
+
+def test_malformed_quoted_header_is_refused() -> None:
+    diff = '+++ "b/mal\\q.py"\n@@ -0,0 +1 @@\n+x\n'
+
+    assert refus_secrets(diff)
+
+
+def test_dev_null_header_is_not_refused() -> None:
+    diff = "--- a/f.py\n+++ /dev/null\n@@ -1 +0,0 @@\n-x = 1\n"
+
+    assert refus_secrets(diff) is None
 
 
 def test_refus_secrets_is_none_on_a_clean_diff_and_names_the_source_otherwise() -> None:

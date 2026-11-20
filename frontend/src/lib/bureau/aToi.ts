@@ -21,10 +21,31 @@ export interface PrARelire {
   pr: number;
 }
 
+/** Les leçons d'un projet qui attendent une validation humaine (ADR-074). */
+export interface LeconsAValider {
+  projet: string;
+  nombre: number;
+}
+
+/** Les cas que le superviseur a laissés à relire sur un projet (ADR-080). */
+export interface CasSuperviseur {
+  projet: string;
+  nombre: number;
+  /** La ligne telle que la colonne l'écrit : « 2 cas du superviseur à relire ». */
+  ligne: string;
+}
+
 export interface ContenuAToi {
   questions: QuestionAToi[];
   figes: string[];
   prs: PrARelire[];
+  lecons: LeconsAValider[];
+  /** Absent chez qui n'a pas de superviseur : lu comme vide. */
+  superviseur?: CasSuperviseur[];
+}
+
+function ligneDesCas(nombre: number): string {
+  return `${nombre} cas du superviseur à relire`;
 }
 
 /**
@@ -46,13 +67,32 @@ export function prARelire(etat: StreamState): number | null {
 }
 
 /**
- * Tout ce qui attend une action humaine : questions, agents figés, PR à relire.
+ * Tout ce qui attend une action humaine : questions, agents figés, PR à relire,
+ * leçons à valider.
+ *
+ * `lecons` donne, par identifiant de projet, le nombre de leçons proposées : un
+ * projet à 0 n'a aucune ligne, et un projet sans run en a une quand même.
+ *
+ * `casSuperviseur` donne, par identifiant de projet, le nombre de cas que le
+ * superviseur a laissés à relire (`superviseur_a_toi`) : aucune ligne à 0.
  *
  * Un run clos n'est jamais « figé » : son dernier événement est vieux de
  * toujours (même règle que `contourDeLaPiece`).
  */
-export function contenuAToi(projets: readonly ProjetPourLaColonne[], maintenant: number): ContenuAToi {
-  const contenu: ContenuAToi = { questions: [], figes: [], prs: [] };
+export function contenuAToi(
+  projets: readonly ProjetPourLaColonne[],
+  maintenant: number,
+  lecons: Readonly<Record<string, number>> = {},
+  casSuperviseur: Readonly<Record<string, number>> = {},
+): ContenuAToi {
+  const superviseur: CasSuperviseur[] = [];
+  const contenu: ContenuAToi = { questions: [], figes: [], prs: [], lecons: [], superviseur };
+  for (const [projet, nombre] of Object.entries(lecons)) {
+    if (nombre > 0) contenu.lecons.push({ projet, nombre });
+  }
+  for (const [projet, nombre] of Object.entries(casSuperviseur)) {
+    if (nombre > 0) superviseur.push({ projet, nombre, ligne: ligneDesCas(nombre) });
+  }
   for (const { nom, etat, runId = null } of projets) {
     if (etat.pendingQuestion) {
       contenu.questions.push({

@@ -14,7 +14,7 @@ from fastapi.testclient import TestClient
 
 from tessera.config import settings
 from tessera.main import app
-from tessera.services.database import init_db
+from tessera.services.noyau.database import init_db
 
 _TICKET_MD = """\
 ---

@@ -11,6 +11,8 @@ const eteints: UseServicesResult = {
       demarre_a: "2026-10-28T10:00:00Z",
       en_cours: false,
       code_de_sortie: null,
+      sortie: [],
+      arrete_a_la_main: false,
     },
   ],
   enCours: false,

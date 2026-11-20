@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services.prompt_loader import MissingPromptError, load_system_prompt
+from tessera.services.noyau.prompt_loader import MissingPromptError, load_system_prompt
 
 
 def test_charge_le_prompt_quand_il_existe(tmp_path: Path) -> None:

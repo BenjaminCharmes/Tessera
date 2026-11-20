@@ -14,6 +14,40 @@ def _union_lines(base: str, theirs: str) -> str:
     return "".join(base_lines + extra)
 
 
+def _lignes_utiles(texte: str) -> list[str]:
+    """Non-blank lines, line endings and trailing spaces dropped (CRLF-safe)."""
+    return [ligne.rstrip() for ligne in texte.splitlines() if ligne.strip()]
+
+
+def _resoudre_lecons(ancetre: str, base: str, branche: str) -> str | None:
+    """Resolve a ``lecons.md`` conflict: the base file plus the branch's own additions.
+
+    Additions are the branch lines found in neither the common ancestor nor the
+    base; they land at the end of ``## Proposées``. Returns None (refusal) when
+    the branch removed or changed an ancestor line, or the base has no
+    ``## Proposées`` section.
+    """
+    lignes_branche = set(_lignes_utiles(branche))
+    if any(ligne not in lignes_branche for ligne in _lignes_utiles(ancetre)):
+        return None
+    connues = set(_lignes_utiles(ancetre)) | set(_lignes_utiles(base))
+    ajouts: list[str] = []
+    for ligne in _lignes_utiles(branche):
+        if ligne not in connues and ligne not in ajouts:
+            ajouts.append(ligne)
+    lignes = base.splitlines()
+    debut = next((i for i, ligne in enumerate(lignes) if ligne.strip() == "## Proposées"), None)
+    if debut is None:
+        return None
+    if not ajouts:
+        return base if base.endswith(chr(10)) else base + chr(10)
+    fin = next((i for i in range(debut + 1, len(lignes)) if lignes[i].startswith("## ")), len(lignes))
+    while fin > debut + 1 and not lignes[fin - 1].strip():
+        fin -= 1
+    nouveau = lignes[:fin] + ajouts + lignes[fin:]
+    return "\n".join(nouveau) + "\n"
+
+
 def _liste_documentes(valeur: object) -> list[object] | None:
     """The id list of a ``documentation.json`` version, None if unrecognised.
 

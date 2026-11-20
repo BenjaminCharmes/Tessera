@@ -22,7 +22,6 @@ An account attached to an organization needs ``org_id`` on the project calls
 ``GET /users/me/organizations`` when the account has exactly one.
 """
 from dataclasses import dataclass, field
-from typing import Optional
 from urllib.parse import quote
 
 import httpx
@@ -60,19 +59,19 @@ class NeonClient:
     def __init__(
         self,
         api_key: str,
-        transport: Optional[httpx.AsyncBaseTransport] = None,
+        transport: httpx.AsyncBaseTransport | None = None,
         org_id: str = "",
     ) -> None:
         self._api_key = api_key
         self._transport = transport
         # None : pas encore résolu ; "" : compte personnel, aucun org_id à envoyer.
-        self._org_id: Optional[str] = org_id.strip() or None
+        self._org_id: str | None = org_id.strip() or None
         # {org_id: managed_by} ; None tant que la liste des organisations n'est pas lue.
-        self._managed: Optional[dict[str, str]] = None
+        self._managed: dict[str, str] | None = None
 
     @classmethod
     def from_settings(
-        cls, settings: Settings, transport: Optional[httpx.AsyncBaseTransport] = None
+        cls, settings: Settings, transport: httpx.AsyncBaseTransport | None = None
     ) -> "NeonClient":
         """Build the client from the key and the organization of ``Settings``."""
         return cls(settings.neon_api_key.get_secret_value(), transport, settings.neon_org_id)
@@ -121,8 +120,8 @@ class NeonClient:
         self,
         method: str,
         path: str,
-        params: Optional[dict[str, str]] = None,
-        body: Optional[dict[str, object]] = None,
+        params: dict[str, str] | None = None,
+        body: dict[str, object] | None = None,
     ) -> object:
         headers = {"Authorization": f"Bearer {self._api_key}"}
         try:

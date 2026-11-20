@@ -20,7 +20,6 @@ The token never appears in a log or an error, which only carry the HTTP status
 and the API's error code.
 """
 from dataclasses import dataclass
-from typing import Optional
 from urllib.parse import quote
 
 import httpx
@@ -54,14 +53,14 @@ class CloudflareClient:
     """The few Cloudflare calls the DNS step needs; nothing updates, nothing deletes."""
 
     def __init__(
-        self, api_token: str, transport: Optional[httpx.AsyncBaseTransport] = None
+        self, api_token: str, transport: httpx.AsyncBaseTransport | None = None
     ) -> None:
         self._api_token = api_token
         self._transport = transport
 
     @classmethod
     def from_settings(
-        cls, settings: Settings, transport: Optional[httpx.AsyncBaseTransport] = None
+        cls, settings: Settings, transport: httpx.AsyncBaseTransport | None = None
     ) -> "CloudflareClient":
         """Build the client from the token of ``Settings``."""
         return cls(settings.cloudflare_api_token.get_secret_value(), transport)
@@ -75,8 +74,8 @@ class CloudflareClient:
         self,
         method: str,
         path: str,
-        params: Optional[dict[str, str]] = None,
-        body: Optional[dict[str, object]] = None,
+        params: dict[str, str] | None = None,
+        body: dict[str, object] | None = None,
     ) -> dict[str, object]:
         headers = {"Authorization": f"Bearer {self._api_token}"}
         try:

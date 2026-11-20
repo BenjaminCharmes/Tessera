@@ -1,0 +1,259 @@
+{
+  "note": "Étiquetage par l'historique git seul (ADR-079). Le défaut du ticket-733 n'y figure pas : la résolution de conflit fautive n'a jamais été mergée, le diff approuvé n'existe pas dans l'historique de develop. Le ticket-750 est hors corpus (faux positif de l'audit, pas un défaut du reviewer). `sensible` d'un diff sain est calculé comme pour un défaut.",
+  "gel_sha256": "ffda8f86cd7038873db5cb9310ae8ee8e355343c35c69b631013f1161b03a092",
+  "entrees": [
+    {
+      "id": "d01",
+      "ticket": "ticket-326",
+      "sha": "2c7d7b308d71de0e2231e8a52920988f46e7bd96",
+      "classe": "defaut",
+      "preuve": "ticket-751 (4ac646ae) ; constat S-10 de docs/audit/securite.md",
+      "fichiers_defaut": [
+        "backend/src/tessera/services/providers/redirections_bash.py"
+      ],
+      "defaut": "The interpreter net looks for -c only, so node -e and Python open() with a named write mode write to protected files unseen.",
+      "sensible": true
+    },
+    {
+      "id": "d02",
+      "ticket": "ticket-705",
+      "sha": "5e63bd2e17afb8da28bf8a1367b95dda7d69ae36",
+      "classe": "defaut",
+      "preuve": "tickets 745 (0af06334) et 746 (7176541b)",
+      "fichiers_defaut": [
+        "backend/src/tessera/services/providers/git_guard_lectures.py",
+        "backend/src/tessera/services/providers/git_guard.py"
+      ],
+      "defaut": "The git allowlist lets an unknown global option or a git grep option hide a command, and its -c filter is bypassed through the environment.",
+      "sensible": true
+    },
+    {
+      "id": "d03",
+      "ticket": "ticket-703",
+      "sha": "849cbeab7cb9ed26fd10c896bf42871329e5b857",
+      "classe": "defaut",
+      "preuve": "ticket-749 (1d6df46c) ; constat S-06 de docs/audit/securite.md",
+      "fichiers_defaut": [
+        "backend/src/tessera/services/providers/git_guard_lexique.py"
+      ],
+      "defaut": "The guard unwraps env but not the common Windows and Git Bash wrappers, so a git write launched through one goes unseen.",
+      "sensible": true
+    },
+    {
+      "id": "d04",
+      "ticket": "ticket-464",
+      "sha": "3e78a04d949f7d1a2d0647e2985c2e1afaba659f",
+      "classe": "defaut",
+      "preuve": "ticket-752 (6f063659)",
+      "fichiers_defaut": [
+        "backend/src/tessera/services/providers/garde_jetons.py"
+      ],
+      "defaut": "The token guard refuses a named read of Tessera's .env but not a glob or a whole folder that reaches it.",
+      "sensible": true
+    },
+    {
+      "id": "d05",
+      "ticket": "ticket-707",
+      "sha": "2d37102c8696ea64437e5a545e025b0cec25b80a",
+      "classe": "defaut",
+      "preuve": "ticket-756 (435ecde1)",
+      "fichiers_defaut": [
+        "backend/src/tessera/services/project_importer.py"
+      ],
+      "defaut": "Link roots are bounded on one path only, so a link to a wide folder still opens that folder for writing through the file API.",
+      "sensible": false
+    },
+    {
+      "id": "d06",
+      "ticket": "ticket-704",
+      "sha": "ae701ea639565cc8035daaeed5882c9b2809a495",
+      "classe": "defaut",
+      "preuve": "ticket-754 (ef5eadb1)",
+      "fichiers_defaut": [
+        "backend/src/tessera/auth.py"
+      ],
+      "defaut": "The Origin check accepts every loopback port, so a page served locally by an app an agent wrote can observe runs.",
+      "sensible": false
+    },
+    {
+      "id": "d07",
+      "ticket": "ticket-718",
+      "sha": "d406cbf31a4f12533b0f28751169fcf9e98efbd3",
+      "classe": "defaut",
+      "preuve": "ticket-755 (00466795)",
+      "fichiers_defaut": [
+        "backend/src/tessera/services/retest_apres_rebase.py"
+      ],
+      "defaut": "A red first retest is erased by a second attempt that finds no test command, so the delivery goes on.",
+      "sensible": false
+    },
+    {
+      "id": "d08",
+      "ticket": "ticket-725",
+      "sha": "cdb0ac2b92cd142c0888308b192329e488ecd757",
+      "classe": "defaut",
+      "preuve": "ticket-748 (169395c5)",
+      "fichiers_defaut": [
+        "backend/src/tessera/services/config_tests_touchee.py"
+      ],
+      "defaut": "The test configuration gate misses some configuration files and lets a ticket cover files it does not name by their full path.",
+      "sensible": false
+    },
+    {
+      "id": "d09",
+      "ticket": "ticket-708",
+      "sha": "1b0191391c19090e54c84415babac6ffb68caecf",
+      "classe": "defaut",
+      "preuve": "ticket-757 (4d10120e)",
+      "fichiers_defaut": [
+        "backend/src/tessera/services/documentation_preuve.py"
+      ],
+      "defaut": "A multi-line proof excerpt is accepted when it glues lines from two places or quotes deleted code.",
+      "sensible": false
+    },
+    {
+      "id": "d10",
+      "ticket": "ticket-700",
+      "sha": "50c040b54501ed5b53f29f619ec6095f033e11e7",
+      "classe": "defaut",
+      "preuve": "ticket-740 (c62520b9)",
+      "fichiers_defaut": [
+        "backend/src/tessera/services/livraison.py"
+      ],
+      "defaut": "After a red retest following a rebase, the delivery stops but leaves the local branch rebased on a faulty conflict resolution.",
+      "sensible": true
+    },
+    {
+      "id": "d11",
+      "ticket": "ticket-382",
+      "sha": "4683ccc7378bd2e92fc5888b3a9c0f3a784f5186",
+      "classe": "defaut",
+      "preuve": "ticket-666 (ca5dbcc1)",
+      "fichiers_defaut": [
+        "backend/src/tessera/services/orchestrator.py"
+      ],
+      "defaut": "Under merge_without_ci, an unmerged PR lets its dependent tickets start instead of removing them from the queue.",
+      "sensible": true
+    },
+    {
+      "id": "s01",
+      "ticket": "ticket-558",
+      "sha": "28f5f90439f7794bb5f5d64304b98cf486095a80",
+      "classe": "sain",
+      "preuve": "",
+      "fichiers_defaut": [],
+      "defaut": "",
+      "sensible": false
+    },
+    {
+      "id": "s02",
+      "ticket": "ticket-547",
+      "sha": "29b370e687a15b8e4a28d7cc00b86ee18c2c61a0",
+      "classe": "sain",
+      "preuve": "",
+      "fichiers_defaut": [],
+      "defaut": "",
+      "sensible": true
+    },
+    {
+      "id": "s03",
+      "ticket": "ticket-540",
+      "sha": "790acbe42dc7dca2e77885fbf24811c4b9157359",
+      "classe": "sain",
+      "preuve": "",
+      "fichiers_defaut": [],
+      "defaut": "",
+      "sensible": false
+    },
+    {
+      "id": "s04",
+      "ticket": "ticket-520",
+      "sha": "18cac4d23ca469248970d710d3db822940ebc810",
+      "classe": "sain",
+      "preuve": "",
+      "fichiers_defaut": [],
+      "defaut": "",
+      "sensible": false
+    },
+    {
+      "id": "s05",
+      "ticket": "ticket-525",
+      "sha": "8d3a2aa6d2ec72da62a805348b0856d825ad6d9f",
+      "classe": "sain",
+      "preuve": "",
+      "fichiers_defaut": [],
+      "defaut": "",
+      "sensible": false
+    },
+    {
+      "id": "s06",
+      "ticket": "ticket-521",
+      "sha": "c83ea42a0c7b80226cdb2005658777e3280143c0",
+      "classe": "sain",
+      "preuve": "",
+      "fichiers_defaut": [],
+      "defaut": "",
+      "sensible": false
+    },
+    {
+      "id": "s07",
+      "ticket": "ticket-509",
+      "sha": "d6e83c56f6e48e31f77602ae409102cec1f3d22d",
+      "classe": "sain",
+      "preuve": "",
+      "fichiers_defaut": [],
+      "defaut": "",
+      "sensible": false
+    },
+    {
+      "id": "s08",
+      "ticket": "ticket-503",
+      "sha": "4564082fc23f0f6f3882ec6ab568f4f05a128c9a",
+      "classe": "sain",
+      "preuve": "",
+      "fichiers_defaut": [],
+      "defaut": "",
+      "sensible": false
+    },
+    {
+      "id": "s09",
+      "ticket": "ticket-305",
+      "sha": "a2908fc1457335cc2831ac34970e5a78be9cec94",
+      "classe": "sain",
+      "preuve": "",
+      "fichiers_defaut": [],
+      "defaut": "",
+      "sensible": true
+    },
+    {
+      "id": "s10",
+      "ticket": "ticket-185",
+      "sha": "b4050ddf38931f226906b2808b11d5297bbcf225",
+      "classe": "sain",
+      "preuve": "",
+      "fichiers_defaut": [],
+      "defaut": "",
+      "sensible": false
+    },
+    {
+      "id": "s11",
+      "ticket": "ticket-130",
+      "sha": "dc054aa800181577aa0f8a6e31b6e85847d52f65",
+      "classe": "sain",
+      "preuve": "",
+      "fichiers_defaut": [],
+      "defaut": "",
+      "sensible": false
+    },
+    {
+      "id": "s12",
+      "ticket": "ticket-432",
+      "sha": "db2b4d4facd5ae0c391427689323f9b0abe82e24",
+      "classe": "sain",
+      "preuve": "",
+      "fichiers_defaut": [],
+      "defaut": "",
+      "sensible": false
+    }
+  ]
+}

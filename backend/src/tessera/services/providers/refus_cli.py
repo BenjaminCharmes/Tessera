@@ -6,12 +6,7 @@ in error carrying a fixed sentence, which nothing read until now. The coder
 simply stopped, and the round was lost without a trace.
 """
 
-from claude_agent_sdk import (
-    AssistantMessage,
-    ToolResultBlock,
-    ToolUseBlock,
-    UserMessage,
-)
+from claude_agent_sdk import AssistantMessage, ToolResultBlock, ToolUseBlock, UserMessage
 
 # Le début du message que le CLI rend à un outil qu'il ne laisse pas passer.
 MESSAGE_REFUS_CLI = "The user doesn't want to take this action right now"

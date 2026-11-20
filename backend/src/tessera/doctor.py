@@ -17,6 +17,8 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from tessera.config import settings
+from tessera.config_coffre import noms_en_clair, source_effective
+from tessera.services.noyau.git_commande import build_command
 
 _BACKEND_PORT = 8100
 _FRONTEND_PORT = 5173
@@ -104,8 +106,8 @@ def check_provider_auth() -> Check:
                 detail="agent_sdk, mais ANTHROPIC_API_KEY est renseignée",
                 fix=(
                     "Le CLI donne la priorité à la clef sur la session d'abonnement. "
-                    "Tessera la neutralise pour ses appels, mais laisse-la vide dans "
-                    "`.env` pour éviter toute ambiguïté."
+                    "Tessera la neutralise pour ses appels, mais retire-la du coffre "
+                    "ou de `.env` pour éviter toute ambiguïté."
                 ),
             )
         cli = shutil.which("claude")
@@ -120,8 +122,26 @@ def check_provider_auth() -> Check:
         name="Authentification du provider",
         ok=bool(key),
         detail=f"{provider} — clef {'présente' if key else 'absente'}",
-        fix="" if key else "Le mode anthropic_api exige une ANTHROPIC_API_KEY dans `.env`.",
+        fix="" if key else "Le mode anthropic_api exige une ANTHROPIC_API_KEY (coffre ou `.env`).",
     )
+
+
+_SOURCES = {
+    "coffre": "coffre joignable",
+    "env-repli": "coffre injoignable, repli sur .env",
+    "env": "coffre jamais lu",
+}
+
+
+def check_secrets(env_file: Path | None = None) -> Check:
+    """Where the secrets live (ADR-073): mode, vault, names still in clear."""
+    en_clair = noms_en_clair(env_file or settings.env_file)
+    detail = f"mode {settings.secrets_source} — {_SOURCES[source_effective()]}"
+    if en_clair:
+        detail += f" ; en clair dans .env : {', '.join(en_clair)}"
+    fix = r"Range-les : `.\scripts\tessera.ps1 secrets migrer`." if en_clair else ""
+    # Jamais bloquant : un PC jamais migré démarre sur son `.env` (mode `auto`).
+    return Check(name="Secrets", ok=True, detail=detail, fix=fix)
 
 
 def check_workspace() -> Check:
@@ -190,7 +210,7 @@ def _git(repo: Path, *args: str) -> tuple[int, str]:
     """Run a read-only git command; a missing binary or a timeout reads as a failure."""
     try:
         done = subprocess.run(
-            ["git", "-C", str(repo), *args],
+            build_command(("-C", str(repo), *args)),
             capture_output=True,
             text=True,
             timeout=_GIT_TIMEOUT_S,
@@ -234,6 +254,7 @@ def run_checks() -> list[Check]:
         check_workspace(),
         check_prompts_dir(),
         check_provider_auth(),
+        check_secrets(),
         check_symlinks(),
         check_rust(),
         check_ports(),

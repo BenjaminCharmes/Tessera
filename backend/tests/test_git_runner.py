@@ -6,23 +6,18 @@ passe par un module appelant : le témoin ne doit jamais apparaître.
 import inspect
 import subprocess
 from collections.abc import Awaitable, Callable
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
 
-from tessera.services import (
-    branch_cleanup,
-    git_runner,
-    journal_en_attente,
-    project_removal,
-    realignement_base,
-    reprise_orphelin,
-    temporary_worktree,
-    ticket_diff,
-)
-from tessera.services.git_runner import GitResult, git, writes
-from tessera.services.git_workspace import GitCommandError
+from tessera.services.creation_projet import project_removal
+from tessera.services.git_workspace import GitCommandError, git_runner, journal_en_attente, ticket_diff
+from tessera.services.git_workspace.git_runner import GitResult, git, writes
+from tessera.services.livraison import branch_cleanup, realignement_base
+from tessera.services.noyau import git_commande
+from tessera.services.pipeline import reprise_orphelin
+from tessera.services.worktrees import temporary_worktree
 
 #: Hooks qui, ensemble, couvrent un commit, un checkout et toute mise à jour de ref.
 _HOOKS = ("pre-commit", "post-checkout", "post-merge", "reference-transaction")
@@ -97,6 +92,11 @@ async def test_a_write_through_the_runner_runs_no_hook(tmp_path: Path) -> None:
         (("rebase", "x"), True),
         (("worktree", "add", "d"), True),
         (("branch", "-D", "x"), True),
+        (("symbolic-ref", "HEAD", "refs/heads/x"), True),
+        (("symbolic-ref", "--short", "HEAD"), False),
+        (("symbolic-ref", "HEAD"), False),
+        (("symbolic-ref", "-d", "HEAD"), True),
+        (("symbolic-ref", "-m", "why", "HEAD"), True),
         (("diff", "HEAD"), False),
         (("status", "--porcelain"), False),
         (("rev-parse", "HEAD"), False),
@@ -132,7 +132,7 @@ async def test_a_read_does_not_create_the_empty_hooks_folder(
         appels.append("cree")
         return tmp_path / "vide"
 
-    monkeypatch.setattr(git_runner, "_dossier_sans_hooks", dossier)
+    monkeypatch.setattr(git_commande, "_dossier_sans_hooks", dossier)
 
     await git(repo, "status", "--porcelain")
     await git(repo, "rev-parse", "HEAD")
@@ -199,7 +199,7 @@ async def _scenario_reprise(tmp_path: Path) -> Path:
     (repo / "README.md").write_text("modifie\n", encoding="utf-8")
     temoin = _pieger(repo, tmp_path)
     await reprise_orphelin._reprendre_depot_seul(
-        "proj", "ticket-001", workspace, datetime(2020, 1, 1, tzinfo=timezone.utc)
+        "proj", "ticket-001", workspace, datetime(2020, 1, 1, tzinfo=UTC)
     )
     assert _sync(repo, "branch", "--show-current") == "develop"
     assert _sync(repo, "rev-list", "--count", "develop..ticket-001-x") == "1"
@@ -266,7 +266,7 @@ def test_no_caller_spawns_git_itself(module: object) -> None:
     source = inspect.getsource(module)  # type: ignore[arg-type]
 
     assert "create_subprocess_exec" not in source
-    assert "tessera.services.git_runner" in source
+    assert "tessera.services.git_workspace.git_runner" in source
 
 
 async def test_read_only_callers_answer_through_the_common_runner(tmp_path: Path) -> None:

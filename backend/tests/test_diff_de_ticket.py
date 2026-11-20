@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services.ticket_diff import TicketDiff, diff_du_ticket
+from tessera.services.git_workspace.ticket_diff import TicketDiff, diff_du_ticket
 
 
 async def _git(cwd: Path, *args: str) -> str:
