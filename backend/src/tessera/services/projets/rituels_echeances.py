@@ -32,7 +32,14 @@ class Unique(BaseModel):
     au: date
 
 
-Rythme = Annotated[Hebdo | Mensuel | Unique, Field(discriminator="type")]
+class Quotidien(BaseModel):
+    type: Literal["quotidien"]
+    heure: time
+    jours: Literal["tous", "ouvres"] = "tous"
+
+
+Rythme = Annotated[Hebdo | Mensuel | Unique | Quotidien, Field(discriminator="type")]
+RythmeConnu = Hebdo | Mensuel | Unique | Quotidien
 
 
 class Echeances(BaseModel):
@@ -51,10 +58,30 @@ def _decaler_mois(annee: int, mois: int, delta: int) -> tuple[int, int]:
     return indice // 12, indice % 12 + 1
 
 
+def _jour_retenu(jour: date, rythme: Quotidien) -> bool:
+    return rythme.jours == "tous" or jour.weekday() < 5
+
+
+def _bornes_quotidien(
+    rythme: Quotidien, maintenant: datetime
+) -> tuple[datetime, datetime]:
+    jour = maintenant.date()
+    if datetime.combine(jour, rythme.heure) > maintenant:
+        jour -= timedelta(days=1)
+    while not _jour_retenu(jour, rythme):
+        jour -= timedelta(days=1)
+    suivant = jour + timedelta(days=1)
+    while not _jour_retenu(suivant, rythme):
+        suivant += timedelta(days=1)
+    return datetime.combine(jour, rythme.heure), datetime.combine(suivant, rythme.heure)
+
+
 def _bornes(
-    rythme: Hebdo | Mensuel | Unique, maintenant: datetime
+    rythme: RythmeConnu, maintenant: datetime
 ) -> tuple[datetime | None, datetime | None]:
     """Return (last due date passed, next one)."""
+    if isinstance(rythme, Quotidien):
+        return _bornes_quotidien(rythme, maintenant)
     if isinstance(rythme, Unique):
         debut = datetime.combine(rythme.du, time.min)
         return (None, debut) if maintenant < debut else (debut, None)
@@ -73,7 +100,7 @@ def _bornes(
     return precedente, courante
 
 
-def _limite(rythme: Hebdo | Mensuel | Unique, derniere: datetime) -> datetime | None:
+def _limite(rythme: RythmeConnu, derniere: datetime) -> datetime | None:
     """First instant after the deadline, if the rhythm has one."""
     if isinstance(rythme, Unique):
         return datetime.combine(rythme.au + timedelta(days=1), time.min)
@@ -84,7 +111,7 @@ def _limite(rythme: Hebdo | Mensuel | Unique, derniere: datetime) -> datetime | 
 
 
 def calculer_echeances(
-    rythme: Hebdo | Mensuel | Unique,
+    rythme: RythmeConnu,
     maintenant: datetime,
     fait_le: datetime | None,
     reporte_jusqua: datetime | None,

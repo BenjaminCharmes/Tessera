@@ -4,6 +4,7 @@ Pièges observés sur ce projet, une ligne chacun. Le service écrit sous `## Pr
 
 ## Proposées
 - Quand un validateur énumère plusieurs cas (A/B/C) et qu'un manque après refactorisation, tous les chemins doivent être traités ensemble. (source : ticket-1029, 2026-11-20)
+- Quand un modèle Pydantic exposé par l'API est modifié, régénérer et committer le schéma OpenAPI. (source : ticket-1033, 2026-11-20)
 
 ## En vigueur
 - Quand un verrou protège un état global partagé, intégrer un test de sa présence pour prévenir sa suppression accidentelle. (source : ticket-1023, 2026-11-20)
