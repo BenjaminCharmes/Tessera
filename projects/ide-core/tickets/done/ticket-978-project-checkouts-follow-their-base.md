@@ -3,6 +3,7 @@ agent: codeur
 created: '2026-11-16'
 depends_on: []
 id: ticket-978
+pr_number: 1223
 priority: medium
 status: done
 title: Les checkouts de projet suivent leur base
