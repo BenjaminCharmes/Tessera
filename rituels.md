@@ -32,6 +32,14 @@ rituels:
     detail: Noter la semaine de travail.
     projets: [carriere]
 
+  - id: journal-du-jour
+    titre: Journal du jour
+    rythme: { type: quotidien, heure: "18:00", jours: ouvres }
+    duree_min: 10
+    phrase: journal du jour
+    detail: Collecte de tout ce qui s'est passé depuis la précédente (le lundi rattrape le week-end), versée en brouillons que le point hebdo valide.
+    projets: [carriere]
+
   - id: releve-marche
     titre: Relevé marché
     rythme: { type: mensuel, jour: 5, heure: "09:00" }
