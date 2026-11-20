@@ -6,6 +6,9 @@ const heure = (h: string): string => h.slice(0, 5);
 export function libelleDuRythme(r: RythmeRituel): string {
   if (r.type === "hebdo") return `Chaque ${r.jour} à ${heure(r.heure)}`;
   if (r.type === "mensuel") return `Le ${r.jour} du mois à ${heure(r.heure)}`;
+  if (r.type === "quotidien") {
+    return `Chaque jour${r.jours === "ouvres" ? " ouvré" : ""} à ${heure(r.heure)}`;
+  }
   return `Du ${r.du} au ${r.au}`;
 }
 

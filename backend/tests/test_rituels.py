@@ -8,7 +8,7 @@ from fastapi.testclient import TestClient
 from tessera.main import app
 from tessera.services.github import rituels_sync
 from tessera.services.projets import rituels as service
-from tessera.services.projets.rituels_echeances import Hebdo, Mensuel, Unique, calculer_echeances
+from tessera.services.projets.rituels_echeances import Hebdo, Mensuel, Quotidien, Unique, calculer_echeances
 
 MAINTENANT = datetime(2026, 11, 10, 12, 0)
 HEBDO = Hebdo(type="hebdo", jour="lundi", heure="18:30")
@@ -93,6 +93,46 @@ def test_one_shot_is_upcoming_with_null_last() -> None:
     assert (e.statut, e.derniere) == ("a_venir", None)
     assert e.prochaine == datetime(2026, 11, 23)
     assert calculer_echeances(unique, datetime(2026, 11, 28), None, None).depasse
+
+
+QUOTIDIEN = Quotidien(type="quotidien", heure="18:00")
+OUVRES = Quotidien(type="quotidien", heure="18:00", jours="ouvres")
+
+
+def test_daily_rhythm_is_read(tmp_path: Path) -> None:
+    fichier = tmp_path / "rituels.md"
+    quotidien = 'rythme: { type: quotidien, heure: "18:00" }'
+    texte = FICHIER.replace('rythme: { type: hebdo, jour: lundi, heure: "18:30" }', quotidien)
+    fichier.write_text(texte, encoding="utf-8")
+    definitions, erreur = service.lire_definitions(fichier)
+    assert erreur is None
+    assert definitions[0].rythme == QUOTIDIEN
+
+
+def test_daily_bounds_every_day() -> None:
+    matin = calculer_echeances(QUOTIDIEN, datetime(2026, 11, 11, 10, 0), None, None)
+    assert matin.derniere == datetime(2026, 11, 10, 18, 0)
+    assert matin.prochaine == datetime(2026, 11, 11, 18, 0)
+    soir = calculer_echeances(QUOTIDIEN, datetime(2026, 11, 11, 19, 0), None, None)
+    assert soir.derniere == datetime(2026, 11, 11, 18, 0)
+    assert soir.prochaine == datetime(2026, 11, 12, 18, 0)
+
+
+def test_daily_bounds_working_days_only() -> None:
+    for maintenant in (datetime(2026, 11, 9, 10, 0), datetime(2026, 11, 7, 12, 0)):
+        e = calculer_echeances(OUVRES, maintenant, None, None)
+        assert e.derniere == datetime(2026, 11, 6, 18, 0)
+        assert e.prochaine == datetime(2026, 11, 9, 18, 0)
+
+
+def test_daily_status_and_never_overdue() -> None:
+    maintenant = datetime(2026, 11, 11, 19, 0)
+    jamais = calculer_echeances(QUOTIDIEN, maintenant, None, None)
+    assert (jamais.statut, jamais.depasse) == ("en_retard", False)
+    fait = calculer_echeances(QUOTIDIEN, maintenant, datetime(2026, 11, 11, 18, 30), None)
+    assert (fait.statut, fait.depasse) == ("fait", False)
+    ancien = calculer_echeances(QUOTIDIEN, datetime(2026, 12, 30, 19, 0), None, None)
+    assert not ancien.depasse
 
 
 def test_postponement_makes_late_upcoming() -> None:
