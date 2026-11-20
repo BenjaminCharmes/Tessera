@@ -10566,3 +10566,17 @@ error: Please commit or stash them.
 - 2026-11-20 11:32:11 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
 - 2026-11-20 11:32:11 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
 - 2026-11-20 11:32:11 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-20 11:35:30 UTC — [ticket-978] branche ticket-978-les-checkouts-de-projet-suivent-leur-base
+- 2026-11-20 11:35:34 UTC — [ticket-978] tour 1 — codeur démarré
+- 2026-11-20 11:38:24 UTC — [ticket-978] tour 1 — codeur terminé (169453ms)
+- 2026-11-20 11:42:33 UTC — [ticket-978] testeur: dur�es : ruff 0 s, mypy 11 s, mypy-linux 11 s, pytest 214 s ; impact depuis base : 121 fichier(s) de test
+- 2026-11-20 11:42:46 UTC — [ticket-978] securite: PASS — Le diff ne fait que faire avancer le checkout du projet vers sa base. Cela passe (12108ms)
+- 2026-11-20 11:42:47 UTC — [ticket-978] tour 1 — reviewer démarré
+- 2026-11-20 11:43:14 UTC — [ticket-978] tour 1 — reviewer terminé (26483ms)
+- 2026-11-20 11:43:45 UTC — [ticket-978] validateur: fichiers cités joints : agents.json, realignement_base.py
+- 2026-11-20 11:43:45 UTC — [ticket-978] validateur: APPROVED — Le codeur a correctement implémenté la réutilisation de `realigner_base` pour su (58155ms)
+- 2026-11-20 11:43:46 UTC — [ticket-978] APPROVED après 1 tour(s)
+- 2026-11-20 11:44:53 UTC — [ticket-978] documentation: 0 fichier(s) (43282ms)
+- 2026-11-20 11:44:53 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-20 11:44:53 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-20 11:44:53 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
