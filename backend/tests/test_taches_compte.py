@@ -9,21 +9,31 @@ from tessera.services.providers import droits_appel, profil_agent, taches_compte
 from tessera.services.providers.droits_appel import clore_appel, ouvrir_appel
 from tessera.services.providers.droits_worktree import DroitsAgentRefuses
 from tessera.services.providers.noms import ProviderIndisponible
-from tessera.services.providers.taches_compte import noms_de_taches, retirer_les_taches
+from tessera.services.providers.taches_compte import noms_de_taches, retirer_les_taches, taches_du_compte
+
+SID = "S-1-5-21-1111-2222-3333-1001"
 
 
-def _ligne(nom: str, compte: str, auteur: str | None = None) -> str:
-    """One row of the verbose listing: name in column 1, author in column 7, "run as" account in column 14."""
-    cellules = ["POSTE", nom, *["N/A"] * 5, compte if auteur is None else auteur, *["N/A"] * 6, compte, *["N/A"] * 13]
-    return ",".join(f'"{c}"' for c in cellules) + "\n"
+def _tache(nom: str, compte: str, auteur: str, commentaire: bool = True) -> str:
+    """One task as `/query /xml` prints it: comment, declaration, then the `<Task>` element."""
+    ns = "http://schemas.microsoft.com/windows/2004/02/mit/task"
+    return (
+        (f"<!-- {chr(10)}{nom} -->{chr(10)}" if commentaire else "")
+        + '<?xml version="1.0" encoding="UTF-16"?>' + chr(10)
+        + f'<Task version="1.2" xmlns="{ns}"><RegistrationInfo><Author>{auteur}</Author><URI>{nom}</URI>'
+        + f"</RegistrationInfo><Principals><Principal id=\"A\"><UserId>{compte}</UserId></Principal></Principals></Task>" + chr(10)
+    )
 
 
-# Ce qu'un compte ordinaire voit : sa tâche (deux déclencheurs), celle d'un éditeur, celle de l'utilisateur.
-SORTIE = (
-    _ligne("\\Nettoyage", "tessera-agent") + _ligne("\\Nettoyage", "tessera-agent")
-    + _ligne("\\Adobe Acrobat Update Task", "INTERACTIF")
-    + _ligne("\\SoftLanding\\Tache", "Benjamin")
-    + _ligne("\\Microsoft\\Windows\\Defrag", "Système")
+def _sortie(*taches: str) -> str:
+    return "<Tasks>" + chr(10) + "".join(taches) + "</Tasks>" + chr(10)
+
+
+# Ce qu'un compte ordinaire voit : sa tâche, celle d'un éditeur, celle de l'utilisateur.
+SORTIE = _sortie(
+    _tache("\\Nettoyage", SID, "poste\\tessera-agent"),
+    _tache("\\Adobe Acrobat Update Task", "S-1-5-4", "Editeur"),
+    _tache("\\SoftLanding\\Tache", "poste\\Benjamin", "poste\\Benjamin"),
 )
 
 
@@ -43,6 +53,7 @@ class Faux:
 @pytest.fixture(autouse=True)
 def compte(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(settings, "agent_user", "tessera-agent")
+    monkeypatch.setattr(taches_compte, "sid_texte_du_compte", lambda compte: SID)
 
 
 async def test_only_the_task_that_runs_as_the_account_is_deleted() -> None:
@@ -55,7 +66,7 @@ async def test_only_the_task_that_runs_as_the_account_is_deleted() -> None:
 
 async def test_a_refused_deletion_of_a_task_the_account_did_not_author_is_logged_not_raised() -> None:
     """Windows creates tasks for the account (OneDrive) that it can neither change nor delete."""
-    sortie = _ligne("\\OneDrive Startup Task", "tessera-agent", auteur="Microsoft Corporation")
+    sortie = _sortie(_tache("\\OneDrive Startup Task", SID, "Microsoft Corporation"))
     faux = Faux(suppression=1, sortie=sortie)
     await retirer_les_taches(faux)
     assert [a for a in faux.appels if "/delete" in a]
@@ -81,18 +92,57 @@ async def test_without_agent_user_nothing_runs(monkeypatch: pytest.MonkeyPatch) 
 
 
 def test_names_keep_only_the_tasks_of_the_account() -> None:
-    assert noms_de_taches(SORTIE, "tessera-agent") == ["\\Nettoyage"]
+    assert noms_de_taches(SORTIE, "tessera-agent", SID) == ["\\Nettoyage"]
 
 
-def test_a_machine_prefix_on_the_account_still_matches() -> None:
-    sortie = _ligne("\\A", "POSTE\\tessera-agent") + _ligne("\\B", "autre-tessera-agent")
-    assert noms_de_taches(sortie, "tessera-agent") == ["\\A"]
+def test_a_user_id_by_name_matches_like_a_user_id_by_sid() -> None:
+    sortie = _sortie(_tache("\\A", "POSTE\\tessera-agent", "x"), _tache("\\B", "autre-tessera-agent", "x"))
+    assert noms_de_taches(sortie, "tessera-agent", SID) == ["\\A"]
 
 
-async def test_the_listing_is_asked_in_verbose_form() -> None:
+def test_a_b_c_authorship_is_told_apart() -> None:
+    sortie = _sortie(
+        _tache("\\A", SID, "poste\\tessera-agent"),
+        _tache("\\B", "S-1-5-21-9-9-9-1002", "poste\\tessera-agent"),
+        _tache("\\C", SID, "Autre"),
+    )
+    assert taches_du_compte(sortie, "tessera-agent", SID) == {"\\A": True, "\\C": False}
+
+
+def test_the_name_falls_back_to_the_comment() -> None:
+    sortie = _sortie(_tache("\\A", SID, "x").replace("<URI>\\A</URI>", ""))
+    assert noms_de_taches(sortie, "tessera-agent", SID) == ["\\A"]
+
+
+@pytest.mark.parametrize("mauvais", ["<!ENTITY x 'y'>", "<!DOCTYPE Task>"])
+async def test_a_hostile_fragment_raises_and_flags(mauvais: str) -> None:
+    sortie = _sortie(_tache("\\A", SID, "x").replace("<RegistrationInfo>", mauvais + "<RegistrationInfo>"))
+    with pytest.raises(DroitsAgentRefuses):
+        await retirer_les_taches(Faux(sortie=sortie))
+    assert taches_compte.taches_en_echec()
+
+
+async def test_an_unparsable_fragment_raises_and_flags() -> None:
+    sortie = _sortie(_tache("\\A", SID, "x").replace("</Principals>", ""))
+    with pytest.raises(DroitsAgentRefuses):
+        await retirer_les_taches(Faux(sortie=sortie))
+    assert taches_compte.taches_en_echec()
+
+
+def test_declarations_without_any_task_are_refused() -> None:
+    with pytest.raises(DroitsAgentRefuses):
+        taches_du_compte('<Tasks><?xml version="1.0"?></Tasks>', "tessera-agent", SID)
+
+
+def test_a_binary_sid_is_written_in_text_form() -> None:
+    binaire = bytes([1, 2]) + (5).to_bytes(6, "big") + (21).to_bytes(4, "little") + (1001).to_bytes(4, "little")
+    assert taches_compte._sid_texte(binaire) == "S-1-5-21-1001"
+
+
+async def test_the_listing_is_asked_in_xml() -> None:
     faux = Faux()
     await retirer_les_taches(faux)
-    assert faux.appels[0][1:] == ["/query", "/fo", "csv", "/nh", "/v"]
+    assert faux.appels[0][1:] == ["/query", "/xml"]
 
 
 async def test_close_removes_tasks_only_at_the_last_call(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -227,3 +277,15 @@ async def test_a_task_failure_does_not_skip_the_stop_nor_the_wipe_and_refuses_th
     assert taches_compte.taches_en_echec()
     with pytest.raises(DroitsAgentRefuses):
         await ouvrir_appel(arbre, _icacls)
+
+
+async def test_refused_deletion_of_c_is_logged_and_that_of_a_raises() -> None:
+    c = _tache("\\C", SID, "Autre")
+    a = _tache("\\A", SID, "poste\\tessera-agent")
+    await retirer_les_taches(Faux(suppression=1, sortie=_sortie(c)))
+    assert not taches_compte.taches_en_echec()
+    faux = Faux(suppression=1, sortie=_sortie(c, a))
+    with pytest.raises(DroitsAgentRefuses, match="A"):
+        await retirer_les_taches(faux)
+    assert taches_compte.taches_en_echec()
+    assert [x[3] for x in faux.appels if "/delete" in x] == ["\\C", "\\A"]

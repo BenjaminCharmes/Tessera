@@ -1,12 +1,13 @@
 ---
-id: ticket-1029
-title: "The account scheduled tasks are read as XML"
-type: refactor
-status: todo
-priority: medium
 agent: codeur
 depends_on: []
+id: ticket-1029
+pr_number: 1221
 preuve_reelle: true
+priority: medium
+status: done
+title: The account scheduled tasks are read as XML
+type: refactor
 ---
 
 # ticket-1029 — Les tâches planifiées du compte se lisent en XML

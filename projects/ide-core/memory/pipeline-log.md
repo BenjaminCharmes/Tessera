@@ -10518,3 +10518,29 @@ error: Please commit or stash them.
 - 2026-11-20 10:49:09 UTC — [ticket-1027] livraison: rebase sur develop (500ms)
 - 2026-11-20 10:49:09 UTC — [ticket-1027] livraison: PR #1219 ouverte (5719ms)
 - 2026-11-20 10:49:09 UTC — [ticket-1027] livraison: arrêt — PR ouverte, merge après preuve réelle
+- 2026-11-20 10:56:54 UTC — [ticket-1029] branche ticket-1029-the-account-scheduled-tasks-are-read-as-xml
+- 2026-11-20 10:56:57 UTC — [ticket-1029] tour 1 — codeur démarré
+- 2026-11-20 10:59:19 UTC — [ticket-1029] tour 1 — codeur terminé (141514ms)
+- 2026-11-20 11:01:59 UTC — [ticket-1029] testeur: dur�es : ruff 2 s, pytest 123 s ; impact depuis base : 99 fichier(s) de test
+- 2026-11-20 11:01:59 UTC — [ticket-1029] tests rouges au tour 1
+- 2026-11-20 11:01:59 UTC — [ticket-1029] tour 2 — codeur démarré
+- 2026-11-20 11:02:33 UTC — [ticket-1029] tour 2 — codeur terminé (33735ms)
+- 2026-11-20 11:05:25 UTC — [ticket-1029] testeur: dur�es : ruff 0 s, mypy 17 s, mypy-linux 18 s, pytest 138 s ; impact depuis base : 99 fichier(s) de test
+- 2026-11-20 11:06:03 UTC — [ticket-1029] securite: PASS — PASS : aucune faille CRITICAL ou HIGH introduite, deux points relevés pour le re (36515ms)
+- 2026-11-20 11:06:03 UTC — [ticket-1029] tour 2 — reviewer démarré
+- 2026-11-20 11:06:39 UTC — [ticket-1029] tour 2 — reviewer terminé (35203ms)
+- 2026-11-20 11:07:40 UTC — [ticket-1029] validateur: CHANGES_REQUESTED — Quatre critères sur cinq sont satisfaits. Le critère 3 échoue : bien que le test (96437ms)
+- 2026-11-20 11:07:40 UTC — [ticket-1029] CHANGES_REQUESTED tour 2: Validateur : Quatre critères sur cinq sont satisfaits. Le critère 3 échoue : bien que le test et la logique pour C (suppression d'une tâche créée par un tiers) existent, le code ne gère pas le cas A (
+- 2026-11-20 11:07:40 UTC — [ticket-1029] tour 3 — codeur démarré
+- 2026-11-20 11:08:43 UTC — [ticket-1029] tour 3 — codeur terminé (62061ms)
+- 2026-11-20 11:11:17 UTC — [ticket-1029] testeur: dur�es : ruff 0 s, mypy 2 s, mypy-linux 2 s, pytest 114 s ; impact depuis base : 99 fichier(s) de test
+- 2026-11-20 11:11:46 UTC — [ticket-1029] securite: PASS — Le passage du CSV au XML est sûr côté parsing. Le code refuse DOCTYPE et ENTITY  (28171ms)
+- 2026-11-20 11:11:46 UTC — [ticket-1029] tour 3 — reviewer démarré
+- 2026-11-20 11:12:15 UTC — [ticket-1029] tour 3 — reviewer terminé (28328ms)
+- 2026-11-20 11:13:33 UTC — [ticket-1029] validateur: APPROVED — Les cinq critères d'acceptation sont satisfaits. Le code remplace correctement l (106343ms)
+- 2026-11-20 11:13:33 UTC — [ticket-1029] APPROVED après 3 tour(s)
+- 2026-11-20 11:14:03 UTC — [ticket-1029] leçons: une leçon proposée
+- 2026-11-20 11:15:14 UTC — [ticket-1029] documentation: 0 fichier(s) (47452ms)
+- 2026-11-20 11:15:14 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-20 11:15:14 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-20 11:15:14 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
