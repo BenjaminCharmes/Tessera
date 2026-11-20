@@ -1,6 +1,5 @@
 """The agent account writes in a worktree only during a call — ticket-943."""
 import asyncio
-import getpass
 import subprocess
 import sys
 from pathlib import Path
@@ -8,11 +7,12 @@ from pathlib import Path
 import pytest
 
 from tessera.config import settings
-from tessera.services.providers import droits_appel, profil_agent
+from tessera.services.providers import droits_appel, droits_worktree, profil_agent
 from tessera.services.providers.droits_appel import clore_appel, ouvrir_appel
 from tessera.services.providers.droits_worktree import DroitsAgentRefuses
 from tessera.services.verification.groupe_d_etape import GroupeDEtape
 from tessera.services.verification.lancement_compte import ProcessusDuCompte
+from tests.faux_securite import FauxSecurite
 
 COMPTE = "tessera-agent"
 
@@ -49,6 +49,7 @@ def compte(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     (tmp_path / "profil-vide").mkdir()
     monkeypatch.setattr(profil_agent, "DOSSIER_PROFIL", tmp_path / "profil-vide")
     monkeypatch.setattr(profil_agent, "_NETTOYAGE_ECHOUE", False)
+    monkeypatch.setattr(droits_worktree, "securite_par_defaut", lambda: FauxSecurite())
     droits_appel._ACTIFS.clear()
     droits_appel._FILE.clear()
     # Une condition se lie à la boucle de son premier `wait` : une neuve par test.
@@ -92,17 +93,9 @@ async def test_right_is_withdrawn_after_a_call_and_set_again_before_the_next(wor
     assert [str(worktree.resolve()), "/grant", f"{COMPTE}:(OI)(CI)M", "/L"] in icacls.appels
     icacls.appels.clear()
     await clore_appel(racine, icacls, procs.enumerer, procs.tuer)
-    racine_s, git = str(worktree.resolve()), str(worktree.resolve() / ".git")
+    racine_s = str(worktree.resolve())
     # Les appels du profil (ticket-1014) sont testés dans test_profil_agent.
-    assert [a for a in icacls.appels if "profil-vide" not in a[0]] == [
-        [git, "/remove:g", COMPTE, "/L"],
-        [racine_s, "/remove:g", COMPTE, "/L"],
-        [racine_s, "/setowner", getpass.getuser(), "/T", "/C", "/L"],
-        [racine_s, "/reset", "/T", "/C", "/L"],
-        [git, "/inheritance:d", "/L"],
-        [git, "/remove:g", COMPTE, "/L"],
-        [git, "/grant:r", f"{COMPTE}:(OI)(CI)RX", "/L"],
-    ]
+    assert [a for a in icacls.appels if "profil-vide" not in a[0]] == [[racine_s, "/remove:g", COMPTE, "/L"]]
     icacls.appels.clear()
     await ouvrir_appel(worktree, icacls)
     assert [str(worktree.resolve()), "/grant", f"{COMPTE}:(OI)(CI)M", "/L"] in icacls.appels
@@ -117,23 +110,14 @@ async def test_overlapping_calls_withdraw_the_right_once_at_the_last(worktree: P
     assert icacls.appels == []
     await clore_appel(second, icacls, procs.enumerer, procs.tuer)
     sur_racine = [a for a in icacls.appels if "profil-vide" not in a[0]]
-    assert sum(1 for a in sur_racine if "/setowner" in a) == 1
-    assert sum(1 for a in sur_racine if "/reset" in a) == 1
+    assert sum(1 for a in sur_racine if "/remove:g" in a) == 1
+    assert not any("/setowner" in a or "/reset" in a for a in sur_racine)
 
 
 async def test_a_failed_withdrawal_raises_so_the_run_is_blocked(worktree: Path) -> None:
     racine = await ouvrir_appel(worktree, Icacls())
     with pytest.raises(DroitsAgentRefuses):
         await clore_appel(racine, Icacls(code=5), Processus([]).enumerer, Processus([]).tuer)
-
-
-@pytest.mark.parametrize("commande", ["/setowner", "/reset"])
-async def test_a_failed_take_back_raises(worktree: Path, commande: str) -> None:
-    racine = await ouvrir_appel(worktree, Icacls())
-    with pytest.raises(DroitsAgentRefuses):
-        await clore_appel(
-            racine, Icacls(echec_sur=commande), Processus([]).enumerer, Processus([]).tuer
-        )
 
 
 async def test_leftover_processes_of_the_account_are_stopped_at_the_end(worktree: Path) -> None:
