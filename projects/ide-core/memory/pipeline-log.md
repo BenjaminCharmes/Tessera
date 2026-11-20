@@ -10485,3 +10485,7 @@ error: Please commit or stash them.
 - 2026-11-20 09:17:46 UTC — [ticket-1023] validateur: APPROVED — Tous les critères sont satisfaits. Le module `station_agent.py` (191 lignes) exp (40688ms)
 - 2026-11-20 09:17:46 UTC — [ticket-1023] APPROVED après 2 tour(s)
 - 2026-11-20 09:19:01 UTC — [ticket-1023] leçons: une leçon proposée
+- 2026-11-20 09:22:34 UTC — [ticket-1023] documentation: 0 fichier(s) (192718ms) — après tour de correction
+- 2026-11-20 09:22:34 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-20 09:22:34 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-20 09:22:34 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
