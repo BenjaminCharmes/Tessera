@@ -638,7 +638,7 @@ Une ADR qu'aucune règle de `contraintes.md` ni aucun `CLAUDE.md` ne cite part d
 ## ADR-088 — Ce que le compte agent garde encore : retiré, fermé ou à trancher
 
 **Date** : 2026-11-19
-**Décision** : amende ADR-087, après essais sous le compte. (1) Sortie du job : aucune voie trouvée (WMI refusé ; une tâche planifiée se crée sans s'exécuter). Ses tâches planifiées se **retirent** au dernier appel ; pas d'inventaire des processus illisibles (faux positifs du ticket-997). (2) Cache uv : le compte l'écrit dès `uv run`, donc `UV_LINK_MODE=copy` et le cache **part** avec le profil ; cache npm **accepté** (intégrité vérifiée). (3) Dossiers ouverts à tous : le backend ne purge que le dossier public ; **à trancher** par l'utilisateur, refus à l'installation ou acceptation (ticket-1020). (4) Fichier protégé ajouté pendant un appel : il entre dans l'empreinte, run `blocked`.
+**Décision** : amende ADR-087, après essais sous le compte. (1) Sortie du job : aucune voie trouvée (WMI refusé ; une tâche planifiée se crée sans s'exécuter). Ses tâches planifiées se **retirent** au dernier appel ; pas d'inventaire des processus illisibles (faux positifs du ticket-997). (2) Cache uv : le compte l'écrit dès `uv run`, donc `UV_LINK_MODE=copy` et le cache **part** avec le profil ; cache npm **accepté** (intégrité vérifiée). (3) Dossiers ouverts à tous : la création s'y **refuse** au seul compte, par un script administrateur lancé une fois, réversible (ticket-1020). (4) Fichier protégé ajouté pendant un appel : il entre dans l'empreinte, run `blocked`.
 **Raison** : uv ne revérifie pas son cache ; le backend, non administrateur, ne lit pas tous les dossiers partagés.
 **Alternative écartée sans essai** : intégrité basse ou jeton restreint.
 

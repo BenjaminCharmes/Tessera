@@ -1,14 +1,14 @@
 ---
 id: ticket-1020
-title: "Files of the agent account in shared folders are purged"
+title: "The agent account cannot create files in shared folders"
 type: feat
-status: blocked
+status: in-progress
 priority: medium
 agent: codeur
 preuve_reelle: true
 ---
 
-# ticket-1020 — Les fichiers du compte dans les dossiers partagés se purgent
+# ticket-1020 — Le compte agent ne crée plus rien dans les dossiers partagés
 
 ## Objectif
 
@@ -16,9 +16,10 @@ ADR-088, point 3. Le compte agent est membre du groupe des utilisateurs : il
 crée des fichiers dans les dossiers ouverts à tout utilisateur, que le
 nettoyage du profil (ticket-1008) ne touche pas.
 
-## Essais faits le 19/11, avant de coder : le ticket est à redéfinir
+## Ce qui a changé depuis la première fiche
 
-Sous le compte, dans un appel réel :
+La première fiche prévoyait une purge par le backend. Essai du 19/11 sous le
+compte, dans un appel réel :
 
 | Dossier | Le compte y crée un fichier | Le backend le supprime |
 |---|---|---|
@@ -27,53 +28,51 @@ Sous le compte, dans un appel réel :
 | Racine du dossier des données de programmes | oui | non : accès refusé |
 | Racine du lecteur, dossier partagé de Tessera | non | sans objet |
 
-La purge par le backend, non administrateur, ne couvre donc que le dossier
-public. Ailleurs, « un fichier que le backend ne peut pas supprimer lève
-`DroitsAgentRefuses` » bloquerait chaque run sur un simple fichier posé par
-un agent, sans que personne ne puisse le retirer sans droit
-d'administrateur.
+La purge est donc impossible sans administrateur. L'utilisateur a tranché le
+19/11 : refuser la création, par un script qu'il lance une fois en
+administrateur.
 
-Deux issues, à trancher par l'utilisateur :
+## Ce qui est fait
 
-1. **Refuser la création** : `agent-setup-admin.ps1` pose, une fois, un refus
-   de création pour le compte sur ces dossiers. L'ADR-088 l'a écarté
-   (modifier l'ACL d'un dossier système) ; c'est pourtant la seule fermeture
-   réelle.
-2. **Accepter** : un fichier laissé là n'atteint ni un worktree ni un secret,
-   et rien ne l'exécute. Le noter dans l'ADR-088 et annuler ce ticket.
-
-## Ce qu'il faut faire
-
-- Une liste des dossiers à surveiller, déclarée dans un module de
-  `services/providers/`, issue de l'inventaire ci-dessous (candidats :
-  `C:\Users\Public`, `C:\Windows\Temp`, la racine de `C:\ProgramData`).
-- À la clôture du dernier appel, juste après l'arrêt des restes du compte
-  (`droits_appel.py`), parcourir ces dossiers sans suivre aucun lien : un
-  fichier dont le propriétaire est le SID du compte se supprime.
-- Un fichier que le backend ne peut pas supprimer lève `DroitsAgentRefuses` :
-  le run finit `blocked` (ADR-037).
-- Rien ne se refuse en écriture : modifier l'ACL d'un dossier système est
-  écarté (ADR-088).
+- `scripts/agent-refus-creation-admin.ps1` pose, pour le seul compte agent
+  (visé par son SID), un refus « créer un fichier, créer un dossier » sur les
+  trois dossiers, hérité par leurs sous-dossiers. `-Retirer` le défait.
+- Il ne touche ni au compte, ni à son mot de passe, ni à son jeton, ni aux
+  droits d'un autre compte. Le dossier partagé de Tessera a son héritage
+  coupé : worktrees, outils et profil du compte ne reçoivent rien.
+- Essayé le 20/11 sur un dossier jetable, sans élévation : pose, relance
+  (rien ne change), héritage par un sous-dossier, sous-dossier à héritage
+  coupé épargné, retrait, dossier absent (rien n'est posé). Le premier essai
+  a montré qu'`icacls` doublait l'entrée à la relance : un dossier déjà dans
+  l'état voulu est désormais sauté.
 
 ## Critères d'acceptation
 
-- [ ] Un test : un fichier du compte dans un dossier de la liste est supprimé
-  à la clôture ; un fichier d'un autre propriétaire reste.
-- [ ] Un test : un lien (jonction) dans un dossier de la liste n'est pas suivi.
-- [ ] Un test : un fichier non supprimable lève `DroitsAgentRefuses`.
+- [ ] Le script ne contient qu'un `/deny`, visé par SID, sur `(CI)(WD,AD)`, et
+  aucun `/grant`, `/inheritance`, `/setowner` ni commande de compte (test).
+- [ ] Les trois dossiers sont nommés ; tous sont vérifiés avant le premier
+  changement (test).
+- [ ] `-Retirer` retire le refus ; un dossier déjà dans l'état voulu est sauté
+  (test).
+- [ ] `docs/agent-isolation.md` dit comment le lancer et le défaire (test).
 
 ## Preuve réelle
 
-Sur le poste, hors dépôt :
+Sur le poste, hors dépôt, hors run :
 
-1. **Avant de coder** : sous le compte, tenter de créer un fichier dans chaque
-   dossier partagé courant (`Public`, `Windows\Temp`, `ProgramData`, racine
-   des lecteurs) ; noter où cela aboutit et le propriétaire résultant.
-2. Après le code : créer un fichier sous le compte dans chacun, terminer un
-   appel, constater la suppression.
+1. L'utilisateur lance le script une fois en administrateur.
+2. Sous le compte (`lancer_sous_compte`), tenter de créer un fichier dans
+   chacun des trois dossiers et dans le sous-dossier Documents du dossier
+   public : chaque tentative est refusée.
+3. Un run complet de Serpent va au bout : rien de ce dont le compte a besoin
+   ne passe par ces dossiers.
 
 ## Ce que ça ne fait pas
 
-- Ne ferme pas la création (accepté : un fichier d'un autre dossier n'atteint
-  ni un worktree ni un secret). Ne retire pas le compte du groupe des
-  utilisateurs.
+- Ne retire pas le compte du groupe des utilisateurs.
+- N'atteint pas un sous-dossier dont l'héritage est coupé, ni un sous-dossier
+  qui accorde en propre la création aux utilisateurs : une autorisation propre
+  passe avant un refus hérité.
+- Ne supprime pas un fichier que le compte y aurait déjà laissé.
+- Le backend ne vérifie pas que le refus est en place : il ne peut pas lire
+  les droits du dossier temporaire de Windows.
