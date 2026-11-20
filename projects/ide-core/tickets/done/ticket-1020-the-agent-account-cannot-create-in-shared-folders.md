@@ -2,7 +2,7 @@
 id: ticket-1020
 title: "The agent account cannot create files in shared folders"
 type: feat
-status: in-progress
+status: done
 priority: medium
 agent: codeur
 preuve_reelle: true
@@ -48,13 +48,13 @@ administrateur.
 
 ## Critères d'acceptation
 
-- [ ] Le script ne contient qu'un `/deny`, visé par SID, sur `(CI)(WD,AD)`, et
+- [x] Le script ne contient qu'un `/deny`, visé par SID, sur `(CI)(WD,AD)`, et
   aucun `/grant`, `/inheritance`, `/setowner` ni commande de compte (test).
-- [ ] Les trois dossiers sont nommés ; tous sont vérifiés avant le premier
+- [x] Les trois dossiers sont nommés ; tous sont vérifiés avant le premier
   changement (test).
-- [ ] `-Retirer` retire le refus ; un dossier déjà dans l'état voulu est sauté
+- [x] `-Retirer` retire le refus ; un dossier déjà dans l'état voulu est sauté
   (test).
-- [ ] `docs/agent-isolation.md` dit comment le lancer et le défaire (test).
+- [x] `docs/agent-isolation.md` dit comment le lancer et le défaire (test).
 
 ## Preuve réelle
 
@@ -66,6 +66,18 @@ Sur le poste, hors dépôt, hors run :
    public : chaque tentative est refusée.
 3. Un run complet de Serpent va au bout : rien de ce dont le compte a besoin
    ne passe par ces dossiers.
+
+### Résultat du 20/11
+
+1. Script lancé par l'utilisateur en administrateur à 12:54 UTC.
+2. Sous le compte, la création d'un fichier et celle d'un dossier sont
+   refusées dans le dossier public, son sous-dossier Documents, le dossier
+   temporaire de Windows, le dossier des données de programmes et un de ses
+   sous-dossiers ; rien n'y a été créé. Le compte écrit toujours dans son
+   profil.
+3. Sous le compte, dans un worktree jetable de Serpent : `npm ci`, typecheck,
+   lint, tests et build passent. Puis un run complet de Serpent (ticket-017)
+   va au bout, approuvé au premier tour.
 
 ## Ce que ça ne fait pas
 
