@@ -4,6 +4,7 @@ created: 2026-11-20
 depends_on: []
 estimated_days: 1
 id: ticket-1033
+pr_number: 1234
 priority: medium
 status: done
 title: A ritual can be daily
