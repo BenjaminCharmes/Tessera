@@ -4,6 +4,7 @@ created: 2026-11-20
 depends_on: []
 estimated_days: 1
 id: ticket-1031
+pr_number: 1228
 priority: medium
 status: done
 title: The weekly report reads the remote base and frontmatter titles
