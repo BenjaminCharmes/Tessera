@@ -4,6 +4,7 @@ created: 2026-11-20
 depends_on: []
 estimated_days: 1
 id: ticket-1036
+pr_number: 1239
 priority: medium
 status: done
 title: A refused edition no longer drops the whole documentation batch
