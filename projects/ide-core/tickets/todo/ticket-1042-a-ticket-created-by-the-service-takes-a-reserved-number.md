@@ -40,9 +40,6 @@ La cause est dans le code :
   identifiant et passe par `create_ticket` ou `create_ticket_sync`, donc
   par `_next_id`.
 
-Une règle en vigueur dit pourtant qu'un numéro de `prochain_numero.py` est
-pris dès l'appel (ADR-080).
-
 ## Solution proposée
 
 `TicketService._next_id` prend son numéro par `reserver`, avec le dossier
