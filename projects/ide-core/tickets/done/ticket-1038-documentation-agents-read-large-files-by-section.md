@@ -6,7 +6,7 @@ depends_on:
 estimated_days: 2
 id: ticket-1038
 plan: true
-pr_number: null
+pr_number: 1243
 priority: high
 status: done
 title: Documentation agents read a large file section by section, on request
