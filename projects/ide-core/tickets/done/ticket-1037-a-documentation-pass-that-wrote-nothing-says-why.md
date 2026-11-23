@@ -1,14 +1,14 @@
 ---
-id: ticket-1037
-title: "A documentation pass that wrote nothing says why, role by role"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-11-23
 depends_on: []
 estimated_days: 1
-created: 2026-11-23
+id: ticket-1037
+pr_number: 1241
+priority: high
+status: done
+title: A documentation pass that wrote nothing says why, role by role
+type: fix
 ---
 
 # ticket-1037 — Une passe de documentation qui n'écrit rien dit pourquoi, rôle par rôle
