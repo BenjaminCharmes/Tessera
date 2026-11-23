@@ -169,7 +169,7 @@ def _journaliser(
     for ecarte in lot.ecartes:
         orch._log(f"[{ecarte}] documentation: pas de diff retrouvable, non documenté")
     for reduit in lot.reduits:
-        orch._log(f"documentation trop longue, titres seuls : {reduit}")
+        orch._log(f"documentation : fichier donné par ses titres, sections à la demande : {reduit}")
     if lot.abandonnes:
         orch._log(
             f"documentation abandonnée pour {', '.join(lot.abandonnes)}"

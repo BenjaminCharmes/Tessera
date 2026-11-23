@@ -805,44 +805,44 @@ def test_fichier_trop_long_remplace_par_ses_titres_et_borne_respectee(
     # Les titres sont présents, pas le corps répété
     assert "# Grand titre" in contenu
     assert "## Section A" in contenu
-    assert "titres uniquement" in contenu
+    assert "fichier donné par ses titres" in contenu
     assert "paragraphe " * 10 not in contenu
     # La section documentation reste dans la borne (+ tolérance pour les en-têtes fixes)
     assert len(contenu) <= borne + len("\n---\nDocumentation actuelle :\n\n### README.md\n\n") + 100
 
 
-def test_documentation_de_150000_caracteres_en_trois_fichiers_rendue_en_entier(
+def test_documentation_de_45000_caracteres_en_trois_fichiers_rendue_en_entier(
     tmp_path: Path,
 ) -> None:
     from tessera.services.documentation.documentation_contenu import contenu_et_reduits
 
     (tmp_path / "docs").mkdir()
-    (tmp_path / "README.md").write_text("# R\n" + "a" * 49_990, encoding="utf-8")
-    (tmp_path / "docs" / "a.md").write_text("# A\n" + "b" * 49_990, encoding="utf-8")
-    (tmp_path / "docs" / "b.md").write_text("# B\n" + "c" * 49_990, encoding="utf-8")
+    (tmp_path / "README.md").write_text("# R\n" + "a" * 14_990, encoding="utf-8")
+    (tmp_path / "docs" / "a.md").write_text("# A\n" + "b" * 14_990, encoding="utf-8")
+    (tmp_path / "docs" / "b.md").write_text("# B\n" + "c" * 14_990, encoding="utf-8")
 
     contenu, reduits = contenu_et_reduits(tmp_path)
 
-    assert "a" * 49_990 in contenu
-    assert "b" * 49_990 in contenu
-    assert "c" * 49_990 in contenu
-    assert "titres uniquement" not in contenu
+    assert "a" * 14_990 in contenu
+    assert "b" * 14_990 in contenu
+    assert "c" * 14_990 in contenu
+    assert "donné par ses titres" not in contenu
     assert reduits == []
 
 
-def test_au_dela_de_la_borne_le_fichier_qui_deborde_est_reduit_et_liste(
+def test_un_fichier_au_dela_de_la_borne_par_fichier_est_reduit_et_liste(
     tmp_path: Path,
 ) -> None:
     from tessera.services.documentation.documentation_contenu import contenu_et_reduits
 
     (tmp_path / "docs").mkdir()
-    (tmp_path / "README.md").write_text("# R\n" + "a" * 120_000, encoding="utf-8")
-    gros = "# B\n## Partie\n" + "b" * 120_000
+    (tmp_path / "README.md").write_text("# R\n" + "a" * 15_000, encoding="utf-8")
+    gros = "# B\n## Partie\n" + "b" * 25_000
     (tmp_path / "docs" / "b.md").write_text(gros, encoding="utf-8")
 
     contenu, reduits = contenu_et_reduits(tmp_path)
 
-    assert "a" * 120_000 in contenu
+    assert "a" * 15_000 in contenu
     assert "b" * 1_000 not in contenu
     assert "## Partie" in contenu
     assert reduits == [f"docs/b.md ({len(gros)} caractères)"]

@@ -206,7 +206,18 @@ def _inserer(avant: str, edition: dict[str, object], chemin: str) -> str:
     """
     section = str(edition.get("apres_section", ""))
     texte = str(edition.get("texte", ""))
+    lignes, _, fin = bornes_section(avant, section, chemin)
+    return "".join(lignes[:fin]) + texte.rstrip("\n") + "\n\n" + "".join(lignes[fin:])
 
+
+def bornes_section(
+    avant: str, section: str, chemin: str
+) -> tuple[list[str], int, int]:
+    """Lines of ``avant`` plus the (start, end) line indexes of a unique section.
+
+    The section runs from its heading to the next heading of equal or higher
+    level. Zero or several matches raise ``EditionRefusee``.
+    """
     niveau = len(section) - len(section.lstrip("#"))
     prefixe = "#" * niveau + " "
     section_norm = _normaliser_section(section)
@@ -236,4 +247,4 @@ def _inserer(avant: str, edition: dict[str, object], chemin: str) -> str:
             if len(titre) - len(titre.lstrip("#")) <= niveau:
                 fin = i
                 break
-    return "".join(lignes[:fin]) + texte.rstrip("\n") + "\n\n" + "".join(lignes[fin:])
+    return lignes, debut, fin

@@ -32,7 +32,14 @@ Quatre blocs, dans cet ordre :
    long n'y est pas ; son nom est donné.
 4. **Le contenu actuel** de `README.md` et des fichiers `docs/`, chacun sous
    son chemin relatif. Quand un fichier est trop long pour être inclus en
-   entier, ses titres `#` sont affichés à la place.
+   entier (au-delà de 20 000 caractères), ses titres `#` sont affichés à la
+   place. Pour en lire des sections, réponds **à la place des éditions** par
+   `{"sections": [{"fichier": "docs/x.md", "titre": "## Un titre affiché"}]}` :
+   le service te rappelle une fois avec le texte entier de ces sections (du
+   titre jusqu'au titre de même niveau ou supérieur). Le titre se recopie avec
+   ses `#`. Un fichier hors documentation ou un titre absent est ignoré, et le
+   rappel te le dit. Un `ancien` se recopie d'une section reçue, jamais d'un
+   titre seul. Sans fichier donné par ses titres, ne demande rien.
 
 Le code est écrit pour un développeur ; tu le lis pour savoir ce que
 l'utilisateur voit, tape ou obtient, et tu l'écris sans le vocabulaire du

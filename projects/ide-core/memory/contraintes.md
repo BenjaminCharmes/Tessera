@@ -10,6 +10,8 @@ Cette section n'est injectée dans aucun appel d'agent. Une règle nouvelle
 s'écrit ici, avec son ADR ; un humain l'accepte en la déplaçant dans sa
 section. (ADR-055)
 
+- **Un fichier de documentation de plus de 20 000 caractères se donne par ses titres, et un rôle en lit les sections par un seul rappel.** Sans tel fichier, un appel par rôle. (ADR-092, ADR-057)
+
 ## Git et périmètre d'écriture
 
 - **Un projet qui déclare `worktree` exécute chaque run dans son worktree, jamais dans le checkout.** Sous `IDE_WORKTREES_DIR/<projet>/<ticket>`, depuis `origin/<base>` : la racine d'écriture du run, sans session humaine. (ADR-056)

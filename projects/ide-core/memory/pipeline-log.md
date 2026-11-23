@@ -10693,3 +10693,19 @@ error: Please commit or stash them.
 - 2026-11-23 08:56:35 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
 - 2026-11-23 08:56:35 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
 - 2026-11-23 08:56:35 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-23 09:02:45 UTC — [ide-core] ticket-1037 PR #1241 mergée (CI verte)
+- 2026-11-23 09:12:35 UTC — [ticket-1038] branche ticket-1038-documentation-agents-read-a-large-file-section-b
+- 2026-11-23 09:13:10 UTC — [ticket-1038] plan rendu (32202ms)
+- 2026-11-23 09:13:11 UTC — [ticket-1038] tour 1 — codeur démarré
+- 2026-11-23 09:17:50 UTC — [ticket-1038] tour 1 — codeur terminé (278983ms)
+- 2026-11-23 09:20:35 UTC — [ticket-1038] testeur: dur�es : ruff 0 s, mypy 20 s, mypy-linux 27 s, pytest 65 s ; impact depuis base : 35 fichier(s) de test
+- 2026-11-23 09:20:52 UTC — [ticket-1038] securite: PASS — Aucune faille CRITICAL ou HIGH. La seule entrée nouvelle est la lecture de secti (16233ms)
+- 2026-11-23 09:20:53 UTC — [ticket-1038] tour 1 — reviewer démarré
+- 2026-11-23 09:21:25 UTC — [ticket-1038] tour 1 — reviewer terminé (31328ms)
+- 2026-11-23 09:21:47 UTC — [ticket-1038] validateur: fichiers cités joints : docs/ (dossier, 9 fichiers), agents/prompts/doc-technique.md, agents/prompts/doc-fonctionnelle.md, memory/decisions.md (tronqué)
+- 2026-11-23 09:21:47 UTC — [ticket-1038] validateur: APPROVED — Les six critères d'acceptation sont tous satisfaits. Les tests nouvellement créé (53296ms)
+- 2026-11-23 09:21:47 UTC — [ticket-1038] APPROVED après 1 tour(s)
+- 2026-11-23 09:23:13 UTC — [ticket-1038] documentation: 0 fichier(s) (64296ms) — doc-technique : aucune édition proposée — doc-fonctionnelle : aucune édition proposée
+- 2026-11-23 09:23:13 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-23 09:23:13 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-23 09:23:13 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)

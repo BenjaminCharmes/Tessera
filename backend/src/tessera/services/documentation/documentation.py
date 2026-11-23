@@ -41,6 +41,7 @@ from tessera.services.documentation.documentation_issues import APPLIQUEES, AUCU
 from tessera.services.documentation.documentation_issues import tour_de_correction as corriger
 from tessera.services.documentation.documentation_preuve import fichiers_de_la_matiere
 from tessera.services.documentation.documentation_reponse import editions_depuis, lire_json
+from tessera.services.documentation.documentation_sections import avec_sections
 from tessera.services.documentation.documentation_selection import MARQUEUR, TicketADocumenter, consigner_lot, marquer_documente, tickets_a_documenter
 from tessera.services.documentation.documentation_titres import titres_fichiers_vises as _titres_fichiers_vises  # noqa: F401
 from tessera.services.noyau.modeles_par_defaut import MODELE_PRODUCTION
@@ -195,8 +196,7 @@ class DocumentationService:
         refus: list[str] = []
         issues: dict[str, str] = {}
         tour_de_correction = False
-        # `reduits` est le budget du lot, calculé une fois ; le contenu que
-        # chaque rôle lit, lui, se relit sur le disque à son appel (ticket-962).
+        # `reduits` : calculé une fois ; le contenu se relit à chaque appel (t.962).
         _, reduits = contenu_et_reduits(racine)
         # Le texte des tickets sert au contrôle des jetons : un numéro d'ADR
         # qu'un ticket cite n'est pas inventé (ticket-542).
@@ -209,8 +209,7 @@ class DocumentationService:
         for role in self._roles:
             systeme = (self._prompts_dir / f"{role}.md").read_text(encoding="utf-8")
             provider, modele = self._pour(role)
-            # Seul `doc-technique` voit le CLAUDE.md et l'AGENTS.md, et seul lui
-            # peut les éditer ou proposer la description (ticket-244, 724).
+            # Seul `doc-technique` voit CLAUDE.md et AGENTS.md (tickets 244, 724).
             technique = role == claude_md_doc.ROLE
             claude_md = self._claude_md if technique else None
             agents_md = claude_md_doc.agents_md_de(racine, claude_md)
@@ -222,6 +221,7 @@ class DocumentationService:
                 max_tokens=_MAX_TOKENS,
                 cwd=project_path,
             )
+            reponse = await avec_sections(reponse, reduits, racine, provider, systeme, user, modele, _MAX_TOKENS, project_path)
             donnees = lire_json(str(reponse.content))
             if donnees is None:
                 noter_illisible(role, issues, refus)

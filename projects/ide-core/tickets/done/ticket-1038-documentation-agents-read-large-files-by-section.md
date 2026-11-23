@@ -1,15 +1,16 @@
 ---
-id: ticket-1038
-title: "Documentation agents read a large file section by section, on request"
-type: feat
-status: todo
-pr_number: null
-priority: high
 agent: codeur
-depends_on: ["ticket-1037"]
-estimated_days: 2
-plan: true
 created: 2026-11-23
+depends_on:
+- ticket-1037
+estimated_days: 2
+id: ticket-1038
+plan: true
+pr_number: 1243
+priority: high
+status: done
+title: Documentation agents read a large file section by section, on request
+type: feat
 ---
 
 # ticket-1038 — Les agents de documentation lisent un gros fichier section par section, à la demande

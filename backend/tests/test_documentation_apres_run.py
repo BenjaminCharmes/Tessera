@@ -234,8 +234,11 @@ async def test_un_fichier_reduit_a_ses_titres_est_ecrit_dans_le_journal(tmp_path
 
     await orc.run_pipeline("proj", "ticket-001", _noop)
 
-    journal = [ln for ln in lignes if "documentation trop longue, titres seuls" in ln]
-    assert journal == ["documentation trop longue, titres seuls : docs/x.md (250000 caractères)"]
+    journal = [ln for ln in lignes if "fichier donné par ses titres" in ln]
+    assert journal == [
+        "documentation : fichier donné par ses titres, sections à la demande : docs/x.md (250000 caractères)"
+    ]
+    assert not any("trop longue" in ln for ln in lignes)
 
 
 async def test_integration_provider_qui_leve_emet_documentation_failed(tmp_path: Path) -> None:
