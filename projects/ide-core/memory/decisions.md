@@ -660,3 +660,12 @@ Une ADR qu'aucune règle de `contraintes.md` ni aucun `CLAUDE.md` ne cite part d
 **Décision** : amende ADR-087. Le droit du compte se pose à l'ouverture d'un appel et se retire à sa clôture, jamais au-delà. Une fois par racine : `OWNER RIGHTS`, contrôle du backend, `.git` protégé. Par appel : `/grant` du compte (4,8 s→1,6 s), `/remove:g` (1,7 s), reprise ciblée en `ctypes` des seules entrées du compte ou à DACL protégée (16 s→0,6 s ; 4,2 s après `npm ci`). Tâches en `/xml` (2,0 s→0,2 s). Profil : même reprise, à mesurer.
 **Raison** : sans `WRITE_DAC` ni `WRITE_OWNER`, le compte ne change que ce qu'il possède ; le reste n'hérite que de la racine. Entrée illisible ou non reprise : `DroitsAgentRefuses`, `blocked` (ADR-037). Un lien se reprend par son handle, jamais sa cible ; les refus des fichiers protégés survivent, sans reset.
 **Alternative rejetée** : droit tenu le temps du run.
+
+---
+
+## ADR-092 — Une borne par fichier, des sections à la demande
+
+**Date** : 2026-11-23
+**Décision** : amende ADR-057. Un fichier de documentation de 20 000 caractères ou moins est donné en entier, au-dessus par ses titres, quel que soit son rang ; les 200 000 totaux ne servent qu'en dernier recours. Un rôle peut répondre `{"sections": [{fichier, titre}]}` à la place des éditions : rappelé une seule fois, il reçoit le texte entier de ces sections (40 000 caractères, surplus nommé). Une demande se contrôle comme une édition : documentation sous la racine, titre unique, sinon ignorée et signalée. Sans fichier par ses titres, un appel par rôle.
+**Raison** : 135 000 jetons par appel, et `doc-technique` ne lisait jamais son fichier : il ne pouvait qu'ajouter.
+**Alternative rejetée** : découper `architecture.md` ; sélection par mots-clés.
