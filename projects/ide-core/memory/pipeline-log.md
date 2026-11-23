@@ -10709,3 +10709,19 @@ error: Please commit or stash them.
 - 2026-11-23 09:23:13 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
 - 2026-11-23 09:23:13 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
 - 2026-11-23 09:23:13 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-23 09:29:32 UTC — [ide-core] ticket-1038 PR #1243 mergée (CI verte)
+- 2026-11-23 09:42:18 UTC — [ticket-1041] branche ticket-1041-decide-whether-tool-less-roles-run-under-the-age
+- 2026-11-23 09:42:22 UTC — [ticket-1041] tour 1 — codeur démarré
+- 2026-11-23 09:43:45 UTC — [ticket-1041] tour 1 — architect terminé (82405ms)
+- 2026-11-23 09:44:30 UTC — [ticket-1041] testeur: OK (exit 0)
+- 2026-11-23 09:44:45 UTC — [ticket-1041] securite: PASS — Diff purement documentaire (règle proposée, ADR-093, ticket-1042), sans changeme (14078ms)
+- 2026-11-23 09:44:46 UTC — [ticket-1041] tour 1 — reviewer démarré
+- 2026-11-23 09:45:05 UTC — [ticket-1041] tour 1 — reviewer terminé (18796ms)
+- 2026-11-23 09:45:22 UTC — [ticket-1041] validateur: fichiers cités joints : memory/decisions.md (tronqué) ; non joints (budget épuisé) : backend/src/tessera/services/providers/agent_sdk.py, tickets/todo/
+- 2026-11-23 09:45:22 UTC — [ticket-1041] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. L'ADR-093 a été créée au bon n (35407ms)
+- 2026-11-23 09:45:22 UTC — [ticket-1041] APPROVED après 1 tour(s)
+- 2026-11-23 09:47:26 UTC — [ticket-1041] documentation: 0 fichier(s) (103217ms) — doc-technique : aucune édition proposée — doc-fonctionnelle : aucune édition proposée
+- 2026-11-23 09:47:26 UTC — [ticket-1039] documentation: pas de diff retrouvable, non documenté
+- 2026-11-23 09:47:26 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (181978 caractères)
+- 2026-11-23 09:47:26 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (137345 caractères)
+- 2026-11-23 09:47:44 UTC — renumérotation : ticket-1042 → ticket-1043 (numéro déjà pris sur origin/develop)

@@ -1,14 +1,14 @@
 ---
-id: ticket-1041
-title: "Decide whether tool-less roles run under the agent account"
-type: design
-status: todo
-pr_number: null
-priority: medium
 agent: architect
+created: 2026-11-23
 depends_on: []
 estimated_days: 1
-created: 2026-11-23
+id: ticket-1041
+pr_number: 1246
+priority: medium
+status: done
+title: Decide whether tool-less roles run under the agent account
+type: design
 ---
 
 # ticket-1041 — Trancher : les rôles sans outils tournent-ils sous le compte agent ?

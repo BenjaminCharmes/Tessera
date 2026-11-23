@@ -669,3 +669,12 @@ Une ADR qu'aucune règle de `contraintes.md` ni aucun `CLAUDE.md` ne cite part d
 **Décision** : amende ADR-057. Un fichier de documentation de 20 000 caractères ou moins est donné en entier, au-dessus par ses titres, quel que soit son rang ; les 200 000 totaux ne servent qu'en dernier recours. Un rôle peut répondre `{"sections": [{fichier, titre}]}` à la place des éditions : rappelé une seule fois, il reçoit le texte entier de ces sections (40 000 caractères, surplus nommé). Une demande se contrôle comme une édition : documentation sous la racine, titre unique, sinon ignorée et signalée. Sans fichier par ses titres, un appel par rôle.
 **Raison** : 135 000 jetons par appel, et `doc-technique` ne lisait jamais son fichier : il ne pouvait qu'ajouter.
 **Alternative rejetée** : découper `architecture.md` ; sélection par mots-clés.
+
+---
+
+## ADR-093 — Un rôle sans outils reste sous le compte de l'utilisateur, et le reste vérifié
+
+**Date** : 2026-11-23
+**Décision** : amende ADR-083. Validateur, doc-technique, doc-fonctionnelle et leçons (`allow_tools=False`) ne passent pas par le compte agent. Dans un projet qui déclare `worktree.compte_agent`, un appel sans compte dont `tools` n'est pas `[]`, ou qui porte skill, plugin ou `signaler`, lève `ProviderIndisponible`.
+**Raison** : `tools=[]` retire tous les outils intégrés : le modèle ne lit ni n'exécute rien, il répond. Seul reste le serveur MCP en mémoire (`ask_user`). Le CLI lit, sous le compte de l'utilisateur, sa session et les `.claude/settings` et `CLAUDE.md` du projet (`setting_sources=["project"]`), fichiers protégés en écriture (ADR-084) ; secrets vidés de l'environnement. Le compte coûterait ~4 s par appel (ADR-091) et la sérialisation d'ADR-087, sans rien fermer de plus.
+**Alternative rejetée** : tous les rôles par le compte — coût payé pour un appel qui n'agit pas.
