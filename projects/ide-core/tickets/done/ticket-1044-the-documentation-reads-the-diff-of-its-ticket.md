@@ -4,7 +4,7 @@ created: 2026-11-23
 depends_on: []
 estimated_days: 1
 id: ticket-1044
-pr_number: null
+pr_number: 1250
 priority: high
 status: done
 title: The documentation pass reads the diff of its ticket, not two months of the
