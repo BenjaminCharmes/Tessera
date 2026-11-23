@@ -10689,3 +10689,7 @@ error: Please commit or stash them.
 - 2026-11-23 08:53:59 UTC — [ticket-1037] validateur: fichiers cités joints : services/documentation/documentation.py, tests/test_longueur_des_fichiers.py (tronqué)
 - 2026-11-23 08:53:59 UTC — [ticket-1037] validateur: APPROVED — Le ticket est complet : tous les critères d'acceptation sont satisfaits. Les tro (41437ms)
 - 2026-11-23 08:54:00 UTC — [ticket-1037] APPROVED après 1 tour(s)
+- 2026-11-23 08:56:35 UTC — [ticket-1037] documentation: 0 fichier(s) (120984ms)
+- 2026-11-23 08:56:35 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-23 08:56:35 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-23 08:56:35 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
