@@ -11,6 +11,7 @@ s'écrit ici, avec son ADR ; un humain l'accepte en la déplaçant dans sa
 section. (ADR-055)
 
 - **Un fichier de documentation de plus de 20 000 caractères se donne par ses titres, et un rôle en lit les sections par un seul rappel.** Sans tel fichier, un appel par rôle. (ADR-092, ADR-057)
+- **Dans un projet qui déclare `worktree.compte_agent`, seul un rôle sans aucun outil, skill, plugin ni `signaler` part sous le compte de l'utilisateur** ; tout autre appel passe par le compte agent, sinon `ProviderIndisponible`. (ADR-093, ADR-083)
 
 ## Git et périmètre d'écriture
 
