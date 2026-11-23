@@ -10720,3 +10720,7 @@ error: Please commit or stash them.
 - 2026-11-23 09:45:22 UTC — [ticket-1041] validateur: fichiers cités joints : memory/decisions.md (tronqué) ; non joints (budget épuisé) : backend/src/tessera/services/providers/agent_sdk.py, tickets/todo/
 - 2026-11-23 09:45:22 UTC — [ticket-1041] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. L'ADR-093 a été créée au bon n (35407ms)
 - 2026-11-23 09:45:22 UTC — [ticket-1041] APPROVED après 1 tour(s)
+- 2026-11-23 09:47:26 UTC — [ticket-1041] documentation: 0 fichier(s) (103217ms) — doc-technique : aucune édition proposée — doc-fonctionnelle : aucune édition proposée
+- 2026-11-23 09:47:26 UTC — [ticket-1039] documentation: pas de diff retrouvable, non documenté
+- 2026-11-23 09:47:26 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (181978 caractères)
+- 2026-11-23 09:47:26 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (137345 caractères)
