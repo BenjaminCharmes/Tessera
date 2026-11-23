@@ -10705,3 +10705,7 @@ error: Please commit or stash them.
 - 2026-11-23 09:21:47 UTC — [ticket-1038] validateur: fichiers cités joints : docs/ (dossier, 9 fichiers), agents/prompts/doc-technique.md, agents/prompts/doc-fonctionnelle.md, memory/decisions.md (tronqué)
 - 2026-11-23 09:21:47 UTC — [ticket-1038] validateur: APPROVED — Les six critères d'acceptation sont tous satisfaits. Les tests nouvellement créé (53296ms)
 - 2026-11-23 09:21:47 UTC — [ticket-1038] APPROVED après 1 tour(s)
+- 2026-11-23 09:23:13 UTC — [ticket-1038] documentation: 0 fichier(s) (64296ms) — doc-technique : aucune édition proposée — doc-fonctionnelle : aucune édition proposée
+- 2026-11-23 09:23:13 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-23 09:23:13 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-23 09:23:13 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
