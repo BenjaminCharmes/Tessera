@@ -10678,3 +10678,14 @@ error: Please commit or stash them.
 - 2026-11-20 20:41:40 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
 - 2026-11-20 20:41:40 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
 - 2026-11-20 20:41:40 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-20 20:48:34 UTC — [ide-core] ticket-1036 PR #1239 mergée (CI verte)
+- 2026-11-23 08:47:13 UTC — [ticket-1037] branche ticket-1037-a-documentation-pass-that-wrote-nothing-says-why
+- 2026-11-23 08:47:18 UTC — [ticket-1037] tour 1 — codeur démarré
+- 2026-11-23 08:50:31 UTC — [ticket-1037] tour 1 — codeur terminé (191890ms)
+- 2026-11-23 08:52:59 UTC — [ticket-1037] testeur: dur�es : ruff 0 s, mypy 28 s, mypy-linux 36 s, pytest 89 s ; impact depuis base : 34 fichier(s) de test
+- 2026-11-23 08:53:17 UTC — [ticket-1037] securite: PASS — Ce diff découpe le code de documentation sans affaiblir de contrôle. Après le to (16437ms)
+- 2026-11-23 08:53:19 UTC — [ticket-1037] tour 1 — reviewer démarré
+- 2026-11-23 08:53:49 UTC — [ticket-1037] tour 1 — reviewer terminé (30608ms)
+- 2026-11-23 08:53:59 UTC — [ticket-1037] validateur: fichiers cités joints : services/documentation/documentation.py, tests/test_longueur_des_fichiers.py (tronqué)
+- 2026-11-23 08:53:59 UTC — [ticket-1037] validateur: APPROVED — Le ticket est complet : tous les critères d'acceptation sont satisfaits. Les tro (41437ms)
+- 2026-11-23 08:54:00 UTC — [ticket-1037] APPROVED après 1 tour(s)
