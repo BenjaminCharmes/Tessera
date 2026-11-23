@@ -6,6 +6,7 @@ from tessera.config import settings
 from tessera.services.documentation.documentation import DocumentationService, ResultatDocumentation
 from tessera.services.documentation.documentation_ailleurs import phrases_interdites
 from tessera.services.documentation.roles_documentation import roles_de_documentation
+from tessera.services.gardes.base_du_projet import base_du_projet
 from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.noyau.journal_pipeline import journal_vers
 from tessera.services.projets.project_loader import load_pipeline_config
@@ -67,7 +68,7 @@ def documenteur(
         _fournisseur("doc-technique")[0], settings.ide_prompts_dir,
         fournisseur=_fournisseur, claude_md=claude_md,
         roles=roles_de_documentation(project_path),
-        base=politique.base_branch,
+        base=base_du_projet(politique),
         phrases_interdites=phrases_interdites(
             project_path, settings.ide_workspace_dir,
             settings.ide_prompts_dir.parent.parent,

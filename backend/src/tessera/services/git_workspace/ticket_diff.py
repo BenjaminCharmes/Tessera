@@ -13,6 +13,7 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field
 
+from tessera.config import settings
 from tessera.services.git_workspace.git_runner import git
 from tessera.utils.logger import get_logger
 
@@ -77,16 +78,26 @@ async def _reference(racine: Path, branche: str, base: str | None) -> str:
     """Ce contre quoi la branche se compare.
 
     Une base explicite l'emporte (locale, sinon `origin/`). Sans elle, la
-    branche courante si ce n'est pas celle du ticket, sinon `main` — ce qui,
-    pour le ticket d'un run encore sur sa branche et un projet dont la base
-    est `develop`, ferait entrer dans le diff tout ce que `develop` a de plus.
+    branche courante si ce n'est pas celle du ticket ; sinon la base par défaut
+    des réglages (locale, sinon `origin/`), jamais un `main` local qui peut
+    avoir des mois de retard et ferait entrer tout le dépôt dans le diff.
     """
+    trouvee = await _premiere_existante(racine, base)
+    if trouvee:
+        return trouvee
+    courante = await git(racine, "symbolic-ref", "--short", "HEAD")
+    nom = courante.out.strip()
+    if courante.ok and nom != branche:
+        return nom
+    return await _premiere_existante(racine, settings.github_base_branch) or "main"
+
+
+async def _premiere_existante(racine: Path, base: str | None) -> str | None:
+    """`base` si elle existe en local, sinon `origin/<base>`, sinon None."""
     for candidate in (base, f"origin/{base}") if base else ():
         if (await git(racine, "rev-parse", "--verify", "--quiet", candidate)).ok:
             return candidate
-    courante = await git(racine, "symbolic-ref", "--short", "HEAD")
-    nom = courante.out.strip()
-    return nom if courante.ok and nom != branche else "main"
+    return None
 
 
 async def _lire(

@@ -21,6 +21,8 @@ _BORNE_DIFF_TICKET = 12_000
 _BORNE_DIFF_LOT = 60_000
 _BORNE_FICHIER = 8_000
 _BORNE_FICHIERS = 40_000
+#: Noms de fichiers non montrés listés dans le bloc ; les autres sont comptés.
+_MAX_NOMS_NON_MONTRES = 30
 
 
 @dataclass(frozen=True)
@@ -160,8 +162,11 @@ def bloc_fichiers(matiere: MatiereCode) -> str:
     for fichier in matiere.fichiers:
         morceaux.append(f"\n### {fichier.chemin}\n\n```\n{fichier.contenu.rstrip()}\n```\n")
     if matiere.fichiers_non_montres:
-        noms = ", ".join(matiere.fichiers_non_montres)
+        nommes = matiere.fichiers_non_montres[:_MAX_NOMS_NON_MONTRES]
+        autres = len(matiere.fichiers_non_montres) - len(nommes)
+        noms = ", ".join(nommes)
+        suite = f" ; et {autres} autres fichiers non nommés" if autres else ""
         morceaux.append(
-            f"\n[contenu non fourni — lisible dans les diffs seulement : {noms}]\n"
+            f"\n[contenu non fourni — lisible dans les diffs seulement : {noms}{suite}]\n"
         )
     return "".join(morceaux)
