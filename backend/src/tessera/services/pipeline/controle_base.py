@@ -12,18 +12,13 @@ import asyncio
 import re
 from pathlib import Path
 
-from tessera.config import settings
+from tessera.services.gardes.base_du_projet import base_du_projet
 from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.noyau.numerotation import GitIllisible, lire_git, noms_de_tickets_sur_la_base
 from tessera.services.projets.ticket_service import TicketService
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
-
-
-def base_du_projet(politique: PolitiqueRun) -> str:
-    """The base branch a run starts from: the declared one, else the global default."""
-    return politique.base_branch or settings.github_base_branch
 
 
 def _present(ticket_id: str, noms: set[str]) -> bool:

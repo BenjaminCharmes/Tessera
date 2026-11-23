@@ -1,14 +1,15 @@
 ---
-id: ticket-1044
-title: "The documentation pass reads the diff of its ticket, not two months of the repository"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-11-23
 depends_on: []
 estimated_days: 1
-created: 2026-11-23
+id: ticket-1044
+pr_number: 1250
+priority: high
+status: done
+title: The documentation pass reads the diff of its ticket, not two months of the
+  repository
+type: fix
 ---
 
 # ticket-1044 — La passe de documentation lit le diff de son ticket, pas deux mois de dépôt

@@ -6,6 +6,7 @@ le worktree. Les fichiers de doc et le marqueur atterrissaient dans le checkout,
 hors de toute branche. Vrai dépôt avec origin local ; les fournisseurs LLM sont
 des doubles.
 """
+import dataclasses
 import json
 from pathlib import Path
 
@@ -14,6 +15,7 @@ import pytest
 from tessera.config import settings
 from tessera.services.documentation import documentation, documenteur_run
 from tessera.services.documentation.documenteur_run import documenteur
+from tessera.services.gardes.base_du_projet import base_du_projet
 from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.pipeline.run_dans_worktree import ouvrir_worktree
 from tessera.services.worktrees.run_worktree import RunWorktree
@@ -132,3 +134,22 @@ async def test_documentation_without_a_worktree_writes_under_the_real_project(
     assert (racine / "README.md").read_text(encoding="utf-8") == "# Projet\n\nTexte nouveau.\n"
     marqueur = json.loads((depot / "memory" / "documentation.json").read_text("utf-8"))
     assert marqueur["documentes"] == ["ticket-1", "ticket-2"]
+
+
+async def test_documentation_receives_the_run_base_when_the_project_declares_none(
+    depot: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    transmises: list[str | None] = []
+
+    class _Espion(documentation.DocumentationService):
+        def __init__(self, *args: object, base: str | None = None, **kwargs: object) -> None:
+            transmises.append(base)
+            super().__init__(*args, base=base, **kwargs)  # type: ignore[arg-type]
+
+    monkeypatch.setattr(documenteur_run, "DocumentationService", _Espion)
+    monkeypatch.setattr(settings, "github_base_branch", "integration")
+    politique = dataclasses.replace(PolitiqueRun.lire(depot), base_branch=None)
+
+    await documenteur(PROJET, politique)()
+
+    assert transmises == [base_du_projet(politique)] == ["integration"]
