@@ -10725,3 +10725,19 @@ error: Please commit or stash them.
 - 2026-11-23 09:47:26 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (181978 caractères)
 - 2026-11-23 09:47:26 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (137345 caractères)
 - 2026-11-23 09:47:44 UTC — renumérotation : ticket-1042 → ticket-1043 (numéro déjà pris sur origin/develop)
+- 2026-11-23 09:53:20 UTC — [ide-core] ticket-1041 PR #1246 mergée (CI verte)
+- 2026-11-23 15:25:22 UTC — [ticket-1044] branche ticket-1044-the-documentation-pass-reads-the-diff-of-its-tic
+- 2026-11-23 15:25:27 UTC — [ticket-1044] tour 1 — codeur démarré
+- 2026-11-23 15:29:30 UTC — [ticket-1044] tour 1 — codeur terminé (241358ms)
+- 2026-11-23 15:32:36 UTC — [ticket-1044] testeur: dur�es : ruff 0 s, pytest 140 s ; impact depuis base : 48 fichier(s) de test
+- 2026-11-23 15:32:36 UTC — [ticket-1044] tests rouges au tour 1
+- 2026-11-23 15:32:36 UTC — [ticket-1044] tour 2 — codeur démarré
+- 2026-11-23 15:32:52 UTC — [ticket-1044] tour 2 — codeur terminé (15125ms)
+- 2026-11-23 15:34:59 UTC — [ticket-1044] testeur: dur�es : ruff 0 s, mypy 10 s, mypy-linux 12 s, pytest 94 s ; impact depuis base : 48 fichier(s) de test
+- 2026-11-23 15:35:06 UTC — [ticket-1044] securite: PASS — J'ai audité le diff complet, sans troncature, et je n'y trouve aucune faille : v (6702ms)
+- 2026-11-23 15:35:07 UTC — [ticket-1044] tour 2 — reviewer démarré
+- 2026-11-23 15:35:23 UTC — [ticket-1044] tour 2 — reviewer terminé (16000ms)
+- 2026-11-23 15:35:36 UTC — [ticket-1044] validateur: fichiers cités joints : backend/src/tessera/routers/tickets.py (tronqué)
+- 2026-11-23 15:35:36 UTC — [ticket-1044] validateur: APPROVED — Les quatre critères sont satisfaits par le code du diff. Les trois tests fonctio (28546ms)
+- 2026-11-23 15:35:36 UTC — [ticket-1044] APPROVED après 2 tour(s)
+- 2026-11-23 15:37:00 UTC — [ticket-1044] leçons: refusée — preuve absente du retour du run
