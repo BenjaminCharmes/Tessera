@@ -1,6 +1,6 @@
 ---
 id: ticket-1045
-title: "Chaque rituel de rituels.md tombe en semaine, pendant les heures où le PC est allumé"
+title: "Chaque rituel de rituels.md tombe en semaine, pendant les heures où le PC est allumé ; le journal du jour disparaît"
 type: chore
 status: todo
 pr_number: null
@@ -31,7 +31,8 @@ Ne modifier que `rituels.md` (le fichier, pas le code) :
 - `lecture-veille` : lundi 10:30 ; `radar-hebdo` : lundi 11:00 (laisse au tour
   de rattrapage le temps de finir).
 - `point-revenus` : lundi 18:30 → lundi 14:00.
-- `journal-du-jour` : 18:00 → 17:00, jours ouvrés inchangés.
+- `journal-du-jour` : supprimé (décision de Benjamin le 23/11 : le point hebdo
+  suffit). Son état « fait » en base locale peut rester, il est ignoré.
 - `portfolio-hebdo` : vendredi 17:00 → vendredi 14:00.
 Les autres rituels (jour du mois ou vendredi 16:00, 09:00-10:00) restent.
 Ajouter à la section « Écrire un rituel » une phrase : une heure se choisit
@@ -40,7 +41,7 @@ quand le PC est allumé, en semaine.
 ## Critères d'acceptation
 - [ ] `rituels.md` donne à `lecture-veille` l'heure `"10:30"` et à `radar-hebdo` l'heure `"11:00"`, toujours le lundi.
 - [ ] `rituels.md` donne à `point-revenus` l'heure `"14:00"` et à `portfolio-hebdo` l'heure `"14:00"`, sans changer leur jour.
-- [ ] `rituels.md` donne à `journal-du-jour` l'heure `"17:00"`, jours `ouvres`.
+- [ ] `rituels.md` ne contient plus d'entrée d'`id` `journal-du-jour`, et `point-hebdo-travail` y reste avec son détail inchangé.
 - [ ] Un test lit `rituels.md` du dépôt avec `lire_definitions` et vérifie qu'aucun rythme `hebdo` ou `quotidien` n'a une heure avant 08:00 ou après 17:59, ni un jour `samedi` ou `dimanche`.
 - [ ] `rituels.md` dit, dans « Écrire un rituel », qu'une heure se choisit en semaine pendant que le PC est allumé.
 
