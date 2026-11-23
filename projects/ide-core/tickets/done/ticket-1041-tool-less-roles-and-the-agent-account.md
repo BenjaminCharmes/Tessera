@@ -4,7 +4,7 @@ created: 2026-11-23
 depends_on: []
 estimated_days: 1
 id: ticket-1041
-pr_number: null
+pr_number: 1246
 priority: medium
 status: done
 title: Decide whether tool-less roles run under the agent account
