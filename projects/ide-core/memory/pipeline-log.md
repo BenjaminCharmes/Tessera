@@ -10724,3 +10724,4 @@ error: Please commit or stash them.
 - 2026-11-23 09:47:26 UTC — [ticket-1039] documentation: pas de diff retrouvable, non documenté
 - 2026-11-23 09:47:26 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (181978 caractères)
 - 2026-11-23 09:47:26 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (137345 caractères)
+- 2026-11-23 09:47:44 UTC — renumérotation : ticket-1042 → ticket-1043 (numéro déjà pris sur origin/develop)

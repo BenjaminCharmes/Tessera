@@ -1,5 +1,5 @@
 ---
-id: ticket-1042
+id: ticket-1043
 title: "A tool-bearing call cannot skip the agent account"
 type: fix
 status: todo
@@ -9,7 +9,7 @@ depends_on: []
 estimated_days: 1
 ---
 
-# ticket-1042 — Un appel outillé ne peut pas contourner le compte agent
+# ticket-1043 — Un appel outillé ne peut pas contourner le compte agent
 
 ## Objectif
 
