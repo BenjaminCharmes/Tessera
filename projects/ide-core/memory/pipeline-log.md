@@ -10741,3 +10741,6 @@ error: Please commit or stash them.
 - 2026-11-23 15:35:36 UTC — [ticket-1044] validateur: APPROVED — Les quatre critères sont satisfaits par le code du diff. Les trois tests fonctio (28546ms)
 - 2026-11-23 15:35:36 UTC — [ticket-1044] APPROVED après 2 tour(s)
 - 2026-11-23 15:37:00 UTC — [ticket-1044] leçons: refusée — preuve absente du retour du run
+- 2026-11-23 15:40:04 UTC — [ticket-1044] documentation: 0 fichier(s) (153516ms) — après tour de correction — doc-technique : refusé — doc-fonctionnelle : aucune édition proposée — refusé : doc-technique : projects/ide-core/CLAUDE.md n'est pas de la documentation : un agent de documentation ne touche ni au code, ni aux tickets, ni aux ADR.
+- 2026-11-23 15:40:04 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (181978 caractères)
+- 2026-11-23 15:40:04 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (137345 caractères)
