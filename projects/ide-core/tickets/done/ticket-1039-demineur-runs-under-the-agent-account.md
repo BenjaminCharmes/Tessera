@@ -2,7 +2,7 @@
 id: ticket-1039
 title: "Démineur runs in a worktree, under the agent account"
 type: chore
-status: todo
+status: done
 pr_number: null
 priority: medium
 agent: codeur
@@ -92,6 +92,31 @@ Puis un ticket Démineur minuscule (un test ou un libellé), poussé sur
 
 Si un point échoue : retirer `compte_agent` par une PR, Démineur revient à son
 fonctionnement d'aujourd'hui, et le défaut devient un ticket ide-core.
+
+## Constat du 23/11
+
+Déclaration mergée à la main dans le dépôt de Démineur (PR #50, `ffb8755`),
+puis ticket de preuve 042 (PR #51) lancé seul par le pipeline, de 09:05 à
+09:10 UTC, sans autre run sous le compte agent.
+
+- `agent doctor` : tout vert avant le run.
+- Worktree `C:\ProgramData\Tessera\worktrees\demineur	icket-042` présent
+  pendant le run, supprimé après ; le checkout `projects/demineur` n'a jamais
+  porté de modification (relevé toutes les 15 secondes).
+- `npm ci` (117 s) puis la `test_command` passent ; run `APPROVED` en un tour,
+  PR #52 mergée seule (`8b7edbe`).
+- `tessera.log` porte, sur la durée du run, 3 `agent_lance_sous_compte` (codeur,
+  audit sécurité, reviewer) et 20 `processus_lance_sous_compte` au nom de
+  `tessera-agent`. Le validateur et les deux rôles de documentation, appelés
+  sans outils, ne passent pas par le compte.
+- Après le run : aucun processus du compte, aucune tâche planifiée à son nom,
+  profil réduit au cache npm.
+- `memory/documentation.json` sur `main` porte `ticket-042` : le marqueur a été
+  lu, pas réinitialisé.
+
+Non constaté : le propriétaire des processus n'a pas été lu en direct par
+`GetOwner` pendant l'appel du codeur (relevé mal écrit) ; la preuve du compte
+vient du journal du backend. Aucune CI ne tourne sur le dépôt de Démineur.
 
 ## Ce que ça ne fait pas
 
