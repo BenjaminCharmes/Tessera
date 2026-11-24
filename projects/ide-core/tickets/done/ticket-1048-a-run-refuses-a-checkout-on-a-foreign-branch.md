@@ -1,15 +1,16 @@
 ---
-id: ticket-1048
-title: "A run refuses a checkout left on a foreign branch, and reads its policy after realigning the base"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
+created: 2026-11-23
 depends_on: []
 estimated_days: 1
+id: ticket-1048
 plan: true
-created: 2026-11-23
+pr_number: 1253
+priority: high
+status: done
+title: A run refuses a checkout left on a foreign branch, and reads its policy after
+  realigning the base
+type: fix
 ---
 
 # ticket-1048 — Un run refuse un checkout laissé sur une branche étrangère, et lit sa politique après le réalignement de la base

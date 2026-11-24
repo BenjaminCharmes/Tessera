@@ -1133,6 +1133,20 @@ Tout autre `ProcessError` (crash du SDK, erreur réseau, etc.) conserve le trait
 
 Ce mécanisme ne relance pas la file automatiquement quand le quota se rétablit, et ne change pas les seuils du mode autonome (ADR-020).
 
+## Préparation du checkout avant orchestration (ticket-1048)
+
+Avant le démarrage d'un run, deux garde-fous s'appliquent aux projets sans worktree.
+
+**Refus du checkout étranger**
+
+Une validation précoce refuse un run (`422 Unprocessable Entity`) si le checkout est sur une branche qui n'est ni la base du projet ni celle d'un ticket existant (`ticket-NNN-*`). Le message nomme la branche actuelle et invite à revenir à la base ou à utiliser un worktree manuel.
+
+Cas d'usage : après qu'un run ait échoué, le checkout reste sur la branche du ticket. Une nouvelle session ne peut pas lancer de run sur cette branche — elle n'existe probablement plus, et tout changement préexistant causerait une confusion. Le checkout doit d'abord être réalignné.
+
+**Réalignement de la base distante**
+
+Avant de figer la politique du run, le réalignement (`realigner_avant_construction()`) synchronise la base locale avec le distant. Cela garantit que tout changement arrivé par la base distante — notamment un nouveau `base_branch` ou une autre configuration — s'applique au run. Sans ce réalignement, un run lancé sur un arbre décalé lirait une politique périmée.
+
 ## Réalignement automatique du workspace avant un run (ticket-457)
 
 Avant le lancement du pipeline, l'orchestrateur prépare l'arbre de travail si l'une des conditions est remplie :
@@ -1218,7 +1232,7 @@ Le module `services/documentation/documentation_code.py` (ticket-540) produit ce
 - **Fichiers modifiés ou ajoutés** : le contenu des fichiers du diff, jusqu'à 8 000 caractères par fichier et 40 000 au total, trié par nombre de lignes changées décroissant. Un fichier trop long reste représenté par ses hunks.
 - **Tickets sans diff** : ceux dont le diff filtré est vide ou introuvable figurent dans une liste séparée.
 
-La fonction accepte une base explicite (commit ou branche) pour le diff, ce qui permet au run d'extraire les changements depuis le commit de la branche de travail — utile si la branche n'a pas encore été rebasée sur `main`. Les appelants existants gardent leur comportement (diff contre `main` par défaut).
+La fonction accepte une base explicite (commit ou branche) pour le diff. Ticket-1044 garantit que la base du diff vient toujours du run (`base_du_projet(politique)`), jamais d'un `main` local qui pourrait avoir des mois de retard — ce qui, avant le correctif, faisait entrer deux mois de dépôt dans le contexte des agents au lieu du diff du ticket.
 
 ### Protection de la configuration lors de la documentation (ticket-866)
 

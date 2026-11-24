@@ -10744,3 +10744,27 @@ error: Please commit or stash them.
 - 2026-11-23 15:40:04 UTC — [ticket-1044] documentation: 0 fichier(s) (153516ms) — après tour de correction — doc-technique : refusé — doc-fonctionnelle : aucune édition proposée — refusé : doc-technique : projects/ide-core/CLAUDE.md n'est pas de la documentation : un agent de documentation ne touche ni au code, ni aux tickets, ni aux ADR.
 - 2026-11-23 15:40:04 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (181978 caractères)
 - 2026-11-23 15:40:04 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (137345 caractères)
+- 2026-11-23 15:49:36 UTC — [ide-core] ticket-1044 PR #1250 mergée (CI verte)
+- 2026-11-24 08:05:56 UTC — [ticket-1048] branche ticket-1048-a-run-refuses-a-checkout-left-on-a-foreign-branc
+- 2026-11-24 08:06:35 UTC — [ticket-1048] plan rendu (35406ms)
+- 2026-11-24 08:06:35 UTC — [ticket-1048] tour 1 — codeur démarré
+- 2026-11-24 08:09:02 UTC — [ticket-1048] tour 1 — codeur terminé (146500ms)
+- 2026-11-24 08:10:06 UTC — [ticket-1048] testeur: 1 failed, 115 passed, 8 warnings in 25.51s — fichiers en échec : tests/test_longueur_des_fichiers.py
+- 2026-11-24 08:10:06 UTC — [ticket-1048] tests rouges au tour 1
+- 2026-11-24 08:10:06 UTC — [ticket-1048] tour 2 — codeur démarré
+- 2026-11-24 08:11:09 UTC — [ticket-1048] tour 2 — codeur terminé (62937ms)
+- 2026-11-24 08:12:22 UTC — [ticket-1048] testeur: dur�es : ruff 0 s, pytest 36 s ; impact depuis base : 20 fichier(s) de test
+- 2026-11-24 08:12:23 UTC — [ticket-1048] tests rouges au tour 2
+- 2026-11-24 08:12:23 UTC — [ticket-1048] tour 3 — codeur démarré
+- 2026-11-24 08:12:50 UTC — [ticket-1048] tour 3 — codeur terminé (26983ms)
+- 2026-11-24 08:14:04 UTC — [ticket-1048] testeur: dur�es : ruff 0 s, mypy 12 s, mypy-linux 13 s, pytest 37 s ; impact depuis base : 20 fichier(s) de test
+- 2026-11-24 08:14:23 UTC — [ticket-1048] securite: PASS — Verdict PASS : le diff n'introduit aucune faille. J'ai relu les deux helpers git (18672ms)
+- 2026-11-24 08:14:24 UTC — [ticket-1048] tour 3 — reviewer démarré
+- 2026-11-24 08:14:50 UTC — [ticket-1048] tour 3 — reviewer terminé (26657ms)
+- 2026-11-24 08:14:57 UTC — [ticket-1048] validateur: fichiers cités joints : agents.json
+- 2026-11-24 08:14:57 UTC — [ticket-1048] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits par le code et les tests. L'impl (32765ms)
+- 2026-11-24 08:14:57 UTC — [ticket-1048] APPROVED après 3 tour(s)
+- 2026-11-24 08:15:48 UTC — [ticket-1048] leçons: une leçon proposée
+- 2026-11-24 08:19:45 UTC — [ticket-1048] documentation: 2 fichier(s) (217687ms)
+- 2026-11-24 08:19:45 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (181978 caractères)
+- 2026-11-24 08:19:45 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (137345 caractères)
