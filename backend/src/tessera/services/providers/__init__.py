@@ -37,6 +37,7 @@ def get_provider(
     base_url: str | None = None,
     endpoint_key: str = "",
     compte_agent: bool = False,
+    compte_exige: bool = False,
 ) -> LLMProvider:
     """Builds the configured LLM provider. Defaults to the subscription-backed SDK.
 
@@ -100,6 +101,8 @@ def get_provider(
             kwargs["effort"] = effort
         if compte_agent:
             kwargs["compte_agent"] = True
+        if compte_exige:
+            kwargs["compte_exige"] = True
         if tools is not None:
             kwargs["allowed_tools"] = list(tools)
         elif not allow_tools:

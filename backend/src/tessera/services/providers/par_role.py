@@ -15,6 +15,7 @@ from tessera.services.projets.project_loader import load_agents_config
 from tessera.services.providers import get_provider
 from tessera.services.providers.agent_sdk import ClaudeAgentSDKProvider
 from tessera.services.providers.base import LLMProvider
+from tessera.services.providers.compte_exige import projet_exige_le_compte
 from tessera.services.providers.declaration import PROVIDER_OLLAMA, PROVIDER_OPENAI, resoudre_cle
 from tessera.services.providers.refus_garde import JournalDesRefus
 from tessera.services.providers.repli import ProviderAvecRepli
@@ -135,6 +136,8 @@ def provider_pour_role(
     # Le plafond d'un appel : celui figé à l'ouverture dans un run, le courant
     # hors run (ADR-075).
     plafond_appel = reglages.courants().llm_max_budget_usd
+    # ADR-093 : un appel outillé sans compte est refusé dans un projet qui le déclare.
+    exige = projet_exige_le_compte(project_path)
 
     def _construire(fournisseur: str) -> LLMProvider:
         principal = fournisseur == nom
@@ -145,7 +148,7 @@ def provider_pour_role(
             skills=skills, duree_max_s=duree, effort=effort,
             base_url=url if principal else None,
             endpoint_key=cle if principal else "",
-            compte_agent=compte_agent, **journal,
+            compte_agent=compte_agent, compte_exige=exige, **journal,
         )
 
     if rapide and config is not None and config.fallback is not None:

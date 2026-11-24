@@ -11,7 +11,6 @@ from claude_agent_sdk import (
     HookMatcher,
     RateLimitEvent,
     ResultMessage,
-    SdkPluginConfig,
     StreamEvent,
     SystemMessage,
     UserMessage,
@@ -24,6 +23,7 @@ from tessera.config import settings
 from tessera.models.agent import EffortLevel
 from tessera.services.noyau.groupe_de_processus import creer_groupe, fermer_le_groupe, rattacher_au_groupe
 from tessera.services.providers.base import ProviderResult, StreamCallback, ToolEventCallback
+from tessera.services.providers.compte_exige import refuser_appel_outille_sans_compte
 from tessera.services.providers.droits_worktree import DroitsAgentRefuses
 from tessera.services.providers.duree_max import borner
 from tessera.services.providers.env_agent import CLI_PARTAGE, env_de_l_agent
@@ -34,6 +34,7 @@ from tessera.services.providers.kill_guard import hook_refus_kill
 from tessera.services.providers.messages_sdk import _format_de_sortie, provider_result_du_sdk
 from tessera.services.providers.noms import ProviderIndisponible
 from tessera.services.providers.perimetre import hook_refus_hors_perimetre
+from tessera.services.providers.plugin_tessera import TESSERA_PLUGIN_PATH, plugins_du_role
 from tessera.services.providers.prompt_fichier import prompt_systeme_pour_sdk
 from tessera.services.providers.refus_cli import ReleveDesRefusCli
 from tessera.services.providers.refus_garde import JournalDesRefus
@@ -82,13 +83,9 @@ def _rappel_de_rattachement(groupe: Any | None) -> Callable[[int], None]:
 
 
 _ALLOWED_TOOLS = ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
-
-# Chemin absolu vers le plugin Tessera, ancré sur la racine du dépôt.
-# Ne jamais le résoudre depuis le cwd d'un projet : il vit dans le dépôt
-# de l'IDE, pas dans celui du projet qui déclare le skill.
-# backend/src/tessera/services/providers/ → parents[5] = racine du dépôt
-_REPO_ROOT: Path = Path(__file__).resolve().parents[5]
-_TESSERA_PLUGIN_PATH: Path = _REPO_ROOT / "agents" / "plugin"
+# Ancien nom du chemin du plugin, que des tests importent encore d'ici :
+# la définition vit désormais dans `plugin_tessera.py` (ticket-1043).
+_TESSERA_PLUGIN_PATH = TESSERA_PLUGIN_PATH
 
 # Octets UTF-8 au-delà desquels le prompt système part par fichier : la ligne
 # de commande Windows tient dans ~32 Ko et porte aussi réglages et outils.
@@ -113,6 +110,7 @@ def _build_options(
     effort: EffortLevel | None = None,
     schema: dict[str, Any] | None = None,
     compte_agent: bool = False,
+    compte_exige: bool = False,
 ) -> ClaudeAgentOptions:
     """Builds SDK options with the guardrails established by the ticket-044 spike.
 
@@ -137,6 +135,11 @@ def _build_options(
     # disables tool availability instead of merely withholding auto-approval,
     # and no configuration path can end up with an implicit toolset
     # (ticket-044 merge-gate review, finding 1).
+    # ADR-093 : seul un appel sans outil se passe du compte agent (ticket-1043).
+    refuser_appel_outille_sans_compte(
+        exige=compte_exige, compte_agent=compte_agent, allowed_tools=allowed_tools,
+        skills=skills, signaler=signaler,
+    )
     effective_tools = allowed_tools if allowed_tools is not None else _ALLOWED_TOOLS
 
     # `tools` étant explicite, l'option `skills` du SDK ne suffit pas à rendre
@@ -146,12 +149,7 @@ def _build_options(
     if skills:
         effective_tools = [*effective_tools, "Skill"]
 
-    # Plugin local Tessera : chargé uniquement si au moins un skill déclaré
-    # porte le préfixe `tessera:`. Le chemin est absolu, ancré sur la racine
-    # du dépôt, jamais sur le cwd du projet (ticket-293).
-    plugins: list[SdkPluginConfig] = []
-    if skills and any(s.startswith("tessera:") for s in skills):
-        plugins = [{"type": "local", "path": str(_TESSERA_PLUGIN_PATH)}]
+    plugins = plugins_du_role(skills)
 
     # `ask_user` : canal de dialogue branché (066) ; `signaler` : rôle outillé, `[]` non (863).
     mcp_servers, noms_mcp = serveur_tessera(ask_user, signaler, outille=allowed_tools != [])
@@ -233,8 +231,10 @@ class ClaudeAgentSDKProvider:
         duree_max_s: float | None = None,
         effort: EffortLevel | None = None,
         compte_agent: bool = False,
+        compte_exige: bool = False,
     ) -> None:
         self._compte_agent = compte_agent  # ticket-915 : faux, compte du backend
+        self._compte_exige = compte_exige  # ticket-1043 : le projet déclare le compte
         # L'effort de raisonnement du rôle (ticket-573) ; None : défaut du SDK.
         self._effort = effort
         # Durée totale d'un appel (ticket-518) ; None : pas de borne, comme
@@ -359,7 +359,7 @@ class ClaudeAgentSDKProvider:
             racine_ecriture=self.racine_ecriture, resume=resume,
             skills=self._skills, git_bash_path=self._git_bash_path,
             journal_refus=self._journal_refus, effort=self._effort,
-            schema=schema, compte_agent=self._compte_agent,
+            schema=schema, compte_agent=self._compte_agent, compte_exige=self._compte_exige,
         )
         # Sous le compte dédié, le CLI part par le transport maison (ADR-083).
         groupe = creer_groupe()
