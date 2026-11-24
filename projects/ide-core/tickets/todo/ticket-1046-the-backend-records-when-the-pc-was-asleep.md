@@ -25,20 +25,34 @@ donc la veille (ou l'arrêt du backend, qu'on ne distingue pas et qu'on dit
 sans prétendre plus).
 
 ## Solution proposée
-- Un battement toutes les 60 s dans une table `battements` ou un fichier
-  d'état sous `IDE_STATE_DIR`, qui garde le dernier instant.
+- Un battement toutes les 60 s, gardé dans la base (`settings.ide_db_path`,
+  table créée par `init_db` de `services/noyau/database.py`), qui retient le
+  dernier instant. La base, déjà isolée par `conftest.py`, survit au
+  redémarrage : le premier battement après un arrêt voit l'écart.
 - Au battement suivant, un écart de plus de 10 minutes s'enregistre comme
   « interruption » (début = dernier battement, fin = maintenant) ; on ne garde
   que les 30 dernières.
-- `GET /api/v1/rituels/interruptions` rend la liste, sous le jeton de session
-  habituel.
-- Un module de `services/` dans son domaine (ADR-076), un test par fonction publique.
+- Les instants sont pris sur la même horloge que les rituels : `datetime.now()`
+  local et naïf, comme `derniere` (`routers/rituels.py`). Le front les compare
+  tels quels à `derniere` (ticket-1047) : une heure UTC décalerait le test
+  d'une heure.
+- `GET /api/v1/rituels/interruptions` rend, sous le jeton de session habituel,
+  un `response_model` de forme `{"interruptions": [{"debut": "…", "fin": "…"}]}`,
+  la plus récente en premier. Ce contrat est celui que lit ticket-1047.
+- La route change le schéma : régénérer `docs/openapi.json` (`make openapi`),
+  et ranger `"GET /api/v1/rituels/interruptions"` dans `HORS_PERIMETRE` de
+  `frontend/src/test/contrat/perimetre.ts`, comme `GET /api/v1/rituels`, sans
+  quoi `contrat.test.ts` échoue.
+- Un module de `services/projets/` (le domaine des rituels, ADR-076), un test
+  par fonction publique.
 
 ## Critères d'acceptation
-- [ ] Un test montre qu'un écart de 11 minutes entre deux battements crée une interruption, et qu'un écart de 5 minutes n'en crée pas.
+- [ ] Un test montre qu'un écart de 11 minutes entre deux battements crée une interruption de début = battement précédent et fin = battement courant, et qu'un écart de 5 minutes n'en crée pas.
 - [ ] Un test montre que la 31e interruption fait sortir la plus ancienne.
-- [ ] Un test de `routers/rituels.py` montre que `GET /api/v1/rituels/interruptions` rend 401 sans jeton et la liste avec.
-- [ ] Le battement démarre avec le backend dans `main.py` et s'arrête à son arrêt, sans bloquer le démarrage si l'écriture échoue (échec journalisé).
+- [ ] Un test de `routers/rituels.py` montre que `GET /api/v1/rituels/interruptions` rend 401 sans jeton et, avec, un corps `{"interruptions": [...]}` dont chaque entrée a `debut` et `fin`, la plus récente en premier.
+- [ ] Le battement démarre dans le `lifespan` de `main.py` et s'arrête après son `yield`.
+- [ ] Un test montre qu'un battement dont l'écriture échoue journalise l'échec et ne lève pas.
+- [ ] `docs/openapi.json` contient la route, et `frontend/src/test/contrat/perimetre.ts` la range dans `HORS_PERIMETRE`.
 - [ ] `uv run mypy src/` passe sans erreur sur les fichiers ajoutés.
 
 ## Dépendances
