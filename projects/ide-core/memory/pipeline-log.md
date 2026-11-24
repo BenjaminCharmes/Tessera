@@ -10863,3 +10863,6 @@ error: Please commit or stash them.
 - 2026-11-24 10:11:33 UTC — [ticket-1047] validateur: fichiers cités joints : RituelsView.test.tsx, apiRituels.ts, frontend/src/hooks/useRituels.test.ts
 - 2026-11-24 10:11:33 UTC — [ticket-1047] validateur: APPROVED — Tous les critères sont satisfaits. Le code ajoute le calcul du retard (« en reta (31547ms)
 - 2026-11-24 10:11:34 UTC — [ticket-1047] APPROVED après 1 tour(s)
+- 2026-11-24 10:16:21 UTC — [ticket-1047] documentation: 2 fichier(s) (259608ms) — après tour de correction
+- 2026-11-24 10:16:21 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (183168 caractères)
+- 2026-11-24 10:16:21 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (137599 caractères)
