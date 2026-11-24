@@ -2,7 +2,7 @@
 rituels:
   - id: lecture-veille
     titre: Lecture de la veille
-    rythme: { type: hebdo, jour: lundi, heure: "09:00" }
+    rythme: { type: hebdo, jour: lundi, heure: "10:30" }
     duree_min: 15
     phrase: ouvrir Vigie
     detail: Lire le résumé de la semaine écoulée.
@@ -10,7 +10,7 @@ rituels:
 
   - id: radar-hebdo
     titre: Radar de la semaine
-    rythme: { type: hebdo, jour: lundi, heure: "09:30" }
+    rythme: { type: hebdo, jour: lundi, heure: "11:00" }
     duree_min: 30
     phrase: radar hebdo
     detail: Candidats du radar confrontés à chaque dépôt, tickets écrits pour ceux qui tiennent, aucune file lancée.
@@ -18,7 +18,7 @@ rituels:
 
   - id: point-revenus
     titre: Point revenus
-    rythme: { type: hebdo, jour: lundi, heure: "18:30" }
+    rythme: { type: hebdo, jour: lundi, heure: "14:00" }
     duree_min: 30
     phrase: point revenus
     detail: Chiffres de la semaine (visiteurs, Search Console), page « À toi de jouer », une décision.
@@ -30,14 +30,6 @@ rituels:
     duree_min: 10
     phrase: point hebdo
     detail: Noter la semaine de travail.
-    projets: [carriere]
-
-  - id: journal-du-jour
-    titre: Journal du jour
-    rythme: { type: quotidien, heure: "18:00", jours: ouvres }
-    duree_min: 10
-    phrase: journal du jour
-    detail: Collecte de tout ce qui s'est passé depuis la précédente (le lundi rattrape le week-end), versée en brouillons que le point hebdo valide.
     projets: [carriere]
 
   - id: releve-marche
@@ -65,7 +57,7 @@ rituels:
 
   - id: portfolio-hebdo
     titre: Portfolio de la semaine
-    rythme: { type: hebdo, jour: vendredi, heure: "17:00" }
+    rythme: { type: hebdo, jour: vendredi, heure: "14:00" }
     duree_min: 45
     phrase: portfolio hebdo
     detail: Relevé de la semaine, pages projets à jour, un article seulement si la semaine a un sujet.
@@ -92,8 +84,8 @@ rituels:
 
 Les actions qui reviennent et qu'on oublie quand la notification est fermée.
 Ce fichier est versionné : la liste est la même sur chaque PC, quel que soit le
-compte Claude utilisé. Tessera la lit et affiche un bandeau sur toutes ses vues
-tant qu'un rituel en retard n'est ni fait ni reporté.
+compte Claude utilisé. Tessera la lit et signale un rituel en retard par une pastille sur l'onglet Rituels et une entrée
+de cloche, tant qu'il n'est ni fait ni reporté.
 
 ## Écrire un rituel
 
@@ -107,7 +99,8 @@ tant qu'un rituel en retard n'est ni fait ni reporté.
 | `detail` | une phrase sur ce qu'il faut faire |
 | `projets` | ids des projets Tessera concernés : un bouton ouvre chacun |
 
-Les heures sont celles du PC. Ce qui est propre à un employeur ou à un client ne
+Les heures sont celles du PC : une heure se choisit en semaine, pendant que le PC
+est allumé. Ce qui est propre à un employeur ou à un client ne
 s'écrit pas ici : un libellé générique, et le détail dans un skill personnel.
 
 L'état « fait » ou « reporté » reste dans la base locale de chaque PC : un

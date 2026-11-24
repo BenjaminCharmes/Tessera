@@ -1,14 +1,15 @@
 ---
-id: ticket-1045
-title: "Chaque rituel de rituels.md tombe en semaine, pendant les heures où le PC est allumé ; le journal du jour disparaît"
-type: chore
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-11-23
 depends_on: []
 estimated_days: 0.5
-created: 2026-11-23
+id: ticket-1045
+pr_number: 1257
+priority: medium
+status: done
+title: Chaque rituel de rituels.md tombe en semaine, pendant les heures où le PC est
+  allumé ; le journal du jour disparaît
+type: chore
 ---
 
 # ticket-1045 — Rituels en semaine, en journée
