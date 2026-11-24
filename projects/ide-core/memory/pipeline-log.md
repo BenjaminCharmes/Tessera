@@ -10768,3 +10768,31 @@ error: Please commit or stash them.
 - 2026-11-24 08:19:45 UTC — [ticket-1048] documentation: 2 fichier(s) (217687ms)
 - 2026-11-24 08:19:45 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (181978 caractères)
 - 2026-11-24 08:19:45 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (137345 caractères)
+- 2026-11-24 08:20:20 UTC — [ide-core] ticket-1048 PR #1253 confiée au CIWatcher
+- 2026-11-24 08:20:26 UTC — [ticket-1042] branche ticket-1042-a-ticket-created-by-the-service-takes-its-number
+- 2026-11-24 08:20:29 UTC — [ticket-1042] tour 1 — codeur démarré
+- 2026-11-24 08:22:11 UTC — [ticket-1042] tour 1 — codeur terminé (100750ms)
+- 2026-11-24 08:25:21 UTC — [ticket-1042] testeur: 1 failed, 453 passed, 16 warnings in 154.28s (0:02:34) — fichiers en échec : tests/test_longueur_des_fichiers.py
+- 2026-11-24 08:25:21 UTC — [ticket-1042] tests rouges au tour 1
+- 2026-11-24 08:25:21 UTC — [ticket-1042] tour 2 — codeur démarré
+- 2026-11-24 08:27:07 UTC — [ticket-1042] tour 2 — codeur terminé (105483ms)
+- 2026-11-24 08:33:16 UTC — [ticket-1042] testeur: dur�es : ruff 0 s, mypy 23 s, mypy-linux 22 s, pytest 328 s ; impact depuis base : 114 fichier(s) de test
+- 2026-11-24 08:33:28 UTC — [ticket-1042] securite: PASS — Aucune faille introduite. Le diff déplace `normalize_depends_on` dans son propre (11344ms)
+- 2026-11-24 08:33:29 UTC — [ticket-1042] tour 2 — reviewer démarré
+- 2026-11-24 08:33:57 UTC — [ticket-1042] tour 2 — reviewer terminé (27875ms)
+- 2026-11-24 08:34:03 UTC — [ticket-1042] validateur: fichiers cités joints : tests/test_signalements.py
+- 2026-11-24 08:34:03 UTC — [ticket-1042] validateur: APPROVED — Les quatre critères d'acceptation sont tous satisfaits par des tests exécutés av (33702ms)
+- 2026-11-24 08:34:03 UTC — [ticket-1042] CHANGES_REQUESTED tour 2: Reviewer : 1. `create_tickets_batch` numérote encore avec `self._next_n()`, c'est-à-dire `highest_number(arbre) + 1`, sans réservation, sans base et sans branches. Ce chemin sert aux tickets du planif
+- 2026-11-24 08:34:03 UTC — [ticket-1042] tour 3 — codeur démarré
+- 2026-11-24 08:36:10 UTC — [ticket-1042] tour 3 — codeur terminé (126077ms)
+- 2026-11-24 08:40:54 UTC — [ticket-1042] testeur: dur�es : ruff 14 s, mypy 14 s, mypy-linux 16 s, pytest 246 s ; impact depuis base : 114 fichier(s) de test
+- 2026-11-24 08:41:04 UTC — [ticket-1042] securite: PASS — Le diff ajouté n'introduit aucune vulnérabilité, d'où le PASS. Il déplace `norma (9453ms)
+- 2026-11-24 08:41:05 UTC — [ticket-1042] tour 3 — reviewer démarré
+- 2026-11-24 08:41:23 UTC — [ticket-1042] tour 3 — reviewer terminé (17780ms)
+- 2026-11-24 08:41:39 UTC — [ticket-1042] validateur: fichiers cités joints : tests/test_signalements.py
+- 2026-11-24 08:41:39 UTC — [ticket-1042] validateur: APPROVED — Les quatre critères sont tous satisfaits par des tests exécutés avec succès. Le  (33703ms)
+- 2026-11-24 08:41:39 UTC — [ticket-1042] APPROVED après 3 tour(s)
+- 2026-11-24 08:42:29 UTC — [ticket-1042] leçons: une leçon proposée
+- 2026-11-24 08:43:29 UTC — [ticket-1042] documentation: 0 fichier(s) (38967ms) — doc-technique : aucune édition proposée — doc-fonctionnelle : aucune édition proposée
+- 2026-11-24 08:43:29 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (181978 caractères)
+- 2026-11-24 08:43:29 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (137345 caractères)

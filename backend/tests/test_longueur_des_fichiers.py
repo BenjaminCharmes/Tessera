@@ -23,7 +23,7 @@ PLAFONDS: dict[str, int] = {
     "services/pipeline/reprise_orphelin.py": 346,
     "services/pipeline/run_executor.py": 331,
     "services/verification/test_runner.py": 435,
-    "services/projets/ticket_service.py": 450,
+    "services/projets/ticket_service.py": 414,
 }
 
 SOURCES = Path(__file__).resolve().parent.parent / "src" / "tessera"

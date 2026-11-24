@@ -244,3 +244,19 @@ async def test_batch_description_is_at_start_of_body(tmp_path: Path) -> None:
     result = await svc.create_tickets_batch([draft])
     body = result[0].body
     assert body.startswith(description)
+
+
+async def test_batch_skips_a_reserved_number_and_the_file_holds_the_last(tmp_path: Path) -> None:
+    import json
+
+    from tessera.config import settings
+    from tessera.services.noyau import numerotation, reservation
+
+    svc = _svc(tmp_path)
+    assert numerotation.reserver(tmp_path / "my-project", "ticket", "develop", settings.ide_state_dir) == 1
+
+    created = await svc.create_tickets_batch([_draft("A"), _draft("B")])
+
+    assert [t.id for t in created] == ["ticket-002", "ticket-003"]
+    contenu = json.loads((settings.ide_state_dir / reservation.NOM_FICHIER).read_text(encoding="utf-8"))
+    assert [genres["ticket"] for genres in contenu.values()] == [3]

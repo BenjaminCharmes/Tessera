@@ -1,14 +1,14 @@
 ---
-id: ticket-1042
-title: "A ticket created by the service takes its number through the reservation"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-11-23
 depends_on: []
 estimated_days: 1
-created: 2026-11-23
+id: ticket-1042
+pr_number: 1255
+priority: medium
+status: done
+title: A ticket created by the service takes its number through the reservation
+type: fix
 ---
 
 # ticket-1042 — Un ticket créé par le service prend son numéro par la réservation
