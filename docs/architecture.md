@@ -1141,7 +1141,7 @@ Avant le démarrage d'un run, deux garde-fous s'appliquent aux projets sans work
 
 Une validation précoce refuse un run (`422 Unprocessable Entity`) si le checkout est sur une branche qui n'est ni la base du projet ni celle d'un ticket existant (`ticket-NNN-*`). Le message nomme la branche actuelle et invite à revenir à la base ou à utiliser un worktree manuel.
 
-Cas d'usage : après qu'un run ait échoué, le checkout reste sur la branche du ticket. Une nouvelle session ne peut pas lancer de run sur cette branche — elle n'existe probablement plus, et tout changement préexistant causerait une confusion. Le checkout doit d'abord être réalignné.
+Cas d'usage : une autre session a laissé le checkout sur sa propre branche (une branche de fiches, par exemple). Un run lancé là bifurquerait de ce travail et lirait un `agents.json` plus vieux que la base : il est refusé. Le checkout resté sur la branche d'un ticket du projet, après un run interrompu, n'est pas refusé : la reprise du ticket en a besoin.
 
 **Réalignement de la base distante**
 
