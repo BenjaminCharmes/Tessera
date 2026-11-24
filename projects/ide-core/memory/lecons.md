@@ -3,11 +3,6 @@
 Pièges observés sur ce projet, une ligne chacun. Le service écrit sous `## Proposées` ; un humain déplace une leçon sous `## En vigueur` pour qu'elle atteigne le codeur et le reviewer.
 
 ## Proposées
-- Quand un validateur énumère plusieurs cas (A/B/C) et qu'un manque après refactorisation, tous les chemins doivent être traités ensemble. (source : ticket-1029, 2026-11-20)
-- Quand un modèle Pydantic exposé par l'API est modifié, régénérer et committer le schéma OpenAPI. (source : ticket-1033, 2026-11-20)
-- Quand on extrait une fonction dans un fichier de service, vérifier que ce fichier ne dépasse pas son plafond, car la contraction ailleurs ne le compense pas toujours. (source : ticket-1036, 2026-11-20)
-- Quand un routeur principal orchestrant plusieurs contrôles approche de 300 lignes, créer un coordinateur intermédiaire plutôt que d'ajouter des appels directs pour respecter le plafond. (source : ticket-1048, 2026-11-24)
-- Quand plusieurs chemins créent des tickets, l'un d'eux peut oublier de passer par la réservation, créant des doublons. (source : ticket-1042, 2026-11-24)
 
 ## En vigueur
 - Quand un verrou protège un état global partagé, intégrer un test de sa présence pour prévenir sa suppression accidentelle. (source : ticket-1023, 2026-11-20)
