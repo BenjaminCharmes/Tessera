@@ -10834,3 +10834,15 @@ error: Please commit or stash them.
 - 2026-11-24 09:35:55 UTC — [ticket-1045] documentation: 0 fichier(s) (80000ms) — doc-technique : aucune édition proposée — doc-fonctionnelle : aucune édition proposée
 - 2026-11-24 09:35:55 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (183168 caractères)
 - 2026-11-24 09:35:55 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (137599 caractères)
+- 2026-11-24 09:38:16 UTC — [ide-core] ticket-1045 PR #1257 confiée au CIWatcher
+- 2026-11-24 09:37:12 UTC — [ide-core] ticket-1043 PR #1256 mergée (CI verte)
+- 2026-11-24 09:38:23 UTC — [ticket-1046] branche ticket-1046-le-backend-enregistre-les-p-riodes-o-le-pc-tait
+- 2026-11-24 09:38:27 UTC — [ticket-1046] tour 1 — codeur démarré
+- 2026-11-24 09:40:34 UTC — [ticket-1046] tour 1 — codeur terminé (126516ms)
+- 2026-11-24 09:47:06 UTC — [ticket-1046] testeur: dur�es : ruff 0 s, mypy 15 s, mypy-linux 14 s, tsc 33 s, eslint 63 s, vitest 254 s, pytest 353 s ; impact depuis base : 131 fichier(s) de test
+- 2026-11-24 09:47:19 UTC — [ticket-1046] securite: PASS — Le diff ajoute un battement en tâche de fond qui écrit dans le SQLite local par  (11922ms)
+- 2026-11-24 09:47:19 UTC — [ticket-1046] tour 1 — reviewer démarré
+- 2026-11-24 09:47:42 UTC — [ticket-1046] tour 1 — reviewer terminé (23000ms)
+- 2026-11-24 09:47:54 UTC — [ticket-1046] validateur: fichiers cités joints : routers/rituels.py, main.py, docs/openapi.json (tronqué) ; non joints (budget épuisé) : frontend/src/test/contrat/perimetre.ts
+- 2026-11-24 09:47:54 UTC — [ticket-1046] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le battement du backend enregis (34781ms)
+- 2026-11-24 09:47:55 UTC — [ticket-1046] APPROVED après 1 tour(s)
