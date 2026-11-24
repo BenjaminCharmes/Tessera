@@ -14,8 +14,10 @@ created: 2026-11-23
 # ticket-1045 — Rituels en semaine, en journée
 
 ## Objectif
-Qu'aucun rituel ne tombe un soir, une nuit ou un week-end : le PC est alors
-éteint ou en veille, et l'échéance n'est vue qu'au réveil.
+Qu'aucun rituel hebdomadaire ne tombe un soir, une nuit ou un week-end : le PC
+est alors éteint ou en veille, et l'échéance n'est vue qu'au réveil. Un rituel
+mensuel garde son jour du mois ; s'il tombe un samedi, il est vu le lundi, et
+ticket-1047 dira pourquoi.
 
 ## Contexte
 Le PC n'est allumé que la semaine en journée, jusqu'au homelab. Dernière
@@ -37,6 +39,9 @@ Ne modifier que `rituels.md` (le fichier, pas le code) :
 Les autres rituels (jour du mois ou vendredi 16:00, 09:00-10:00) restent.
 Ajouter à la section « Écrire un rituel » une phrase : une heure se choisit
 quand le PC est allumé, en semaine.
+Corriger l'introduction du fichier, qui dit encore que Tessera « affiche un
+bandeau sur toutes ses vues » : il n'y en a pas (écarté au ticket-903), c'est
+une pastille sur l'onglet Rituels et une entrée de cloche.
 
 ## Critères d'acceptation
 - [ ] `rituels.md` donne à `lecture-veille` l'heure `"10:30"` et à `radar-hebdo` l'heure `"11:00"`, toujours le lundi.
@@ -44,6 +49,7 @@ quand le PC est allumé, en semaine.
 - [ ] `rituels.md` ne contient plus d'entrée d'`id` `journal-du-jour`, et `point-hebdo-travail` y reste avec son détail inchangé.
 - [ ] Un test lit `rituels.md` du dépôt avec `lire_definitions` et vérifie qu'aucun rythme `hebdo` ou `quotidien` n'a une heure avant 08:00 ou après 17:59, ni un jour `samedi` ou `dimanche`.
 - [ ] `rituels.md` dit, dans « Écrire un rituel », qu'une heure se choisit en semaine pendant que le PC est allumé.
+- [ ] `rituels.md` ne contient plus le mot « bandeau ».
 
 ## Dépendances
 Aucune.
