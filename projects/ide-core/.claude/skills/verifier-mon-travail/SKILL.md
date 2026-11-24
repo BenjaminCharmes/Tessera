@@ -37,6 +37,15 @@ suffit pour te renvoyer un tour entier (957, 960 et 964 l'ont perdu ainsi).
 cd ../../backend && uv run python -m ruff check --fix src/tessera/mon_module.py tests/test_mon_module.py
 ```
 
+Et le plafond de longueur dès que tu as ajouté des lignes à un fichier de
+`src/` : il se juge en une seconde, et trois tickets sur six ont perdu leur
+premier tour sur lui le 24/11 (1048, 1042, 1043). Rouge : extrais un module,
+ne relève pas le plafond.
+
+```bash
+cd ../../backend && uv run python -m pytest tests/test_longueur_des_fichiers.py -q -p no:cacheprovider
+```
+
 Frontend, et le typage si tu as touché du TypeScript :
 
 ```bash
