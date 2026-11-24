@@ -2219,6 +2219,7 @@ Avant de lancer, Tessera vérifie que tu peux aller jusqu'au bout de la livraiso
 - **`github_remote` absent** : tu veux créer une PR (`autonomy: pr` ou plus), mais ton projet n'est pas lié à un dépôt GitHub.
 - **CI absente** : tu veux fusionner (`autonomy: merge`), tu n'as aucun fichier `.github/workflows/*.yml` et tu n'as pas déclaré `merge_without_ci: true`.
 - **Commande manquante** : ton `test_command` demande une commande (`pytest`, `npm test`, `cargo test`…) qui n'existe pas sur ta machine — le message énumère laquelle.
+- **Checkout sur branche étrangère** : ton arbre de travail n'est pas sur la base du projet ni sur une branche de ticket en cours. Reviens sur la base avant de lancer.
 
 **Solutions :**
 
@@ -2226,6 +2227,7 @@ L'erreur énumère exactement ce qui manque. Ajoute-le :
 - Renseigne `github_remote` pour lier à GitHub.
 - Crée un workflow GitHub Actions, ou pose `merge_without_ci: true` dans la configuration du projet.
 - Installe ou corrige la commande de test.
+- Reviens sur la base (`git checkout develop`), ou travaille dans un worktree manuel.
 
 Après correction, relance. Si tu veux contourner ces vérifications — par exemple pour tester un ticket sans le livrer — passe `force: true` au lancement (détail en fonction du mode de requête utilisé).
 
