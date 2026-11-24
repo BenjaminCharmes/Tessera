@@ -10796,3 +10796,23 @@ error: Please commit or stash them.
 - 2026-11-24 08:43:29 UTC — [ticket-1042] documentation: 0 fichier(s) (38967ms) — doc-technique : aucune édition proposée — doc-fonctionnelle : aucune édition proposée
 - 2026-11-24 08:43:29 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (181978 caractères)
 - 2026-11-24 08:43:29 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (137345 caractères)
+- 2026-11-24 08:49:14 UTC — [ide-core] ticket-1042 PR #1255 confiée au CIWatcher
+- 2026-11-24 08:31:46 UTC — [ide-core] ticket-1048 PR #1253 mergée (CI verte)
+- 2026-11-24 08:49:21 UTC — [ticket-1043] branche ticket-1043-a-tool-bearing-call-cannot-skip-the-agent-accoun
+- 2026-11-24 08:49:25 UTC — [ticket-1043] tour 1 — codeur démarré
+- 2026-11-24 08:51:54 UTC — [ticket-1043] tour 1 — codeur terminé (149203ms)
+- 2026-11-24 09:00:54 UTC — [ticket-1043] testeur: 1 failed, 2456 passed, 3 skipped, 121 warnings in 495.46s (0:08:15) — fichiers en échec : tests/test_longueur_des_fichiers.py
+- 2026-11-24 09:00:54 UTC — [ticket-1043] tests rouges au tour 1
+- 2026-11-24 09:00:54 UTC — [ticket-1043] tour 2 — codeur démarré
+- 2026-11-24 09:02:50 UTC — [ticket-1043] tour 2 — codeur terminé (115125ms)
+- 2026-11-24 09:07:12 UTC — [ticket-1043] testeur: 1258 passed, 3 skipped, 121 warnings, 1 error in 214.33s (0:03:34) — fichiers en échec : tests/test_agent_sdk_groupe.py
+- 2026-11-24 09:07:13 UTC — [ticket-1043] tests rouges au tour 2
+- 2026-11-24 09:07:13 UTC — [ticket-1043] tour 3 — codeur démarré
+- 2026-11-24 09:08:56 UTC — [ticket-1043] tour 3 — codeur terminé (102967ms)
+- 2026-11-24 09:18:26 UTC — [ticket-1043] testeur: dur�es : ruff 0 s, mypy 11 s, mypy-linux 11 s, pytest 526 s ; impact depuis base : 320 fichier(s) de test
+- 2026-11-24 09:18:38 UTC — [ticket-1043] securite: PASS — Le diff ajoute une protection : un appel outillé hors du compte agent lève Provi (11655ms)
+- 2026-11-24 09:18:39 UTC — [ticket-1043] tour 3 — reviewer démarré
+- 2026-11-24 09:19:15 UTC — [ticket-1043] tour 3 — reviewer terminé (35547ms)
+- 2026-11-24 09:19:19 UTC — [ticket-1043] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le code implémente correctemen (39452ms)
+- 2026-11-24 09:19:19 UTC — [ticket-1043] APPROVED après 3 tour(s)
+- 2026-11-24 09:20:47 UTC — [ticket-1043] leçons: refusée — plus de 200 caractères
