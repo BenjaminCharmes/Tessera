@@ -10846,3 +10846,6 @@ error: Please commit or stash them.
 - 2026-11-24 09:47:54 UTC — [ticket-1046] validateur: fichiers cités joints : routers/rituels.py, main.py, docs/openapi.json (tronqué) ; non joints (budget épuisé) : frontend/src/test/contrat/perimetre.ts
 - 2026-11-24 09:47:54 UTC — [ticket-1046] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le battement du backend enregis (34781ms)
 - 2026-11-24 09:47:55 UTC — [ticket-1046] APPROVED après 1 tour(s)
+- 2026-11-24 09:51:08 UTC — [ticket-1046] documentation: 1 fichier(s) (174516ms) — après tour de correction — doc-fonctionnelle : aucune édition proposée — refusé : doc-technique : docs/api.md : règle « jeton vérifiable » — guillemets « 2026-11-24t09:30:00 » n'est ni dans le texte remplacé, ni dans les tickets, le diff ou l
+- 2026-11-24 09:51:08 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (183168 caractères)
+- 2026-11-24 09:51:08 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (137599 caractères)
