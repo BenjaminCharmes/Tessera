@@ -1688,6 +1688,14 @@ Dans la rail de navigation (`NavRail`), le panneau **Rituels** rejoint le groupe
 
 Le hook `useRituels` lit `GET /api/v1/rituels` par `usePolling` (intervalle de 5 minutes et à l'ouverture du panneau). Il expose la liste des rituels et un compteur `enRetard`, plus deux actions : `fait(id)` et `reporter(id)`, qui appellent les routes correspondantes (`POST /api/v1/rituels/{id}/fait` et `POST /api/v1/rituels/{id}/reporter`) puis relisent la liste.
 
+### Affichage du retard et des interruptions (ticket-1047)
+
+Une carte de rituel en retard affiche maintenant :
+- **Durée du retard**, arrondie selon la magnitude : minutes si moins d'une heure, heures si moins d'une journée, jours au-delà.
+- **Période d'interruption**, si elle couvre l'échéance : « Tessera n'a pas tourné du <début> au <fin> ».
+
+Les interruptions viennent de `GET /api/v1/rituels/interruptions` (ticket-1046), avec `debut` et `fin` en heures locales sans fuseau. Le frontend les charge indépendamment de la liste des rituels ; leur absence ne bloque pas l'affichage.
+
 ## Caching des statuts GitHub (ticket-364)
 
 L'endpoint `/projects/{id}/tickets/{id}/pr-status` affichait le statut de chaque PR en interrogeant GitHub, sans cache. Chaque appel lancait deux requêtes GitHub (la PR, puis ses check-runs). Avec 139 tickets portant un `pr_number` dans ide-core, ouvrir le projet provoquait 139 appels à l'endpoint, soit ~280 requêtes GitHub — consommant 5,6 % du quota horaire (5 000 requêtes).
