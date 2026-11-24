@@ -565,7 +565,7 @@ Clique sur « Rituels » dans le groupe Pilotage de la barre latérale. Si un ou
 
 La vue affiche trois sections :
 
-- **À faire** : rituels en retard sous forme de cartes, avec le titre, le temps écoulé (en rouge si urgent), le rythme et la durée, et une phrase à dire à Claude.
+- **À faire** : rituels en retard sous forme de cartes, avec le titre, la date depuis laquelle tu n'as rien fait (en rouge si urgent), le rythme et la durée, le nombre de retard arrondi en heures ou minutes, et une phrase à dire à Claude. Si Tessera n'a pas tourné pendant l'horaire du rituel, tu vois la période d'interruption.
 - **À venir** : une ligne par rituel, avec sa prochaine échéance.
 - **Faits récemment** : les rituels que tu viens de marquer comme faits.
 

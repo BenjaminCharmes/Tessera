@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
-import { lireRituels, marquerFait, reporterRituel } from "../lib/apiRituels";
-import type { ListeRituels, Rituel } from "../lib/apiRituels";
+import { lireInterruptions, lireRituels, marquerFait, reporterRituel } from "../lib/apiRituels";
+import type { Interruption, ListeRituels, Rituel } from "../lib/apiRituels";
 import { usePolling } from "./usePolling";
 
 /** Cinq minutes : un rituel se mesure en heures. */
@@ -8,6 +8,8 @@ const CADENCE_MS = 5 * 60 * 1000;
 
 export interface UseRituelsResult {
   rituels: Rituel[];
+  /** Les périodes où Tessera n'a pas tourné ; vide si leur lecture échoue. */
+  interruptions: Interruption[];
   /** Combien de rituels sont en retard : le nombre de la pastille. */
   enRetard: number;
   /** L'erreur du backend (lecture de `rituels.md`) ou de la requête. */
@@ -25,6 +27,7 @@ const message = (e: unknown): string => (e instanceof Error ? e.message : String
 /** Lit les rituels à l'ouverture puis toutes les cinq minutes (ticket-903). */
 export function useRituels(): UseRituelsResult {
   const [liste, setListe] = useState<ListeRituels>(VIDE);
+  const [interruptions, setInterruptions] = useState<Interruption[]>([]);
   const [echec, setEchec] = useState<string | null>(null);
 
   const lire = useCallback(async () => {
@@ -33,6 +36,12 @@ export function useRituels(): UseRituelsResult {
       setEchec(null);
     } catch (e) {
       setEchec(message(e));
+    }
+    // Séparé : sans interruptions, les rituels restent lus et le retard se dit sans cause.
+    try {
+      setInterruptions(await lireInterruptions());
+    } catch {
+      setInterruptions([]);
     }
   }, []);
 
@@ -53,6 +62,7 @@ export function useRituels(): UseRituelsResult {
 
   return {
     rituels: liste.rituels,
+    interruptions,
     enRetard: liste.rituels.filter((r) => r.statut === "en_retard").length,
     erreur: liste.erreur ?? echec,
     synchro: liste.synchro,

@@ -36,6 +36,18 @@ export function lireRituels(): Promise<ListeRituels> {
   return request<ListeRituels>("/rituels");
 }
 
+/** Une période où Tessera n'a pas tourné, en heures locales sans fuseau. */
+export interface Interruption {
+  debut: string;
+  fin: string;
+}
+
+/** Les périodes d'interruption relevées par le backend (ticket-1046). */
+export async function lireInterruptions(): Promise<Interruption[]> {
+  const reponse = await request<{ interruptions: Interruption[] }>("/rituels/interruptions");
+  return reponse.interruptions;
+}
+
 /** Marque un rituel fait maintenant. */
 export async function marquerFait(id: string): Promise<void> {
   await send(`/rituels/${encodeURIComponent(id)}/fait`, { method: "POST" });

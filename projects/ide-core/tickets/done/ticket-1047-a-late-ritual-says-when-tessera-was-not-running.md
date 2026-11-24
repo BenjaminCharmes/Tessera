@@ -1,14 +1,15 @@
 ---
-id: ticket-1047
-title: "Un rituel en retard dit combien et pendant quelle interruption il est tombé"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
-depends_on: ["ticket-1046"]
-estimated_days: 1
 created: 2026-11-23
+depends_on:
+- ticket-1046
+estimated_days: 1
+id: ticket-1047
+pr_number: 1259
+priority: medium
+status: done
+title: Un rituel en retard dit combien et pendant quelle interruption il est tombé
+type: feat
 ---
 
 # ticket-1047 — Un retard qui s'explique
