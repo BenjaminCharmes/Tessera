@@ -106,6 +106,7 @@ L'endpoint accepte un signalement (bug ou idée) sur Tessera. Il crée automatiq
 | Méthode | Endpoint | Description |
 |---------|----------|-------------|
 | `GET` | `/api/v1/rituels` | List Rituels |
+| `GET` | `/api/v1/rituels/interruptions` | Backend Gaps |
 | `POST` | `/api/v1/rituels/{id}/fait` | Mark Ritual Done |
 | `POST` | `/api/v1/rituels/{id}/reporter` | Postpone Ritual |
 
