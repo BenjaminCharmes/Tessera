@@ -10793,3 +10793,6 @@ error: Please commit or stash them.
 - 2026-11-24 08:41:39 UTC — [ticket-1042] validateur: APPROVED — Les quatre critères sont tous satisfaits par des tests exécutés avec succès. Le  (33703ms)
 - 2026-11-24 08:41:39 UTC — [ticket-1042] APPROVED après 3 tour(s)
 - 2026-11-24 08:42:29 UTC — [ticket-1042] leçons: une leçon proposée
+- 2026-11-24 08:43:29 UTC — [ticket-1042] documentation: 0 fichier(s) (38967ms) — doc-technique : aucune édition proposée — doc-fonctionnelle : aucune édition proposée
+- 2026-11-24 08:43:29 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (181978 caractères)
+- 2026-11-24 08:43:29 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (137345 caractères)
