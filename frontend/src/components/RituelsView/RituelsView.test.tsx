@@ -29,6 +29,7 @@ function rituel(surcharge: Partial<Rituel>): Rituel {
 function etat(rituels: Rituel[], erreur: string | null = null): UseRituelsResult {
   return {
     rituels,
+    interruptions: [],
     enRetard: rituels.filter((r) => r.statut === "en_retard").length,
     erreur,
     fait: vi.fn().mockResolvedValue(undefined),
@@ -95,6 +96,29 @@ describe("RituelsView", () => {
     expect(screen.queryByText(/sur ce PC seulement/)).toBeNull();
   });
 
+  it("says how late a ritual is, rounded down to the hour", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-11-10T03:42:00"));
+    render(<RituelsView rituels={etat([rituel({})])} projets={[]} />);
+    vi.useRealTimers();
+    expect(screen.getByText(/en retard de 9 h/)).toBeInTheDocument();
+  });
+
+  it("names the interruption that covers the due date", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-11-10T03:42:00"));
+    const liste = etat([rituel({})]);
+    liste.interruptions = [{ debut: "2026-11-09T18:00:00", fin: "2026-11-10T02:15:00" }];
+    render(<RituelsView rituels={liste} projets={[]} />);
+    vi.useRealTimers();
+    expect(screen.getByText(/Tessera n'a pas tourné du .+ au /)).toBeInTheDocument();
+  });
+
+  it("does not name an interruption when none covers the due date", () => {
+    render(<RituelsView rituels={etat([rituel({})])} projets={[]} />);
+    expect(screen.queryByText(/Tessera n'a pas tourné/)).toBeNull();
+  });
+
   it("shows an overdue ritual in red", () => {
     render(<RituelsView rituels={etat([rituel({ depasse: true })])} projets={[]} />);
     expect(screen.getByText(/Dépassé/).className).toMatch(/text-red-/);
@@ -122,8 +146,11 @@ describe("useRituels", () => {
     vi.stubGlobal(
       "fetch",
       vi.fn(async (url: string, init?: RequestInit) => {
-        appels.push(`${init?.method ?? "GET"} ${url.slice(url.indexOf("/api/v1"))}`);
+        if (!url.endsWith("/rituels/interruptions")) appels.push(`${init?.method ?? "GET"} ${url.slice(url.indexOf("/api/v1"))}`);
         if (init?.method === "POST") return new Response(null, { status: 204 });
+        if (url.endsWith("/rituels/interruptions")) {
+          return new Response(JSON.stringify({ interruptions: [] }), { status: 200 });
+        }
         return new Response(JSON.stringify(liste), { status: 200 });
       }),
     );

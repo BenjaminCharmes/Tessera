@@ -38,7 +38,7 @@ const parDate = (cle: "prochaine" | "fait_le", sens: 1 | -1) => (a: Rituel, b: R
 
 /** La vue Rituels : ce qui est en retard, ce qui vient, ce qui est fait (ticket-903). */
 export default function RituelsView({ rituels, projets, onOpenProject }: RituelsViewProps) {
-  const { rituels: liste, erreur, synchro, fait, reporter } = rituels;
+  const { rituels: liste, interruptions, erreur, synchro, fait, reporter } = rituels;
   const aFaire = liste.filter((r) => r.statut === "en_retard");
   const aVenir = liste.filter((r) => r.statut === "a_venir").sort(parDate("prochaine", 1));
   const faits = liste.filter((r) => r.statut === "fait").sort(parDate("fait_le", -1));
@@ -68,6 +68,7 @@ export default function RituelsView({ rituels, projets, onOpenProject }: Rituels
                 key={r.id}
                 rituel={r}
                 projets={projets}
+                interruptions={interruptions}
                 onOpenProject={onOpenProject}
                 onFait={(id) => void fait(id)}
                 onReporter={(id) => void reporter(id)}
