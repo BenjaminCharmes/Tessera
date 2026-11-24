@@ -6,6 +6,7 @@ from fastapi import APIRouter, HTTPException
 from tessera.config import settings
 from tessera.services.github import rituels_sync
 from tessera.services.projets import rituels as service
+from tessera.services.projets import veille
 
 router = APIRouter(prefix="/rituels", tags=["rituels"])
 
@@ -22,6 +23,12 @@ async def get_rituels() -> service.ListeRituels:
     synchro = await rituels_sync.tirer(settings.ide_db_path)
     liste = await service.lister(settings.ide_db_path, datetime.now())
     return liste.model_copy(update={"synchro": synchro})
+
+
+@router.get("/interruptions", response_model=veille.ListeInterruptions)
+async def get_interruptions() -> veille.ListeInterruptions:
+    """Gaps in the backend's heartbeat (PC asleep or backend stopped), latest first."""
+    return await veille.lister(settings.ide_db_path)
 
 
 @router.post("/{identifiant}/fait", status_code=204)
