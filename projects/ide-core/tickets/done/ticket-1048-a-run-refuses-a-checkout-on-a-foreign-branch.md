@@ -5,7 +5,7 @@ depends_on: []
 estimated_days: 1
 id: ticket-1048
 plan: true
-pr_number: null
+pr_number: 1253
 priority: high
 status: done
 title: A run refuses a checkout left on a foreign branch, and reads its policy after
