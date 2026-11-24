@@ -10849,3 +10849,17 @@ error: Please commit or stash them.
 - 2026-11-24 09:51:08 UTC — [ticket-1046] documentation: 1 fichier(s) (174516ms) — après tour de correction — doc-fonctionnelle : aucune édition proposée — refusé : doc-technique : docs/api.md : règle « jeton vérifiable » — guillemets « 2026-11-24t09:30:00 » n'est ni dans le texte remplacé, ni dans les tickets, le diff ou l
 - 2026-11-24 09:51:08 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (183168 caractères)
 - 2026-11-24 09:51:08 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (137599 caractères)
+- 2026-11-24 10:03:49 UTC — [ide-core] ticket-1046 : base réalignée sur develop
+- 2026-11-24 10:03:49 UTC — [ide-core] ticket-1046 PR #1258 confiée au CIWatcher
+- 2026-11-24 09:44:26 UTC — [ide-core] ticket-1045 PR #1257 mergée (CI verte)
+- 2026-11-24 10:03:47 UTC — [ide-core] ticket-1046 PR #1258 mergée (CI verte)
+- 2026-11-24 10:03:55 UTC — [ticket-1047] branche ticket-1047-un-rituel-en-retard-dit-combien-et-pendant-quell
+- 2026-11-24 10:03:59 UTC — [ticket-1047] tour 1 — codeur démarré
+- 2026-11-24 10:05:54 UTC — [ticket-1047] tour 1 — codeur terminé (115313ms)
+- 2026-11-24 10:10:52 UTC — [ticket-1047] testeur: dur�es : tsc 19 s, eslint 30 s, vitest 204 s
+- 2026-11-24 10:11:01 UTC — [ticket-1047] securite: PASS — Je n'ai relevé aucune faille dans ce diff, qui ne touche que le frontend. Il ajo (7657ms)
+- 2026-11-24 10:11:03 UTC — [ticket-1047] tour 1 — reviewer démarré
+- 2026-11-24 10:11:20 UTC — [ticket-1047] tour 1 — reviewer terminé (17438ms)
+- 2026-11-24 10:11:33 UTC — [ticket-1047] validateur: fichiers cités joints : RituelsView.test.tsx, apiRituels.ts, frontend/src/hooks/useRituels.test.ts
+- 2026-11-24 10:11:33 UTC — [ticket-1047] validateur: APPROVED — Tous les critères sont satisfaits. Le code ajoute le calcul du retard (« en reta (31547ms)
+- 2026-11-24 10:11:34 UTC — [ticket-1047] APPROVED après 1 tour(s)
