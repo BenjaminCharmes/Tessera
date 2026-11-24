@@ -5,7 +5,7 @@ depends_on:
 - ticket-1046
 estimated_days: 1
 id: ticket-1047
-pr_number: null
+pr_number: 1259
 priority: medium
 status: done
 title: Un rituel en retard dit combien et pendant quelle interruption il est tombé
