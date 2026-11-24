@@ -10765,3 +10765,6 @@ error: Please commit or stash them.
 - 2026-11-24 08:14:57 UTC — [ticket-1048] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits par le code et les tests. L'impl (32765ms)
 - 2026-11-24 08:14:57 UTC — [ticket-1048] APPROVED après 3 tour(s)
 - 2026-11-24 08:15:48 UTC — [ticket-1048] leçons: une leçon proposée
+- 2026-11-24 08:19:45 UTC — [ticket-1048] documentation: 2 fichier(s) (217687ms)
+- 2026-11-24 08:19:45 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (181978 caractères)
+- 2026-11-24 08:19:45 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (137345 caractères)
