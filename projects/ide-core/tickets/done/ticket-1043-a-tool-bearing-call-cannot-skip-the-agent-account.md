@@ -1,12 +1,13 @@
 ---
-id: ticket-1043
-title: "A tool-bearing call cannot skip the agent account"
-type: fix
-status: todo
-priority: medium
 agent: codeur
 depends_on: []
 estimated_days: 1
+id: ticket-1043
+pr_number: 1256
+priority: medium
+status: done
+title: A tool-bearing call cannot skip the agent account
+type: fix
 ---
 
 # ticket-1043 — Un appel outillé ne peut pas contourner le compte agent
