@@ -10819,3 +10819,15 @@ error: Please commit or stash them.
 - 2026-11-24 09:22:10 UTC — [ticket-1043] documentation: 0 fichier(s) (62188ms) — doc-technique : aucune édition proposée — doc-fonctionnelle : aucune édition proposée
 - 2026-11-24 09:22:10 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (183168 caractères)
 - 2026-11-24 09:22:10 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (137599 caractères)
+- 2026-11-24 09:31:26 UTC — [ide-core] ticket-1043 PR #1256 confiée au CIWatcher
+- 2026-11-24 08:55:04 UTC — [ide-core] ticket-1042 PR #1255 mergée (CI verte)
+- 2026-11-24 09:31:32 UTC — [ticket-1045] branche ticket-1045-chaque-rituel-de-rituels-md-tombe-en-semaine-pen
+- 2026-11-24 09:31:36 UTC — [ticket-1045] tour 1 — codeur démarré
+- 2026-11-24 09:32:22 UTC — [ticket-1045] tour 1 — codeur terminé (45734ms)
+- 2026-11-24 09:33:38 UTC — [ticket-1045] testeur: dur�es : ruff 0 s, mypy 21 s, mypy-linux 17 s, pytest 39 s ; impact depuis base : 6 fichier(s) de test
+- 2026-11-24 09:33:43 UTC — [ticket-1045] securite: PASS — Le diff ne fait que trois choses : il déplace des heures de rituels dans rituels (4532ms)
+- 2026-11-24 09:33:44 UTC — [ticket-1045] tour 1 — reviewer démarré
+- 2026-11-24 09:34:01 UTC — [ticket-1045] tour 1 — reviewer terminé (16359ms)
+- 2026-11-24 09:34:12 UTC — [ticket-1045] validateur: fichiers cités joints : rituels.md
+- 2026-11-24 09:34:12 UTC — [ticket-1045] validateur: APPROVED — Tous les critères sont satisfaits. Les heures des quatre rituels ont été ajustée (27968ms)
+- 2026-11-24 09:34:12 UTC — [ticket-1045] APPROVED après 1 tour(s)
