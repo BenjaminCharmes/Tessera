@@ -4,7 +4,7 @@ created: 2026-11-23
 depends_on: []
 estimated_days: 0.5
 id: ticket-1045
-pr_number: null
+pr_number: 1257
 priority: medium
 status: done
 title: Chaque rituel de rituels.md tombe en semaine, pendant les heures où le PC est
