@@ -3,6 +3,7 @@ agent: codeur
 depends_on: []
 estimated_days: 1
 id: ticket-1043
+pr_number: 1256
 priority: medium
 status: done
 title: A tool-bearing call cannot skip the agent account
