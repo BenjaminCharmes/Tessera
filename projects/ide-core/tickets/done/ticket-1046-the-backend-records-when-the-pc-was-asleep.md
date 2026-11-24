@@ -1,14 +1,14 @@
 ---
-id: ticket-1046
-title: "Le backend enregistre les périodes où le PC était en veille"
-type: feat
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-11-23
 depends_on: []
 estimated_days: 1
-created: 2026-11-23
+id: ticket-1046
+pr_number: 1258
+priority: medium
+status: done
+title: Le backend enregistre les périodes où le PC était en veille
+type: feat
 ---
 
 # ticket-1046 — Les périodes de veille sont connues

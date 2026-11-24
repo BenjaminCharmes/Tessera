@@ -52,6 +52,7 @@ from tessera.services.pipeline.reprise_orphelin import reprendre_depots_orphelin
 from tessera.services.pipeline.reprise_worktrees import reprendre_worktrees_orphelins
 from tessera.services.pipeline.run_registry import RUN_REGISTRY
 from tessera.services.pipeline.signalements_en_attente import migrer_ancien_fichier
+from tessera.services.projets import veille
 from tessera.services.providers.droits_worktree import DroitsAgentRefuses
 from tessera.services.providers.profil_agent import reinitialiser_profil
 from tessera.services.providers.taches_compte import retirer_les_taches
@@ -155,7 +156,10 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     )
     # Le superviseur (ADR-080) : ne démarre que si un projet déclare le rôle actif.
     superviseur = asyncio.create_task(boucle_du_superviseur(rouvrir=_rouvrir_une_file).boucle())
+    # Le battement qui laisse voir la veille (ticket-1046).
+    battement = veille.demarrer()
     yield
+    await veille.arreter(battement)
     await arreter_le_detecteur(superviseur)
     await arreter_le_detecteur(detecteur)
     # Les services lancés pour un projet sont des enfants de ce process et
