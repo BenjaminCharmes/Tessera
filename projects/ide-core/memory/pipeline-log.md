@@ -10878,3 +10878,5 @@ error: Please commit or stash them.
 - 2026-11-25 08:34:20 UTC — [ticket-1049] validateur: fichiers cités joints : memory/decisions.md (tronqué) ; non joints (budget épuisé) : memory/contraintes.md, tickets/todo/, backend/, frontend/
 - 2026-11-25 08:34:20 UTC — [ticket-1049] validateur: APPROVED — L'ADR-094 tranche net : chat sans outils (compte utilisateur, sans worktree), ag (37344ms)
 - 2026-11-25 08:34:20 UTC — [ticket-1049] APPROVED après 1 tour(s)
+- 2026-11-25 08:34:41 UTC — [ticket-1049] documentation: 0 fichier(s) (438ms)
+- 2026-11-25 08:34:41 UTC — [ticket-1049] documentation: pas de diff retrouvable, non documenté
