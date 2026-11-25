@@ -17,3 +17,4 @@ Une ligne par action : `- date | action | cible | sha | résumé`. Le service se
 - 2026-11-20 | a_toi | regle-5bdaa283 |  | decider : le bloc touche une porte, un mot sensible ou le superviseur
 - 2026-11-20 | a_toi | regle-d06fbb15 |  | decider : le bloc touche une porte, un mot sensible ou le superviseur
 - 2026-11-20 | a_toi | lecon-124779f1 |  | decider : le bloc touche une porte, un mot sensible ou le superviseur
+- 2026-11-25 | a_toi | regle-a78ca9b1 |  | decider : ADR-093 cité touche une porte ou un mot sensible
