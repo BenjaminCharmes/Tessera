@@ -1,14 +1,15 @@
 ---
-id: ticket-1049
-title: "Decide how the chat and agents/run work in a project that declares the agent account"
-type: design
-status: todo
-pr_number: null
-priority: medium
 agent: architect
+created: 2026-11-24
 depends_on: []
 estimated_days: 1
-created: 2026-11-24
+id: ticket-1049
+pr_number: 1264
+priority: medium
+status: done
+title: Decide how the chat and agents/run work in a project that declares the agent
+  account
+type: design
 ---
 
 # ticket-1049 — Décider comment le chat et `agents/run` tournent dans un projet à compte agent

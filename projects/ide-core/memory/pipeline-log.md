@@ -10866,3 +10866,17 @@ error: Please commit or stash them.
 - 2026-11-24 10:16:21 UTC — [ticket-1047] documentation: 2 fichier(s) (259608ms) — après tour de correction
 - 2026-11-24 10:16:21 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (183168 caractères)
 - 2026-11-24 10:16:21 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (137599 caractères)
+- 2026-11-24 10:16:56 UTC — [ide-core] ticket-1047 PR #1259 confiée au CIWatcher
+- 2026-11-24 10:22:24 UTC — [ide-core] ticket-1047 PR #1259 mergée (CI verte)
+- 2026-11-25 08:31:51 UTC — [ticket-1049] branche ticket-1049-decide-how-the-chat-and-agents-run-work-in-a-pro
+- 2026-11-25 08:31:55 UTC — [ticket-1049] tour 1 — codeur démarré
+- 2026-11-25 08:32:46 UTC — [ticket-1049] tour 1 — architect terminé (50858ms)
+- 2026-11-25 08:33:36 UTC — [ticket-1049] testeur: OK (exit 0)
+- 2026-11-25 08:33:42 UTC — [ticket-1049] securite: PASS — Ce diff ne contient que de la documentation : une règle ajoutée sous « ## Propos (5234ms)
+- 2026-11-25 08:33:43 UTC — [ticket-1049] tour 1 — reviewer démarré
+- 2026-11-25 08:34:03 UTC — [ticket-1049] tour 1 — reviewer terminé (20734ms)
+- 2026-11-25 08:34:20 UTC — [ticket-1049] validateur: fichiers cités joints : memory/decisions.md (tronqué) ; non joints (budget épuisé) : memory/contraintes.md, tickets/todo/, backend/, frontend/
+- 2026-11-25 08:34:20 UTC — [ticket-1049] validateur: APPROVED — L'ADR-094 tranche net : chat sans outils (compte utilisateur, sans worktree), ag (37344ms)
+- 2026-11-25 08:34:20 UTC — [ticket-1049] APPROVED après 1 tour(s)
+- 2026-11-25 08:34:41 UTC — [ticket-1049] documentation: 0 fichier(s) (438ms)
+- 2026-11-25 08:34:41 UTC — [ticket-1049] documentation: pas de diff retrouvable, non documenté

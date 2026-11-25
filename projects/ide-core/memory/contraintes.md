@@ -10,6 +10,8 @@ Cette section n'est injectée dans aucun appel d'agent. Une règle nouvelle
 s'écrit ici, avec son ADR ; un humain l'accepte en la déplaçant dans sa
 section. (ADR-055)
 
+- **Dans un projet à `worktree.compte_agent`, le chat part sans outil, skill ni `signaler`, et `agents/run` et `agents/stream` refusent (409) tout rôle sauf `github-sync`.** À l'acceptation, fusionner une règle voisine : `contraintes.md` est au plafond. (ADR-094, ADR-093)
+
 ## Git et périmètre d'écriture
 
 - **Un projet qui déclare `worktree` exécute chaque run dans son worktree, jamais dans le checkout.** Sous `IDE_WORKTREES_DIR/<projet>/<ticket>`, depuis `origin/<base>` : la racine d'écriture du run, sans session humaine. (ADR-056)
