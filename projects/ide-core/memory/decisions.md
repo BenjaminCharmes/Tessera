@@ -678,3 +678,12 @@ Une ADR qu'aucune règle de `contraintes.md` ni aucun `CLAUDE.md` ne cite part d
 **Décision** : amende ADR-083. Validateur, doc-technique, doc-fonctionnelle et leçons (`allow_tools=False`) ne passent pas par le compte agent. Dans un projet qui déclare `worktree.compte_agent`, un appel sans compte dont `tools` n'est pas `[]`, ou qui porte skill, plugin ou `signaler`, lève `ProviderIndisponible`.
 **Raison** : `tools=[]` retire tous les outils intégrés : le modèle ne lit ni n'exécute rien, il répond. Seul reste le serveur MCP en mémoire (`ask_user`). Le CLI lit, sous le compte de l'utilisateur, sa session et les `.claude/settings` et `CLAUDE.md` du projet (`setting_sources=["project"]`), fichiers protégés en écriture (ADR-084) ; secrets vidés de l'environnement. Le compte coûterait ~4 s par appel (ADR-091) et la sérialisation d'ADR-087, sans rien fermer de plus.
 **Alternative rejetée** : tous les rôles par le compte — coût payé pour un appel qui n'agit pas.
+
+---
+
+## ADR-094 — Dans un projet à compte agent, le chat parle sans outils et `agents/run` se ferme
+
+**Date** : 2026-11-25
+**Décision** : amende ADR-093. Là où `projet_exige_le_compte` est vrai, le chat part sans outil, skill ni `signaler`, sous le compte de l'utilisateur, sans dossier de travail : il garde son contexte, ne lit ni n'écrit rien, ne commite pas, et l'interface le dit. `POST /agents/run` et `WS /agents/stream` répondent 409 pour tout rôle sauf `github-sync` (ADR-010).
+**Raison** : le chat vise le checkout, où le compte n'a aucun droit (ADR-083) ; un seul message de chat en base.
+**Alternative rejetée** : un worktree `chat-…` par conversation (droit posé et repris par appel, ADR-091 ; livraison sans audit ni relecture) ; refus pur, qui perd la discussion.
