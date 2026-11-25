@@ -51,6 +51,38 @@ Pour chaque option : ce que le compte peut lire et écrire, ce que coûte un
 appel (ADR-091), ce qui se passe pour `agents/run`, et ce que voit
 l'utilisateur. L'ADR nomme les tickets de réalisation à écrire.
 
+## Décision de l'utilisateur (25/11)
+
+L'option retenue est la 2, dans sa forme « chat sans outils ». L'ADR
+l'écrit et la justifie, sans rouvrir le choix :
+
+- **Chat** : dans un projet où `projet_exige_le_compte` est vrai, le chat
+  part sans outil ni skill ni `signaler`. ADR-093 le permet déjà (seul un
+  appel sans outil se passe du compte) : il part donc sous le compte de
+  l'utilisateur, sans dossier de travail où écrire. Il garde son contexte
+  (CLAUDE.md du projet, tickets ouverts, contraintes) : il sert à discuter et à
+  préparer un ticket, ne lit ni n'écrit de fichier, et ne fait donc aucun
+  commit. L'interface le dit (par exemple « sans accès aux fichiers sur ce
+  projet ») au lieu d'afficher une erreur de provider. Vérifier dans
+  `providers/par_role.py` que le rôle `chat` d'un tel projet ne reçoit ni skill
+  ni `signaler` par sa déclaration dans `agents.json`.
+- **`POST /api/v1/agents/run` et `WS /api/v1/agents/stream`** : dans un tel
+  projet, un 409 explicite pour tout rôle sauf `github-sync`, qui n'appelle
+  aucun modèle (ADR-010). Même forme que `refuser_projet_a_worktree`
+  (`routers/dependencies.py`), qui refuse déjà `/chat/run` dans tout projet à
+  worktree. Aucun écran n'appelle aujourd'hui ces deux routes pour un autre
+  rôle que `github-sync`.
+- **Rejetée, l'option 1 (un worktree par conversation)** : création du
+  worktree, droit posé puis repris à chaque appel (ADR-091), et une livraison à
+  inventer pour la branche `chat-…`, dont l'écriture ne passe aujourd'hui ni
+  par l'audit ni par la relecture. Plusieurs tickets pour un usage quasi nul :
+  la base ne compte qu'un message de chat, le 15/09. Elle reste possible plus
+  tard si le besoin vient.
+- **Rejetée, le refus pur** : aussi simple, mais on perd la discussion.
+
+Une seule fiche de réalisation suffit (chat, `agents/run`, `agents/stream`,
+message de l'interface), type `fix`.
+
 ## Critères d'acceptation
 
 - [ ] Une ADR au prochain numéro libre de `memory/decisions.md` tranche le
