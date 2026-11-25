@@ -4,6 +4,7 @@ created: 2026-11-25
 depends_on: []
 estimated_days: 1
 id: ticket-1051
+pr_number: 1268
 priority: medium
 status: done
 title: The chat talks without tools and agents/run refuses in an agent-account project
