@@ -5,6 +5,7 @@ from starlette.requests import Request
 from tessera.config import settings
 from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.github.github_service import GitHubService
+from tessera.services.providers.compte_exige import projet_exige_le_compte
 from tessera.utils.project_id import validate_project_id
 
 
@@ -48,3 +49,18 @@ async def refuser_projet_a_worktree(project_id: str) -> None:
             detail="Ce projet déclare un worktree : le chat ne peut pas lancer "
             "de run dans son checkout. Lance le ticket depuis le pipeline.",
         )
+
+
+def motif_refus_compte_agent(project_id: str, role: str) -> str | None:
+    """Why `agents/run` refuses `role` in an account-agent project, or None (ADR-094).
+
+    Seul `github-sync` y passe : il n'appelle aucun modèle outillé.
+    """
+    if role == "github-sync":
+        return None
+    if not projet_exige_le_compte(settings.ide_workspace_dir / project_id):
+        return None
+    return (
+        "Ce projet exige le compte agent : un agent outillé ne peut pas y "
+        "tourner hors d'un run. Lance le ticket depuis le pipeline."
+    )

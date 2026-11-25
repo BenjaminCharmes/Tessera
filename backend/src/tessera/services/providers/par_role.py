@@ -99,6 +99,7 @@ def provider_pour_role(
     journal_repli: Callable[[str], None] | None = None,
     rapide: bool = False,
     compte_agent: bool = False,
+    sans_skill: bool = False,
 ) -> LLMProvider:
     """Builds the provider `role` declares, wrapped in its fallback if any.
 
@@ -115,12 +116,13 @@ def provider_pour_role(
     reçoit la ligne que `ProviderAvecRepli` écrit quand le repli joue.
 
     `compte_agent` : le projet du run a déclaré le compte dédié (ticket-915).
+    `sans_skill` : ignore les skills du rôle (chat d'un projet à compte agent).
     """
     config = config_du_role(project_path, role)
     tools = outils_du_role(config, allow_tools, tools)
     nom = config.provider if config is not None else settings.llm_provider
     tours = max_turns if max_turns is not None else settings.llm_max_turns
-    skills = config.skills if config is not None else []
+    skills = config.skills if config is not None and not sans_skill else []
     effort = config.effort if config is not None else None
     # Transmis seulement quand il y en a un : un appel sans journal reste
     # identique à ce qu'il était avant ticket-476.

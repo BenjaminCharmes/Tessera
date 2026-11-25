@@ -71,6 +71,13 @@ export default function ChatPanel({ project, conversationId }: ChatPanelProps) {
         )}
       </header>
 
+      {chat.sansOutils && (
+        <p className="border-b border-zinc-800 bg-zinc-800/60 px-3 py-2 text-xs text-zinc-300">
+          Sans accès aux fichiers sur ce projet : l'agent répond d'après le
+          contexte, sans lire ni écrire.
+        </p>
+      )}
+
       <div className="flex-1 overflow-y-auto px-3 py-3 space-y-3">
         {chat.messages.length === 0 && !thinking && (
           <p className="text-sm text-zinc-500">

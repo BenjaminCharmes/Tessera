@@ -648,6 +648,7 @@ def test_aucun_routeur_n_appelle_get_provider_directement() -> None:
 
 def test_le_chat_passe_par_la_fabrique_pour_son_role(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     from tessera.routers import chat as routeur_chat
+    from tessera.routers import chat_outils
 
     roles: list[str] = []
 
@@ -655,7 +656,7 @@ def test_le_chat_passe_par_la_fabrique_pour_son_role(monkeypatch: pytest.MonkeyP
         roles.append(role)
         return FakeProvider()
 
-    monkeypatch.setattr(routeur_chat, "provider_pour_role", fausse)
+    monkeypatch.setattr(chat_outils, "provider_pour_role", fausse)
     ws = tmp_path / "ws"
     projet = ws / "p"
     projet.mkdir(parents=True)

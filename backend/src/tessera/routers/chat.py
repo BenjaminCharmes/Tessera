@@ -9,6 +9,7 @@ from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisco
 from pydantic import BaseModel
 
 from tessera.config import settings
+from tessera.routers.chat_outils import chat_sans_outils, provider_du_chat
 from tessera.routers.dependencies import refuser_projet_a_worktree, require_valid_project_id
 from tessera.services.agents.chat_service import ChatBudgetExceeded, ChatService
 from tessera.services.agents.chat_suggestion import summarize_conversation
@@ -30,7 +31,6 @@ from tessera.services.pipeline.run_registry import RUN_REGISTRY, RunActif, RunAl
 from tessera.services.projets.adr import adr_pertinents, lire_contraintes
 from tessera.services.projets.project_loader import load_project
 from tessera.services.projets.ticket_service import TicketService
-from tessera.services.providers.par_role import provider_pour_role
 from tessera.utils.logger import get_logger
 from tessera.utils.project_id import validate_project_id
 
@@ -63,6 +63,7 @@ class ChatHistory(BaseModel):
     messages: list[ChatMessageRow]
     spent_usd: float
     max_usd: float
+    sans_outils: bool = False
 
 
 def _project_path(project_id: str) -> Path:
@@ -97,15 +98,13 @@ async def _build_context(project_id: str, project_path: Path) -> str:
 async def _build_service(project_id: str) -> ChatService:
     project_path = _project_path(project_id)
     return ChatService(
-        # Par la fabrique, comme tout le monde : le chat ignorait jusqu'ici
-        # le provider réglé, et tournait toujours sur le SDK (ticket-188).
-        provider=provider_pour_role(
-            project_path, "chat", tools=_CHAT_TOOLS, project_id=project_id
-        ),
+        # Par la fabrique (ticket-188) ; sans outil si le projet exige le compte.
+        provider=provider_du_chat(project_path, project_id, _ROLE_CHAT, _CHAT_TOOLS),
         prompts_dir=settings.ide_prompts_dir,
         project_path=project_path,
         project_context=await _build_context(project_id, project_path),
-        git_workspace=GitWorkspaceService(project_path),
+        # Sans outil, rien n'est écrit : pas de branche `chat-…` (ADR-094).
+        git_workspace=None if chat_sans_outils(project_path) else GitWorkspaceService(project_path),
         max_conversation_usd=settings.chat_max_conversation_usd,
     )
 
@@ -127,13 +126,14 @@ async def get_conversations(project_id: str) -> list[ConversationSummary]:
     dependencies=[Depends(require_valid_project_id)],
 )
 async def get_chat_history(project_id: str, conversation_id: str) -> ChatHistory:
-    _project_path(project_id)
+    chemin = _project_path(project_id)
     return ChatHistory(
         project_id=project_id,
         conversation_id=conversation_id,
         messages=await list_chat_messages(settings.ide_db_path, project_id, conversation_id),
         spent_usd=await conversation_cost_usd(settings.ide_db_path, project_id, conversation_id),
         max_usd=settings.chat_max_conversation_usd,
+        sans_outils=chat_sans_outils(chemin),
     )
 
 
