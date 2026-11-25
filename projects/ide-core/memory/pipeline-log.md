@@ -10450,3 +10450,419 @@ error: Please commit or stash them.
 - 2026-11-19 15:54:41 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
 - 2026-11-19 15:54:41 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
 - 2026-11-19 15:54:41 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-20 08:45:16 UTC — [ticket-1025] branche ticket-1025-design-a-call-under-the-agent-account-costs-a-fe
+- 2026-11-20 08:45:19 UTC — [ticket-1025] tour 1 — codeur démarré
+- 2026-11-20 08:49:35 UTC — [ticket-1025] tour 1 — architect terminé (254640ms)
+- 2026-11-20 08:50:38 UTC — [ticket-1025] testeur: OK (exit 0)
+- 2026-11-20 08:51:04 UTC — [ticket-1025] securite: PASS — Le diff ne contient que de la documentation (une règle sous « Proposées », l'ADR (24468ms)
+- 2026-11-20 08:51:05 UTC — [ticket-1025] tour 1 — reviewer démarré
+- 2026-11-20 08:51:51 UTC — [ticket-1025] validateur: fichiers cités joints : projects/ide-core/memory/decisions.md (tronqué) ; non joints (budget épuisé) : droits_worktree.py, projects/ide-core/tickets/todo/, profil_agent.py, taches_compte.py, projects/ide-core/tickets/, projects/ide-core/memory/
+- 2026-11-20 08:51:51 UTC — [ticket-1025] validateur: APPROVED — Conception complète et conforme. L'ADR-091 retient une stratégie combinée (repri (46561ms)
+- 2026-11-20 08:51:52 UTC — [ticket-1025] tour 1 — reviewer terminé (46875ms)
+- 2026-11-20 08:51:53 UTC — [ticket-1025] APPROVED après 1 tour(s)
+- 2026-11-20 08:53:15 UTC — [ticket-1025] documentation: 0 fichier(s) (61046ms)
+- 2026-11-20 08:53:15 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-20 08:53:15 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-20 08:53:15 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-20 08:59:35 UTC — [ide-core] ticket-1025 PR #1211 mergée (CI verte)
+- 2026-11-20 09:09:37 UTC — [ticket-1023] branche ticket-1023-the-agent-account-launches-on-a-dedicated-window
+- 2026-11-20 09:09:41 UTC — [ticket-1023] tour 1 — codeur démarré
+- 2026-11-20 09:12:21 UTC — [ticket-1023] tour 1 — codeur terminé (160046ms)
+- 2026-11-20 09:13:28 UTC — [ticket-1023] testeur: dur�es : ruff 0 s, pytest 15 s, mypy 15 s, mypy-linux 12 s ; impact depuis base : 14 fichier(s) de test
+- 2026-11-20 09:14:02 UTC — [ticket-1023] securite: PASS — Le diff durcit l'isolement : chaque appel d'agent tourne sur un bureau à lui, sa (33296ms)
+- 2026-11-20 09:14:03 UTC — [ticket-1023] tour 1 — reviewer démarré
+- 2026-11-20 09:14:41 UTC — [ticket-1023] validateur: fichiers cités joints : station_agent.py
+- 2026-11-20 09:14:41 UTC — [ticket-1023] validateur: APPROVED — Le code crée un module `station_agent.py` strictement typé de 187 lignes, sans p (37750ms)
+- 2026-11-20 09:14:41 UTC — [ticket-1023] tour 1 — reviewer terminé (37485ms)
+- 2026-11-20 09:14:41 UTC — [ticket-1023] CHANGES_REQUESTED tour 1: Reviewer : 1. Le passage par `SetProcessWindowStation` dans `_creer_bureau` n'est protégé par aucun verrou. Le ticket l'exige pourtant (« se fait sous un verrou »). `_lancer` tourne dans `anyio.to_thr
+- 2026-11-20 09:14:41 UTC — [ticket-1023] tour 2 — codeur démarré
+- 2026-11-20 09:15:40 UTC — [ticket-1023] tour 2 — codeur terminé (58234ms)
+- 2026-11-20 09:16:32 UTC — [ticket-1023] testeur: dur�es : ruff 0 s, mypy 9 s, pytest 15 s, mypy-linux 9 s ; impact depuis base : 14 fichier(s) de test
+- 2026-11-20 09:17:04 UTC — [ticket-1023] securite: PASS — Le diff isole l'agent sur un bureau créé par appel, dont la DACL ne nomme que le (31016ms)
+- 2026-11-20 09:17:05 UTC — [ticket-1023] tour 2 — reviewer démarré
+- 2026-11-20 09:17:31 UTC — [ticket-1023] tour 2 — reviewer terminé (25078ms)
+- 2026-11-20 09:17:46 UTC — [ticket-1023] validateur: fichiers cités joints : station_agent.py
+- 2026-11-20 09:17:46 UTC — [ticket-1023] validateur: APPROVED — Tous les critères sont satisfaits. Le module `station_agent.py` (191 lignes) exp (40688ms)
+- 2026-11-20 09:17:46 UTC — [ticket-1023] APPROVED après 2 tour(s)
+- 2026-11-20 09:19:01 UTC — [ticket-1023] leçons: une leçon proposée
+- 2026-11-20 09:22:34 UTC — [ticket-1023] documentation: 0 fichier(s) (192718ms) — après tour de correction
+- 2026-11-20 09:22:34 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-20 09:22:34 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-20 09:22:34 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-20 09:30:09 UTC — [ticket-1024] branche ticket-1024-the-agent-call-job-limits-the-user-interface
+- 2026-11-20 09:30:12 UTC — [ticket-1024] tour 1 — codeur démarré
+- 2026-11-20 09:31:19 UTC — [ticket-1024] tour 1 — codeur terminé (66250ms)
+- 2026-11-20 09:33:07 UTC — [ticket-1024] testeur: dur�es : ruff 0 s, mypy 19 s, mypy-linux 15 s, pytest 63 s ; impact depuis base : 57 fichier(s) de test
+- 2026-11-20 09:33:23 UTC — [ticket-1024] securite: PASS — Le diff durcit le lanceur : le job de l'agent reçoit les huit restrictions `JOB_ (14344ms)
+- 2026-11-20 09:33:23 UTC — [ticket-1024] tour 1 — reviewer démarré
+- 2026-11-20 09:33:40 UTC — [ticket-1024] tour 1 — reviewer terminé (16500ms)
+- 2026-11-20 09:33:52 UTC — [ticket-1024] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le paramètre `restrictions_ui`  (28108ms)
+- 2026-11-20 09:33:53 UTC — [ticket-1024] APPROVED après 1 tour(s)
+- 2026-11-20 09:36:16 UTC — [ticket-1024] documentation: 0 fichier(s) (122656ms) — après tour de correction
+- 2026-11-20 09:36:16 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-20 09:36:16 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-20 09:36:16 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-20 09:46:34 UTC — [ticket-1027] branche ticket-1027-a-call-sets-its-right-alone-and-takes-back-only
+- 2026-11-20 09:46:44 UTC — [ticket-1027] tour 1 — codeur démarré
+- 2026-11-20 10:27:21 UTC — [ticket-1027] tour 1 — codeur terminé (2437406ms)
+- 2026-11-20 10:42:37 UTC — [ticket-1027] testeur: dur�es : ruff 0 s, mypy 26 s, mypy-linux 49 s, pytest 870 s ; impact depuis base : suite compl�te
+- 2026-11-20 10:43:36 UTC — [ticket-1027] securite: PASS — PASS : aucune faille CRITICAL ou HIGH introduite ; deux remarques mineures (LOW  (57828ms)
+- 2026-11-20 10:43:37 UTC — [ticket-1027] tour 1 — reviewer démarré
+- 2026-11-20 10:44:27 UTC — [ticket-1027] tour 1 — reviewer terminé (49671ms)
+- 2026-11-20 10:45:21 UTC — [ticket-1027] validateur: APPROVED — Le ticket 1027 réalise complètement l'ADR-091 : séparation claire entre `poser_b (104469ms)
+- 2026-11-20 10:45:22 UTC — [ticket-1027] APPROVED après 1 tour(s)
+- 2026-11-20 10:48:37 UTC — [ticket-1027] documentation: 0 fichier(s) (174906ms)
+- 2026-11-20 10:48:37 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-20 10:48:37 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-20 10:48:37 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-20 10:49:09 UTC — [ticket-1027] livraison: rebase sur develop (500ms)
+- 2026-11-20 10:49:09 UTC — [ticket-1027] livraison: PR #1219 ouverte (5719ms)
+- 2026-11-20 10:49:09 UTC — [ticket-1027] livraison: arrêt — PR ouverte, merge après preuve réelle
+- 2026-11-20 10:56:54 UTC — [ticket-1029] branche ticket-1029-the-account-scheduled-tasks-are-read-as-xml
+- 2026-11-20 10:56:57 UTC — [ticket-1029] tour 1 — codeur démarré
+- 2026-11-20 10:59:19 UTC — [ticket-1029] tour 1 — codeur terminé (141514ms)
+- 2026-11-20 11:01:59 UTC — [ticket-1029] testeur: dur�es : ruff 2 s, pytest 123 s ; impact depuis base : 99 fichier(s) de test
+- 2026-11-20 11:01:59 UTC — [ticket-1029] tests rouges au tour 1
+- 2026-11-20 11:01:59 UTC — [ticket-1029] tour 2 — codeur démarré
+- 2026-11-20 11:02:33 UTC — [ticket-1029] tour 2 — codeur terminé (33735ms)
+- 2026-11-20 11:05:25 UTC — [ticket-1029] testeur: dur�es : ruff 0 s, mypy 17 s, mypy-linux 18 s, pytest 138 s ; impact depuis base : 99 fichier(s) de test
+- 2026-11-20 11:06:03 UTC — [ticket-1029] securite: PASS — PASS : aucune faille CRITICAL ou HIGH introduite, deux points relevés pour le re (36515ms)
+- 2026-11-20 11:06:03 UTC — [ticket-1029] tour 2 — reviewer démarré
+- 2026-11-20 11:06:39 UTC — [ticket-1029] tour 2 — reviewer terminé (35203ms)
+- 2026-11-20 11:07:40 UTC — [ticket-1029] validateur: CHANGES_REQUESTED — Quatre critères sur cinq sont satisfaits. Le critère 3 échoue : bien que le test (96437ms)
+- 2026-11-20 11:07:40 UTC — [ticket-1029] CHANGES_REQUESTED tour 2: Validateur : Quatre critères sur cinq sont satisfaits. Le critère 3 échoue : bien que le test et la logique pour C (suppression d'une tâche créée par un tiers) existent, le code ne gère pas le cas A (
+- 2026-11-20 11:07:40 UTC — [ticket-1029] tour 3 — codeur démarré
+- 2026-11-20 11:08:43 UTC — [ticket-1029] tour 3 — codeur terminé (62061ms)
+- 2026-11-20 11:11:17 UTC — [ticket-1029] testeur: dur�es : ruff 0 s, mypy 2 s, mypy-linux 2 s, pytest 114 s ; impact depuis base : 99 fichier(s) de test
+- 2026-11-20 11:11:46 UTC — [ticket-1029] securite: PASS — Le passage du CSV au XML est sûr côté parsing. Le code refuse DOCTYPE et ENTITY  (28171ms)
+- 2026-11-20 11:11:46 UTC — [ticket-1029] tour 3 — reviewer démarré
+- 2026-11-20 11:12:15 UTC — [ticket-1029] tour 3 — reviewer terminé (28328ms)
+- 2026-11-20 11:13:33 UTC — [ticket-1029] validateur: APPROVED — Les cinq critères d'acceptation sont satisfaits. Le code remplace correctement l (106343ms)
+- 2026-11-20 11:13:33 UTC — [ticket-1029] APPROVED après 3 tour(s)
+- 2026-11-20 11:14:03 UTC — [ticket-1029] leçons: une leçon proposée
+- 2026-11-20 11:15:14 UTC — [ticket-1029] documentation: 0 fichier(s) (47452ms)
+- 2026-11-20 11:15:14 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-20 11:15:14 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-20 11:15:14 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-20 11:18:16 UTC — [ticket-1028] branche ticket-1028-the-agent-profile-is-taken-back-by-targeted-repr
+- 2026-11-20 11:18:19 UTC — [ticket-1028] tour 1 — codeur démarré
+- 2026-11-20 11:19:58 UTC — [ticket-1028] tour 1 — codeur terminé (97890ms)
+- 2026-11-20 11:22:49 UTC — [ticket-1028] testeur: dur�es : ruff 0 s, mypy 9 s, mypy-linux 9 s, pytest 130 s ; impact depuis base : 103 fichier(s) de test
+- 2026-11-20 11:23:06 UTC — [ticket-1028] securite: PASS — J'ai lu `reprendre_arbre` (reprise_ciblee.py) : la reprise ciblée récupère tout  (16421ms)
+- 2026-11-20 11:23:07 UTC — [ticket-1028] tour 1 — reviewer démarré
+- 2026-11-20 11:23:34 UTC — [ticket-1028] tour 1 — reviewer terminé (26750ms)
+- 2026-11-20 11:23:37 UTC — [ticket-1028] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. La fonction `_reprendre_la_main (29343ms)
+- 2026-11-20 11:23:37 UTC — [ticket-1028] CHANGES_REQUESTED tour 1: Reviewer : 1. Le test du lien non parcouru ne peut pas échouer. Son assertion `cible / "dedans" not in securite.lus` vérifie le mauvais chemin. Si `reprendre_arbre` parcourait le lien, `_entrees` cons
+- 2026-11-20 11:23:37 UTC — [ticket-1028] tour 2 — codeur démarré
+- 2026-11-20 11:23:59 UTC — [ticket-1028] tour 2 — codeur terminé (21625ms)
+- 2026-11-20 11:26:39 UTC — [ticket-1028] testeur: dur�es : ruff 0 s, mypy 2 s, mypy-linux 2 s, pytest 119 s ; impact depuis base : 103 fichier(s) de test
+- 2026-11-20 11:27:00 UTC — [ticket-1028] securite: PASS — Le profil n'est plus repris par `/setowner /T` puis `/reset /T` : il passe par ` (19719ms)
+- 2026-11-20 11:27:01 UTC — [ticket-1028] tour 2 — reviewer démarré
+- 2026-11-20 11:27:20 UTC — [ticket-1028] tour 2 — reviewer terminé (19577ms)
+- 2026-11-20 11:27:50 UTC — [ticket-1028] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. La fonction `_reprendre_la_main (49125ms)
+- 2026-11-20 11:27:50 UTC — [ticket-1028] APPROVED après 2 tour(s)
+- 2026-11-20 11:28:14 UTC — [ticket-1028] leçons: refusée — preuve absente du retour du run
+- 2026-11-20 11:32:11 UTC — [ticket-1028] documentation: 0 fichier(s) (213139ms) — après tour de correction
+- 2026-11-20 11:32:11 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-20 11:32:11 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-20 11:32:11 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-20 11:35:30 UTC — [ticket-978] branche ticket-978-les-checkouts-de-projet-suivent-leur-base
+- 2026-11-20 11:35:34 UTC — [ticket-978] tour 1 — codeur démarré
+- 2026-11-20 11:38:24 UTC — [ticket-978] tour 1 — codeur terminé (169453ms)
+- 2026-11-20 11:42:33 UTC — [ticket-978] testeur: dur�es : ruff 0 s, mypy 11 s, mypy-linux 11 s, pytest 214 s ; impact depuis base : 121 fichier(s) de test
+- 2026-11-20 11:42:46 UTC — [ticket-978] securite: PASS — Le diff ne fait que faire avancer le checkout du projet vers sa base. Cela passe (12108ms)
+- 2026-11-20 11:42:47 UTC — [ticket-978] tour 1 — reviewer démarré
+- 2026-11-20 11:43:14 UTC — [ticket-978] tour 1 — reviewer terminé (26483ms)
+- 2026-11-20 11:43:45 UTC — [ticket-978] validateur: fichiers cités joints : agents.json, realignement_base.py
+- 2026-11-20 11:43:45 UTC — [ticket-978] validateur: APPROVED — Le codeur a correctement implémenté la réutilisation de `realigner_base` pour su (58155ms)
+- 2026-11-20 11:43:46 UTC — [ticket-978] APPROVED après 1 tour(s)
+- 2026-11-20 11:44:53 UTC — [ticket-978] documentation: 0 fichier(s) (43282ms)
+- 2026-11-20 11:44:53 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-20 11:44:53 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-20 11:44:53 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-20 11:49:20 UTC — [ticket-1030] branche ticket-1030-a-lockfile-cited-by-a-criterion-reaches-the-vali
+- 2026-11-20 11:49:24 UTC — [ticket-1030] tour 1 — codeur démarré
+- 2026-11-20 11:50:34 UTC — [ticket-1030] tour 1 — codeur terminé (69750ms)
+- 2026-11-20 11:53:40 UTC — [ticket-1030] testeur: dur�es : ruff 0 s, mypy 10 s, mypy-linux 10 s, pytest 146 s ; impact depuis base : 67 fichier(s) de test
+- 2026-11-20 11:53:52 UTC — [ticket-1030] securite: PASS — Pour un verrou cité, le diff joint au validateur la partie du diff du run (code_ (11093ms)
+- 2026-11-20 11:53:54 UTC — [ticket-1030] tour 1 — reviewer démarré
+- 2026-11-20 11:54:10 UTC — [ticket-1030] tour 1 — reviewer terminé (16735ms)
+- 2026-11-20 11:54:24 UTC — [ticket-1030] validateur: fichiers cités joints : package-lock.json (tronqué)
+- 2026-11-20 11:54:24 UTC — [ticket-1030] validateur: APPROVED — Tous les critères sont satisfaits. Le codeur a implémenté le traitement des verr (30437ms)
+- 2026-11-20 11:54:24 UTC — [ticket-1030] APPROVED après 1 tour(s)
+- 2026-11-20 12:00:00 UTC — [ticket-1030] documentation: 0 fichier(s) (313186ms) — après tour de correction
+- 2026-11-20 12:00:00 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-20 12:00:00 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-20 12:00:00 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-20 11:54:21 UTC — [ide-core] ticket-978 PR #1223 mergée (CI verte)
+- 2026-11-20 12:09:17 UTC — [ide-core] ticket-1030 PR #1224 mergée (CI verte)
+- 2026-11-20 14:18:24 UTC — [ticket-1031] branche ticket-1031-the-weekly-report-reads-the-remote-base-and-fron
+- 2026-11-20 14:18:28 UTC — [ticket-1031] tour 1 — codeur démarré
+- 2026-11-20 14:19:56 UTC — [ticket-1031] tour 1 — codeur terminé (87671ms)
+- 2026-11-20 14:20:56 UTC — [ticket-1031] testeur: 1 failed, 67 passed, 8 warnings in 15.66s — fichiers en échec : tests/test_aucune_trace_professionnelle.py
+- 2026-11-20 14:20:56 UTC — [ticket-1031] tests rouges au tour 1
+- 2026-11-20 14:20:56 UTC — [ticket-1031] tour 2 — codeur démarré
+- 2026-11-20 14:21:28 UTC — [ticket-1031] tour 2 — codeur terminé (31203ms)
+- 2026-11-20 14:22:23 UTC — [ticket-1031] testeur: dur�es : ruff 0 s, pytest 17 s ; impact depuis base : 6 fichier(s) de test
+- 2026-11-20 14:22:23 UTC — [ticket-1031] tests rouges au tour 2
+- 2026-11-20 14:22:23 UTC — [ticket-1031] tour 3 — codeur démarré
+- 2026-11-20 14:22:54 UTC — [ticket-1031] tour 3 — codeur terminé (29952ms)
+- 2026-11-20 14:23:46 UTC — [ticket-1031] testeur: dur�es : ruff 0 s, mypy 4 s, mypy-linux 3 s, pytest 16 s ; impact depuis base : 6 fichier(s) de test
+- 2026-11-20 14:23:59 UTC — [ticket-1031] securite: PASS — Le diff lit seulement le dépôt local (git rev-parse, ls-tree et show, sans shell (13000ms)
+- 2026-11-20 14:24:00 UTC — [ticket-1031] tour 3 — reviewer démarré
+- 2026-11-20 14:24:30 UTC — [ticket-1031] tour 3 — reviewer terminé (29093ms)
+- 2026-11-20 14:25:20 UTC — [ticket-1031] validateur: fichiers cités joints : backend/tests/test_releve_semaine.py
+- 2026-11-20 14:25:20 UTC — [ticket-1031] validateur: APPROVED — Le codeur a satisfait tous les critères d'acceptation. Les deux nouveaux modules (80000ms)
+- 2026-11-20 14:25:21 UTC — [ticket-1031] APPROVED après 3 tour(s)
+- 2026-11-20 14:26:11 UTC — [ticket-1031] leçons: refusée — preuve absente du retour du run
+- 2026-11-20 14:28:13 UTC — [ticket-1031] documentation: 0 fichier(s) (99531ms)
+- 2026-11-20 14:28:13 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-20 14:28:13 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-20 14:28:13 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-20 14:34:27 UTC — [ide-core] ticket-1031 PR #1228 mergée (CI verte)
+- 2026-11-20 14:45:12 UTC — [ticket-1032] branche ticket-1032-stops-states-and-project-cards-follow-the-charte
+- 2026-11-20 14:45:15 UTC — [ticket-1032] tour 1 — codeur démarré
+- 2026-11-20 14:46:41 UTC — [ticket-1032] tour 1 — codeur terminé (85078ms)
+- 2026-11-20 14:51:12 UTC — [ticket-1032] testeur: dur�es : tsc 20 s, eslint 42 s, vitest 172 s
+- 2026-11-20 14:51:20 UTC — [ticket-1032] securite: PASS — Le diff ne touche que du style : classes Tailwind de ProjetCarte, RemoveProjectM (6483ms)
+- 2026-11-20 14:51:22 UTC — [ticket-1032] tour 1 — reviewer démarré
+- 2026-11-20 14:51:36 UTC — [ticket-1032] tour 1 — reviewer terminé (14375ms)
+- 2026-11-20 14:52:05 UTC — [ticket-1032] validateur: fichiers cités joints : frontend/src/components/Sidebar/RemoveProjectModal.test.tsx, frontend/src/components/Sidebar/ticketCardTables.ts, frontend/src/components/Toast.test.tsx, frontend/src/components/ProjetsView/ProjetCarte.test.tsx, frontend/src/design/coherence.test.ts (tronqué) ; absents : bg-red-500/12
+- 2026-11-20 14:52:05 UTC — [ticket-1032] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le codeur a implémenté les quat (44639ms)
+- 2026-11-20 14:52:05 UTC — [ticket-1032] APPROVED après 1 tour(s)
+- 2026-11-20 14:53:06 UTC — [ticket-1032] documentation: 0 fichier(s) (41625ms)
+- 2026-11-20 14:53:06 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-20 14:53:06 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-20 14:53:06 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-20 14:58:57 UTC — [ide-core] ticket-1032 PR #1231 mergée (CI verte)
+- 2026-11-20 15:44:35 UTC — [ticket-1033] branche ticket-1033-a-ritual-can-be-daily
+- 2026-11-20 15:44:45 UTC — [ticket-1033] tour 1 — codeur démarré
+- 2026-11-20 15:47:39 UTC — [ticket-1033] tour 1 — codeur terminé (172640ms)
+- 2026-11-20 15:52:35 UTC — [ticket-1033] testeur: 1 failed, 79 passed, 8 warnings in 23.39s — fichiers en échec : tests/test_openapi_export.py
+- 2026-11-20 15:52:35 UTC — [ticket-1033] tests rouges au tour 1
+- 2026-11-20 15:52:35 UTC — [ticket-1033] tour 2 — codeur démarré
+- 2026-11-20 15:53:31 UTC — [ticket-1033] tour 2 — codeur terminé (55547ms)
+- 2026-11-20 15:58:10 UTC — [ticket-1033] testeur: dur�es : ruff 0 s, mypy 5 s, mypy-linux 5 s, pytest 23 s, tsc 29 s, eslint 42 s, vitest 172 s ; impact depuis base : 7 fichier(s) de test
+- 2026-11-20 15:58:18 UTC — [ticket-1033] securite: PASS — Le diff ajoute un rythme « quotidien » au calcul des échéances des rituels. Côté (6906ms)
+- 2026-11-20 15:58:19 UTC — [ticket-1033] tour 2 — reviewer démarré
+- 2026-11-20 15:58:38 UTC — [ticket-1033] tour 2 — reviewer terminé (18828ms)
+- 2026-11-20 15:58:57 UTC — [ticket-1033] validateur: fichiers cités joints : backend/tests/test_rituels.py, rituels.md, frontend/src/components/RituelsView/format.test.ts
+- 2026-11-20 15:58:57 UTC — [ticket-1033] validateur: APPROVED — Tous les critères d'acceptation du ticket 1033 sont satisfaits. Le modèle `Quoti (38406ms)
+- 2026-11-20 15:58:58 UTC — [ticket-1033] APPROVED après 2 tour(s)
+- 2026-11-20 15:59:46 UTC — [ticket-1033] leçons: une leçon proposée
+- 2026-11-20 16:03:14 UTC — [ticket-1033] documentation: 0 fichier(s) (188532ms)
+- 2026-11-20 16:03:14 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-20 16:03:14 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-20 16:03:14 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-20 16:09:02 UTC — [ide-core] ticket-1033 PR #1234 mergée (CI verte)
+- 2026-11-20 20:28:19 UTC — [ticket-1036] branche ticket-1036-a-refused-edition-no-longer-drops-the-whole-docu
+- 2026-11-20 20:28:23 UTC — [ticket-1036] tour 1 — codeur démarré
+- 2026-11-20 20:29:47 UTC — [ticket-1036] tour 1 — codeur terminé (83406ms)
+- 2026-11-20 20:31:02 UTC — [ticket-1036] testeur: 1 failed, 316 passed, 8 warnings in 34.57s — fichiers en échec : tests/test_longueur_des_fichiers.py
+- 2026-11-20 20:31:03 UTC — [ticket-1036] tests rouges au tour 1
+- 2026-11-20 20:31:03 UTC — [ticket-1036] tour 2 — codeur démarré
+- 2026-11-20 20:32:45 UTC — [ticket-1036] tour 2 — codeur terminé (101327ms)
+- 2026-11-20 20:34:00 UTC — [ticket-1036] testeur: 1 failed, 269 passed, 8 warnings in 34.77s — fichiers en échec : tests/test_documentation_relecture.py
+- 2026-11-20 20:34:01 UTC — [ticket-1036] tests rouges au tour 2
+- 2026-11-20 20:34:01 UTC — [ticket-1036] tour 3 — codeur démarré
+- 2026-11-20 20:35:48 UTC — [ticket-1036] tour 3 — codeur terminé (107031ms)
+- 2026-11-20 20:37:03 UTC — [ticket-1036] testeur: dur�es : ruff 0 s, mypy 9 s, mypy-linux 10 s, pytest 41 s ; impact depuis base : 29 fichier(s) de test
+- 2026-11-20 20:37:15 UTC — [ticket-1036] securite: PASS — Verdict PASS : le diff ne fait que garder les éditions valides du tour de correc (11453ms)
+- 2026-11-20 20:37:17 UTC — [ticket-1036] tour 3 — reviewer démarré
+- 2026-11-20 20:37:34 UTC — [ticket-1036] tour 3 — reviewer terminé (17156ms)
+- 2026-11-20 20:37:59 UTC — [ticket-1036] validateur: fichiers cités joints : backend/tests/test_documentation.py (tronqué)
+- 2026-11-20 20:37:59 UTC — [ticket-1036] validateur: APPROVED — Le ticket satisfait tous les critères. Le nouveau fichier `test_documentation_ec (42202ms)
+- 2026-11-20 20:37:59 UTC — [ticket-1036] APPROVED après 3 tour(s)
+- 2026-11-20 20:38:48 UTC — [ticket-1036] leçons: une leçon proposée
+- 2026-11-20 20:41:40 UTC — [ticket-1036] documentation: 0 fichier(s) (150000ms)
+- 2026-11-20 20:41:40 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-20 20:41:40 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-20 20:41:40 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-20 20:48:34 UTC — [ide-core] ticket-1036 PR #1239 mergée (CI verte)
+- 2026-11-23 08:47:13 UTC — [ticket-1037] branche ticket-1037-a-documentation-pass-that-wrote-nothing-says-why
+- 2026-11-23 08:47:18 UTC — [ticket-1037] tour 1 — codeur démarré
+- 2026-11-23 08:50:31 UTC — [ticket-1037] tour 1 — codeur terminé (191890ms)
+- 2026-11-23 08:52:59 UTC — [ticket-1037] testeur: dur�es : ruff 0 s, mypy 28 s, mypy-linux 36 s, pytest 89 s ; impact depuis base : 34 fichier(s) de test
+- 2026-11-23 08:53:17 UTC — [ticket-1037] securite: PASS — Ce diff découpe le code de documentation sans affaiblir de contrôle. Après le to (16437ms)
+- 2026-11-23 08:53:19 UTC — [ticket-1037] tour 1 — reviewer démarré
+- 2026-11-23 08:53:49 UTC — [ticket-1037] tour 1 — reviewer terminé (30608ms)
+- 2026-11-23 08:53:59 UTC — [ticket-1037] validateur: fichiers cités joints : services/documentation/documentation.py, tests/test_longueur_des_fichiers.py (tronqué)
+- 2026-11-23 08:53:59 UTC — [ticket-1037] validateur: APPROVED — Le ticket est complet : tous les critères d'acceptation sont satisfaits. Les tro (41437ms)
+- 2026-11-23 08:54:00 UTC — [ticket-1037] APPROVED après 1 tour(s)
+- 2026-11-23 08:56:35 UTC — [ticket-1037] documentation: 0 fichier(s) (120984ms)
+- 2026-11-23 08:56:35 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-23 08:56:35 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-23 08:56:35 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-23 09:02:45 UTC — [ide-core] ticket-1037 PR #1241 mergée (CI verte)
+- 2026-11-23 09:12:35 UTC — [ticket-1038] branche ticket-1038-documentation-agents-read-a-large-file-section-b
+- 2026-11-23 09:13:10 UTC — [ticket-1038] plan rendu (32202ms)
+- 2026-11-23 09:13:11 UTC — [ticket-1038] tour 1 — codeur démarré
+- 2026-11-23 09:17:50 UTC — [ticket-1038] tour 1 — codeur terminé (278983ms)
+- 2026-11-23 09:20:35 UTC — [ticket-1038] testeur: dur�es : ruff 0 s, mypy 20 s, mypy-linux 27 s, pytest 65 s ; impact depuis base : 35 fichier(s) de test
+- 2026-11-23 09:20:52 UTC — [ticket-1038] securite: PASS — Aucune faille CRITICAL ou HIGH. La seule entrée nouvelle est la lecture de secti (16233ms)
+- 2026-11-23 09:20:53 UTC — [ticket-1038] tour 1 — reviewer démarré
+- 2026-11-23 09:21:25 UTC — [ticket-1038] tour 1 — reviewer terminé (31328ms)
+- 2026-11-23 09:21:47 UTC — [ticket-1038] validateur: fichiers cités joints : docs/ (dossier, 9 fichiers), agents/prompts/doc-technique.md, agents/prompts/doc-fonctionnelle.md, memory/decisions.md (tronqué)
+- 2026-11-23 09:21:47 UTC — [ticket-1038] validateur: APPROVED — Les six critères d'acceptation sont tous satisfaits. Les tests nouvellement créé (53296ms)
+- 2026-11-23 09:21:47 UTC — [ticket-1038] APPROVED après 1 tour(s)
+- 2026-11-23 09:23:13 UTC — [ticket-1038] documentation: 0 fichier(s) (64296ms) — doc-technique : aucune édition proposée — doc-fonctionnelle : aucune édition proposée
+- 2026-11-23 09:23:13 UTC — documentation trop longue, titres seuls : docs/architecture.md (181978 caractères)
+- 2026-11-23 09:23:13 UTC — documentation trop longue, titres seuls : docs/historique.md (7035 caractères)
+- 2026-11-23 09:23:13 UTC — documentation trop longue, titres seuls : docs/ticket-strategy.md (3929 caractères)
+- 2026-11-23 09:29:32 UTC — [ide-core] ticket-1038 PR #1243 mergée (CI verte)
+- 2026-11-23 09:42:18 UTC — [ticket-1041] branche ticket-1041-decide-whether-tool-less-roles-run-under-the-age
+- 2026-11-23 09:42:22 UTC — [ticket-1041] tour 1 — codeur démarré
+- 2026-11-23 09:43:45 UTC — [ticket-1041] tour 1 — architect terminé (82405ms)
+- 2026-11-23 09:44:30 UTC — [ticket-1041] testeur: OK (exit 0)
+- 2026-11-23 09:44:45 UTC — [ticket-1041] securite: PASS — Diff purement documentaire (règle proposée, ADR-093, ticket-1042), sans changeme (14078ms)
+- 2026-11-23 09:44:46 UTC — [ticket-1041] tour 1 — reviewer démarré
+- 2026-11-23 09:45:05 UTC — [ticket-1041] tour 1 — reviewer terminé (18796ms)
+- 2026-11-23 09:45:22 UTC — [ticket-1041] validateur: fichiers cités joints : memory/decisions.md (tronqué) ; non joints (budget épuisé) : backend/src/tessera/services/providers/agent_sdk.py, tickets/todo/
+- 2026-11-23 09:45:22 UTC — [ticket-1041] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. L'ADR-093 a été créée au bon n (35407ms)
+- 2026-11-23 09:45:22 UTC — [ticket-1041] APPROVED après 1 tour(s)
+- 2026-11-23 09:47:26 UTC — [ticket-1041] documentation: 0 fichier(s) (103217ms) — doc-technique : aucune édition proposée — doc-fonctionnelle : aucune édition proposée
+- 2026-11-23 09:47:26 UTC — [ticket-1039] documentation: pas de diff retrouvable, non documenté
+- 2026-11-23 09:47:26 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (181978 caractères)
+- 2026-11-23 09:47:26 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (137345 caractères)
+- 2026-11-23 09:47:44 UTC — renumérotation : ticket-1042 → ticket-1043 (numéro déjà pris sur origin/develop)
+- 2026-11-23 09:53:20 UTC — [ide-core] ticket-1041 PR #1246 mergée (CI verte)
+- 2026-11-23 15:25:22 UTC — [ticket-1044] branche ticket-1044-the-documentation-pass-reads-the-diff-of-its-tic
+- 2026-11-23 15:25:27 UTC — [ticket-1044] tour 1 — codeur démarré
+- 2026-11-23 15:29:30 UTC — [ticket-1044] tour 1 — codeur terminé (241358ms)
+- 2026-11-23 15:32:36 UTC — [ticket-1044] testeur: dur�es : ruff 0 s, pytest 140 s ; impact depuis base : 48 fichier(s) de test
+- 2026-11-23 15:32:36 UTC — [ticket-1044] tests rouges au tour 1
+- 2026-11-23 15:32:36 UTC — [ticket-1044] tour 2 — codeur démarré
+- 2026-11-23 15:32:52 UTC — [ticket-1044] tour 2 — codeur terminé (15125ms)
+- 2026-11-23 15:34:59 UTC — [ticket-1044] testeur: dur�es : ruff 0 s, mypy 10 s, mypy-linux 12 s, pytest 94 s ; impact depuis base : 48 fichier(s) de test
+- 2026-11-23 15:35:06 UTC — [ticket-1044] securite: PASS — J'ai audité le diff complet, sans troncature, et je n'y trouve aucune faille : v (6702ms)
+- 2026-11-23 15:35:07 UTC — [ticket-1044] tour 2 — reviewer démarré
+- 2026-11-23 15:35:23 UTC — [ticket-1044] tour 2 — reviewer terminé (16000ms)
+- 2026-11-23 15:35:36 UTC — [ticket-1044] validateur: fichiers cités joints : backend/src/tessera/routers/tickets.py (tronqué)
+- 2026-11-23 15:35:36 UTC — [ticket-1044] validateur: APPROVED — Les quatre critères sont satisfaits par le code du diff. Les trois tests fonctio (28546ms)
+- 2026-11-23 15:35:36 UTC — [ticket-1044] APPROVED après 2 tour(s)
+- 2026-11-23 15:37:00 UTC — [ticket-1044] leçons: refusée — preuve absente du retour du run
+- 2026-11-23 15:40:04 UTC — [ticket-1044] documentation: 0 fichier(s) (153516ms) — après tour de correction — doc-technique : refusé — doc-fonctionnelle : aucune édition proposée — refusé : doc-technique : projects/ide-core/CLAUDE.md n'est pas de la documentation : un agent de documentation ne touche ni au code, ni aux tickets, ni aux ADR.
+- 2026-11-23 15:40:04 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (181978 caractères)
+- 2026-11-23 15:40:04 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (137345 caractères)
+- 2026-11-23 15:49:36 UTC — [ide-core] ticket-1044 PR #1250 mergée (CI verte)
+- 2026-11-24 08:05:56 UTC — [ticket-1048] branche ticket-1048-a-run-refuses-a-checkout-left-on-a-foreign-branc
+- 2026-11-24 08:06:35 UTC — [ticket-1048] plan rendu (35406ms)
+- 2026-11-24 08:06:35 UTC — [ticket-1048] tour 1 — codeur démarré
+- 2026-11-24 08:09:02 UTC — [ticket-1048] tour 1 — codeur terminé (146500ms)
+- 2026-11-24 08:10:06 UTC — [ticket-1048] testeur: 1 failed, 115 passed, 8 warnings in 25.51s — fichiers en échec : tests/test_longueur_des_fichiers.py
+- 2026-11-24 08:10:06 UTC — [ticket-1048] tests rouges au tour 1
+- 2026-11-24 08:10:06 UTC — [ticket-1048] tour 2 — codeur démarré
+- 2026-11-24 08:11:09 UTC — [ticket-1048] tour 2 — codeur terminé (62937ms)
+- 2026-11-24 08:12:22 UTC — [ticket-1048] testeur: dur�es : ruff 0 s, pytest 36 s ; impact depuis base : 20 fichier(s) de test
+- 2026-11-24 08:12:23 UTC — [ticket-1048] tests rouges au tour 2
+- 2026-11-24 08:12:23 UTC — [ticket-1048] tour 3 — codeur démarré
+- 2026-11-24 08:12:50 UTC — [ticket-1048] tour 3 — codeur terminé (26983ms)
+- 2026-11-24 08:14:04 UTC — [ticket-1048] testeur: dur�es : ruff 0 s, mypy 12 s, mypy-linux 13 s, pytest 37 s ; impact depuis base : 20 fichier(s) de test
+- 2026-11-24 08:14:23 UTC — [ticket-1048] securite: PASS — Verdict PASS : le diff n'introduit aucune faille. J'ai relu les deux helpers git (18672ms)
+- 2026-11-24 08:14:24 UTC — [ticket-1048] tour 3 — reviewer démarré
+- 2026-11-24 08:14:50 UTC — [ticket-1048] tour 3 — reviewer terminé (26657ms)
+- 2026-11-24 08:14:57 UTC — [ticket-1048] validateur: fichiers cités joints : agents.json
+- 2026-11-24 08:14:57 UTC — [ticket-1048] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits par le code et les tests. L'impl (32765ms)
+- 2026-11-24 08:14:57 UTC — [ticket-1048] APPROVED après 3 tour(s)
+- 2026-11-24 08:15:48 UTC — [ticket-1048] leçons: une leçon proposée
+- 2026-11-24 08:19:45 UTC — [ticket-1048] documentation: 2 fichier(s) (217687ms)
+- 2026-11-24 08:19:45 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (181978 caractères)
+- 2026-11-24 08:19:45 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (137345 caractères)
+- 2026-11-24 08:20:20 UTC — [ide-core] ticket-1048 PR #1253 confiée au CIWatcher
+- 2026-11-24 08:20:26 UTC — [ticket-1042] branche ticket-1042-a-ticket-created-by-the-service-takes-its-number
+- 2026-11-24 08:20:29 UTC — [ticket-1042] tour 1 — codeur démarré
+- 2026-11-24 08:22:11 UTC — [ticket-1042] tour 1 — codeur terminé (100750ms)
+- 2026-11-24 08:25:21 UTC — [ticket-1042] testeur: 1 failed, 453 passed, 16 warnings in 154.28s (0:02:34) — fichiers en échec : tests/test_longueur_des_fichiers.py
+- 2026-11-24 08:25:21 UTC — [ticket-1042] tests rouges au tour 1
+- 2026-11-24 08:25:21 UTC — [ticket-1042] tour 2 — codeur démarré
+- 2026-11-24 08:27:07 UTC — [ticket-1042] tour 2 — codeur terminé (105483ms)
+- 2026-11-24 08:33:16 UTC — [ticket-1042] testeur: dur�es : ruff 0 s, mypy 23 s, mypy-linux 22 s, pytest 328 s ; impact depuis base : 114 fichier(s) de test
+- 2026-11-24 08:33:28 UTC — [ticket-1042] securite: PASS — Aucune faille introduite. Le diff déplace `normalize_depends_on` dans son propre (11344ms)
+- 2026-11-24 08:33:29 UTC — [ticket-1042] tour 2 — reviewer démarré
+- 2026-11-24 08:33:57 UTC — [ticket-1042] tour 2 — reviewer terminé (27875ms)
+- 2026-11-24 08:34:03 UTC — [ticket-1042] validateur: fichiers cités joints : tests/test_signalements.py
+- 2026-11-24 08:34:03 UTC — [ticket-1042] validateur: APPROVED — Les quatre critères d'acceptation sont tous satisfaits par des tests exécutés av (33702ms)
+- 2026-11-24 08:34:03 UTC — [ticket-1042] CHANGES_REQUESTED tour 2: Reviewer : 1. `create_tickets_batch` numérote encore avec `self._next_n()`, c'est-à-dire `highest_number(arbre) + 1`, sans réservation, sans base et sans branches. Ce chemin sert aux tickets du planif
+- 2026-11-24 08:34:03 UTC — [ticket-1042] tour 3 — codeur démarré
+- 2026-11-24 08:36:10 UTC — [ticket-1042] tour 3 — codeur terminé (126077ms)
+- 2026-11-24 08:40:54 UTC — [ticket-1042] testeur: dur�es : ruff 14 s, mypy 14 s, mypy-linux 16 s, pytest 246 s ; impact depuis base : 114 fichier(s) de test
+- 2026-11-24 08:41:04 UTC — [ticket-1042] securite: PASS — Le diff ajouté n'introduit aucune vulnérabilité, d'où le PASS. Il déplace `norma (9453ms)
+- 2026-11-24 08:41:05 UTC — [ticket-1042] tour 3 — reviewer démarré
+- 2026-11-24 08:41:23 UTC — [ticket-1042] tour 3 — reviewer terminé (17780ms)
+- 2026-11-24 08:41:39 UTC — [ticket-1042] validateur: fichiers cités joints : tests/test_signalements.py
+- 2026-11-24 08:41:39 UTC — [ticket-1042] validateur: APPROVED — Les quatre critères sont tous satisfaits par des tests exécutés avec succès. Le  (33703ms)
+- 2026-11-24 08:41:39 UTC — [ticket-1042] APPROVED après 3 tour(s)
+- 2026-11-24 08:42:29 UTC — [ticket-1042] leçons: une leçon proposée
+- 2026-11-24 08:43:29 UTC — [ticket-1042] documentation: 0 fichier(s) (38967ms) — doc-technique : aucune édition proposée — doc-fonctionnelle : aucune édition proposée
+- 2026-11-24 08:43:29 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (181978 caractères)
+- 2026-11-24 08:43:29 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (137345 caractères)
+- 2026-11-24 08:49:14 UTC — [ide-core] ticket-1042 PR #1255 confiée au CIWatcher
+- 2026-11-24 08:31:46 UTC — [ide-core] ticket-1048 PR #1253 mergée (CI verte)
+- 2026-11-24 08:49:21 UTC — [ticket-1043] branche ticket-1043-a-tool-bearing-call-cannot-skip-the-agent-accoun
+- 2026-11-24 08:49:25 UTC — [ticket-1043] tour 1 — codeur démarré
+- 2026-11-24 08:51:54 UTC — [ticket-1043] tour 1 — codeur terminé (149203ms)
+- 2026-11-24 09:00:54 UTC — [ticket-1043] testeur: 1 failed, 2456 passed, 3 skipped, 121 warnings in 495.46s (0:08:15) — fichiers en échec : tests/test_longueur_des_fichiers.py
+- 2026-11-24 09:00:54 UTC — [ticket-1043] tests rouges au tour 1
+- 2026-11-24 09:00:54 UTC — [ticket-1043] tour 2 — codeur démarré
+- 2026-11-24 09:02:50 UTC — [ticket-1043] tour 2 — codeur terminé (115125ms)
+- 2026-11-24 09:07:12 UTC — [ticket-1043] testeur: 1258 passed, 3 skipped, 121 warnings, 1 error in 214.33s (0:03:34) — fichiers en échec : tests/test_agent_sdk_groupe.py
+- 2026-11-24 09:07:13 UTC — [ticket-1043] tests rouges au tour 2
+- 2026-11-24 09:07:13 UTC — [ticket-1043] tour 3 — codeur démarré
+- 2026-11-24 09:08:56 UTC — [ticket-1043] tour 3 — codeur terminé (102967ms)
+- 2026-11-24 09:18:26 UTC — [ticket-1043] testeur: dur�es : ruff 0 s, mypy 11 s, mypy-linux 11 s, pytest 526 s ; impact depuis base : 320 fichier(s) de test
+- 2026-11-24 09:18:38 UTC — [ticket-1043] securite: PASS — Le diff ajoute une protection : un appel outillé hors du compte agent lève Provi (11655ms)
+- 2026-11-24 09:18:39 UTC — [ticket-1043] tour 3 — reviewer démarré
+- 2026-11-24 09:19:15 UTC — [ticket-1043] tour 3 — reviewer terminé (35547ms)
+- 2026-11-24 09:19:19 UTC — [ticket-1043] validateur: APPROVED — Les trois critères d'acceptation sont satisfaits. Le code implémente correctemen (39452ms)
+- 2026-11-24 09:19:19 UTC — [ticket-1043] APPROVED après 3 tour(s)
+- 2026-11-24 09:20:47 UTC — [ticket-1043] leçons: refusée — plus de 200 caractères
+- 2026-11-24 09:22:10 UTC — [ticket-1043] documentation: 0 fichier(s) (62188ms) — doc-technique : aucune édition proposée — doc-fonctionnelle : aucune édition proposée
+- 2026-11-24 09:22:10 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (183168 caractères)
+- 2026-11-24 09:22:10 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (137599 caractères)
+- 2026-11-24 09:31:26 UTC — [ide-core] ticket-1043 PR #1256 confiée au CIWatcher
+- 2026-11-24 08:55:04 UTC — [ide-core] ticket-1042 PR #1255 mergée (CI verte)
+- 2026-11-24 09:31:32 UTC — [ticket-1045] branche ticket-1045-chaque-rituel-de-rituels-md-tombe-en-semaine-pen
+- 2026-11-24 09:31:36 UTC — [ticket-1045] tour 1 — codeur démarré
+- 2026-11-24 09:32:22 UTC — [ticket-1045] tour 1 — codeur terminé (45734ms)
+- 2026-11-24 09:33:38 UTC — [ticket-1045] testeur: dur�es : ruff 0 s, mypy 21 s, mypy-linux 17 s, pytest 39 s ; impact depuis base : 6 fichier(s) de test
+- 2026-11-24 09:33:43 UTC — [ticket-1045] securite: PASS — Le diff ne fait que trois choses : il déplace des heures de rituels dans rituels (4532ms)
+- 2026-11-24 09:33:44 UTC — [ticket-1045] tour 1 — reviewer démarré
+- 2026-11-24 09:34:01 UTC — [ticket-1045] tour 1 — reviewer terminé (16359ms)
+- 2026-11-24 09:34:12 UTC — [ticket-1045] validateur: fichiers cités joints : rituels.md
+- 2026-11-24 09:34:12 UTC — [ticket-1045] validateur: APPROVED — Tous les critères sont satisfaits. Les heures des quatre rituels ont été ajustée (27968ms)
+- 2026-11-24 09:34:12 UTC — [ticket-1045] APPROVED après 1 tour(s)
+- 2026-11-24 09:35:55 UTC — [ticket-1045] documentation: 0 fichier(s) (80000ms) — doc-technique : aucune édition proposée — doc-fonctionnelle : aucune édition proposée
+- 2026-11-24 09:35:55 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (183168 caractères)
+- 2026-11-24 09:35:55 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (137599 caractères)
+- 2026-11-24 09:38:16 UTC — [ide-core] ticket-1045 PR #1257 confiée au CIWatcher
+- 2026-11-24 09:37:12 UTC — [ide-core] ticket-1043 PR #1256 mergée (CI verte)
+- 2026-11-24 09:38:23 UTC — [ticket-1046] branche ticket-1046-le-backend-enregistre-les-p-riodes-o-le-pc-tait
+- 2026-11-24 09:38:27 UTC — [ticket-1046] tour 1 — codeur démarré
+- 2026-11-24 09:40:34 UTC — [ticket-1046] tour 1 — codeur terminé (126516ms)
+- 2026-11-24 09:47:06 UTC — [ticket-1046] testeur: dur�es : ruff 0 s, mypy 15 s, mypy-linux 14 s, tsc 33 s, eslint 63 s, vitest 254 s, pytest 353 s ; impact depuis base : 131 fichier(s) de test
+- 2026-11-24 09:47:19 UTC — [ticket-1046] securite: PASS — Le diff ajoute un battement en tâche de fond qui écrit dans le SQLite local par  (11922ms)
+- 2026-11-24 09:47:19 UTC — [ticket-1046] tour 1 — reviewer démarré
+- 2026-11-24 09:47:42 UTC — [ticket-1046] tour 1 — reviewer terminé (23000ms)
+- 2026-11-24 09:47:54 UTC — [ticket-1046] validateur: fichiers cités joints : routers/rituels.py, main.py, docs/openapi.json (tronqué) ; non joints (budget épuisé) : frontend/src/test/contrat/perimetre.ts
+- 2026-11-24 09:47:54 UTC — [ticket-1046] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le battement du backend enregis (34781ms)
+- 2026-11-24 09:47:55 UTC — [ticket-1046] APPROVED après 1 tour(s)
+- 2026-11-24 09:51:08 UTC — [ticket-1046] documentation: 1 fichier(s) (174516ms) — après tour de correction — doc-fonctionnelle : aucune édition proposée — refusé : doc-technique : docs/api.md : règle « jeton vérifiable » — guillemets « 2026-11-24t09:30:00 » n'est ni dans le texte remplacé, ni dans les tickets, le diff ou l
+- 2026-11-24 09:51:08 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (183168 caractères)
+- 2026-11-24 09:51:08 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (137599 caractères)
+- 2026-11-24 10:03:49 UTC — [ide-core] ticket-1046 : base réalignée sur develop
+- 2026-11-24 10:03:49 UTC — [ide-core] ticket-1046 PR #1258 confiée au CIWatcher
+- 2026-11-24 09:44:26 UTC — [ide-core] ticket-1045 PR #1257 mergée (CI verte)
+- 2026-11-24 10:03:47 UTC — [ide-core] ticket-1046 PR #1258 mergée (CI verte)
+- 2026-11-24 10:03:55 UTC — [ticket-1047] branche ticket-1047-un-rituel-en-retard-dit-combien-et-pendant-quell
+- 2026-11-24 10:03:59 UTC — [ticket-1047] tour 1 — codeur démarré
+- 2026-11-24 10:05:54 UTC — [ticket-1047] tour 1 — codeur terminé (115313ms)
+- 2026-11-24 10:10:52 UTC — [ticket-1047] testeur: dur�es : tsc 19 s, eslint 30 s, vitest 204 s
+- 2026-11-24 10:11:01 UTC — [ticket-1047] securite: PASS — Je n'ai relevé aucune faille dans ce diff, qui ne touche que le frontend. Il ajo (7657ms)
+- 2026-11-24 10:11:03 UTC — [ticket-1047] tour 1 — reviewer démarré
+- 2026-11-24 10:11:20 UTC — [ticket-1047] tour 1 — reviewer terminé (17438ms)
+- 2026-11-24 10:11:33 UTC — [ticket-1047] validateur: fichiers cités joints : RituelsView.test.tsx, apiRituels.ts, frontend/src/hooks/useRituels.test.ts
+- 2026-11-24 10:11:33 UTC — [ticket-1047] validateur: APPROVED — Tous les critères sont satisfaits. Le code ajoute le calcul du retard (« en reta (31547ms)
+- 2026-11-24 10:11:34 UTC — [ticket-1047] APPROVED après 1 tour(s)
+- 2026-11-24 10:16:21 UTC — [ticket-1047] documentation: 2 fichier(s) (259608ms) — après tour de correction
+- 2026-11-24 10:16:21 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (183168 caractères)
+- 2026-11-24 10:16:21 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (137599 caractères)

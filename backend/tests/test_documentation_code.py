@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from tessera.services.documentation.documentation_code import MatiereCode, matiere_du_lot
+from tessera.services.documentation.documentation_code import MatiereCode, bloc_fichiers, matiere_du_lot
 
 
 async def _git(cwd: Path, *args: str) -> str:
@@ -187,3 +187,12 @@ async def test_tickets_without_a_diff_are_listed_apart(depot: Path) -> None:
     assert isinstance(matiere, MatiereCode)
     assert matiere.sans_diff == ["ticket-030", "ticket-999"]
     assert [d.ticket_id for d in matiere.diffs] == ["ticket-031"]
+
+
+def test_unshown_files_block_names_at_most_thirty_and_counts_the_rest() -> None:
+    noms = [f"src/f{i:03}.py" for i in range(200)]
+
+    bloc = bloc_fichiers(MatiereCode(fichiers_non_montres=noms))
+
+    assert sum(1 for n in noms if n in bloc) == 30
+    assert "170 autres" in bloc

@@ -7,11 +7,12 @@ from claude_agent_sdk import ClaudeAgentOptions
 from claude_agent_sdk._internal.transport.subprocess_cli import SubprocessCLITransport
 
 from tessera.config import settings
-from tessera.services.providers import droits_appel, profil_agent
+from tessera.services.providers import droits_appel, droits_worktree, profil_agent
 from tessera.services.providers.droits_appel import clore_appel, ouvrir_appel
 from tessera.services.providers.lanceur_agent import LanceurAgent
 from tessera.services.providers.process_agent import ProcessAgent
 from tessera.services.providers.transport_agent import TransportCompteAgent
+from tests.faux_securite import FauxSecurite
 
 COMPTE = "tessera-agent"
 
@@ -22,6 +23,7 @@ def cadre(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Path:
     (tmp_path / "profil-vide").mkdir()
     monkeypatch.setattr(profil_agent, "DOSSIER_PROFIL", tmp_path / "profil-vide")
     monkeypatch.setattr(profil_agent, "_NETTOYAGE_ECHOUE", False)
+    monkeypatch.setattr(droits_worktree, "securite_par_defaut", lambda: FauxSecurite())
     droits_appel._ACTIFS.clear()
     droits_appel._FILE.clear()
     monkeypatch.setattr(droits_appel, "_VERROU", asyncio.Condition())
@@ -53,7 +55,7 @@ async def test_a_call_cancelled_during_the_close_still_withdraws_the_right(cadre
     async def icacls(args: list[str]) -> tuple[int, str]:
         if "/remove:g" in args:
             retraits.append(args)
-        if "profil-vide" in args[0] or "/reset" in args:
+        if "profil-vide" in args[0] or ("/remove:g" in args and args[0] == str(cadre.resolve())):
             entre.set()
             await attente.wait()
         return 0, ""

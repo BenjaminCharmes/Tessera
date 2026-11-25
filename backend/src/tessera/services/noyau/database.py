@@ -148,6 +148,17 @@ UPDATE pipeline_runs SET depot_repris_at = COALESCE(finished_at, started_at)
     fait_le        TEXT,
     reporte_jusqua TEXT
 );""",
+    # 15 — ticket-1046 : le dernier battement du backend et les interruptions
+    # qu'un écart entre deux battements a révélées (veille ou arrêt).
+    """CREATE TABLE IF NOT EXISTS veille_battement (
+    id     INTEGER PRIMARY KEY CHECK (id = 1),
+    dernier TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS veille_interruptions (
+    id    INTEGER PRIMARY KEY AUTOINCREMENT,
+    debut TEXT NOT NULL,
+    fin   TEXT NOT NULL
+);""",
 ]
 
 

@@ -12,7 +12,7 @@ from collections.abc import Awaitable, Callable
 from pathlib import Path
 
 from tessera.config import settings
-from tessera.services.providers.droits_worktree import DroitsAgentRefuses, Icacls, _icacls_reel, poser_ecriture, retirer_ecriture
+from tessera.services.providers.droits_worktree import DroitsAgentRefuses, Icacls, _icacls_reel, poser_base, poser_ecriture, retirer_ecriture
 from tessera.services.providers.processus_compte import ProcessusIllisibles, processus_du_compte, processus_existe, sid_du_compte
 from tessera.services.providers.profil_agent import nettoyage_en_echec, reinitialiser_profil
 from tessera.services.providers.taches_compte import retirer_les_taches, taches_en_echec
@@ -137,6 +137,7 @@ async def _retenter_le_nettoyage(compte: str, icacls: Icacls) -> None:
 async def _poser_ou_retirer(racine: Path, compte: str, icacls: Icacls) -> None:
     """Set the right; on cancellation or failure before the counter exists, withdraw it (no counter would ever do)."""
     try:
+        await poser_base(racine, compte, icacls)
         await poser_ecriture(racine, compte, icacls)
     except BaseException:
         await asyncio.shield(_retirer_sans_masquer(racine, compte, icacls))

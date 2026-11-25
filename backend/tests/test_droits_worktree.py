@@ -1,4 +1,4 @@
-"""The agent account gets exactly what a run needs on its worktree — ticket-895."""
+"""The agent account gets exactly what a run needs on its worktree — ticket-895, ticket-1027."""
 import getpass
 import json
 import sys
@@ -8,10 +8,16 @@ import pytest
 
 from tessera.config import settings
 from tessera.services.providers import droits_worktree
-from tessera.services.providers.droits_worktree import DroitsAgentRefuses, accorder_droits_agent, retirer_ecriture
+from tessera.services.providers.droits_worktree import DroitsAgentRefuses, accorder_droits_agent, poser_base, poser_ecriture, retirer_ecriture
 from tessera.services.worktrees.run_worktree import RunWorktree
+from tests.faux_securite import COMPTE_SID, FauxSecurite
 
 COMPTE = "tessera-agent"
+
+
+@pytest.fixture
+def faux() -> FauxSecurite:
+    return FauxSecurite()
 
 
 @pytest.fixture
@@ -54,20 +60,48 @@ async def test_rights_are_set_in_order(wt: RunWorktree, monkeypatch: pytest.Monk
     icacls = Enregistreur()
     await accorder_droits_agent(wt, "python scripts/verif.py", icacls)
     appels = icacls.appels
-    assert appels[0] == [str(wt.racine), "/grant", f"{COMPTE}:(OI)(CI)M", "/L"]
-    git = str(wt.racine / ".git")
+    dossier_git = str(wt.racine / ".git")
     # Le backend d'abord : propriétaire de la racine, il perdrait WRITE_DAC dès l'ACE OWNER RIGHTS.
-    assert appels[1] == [str(wt.racine), "/grant", f"{getpass.getuser()}:(OI)(CI)F", "/L"]
-    assert appels[2] == [str(wt.racine), "/grant", "*S-1-3-4:(OI)(CI)(RC)", "/L"]
-    assert appels[3:6] == [
-        [git, "/inheritance:d", "/L"],
-        [git, "/remove:g", COMPTE, "/L"],
-        [git, "/grant:r", f"{COMPTE}:(OI)(CI)RX", "/L"],
+    assert appels[0] == [str(wt.racine), "/grant", f"{getpass.getuser()}:(OI)(CI)F", "/L"]
+    assert appels[1] == [str(wt.racine), "/grant", "*S-1-3-4:(OI)(CI)(RC)", "/L"]
+    assert appels[2:5] == [
+        [dossier_git, "/inheritance:d", "/L"],
+        [dossier_git, "/remove:g", COMPTE, "/L"],
+        [dossier_git, "/grant:r", f"{COMPTE}:(OI)(CI)RX", "/L"],
     ]
+    assert appels[5] == [str(wt.racine), "/grant", f"{COMPTE}:(OI)(CI)M", "/L"]
     refuses = {Path(a[0]).name for a in appels[6:] if a[1:3] == ["/deny", f"{COMPTE}:(WD,AD,WEA,WA,DE)"]}
     assert refuses == {"agents.json", "CLAUDE.md", "verif.py"}
     assert all("/L" in a for a in appels)
     assert len(appels) == 6 + 3
+
+
+async def test_write_grant_is_a_single_icacls_call(wt: RunWorktree) -> None:
+    icacls = Enregistreur()
+    await poser_ecriture(wt.racine, COMPTE, icacls)
+    assert icacls.appels == [[str(wt.racine), "/grant", f"{COMPTE}:(OI)(CI)M", "/L"]]
+
+
+async def test_base_is_set_once_per_root_and_again_for_a_recreated_worktree(wt: RunWorktree) -> None:
+    icacls = Enregistreur()
+    await poser_base(wt.racine, COMPTE, icacls)
+    n = len(icacls.appels)
+    assert n == 5
+    await poser_base(wt.racine, COMPTE, icacls)
+    assert len(icacls.appels) == n
+    # Même chemin, autre création : la clé mémorisée n'est plus la bonne.
+    chemin, ctime = droits_worktree._cle_base(wt.racine)
+    droits_worktree._BASES.discard((chemin, ctime))
+    droits_worktree._BASES.add((chemin, ctime - 1))
+    await poser_base(wt.racine, COMPTE, icacls)
+    assert len(icacls.appels) == 2 * n
+
+
+async def test_base_gives_the_account_no_modify_right(wt: RunWorktree) -> None:
+    icacls = Enregistreur()
+    await poser_base(wt.racine, COMPTE, icacls)
+    for appel in icacls.appels:
+        assert not any(arg.startswith(f"{COMPTE}:") and "M" in arg.split(":")[1] for arg in appel)
 
 
 async def test_agent_account_never_gets_full_control(wt: RunWorktree, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -99,33 +133,50 @@ async def test_protected_files_stay_readable(wt: RunWorktree, monkeypatch: pytes
         assert {"WD", "AD", "DE"} <= set(drapeaux)
 
 
-class EchecSurDeny(Enregistreur):
-    async def __call__(self, args: list[str]) -> tuple[int, str]:
-        await super().__call__(args)
+async def test_closing_removes_the_grant_without_setowner_nor_reset(wt: RunWorktree, faux: FauxSecurite) -> None:
+    icacls = Enregistreur()
+    await retirer_ecriture(wt.racine, COMPTE, icacls, "backend", faux)
+    assert icacls.appels == [[str(wt.racine), "/remove:g", COMPTE, "/L"]]
+
+
+async def test_the_grant_is_removed_first_and_stays_so_when_the_take_back_fails(
+    wt: RunWorktree, faux: FauxSecurite
+) -> None:
+    sale = wt.racine / "app" / "src" / "a.py"
+    faux.poser(sale, COMPTE_SID)
+    faux.reprise_sans_effet.add(sale)
+    icacls = Enregistreur()
+    with pytest.raises(DroitsAgentRefuses):
+        await retirer_ecriture(wt.racine, COMPTE, icacls, "backend", faux)
+    assert icacls.appels == [[str(wt.racine), "/remove:g", COMPTE, "/L"]]
+
+
+async def test_a_taken_back_protected_file_gets_its_denial_again(
+    wt: RunWorktree, monkeypatch: pytest.MonkeyPatch, faux: FauxSecurite
+) -> None:
+    monkeypatch.setattr(settings, "agent_user", COMPTE)
+    await accorder_droits_agent(wt, "python scripts/verif.py", Enregistreur())
+    repris = wt.projet / "CLAUDE.md"
+    faux.poser(repris, COMPTE_SID)
+    icacls = Enregistreur()
+    await retirer_ecriture(wt.racine, COMPTE, icacls, "backend", faux)
+    refus = [a for a in icacls.appels if a[1] == "/deny"]
+    assert [Path(a[0]) for a in refus] == [repris]
+    assert refus[0][2] == f"{COMPTE}:(WD,AD,WEA,WA,DE)"
+
+
+async def test_a_failed_denial_after_a_take_back_raises(
+    wt: RunWorktree, monkeypatch: pytest.MonkeyPatch, faux: FauxSecurite
+) -> None:
+    monkeypatch.setattr(settings, "agent_user", COMPTE)
+    await accorder_droits_agent(wt, "python scripts/verif.py", Enregistreur())
+    faux.poser(wt.projet / "CLAUDE.md", COMPTE_SID)
+
+    async def echec_sur_deny(args: list[str]) -> tuple[int, str]:
         return (5, "refusé") if "/deny" in args else (0, "")
 
-
-async def test_closing_lays_the_denials_again_after_the_reset(
-    wt: RunWorktree, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    monkeypatch.setattr(settings, "agent_user", COMPTE)
-    await accorder_droits_agent(wt, "python scripts/verif.py", Enregistreur())
-    icacls = Enregistreur()
-    await retirer_ecriture(wt.racine, COMPTE, icacls)
-    noms = [a[1] for a in icacls.appels]
-    dernier_reset = max(i for i, n in enumerate(noms) if n == "/reset")
-    refuses = {Path(a[0]).name for a in icacls.appels[dernier_reset:] if a[1] == "/deny"}
-    assert refuses == {"agents.json", "CLAUDE.md", "verif.py"}
-    assert all(a[2] == f"{COMPTE}:(WD,AD,WEA,WA,DE)" for a in icacls.appels if a[1] == "/deny")
-
-
-async def test_a_failed_denial_at_closing_raises(
-    wt: RunWorktree, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    monkeypatch.setattr(settings, "agent_user", COMPTE)
-    await accorder_droits_agent(wt, "python scripts/verif.py", Enregistreur())
     with pytest.raises(DroitsAgentRefuses):
-        await retirer_ecriture(wt.racine, COMPTE, EchecSurDeny())
+        await retirer_ecriture(wt.racine, COMPTE, echec_sur_deny, "backend", faux)
 
 
 @pytest.mark.skipif(sys.platform != "win32", reason="real ACLs need Windows")
@@ -137,7 +188,7 @@ async def test_a_protected_file_keeps_its_denial_after_a_real_closing(tmp_path: 
     protege.write_text("{}", encoding="utf-8")
     droits_worktree._REFUSES[racine.resolve()] = [protege]
     await droits_worktree._refuser(protege, guests, droits_worktree._icacls_reel)
-    await retirer_ecriture(racine, guests)
+    await retirer_ecriture(racine, guests, droits_worktree._icacls_reel, "backend", FauxSecurite())
     code, sortie = await droits_worktree._icacls_reel([str(protege)])
     assert code == 0
     assert "(DENY)" in sortie

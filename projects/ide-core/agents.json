@@ -4,6 +4,7 @@
   "category": "Tessera",
   "artifacts": "tracked",
   "git_root": "ancestor",
+  "base_branch": "develop",
   "services": [
     {
       "nom": "backend",

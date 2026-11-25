@@ -12,7 +12,7 @@ PLAFONDS: dict[str, int] = {
     "routers/orchestrator.py": 311,
     "routers/tickets.py": 548,
     "services/livraison/ci_watcher.py": 520,
-    "services/documentation/documentation.py": 326,
+    "services/documentation/documentation.py": 315,
     "services/github/github_service.py": 592,
     "services/github/github_workflow.py": 421,
     "services/livraison/livraison.py": 524,
@@ -23,7 +23,7 @@ PLAFONDS: dict[str, int] = {
     "services/pipeline/reprise_orphelin.py": 346,
     "services/pipeline/run_executor.py": 331,
     "services/verification/test_runner.py": 435,
-    "services/projets/ticket_service.py": 450,
+    "services/projets/ticket_service.py": 414,
 }
 
 SOURCES = Path(__file__).resolve().parent.parent / "src" / "tessera"

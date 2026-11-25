@@ -489,7 +489,7 @@ class CIWatcher:
         cible = self._realignements.get(f"{project_id}:{ticket_id}")
         if cible is None:
             return
-        if RUN_REGISTRY.projet_occupe(project_id):
+        if not cible.projet_a_worktree and RUN_REGISTRY.projet_occupe(project_id):
             _logger.info(
                 "realignement_ignore",
                 extra={"project": project_id, "raison": "un run occupe le projet"},

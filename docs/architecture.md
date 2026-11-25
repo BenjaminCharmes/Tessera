@@ -1133,6 +1133,20 @@ Tout autre `ProcessError` (crash du SDK, erreur réseau, etc.) conserve le trait
 
 Ce mécanisme ne relance pas la file automatiquement quand le quota se rétablit, et ne change pas les seuils du mode autonome (ADR-020).
 
+## Préparation du checkout avant orchestration (ticket-1048)
+
+Avant le démarrage d'un run, deux garde-fous s'appliquent aux projets sans worktree.
+
+**Refus du checkout étranger**
+
+Une validation précoce refuse un run (`422 Unprocessable Entity`) si le checkout est sur une branche qui n'est ni la base du projet ni celle d'un ticket existant (`ticket-NNN-*`). Le message nomme la branche actuelle et invite à revenir à la base ou à utiliser un worktree manuel.
+
+Cas d'usage : une autre session a laissé le checkout sur sa propre branche (une branche de fiches, par exemple). Un run lancé là bifurquerait de ce travail et lirait un `agents.json` plus vieux que la base : il est refusé. Le checkout resté sur la branche d'un ticket du projet, après un run interrompu, n'est pas refusé : la reprise du ticket en a besoin.
+
+**Réalignement de la base distante**
+
+Avant de figer la politique du run, le réalignement (`realigner_avant_construction()`) synchronise la base locale avec le distant. Cela garantit que tout changement arrivé par la base distante — notamment un nouveau `base_branch` ou une autre configuration — s'applique au run. Sans ce réalignement, un run lancé sur un arbre décalé lirait une politique périmée.
+
 ## Réalignement automatique du workspace avant un run (ticket-457)
 
 Avant le lancement du pipeline, l'orchestrateur prépare l'arbre de travail si l'une des conditions est remplie :
@@ -1218,7 +1232,7 @@ Le module `services/documentation/documentation_code.py` (ticket-540) produit ce
 - **Fichiers modifiés ou ajoutés** : le contenu des fichiers du diff, jusqu'à 8 000 caractères par fichier et 40 000 au total, trié par nombre de lignes changées décroissant. Un fichier trop long reste représenté par ses hunks.
 - **Tickets sans diff** : ceux dont le diff filtré est vide ou introuvable figurent dans une liste séparée.
 
-La fonction accepte une base explicite (commit ou branche) pour le diff, ce qui permet au run d'extraire les changements depuis le commit de la branche de travail — utile si la branche n'a pas encore été rebasée sur `main`. Les appelants existants gardent leur comportement (diff contre `main` par défaut).
+La fonction accepte une base explicite (commit ou branche) pour le diff. Ticket-1044 garantit que la base du diff vient toujours du run (`base_du_projet(politique)`), jamais d'un `main` local qui pourrait avoir des mois de retard — ce qui, avant le correctif, faisait entrer deux mois de dépôt dans le contexte des agents au lieu du diff du ticket.
 
 ### Protection de la configuration lors de la documentation (ticket-866)
 
@@ -1673,6 +1687,14 @@ Dans la rail de navigation (`NavRail`), le panneau **Rituels** rejoint le groupe
 ### Polling et actions
 
 Le hook `useRituels` lit `GET /api/v1/rituels` par `usePolling` (intervalle de 5 minutes et à l'ouverture du panneau). Il expose la liste des rituels et un compteur `enRetard`, plus deux actions : `fait(id)` et `reporter(id)`, qui appellent les routes correspondantes (`POST /api/v1/rituels/{id}/fait` et `POST /api/v1/rituels/{id}/reporter`) puis relisent la liste.
+
+### Affichage du retard et des interruptions (ticket-1047)
+
+Une carte de rituel en retard affiche maintenant :
+- **Durée du retard**, arrondie selon la magnitude : minutes si moins d'une heure, heures si moins d'une journée, jours au-delà.
+- **Période d'interruption**, si elle couvre l'échéance : « Tessera n'a pas tourné du <début> au <fin> ».
+
+Les interruptions viennent de `GET /api/v1/rituels/interruptions` (ticket-1046), avec `debut` et `fin` en heures locales sans fuseau. Le frontend les charge indépendamment de la liste des rituels ; leur absence ne bloque pas l'affichage.
 
 ## Caching des statuts GitHub (ticket-364)
 

@@ -217,3 +217,20 @@ def test_closing_another_project_run_keeps_the_queue(
 
     assert _tickets(workspace, "ide-core") == []
     assert len(json.loads(attente.read_text(encoding="utf-8"))) == 1
+
+
+# -- ticket-1042 : un signalement ne reprend pas un numéro réservé -----------
+
+
+def test_report_after_a_reservation_does_not_take_the_reserved_number(workspace: Path) -> None:
+    from tessera.services.noyau import numerotation
+
+    projet = workspace / "ide-core"
+    (projet / "tickets" / "todo" / "ticket-009-x.md").write_text("x", encoding="utf-8")
+    reserve = numerotation.reserver(projet, "ticket", "develop", settings.ide_state_dir)
+    assert reserve == 10
+
+    resp = _envoyer()
+
+    assert resp.status_code == 201
+    assert resp.json()["id"] == f"ticket-{reserve + 1:03d}"

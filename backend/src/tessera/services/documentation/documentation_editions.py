@@ -37,6 +37,7 @@ def appliquer_editions(
     matiere: MatiereCode | None = None,
     tickets: str = "",
     agents_md: Path | None = None,
+    ecartees: list[str] | None = None,
 ) -> list[str]:
     """Applique toutes les modifications, ou aucune.
 
@@ -56,6 +57,10 @@ def appliquer_editions(
     et ses jetons vérifiables doivent y figurer (ticket-542, ADR-057). Sans
     elle, rien n'est contrôlé : seul le service sait ce que l'agent a reçu, et
     il la passe toujours.
+
+    ``ecartees``, si fourni, change le sort des seuls refus du contrôle de
+    preuve : l'édition est écartée seule, son motif ajouté à la liste, et les
+    autres s'appliquent. Tout autre refus lève, comme sans liste.
     """
     resultat: dict[Path, str] = {}
     controle = None if matiere is None else ControleDePreuve(matiere, tickets)
@@ -75,7 +80,14 @@ def appliquer_editions(
             fichier = racine / chemin
 
         if controle is not None:
-            controle.verifier(edition, chemin)
+            try:
+                controle.verifier(edition, chemin)
+            except EditionRefusee as exc:
+                if ecartees is None:
+                    raise
+                # Tour de correction : cette édition tombe seule (ticket-1036).
+                ecartees.append(str(exc))
+                continue
 
         if "contenu" in edition:
             if fichier in resultat or fichier.exists():
@@ -194,7 +206,18 @@ def _inserer(avant: str, edition: dict[str, object], chemin: str) -> str:
     """
     section = str(edition.get("apres_section", ""))
     texte = str(edition.get("texte", ""))
+    lignes, _, fin = bornes_section(avant, section, chemin)
+    return "".join(lignes[:fin]) + texte.rstrip("\n") + "\n\n" + "".join(lignes[fin:])
 
+
+def bornes_section(
+    avant: str, section: str, chemin: str
+) -> tuple[list[str], int, int]:
+    """Lines of ``avant`` plus the (start, end) line indexes of a unique section.
+
+    The section runs from its heading to the next heading of equal or higher
+    level. Zero or several matches raise ``EditionRefusee``.
+    """
     niveau = len(section) - len(section.lstrip("#"))
     prefixe = "#" * niveau + " "
     section_norm = _normaliser_section(section)
@@ -224,4 +247,4 @@ def _inserer(avant: str, edition: dict[str, object], chemin: str) -> str:
             if len(titre) - len(titre.lstrip("#")) <= niveau:
                 fin = i
                 break
-    return "".join(lignes[:fin]) + texte.rstrip("\n") + "\n\n" + "".join(lignes[fin:])
+    return lignes, debut, fin

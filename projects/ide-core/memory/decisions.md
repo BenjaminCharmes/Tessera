@@ -638,7 +638,7 @@ Une ADR qu'aucune règle de `contraintes.md` ni aucun `CLAUDE.md` ne cite part d
 ## ADR-088 — Ce que le compte agent garde encore : retiré, fermé ou à trancher
 
 **Date** : 2026-11-19
-**Décision** : amende ADR-087, après essais sous le compte. (1) Sortie du job : aucune voie trouvée (WMI refusé ; une tâche planifiée se crée sans s'exécuter). Ses tâches planifiées se **retirent** au dernier appel ; pas d'inventaire des processus illisibles (faux positifs du ticket-997). (2) Cache uv : le compte l'écrit dès `uv run`, donc `UV_LINK_MODE=copy` et le cache **part** avec le profil ; cache npm **accepté** (intégrité vérifiée). (3) Dossiers ouverts à tous : le backend ne purge que le dossier public ; **à trancher** par l'utilisateur, refus à l'installation ou acceptation (ticket-1020). (4) Fichier protégé ajouté pendant un appel : il entre dans l'empreinte, run `blocked`.
+**Décision** : amende ADR-087, après essais sous le compte. (1) Sortie du job : aucune voie trouvée (WMI refusé ; une tâche planifiée se crée sans s'exécuter). Ses tâches planifiées se **retirent** au dernier appel ; pas d'inventaire des processus illisibles (faux positifs du ticket-997). (2) Cache uv : le compte l'écrit dès `uv run`, donc `UV_LINK_MODE=copy` et le cache **part** avec le profil ; cache npm **accepté** (intégrité vérifiée). (3) Dossiers ouverts à tous : la création s'y **refuse** au seul compte, par un script administrateur lancé une fois, réversible (ticket-1020). (4) Fichier protégé ajouté pendant un appel : il entre dans l'empreinte, run `blocked`.
 **Raison** : uv ne revérifie pas son cache ; le backend, non administrateur, ne lit pas tous les dossiers partagés.
 **Alternative écartée sans essai** : intégrité basse ou jeton restreint.
 
@@ -647,7 +647,34 @@ Une ADR qu'aucune règle de `contraintes.md` ni aucun `CLAUDE.md` ne cite part d
 ## ADR-089 — Le compte agent tourne sur une window station et un bureau dédiés
 
 **Date** : 2026-11-19
-**Décision** : amende ADR-083. Le backend crée, par appel, une window station et un bureau nommés, dont la DACL ne vise que le compte agent et lui-même ; `lpDesktop` les nomme. Le job d'appel y ajoute `JOB_OBJECT_UILIMIT_*` en défense en profondeur. Station impossible à créer ou lancement refusé : `EchecLancementCompte`, jamais de repli sur `WinSta0\Default` (ADR-037).
+**Décision** : amende ADR-083. Le backend inscrit le compte agent sur la station non interactive de sa session (en nommer une exige un administrateur) et crée, par appel, un bureau dont la DACL ne vise qu'eux deux ; `lpDesktop` les nomme. Le job d'appel y ajoute `JOB_OBJECT_UILIMIT_*` en défense en profondeur. Station impossible à créer ou lancement refusé : `EchecLancementCompte`, jamais de repli sur `WinSta0\Default` (ADR-037).
 **Raison** : presse-papiers, atomes et hooks sont propres à la station ; `SendInput` et la capture dépendent du bureau, hors de portée d'un job.
 **Alternative rejetée** : `UILIMIT` seul (ni frappes simulées ni capture) ; session 0 par tâche ou service (administrateur, tuyaux stdio perdus, sortie du job d'ADR-088).
 **Ne ferme pas** : Node, Playwright ou le CLI peuvent refuser une station non interactive ; preuve avant câblage (ticket-1023).
+
+---
+
+## ADR-091 — Clore un appel ne reprend que ce que le compte possède
+
+**Date** : 2026-11-20
+**Décision** : amende ADR-087. Le droit du compte se pose à l'ouverture d'un appel et se retire à sa clôture, jamais au-delà. Une fois par racine : `OWNER RIGHTS`, contrôle du backend, `.git` protégé. Par appel : `/grant` du compte (4,8 s→1,6 s), `/remove:g` (1,7 s), reprise ciblée en `ctypes` des seules entrées du compte ou à DACL protégée (16 s→0,6 s ; 4,2 s après `npm ci`). Tâches en `/xml` (2,0 s→0,2 s). Profil : même reprise, à mesurer.
+**Raison** : sans `WRITE_DAC` ni `WRITE_OWNER`, le compte ne change que ce qu'il possède ; le reste n'hérite que de la racine. Entrée illisible ou non reprise : `DroitsAgentRefuses`, `blocked` (ADR-037). Un lien se reprend par son handle, jamais sa cible ; les refus des fichiers protégés survivent, sans reset.
+**Alternative rejetée** : droit tenu le temps du run.
+
+---
+
+## ADR-092 — Une borne par fichier, des sections à la demande
+
+**Date** : 2026-11-23
+**Décision** : amende ADR-057. Un fichier de documentation de 20 000 caractères ou moins est donné en entier, au-dessus par ses titres, quel que soit son rang ; les 200 000 totaux ne servent qu'en dernier recours. Un rôle peut répondre `{"sections": [{fichier, titre}]}` à la place des éditions : rappelé une seule fois, il reçoit le texte entier de ces sections (40 000 caractères, surplus nommé). Une demande se contrôle comme une édition : documentation sous la racine, titre unique, sinon ignorée et signalée. Sans fichier par ses titres, un appel par rôle.
+**Raison** : 135 000 jetons par appel, et `doc-technique` ne lisait jamais son fichier : il ne pouvait qu'ajouter.
+**Alternative rejetée** : découper `architecture.md` ; sélection par mots-clés.
+
+---
+
+## ADR-093 — Un rôle sans outils reste sous le compte de l'utilisateur, et le reste vérifié
+
+**Date** : 2026-11-23
+**Décision** : amende ADR-083. Validateur, doc-technique, doc-fonctionnelle et leçons (`allow_tools=False`) ne passent pas par le compte agent. Dans un projet qui déclare `worktree.compte_agent`, un appel sans compte dont `tools` n'est pas `[]`, ou qui porte skill, plugin ou `signaler`, lève `ProviderIndisponible`.
+**Raison** : `tools=[]` retire tous les outils intégrés : le modèle ne lit ni n'exécute rien, il répond. Seul reste le serveur MCP en mémoire (`ask_user`). Le CLI lit, sous le compte de l'utilisateur, sa session et les `.claude/settings` et `CLAUDE.md` du projet (`setting_sources=["project"]`), fichiers protégés en écriture (ADR-084) ; secrets vidés de l'environnement. Le compte coûterait ~4 s par appel (ADR-091) et la sérialisation d'ADR-087, sans rien fermer de plus.
+**Alternative rejetée** : tous les rôles par le compte — coût payé pour un appel qui n'agit pas.

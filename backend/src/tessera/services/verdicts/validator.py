@@ -171,7 +171,9 @@ class ValidatorService:
         cited_block, report = "", CitedFilesReport()
         if project_root is not None:
             refs = extract_file_refs(criteria)
-            cited_block, report = build_cited_files_section(refs, project_root)
+            cited_block, report = build_cited_files_section(
+                refs, project_root, code_produced
+            )
         message = (
             f"## Critères d'acceptation\n{criteria_block}\n\n"
             + build_decisions_section(exchanges)

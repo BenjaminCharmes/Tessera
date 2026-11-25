@@ -2,12 +2,12 @@ import type { EtatPastille } from "../../design/ui/StatusPill";
 import type { TicketPriority, TicketStatus } from "../../types/api";
 
 export const STATUS_STYLE: Record<TicketStatus, string> = {
-  todo: "bg-zinc-700 text-zinc-300",
-  "in-progress": "bg-blue-900 text-blue-300",
-  "in-review": "bg-amber-900 text-amber-300",
-  done: "bg-green-900 text-green-300",
-  blocked: "bg-red-900 text-red-300",
-  cancelled: "bg-zinc-800 text-zinc-400",
+  todo: "bg-zinc-500/12 text-zinc-300",
+  "in-progress": "bg-blue-500/12 text-blue-300",
+  "in-review": "bg-amber-500/12 text-amber-300",
+  done: "bg-green-500/12 text-green-300",
+  blocked: "bg-red-500/12 text-red-300",
+  cancelled: "bg-zinc-500/12 text-zinc-300",
 };
 
 /** Correspondance de la charte : une priorité se lit comme un état. */

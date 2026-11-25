@@ -12,6 +12,7 @@ from pathlib import Path
 from tessera.services.gardes.politique_run import PolitiqueRun
 from tessera.services.verdicts.validator_binary import is_binary_file
 from tessera.services.verdicts.validator_cited_dirs import list_folder_files, looks_like_folder, render_folder_entry, resolve_folder
+from tessera.services.verdicts.validator_cited_locks import is_lockfile, render_lockfile_entry
 from tessera.services.verdicts.validator_file_extensions import looks_like_file
 
 # Max size of the cited-files section -- all entries combined.
@@ -40,6 +41,8 @@ class CitedFilesReport:
     omitted: list[str] = field(default_factory=list)
     # Subset of ``joined`` that are folders, with their number of files.
     folders: dict[str, int] = field(default_factory=dict)
+    # Subset of ``joined`` that are lockfiles, joined by their diff.
+    diffs: list[str] = field(default_factory=list)
 
     def is_empty(self) -> bool:
         return not (self.joined or self.absent or self.omitted)
@@ -175,8 +178,20 @@ def _read_entry(
     return f"### {ref}\n```\n{raw}\n```"
 
 
+def _lockfile_entry(
+    ref: str, diff: str, budget: int, report: CitedFilesReport
+) -> str:
+    """A cited lockfile as its run diff, cut at ``budget``."""
+    entry, cut = render_lockfile_entry(ref, diff, budget)
+    report.joined.append(ref)
+    report.diffs.append(ref)
+    if cut:
+        report.truncated.append(ref)
+    return entry
+
+
 def build_cited_files_section(
-    refs: list[str], project_root: Path
+    refs: list[str], project_root: Path, diff: str = ""
 ) -> tuple[str, CitedFilesReport]:
     """Build the cited-files section and the report of what it holds.
 
@@ -195,6 +210,11 @@ def build_cited_files_section(
         if budget <= 0:
             report.omitted.append(ref)
             entries.append(f"### {ref}\n*(non joint : budget épuisé)*")
+            continue
+        if is_lockfile(ref):
+            entry = _lockfile_entry(ref, diff, budget, report)
+            budget -= len(entry)
+            entries.append(entry)
             continue
         folder = _find_folder_in_project(ref, project_root)
         if folder is not None:
@@ -225,6 +245,8 @@ def build_cited_files_section(
 def _log_label(ref: str, report: CitedFilesReport) -> str:
     """``ref`` as the journal names it: folder count and cut marks included."""
     cut = ref in report.truncated
+    if ref in report.diffs:
+        return f"{ref} (diff, tronqué)" if cut else f"{ref} (diff)"
     if ref in report.folders:
         marks = f"dossier, {report.folders[ref]} fichiers"
         return f"{ref} ({marks}, tronqué)" if cut else f"{ref} ({marks})"

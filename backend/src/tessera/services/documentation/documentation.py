@@ -28,6 +28,7 @@ coûterait plus qu'il n'apporterait.
 """
 from collections.abc import Callable
 from dataclasses import dataclass, field
+from functools import partial
 from pathlib import Path
 
 from tessera.services.documentation import documentation_claude_md as claude_md_doc
@@ -36,11 +37,13 @@ from tessera.services.documentation.documentation_code import FournisseurMatiere
 from tessera.services.documentation.documentation_contenu import contenu_et_reduits
 from tessera.services.documentation.documentation_description import appliquer_description
 from tessera.services.documentation.documentation_editions import appliquer_editions
+from tessera.services.documentation.documentation_issues import APPLIQUEES, AUCUNE, ContexteEdition, noter_illisible
+from tessera.services.documentation.documentation_issues import tour_de_correction as corriger
 from tessera.services.documentation.documentation_preuve import fichiers_de_la_matiere
-from tessera.services.documentation.documentation_reponse import donnees_de, editions_de, editions_depuis
+from tessera.services.documentation.documentation_reponse import editions_depuis, lire_json
+from tessera.services.documentation.documentation_sections import avec_sections
 from tessera.services.documentation.documentation_selection import MARQUEUR, TicketADocumenter, consigner_lot, marquer_documente, tickets_a_documenter
-from tessera.services.documentation.documentation_titres import brief_correction as _brief_correction
-from tessera.services.documentation.documentation_titres import titres_fichiers_vises as _titres_fichiers_vises
+from tessera.services.documentation.documentation_titres import titres_fichiers_vises as _titres_fichiers_vises  # noqa: F401
 from tessera.services.noyau.modeles_par_defaut import MODELE_PRODUCTION
 from tessera.services.providers.base import LLMProvider
 from tessera.utils.logger import get_logger
@@ -77,6 +80,8 @@ class ResultatDocumentation:
     #: Fichiers de documentation réduits à leurs titres, « chemin (N caractères) »
     #: (ticket-954).
     reduits: list[str] = field(default_factory=list)
+    #: L'issue de chaque rôle appelé (ticket-1037).
+    issues: dict[str, str] = field(default_factory=dict)
 
 
 #: Les deux lectures d'une même livraison. Deux rôles et pas un seul : un agent
@@ -189,9 +194,9 @@ class DocumentationService:
 
         modifies: list[str] = []
         refus: list[str] = []
+        issues: dict[str, str] = {}
         tour_de_correction = False
-        # `reduits` est le budget du lot, calculé une fois ; le contenu que
-        # chaque rôle lit, lui, se relit sur le disque à son appel (ticket-962).
+        # `reduits` : calculé une fois ; le contenu se relit à chaque appel (t.962).
         _, reduits = contenu_et_reduits(racine)
         # Le texte des tickets sert au contrôle des jetons : un numéro d'ADR
         # qu'un ticket cite n'est pas inventé (ticket-542).
@@ -204,8 +209,7 @@ class DocumentationService:
         for role in self._roles:
             systeme = (self._prompts_dir / f"{role}.md").read_text(encoding="utf-8")
             provider, modele = self._pour(role)
-            # Seul `doc-technique` voit le CLAUDE.md et l'AGENTS.md, et seul lui
-            # peut les éditer ou proposer la description (ticket-244, 724).
+            # Seul `doc-technique` voit CLAUDE.md et AGENTS.md (tickets 244, 724).
             technique = role == claude_md_doc.ROLE
             claude_md = self._claude_md if technique else None
             agents_md = claude_md_doc.agents_md_de(racine, claude_md)
@@ -217,7 +221,11 @@ class DocumentationService:
                 max_tokens=_MAX_TOKENS,
                 cwd=project_path,
             )
-            donnees = donnees_de(str(reponse.content), role)
+            reponse = await avec_sections(reponse, reduits, racine, provider, systeme, user, modele, _MAX_TOKENS, project_path)
+            donnees = lire_json(str(reponse.content))
+            if donnees is None:
+                noter_illisible(role, issues, refus)
+                continue
             if technique:
                 # L'agents.json du dossier où le run écrit, jamais le checkout.
                 ecrits, refuses = appliquer_description(
@@ -227,45 +235,25 @@ class DocumentationService:
                 fichiers_description.extend(ecrits)
                 refus_description.extend(refuses)
             editions = editions_depuis(donnees)
+            issues[role] = APPLIQUEES if editions else AUCUNE
             if not editions:
                 continue
+            contexte = ContexteEdition(racine, fichiers, claude_md, matiere, intentions, agents_md)
             try:
                 ecrits_role = appliquer_editions(
                     racine, editions, claude_md, matiere, intentions, agents_md
                 )
-                modifies.extend(ecrits_role)
-                _journaliser_editions(role, ecrits_role)
             except EditionRefusee as exc:
-                # Tour de correction (ticket-395) : rappeler l'agent une seule fois
-                # avec le motif du refus et les titres des fichiers visés.
+                # Tour de correction (ticket-395), une seule fois.
                 tour_de_correction = True
-                motif = str(exc)
-                titres = _titres_fichiers_vises(racine, editions)
-                reponse2 = await provider.complete(
-                    system=systeme,
-                    user=_brief_correction(
-                        _user_du_disque(racine, tickets, matiere, claude_md, agents_md),
-                        str(reponse.content), motif, titres, fichiers, exc.extrait
-                    ),
-                    model=modele,
-                    max_tokens=_MAX_TOKENS,
-                    cwd=project_path,
+                ecrits_role = await corriger(
+                    provider, modele, _MAX_TOKENS, project_path, systeme,
+                    partial(_user_du_disque, racine, tickets, matiere, claude_md, agents_md),
+                    role, str(reponse.content), exc, editions, contexte, issues, refus,
                 )
-                editions2 = editions_de(str(reponse2.content), role)
-                if not editions2:
-                    continue
-                try:
-                    ecrits2 = appliquer_editions(
-                        racine, editions2, claude_md, matiere, intentions, agents_md
-                    )
-                    modifies.extend(ecrits2)
-                    _journaliser_editions(role, ecrits2)
-                except EditionRefusee as exc2:
-                    # Deuxième refus : comportement courant (ticket-395).
-                    _logger.warning(
-                        "editions_refusees", extra={"role": role, "motif": str(exc2)}
-                    )
-                    refus.append(f"{role} : {exc2}")
+            modifies.extend(ecrits_role)
+            if ecrits_role:
+                _journaliser_editions(role, ecrits_role)
 
         # Le marqueur avance si une édition est appliquée ou si aucune n'est
         # proposée ; un lot refusé est compté, abandonné au 2e refus (t.940).
@@ -276,6 +264,7 @@ class DocumentationService:
         return ResultatDocumentation(
             fichiers_modifies=[*modifies, *fichiers_description],
             refus=[*refus, *refus_description],
+            issues=issues,
             tickets=[t.id for t in tickets],
             tronque=tronque,
             marqueur_ecrit=marqueur_ecrit,

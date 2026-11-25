@@ -78,6 +78,22 @@ Tous les appels `icacls` portent le flag `/L` pour opérer sur le lien lui-même
 
 Sans `AGENT_USER` configuré, aucune de ces protections ne s'applique : l'IDE tourne sous ton compte, avec tes droits.
 
+## Dossiers ouverts à tout utilisateur
+
+Le compte agent est membre du groupe des utilisateurs : sans rien faire, il
+peut créer des fichiers dans `C:\Users\Public`, `C:\Windows\Temp` et
+`C:\ProgramData`, que l'IDE, non administrateur, ne peut pas tous purger. Un
+script les lui ferme, une fois, dans un PowerShell **administrateur** :
+
+`powershell -ExecutionPolicy Bypass -File scripts\agent-refus-creation-admin.ps1`
+
+Il pose sur ces trois dossiers, pour le seul compte agent, un refus de créer
+fichier ou dossier, hérité par leurs sous-dossiers. Il ne touche ni au compte,
+ni à son mot de passe, ni à son jeton. `C:\ProgramData\Tessera` a son héritage
+coupé : worktrees, outils et profil du compte ne reçoivent rien. Sur
+`C:\ProgramData`, la propagation aux sous-dossiers peut prendre une minute.
+Le même script avec `-Retirer` le défait ; le relancer ne change rien.
+
 ## `agent doctor`
 
 Il liste chaque point avec son remède : compte présent, mot de passe et jeton

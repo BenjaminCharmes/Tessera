@@ -1,12 +1,13 @@
 ---
-id: ticket-1024
-title: "The agent call job limits the user interface"
-type: feat
-status: todo
-priority: medium
 agent: codeur
 depends_on: []
+id: ticket-1024
+pr_number: 1216
 preuve_reelle: true
+priority: medium
+status: done
+title: The agent call job limits the user interface
+type: feat
 ---
 
 # ticket-1024 — Le job d'un appel agent limite l'interface utilisateur
@@ -21,6 +22,18 @@ sur le job de chaque appel du compte agent, sans toucher aux jobs de services.
 `creer_groupe()` (`services/noyau/groupe_de_processus.py`) ne pose que
 `KILL_ON_JOB_CLOSE`. `LanceurWindows` s'en sert pour chaque appel (ticket-943).
 `SetInformationJobObject` accepte la classe `JobObjectBasicUIRestrictions` (4).
+
+## Essai du 20/11, avant câblage
+
+Sur le poste, hors dépôt, avec le lanceur réel et un job portant les huit
+drapeaux (`0xFF`, classe 4, pose acceptée) :
+
+- Seul, sur `WinSta0\Default` : le presse-papiers n'est plus lu, mais
+  `SendInput` injecte toujours et l'écran se lit toujours. Ce ticket ne remplace
+  donc pas le 1023.
+- Avec la station dédiée du 1023 : `node --version`, un appel complet du CLI
+  avec l'outil Bash, puis `tsc`, `eslint`, les 193 tests `vitest` et
+  `vite build` de Serpent démarrent et vont au bout.
 
 ## À faire
 

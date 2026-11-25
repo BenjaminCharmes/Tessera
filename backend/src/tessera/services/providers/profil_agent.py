@@ -7,8 +7,8 @@ sauf `npm-cache` ; le dossier est recréé et le compte retrouve
 lui-même. npm vérifie l'intégrité de ce qu'il sort de son cache, donc il
 survit ; uv ne revérifie pas un paquet décompressé, son cache part (ticket-1019,
 ADR-088). Un échec est une `DroitsAgentRefuses` (ADR-037). Avant la purge, le dossier
-revient au backend (`/setowner`, `/reset`) : le compte, propriétaire de ce qu'il
-crée, ne peut pas piéger la purge (ticket-1014).
+revient au backend par reprise ciblée (`reprendre_arbre`, ADR-091) : le compte,
+propriétaire de ce qu'il crée, ne peut pas piéger la purge (ticket-1014, ticket-1028).
 """
 import asyncio
 import ntpath
@@ -18,6 +18,8 @@ from pathlib import Path
 
 from tessera.services.providers.droits_worktree import OWNER_RIGHTS, DroitsAgentRefuses, Icacls, _icacls_reel, _lancer, compte_du_backend
 from tessera.services.providers.env_agent import CACHE_NPM, PROFIL_AGENT, env_du_profil
+from tessera.services.providers.reprise_ciblee import reprendre_arbre
+from tessera.services.providers.securite_fichiers import SecuriteFichiers, securite_par_defaut
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -107,10 +109,30 @@ def _prefixe_long(chemin: Path) -> Path:
     return chemin if absolu.startswith(_PREFIXE_LONG) else Path(_PREFIXE_LONG + absolu)
 
 
-async def _reprendre_la_main(dossier: Path, compte: str, icacls: Icacls, backend: str) -> None:
-    """Owner back to the backend, DACLs back to inheritance: the account cannot have closed anything for it."""
-    await _lancer(icacls, [str(dossier), "/setowner", backend, "/T", "/C", "/L"])
-    await _lancer(icacls, [str(dossier), "/reset", "/T", "/C", "/L"])
+async def _reprendre_la_main(
+    dossier: Path, compte: str, backend: str, securite: SecuriteFichiers,
+) -> bool:
+    """Take back what the account owns under `dossier`; `True` when the root itself had to be taken back.
+
+    Le compte n'a que `RC` (OWNER RIGHTS) sur la racine : il n'en change ni le
+    propriétaire ni la DACL. Une racine à son nom ou à DACL protégée est donc
+    l'indice d'une altération, reprise puis redonnée. Les autres entrées passent
+    par `reprendre_arbre` (aucun lien suivi, refus nommant le chemin).
+    """
+    await reprendre_arbre(dossier, compte, backend, securite)
+    racine = await asyncio.to_thread(_racine_a_reprendre, dossier, compte, backend, securite)
+    return racine
+
+
+def _racine_a_reprendre(dossier: Path, compte: str, backend: str, securite: SecuriteFichiers) -> bool:
+    try:
+        info = securite.lire(dossier)
+        if info.proprietaire_sid != securite.sid_de(compte) and not info.dacl_protegee:
+            return False
+        securite.reprendre(dossier, securite.sid_de(backend), proprietaire_seul=False)
+    except OSError as exc:
+        raise DroitsAgentRefuses(f"racine du profil non reprise ({dossier}) : {type(exc).__name__}") from exc
+    return True
 
 
 async def _redonner_au_compte(dossier: Path, compte: str, icacls: Icacls, backend: str) -> None:
@@ -128,8 +150,11 @@ async def _redonner_au_compte(dossier: Path, compte: str, icacls: Icacls, backen
 
 async def reinitialiser_profil(
     compte: str, icacls: Icacls = _icacls_reel, profil: Path | None = None, backend: str | None = None,
+    securite: SecuriteFichiers | None = None,
 ) -> None:
     """Take the agent profile back, wipe it except the npm cache, recreate it, give `compte` its rights.
+
+    La racine garde sa DACL : les quatre droits ne se reposent que si elle a été reprise.
 
     Un dossier absent est une `DroitsAgentRefuses` : l'appel suivant partirait
     avec un `HOME` qui n'existe pas. Tout échec lève le drapeau
@@ -141,10 +166,11 @@ async def reinitialiser_profil(
         if not dossier.is_dir():
             raise DroitsAgentRefuses(f"profil de l'agent absent ({dossier}) : agent setup à relancer")
         proprietaire = backend or compte_du_backend()
-        await _reprendre_la_main(dossier, compte, icacls, proprietaire)
+        racine_reprise = await _reprendre_la_main(dossier, compte, proprietaire, securite or securite_par_defaut())
         await asyncio.to_thread(_vider, dossier)
         await asyncio.to_thread(_recreer, dossier)
-        await _redonner_au_compte(dossier, compte, icacls, proprietaire)
+        if racine_reprise:
+            await _redonner_au_compte(dossier, compte, icacls, proprietaire)
     except DroitsAgentRefuses:
         _NETTOYAGE_ECHOUE = True
         raise

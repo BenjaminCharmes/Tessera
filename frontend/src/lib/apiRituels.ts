@@ -5,7 +5,8 @@ export type StatutRituel = "fait" | "a_venir" | "en_retard";
 export type RythmeRituel =
   | { type: "hebdo"; jour: string; heure: string }
   | { type: "mensuel"; jour: number; heure: string; avant: number | null }
-  | { type: "unique"; du: string; au: string };
+  | { type: "unique"; du: string; au: string }
+  | { type: "quotidien"; heure: string; jours: "tous" | "ouvres" };
 
 /** Un rituel de `rituels.md` avec son état local, tel que `GET /rituels` le rend. */
 export interface Rituel {
@@ -33,6 +34,18 @@ export interface ListeRituels {
 
 export function lireRituels(): Promise<ListeRituels> {
   return request<ListeRituels>("/rituels");
+}
+
+/** Une période où Tessera n'a pas tourné, en heures locales sans fuseau. */
+export interface Interruption {
+  debut: string;
+  fin: string;
+}
+
+/** Les périodes d'interruption relevées par le backend (ticket-1046). */
+export async function lireInterruptions(): Promise<Interruption[]> {
+  const reponse = await request<{ interruptions: Interruption[] }>("/rituels/interruptions");
+  return reponse.interruptions;
 }
 
 /** Marque un rituel fait maintenant. */

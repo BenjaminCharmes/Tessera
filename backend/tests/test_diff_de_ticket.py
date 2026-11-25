@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 
+from tessera.config import settings
 from tessera.services.git_workspace.ticket_diff import TicketDiff, diff_du_ticket
 
 
@@ -158,14 +159,18 @@ async def test_an_explicit_base_replaces_main_for_the_ticket_on_its_branch(
     assert "dev.py" not in resultat.diff
 
 
-async def test_without_a_base_the_history_screen_keeps_its_behaviour(
-    depot: Path,
+async def test_without_a_base_on_the_ticket_branch_the_default_base_is_the_reference(
+    depot: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    # `main` a du retard sur `develop` : sans base explicite, le diff se prend
+    # contre la base par défaut des réglages, pas contre `main`.
+    monkeypatch.setattr(settings, "github_base_branch", "develop")
     await _branche_depuis_develop(depot)
 
     resultat = await diff_du_ticket(depot, "ticket-005")
 
-    assert resultat.files == ["app.py", "dev.py"]
+    assert resultat.files == ["app.py"]
+    assert "dev.py" not in resultat.diff
 
 
 async def test_un_ticket_jamais_lance_n_a_ni_branche_ni_commit(depot: Path) -> None:
@@ -174,3 +179,4 @@ async def test_un_ticket_jamais_lance_n_a_ni_branche_ni_commit(depot: Path) -> N
     assert resultat.branch is None
     assert resultat.commit is None
     assert resultat.diff == ""
+

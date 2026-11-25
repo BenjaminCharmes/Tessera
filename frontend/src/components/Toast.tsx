@@ -3,9 +3,9 @@ import type { Toast as ToastItem } from "../hooks/useToast";
 import { IconCheck, IconCross, IconInfo } from "../design/icons";
 
 const TYPE_STYLE: Record<ToastItem["type"], string> = {
-  success: "bg-green-800 text-green-100",
-  error: "bg-red-800 text-red-100",
-  info: "bg-zinc-700 text-zinc-100",
+  success: "bg-green-500/12 text-green-300",
+  error: "bg-red-500/12 text-red-300",
+  info: "bg-zinc-500/12 text-zinc-300",
 };
 
 const TYPE_ICON: Record<ToastItem["type"], ReactElement> = {
@@ -25,17 +25,21 @@ function ToastRow({ toast, onDismiss }: ToastItemProps) {
       role="status"
       aria-live="polite"
       data-type={toast.type}
-      className={`flex items-center gap-2 px-4 py-3 rounded-lg shadow-lg text-sm font-medium ${TYPE_STYLE[toast.type]}`}
+      className="rounded-lg border border-zinc-700 bg-zinc-900 shadow-lg"
     >
-      <span>{TYPE_ICON[toast.type]}</span>
-      <span className="flex-1">{toast.message}</span>
-      <button
-        onClick={() => onDismiss(toast.id)}
-        aria-label="Fermer"
-        className="ml-2 opacity-70 hover:opacity-100 transition-opacity"
+      <div
+        className={`flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium ${TYPE_STYLE[toast.type]}`}
       >
-        <IconCross size={12} />
-      </button>
+        <span>{TYPE_ICON[toast.type]}</span>
+        <span className="flex-1">{toast.message}</span>
+        <button
+          onClick={() => onDismiss(toast.id)}
+          aria-label="Fermer"
+          className="ml-2 opacity-70 hover:opacity-100 transition-opacity"
+        >
+          <IconCross size={12} />
+        </button>
+      </div>
     </div>
   );
 }

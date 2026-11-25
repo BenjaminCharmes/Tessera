@@ -16,6 +16,7 @@ from tessera.services.livraison.reprise_outils import ecrire_log
 from tessera.services.noyau.event_hub import EVENT_HUB
 from tessera.services.pipeline.assemblage_run import build_orchestrator
 from tessera.services.pipeline.controle_base import refus_avant_ouverture, refuser_absents_de_la_base
+from tessera.services.pipeline.controle_checkout import realigner_avant_construction, refus_checkout_etranger
 from tessera.services.pipeline.controle_dependances import dependance_non_terminee
 from tessera.services.pipeline.controles_depart import refus_des_manques
 from tessera.services.pipeline.file_vivante import FileFermee, FileVivante, lecteur_sur_la_base, trier_ajouts
@@ -119,6 +120,7 @@ async def _preparer_orchestrateur(
     try:
         politique = PolitiqueRun.lire(project_path)
         if politique.worktree is None:
+            await realigner_avant_construction(project_path)  # politique figée à la construction
             orchestrator = await build_orchestrator(request.project_id, **options)
         else:
             # Échoue fermé : un projet à worktree ne tourne jamais dans le
@@ -179,19 +181,17 @@ async def run_pipeline(request: RunRequest) -> RunStarted:
         else await _lire_titre(ticket_svc, initial_ticket_id)
     )
 
-    # Refus d'emblée, avant toute réservation : le projet reste libre (ticket-413).
-    # Les manques se listent tous ; `force` laisse passer (ticket-477).
+    # Refus d'emblée, sans réservation (413) ; `force` passe les manques (477), pas le checkout (1048).
     manques = refus_des_manques(project_path, settings.github_token, request.project_id, request.force)
-    if manques:
-        raise HTTPException(status_code=422, detail=manques)
+    if refus := manques or refus_checkout_etranger(project_path):
+        raise HTTPException(status_code=422, detail=refus)
     # Un ticket seul attend ses dépendances, `force` passe (ticket-958).
     attente = request.mode == "single" and initial_ticket_id and await dependance_non_terminee(
         project_path, request.project_id, ticket_svc, initial_ticket_id, request.force
     )
     if attente:
         raise HTTPException(status_code=409, detail=attente)
-    # Une file dont un ticket manque s'arrêterait au milieu : refus d'emblée,
-    # sans verrou (ticket-849).
+    # Une file dont un ticket manque s'arrêterait au milieu : refus sans verrou (ticket-849).
     absent = request.mode == "queue" and await refus_avant_ouverture(
         project_path, ticket_svc, request.ticket_ids
     )

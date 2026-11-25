@@ -7,8 +7,11 @@ from typing import Any
 
 import frontmatter
 
+from tessera.config import settings
 from tessera.models.ticket import Ticket, TicketDraftPlan, TicketPriority, TicketStatus, TicketType, TicketUnreadable
-from tessera.services.projets.ticket_archive import archive_done_tickets, highest_number, is_archived, iter_archive_files
+from tessera.services.noyau import numerotation
+from tessera.services.projets.ticket_archive import archive_done_tickets, is_archived, iter_archive_files
+from tessera.services.projets.ticket_depends_on import normalize_depends_on
 from tessera.utils.logger import get_logger
 
 _logger = get_logger(__name__)
@@ -60,46 +63,6 @@ def _slugify(text: str, max_len: int = 40) -> str:
     slug = re.sub(r"[^\w\s-]", "", text.lower())
     slug = re.sub(r"[\s_]+", "-", slug)
     return slug[:max_len].rstrip("-")
-
-
-_TICKET_ID_RE = re.compile(r"^ticket-\d+$")
-
-
-def _normalize_depends_on(raw: object) -> list[str]:
-    """Coerce any YAML representation of depends_on into a list of ticket ids.
-
-    YAML scalars like ``depends_on: ticket-001`` reach Python as a plain string.
-    Iterating over a string yields characters, not ticket ids — the root cause
-    of ticket-275.  This function handles all three forms:
-
-    * ``None`` / empty string / empty list → ``[]``
-    * ``str`` → split on commas, strip whitespace, discard empty pieces
-    * ``list`` → kept as-is after coercion to str
-
-    Items that do not look like ``ticket-NNN`` are discarded and logged.
-    """
-    if not raw:
-        return []
-
-    if isinstance(raw, str):
-        pieces = [part.strip() for part in raw.split(",")]
-    elif isinstance(raw, (list, tuple)):
-        pieces = [str(item) for item in raw]
-    else:
-        pieces = [str(raw)]
-
-    result: list[str] = []
-    for piece in pieces:
-        if not piece:
-            continue
-        if _TICKET_ID_RE.match(piece):
-            result.append(piece)
-        else:
-            _logger.warning(
-                "depends_on_invalid_id",
-                extra={"value": piece},
-            )
-    return result
 
 
 def _status_from_folder(path: Path, meta: dict[str, Any]) -> TicketStatus:
@@ -246,8 +209,8 @@ class TicketService:
     async def create_tickets_batch(self, drafts: list[TicketDraftPlan]) -> list[Ticket]:
         if not drafts:
             return []
-        base_n = self._next_n()
-        ids = [f"ticket-{base_n + i:03d}" for i in range(len(drafts))]
+        # Un numéro réservé par fiche, comme `create_ticket_sync` (ticket-1042).
+        ids = [self._next_id() for _ in drafts]
 
         created: list[Ticket] = []
         for i, draft in enumerate(drafts):
@@ -355,12 +318,13 @@ class TicketService:
             if path.stem == ticket_id or path.stem.startswith(ticket_id + "-")
         ]
 
-    def _next_n(self) -> int:
-        # Archive comprise : un numéro rangé ne se réattribue pas.
-        return highest_number(self._tickets_root()) + 1
-
     def _next_id(self) -> str:
-        return f"ticket-{self._next_n():03d}"
+        # Par la réservation : un numéro que `prochain_numero.py` a rendu, ou
+        # qui existe sur la base ou une branche, ne se reprend pas (ticket-1042).
+        numero = numerotation.reserver(
+            self._root, "ticket", numerotation.BASE_PAR_DEFAUT, settings.ide_state_dir
+        )
+        return f"ticket-{numero:03d}"
 
     def _cached_parse(self, path: Path) -> Ticket:
         """Return a cached Ticket for `path`, re-parsing only when mtime/size changes."""
@@ -390,7 +354,7 @@ def _ticket_from_post(post: frontmatter.Post, path: Path, project_id: str) -> Ti
         status=_status_from_folder(path, meta),
         priority=TicketPriority(meta["priority"]),
         agent=str(meta["agent"]),
-        depends_on=_normalize_depends_on(meta.get("depends_on")),
+        depends_on=normalize_depends_on(meta.get("depends_on")),
         created=str(meta.get("created", "")),
         github_issue_url=str(meta["github_issue_url"])
         if meta.get("github_issue_url") else None,

@@ -9,7 +9,8 @@ import frontmatter  # type: ignore[import-untyped]
 import pytest
 
 from tessera.models.ticket import Ticket, TicketPriority, TicketStatus, TicketType
-from tessera.services.projets.ticket_service import TicketService, _normalize_depends_on, validate_ticket
+from tessera.services.projets.ticket_depends_on import normalize_depends_on as _normalize_depends_on
+from tessera.services.projets.ticket_service import TicketService, validate_ticket
 
 
 def _svc(project_path: Path) -> TicketService:
@@ -397,13 +398,13 @@ async def test_archived_ticket_stays_out_of_the_listing(tmp_path: Path) -> None:
     assert await _svc(tmp_path).list_tickets() == []
 
 
-async def test_next_n_counts_the_archive(tmp_path: Path) -> None:
+async def test_next_id_counts_the_archive(tmp_path: Path) -> None:
     _write_ticket(
         tmp_path / "tickets/archive/done/600-699/ticket-698-old.md", "ticket-698"
     )
     _write_ticket(tmp_path / "tickets/todo/ticket-003-a.md", "ticket-003")
 
-    assert _svc(tmp_path)._next_n() == 699
+    assert _svc(tmp_path)._next_id() == "ticket-699"
 
 
 # ------------------------------------------------------------------
@@ -519,7 +520,7 @@ def test_normalize_depends_on_invalid_id_is_discarded(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """An item that does not match ticket-NNN is dropped and logged."""
-    with caplog.at_level(logging.WARNING, logger="tessera.services.projets.ticket_service"):
+    with caplog.at_level(logging.WARNING, logger="tessera.services.projets.ticket_depends_on"):
         result = _normalize_depends_on("ticket-001, not-a-ticket, ticket-002")
 
     assert result == ["ticket-001", "ticket-002"]
