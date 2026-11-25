@@ -34,9 +34,12 @@ serait encore refusé. Aucun rôle `chat` n'est déclaré dans ide-core aujourd'
    (CLAUDE.md, tickets ouverts, contraintes) reste fourni. Aucune écriture,
    donc aucun commit `chat-…` pour ce projet.
 2. **`agents/run` et `agents/stream`** (`routers/agents.py`) : dans un tel
-   projet, 409 avec un `detail` en français pour tout rôle sauf
-   `github-sync`, sur le modèle de `refuser_projet_a_worktree`
-   (`routers/dependencies.py`). Le contrôle précède la construction du runner.
+   projet, refus pour tout rôle sauf `github-sync`, avant la construction du
+   runner. `POST /agents/run` répond 409 avec un `detail` en français, sur le
+   modèle de `refuser_projet_a_worktree` (`routers/dependencies.py`).
+   `WS /agents/stream` accepte la connexion avant de lire la requête et ne
+   peut donc pas répondre par un code HTTP : il envoie `{"error": …}` en
+   français, puis ferme avec le code 1008, comme le chat.
 3. **Interface** : le chat d'un tel projet affiche un bandeau « sans accès aux
    fichiers sur ce projet » à la place d'une erreur de provider. L'état se lit
    d'un champ de l'API du chat (ex. `sans_outils: bool` dans `ChatHistory`),
@@ -52,10 +55,13 @@ serait encore refusé. Aucun rôle `chat` n'est déclaré dans ide-core aujourd'
       dans `agents.json` part quand même sans outil ni skill dans ce projet.
 - [ ] Un test montre que, dans un projet sans `compte_agent`, le chat garde
       `_CHAT_TOOLS` et son comportement actuel.
-- [ ] Des tests montrent que `POST /api/v1/agents/run` et
-      `WS /api/v1/agents/stream` répondent 409 pour `codeur` et `reviewer`
-      dans un tel projet, et que `github-sync` passe encore.
-- [ ] Le chat d'un tel projet ne crée ni branche `chat-…` ni commit.
+- [ ] Des tests montrent, pour `codeur` et `reviewer` dans un tel projet,
+      que `POST /api/v1/agents/run` répond 409 et que
+      `WS /api/v1/agents/stream` envoie une erreur en français puis ferme
+      avec le code 1008, sans construire de runner ; et que `github-sync`
+      passe encore.
+- [ ] Un test montre que le chat d'un tel projet ne crée ni branche
+      `chat-…` ni commit.
 - [ ] Un test frontend (Vitest) montre le bandeau « sans accès aux fichiers
       sur ce projet » quand l'API signale `sans_outils`, et son absence sinon.
 - [ ] Le diff ne touche ni `compte_exige.py` ni la règle d'ADR-093 : un appel
