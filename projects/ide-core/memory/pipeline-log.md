@@ -10900,3 +10900,6 @@ error: Please commit or stash them.
 - 2026-11-25 15:13:07 UTC — [ticket-1051] validateur: APPROVED — Tous les critères d'ADR-094 sont satisfaits. Le chat fonctionne sans outils ni s (59219ms)
 - 2026-11-25 15:13:07 UTC — [ticket-1051] APPROVED après 3 tour(s)
 - 2026-11-25 15:14:31 UTC — [ticket-1051] leçons: rien à retenir
+- 2026-11-25 15:21:50 UTC — [ticket-1051] documentation: 2 fichier(s) (419905ms) — après tour de correction
+- 2026-11-25 15:21:50 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (183828 caractères)
+- 2026-11-25 15:21:50 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (137765 caractères)
