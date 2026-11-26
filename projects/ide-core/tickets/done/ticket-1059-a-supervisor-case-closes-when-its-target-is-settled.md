@@ -4,7 +4,7 @@ created: 2026-11-26
 depends_on: []
 estimated_days: 1
 id: ticket-1059
-pr_number: null
+pr_number: 1280
 priority: medium
 status: done
 title: A supervisor case closes by itself once its ticket, rule or lesson is settled
