@@ -11003,3 +11003,6 @@ error: Please commit or stash them.
 - 2026-11-26 12:46:42 UTC — [ticket-1056] tour 1 — reviewer terminé (36890ms)
 - 2026-11-26 12:46:59 UTC — [ticket-1056] validateur: APPROVED — Le codeur a implémenté l'intégralité de la logique de décision et rapport du ban (54094ms)
 - 2026-11-26 12:47:00 UTC — [ticket-1056] APPROVED après 1 tour(s)
+- 2026-11-26 12:50:14 UTC — [ticket-1056] documentation: 1 fichier(s) (169625ms) — après tour de correction — doc-fonctionnelle : aucune édition proposée
+- 2026-11-26 12:50:14 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (184459 caractères)
+- 2026-11-26 12:50:14 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (138169 caractères)
