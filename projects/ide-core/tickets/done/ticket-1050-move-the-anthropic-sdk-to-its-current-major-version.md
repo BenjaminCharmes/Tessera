@@ -1,14 +1,14 @@
 ---
-id: ticket-1050
-title: "Move the anthropic SDK to its current major version"
-type: chore
-status: todo
-pr_number: null
-priority: low
 agent: codeur
+created: 2026-11-24
 depends_on: []
 estimated_days: 1
-created: 2026-11-24
+id: ticket-1050
+pr_number: 1272
+priority: low
+status: done
+title: Move the anthropic SDK to its current major version
+type: chore
 ---
 
 # ticket-1050 — Passer le SDK `anthropic` à sa version majeure courante

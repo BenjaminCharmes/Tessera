@@ -258,3 +258,27 @@ async def test_stream_ignore_cwd_et_on_tool_use() -> None:
     on_tool_use.assert_not_awaited()
     assert result.content == "text"
     assert result.provider_name == "anthropic_api"
+
+
+_PARAMS_RETIRES = {"temperature", "top_p", "top_k"}
+
+
+@pytest.mark.asyncio
+async def test_complete_n_envoie_aucun_parametre_d_echantillonnage() -> None:
+    client = _mock_client()
+    await AnthropicApiProvider(client).complete(
+        system="sys", user="usr", model="claude-sonnet-4-6", max_tokens=1000
+    )
+    kwargs = client.messages.create.call_args.kwargs
+    assert _PARAMS_RETIRES.isdisjoint(kwargs)
+
+
+@pytest.mark.asyncio
+async def test_stream_n_envoie_aucun_parametre_d_echantillonnage() -> None:
+    client = MagicMock()
+    client.messages.stream = MagicMock(return_value=_MockAsyncStream(["text"]))
+    await AnthropicApiProvider(client).stream(
+        system="sys", user="usr", model="claude-sonnet-4-6", max_tokens=1000
+    )
+    kwargs = client.messages.stream.call_args.kwargs
+    assert _PARAMS_RETIRES.isdisjoint(kwargs)

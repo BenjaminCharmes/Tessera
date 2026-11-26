@@ -10903,3 +10903,17 @@ error: Please commit or stash them.
 - 2026-11-25 15:21:50 UTC — [ticket-1051] documentation: 2 fichier(s) (419905ms) — après tour de correction
 - 2026-11-25 15:21:50 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (183828 caractères)
 - 2026-11-25 15:21:50 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (137765 caractères)
+- 2026-11-25 15:28:39 UTC — [ticket-1051] livraison: arrêt — PR #1268 non mergée : CI failing : la PR #1268 reste ouverte.
+- 2026-11-26 09:00:43 UTC — [ticket-1050] branche ticket-1050-move-the-anthropic-sdk-to-its-current-major-vers
+- 2026-11-26 09:00:47 UTC — [ticket-1050] tour 1 — codeur démarré
+- 2026-11-26 09:01:52 UTC — [ticket-1050] tour 1 — codeur terminé (65109ms)
+- 2026-11-26 09:13:53 UTC — [ticket-1050] testeur: dur�es : ruff 1 s, mypy 261 s, mypy-linux 245 s, pytest 689 s ; impact depuis base : suite compl�te
+- 2026-11-26 09:14:14 UTC — [ticket-1050] securite: PASS — PASS : rien de bloquant dans ce diff. Il relève la version minimale d'`anthropic (20000ms)
+- 2026-11-26 09:14:15 UTC — [ticket-1050] tour 1 — reviewer démarré
+- 2026-11-26 09:14:29 UTC — [ticket-1050] tour 1 — reviewer terminé (14358ms)
+- 2026-11-26 09:15:54 UTC — [ticket-1050] validateur: fichiers cités joints : backend/pyproject.toml, backend/uv.lock (diff), anthropic_api.py
+- 2026-11-26 09:15:54 UTC — [ticket-1050] validateur: APPROVED — Les 5 critères d'acceptation sont satisfaits. Le codeur a correctement relevé la (99139ms)
+- 2026-11-26 09:15:54 UTC — [ticket-1050] APPROVED après 1 tour(s)
+- 2026-11-26 09:16:36 UTC — [ticket-1050] documentation: 0 fichier(s) (20813ms) — doc-technique : aucune édition proposée — doc-fonctionnelle : aucune édition proposée
+- 2026-11-26 09:16:36 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (184459 caractères)
+- 2026-11-26 09:16:36 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (138169 caractères)
