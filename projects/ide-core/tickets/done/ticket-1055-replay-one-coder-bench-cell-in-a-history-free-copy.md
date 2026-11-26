@@ -1,13 +1,16 @@
 ---
-id: ticket-1055
-title: "Replay one coder bench cell in a history-free copy"
-type: feat
-status: todo
-priority: medium
 agent: codeur
-depends_on: [ticket-1053, ticket-1054]
-estimated_days: 2
 created: 2026-11-26
+depends_on:
+- ticket-1053
+- ticket-1054
+estimated_days: 2
+id: ticket-1055
+pr_number: 1278
+priority: medium
+status: done
+title: Replay one coder bench cell in a history-free copy
+type: feat
 ---
 
 # ticket-1055 — Rejouer une cellule du banc dans une copie sans historique
