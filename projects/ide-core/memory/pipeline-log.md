@@ -10976,3 +10976,15 @@ error: Please commit or stash them.
 - 2026-11-26 11:17:59 UTC — [ticket-1054] documentation: 0 fichier(s) (66875ms) — doc-technique : aucune édition proposée — doc-fonctionnelle : aucune édition proposée
 - 2026-11-26 11:17:59 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (184459 caractères)
 - 2026-11-26 11:17:59 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (138169 caractères)
+- 2026-11-26 12:01:51 UTC — [ide-core] ticket-1054 : base réalignée sur develop
+- 2026-11-26 12:01:51 UTC — [ide-core] ticket-1054 PR #1277 confiée au CIWatcher
+- 2026-11-26 12:01:50 UTC — [ide-core] ticket-1054 PR #1277 mergée (CI verte)
+- 2026-11-26 12:01:57 UTC — [ticket-1055] branche ticket-1055-replay-one-coder-bench-cell-in-a-history-free-co
+- 2026-11-26 12:02:01 UTC — [ticket-1055] tour 1 — codeur démarré
+- 2026-11-26 12:08:26 UTC — [ticket-1055] tour 1 — codeur terminé (384905ms)
+- 2026-11-26 12:19:55 UTC — [ticket-1055] testeur: dur�es : ruff 0 s, mypy 5 s, mypy-linux 4 s, pytest 648 s ; impact depuis base : suite compl�te
+- 2026-11-26 12:20:27 UTC — [ticket-1055] securite: PASS — PASS : aucune faille CRITICAL ou HIGH introduite par ce diff. Relevé : `tar.extr (31155ms)
+- 2026-11-26 12:20:27 UTC — [ticket-1055] tour 1 — reviewer démarré
+- 2026-11-26 12:21:18 UTC — [ticket-1055] validateur: APPROVED — Les trois scripts (`banc_codeur.py`, `banc_codeur_cellule.py`, `banc_codeur_role (50375ms)
+- 2026-11-26 12:21:28 UTC — [ticket-1055] tour 1 — reviewer terminé (60483ms)
+- 2026-11-26 12:21:28 UTC — [ticket-1055] APPROVED après 1 tour(s)
