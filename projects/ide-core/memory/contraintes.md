@@ -1,6 +1,6 @@
 # Contraintes en vigueur
 
-Chaque règle porte son ADR ; l'histoire est dans `decisions.md`.
+Chaque règle porte son ADR, raconté dans `decisions.md`.
 
 ---
 
@@ -10,8 +10,6 @@ Cette section n'est injectée dans aucun appel d'agent. Une règle nouvelle
 s'écrit ici, avec son ADR ; un humain l'accepte en la déplaçant dans sa
 section. (ADR-055)
 
-- **Dans un projet à `worktree.compte_agent`, le chat part sans outil, skill ni `signaler`, et `agents/run` et `agents/stream` refusent (409) tout rôle sauf `github-sync`.** À l'acceptation, fusionner une règle voisine : `contraintes.md` est au plafond. (ADR-094, ADR-093)
-
 ## Git et périmètre d'écriture
 
 - **Un projet qui déclare `worktree` exécute chaque run dans son worktree, jamais dans le checkout.** Sous `IDE_WORKTREES_DIR/<projet>/<ticket>`, depuis `origin/<base>` : la racine d'écriture du run, sans session humaine. (ADR-056)
@@ -20,8 +18,7 @@ section. (ADR-055)
 - **Le service de documentation n'écrit dans `agents.json` que la clé `description`**, proposée par doc-technique et contrôlée. (ADR-068, ADR-027, ADR-057)
 - **Ne jamais émettre une commande git ou `gh` en écriture.** Le hook `PreToolUse` n'admet que des lectures nommées. `agents.json`, `.git/`, `.claude/settings*.json` et `.github/workflows/` se refusent en écriture. (ADR-067, ADR-027)
 - **Le script que `test_command` lance se refuse en écriture.** Un diff qui touche la configuration des tests (`conftest.py`, `[tool.pytest*]`, `[tool.mypy]`, `vite.config.*`, `vitest.*`, `eslint.config.*`, `tsconfig*.json`, `scripts` de `package.json`…) sans que le ticket la nomme par son chemin complet est refusé à la revue. (ADR-027, ADR-072)
-- **Une règle nouvelle s'écrit sous `## Proposées` dans `contraintes.md`, avec son ADR.** Un diff qui le modifie ailleurs met le run en `blocked`. (ADR-055)
-- **Une leçon s'écrit sous `## Proposées` de `memory/lecons.md`, par le service seul.** Seule `## En vigueur`, où un humain la déplace, atteint codeur et reviewer ; un diff de run qui y touche le met en `blocked`. (ADR-074, ADR-055)
+- **Une règle s'écrit sous `## Proposées` de `contraintes.md` avec son ADR, une leçon sous celle de `memory/lecons.md` par le service seul.** Seul `## En vigueur` des leçons, où un humain la déplace, atteint codeur et reviewer. Un diff de run qui touche l'un des deux fichiers hors de `## Proposées` met le run en `blocked`. (ADR-055, ADR-074)
 - **Avant toute création de branche, `git rev-parse --show-toplevel` renvoie le dossier du projet**, sinon `NotAGitRepository`, sauf `git_root: ancestor`. (ADR-024, ADR-028)
 
 ## Livraison et autonomie
@@ -62,7 +59,7 @@ section. (ADR-055)
 
 - **Les services passent par `LLMProvider` (`complete`/`stream`), jamais par le SDK.** (ADR-017)
 - **Chaque rôle déclare `provider`, `model` et `fallback` dans `agents.json`** (défaut `agent_sdk`). Le repli ne part que sur indisponibilité (`provider_fallback`), run `rapide` ou prompt au-delà du `fallback_above_chars` d'un rôle `ollama`, jamais sur une réponse illisible. (ADR-046, ADR-059, ADR-071)
-- **Avec `worktree.compte_agent` et `AGENT_USER`, CLI, tests et app du contrôle visuel partent sous ce compte, sans repli, aux seuls outils de `C:\ProgramData\Tessera\toolchain\`** : ni `PATH` ni droit sous `C:\Users`, ni droit, profil ou tâche planifiée gardé entre deux appels, jamais sur `WinSta0\Default`, un worktree à la fois sauf `AGENT_CALLS_PARALLEL=true`. Seul un appel sans outil, skill, plugin ni `signaler` s'en passe ; tout autre lève `ProviderIndisponible`. (ADR-083, ADR-085, ADR-086, ADR-087, ADR-088, ADR-089, ADR-093)
+- **Avec `worktree.compte_agent` et `AGENT_USER`, CLI, tests et app du contrôle visuel partent sous ce compte, sans repli, aux seuls outils de `C:\ProgramData\Tessera\toolchain\`** : ni `PATH` ni droit sous `C:\Users`, ni droit, profil ou tâche planifiée gardé entre deux appels, jamais sur `WinSta0\Default`, un worktree à la fois sauf `AGENT_CALLS_PARALLEL=true`. Seul un appel sans outil, skill, plugin ni `signaler` s'en passe, ainsi le chat ; tout autre lève `ProviderIndisponible`. (ADR-083, ADR-085, ADR-086, ADR-087, ADR-088, ADR-089, ADR-093, ADR-094)
 - **Un rôle `"web": true` reçoit `WebFetch` et `WebSearch` et perd `Bash`.** (ADR-049)
 
 *(architect, codeur, reviewer)*
@@ -72,14 +69,13 @@ section. (ADR-055)
 - **Le verdict du reviewer, de l'audit sécurité et du validateur se lit dans une sortie validée par un schéma, jamais dans le texte** ; absente, hors schéma ou contradictoire, elle refuse. (ADR-061, ADR-009)
 - **Un module de `services/` vit dans son domaine et n'importe que son domaine ou un plus bas** (`ORDRE` de `test_domaines_services.py`). Aucun paquet de premier niveau hors `models`, `services`, `routers`, `utils`. (ADR-076)
 - **Seuls les cinq réglages de `reglages.py` se changent depuis l'interface**, lus par `reglages.courants()` et figés à l'ouverture d'un run. Écrire exige un `Origin` déclaré ; aucun agent n'appelle `/api/v1/reglages`. (ADR-075, ADR-031)
-- **`role: github-sync` passe par `POST /api/v1/agents/run`**, sans endpoint dédié. (ADR-010)
+- **`github-sync` passe par `POST /api/v1/agents/run`**, sans endpoint dédié ; sous `worktree.compte_agent`, `agents/run` et `/stream` refusent tout autre rôle. (ADR-010, ADR-094)
 
 ## Confidentialité
 
 - **Aucune donnée professionnelle dans un dépôt personnel** — nom de client, e-mail d'employeur, identifiant, jeton, hostname interne — ni dans le contenu ni dans les métadonnées git. (ADR-043)
-- **Avant tout push, le diff ajouté, les messages et les auteurs passent `FORBIDDEN_TERMS`** ; `"confidentiality": "professional"` en exempte un projet. (ADR-048)
+- **Le diff ajouté, les messages et les auteurs passent `FORBIDDEN_TERMS` à trois portes** (push du pipeline, hook `pre-push`, CI de chaque PR) ; une porte qui ne peut juger refuse, `"confidentiality": "professional"` en exempte un projet. (ADR-048, ADR-050)
 - **Un secret de Tessera se lit : environnement, coffre du système, puis `.env`**. Ni exporté à un sous-processus, ni affiché, ni passé en argument, ni donné à un agent ; seule une action de l'utilisateur crée une ressource en ligne. Aucun agent n'exécute le coffre (`keyring`, `cmdkey`, `coffre_cli`). (ADR-073, ADR-053)
-- **Les termes interdits s'arrêtent à trois portes** (push du pipeline, hook `pre-push`, CI de chaque PR) ; une porte qui ne peut juger refuse. (ADR-050)
 - **Toute requête HTTP ou WebSocket, sauf `/health` et le préflight, exige le jeton de session** (`STATIC_TOKEN` ou tiré au démarrage). (ADR-081, ADR-031)
 
 ## Interface et design
