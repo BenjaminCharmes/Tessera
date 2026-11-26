@@ -10991,3 +10991,18 @@ error: Please commit or stash them.
 - 2026-11-26 12:26:20 UTC — [ticket-1055] documentation: 0 fichier(s) (265391ms) — après tour de correction — doc-technique : refusé — doc-fonctionnelle : aucune édition proposée — refusé : doc-technique : docs/architecture.md : section « #### Étape DNS (ticket-469) » introuvable.
 - 2026-11-26 12:26:20 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (184459 caractères)
 - 2026-11-26 12:26:20 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (138169 caractères)
+- 2026-11-26 12:32:49 UTC — [ide-core] ticket-1055 : base réalignée sur develop
+- 2026-11-26 12:32:49 UTC — [ide-core] ticket-1055 PR #1278 confiée au CIWatcher
+- 2026-11-26 12:32:46 UTC — [ide-core] ticket-1055 PR #1278 mergée (CI verte)
+- 2026-11-26 12:32:54 UTC — [ticket-1056] branche ticket-1056-decision-rule-and-report-of-the-coder-bench
+- 2026-11-26 12:32:58 UTC — [ticket-1056] tour 1 — codeur démarré
+- 2026-11-26 12:34:56 UTC — [ticket-1056] tour 1 — codeur terminé (117204ms)
+- 2026-11-26 12:45:55 UTC — [ticket-1056] testeur: dur�es : ruff 0 s, mypy 5 s, mypy-linux 3 s, pytest 619 s ; impact depuis base : suite compl�te
+- 2026-11-26 12:46:04 UTC — [ticket-1056] securite: PASS — PASS : aucune faille relevée. Le diff ajoute des fonctions pures (règle de décis (8469ms)
+- 2026-11-26 12:46:05 UTC — [ticket-1056] tour 1 — reviewer démarré
+- 2026-11-26 12:46:42 UTC — [ticket-1056] tour 1 — reviewer terminé (36890ms)
+- 2026-11-26 12:46:59 UTC — [ticket-1056] validateur: APPROVED — Le codeur a implémenté l'intégralité de la logique de décision et rapport du ban (54094ms)
+- 2026-11-26 12:47:00 UTC — [ticket-1056] APPROVED après 1 tour(s)
+- 2026-11-26 12:50:14 UTC — [ticket-1056] documentation: 1 fichier(s) (169625ms) — après tour de correction — doc-fonctionnelle : aucune édition proposée
+- 2026-11-26 12:50:14 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (184459 caractères)
+- 2026-11-26 12:50:14 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (138169 caractères)

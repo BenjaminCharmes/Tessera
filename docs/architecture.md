@@ -2004,6 +2004,25 @@ WAL mode activé pour éviter les locks en écriture concurrente.
 
 Les tests du backend (`pytest`) redirectent `settings.ide_db_path` vers un fichier SQLite temporaire pour chacune de leurs exécutions (fixture `autouse` dans `backend/tests/conftest.py`, ticket-422). Aucun run de test n'écrit jamais dans `backend/tessera.db`, même quand les tests lancent le serveur complet via `TestClient(app)`.
 
+## Banc du codeur (ADR-095, ticket-1055, ticket-1056)
+
+Évaluer une stratégie du codeur sur un corpus stable — comparer les modèles, les prompts ou les limites sans toucher au pipeline de production.
+
+### Cellules et corpus
+
+Un **corpus** fixe l'ensemble d'entrées (fichiers de test du dépôt à une ref stable), et les **bras** déclarent des configurations du codeur (modèle, provider, prompt). Chaque (entrée, bras) est une **cellule**, relancée dans une copie sans historique git, isolée sous `~/.tessera/banc-codeur/<essai>/<cellule>/`. La cellule s'exécute **trois tours au maximum** : codeur, tests, puis reviewer et validateur.
+
+### Garanties
+
+- Pas de push, PR, `RunLock` ni base SQLite : l'outil n'interfère jamais avec la production
+- Idempotent : une cellule déjà `ok` n'est pas relancée ; un `gel_sha256` différent arrête le script
+- Budget : plafond par cellule (6 $) et global (paramètre `--budget-usd`), vérifié avant chaque cellule
+- Reprise : résultats en JSONL pour arrêter et relancer sans dupliquer
+
+### Décision et rapport
+
+`banc_codeur_decision.py` lit le corpus et les résultats JSONL, applique la règle de décision (ADR-095, §6) : non concluant → meilleur → moins cher → garder A. Elle produit un rapport Markdown avec tableau des mesures par bras et recommandation, humaine par essence.
+
 ## Récupération de l'historique d'un run (ticket-280, ticket-281, ticket-327)
 
 Un run qui quitte la supervision — fermé ou au redémarrage du backend — disparaît 

@@ -1,13 +1,15 @@
 ---
-id: ticket-1056
-title: "Decision rule and report of the coder bench"
-type: feat
-status: todo
-priority: medium
 agent: codeur
-depends_on: [ticket-1055]
-estimated_days: 1
 created: 2026-11-26
+depends_on:
+- ticket-1055
+estimated_days: 1
+id: ticket-1056
+pr_number: 1279
+priority: medium
+status: done
+title: Decision rule and report of the coder bench
+type: feat
 ---
 
 # ticket-1056 — Règle de décision et rapport du banc du codeur
