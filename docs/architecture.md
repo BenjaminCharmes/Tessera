@@ -2228,19 +2228,28 @@ contexte projet, lit et écrit les fichiers, et streame sa réponse.
 Trames WebSocket : `start`, `token`, `tool_use`, `done`, `budget_exceeded`,
 `error`.
 
-**Outils** : `Read`, `Write`, `Edit`, `Glob`, `Grep`. **Aucun outil shell** —
+**Outils** : par défaut, `Read`, `Write`, `Edit`, `Glob`, `Grep`. **Aucun outil shell** —
 un agent conversationnel exécutant des commandes arbitraires dans le dépôt de
-l'utilisateur est une surface d'attaque refusée par le ticket.
+l'utilisateur est une surface d'attaque refusée par le ticket. Dans un projet où
+`worktree.compte_agent` est déclaré, le chat fonctionne sans aucun outil : il
+répond en lisant le contexte CLAUDE.md, les tickets ouverts et les contraintes,
+sans pouvoir lire ni modifier les fichiers du projet (ADR-094). L'interface
+affiche un bandeau « Sans accès aux fichiers sur ce projet ».
 
 **Cohabitation git (ADR-019)** : les écritures du chat sont commitées sur une
 branche `chat-<horodatage>`, exactement comme un run de pipeline sur la branche
 de son ticket. Sans ça, l'arbre resterait sale et le ticket suivant partirait
-en `blocked` sans qu'aucun agent n'ait tourné (ADR-018). Un tour purement
-conversationnel ne crée ni branche ni commit.
+en `blocked` sans qu'aucun agent n'ait tourné (ADR-018). Hors compte agent,
+si le chat n'écrit rien, ni branche ni commit ne sont créés.
 
 **Coût** : `llm_max_budget_usd` borne *un appel*. Une conversation a son propre
 plafond, `chat_max_conversation_usd` (défaut 2 USD), et son total cumulé est
 affiché dans l'UI.
+
+**Restriction des agents lancés depuis l'API en compte agent** : dans un projet où
+`worktree.compte_agent` est déclaré, l'endpoint `POST /api/v1/agents/run` (et
+`WS /api/v1/agents/stream`) refuse tout rôle sauf `github-sync` : seul le
+pipeline a accès aux agents outillés (ticket-1051).
 
 ## OrchestratorEvents (WebSocket)
 

@@ -26,6 +26,8 @@ export interface ChatHistory {
   messages: ChatMessage[];
   spent_usd: number;
   max_usd: number;
+  /** Projet à compte agent : le chat répond sans accès aux fichiers (ADR-094). */
+  sans_outils?: boolean;
 }
 
 /** Résultat d'un pipeline lancé depuis la conversation (ticket-055). */

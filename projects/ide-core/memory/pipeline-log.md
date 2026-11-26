@@ -10880,3 +10880,26 @@ error: Please commit or stash them.
 - 2026-11-25 08:34:20 UTC — [ticket-1049] APPROVED après 1 tour(s)
 - 2026-11-25 08:34:41 UTC — [ticket-1049] documentation: 0 fichier(s) (438ms)
 - 2026-11-25 08:34:41 UTC — [ticket-1049] documentation: pas de diff retrouvable, non documenté
+- 2026-11-25 08:41:52 UTC — [ide-core] ticket-1049 PR #1264 mergée (CI verte)
+- 2026-11-25 14:44:51 UTC — [ticket-1051] branche ticket-1051-the-chat-talks-without-tools-and-agents-run-refu
+- 2026-11-25 14:44:54 UTC — [ticket-1051] tour 1 — codeur démarré
+- 2026-11-25 14:49:52 UTC — [ticket-1051] tour 1 — codeur terminé (297188ms)
+- 2026-11-25 14:54:49 UTC — [ticket-1051] testeur: 1 failed, 409 passed, 8 warnings in 95.93s (0:01:35) — fichiers en échec : tests/test_provider_par_role.py
+- 2026-11-25 14:54:49 UTC — [ticket-1051] tests rouges au tour 1
+- 2026-11-25 14:54:49 UTC — [ticket-1051] tour 2 — codeur démarré
+- 2026-11-25 14:55:19 UTC — [ticket-1051] tour 2 — codeur terminé (29093ms)
+- 2026-11-25 15:00:01 UTC — [ticket-1051] testeur: dur�es : ruff 0 s, mypy 2 s, mypy-linux 4 s, tsc 22 s, eslint 59 s, pytest 204 s, vitest 165 s ; impact depuis base : 48 fichier(s) de test — fichiers en échec : src/longueur-des-fichiers.test.ts
+- 2026-11-25 15:00:02 UTC — [ticket-1051] tests rouges au tour 2
+- 2026-11-25 15:00:02 UTC — [ticket-1051] tour 3 — codeur démarré
+- 2026-11-25 15:07:01 UTC — [ticket-1051] tour 3 — codeur terminé (418717ms)
+- 2026-11-25 15:11:46 UTC — [ticket-1051] testeur: dur�es : ruff 0 s, mypy 3 s, mypy-linux 5 s, tsc 29 s, eslint 56 s, pytest 194 s, vitest 167 s ; impact depuis base : 48 fichier(s) de test
+- 2026-11-25 15:12:06 UTC — [ticket-1051] securite: PASS — PASS : le diff ferme des accès sans en ouvrir. Sur un projet à `worktree.compte_ (19061ms)
+- 2026-11-25 15:12:07 UTC — [ticket-1051] tour 3 — reviewer démarré
+- 2026-11-25 15:12:35 UTC — [ticket-1051] tour 3 — reviewer terminé (27391ms)
+- 2026-11-25 15:13:07 UTC — [ticket-1051] validateur: fichiers cités joints : agents.json, compte_exige.py
+- 2026-11-25 15:13:07 UTC — [ticket-1051] validateur: APPROVED — Tous les critères d'ADR-094 sont satisfaits. Le chat fonctionne sans outils ni s (59219ms)
+- 2026-11-25 15:13:07 UTC — [ticket-1051] APPROVED après 3 tour(s)
+- 2026-11-25 15:14:31 UTC — [ticket-1051] leçons: rien à retenir
+- 2026-11-25 15:21:50 UTC — [ticket-1051] documentation: 2 fichier(s) (419905ms) — après tour de correction
+- 2026-11-25 15:21:50 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (183828 caractères)
+- 2026-11-25 15:21:50 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (137765 caractères)

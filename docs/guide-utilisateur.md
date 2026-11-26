@@ -1768,6 +1768,10 @@ Après un run livré en autonomie ou approuvé, Tessera t'envoie une notificatio
 
 Comme toutes les notifications, aucune n'est envoyée si le projet actif est affiché et la fenêtre visible.
 
+### Chat sans accès aux fichiers (compte agent)
+
+Si le chat affiche un bandeau « Sans accès aux fichiers sur ce projet », c'est que le projet est configuré pour tourner sur un compte agent spécialisé. Dans ce mode, le chat ne peut pas lire ni modifier tes fichiers : il répond d'après le contexte seul (CLAUDE.md, tickets ouverts, contraintes). Pour modifier le projet, lance un ticket par le pipeline.
+
 ## 9. Les agents disponibles
 
 | Agent | Rôle |

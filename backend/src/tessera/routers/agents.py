@@ -7,6 +7,7 @@ from tessera.config import settings
 from tessera.models.agent import AgentResult, AgentRole, AgentRunRequest, CreateAgentConversationResponse
 from tessera.models.project import ConversationMessage, CreateProjectRequest, CreateProjectResponse, ProjectContext
 from tessera.models.ticket import TicketStatus
+from tessera.routers.dependencies import motif_refus_compte_agent
 from tessera.services.agents.agent_creator import AgentCreatorService
 from tessera.services.agents.agent_registry import AgentRegistryService
 from tessera.services.agents.agent_runner import OUTILS_DE_RELECTURE, AgentRunner
@@ -154,6 +155,10 @@ async def run_agent(request: AgentRunRequest) -> AgentResult:
     if request.role == AgentRole.github_sync:
         return await _run_github_sync(request.project_id)
 
+    motif = motif_refus_compte_agent(request.project_id, request.role)
+    if motif is not None:
+        raise HTTPException(status_code=409, detail=motif)
+
     ctx = await _build_context(request.project_id)
 
     ticket_svc = TicketService(
@@ -183,6 +188,12 @@ async def stream_agent(websocket: WebSocket) -> None:
     try:
         raw = await websocket.receive_json()
         request = AgentRunRequest(**raw)
+
+        motif = motif_refus_compte_agent(request.project_id, request.role)
+        if motif is not None:
+            await websocket.send_json({"error": motif})
+            await websocket.close(code=1008)
+            return
 
         ctx = await _build_context(request.project_id)
 
