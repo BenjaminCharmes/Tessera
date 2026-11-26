@@ -687,3 +687,13 @@ Une ADR qu'aucune règle de `contraintes.md` ni aucun `CLAUDE.md` ne cite part d
 **Décision** : amende ADR-093. Là où `projet_exige_le_compte` est vrai, le chat part sans outil, skill ni `signaler`, sous le compte de l'utilisateur, sans dossier de travail : il garde son contexte, ne lit ni n'écrit rien, ne commite pas, et l'interface le dit. `POST /agents/run` et `WS /agents/stream` répondent 409 pour tout rôle sauf `github-sync` (ADR-010).
 **Raison** : le chat vise le checkout, où le compte n'a aucun droit (ADR-083) ; un seul message de chat en base.
 **Alternative rejetée** : un worktree `chat-…` par conversation (droit posé et repris par appel, ADR-091 ; livraison sans audit ni relecture) ; refus pur, qui perd la discussion.
+
+---
+
+## ADR-095 — Le codeur se mesure hors du produit, sur des tickets faits
+
+**Date** : 2026-11-26
+**Portée** : architect, codeur
+**Décision** : un banc `scripts/banc_codeur*.py` rejoue 20 tickets faits sur trois bras : couple actuel, Opus 5.5, variante de prompt. Chaque cellule part d'une copie sans historique du commit de base et boucle codeur, reviewer, validateur sur trois tours : ni push, ni PR, ni `RunLock`. Avant sa conclusion il ne touche ni `backend/src`, ni `agents.json`, ni `agents/prompts/` ; adopter est une autre ADR. Règle : un bras l'emporte avec 3 approbations de plus au premier tour, sans tests verts en moins, ou 40 % de coût en moins pour 1 approbation de moins au plus ; l'actuel sous 14 reproductions sur 20 : non concluant. Plafond 100 $.
+**Raison** : sur vingt tickets, un écart sans corpus ni règle figés d'avance est du bruit.
+**Alternative rejetée** : rejouer dans le pipeline — il livrerait.

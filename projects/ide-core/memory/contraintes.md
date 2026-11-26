@@ -10,6 +10,8 @@ Cette section n'est injectée dans aucun appel d'agent. Une règle nouvelle
 s'écrit ici, avec son ADR ; un humain l'accepte en la déplaçant dans sa
 section. (ADR-055)
 
+- **Le banc du codeur rejoue dans une copie sans historique, hors `IDE_WORKTREES_DIR`, sans push, PR ni `RunLock`, et ne touche ni `backend/src`, ni `agents.json`, ni `agents/prompts/` avant sa conclusion.** Corpus, bras et règle sont figés avant le premier appel mesuré. (ADR-095)
+
 ## Git et périmètre d'écriture
 
 - **Un projet qui déclare `worktree` exécute chaque run dans son worktree, jamais dans le checkout.** Sous `IDE_WORKTREES_DIR/<projet>/<ticket>`, depuis `origin/<base>` : la racine d'écriture du run, sans session humaine. (ADR-056)
