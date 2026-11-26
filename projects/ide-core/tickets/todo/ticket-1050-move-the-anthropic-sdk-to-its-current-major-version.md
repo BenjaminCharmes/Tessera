@@ -32,13 +32,36 @@ aucune faille connue).
 
 ## Solution proposée
 
-- Lire les notes de migration de la version majeure avant de changer le code.
+- Lire la section « Notes de migration » ci-dessous avant de changer le code.
 - Relever la borne dans `backend/pyproject.toml` et régénérer `backend/uv.lock`
   pour le seul paquet `anthropic` (`uv lock --upgrade-package anthropic`).
 - Adapter `anthropic_api.py` et les tests de ce provider à ce que la version
   change (noms d'exceptions, forme de `usage`, flux).
 - Si la série 2.x n'existe pas sur l'index ou n'a pas de wheel Windows, ne rien
   changer et le dire dans le rapport.
+
+## Notes de migration (vérifiées le 26/11 sur anthropic 2.14.0)
+
+Le codeur n'a pas le web : ce qui suit a été relevé sur une installation réelle.
+
+- **Dépendances** : `httpx2`, `httpcore2`, `opentelemetry-api`, `truststore`
+  arrivent, toutes pure-Python. `httpx2` est un **module distinct**
+  (`import httpx2`) : il cohabite avec `httpx`, rien n'est à renommer dans
+  Tessera. `pydantic>=1.10` et `anyio>=4.1` : le lock actuel convient.
+- **API** : le client envoie `anthropic-version: 2026-10-21` et la clé en
+  `Authorization: Bearer` (plus `x-api-key`). `AsyncAnthropic(api_key=...)`
+  ne change pas.
+- **Paramètres** : `messages.create` et `messages.stream` n'acceptent plus
+  `temperature`, `top_p` ni `top_k`. `anthropic_api.py` n'en passe aucun.
+  `model`, `max_tokens`, `system`, `messages`, `tools`, `tool_choice` restent.
+- **Inchangé, utilisé par `anthropic_api.py`** : `anthropic.types.TextBlockParam`
+  (avec `cache_control`) ; `stream.text_stream` (async) et
+  `await stream.get_final_message()` ; `usage.input_tokens`, `output_tokens`,
+  `cache_read_input_tokens`, `cache_creation_input_tokens` ; les exceptions
+  `APIError`, `APIStatusError`, `APIConnectionError`, `RateLimitError`,
+  `AuthenticationError`, `InternalServerError`, `OverloadedError`.
+- Le travail attendu est donc surtout le lock, la borne et des tests au
+  client doublé ; ne pas réécrire le provider sans raison trouvée dans le code.
 
 ## Critères d'acceptation
 
