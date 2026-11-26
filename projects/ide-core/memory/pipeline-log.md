@@ -10917,3 +10917,18 @@ error: Please commit or stash them.
 - 2026-11-26 09:16:36 UTC — [ticket-1050] documentation: 0 fichier(s) (20813ms) — doc-technique : aucune édition proposée — doc-fonctionnelle : aucune édition proposée
 - 2026-11-26 09:16:36 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (184459 caractères)
 - 2026-11-26 09:16:36 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (138169 caractères)
+- 2026-11-26 09:31:03 UTC — [ticket-1052] branche ticket-1052-design-a-bench-that-replays-done-tickets-on-the
+- 2026-11-26 09:31:07 UTC — [ticket-1052] tour 1 — codeur démarré
+- 2026-11-26 09:34:24 UTC — [ticket-1052] tour 1 — architect terminé (196937ms)
+- 2026-11-26 09:35:26 UTC — [ticket-1052] testeur: 1 failed, 27 passed, 1 warning in 15.79s — fichiers en échec : tests/test_consignes_coherentes.py
+- 2026-11-26 09:35:26 UTC — [ticket-1052] tests rouges au tour 1
+- 2026-11-26 09:35:26 UTC — [ticket-1052] tour 2 — codeur démarré
+- 2026-11-26 09:35:41 UTC — [ticket-1052] tour 2 — architect terminé (14766ms)
+- 2026-11-26 09:37:59 UTC — [ticket-1052] testeur: OK (exit 0)
+- 2026-11-26 09:38:15 UTC — [ticket-1052] securite: PASS — PASS : le diff ne contient que de la documentation (conception, ADR-095, une règ (15343ms)
+- 2026-11-26 09:38:16 UTC — [ticket-1052] tour 2 — reviewer démarré
+- 2026-11-26 09:38:38 UTC — [ticket-1052] tour 2 — reviewer terminé (22328ms)
+- 2026-11-26 09:39:12 UTC — [ticket-1052] validateur: fichiers cités joints : memory/decisions.md (tronqué) ; non joints (budget épuisé) : backend/src, agents.json, agents/prompts/, tickets/todo/
+- 2026-11-26 09:39:12 UTC — [ticket-1052] validateur: APPROVED — Tous les critères de conception du banc du codeur sont satisfaits. L'ADR-095 déc (55797ms)
+- 2026-11-26 09:39:12 UTC — [ticket-1052] APPROVED après 2 tour(s)
+- 2026-11-26 09:39:30 UTC — [ticket-1052] leçons: refusée — preuve absente du retour du run
