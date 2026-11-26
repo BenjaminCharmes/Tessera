@@ -4,7 +4,7 @@ created: 2026-11-26
 depends_on: []
 estimated_days: 1
 id: ticket-1052
-pr_number: null
+pr_number: 1273
 priority: medium
 status: done
 title: Design a bench that replays done tickets on the coder with several models and
