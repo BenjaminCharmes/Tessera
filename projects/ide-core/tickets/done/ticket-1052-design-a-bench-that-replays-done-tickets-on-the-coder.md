@@ -1,14 +1,15 @@
 ---
-id: ticket-1052
-title: "Design a bench that replays done tickets on the coder with several models and prompts"
-type: design
-status: todo
-pr_number: null
-priority: medium
 agent: architect
+created: 2026-11-26
 depends_on: []
 estimated_days: 1
-created: 2026-11-26
+id: ticket-1052
+pr_number: 1273
+priority: medium
+status: done
+title: Design a bench that replays done tickets on the coder with several models and
+  prompts
+type: design
 ---
 
 # ticket-1052 — Concevoir un banc d'essai qui rejoue des tickets faits sur le codeur
