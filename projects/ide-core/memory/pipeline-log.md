@@ -10960,3 +10960,19 @@ error: Please commit or stash them.
 - 2026-11-26 10:30:49 UTC — [ticket-1053] documentation: 0 fichier(s) (112265ms) — doc-technique : aucune édition proposée — doc-fonctionnelle : aucune édition proposée
 - 2026-11-26 10:30:49 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (184459 caractères)
 - 2026-11-26 10:30:49 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (138169 caractères)
+- 2026-11-26 10:51:45 UTC — [ide-core] ticket-1053 : base réalignée sur develop
+- 2026-11-26 10:51:45 UTC — [ide-core] ticket-1053 PR #1275 confiée au CIWatcher
+- 2026-11-26 10:51:42 UTC — [ide-core] ticket-1053 PR #1275 mergée (CI verte)
+- 2026-11-26 10:51:54 UTC — [ticket-1054] branche ticket-1054-declare-coder-bench-arms-and-a-temporary-agent-m
+- 2026-11-26 10:51:59 UTC — [ticket-1054] tour 1 — codeur démarré
+- 2026-11-26 10:54:00 UTC — [ticket-1054] tour 1 — codeur terminé (120437ms)
+- 2026-11-26 11:15:11 UTC — [ticket-1054] testeur: dur�es : ruff 0 s, mypy 11 s, mypy-linux 11 s, pytest 1219 s ; impact depuis base : suite compl�te
+- 2026-11-26 11:15:26 UTC — [ticket-1054] securite: PASS — PASS : aucune faille CRITICAL ou HIGH. Le script sert à l'outillage local d'un e (13781ms)
+- 2026-11-26 11:15:28 UTC — [ticket-1054] tour 1 — reviewer démarré
+- 2026-11-26 11:16:24 UTC — [ticket-1054] validateur: fichiers cités joints : bras.json, agents.json, agents/prompts/codeur.md, codeur-p.md, codeur.md (tronqué) ; non joints (budget épuisé) : agents/prompts/, backend/src/
+- 2026-11-26 11:16:24 UTC — [ticket-1054] validateur: APPROVED — Les six critères d'acceptation sont satisfaits. Les trois bras (A, M, P) sont dé (56813ms)
+- 2026-11-26 11:16:25 UTC — [ticket-1054] tour 1 — reviewer terminé (56125ms)
+- 2026-11-26 11:16:25 UTC — [ticket-1054] APPROVED après 1 tour(s)
+- 2026-11-26 11:17:59 UTC — [ticket-1054] documentation: 0 fichier(s) (66875ms) — doc-technique : aucune édition proposée — doc-fonctionnelle : aucune édition proposée
+- 2026-11-26 11:17:59 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (184459 caractères)
+- 2026-11-26 11:17:59 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (138169 caractères)

@@ -1,0 +1,23 @@
+{
+  "gel": "2026-11-26",
+  "bras": [
+    {
+      "id": "A",
+      "modele": "claude-sonnet-5-5",
+      "provider": "agent_sdk",
+      "prompt": "prompts/codeur-a.md"
+    },
+    {
+      "id": "M",
+      "modele": "claude-opus-5-5",
+      "provider": "agent_sdk",
+      "prompt": "prompts/codeur-a.md"
+    },
+    {
+      "id": "P",
+      "modele": "claude-sonnet-5-5",
+      "provider": "agent_sdk",
+      "prompt": "prompts/codeur-p.md"
+    }
+  ]
+}

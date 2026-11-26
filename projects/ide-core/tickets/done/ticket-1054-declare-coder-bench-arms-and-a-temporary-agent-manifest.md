@@ -1,13 +1,14 @@
 ---
-id: ticket-1054
-title: "Declare coder bench arms and a temporary agent manifest"
-type: feat
-status: todo
-priority: medium
 agent: codeur
+created: 2026-11-26
 depends_on: []
 estimated_days: 1
-created: 2026-11-26
+id: ticket-1054
+pr_number: 1277
+priority: medium
+status: done
+title: Declare coder bench arms and a temporary agent manifest
+type: feat
 ---
 
 # ticket-1054 — Déclarer les bras du banc et leur manifeste temporaire
