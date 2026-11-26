@@ -10973,3 +10973,6 @@ error: Please commit or stash them.
 - 2026-11-26 11:16:24 UTC — [ticket-1054] validateur: APPROVED — Les six critères d'acceptation sont satisfaits. Les trois bras (A, M, P) sont dé (56813ms)
 - 2026-11-26 11:16:25 UTC — [ticket-1054] tour 1 — reviewer terminé (56125ms)
 - 2026-11-26 11:16:25 UTC — [ticket-1054] APPROVED après 1 tour(s)
+- 2026-11-26 11:17:59 UTC — [ticket-1054] documentation: 0 fichier(s) (66875ms) — doc-technique : aucune édition proposée — doc-fonctionnelle : aucune édition proposée
+- 2026-11-26 11:17:59 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (184459 caractères)
+- 2026-11-26 11:17:59 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (138169 caractères)
