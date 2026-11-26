@@ -6,6 +6,7 @@ depends_on:
 - ticket-1054
 estimated_days: 2
 id: ticket-1055
+pr_number: 1278
 priority: medium
 status: done
 title: Replay one coder bench cell in a history-free copy
