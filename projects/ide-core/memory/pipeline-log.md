@@ -10914,3 +10914,6 @@ error: Please commit or stash them.
 - 2026-11-26 09:15:54 UTC — [ticket-1050] validateur: fichiers cités joints : backend/pyproject.toml, backend/uv.lock (diff), anthropic_api.py
 - 2026-11-26 09:15:54 UTC — [ticket-1050] validateur: APPROVED — Les 5 critères d'acceptation sont satisfaits. Le codeur a correctement relevé la (99139ms)
 - 2026-11-26 09:15:54 UTC — [ticket-1050] APPROVED après 1 tour(s)
+- 2026-11-26 09:16:36 UTC — [ticket-1050] documentation: 0 fichier(s) (20813ms) — doc-technique : aucune édition proposée — doc-fonctionnelle : aucune édition proposée
+- 2026-11-26 09:16:36 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (184459 caractères)
+- 2026-11-26 09:16:36 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (138169 caractères)
