@@ -10932,3 +10932,6 @@ error: Please commit or stash them.
 - 2026-11-26 09:39:12 UTC — [ticket-1052] validateur: APPROVED — Tous les critères de conception du banc du codeur sont satisfaits. L'ADR-095 déc (55797ms)
 - 2026-11-26 09:39:12 UTC — [ticket-1052] APPROVED après 2 tour(s)
 - 2026-11-26 09:39:30 UTC — [ticket-1052] leçons: refusée — preuve absente du retour du run
+- 2026-11-26 09:40:37 UTC — [ticket-1052] documentation: 0 fichier(s) (46656ms) — doc-technique : aucune édition proposée — doc-fonctionnelle : aucune édition proposée
+- 2026-11-26 09:40:37 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (184459 caractères)
+- 2026-11-26 09:40:37 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (138169 caractères)
