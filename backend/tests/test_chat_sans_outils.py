@@ -47,7 +47,13 @@ def ws(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
 
 
 @pytest.fixture
-def client(ws: Path) -> Iterator[TestClient]:
+def client(ws: Path, monkeypatch: pytest.MonkeyPatch) -> Iterator[TestClient]:
+    # Le démarrage nettoierait le profil de `tessera-agent` : hors Windows il
+    # échoue et laisse `nettoyage_en_echec()` levé pour les tests suivants.
+    async def _sans_nettoyage() -> None:
+        return None
+
+    monkeypatch.setattr("tessera.main._reinitialiser_le_profil_agent", _sans_nettoyage)
     with TestClient(app) as c:
         yield c
 
