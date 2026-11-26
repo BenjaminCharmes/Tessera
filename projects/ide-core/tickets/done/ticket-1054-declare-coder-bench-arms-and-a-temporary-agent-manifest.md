@@ -4,6 +4,7 @@ created: 2026-11-26
 depends_on: []
 estimated_days: 1
 id: ticket-1054
+pr_number: 1277
 priority: medium
 status: done
 title: Declare coder bench arms and a temporary agent manifest
