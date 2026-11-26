@@ -5,6 +5,7 @@ depends_on:
 - ticket-1055
 estimated_days: 1
 id: ticket-1056
+pr_number: 1279
 priority: medium
 status: done
 title: Decision rule and report of the coder bench
