@@ -11006,3 +11006,24 @@ error: Please commit or stash them.
 - 2026-11-26 12:50:14 UTC — [ticket-1056] documentation: 1 fichier(s) (169625ms) — après tour de correction — doc-fonctionnelle : aucune édition proposée
 - 2026-11-26 12:50:14 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (184459 caractères)
 - 2026-11-26 12:50:14 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (138169 caractères)
+- 2026-11-26 12:50:51 UTC — [ide-core] ticket-1056 PR #1279 confiée au CIWatcher
+- 2026-11-26 12:56:53 UTC — [ide-core] ticket-1056 PR #1279 mergée (CI verte)
+- 2026-11-26 14:17:54 UTC — [ticket-1059] branche ticket-1059-a-supervisor-case-closes-by-itself-once-its-tick
+- 2026-11-26 14:18:07 UTC — [ticket-1059] tour 1 — codeur démarré
+- 2026-11-26 14:21:02 UTC — [ticket-1059] tour 1 — codeur terminé (172782ms)
+- 2026-11-26 14:22:12 UTC — [ticket-1059] testeur: en attente d'un créneau de test
+- 2026-11-26 14:25:55 UTC — [ticket-1059] testeur: 1 failed, 86 passed, 8 warnings in 34.69s — fichiers en échec : tests/test_openapi_export.py
+- 2026-11-26 14:25:55 UTC — [ticket-1059] tests rouges au tour 1
+- 2026-11-26 14:25:55 UTC — [ticket-1059] tour 2 — codeur démarré
+- 2026-11-26 14:27:26 UTC — [ticket-1059] tour 2 — codeur terminé (89795ms)
+- 2026-11-26 14:34:04 UTC — [ticket-1059] testeur: dur�es : ruff 0 s, mypy 14 s, mypy-linux 11 s, tsc 54 s, pytest 66 s, eslint 75 s, vitest 207 s ; impact depuis base : 11 fichier(s) de test
+- 2026-11-26 14:34:14 UTC — [ticket-1059] securite: PASS — Le diff n'ajoute qu'un filtre en lecture sur les cas « À toi ». Il lit `tickets/ (8233ms)
+- 2026-11-26 14:34:15 UTC — [ticket-1059] tour 2 — reviewer démarré
+- 2026-11-26 14:34:35 UTC — [ticket-1059] tour 2 — reviewer terminé (19405ms)
+- 2026-11-26 14:35:00 UTC — [ticket-1059] validateur: fichiers cités joints : tickets/done/ (dossier, 1025 fichiers, tronqué), tickets/cancelled/ (dossier, 2 fichiers), tickets/todo/ (dossier, 3 fichiers), contraintes.md, lecons.md (tronqué) ; non joints (budget épuisé) : memory/supervision.md
+- 2026-11-26 14:35:00 UTC — [ticket-1059] validateur: APPROVED — Les six critères sont satisfaits. Le code implémente un filtre à la lecture pure (44828ms)
+- 2026-11-26 14:35:03 UTC — [ticket-1059] APPROVED après 2 tour(s)
+- 2026-11-26 14:35:23 UTC — [ticket-1059] leçons: une leçon proposée
+- 2026-11-26 14:37:43 UTC — [ticket-1059] documentation: 0 fichier(s) (113672ms) — doc-technique : aucune édition proposée — doc-fonctionnelle : aucune édition proposée
+- 2026-11-26 14:37:43 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (185769 caractères)
+- 2026-11-26 14:37:43 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (138169 caractères)

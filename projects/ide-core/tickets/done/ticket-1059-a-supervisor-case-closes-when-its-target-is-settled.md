@@ -1,14 +1,14 @@
 ---
-id: ticket-1059
-title: "A supervisor case closes by itself once its ticket, rule or lesson is settled"
-type: fix
-status: todo
-pr_number: null
-priority: medium
 agent: codeur
+created: 2026-11-26
 depends_on: []
 estimated_days: 1
-created: 2026-11-26
+id: ticket-1059
+pr_number: 1280
+priority: medium
+status: done
+title: A supervisor case closes by itself once its ticket, rule or lesson is settled
+type: fix
 ---
 
 # ticket-1059 — Un cas du superviseur se ferme seul quand sa cible est réglée
