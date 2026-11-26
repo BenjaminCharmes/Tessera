@@ -3,6 +3,7 @@
 Pièges observés sur ce projet, une ligne chacun. Le service écrit sous `## Proposées` ; un humain déplace une leçon sous `## En vigueur` pour qu'elle atteigne le codeur et le reviewer.
 
 ## Proposées
+- Quand un fichier généré automatiquement est signalé obsolète ou stale, le regénérer via sa commande d'export plutôt que de l'éditer directement. (source : ticket-1059, 2026-11-26)
 
 ## En vigueur
 - Quand un verrou protège un état global partagé, intégrer un test de sa présence pour prévenir sa suppression accidentelle. (source : ticket-1023, 2026-11-20)

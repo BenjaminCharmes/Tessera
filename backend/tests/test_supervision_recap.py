@@ -10,6 +10,7 @@ from tessera.config import settings
 from tessera.main import app
 from tessera.routers import supervision_recap
 from tessera.services.noyau.database import init_db
+from tessera.services.supervision.superviseur_decision_blocs import cible_de
 from tessera.services.supervision.superviseur_journal import ajouter_ligne
 
 URL = "/api/v1/supervision/recap"
@@ -79,9 +80,9 @@ def test_bad_date_is_422(client: TestClient) -> None:
 
 
 def test_a_toi_count_matches_open_cases(client: TestClient) -> None:
-    _ajouter("2026-11-02", "a_toi", "regle-1", "Touche une porte : à toi.")
-    _ajouter("2026-11-03", "a_toi", "regle-2", "Tri impossible.")
-    _ajouter("2026-11-04", "resolu", "regle-1")
+    _ajouter("2026-11-02", "a_toi", "cas-1", "Touche une porte : à toi.")
+    _ajouter("2026-11-03", "a_toi", "cas-2", "Tri impossible.")
+    _ajouter("2026-11-04", "resolu", "cas-1")
 
     with client:
         recap = client.get(URL, params={"depuis": "2026-11-04"}).json()
@@ -89,7 +90,7 @@ def test_a_toi_count_matches_open_cases(client: TestClient) -> None:
 
     # Un cas ouvert le reste quel que soit `depuis` ; le compte du projet le suit.
     assert recap["a_toi"] == [
-        {"jour": "2026-11-03", "cible": "regle-2", "recommandation": "Tri impossible."}
+        {"jour": "2026-11-03", "cible": "cas-2", "recommandation": "Tri impossible."}
     ]
     assert {p["id"]: p["superviseur_a_toi"] for p in projets} == {"ide-core": 1}
 
@@ -98,6 +99,34 @@ def test_a_toi_count_is_zero_without_a_journal(client: TestClient) -> None:
     with client:
         assert client.get(PROJETS).json()[0]["superviseur_a_toi"] == 0
         (_memoire() / "supervision.md").write_bytes(b"\xff\xfe\x00 pas de l'utf-8")
+        assert client.get(PROJETS).json()[0]["superviseur_a_toi"] == 0
+
+
+def test_recap_drops_a_settled_case_but_keeps_its_line(client: TestClient) -> None:
+    bloc = "- **Une règle proposée.** (ADR-1)"
+    contraintes = _memoire() / "contraintes.md"
+    contraintes.write_text(f"## Proposées\n\n{bloc}\n", encoding="utf-8")
+    _ajouter("2026-11-02", "a_toi", cible_de("regle", bloc))
+    _ajouter("2026-11-03", "a_toi", "ticket-7")
+    with client:
+        avant = client.get(URL).json()
+        contraintes.write_text(f"## En vigueur\n\n{bloc}\n", encoding="utf-8")
+        apres = client.get(URL).json()
+        projets = client.get(PROJETS).json()
+
+    assert len(avant["a_toi"]) == 2
+    assert [c["cible"] for c in apres["a_toi"]] == ["ticket-7"]
+    assert len(apres["lignes"]) == 2
+    assert projets[0]["superviseur_a_toi"] == 1
+
+
+def test_listing_count_ignores_a_case_whose_ticket_is_done(client: TestClient) -> None:
+    _ajouter("2026-11-02", "a_toi", "ticket-9")
+    with client:
+        assert client.get(PROJETS).json()[0]["superviseur_a_toi"] == 1
+        fait = settings.ide_workspace_dir / "ide-core" / "tickets" / "done"
+        fait.mkdir(parents=True)
+        (fait / "ticket-9-un-titre.md").write_text("x", encoding="utf-8")
         assert client.get(PROJETS).json()[0]["superviseur_a_toi"] == 0
 
 

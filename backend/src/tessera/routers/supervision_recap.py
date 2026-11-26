@@ -9,7 +9,8 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 
 from tessera.config import settings
-from tessera.services.supervision.superviseur_journal import LigneJournal, cas_a_toi_ouverts, lire_journal
+from tessera.services.supervision.superviseur_cas_regles import cas_a_toi_a_relire
+from tessera.services.supervision.superviseur_journal import LigneJournal, lire_journal
 
 #: The project whose backlog and journal the supervisor keeps: Tessera itself.
 PROJET_SUPERVISE = "ide-core"
@@ -56,7 +57,8 @@ async def get_supervision_recap(depuis: date | None = None) -> RecapSupervision:
 
     An unreadable ``depuis`` is a 422 (FastAPI validation). A date in the future gives
     no line. The open cases do not depend on ``depuis``: a case stays open until a
-    `resolu` line closes it, whatever its age.
+    `resolu` line or its settled target (ticket done/cancelled, rule or lesson no
+    longer proposed) closes it, whatever its age.
     """
     memoire = settings.ide_workspace_dir / PROJET_SUPERVISE / "memory"
     journal = lire_journal(memoire)
@@ -72,6 +74,6 @@ async def get_supervision_recap(depuis: date | None = None) -> RecapSupervision:
         ],
         a_toi=[
             CasAToi(jour=cas.jour, cible=cas.cible, recommandation=cas.resume)
-            for cas in _plus_recentes_d_abord(cas_a_toi_ouverts(journal))
+            for cas in _plus_recentes_d_abord(cas_a_toi_a_relire(memoire, journal))
         ],
     )
