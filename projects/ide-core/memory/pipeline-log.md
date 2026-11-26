@@ -10988,3 +10988,6 @@ error: Please commit or stash them.
 - 2026-11-26 12:21:18 UTC — [ticket-1055] validateur: APPROVED — Les trois scripts (`banc_codeur.py`, `banc_codeur_cellule.py`, `banc_codeur_role (50375ms)
 - 2026-11-26 12:21:28 UTC — [ticket-1055] tour 1 — reviewer terminé (60483ms)
 - 2026-11-26 12:21:28 UTC — [ticket-1055] APPROVED après 1 tour(s)
+- 2026-11-26 12:26:20 UTC — [ticket-1055] documentation: 0 fichier(s) (265391ms) — après tour de correction — doc-technique : refusé — doc-fonctionnelle : aucune édition proposée — refusé : doc-technique : docs/architecture.md : section « #### Étape DNS (ticket-469) » introuvable.
+- 2026-11-26 12:26:20 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (184459 caractères)
+- 2026-11-26 12:26:20 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (138169 caractères)
