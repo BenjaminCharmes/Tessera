@@ -63,6 +63,14 @@ rituels:
     detail: Relevé de la semaine, pages projets à jour, un article seulement si la semaine a un sujet.
     projets: [portfolio]
 
+  - id: linkedin-hebdo
+    titre: Post LinkedIn de la semaine
+    rythme: { type: hebdo, jour: vendredi, heure: "15:00" }
+    duree_min: 20
+    phrase: linkedin hebdo
+    detail: Brouillon d'un post depuis les PR mergées de la semaine, chiffres sourcés, remis sur la page « À toi de jouer », rien de publié.
+    projets: [ide-core]
+
   - id: menage-mensuel
     titre: Ménage des mémoires
     rythme: { type: mensuel, jour: 1, heure: "10:00" }
