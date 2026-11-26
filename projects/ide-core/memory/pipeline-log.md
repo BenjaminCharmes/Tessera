@@ -10935,3 +10935,28 @@ error: Please commit or stash them.
 - 2026-11-26 09:40:37 UTC — [ticket-1052] documentation: 0 fichier(s) (46656ms) — doc-technique : aucune édition proposée — doc-fonctionnelle : aucune édition proposée
 - 2026-11-26 09:40:37 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (184459 caractères)
 - 2026-11-26 09:40:37 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (138169 caractères)
+- 2026-11-26 09:35:18 UTC — [ide-core] ticket-1050 PR #1272 mergée (CI verte)
+- 2026-11-26 09:49:37 UTC — [ide-core] ticket-1052 PR #1273 mergée (CI verte)
+- 2026-11-26 09:50:28 UTC — [ticket-1053] branche ticket-1053-freeze-the-coder-bench-corpus-with-base-commit-a
+- 2026-11-26 09:50:32 UTC — [ticket-1053] tour 1 — codeur démarré
+- 2026-11-26 09:52:50 UTC — [ticket-1053] tour 1 — codeur terminé (137593ms)
+- 2026-11-26 09:58:46 UTC — [ticket-1053] testeur: 1 failed, 2166 passed, 3 skipped, 120 warnings in 316.22s (0:05:16) — fichiers en échec : tests/test_aucune_trace_professionnelle.py
+- 2026-11-26 09:58:46 UTC — [ticket-1053] tests rouges au tour 1
+- 2026-11-26 09:58:46 UTC — [ticket-1053] tour 2 — codeur démarré
+- 2026-11-26 10:02:20 UTC — [ticket-1053] codeur: outil Bash refusé par le CLI
+- 2026-11-26 10:02:20 UTC — [ticket-1053] tour 2 — codeur terminé (213452ms)
+- 2026-11-26 10:14:29 UTC — [ticket-1053] testeur: 1 failed, 5264 passed, 4 skipped, 121 warnings in 689.55s (0:11:29) — fichiers en échec : tests/test_ruff_propre.py
+- 2026-11-26 10:14:30 UTC — [ticket-1053] tests rouges au tour 2
+- 2026-11-26 10:14:30 UTC — [ticket-1053] tour 3 — codeur démarré
+- 2026-11-26 10:15:31 UTC — [ticket-1053] tour 3 — codeur terminé (60561ms)
+- 2026-11-26 10:26:32 UTC — [ticket-1053] testeur: dur�es : ruff 0 s, mypy 5 s, mypy-linux 5 s, pytest 623 s ; impact depuis base : suite compl�te
+- 2026-11-26 10:26:48 UTC — [ticket-1053] securite: PASS — Scripts hors ligne en lecture git seule, subprocess sans shell, ni secret, ni ev (15125ms)
+- 2026-11-26 10:26:49 UTC — [ticket-1053] tour 3 — reviewer démarré
+- 2026-11-26 10:27:12 UTC — [ticket-1053] tour 3 — reviewer terminé (22952ms)
+- 2026-11-26 10:27:22 UTC — [ticket-1053] validateur: fichiers cités joints : agents.json, .github/ (dossier, 2 fichiers), backend/src/ (dossier, 0 fichiers)
+- 2026-11-26 10:27:22 UTC — [ticket-1053] validateur: APPROVED — Le code implémente correctement le gel du corpus du banc du codeur. Les trois mo (33797ms)
+- 2026-11-26 10:27:23 UTC — [ticket-1053] APPROVED après 3 tour(s)
+- 2026-11-26 10:28:34 UTC — [ticket-1053] leçons: refusée — plus de 200 caractères
+- 2026-11-26 10:30:49 UTC — [ticket-1053] documentation: 0 fichier(s) (112265ms) — doc-technique : aucune édition proposée — doc-fonctionnelle : aucune édition proposée
+- 2026-11-26 10:30:49 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (184459 caractères)
+- 2026-11-26 10:30:49 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (138169 caractères)
