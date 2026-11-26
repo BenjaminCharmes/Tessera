@@ -4,7 +4,7 @@ created: 2026-11-24
 depends_on: []
 estimated_days: 1
 id: ticket-1050
-pr_number: null
+pr_number: 1272
 priority: low
 status: done
 title: Move the anthropic SDK to its current major version
