@@ -4,6 +4,7 @@ created: 2026-11-26
 depends_on: []
 estimated_days: 1
 id: ticket-1053
+pr_number: 1275
 priority: medium
 status: done
 title: Freeze the coder bench corpus with base commit and ticket text
