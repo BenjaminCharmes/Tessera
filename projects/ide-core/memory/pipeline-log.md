@@ -11024,3 +11024,6 @@ error: Please commit or stash them.
 - 2026-11-26 14:35:00 UTC — [ticket-1059] validateur: APPROVED — Les six critères sont satisfaits. Le code implémente un filtre à la lecture pure (44828ms)
 - 2026-11-26 14:35:03 UTC — [ticket-1059] APPROVED après 2 tour(s)
 - 2026-11-26 14:35:23 UTC — [ticket-1059] leçons: une leçon proposée
+- 2026-11-26 14:37:43 UTC — [ticket-1059] documentation: 0 fichier(s) (113672ms) — doc-technique : aucune édition proposée — doc-fonctionnelle : aucune édition proposée
+- 2026-11-26 14:37:43 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (185769 caractères)
+- 2026-11-26 14:37:43 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (138169 caractères)
