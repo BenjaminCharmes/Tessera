@@ -2,7 +2,7 @@
 id: ticket-1057
 title: "Run the coder bench pilot on three entries"
 type: chore
-status: todo
+status: in-progress
 priority: medium
 agent: codeur
 depends_on: [ticket-1055, ticket-1056]
