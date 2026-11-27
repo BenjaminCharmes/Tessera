@@ -11038,3 +11038,6 @@ error: Please commit or stash them.
 - 2026-11-27 13:27:33 UTC — [ticket-1060] validateur: fichiers cités joints : scripts/banc_codeur_roles.py, Scripts/python.exe, backend/ (dossier, 8 fichiers), backend/src/ (dossier, 0 fichiers), agents.json, agents/prompts/ (dossier, 17 fichiers) ; absents : bin/python, scripts/banc_codeur*.py
 - 2026-11-27 13:27:33 UTC — [ticket-1060] validateur: APPROVED — Le diff implémente complètement la solution proposée : `environnement_partage()` (34234ms)
 - 2026-11-27 13:27:33 UTC — [ticket-1060] APPROVED après 1 tour(s)
+- 2026-11-27 13:29:43 UTC — [ticket-1060] documentation: 1 fichier(s) (106594ms) — doc-fonctionnelle : aucune édition proposée
+- 2026-11-27 13:29:43 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (185769 caractères)
+- 2026-11-27 13:29:43 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (138169 caractères)
