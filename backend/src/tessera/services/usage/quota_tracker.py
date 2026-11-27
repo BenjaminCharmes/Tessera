@@ -73,6 +73,55 @@ def snapshot_from_rate_limit(info: Any) -> QuotaSnapshot | None:
     )
 
 
+def _resets_at_from_epoch(value: object) -> datetime | None:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return None
+    try:
+        return datetime.fromtimestamp(value, tz=UTC)
+    except (OverflowError, OSError, ValueError):
+        _logger.warning("quota_resets_at_illisible", extra={"value": value})
+        return None
+
+
+def _window_snapshots(info: Any) -> list[QuotaSnapshot]:
+    """Readings of `raw["unifiedWindows"]`; a missing or malformed raw gives []."""
+    raw = getattr(info, "raw", None)
+    windows = raw.get("unifiedWindows") if isinstance(raw, dict) else None
+    if not isinstance(windows, dict):
+        return []
+    snapshots: list[QuotaSnapshot] = []
+    for name, entry in windows.items():
+        if not isinstance(entry, dict):
+            continue
+        utilization = entry.get("utilization")
+        if isinstance(utilization, bool) or not isinstance(utilization, (int, float)):
+            continue
+        status = _STATUSES.get(str(entry.get("status", "allowed")), "allowed")
+        snapshots.append(
+            QuotaSnapshot(
+                status=status,
+                utilization=float(utilization),
+                window=str(name),
+                resets_at=_resets_at_from_epoch(entry.get("resetsAt")),
+            )
+        )
+    return snapshots
+
+
+def snapshots_from_rate_limit(info: Any) -> list[QuotaSnapshot]:
+    """Every readable window of an SDK payload.
+
+    The CLI sends the usage of each window in `raw["unifiedWindows"]` and leaves
+    the top-level `utilization` empty while the status is `allowed`. The
+    top-level reading is added when its window is not already covered.
+    """
+    snapshots = _window_snapshots(info)
+    top = snapshot_from_rate_limit(info)
+    if top is not None and top.window not in {s.window for s in snapshots}:
+        snapshots.append(top)
+    return snapshots
+
+
 class QuotaTracker:
     """Keeps the last known quota state for one run.
 
@@ -95,10 +144,13 @@ class QuotaTracker:
 
     def observe(self, info: Any) -> QuotaSnapshot | None:
         """Normalise and record an SDK payload; returns what was recorded."""
-        snapshot = snapshot_from_rate_limit(info)
+        snapshots = snapshots_from_rate_limit(info)
+        for reading in snapshots:
+            # Le relevé par fenêtre survit au run ; `record` reste propre au tracker.
+            QUOTA_REGISTRY.record(reading)
+        # La fenêtre la plus consommée est celle qui limite.
+        snapshot = max(snapshots, key=lambda s: s.utilization, default=None)
         self.record(snapshot)
-        # Le relevé par fenêtre survit au run ; `record` reste propre au tracker.
-        QUOTA_REGISTRY.record(snapshot)
         return snapshot
 
     def is_exhausted(self) -> bool:

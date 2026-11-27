@@ -149,3 +149,29 @@ def test_endpoint_returns_each_window(clean_global: None) -> None:
     assert five["resets_at"] is not None
     assert five["observed_at"] is not None
     assert body["windows"]["seven_day"]["utilization"] == 0.7
+
+
+def test_endpoint_returns_windows_from_the_cli_unified_payload(clean_global: None) -> None:
+    class _Unified:
+        status = "allowed"
+        utilization = None
+        resets_at = None
+        rate_limit_type = None
+        raw = {"unifiedWindows": {
+            "five_hour": {
+                "utilization": 0.15,
+                "resetsAt": (datetime.now(UTC) + timedelta(hours=2)).timestamp(),
+            },
+            "seven_day": {
+                "utilization": 0.56,
+                "resetsAt": (datetime.now(UTC) + timedelta(days=3)).timestamp(),
+            },
+        }}
+
+    QuotaTracker().observe(_Unified())
+
+    body = TestClient(app).get("/api/v1/usage/quota").json()
+
+    assert set(body["windows"]) == {"five_hour", "seven_day"}
+    assert body["windows"]["five_hour"]["utilization"] == 0.15
+    assert body["windows"]["seven_day"]["utilization"] == 0.56
