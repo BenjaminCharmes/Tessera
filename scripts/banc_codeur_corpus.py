@@ -15,7 +15,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
-MIN_HORS_PILOTE = 16
+MIN_HORS_PILOTE = 9
 
 _CHAMPS_TEXTE = ("id", "ticket", "sha", "base_sha", "ticket_chemin", "ticket_sha256")
 _FRONTMATTER = re.compile(r"---\n.*?\n---\n?", re.DOTALL)

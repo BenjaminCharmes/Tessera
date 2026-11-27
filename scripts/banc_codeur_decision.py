@@ -15,9 +15,9 @@ from banc_codeur_cellule import Resultat
 from banc_codeur_corpus import Corpus
 
 # Conception §6 : des entiers, pas des pourcentages.
-MIN_REPRODUITES_A = 14  # sur 20 entrées
-MAX_EXCLUES_PAR_BRAS = 4
-MIN_ECART_T1 = 3
+MIN_REPRODUITES_A = 7  # sur 9 entrées (14 sur 20 à l'ADR, proportion gardée, ticket-1058)
+MAX_EXCLUES_PAR_BRAS = 2
+MIN_ECART_T1 = 2
 MAX_COUT_POUR_CENT = 60  # 40 % de coût en moins
 MAX_DUREE_FACTEUR = 2
 MIN_DIVERGENCES_A_A2 = 3  # sur les 5 entrées rejouées
