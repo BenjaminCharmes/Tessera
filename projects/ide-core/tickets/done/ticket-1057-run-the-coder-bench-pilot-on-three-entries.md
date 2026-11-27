@@ -2,7 +2,7 @@
 id: ticket-1057
 title: "Run the coder bench pilot on three entries"
 type: chore
-status: in-progress
+status: done
 priority: medium
 agent: codeur
 depends_on: [ticket-1055, ticket-1056]
@@ -50,3 +50,10 @@ Une journée, dont l'essentiel en attente de tests.
 ## Risques
 
 Un pilote de neuf cellules qui coûte plus de 15 $ se coupe : le plafond est la règle, pas une indication.
+
+## Bilan
+
+Trois cellules sur neuf ont tourné (9,41 $) : le garde-fou de 15 $ a coupé la suite, une cellule pouvant coûter
+6 $. Les critères sur les neuf cellules, la référence verte des trois entrées et la taille du corpus tenant sous
+100 $ ne sont pas atteints ; `docs/essais/banc-codeur/pilote.md` dit pourquoi. L'entrée ticket-967 a une
+référence rouge et se remplace. Le ticket-1058 attend une décision humaine sur le plafond ou la taille.
