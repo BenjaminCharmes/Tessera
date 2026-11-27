@@ -111,8 +111,11 @@ def copier_sans_historique(depot: Path, base_sha: str, cible: Path) -> None:
     )
     with tarfile.open(fileobj=io.BytesIO(archive.stdout)) as tar:
         tar.extractall(cible, filter="data")
-    env = ["-c", "user.name=banc", "-c", "user.email=banc@localhost", "-c", "commit.gpgsign=false"]
-    for args in (["init", "-q"], ["add", "-A"], [*env, "commit", "-q", "-m", "base"]):
+    env = ["-c", "user.name=banc", "-c", "user.email=banc@example.com", "-c", "commit.gpgsign=false"]
+    # `origin/develop` sur le commit de base, sans remote : `verifier.py --impact base`
+    # y trouve son point de départ et ne teste que le diff, frontend compris (ticket-1057).
+    for args in (["init", "-q"], ["add", "-A"], [*env, "commit", "-q", "-m", "base"],
+                 ["update-ref", "refs/remotes/origin/develop", "HEAD"]):
         subprocess.run(["git", "-C", str(cible), *args], capture_output=True, check=True)
 
 
@@ -123,6 +126,16 @@ def diff_de_la_copie(cwd: Path) -> str:
         ["git", "-C", str(cwd), "diff", "--cached", "HEAD"], capture_output=True, check=True
     )
     return sortie.stdout.decode("utf-8", "replace")
+
+
+def poser_solution(depot: Path, entree: Entree, cwd: Path) -> None:
+    """Applies the real diff `base_sha..sha` to a base copy: the reference to check."""
+    diff = subprocess.run(
+        ["git", "-C", str(depot), "diff", "--binary", "--no-renames", entree.base_sha, entree.sha],
+        capture_output=True, check=True,
+    )
+    subprocess.run(["git", "-C", str(cwd), "apply", "--whitespace=nowarn", "-"],
+                   input=diff.stdout, capture_output=True, check=True)
 
 
 def poser_tests_reference(depot: Path, entree: Entree, cwd: Path) -> None:

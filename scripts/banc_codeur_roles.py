@@ -24,6 +24,9 @@ from tessera.services.verdicts.verdict_reviewer import lire_verdict
 
 _MAX_TOKENS = 8192
 _VERIFIER = "../scripts/verifier.py"
+# L'extra `dev` porte pytest et mypy ; `--frozen` laisse `uv.lock` hors du diff du codeur.
+COMMANDE_ENV = ["uv", "sync", "--frozen", "--extra", "dev"]
+COMMANDE_TESTS = ["uv", "run", "--frozen", "--extra", "dev", "python", _VERIFIER, "--impact", "base"]
 
 
 async def _lancer(commande: list[str], cwd: Path) -> bool:
@@ -70,12 +73,10 @@ def _coeur(dossier: Path, bras: Bras) -> Roles:
         return Controle(ok_rev and ok_val, retour, float(rev.cost_usd or 0.0))
 
     async def env(cwd: Path) -> bool:
-        return await _lancer(["uv", "sync"], cwd / "backend")
+        return await _lancer(COMMANDE_ENV, cwd / "backend")
 
     async def tester(cwd: Path) -> bool:
-        return await _lancer(
-            ["uv", "run", "python", _VERIFIER, "--impact", "base"], cwd / "backend"
-        )
+        return await _lancer(COMMANDE_TESTS, cwd / "backend")
 
     return Roles(env=env, coder=coder, tester=tester, controler=controler)
 
