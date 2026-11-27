@@ -2004,13 +2004,19 @@ WAL mode activé pour éviter les locks en écriture concurrente.
 
 Les tests du backend (`pytest`) redirectent `settings.ide_db_path` vers un fichier SQLite temporaire pour chacune de leurs exécutions (fixture `autouse` dans `backend/tests/conftest.py`, ticket-422). Aucun run de test n'écrit jamais dans `backend/tessera.db`, même quand les tests lancent le serveur complet via `TestClient(app)`.
 
-## Banc du codeur (ADR-095, ticket-1055, ticket-1056)
+## Banc du codeur (ADR-095, ticket-1055, ticket-1056, ticket-1057, ticket-1060)
 
 Évaluer une stratégie du codeur sur un corpus stable — comparer les modèles, les prompts ou les limites sans toucher au pipeline de production.
 
 ### Cellules et corpus
 
-Un **corpus** fixe l'ensemble d'entrées (fichiers de test du dépôt à une ref stable), et les **bras** déclarent des configurations du codeur (modèle, provider, prompt). Chaque (entrée, bras) est une **cellule**, relancée dans une copie sans historique git, isolée sous `~/.tessera/banc-codeur/<essai>/<cellule>/`. La cellule s'exécute **trois tours au maximum** : codeur, tests, puis reviewer et validateur.
+Un **corpus** fixe l'ensemble d'entrées (fichiers de test du dépôt à une ref stable), et les **bras** déclarent des configurations du codeur (modèle, provider, prompt). Chaque (entrée, bras) est une **cellule**, relancée dans une copie sans historique git, isolée sous `~/.tessera/banc-codeur/<essai>/<cellule>/`.
+
+**Setup d'une copie** : `copier_sans_historique()` extrait le snapshot du dépôt à `base_sha` via `git archive`, puis pose une branche locale unique pointant `origin/develop` sur le commit de base. Cela permet au testeur de lancer `verifier.py --impact base`, qui ne compare que le diff sans l'historique ni le checkout. La solution du ticket (diff `base_sha..sha` du dépôt réel) est ensuite appliquée via `poser_solution()`, qui lance `git apply` sur la copie — c'est la **référence à valider** : ses tests doivent passer (et signent l'entrée `ok` ou l'invalident `echec_env`).
+
+La cellule s'exécute **trois tours au maximum** : codeur, tests, puis reviewer et validateur.
+
+**Mode pilote** : un corpus peut marquer des entrées comme `pilote: True` (hors du gel d'essai réel). Lancé avec `--pilote`, le banc relit seulement ces entrées, chacune sur les trois bras, sous un budget limité (`--budget-usd`, par exemple 15 $). C'est un démarrage à coût limité qui détecte les problèmes (env cassé, Smart App Control) avant le gel réel.
 
 ### Garanties
 
@@ -2018,6 +2024,7 @@ Un **corpus** fixe l'ensemble d'entrées (fichiers de test du dépôt à une ref
 - Idempotent : une cellule déjà `ok` n'est pas relancée ; un `gel_sha256` différent arrête le script
 - Budget : plafond par cellule (6 $) et global (paramètre `--budget-usd`), vérifié avant chaque cellule
 - Reprise : résultats en JSONL pour arrêter et relancer sans dupliquer
+- **Environnement partagé** : les cellules d'un essai réutilisent un seul `.venv` désigné par `BANC_VENV`. Cette variable doit pointer un chemin absolu contenant `Scripts/python.exe` (Windows) ou `bin/python` (POSIX). Le banc refuse de démarrer si elle est absente, relative, sans interpréteur ou égale au `.venv` du backend de Tessera lui-même. Une fonction `env_des_commandes(venv)` retourne un dict modifié à chaque commande (`uv sync`, `uv run`), sans toucher `os.environ` du processus du banc.
 
 ### Décision et rapport
 

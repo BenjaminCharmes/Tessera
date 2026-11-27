@@ -1,14 +1,16 @@
 ---
-id: ticket-1060
-title: "The coder bench reuses one existing Python environment instead of creating one per copy"
-type: fix
-status: todo
-pr_number: null
-priority: high
 agent: codeur
-depends_on: [ticket-1057]
-estimated_days: 1
 created: 2026-11-27
+depends_on:
+- ticket-1057
+estimated_days: 1
+id: ticket-1060
+pr_number: 1283
+priority: high
+status: done
+title: The coder bench reuses one existing Python environment instead of creating
+  one per copy
+type: fix
 ---
 
 # ticket-1060 — Le banc du codeur réutilise un seul environnement Python existant
