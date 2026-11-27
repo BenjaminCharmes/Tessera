@@ -63,8 +63,8 @@ def test_meilleur_refused_when_tests_or_duration_regress() -> None:
     assert decision(_m(_mb("M", t1=13, duree_moyenne_ms=2000))).decision == "meilleur"
 
 
-def test_meilleur_gap_is_three_entries() -> None:
-    assert decision(_m(_mb("M", t1=12))).decision == "garder A"
+def test_meilleur_gap_is_two_entries() -> None:
+    assert decision(_m(_mb("M", t1=11))).decision == "garder A"
 
 
 def test_moins_cher() -> None:
@@ -103,14 +103,14 @@ def test_indisponible_cell_counts_as_excluded() -> None:
     assert m.non_concluant is not None and "M" in m.non_concluant
 
 
-def test_exclusion_threshold_is_four() -> None:
-    res = _bras("A", 10) + [_res(i, "M", etat="indisponible") for i in range(4)] + _bras("M", 10)[4:]
+def test_exclusion_threshold_is_two() -> None:
+    res = _bras("A", 10) + [_res(i, "M", etat="indisponible") for i in range(2)] + _bras("M", 10)[2:]
     assert mesures_depuis(_corpus(), res).non_concluant is None
 
 
-def test_a_reproducing_fewer_than_fourteen_is_inconclusive() -> None:
-    res = [_res(i, "A", final=i < 13) for i in range(20)]
-    assert "A reproduit 13" in str(mesures_depuis(_corpus(), res).non_concluant)
+def test_a_reproducing_fewer_than_seven_is_inconclusive() -> None:
+    res = [_res(i, "A", final=i < 6) for i in range(9)]
+    assert "A reproduit 6" in str(mesures_depuis(_corpus(), res).non_concluant)
 
 
 def test_noise_between_a_and_a2() -> None:

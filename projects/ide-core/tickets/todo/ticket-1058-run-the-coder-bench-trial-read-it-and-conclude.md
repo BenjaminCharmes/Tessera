@@ -18,9 +18,17 @@ Une recommandation chiffrée sur le couple modèle + prompt du codeur, lue par u
 
 ## Contexte
 
-ADR-095. Corpus de 16 à 20 entrées (taille proposée par `pilote.md`), trois bras A, M, P, plus A rejoué sur 5
-entrées (A2) : 65 cellules au plus. Plafond **100 $** d'estimation SDK, que l'humain confirme au lancement.
-Le texte de la variante P est validé par l'humain avant le gel.
+ADR-095. Décision humaine du 27/11, après le pilote (`pilote.md`) : le corpus de 16 à 20 entrées ne tient pas
+sous 100 $ (9,41 $ par entrée sur trois bras). L'essai se joue donc sur **9 entrées** hors pilote, trois bras
+A, M, P, **sans A2** : 27 cellules au plus, durée estimée de 12 à 15 h en séquence (17 à 40 min par cellule).
+Plafond **100 $** d'estimation SDK, confirmé au lancement ; coût estimé d'environ 85 $ d'après le pilote. L'entrée
+ticket-967, dont la référence est rouge, est écartée ; les 9 entrées sont les premières du corpus, dans l'ordre
+du fichier, dont la référence est verte (commande `reference`). Le texte de la variante P est validé par
+l'humain avant le gel.
+
+Conséquence sur la règle : le seuil de l'ADR (14 reproductions sur 20) se lit ici **7 sur 9** (14 sur 20 en proportion, arrondi au supérieur), et « 3
+approbations de plus » se lit **2 de plus** au premier tour, 2 exclusions au plus par bras ; le bruit A/A2 n'est pas mesuré, la conclusion le
+dit. Le plancher du corpus (`MIN_HORS_PILOTE`) passe de 16 à 9.
 
 ## Solution proposée
 
@@ -31,13 +39,13 @@ Geler le corpus et les bras (somme dans `corpus.json` et `bras.json`), lancer
 
 - [ ] `corpus.json` et `bras.json` sont gelés (`gel_sha256`) et commités **avant** la première ligne de
       `resultats.jsonl`, et la variante P est celle que l'humain a validée.
-- [ ] `resultats.jsonl` porte une ligne par cellule jouée, chacune avec le `gel_sha256` du corpus ; la somme
+- [ ] `resultats.jsonl` porte une ligne par cellule jouée (27 au plus), chacune avec le `gel_sha256` du corpus ; la somme
       de `cout_codeur_usd` et `cout_controles_usd` ne dépasse pas 100 $.
 - [ ] `docs/essais/banc-codeur.md` est généré par `scripts/banc_codeur_decision.py` et porte le bloc de
       conclusion balisé : comptes, `T1`, `V`, coût et durée par bras, recommandation.
 - [ ] Un humain a lu les cellules refusées au tour 1 de A (au moins la remarque du reviewer et l'état des
       tests) et l'a noté au rapport.
-- [ ] Le rapport dit si l'essai est concluant (A reproduit au moins 14 entrées sur 20, bruit A/A2 acceptable)
+- [ ] Le rapport dit si l'essai est concluant (A reproduit au moins 7 entrées sur 9 ; le bruit A/A2 n'est pas mesuré)
       et, sinon, pourquoi il ne l'est pas.
 - [ ] Ni `backend/src/`, ni `agents.json`, ni `agents/prompts/` ne sont modifiés : une adoption est une autre
       ADR et un autre ticket.
@@ -53,7 +61,7 @@ ticket-1057.
 
 ## Estimation
 
-Deux jours, dont une partie en attente de tests.
+Deux jours, dont 12 à 15 h d'attente de tests et d'appels.
 
 ## Risques
 

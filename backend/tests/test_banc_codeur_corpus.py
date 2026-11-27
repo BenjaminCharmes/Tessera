@@ -54,18 +54,18 @@ def test_somme_gel_ignores_order_and_pilots() -> None:
     assert somme_gel([a, b]) != somme_gel([a, replace(b, base_sha="0" * 40)])
 
 
-def test_verifier_accepts_a_frozen_corpus_of_sixteen() -> None:
-    verifier(_corpus(tuple(_entree(n) for n in range(16))))
+def test_verifier_accepts_a_frozen_corpus_of_nine() -> None:
+    verifier(_corpus(tuple(_entree(n) for n in range(9))))
 
 
 def test_verifier_refuses_a_wrong_sum() -> None:
-    entrees = tuple(_entree(n) for n in range(16))
+    entrees = tuple(_entree(n) for n in range(9))
     with pytest.raises(CorpusInvalide, match="gel_sha256"):
         verifier(Corpus(entrees=entrees, gel_sha256="0" * 64))
 
 
-def test_verifier_refuses_fewer_than_sixteen_outside_pilot() -> None:
-    entrees = tuple(_entree(n) for n in range(15)) + tuple(_entree(n, True) for n in range(20, 24))
+def test_verifier_refuses_fewer_than_nine_outside_pilot() -> None:
+    entrees = tuple(_entree(n) for n in range(8)) + tuple(_entree(n, True) for n in range(20, 24))
     with pytest.raises(CorpusInvalide, match="hors pilote"):
         verifier(_corpus(entrees))
 
