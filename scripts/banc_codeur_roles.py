@@ -7,6 +7,7 @@ Ticket-1055, ADR-095. Imports `provider_pour_role`, `lire_verdict`,
 from __future__ import annotations
 
 import asyncio
+import os
 import subprocess
 import time
 from pathlib import Path
@@ -29,14 +30,42 @@ COMMANDE_ENV = ["uv", "sync", "--frozen", "--extra", "dev"]
 COMMANDE_TESTS = ["uv", "run", "--frozen", "--extra", "dev", "python", _VERIFIER, "--impact", "base"]
 
 
-async def _lancer(commande: list[str], cwd: Path) -> bool:
+_DEPOT = Path(__file__).resolve().parent.parent
+
+
+class EnvironnementRefuse(RuntimeError):
+    """The shared environment named by `BANC_VENV` cannot serve the bench."""
+
+
+def environnement_partage() -> Path:
+    """Return the existing venv named by `BANC_VENV`; never create it."""
+    brut = os.environ.get("BANC_VENV", "")
+    if not brut:
+        raise EnvironnementRefuse("BANC_VENV is not set")
+    venv = Path(brut)
+    if not venv.is_absolute():
+        raise EnvironnementRefuse(f"BANC_VENV must be an absolute path: {brut}")
+    if not ((venv / "Scripts" / "python.exe").is_file() or (venv / "bin" / "python").is_file()):
+        raise EnvironnementRefuse(f"no interpreter in {venv}")
+    # Le backend de Tessera tourne sur son propre .venv : on n'y touche pas.
+    if venv.resolve() == (_DEPOT / "backend" / ".venv").resolve():
+        raise EnvironnementRefuse("BANC_VENV is the Tessera backend environment")
+    return venv
+
+
+def env_des_commandes(venv: Path) -> dict[str, str]:
+    """Copy of `os.environ` pointing `uv` at `venv`; the process environment is untouched."""
+    return {**os.environ, "UV_PROJECT_ENVIRONMENT": str(venv)}
+
+
+async def _lancer(commande: list[str], cwd: Path, env: dict[str, str]) -> bool:
     def _run() -> bool:
-        return subprocess.run(commande, cwd=cwd, capture_output=True).returncode == 0
+        return subprocess.run(commande, cwd=cwd, capture_output=True, env=env).returncode == 0
 
     return await asyncio.to_thread(_run)
 
 
-def _coeur(dossier: Path, bras: Bras) -> Roles:
+def _coeur(dossier: Path, bras: Bras, venv: Path) -> Roles:
     codeur = provider_pour_role(dossier, "codeur")
     reviewer = provider_pour_role(dossier, "reviewer", allow_tools=False)
     juge = provider_pour_role(dossier, "validateur", allow_tools=False)
@@ -72,15 +101,20 @@ def _coeur(dossier: Path, bras: Bras) -> Roles:
         retour = "\n".join(x for x in (raison, "" if ok_val else val.feedback) if x)
         return Controle(ok_rev and ok_val, retour, float(rev.cost_usd or 0.0))
 
+    env_uv = env_des_commandes(venv)
+
     async def env(cwd: Path) -> bool:
-        return await _lancer(COMMANDE_ENV, cwd / "backend")
+        return await _lancer(COMMANDE_ENV, cwd / "backend", env_uv)
 
     async def tester(cwd: Path) -> bool:
-        return await _lancer(COMMANDE_TESTS, cwd / "backend")
+        return await _lancer(COMMANDE_TESTS, cwd / "backend", env_uv)
 
     return Roles(env=env, coder=coder, tester=tester, controler=controler)
 
 
 def roles_reels(dossier: Path, bras: Bras) -> Roles:
-    """Roles built from the arm's temporary project folder (`manifeste_temporaire`)."""
-    return _coeur(dossier, bras)
+    """Roles built from the arm's temporary project folder (`manifeste_temporaire`).
+
+    Raises `EnvironnementRefuse` before any paid call when `BANC_VENV` is unusable.
+    """
+    return _coeur(dossier, bras, environnement_partage())
