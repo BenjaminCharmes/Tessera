@@ -5,7 +5,7 @@ depends_on:
 - ticket-1057
 estimated_days: 1
 id: ticket-1060
-pr_number: null
+pr_number: 1283
 priority: high
 status: done
 title: The coder bench reuses one existing Python environment instead of creating
