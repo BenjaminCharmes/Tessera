@@ -11041,3 +11041,17 @@ error: Please commit or stash them.
 - 2026-11-27 13:29:43 UTC — [ticket-1060] documentation: 1 fichier(s) (106594ms) — doc-fonctionnelle : aucune édition proposée
 - 2026-11-27 13:29:43 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (185769 caractères)
 - 2026-11-27 13:29:43 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (138169 caractères)
+- 2026-11-27 13:36:48 UTC — [ide-core] ticket-1060 PR #1283 mergée (CI verte)
+- 2026-11-27 14:01:11 UTC — [ticket-1061] branche ticket-1061-the-quota-reading-uses-the-per-window-usage-the
+- 2026-11-27 14:01:15 UTC — [ticket-1061] tour 1 — codeur démarré
+- 2026-11-27 14:02:56 UTC — [ticket-1061] tour 1 — codeur terminé (100906ms)
+- 2026-11-27 14:08:44 UTC — [ticket-1061] testeur: dur�es : ruff 0 s, mypy 39 s, mypy-linux 41 s, pytest 297 s ; impact depuis base : 78 fichier(s) de test
+- 2026-11-27 14:08:59 UTC — [ticket-1061] securite: PASS — Le diff lit le relevé de quota par fenêtre dans la charge utile du SDK. Il ne co (13704ms)
+- 2026-11-27 14:09:05 UTC — [ticket-1061] tour 1 — reviewer démarré
+- 2026-11-27 14:09:28 UTC — [ticket-1061] tour 1 — reviewer terminé (22890ms)
+- 2026-11-27 14:09:41 UTC — [ticket-1061] validateur: fichiers cités joints : backend/tests/test_quota_tracker.py, test_quota_tracker.py, frontend/ (dossier, 17 fichiers)
+- 2026-11-27 14:09:41 UTC — [ticket-1061] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le codeur a implémenté les fonc (38329ms)
+- 2026-11-27 14:09:42 UTC — [ticket-1061] APPROVED après 1 tour(s)
+- 2026-11-27 14:11:14 UTC — [ticket-1061] documentation: 0 fichier(s) (53686ms) — doc-technique : aucune édition proposée — doc-fonctionnelle : aucune édition proposée
+- 2026-11-27 14:11:14 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (187232 caractères)
+- 2026-11-27 14:11:14 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (138169 caractères)

@@ -1,7 +1,33 @@
 """Suivi du quota d'abonnement — ticket-054."""
-from datetime import UTC, datetime
+from collections.abc import Iterator
+from datetime import UTC, datetime, timedelta
 
+import pytest
+
+from tessera.services.usage.quota_registry import QUOTA_REGISTRY
 from tessera.services.usage.quota_tracker import QuotaSnapshot, QuotaTracker, snapshot_from_rate_limit
+
+
+@pytest.fixture
+def clean_registry() -> Iterator[None]:
+    QUOTA_REGISTRY.clear()
+    yield
+    QUOTA_REGISTRY.clear()
+
+
+def _unified_info(week: float = 0.56) -> "_FakeRateLimitInfo":
+    """Relevé réel du CLI : utilisation de tête vide, usage dans `unifiedWindows`."""
+    now = datetime.now(UTC)
+    five = (now + timedelta(hours=3)).timestamp()
+    seven = (now + timedelta(days=3)).timestamp()
+    return _FakeRateLimitInfo(
+        status="allowed",
+        utilization=None,
+        raw={"unifiedWindows": {
+            "five_hour": {"utilization": 0.15, "resetsAt": five, "status": "allowed"},
+            "seven_day": {"utilization": week, "resetsAt": seven, "status": "allowed"},
+        }},
+    )
 
 
 class _FakeRateLimitInfo:
@@ -12,6 +38,7 @@ class _FakeRateLimitInfo:
         self.resets_at = kwargs.get("resets_at")
         self.rate_limit_type = kwargs.get("rate_limit_type")
         self.utilization = kwargs.get("utilization")
+        self.raw = kwargs.get("raw")
 
 
 # ------------------------------------------------------------------
@@ -134,3 +161,78 @@ def test_le_provider_expose_le_dernier_quota_observe() -> None:
 
     assert provider.quota.snapshot is not None
     assert provider.quota.snapshot.utilization == 0.88
+
+
+# ------------------------------------------------------------------
+# Fenêtres du CLI (`raw["unifiedWindows"]`) — ticket-1061
+# ------------------------------------------------------------------
+
+
+def test_observe_reads_both_windows_when_top_level_is_empty(clean_registry: None) -> None:
+    QuotaTracker().observe(_unified_info())
+
+    readings = QUOTA_REGISTRY.readings()
+
+    assert set(readings) == {"five_hour", "seven_day"}
+    assert readings["five_hour"].snapshot.utilization == 0.15
+    assert readings["seven_day"].snapshot.utilization == 0.56
+    for reading in readings.values():
+        resets_at = reading.snapshot.resets_at
+        assert resets_at is not None
+        assert resets_at.tzinfo is UTC
+
+
+def test_tracker_keeps_the_most_used_window_and_is_low_on_the_week(
+    clean_registry: None,
+) -> None:
+    tracker = QuotaTracker()
+    tracker.observe(_unified_info(0.56))
+
+    assert tracker.snapshot is not None
+    assert tracker.snapshot.window == "seven_day"
+    assert tracker.snapshot.utilization == 0.56
+    assert tracker.is_low() is False
+
+    tracker.observe(_unified_info(0.92))
+
+    assert tracker.is_low() is True
+
+
+@pytest.mark.parametrize("raw", [None, {}, {"other": 1}, {"unifiedWindows": "x"}, "texte"])
+def test_observe_without_usable_raw_returns_none(clean_registry: None, raw: object) -> None:
+    tracker = QuotaTracker()
+
+    assert tracker.observe(_FakeRateLimitInfo(utilization=None, raw=raw)) is None
+    assert tracker.snapshot is None
+    assert QUOTA_REGISTRY.readings() == {}
+
+
+def test_a_window_without_numeric_utilization_is_ignored(clean_registry: None) -> None:
+    info = _FakeRateLimitInfo(
+        utilization=None,
+        raw={"unifiedWindows": {
+            "five_hour": {"utilization": None, "status": "allowed"},
+            "overage": "illisible",
+            "seven_day": {"utilization": 0.4},
+        }},
+    )
+
+    QuotaTracker().observe(info)
+
+    readings = QUOTA_REGISTRY.readings()
+    assert set(readings) == {"seven_day"}
+    assert readings["seven_day"].snapshot.status == "allowed"
+
+
+def test_top_level_reading_is_kept_when_its_window_is_not_covered(
+    clean_registry: None,
+) -> None:
+    info = _FakeRateLimitInfo(
+        utilization=0.95,
+        rate_limit_type="five_hour",
+        raw={"unifiedWindows": {"seven_day": {"utilization": 0.3}}},
+    )
+
+    QuotaTracker().observe(info)
+
+    assert set(QUOTA_REGISTRY.readings()) == {"five_hour", "seven_day"}
