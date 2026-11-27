@@ -11027,3 +11027,14 @@ error: Please commit or stash them.
 - 2026-11-26 14:37:43 UTC — [ticket-1059] documentation: 0 fichier(s) (113672ms) — doc-technique : aucune édition proposée — doc-fonctionnelle : aucune édition proposée
 - 2026-11-26 14:37:43 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (185769 caractères)
 - 2026-11-26 14:37:43 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (138169 caractères)
+- 2026-11-26 14:44:13 UTC — [ide-core] ticket-1059 PR #1280 mergée (CI verte)
+- 2026-11-27 13:06:29 UTC — [ticket-1060] branche ticket-1060-the-coder-bench-reuses-one-existing-python-envir
+- 2026-11-27 13:06:33 UTC — [ticket-1060] tour 1 — codeur démarré
+- 2026-11-27 13:09:45 UTC — [ticket-1060] tour 1 — codeur terminé (192406ms)
+- 2026-11-27 13:26:48 UTC — [ticket-1060] testeur: dur�es : ruff 0 s, mypy 12 s, mypy-linux 12 s, pytest 982 s ; impact depuis base : suite compl�te
+- 2026-11-27 13:26:58 UTC — [ticket-1060] securite: PASS — Le diff ajoute un script de banc : il lit un venv désigné par l'humain dans `BAN (8530ms)
+- 2026-11-27 13:27:03 UTC — [ticket-1060] tour 1 — reviewer démarré
+- 2026-11-27 13:27:23 UTC — [ticket-1060] tour 1 — reviewer terminé (20515ms)
+- 2026-11-27 13:27:33 UTC — [ticket-1060] validateur: fichiers cités joints : scripts/banc_codeur_roles.py, Scripts/python.exe, backend/ (dossier, 8 fichiers), backend/src/ (dossier, 0 fichiers), agents.json, agents/prompts/ (dossier, 17 fichiers) ; absents : bin/python, scripts/banc_codeur*.py
+- 2026-11-27 13:27:33 UTC — [ticket-1060] validateur: APPROVED — Le diff implémente complètement la solution proposée : `environnement_partage()` (34234ms)
+- 2026-11-27 13:27:33 UTC — [ticket-1060] APPROVED après 1 tour(s)
