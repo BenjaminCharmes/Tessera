@@ -11052,3 +11052,6 @@ error: Please commit or stash them.
 - 2026-11-27 14:09:41 UTC — [ticket-1061] validateur: fichiers cités joints : backend/tests/test_quota_tracker.py, test_quota_tracker.py, frontend/ (dossier, 17 fichiers)
 - 2026-11-27 14:09:41 UTC — [ticket-1061] validateur: APPROVED — Tous les critères d'acceptation sont satisfaits. Le codeur a implémenté les fonc (38329ms)
 - 2026-11-27 14:09:42 UTC — [ticket-1061] APPROVED après 1 tour(s)
+- 2026-11-27 14:11:14 UTC — [ticket-1061] documentation: 0 fichier(s) (53686ms) — doc-technique : aucune édition proposée — doc-fonctionnelle : aucune édition proposée
+- 2026-11-27 14:11:14 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/architecture.md (187232 caractères)
+- 2026-11-27 14:11:14 UTC — documentation : fichier donné par ses titres, sections à la demande : docs/guide-utilisateur.md (138169 caractères)
