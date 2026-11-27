@@ -45,7 +45,7 @@ Geler le corpus et les bras (somme dans `corpus.json` et `bras.json`), lancer
       conclusion balisé : comptes, `T1`, `V`, coût et durée par bras, recommandation.
 - [ ] Un humain a lu les cellules refusées au tour 1 de A (au moins la remarque du reviewer et l'état des
       tests) et l'a noté au rapport.
-- [ ] Le rapport dit si l'essai est concluant (A reproduit au moins 7 entrées sur 10 ; le bruit A/A2 n'est pas mesuré)
+- [ ] Le rapport dit si l'essai est concluant (A reproduit au moins 7 entrées sur 9 ; le bruit A/A2 n'est pas mesuré)
       et, sinon, pourquoi il ne l'est pas.
 - [ ] Ni `backend/src/`, ni `agents.json`, ni `agents/prompts/` ne sont modifiés : une adoption est une autre
       ADR et un autre ticket.
