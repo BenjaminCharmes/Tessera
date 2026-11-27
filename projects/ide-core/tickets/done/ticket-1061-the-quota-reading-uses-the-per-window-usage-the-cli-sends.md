@@ -4,7 +4,7 @@ created: 2026-11-27
 depends_on: []
 estimated_days: 1
 id: ticket-1061
-pr_number: null
+pr_number: 1285
 priority: medium
 status: done
 title: The quota reading uses the per-window usage the CLI sends
