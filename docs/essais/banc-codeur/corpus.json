@@ -1,5 +1,5 @@
 {
-  "gel_sha256": "6e22fa854c11ab25081e78bcf5d83093309fd9e421bcc90fbf238e105c28852c",
+  "gel_sha256": "3b9541eeece9ace54955ed4dd33539c0c4e51c1d8d1674c7e73e33faf558d6c4",
   "entrees": [
     {
       "id": "a914ba2e0a38",
@@ -181,222 +181,6 @@
         "projects/ide-core/tickets/todo/ticket-1026-the-tickets-a-design-run-writes-reach-the-validator.md"
       ],
       "lignes_ajoutees": 191,
-      "pilote": false
-    },
-    {
-      "id": "4320c1af960d",
-      "ticket": "ticket-1021",
-      "sha": "4320c1af960de60f4573fe0499dbe55a0d1c58e7",
-      "base_sha": "9506f3c7aad61b50c7c35f1465baa7da29ee81ba",
-      "ticket_chemin": "projects/ide-core/tickets/todo/ticket-1021-a-protected-file-created-in-a-subfolder-refuses-the-run.md",
-      "ticket_sha256": "b2cc6312ca1746c77bb920d57528ab829a918ab83f7bebb466b67a78e552d1f7",
-      "fichiers": [
-        "backend/src/tessera/services/pipeline/pipeline_ajouts.py",
-        "backend/src/tessera/services/pipeline/pipeline_empreinte.py",
-        "backend/tests/test_empreinte_ajouts.py",
-        "projects/ide-core/memory/pipeline-log.md",
-        "projects/ide-core/tickets/done/ticket-1021-a-protected-file-created-in-a-subfolder-refuses-the-run.md",
-        "projects/ide-core/tickets/todo/ticket-1021-a-protected-file-created-in-a-subfolder-refuses-the-run.md"
-      ],
-      "lignes_ajoutees": 188,
-      "pilote": false
-    },
-    {
-      "id": "312191d6c4ec",
-      "ticket": "ticket-1017",
-      "sha": "312191d6c4ec048d9d9c9ca5da557e9c3cd6a0bf",
-      "base_sha": "61681ac3ae9669ccbbbc8263ca8a527cc51f112d",
-      "ticket_chemin": "projects/ide-core/tickets/todo/ticket-1017-a-cancelled-closure-still-withdraws-the-right.md",
-      "ticket_sha256": "4776f90fbbcac1b1b402feccf5870a2e3fa0024953b89be99bdbb295cd9f46cb",
-      "fichiers": [
-        "backend/src/tessera/services/providers/droits_appel.py",
-        "backend/src/tessera/services/providers/transport_agent.py",
-        "backend/tests/test_droits_appel_annulation.py",
-        "projects/ide-core/memory/pipeline-log.md",
-        "projects/ide-core/tickets/done/ticket-1017-a-cancelled-closure-still-withdraws-the-right.md",
-        "projects/ide-core/tickets/todo/ticket-1017-a-cancelled-closure-still-withdraws-the-right.md"
-      ],
-      "lignes_ajoutees": 216,
-      "pilote": false
-    },
-    {
-      "id": "8e5481caff5e",
-      "ticket": "ticket-1010",
-      "sha": "8e5481caff5e4c6c543932ca18a832b0ba36e27d",
-      "base_sha": "95cb24af4b68c296d85107c246bde96575032e8f",
-      "ticket_chemin": "projects/ide-core/tickets/todo/ticket-1010-a-resumed-branch-delivers-without-a-forced-push.md",
-      "ticket_sha256": "ae02bf42d762ba4b8ef3d52065bfaa1e17d353d38a5e64aa5c704f9c521d2911",
-      "fichiers": [
-        "backend/src/tessera/services/git_workspace/poussee.py",
-        "backend/src/tessera/services/github/github_workflow.py",
-        "backend/src/tessera/services/livraison/livraison.py",
-        "backend/tests/test_git_push_course.py",
-        "backend/tests/test_git_push_diverge.py",
-        "backend/tests/test_git_workspace_refspec_reduit.py",
-        "projects/ide-core/memory/pipeline-log.md",
-        "projects/ide-core/tickets/done/ticket-1010-a-resumed-branch-delivers-without-a-forced-push.md",
-        "projects/ide-core/tickets/todo/ticket-1010-a-resumed-branch-delivers-without-a-forced-push.md"
-      ],
-      "lignes_ajoutees": 345,
-      "pilote": false
-    },
-    {
-      "id": "3e9e2b2726e8",
-      "ticket": "ticket-1004",
-      "sha": "3e9e2b2726e84ab1eba139d9c28a71ea50416fd0",
-      "base_sha": "afbfdead6ec9ee0758ec82db535f57c1b6b8b213",
-      "ticket_chemin": "projects/ide-core/tickets/todo/ticket-1004-merge-without-ci-waits-for-a-running-ci.md",
-      "ticket_sha256": "795d7f93eafac5ca93b71e3a816cba490e1b9a9c86f9e06dc15ff69d6453ee6c",
-      "fichiers": [
-        "backend/src/tessera/services/github/github_workflow.py",
-        "backend/src/tessera/services/livraison/livraison.py",
-        "backend/src/tessera/services/livraison/livraison_arrets.py",
-        "backend/src/tessera/services/livraison/livraison_merge.py",
-        "backend/tests/test_livraison_sans_ci_en_attente.py",
-        "backend/tests/test_longueur_des_fichiers.py",
-        "projects/ide-core/memory/pipeline-log.md",
-        "projects/ide-core/tickets/done/ticket-1004-merge-without-ci-waits-for-a-running-ci.md",
-        "projects/ide-core/tickets/todo/ticket-1004-merge-without-ci-waits-for-a-running-ci.md"
-      ],
-      "lignes_ajoutees": 268,
-      "pilote": false
-    },
-    {
-      "id": "56bfffa99f16",
-      "ticket": "ticket-989",
-      "sha": "56bfffa99f167c64543e35c35131b18f41fc7fcf",
-      "base_sha": "0290cd9303bbb69a77593c431f6283d7053d2c71",
-      "ticket_chemin": "projects/ide-core/tickets/todo/ticket-989-a-refused-doc-edit-shows-the-agent-where-its-anchor-stands.md",
-      "ticket_sha256": "f3b817c2343a7accc52c886957425d8fdfd30644d0b08ea6962ceeeedfddb672",
-      "fichiers": [
-        "backend/src/tessera/services/documentation/documentation.py",
-        "backend/src/tessera/services/documentation/documentation_base.py",
-        "backend/src/tessera/services/documentation/documentation_editions.py",
-        "backend/src/tessera/services/documentation/documentation_extraits.py",
-        "backend/src/tessera/services/documentation/documentation_titres.py",
-        "backend/tests/test_documentation_extraits.py",
-        "projects/ide-core/memory/pipeline-log.md",
-        "projects/ide-core/tickets/done/ticket-989-a-refused-doc-edit-shows-the-agent-where-its-anchor-stands.md",
-        "projects/ide-core/tickets/todo/ticket-989-a-refused-doc-edit-shows-the-agent-where-its-anchor-stands.md"
-      ],
-      "lignes_ajoutees": 216,
-      "pilote": false
-    },
-    {
-      "id": "0290cd9303bb",
-      "ticket": "ticket-990",
-      "sha": "0290cd9303bbb69a77593c431f6283d7053d2c71",
-      "base_sha": "8e244142aaa5adbb582c5db0b43adf1f8d120b04",
-      "ticket_chemin": "projects/ide-core/tickets/todo/ticket-990-the-tester-log-names-the-failing-test-files.md",
-      "ticket_sha256": "7930dcb537eba326535e473584c02ab3e6f4e3296dc5cbb8940f6beedba6a840",
-      "fichiers": [
-        "backend/src/tessera/services/pipeline/pipeline_testeur.py",
-        "backend/src/tessera/services/verification/ligne_des_echecs.py",
-        "backend/tests/test_ligne_des_echecs.py",
-        "projects/ide-core/memory/pipeline-log.md",
-        "projects/ide-core/tickets/done/ticket-990-the-tester-log-names-the-failing-test-files.md",
-        "projects/ide-core/tickets/todo/ticket-990-the-tester-log-names-the-failing-test-files.md"
-      ],
-      "lignes_ajoutees": 139,
-      "pilote": false
-    },
-    {
-      "id": "a61913d76ae9",
-      "ticket": "ticket-985",
-      "sha": "a61913d76ae93142e7e36c0cc3b2a473cf1361a1",
-      "base_sha": "4dea4eb5b5c2b11f37a393082a612b47dd35dbec",
-      "ticket_chemin": "projects/ide-core/tickets/todo/ticket-985-a-stopped-ticket-always-carries-its-reason.md",
-      "ticket_sha256": "28f641a252dccc8d5a4faccb8746fd8b74e548b586ee9b3c7bba55a1741d6b46",
-      "fichiers": [
-        "backend/src/tessera/services/pipeline/pipeline_outcomes.py",
-        "backend/src/tessera/services/pipeline/pipeline_text.py",
-        "backend/tests/test_arret_motif_des_sorties.py",
-        "projects/ide-core/memory/pipeline-log.md",
-        "projects/ide-core/tickets/done/ticket-985-a-stopped-ticket-always-carries-its-reason.md",
-        "projects/ide-core/tickets/todo/ticket-985-a-stopped-ticket-always-carries-its-reason.md"
-      ],
-      "lignes_ajoutees": 210,
-      "pilote": false
-    },
-    {
-      "id": "3e2368cb3c20",
-      "ticket": "ticket-973",
-      "sha": "3e2368cb3c207429c5e5955b77e915350e73f200",
-      "base_sha": "6db2995751aacffc70eb0b3d023cbe91b6610e33",
-      "ticket_chemin": "projects/ide-core/tickets/todo/ticket-973-the-hooks-command-skips-a-project-with-an-open-run.md",
-      "ticket_sha256": "87740c66618cc42520bb402a7106cb7d68f0b35ed3362d8db1cd094a9e815085",
-      "fichiers": [
-        "backend/src/tessera/services/creation_projet/hook_pre_push.py",
-        "backend/tests/test_hook_pre_push_projet.py",
-        "projects/ide-core/memory/pipeline-log.md",
-        "projects/ide-core/tickets/done/ticket-973-the-hooks-command-skips-a-project-with-an-open-run.md",
-        "projects/ide-core/tickets/todo/ticket-973-the-hooks-command-skips-a-project-with-an-open-run.md"
-      ],
-      "lignes_ajoutees": 146,
-      "pilote": false
-    },
-    {
-      "id": "6db2995751aa",
-      "ticket": "ticket-970",
-      "sha": "6db2995751aacffc70eb0b3d023cbe91b6610e33",
-      "base_sha": "f01562ca5b7b9685a5a775236d94e13994f0a68a",
-      "ticket_chemin": "projects/ide-core/tickets/todo/ticket-970-a-base-that-only-diverges-in-history-does-not-stop-the-queue.md",
-      "ticket_sha256": "33ce6160b251cece4af57649153579044004097fd41d91d43e5a44217acbe0c6",
-      "fichiers": [
-        "backend/src/tessera/services/git_workspace/base.py",
-        "backend/src/tessera/services/git_workspace/realignement.py",
-        "backend/src/tessera/services/git_workspace/synchro.py",
-        "backend/src/tessera/services/pipeline/pipeline_branche.py",
-        "backend/tests/test_base_realignee.py",
-        "backend/tests/test_pipeline_stages.py",
-        "projects/ide-core/memory/pipeline-log.md",
-        "projects/ide-core/tickets/done/ticket-970-a-base-that-only-diverges-in-history-does-not-stop-the-queue.md",
-        "projects/ide-core/tickets/todo/ticket-970-a-base-that-only-diverges-in-history-does-not-stop-the-queue.md"
-      ],
-      "lignes_ajoutees": 422,
-      "pilote": false
-    },
-    {
-      "id": "1e302a770979",
-      "ticket": "ticket-987",
-      "sha": "1e302a77097999f60319b7f2e5de4dc0c8199257",
-      "base_sha": "691f92b5e0e2b43e0e9bc88fa54cd54bc55d09a8",
-      "ticket_chemin": "projects/ide-core/tickets/todo/ticket-987-a-resumed-ticket-reads-the-file-of-its-base.md",
-      "ticket_sha256": "67a0bbb289ac8540e68651a2aa2deafc7553f2a8c6a8b43d86185553dd0e1f84",
-      "fichiers": [
-        "backend/src/tessera/services/git_workspace/ticket_sur_base.py",
-        "backend/src/tessera/services/pipeline/ticket_apres_avance.py",
-        "backend/src/tessera/services/projets/ticket_alignement.py",
-        "backend/tests/test_ticket_relu_apres_avance.py",
-        "backend/tests/test_ticket_repris_corps_de_la_base.py",
-        "projects/ide-core/memory/lecons.md",
-        "projects/ide-core/memory/pipeline-log.md",
-        "projects/ide-core/tickets/done/ticket-987-a-resumed-ticket-reads-the-file-of-its-base.md",
-        "projects/ide-core/tickets/todo/ticket-987-a-resumed-ticket-reads-the-file-of-its-base.md"
-      ],
-      "lignes_ajoutees": 331,
-      "pilote": false
-    },
-    {
-      "id": "f2aee7f2155d",
-      "ticket": "ticket-980",
-      "sha": "f2aee7f2155deed276b834603e8716312ca7f6ac",
-      "base_sha": "8d2bbf76e7dcd2dfcd4815f2007111ade4a052e3",
-      "ticket_chemin": "projects/ide-core/tickets/todo/ticket-980-a-merge-in-doubt-is-reread-before-it-counts-as-failed.md",
-      "ticket_sha256": "b72200901bff723efc04e9adb1bdf07d64cbdfbe26ec1e1011381caaca372a50",
-      "fichiers": [
-        "backend/src/tessera/routers/merge_http.py",
-        "backend/src/tessera/routers/tickets.py",
-        "backend/src/tessera/services/github/github_workflow.py",
-        "backend/src/tessera/services/livraison/livraison_merge.py",
-        "backend/src/tessera/utils/statut_douteux.py",
-        "backend/tests/test_livraison.py",
-        "backend/tests/test_livraison_merge.py",
-        "projects/ide-core/memory/pipeline-log.md",
-        "projects/ide-core/tickets/done/ticket-980-a-merge-in-doubt-is-reread-before-it-counts-as-failed.md",
-        "projects/ide-core/tickets/todo/ticket-980-a-merge-in-doubt-is-reread-before-it-counts-as-failed.md"
-      ],
-      "lignes_ajoutees": 414,
       "pilote": false
     },
     {
@@ -888,6 +672,61 @@
       "ticket": "ticket-965",
       "sha": "089dcc167eb3928b8d1712bd227b9fb8e27202bb",
       "motif": "hors périmètre : docs/guide-utilisateur.md"
+    },
+    {
+      "ticket": "ticket-1021",
+      "sha": "4320c1af960de60f4573fe0499dbe55a0d1c58e7",
+      "motif": "non retenue : neuf références vertes atteintes, dans l'ordre du fichier"
+    },
+    {
+      "ticket": "ticket-1017",
+      "sha": "312191d6c4ec048d9d9c9ca5da557e9c3cd6a0bf",
+      "motif": "non retenue : neuf références vertes atteintes, dans l'ordre du fichier"
+    },
+    {
+      "ticket": "ticket-1010",
+      "sha": "8e5481caff5e4c6c543932ca18a832b0ba36e27d",
+      "motif": "non retenue : neuf références vertes atteintes, dans l'ordre du fichier"
+    },
+    {
+      "ticket": "ticket-1004",
+      "sha": "3e9e2b2726e84ab1eba139d9c28a71ea50416fd0",
+      "motif": "non retenue : neuf références vertes atteintes, dans l'ordre du fichier"
+    },
+    {
+      "ticket": "ticket-989",
+      "sha": "56bfffa99f167c64543e35c35131b18f41fc7fcf",
+      "motif": "non retenue : neuf références vertes atteintes, dans l'ordre du fichier"
+    },
+    {
+      "ticket": "ticket-990",
+      "sha": "0290cd9303bbb69a77593c431f6283d7053d2c71",
+      "motif": "non retenue : neuf références vertes atteintes, dans l'ordre du fichier"
+    },
+    {
+      "ticket": "ticket-985",
+      "sha": "a61913d76ae93142e7e36c0cc3b2a473cf1361a1",
+      "motif": "non retenue : neuf références vertes atteintes, dans l'ordre du fichier"
+    },
+    {
+      "ticket": "ticket-973",
+      "sha": "3e2368cb3c207429c5e5955b77e915350e73f200",
+      "motif": "non retenue : neuf références vertes atteintes, dans l'ordre du fichier"
+    },
+    {
+      "ticket": "ticket-970",
+      "sha": "6db2995751aacffc70eb0b3d023cbe91b6610e33",
+      "motif": "non retenue : neuf références vertes atteintes, dans l'ordre du fichier"
+    },
+    {
+      "ticket": "ticket-987",
+      "sha": "1e302a77097999f60319b7f2e5de4dc0c8199257",
+      "motif": "non retenue : neuf références vertes atteintes, dans l'ordre du fichier"
+    },
+    {
+      "ticket": "ticket-980",
+      "sha": "f2aee7f2155deed276b834603e8716312ca7f6ac",
+      "motif": "non retenue : neuf références vertes atteintes, dans l'ordre du fichier"
     }
   ]
 }
